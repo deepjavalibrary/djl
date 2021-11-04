@@ -29,5 +29,5 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 
 ```
 cd examples
-./gradlew run -Dai.djl.default_engine=PyTorch -Dmain=ai.djl.examples.inference.SentimentAnalysis
+./gradlew run -Dmain=ai.djl.examples.inference.SentimentAnalysis
 ```

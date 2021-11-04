@@ -30,7 +30,7 @@ Use the following commands to run the project:
 
 ```
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.sr.SuperResolution -Dai.djl.default_engine=TensorFlow
+./gradlew run -Dmain=ai.djl.examples.inference.sr.SuperResolution
 ```
 
 ### Output

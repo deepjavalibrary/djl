@@ -8,13 +8,9 @@ dependencies {
     implementation project(":basicdataset")
     implementation project(":model-zoo")
 
-    if (System.getProperty("ai.djl.default_engine") == "PyTorch") {
-        runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
-    } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
-        runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
-    } else {
-        runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
-    }
+    runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
+    runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
+    runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

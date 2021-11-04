@@ -56,7 +56,7 @@ public class BlockFactoryTest {
             zipPath = prepareModel(savedDir);
         } catch (ModelNotFoundException e) {
             throw new UnsupportedOperationException(
-                    "No test model for engine: " + Engine.getInstance().getEngineName(), e);
+                    "No test model for engine: " + Engine.getDefaultEngineName(), e);
         }
         // load model from here
         Criteria<NDList, NDList> criteria =
@@ -91,8 +91,7 @@ public class BlockFactoryTest {
                 Paths.get(
                         "build/classes/java/main/ai/djl/integration/tests/nn/BlockFactoryTest$TestBlockFactory.class"),
                 classDir.resolve("BlockFactoryTest$TestBlockFactory.class"));
-        Path zipPath =
-                Paths.get("build/testBlockFactory" + Engine.getInstance().getEngineName() + ".zip");
+        Path zipPath = Paths.get("build/testBlockFactory" + Engine.getDefaultEngineName() + ".zip");
         Files.deleteIfExists(zipPath);
         ZipUtils.zip(savedDir, zipPath, false);
         return zipPath;
@@ -112,7 +111,7 @@ public class BlockFactoryTest {
 
         public Model getRemoveLastBlockModel()
                 throws MalformedModelException, ModelNotFoundException, IOException {
-            String name = Engine.getInstance().getEngineName();
+            String name = Engine.getDefaultEngineName();
             Criteria.Builder<Image, Classifications> builder =
                     Criteria.builder()
                             .optApplication(Application.CV.IMAGE_CLASSIFICATION)

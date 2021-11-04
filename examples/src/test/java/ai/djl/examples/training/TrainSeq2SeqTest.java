@@ -13,6 +13,7 @@
 
 package ai.djl.examples.training;
 
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
@@ -23,6 +24,8 @@ public class TrainSeq2SeqTest {
 
     @Test
     public void testTrainSeq2Seq() throws IOException, TranslateException {
+        TestRequirements.engine("MXNet");
+
         String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2"};
         TrainingResult result = TrainSeq2Seq.runExample(args);
         Assert.assertNotNull(result);

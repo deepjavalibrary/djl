@@ -53,7 +53,7 @@ public final class ObjectDetection {
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
         String backbone;
-        if ("TensorFlow".equals(Engine.getInstance().getEngineName())) {
+        if ("TensorFlow".equals(Engine.getDefaultEngineName())) {
             backbone = "mobilenet_v2";
         } else {
             backbone = "resnet50";
@@ -64,6 +64,7 @@ public final class ObjectDetection {
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
                         .optFilter("backbone", backbone)
+                        .optEngine(Engine.getDefaultEngineName())
                         .optProgress(new ProgressBar())
                         .build();
 

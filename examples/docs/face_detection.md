@@ -26,8 +26,8 @@ Use the following command to run the project:
 
 ```
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.face.RetinaFaceDetection -Dai.djl.default_engine=PyTorch
-./gradlew run -Dmain=ai.djl.examples.inference.face.LightFaceDetection -Dai.djl.default_engine=PyTorch
+./gradlew run -Dmain=ai.djl.examples.inference.face.RetinaFaceDetection
+./gradlew run -Dmain=ai.djl.examples.inference.face.LightFaceDetection
 ```
 
 Your output should look like the following:

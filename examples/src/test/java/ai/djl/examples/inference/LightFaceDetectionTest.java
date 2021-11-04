@@ -29,15 +29,14 @@ public class LightFaceDetectionTest {
     @Test
     public void testLightFaceDetection() throws ModelException, TranslateException, IOException {
         TestRequirements.engine("PyTorch");
+        TestRequirements.nightly();
 
-        if (Boolean.getBoolean("nightly")) {
-            DetectedObjects result = LightFaceDetection.predict();
+        DetectedObjects result = LightFaceDetection.predict();
 
-            List<String> objects = Collections.singletonList("Face");
-            for (Classifications.Classification obj : result.items()) {
-                Assert.assertTrue(objects.contains(obj.getClassName()));
-                Assert.assertTrue(Double.compare(obj.getProbability(), 0.6) > 0);
-            }
+        List<String> objects = Collections.singletonList("Face");
+        for (Classifications.Classification obj : result.items()) {
+            Assert.assertTrue(objects.contains(obj.getClassName()));
+            Assert.assertTrue(Double.compare(obj.getProbability(), 0.6) > 0);
         }
     }
 }

@@ -72,7 +72,7 @@ public final class TrainAmazonReviewRanking {
 
         // MXNet base model
         String modelUrls = "https://resources.djl.ai/test-models/distilbert.zip";
-        if ("PyTorch".equals(Engine.getInstance().getEngineName())) {
+        if ("PyTorch".equals(Engine.getDefaultEngineName())) {
             modelUrls =
                     "https://resources.djl.ai/test-models/traced_distilbert_wikipedia_uncased.zip";
         }
@@ -82,6 +82,7 @@ public final class TrainAmazonReviewRanking {
                         .optApplication(Application.NLP.WORD_EMBEDDING)
                         .setTypes(NDList.class, NDList.class)
                         .optModelUrls(modelUrls)
+                        .optEngine(Engine.getDefaultEngineName())
                         .optProgress(new ProgressBar())
                         .build();
         int maxTokenLength = 64;
@@ -142,7 +143,7 @@ public final class TrainAmazonReviewRanking {
     }
 
     private static Block addFreezeLayer(Predictor<NDList, NDList> embedder) {
-        if ("PyTorch".equals(Engine.getInstance().getEngineName())) {
+        if ("PyTorch".equals(Engine.getDefaultEngineName())) {
             return new LambdaBlock(
                     ndList -> {
                         NDArray data = ndList.singletonOrThrow();

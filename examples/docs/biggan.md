@@ -30,7 +30,7 @@ Use the following commands to run the project:
 
 ```
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.BigGAN -Dai.djl.default_engine=PyTorch
+./gradlew run -Dmain=ai.djl.examples.inference.BigGAN
 ```
 
 ### Output

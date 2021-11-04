@@ -13,7 +13,6 @@
 package ai.djl.examples.inference.face;
 
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -42,11 +41,6 @@ public final class FeatureExtraction {
     private FeatureExtraction() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        if (!"PyTorch".equals(Engine.getInstance().getEngineName())) {
-            logger.info("This example only works for PyTorch.");
-            return;
-        }
-
         Path imageFile = Paths.get("src/test/resources/kana1.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 

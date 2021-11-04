@@ -13,6 +13,7 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
@@ -22,7 +23,9 @@ public class BertQaTest {
 
     @Test
     public void testBertQa() throws ModelException, TranslateException, IOException {
+        TestRequirements.engine("MXNet", "PyTorch");
+
         String result = BertQaInference.predict();
-        Assert.assertEquals(result, "[december, 2004]");
+        Assert.assertEquals(result, "december 2004");
     }
 }

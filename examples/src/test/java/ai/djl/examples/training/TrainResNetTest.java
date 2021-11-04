@@ -28,6 +28,8 @@ public class TrainResNetTest {
 
     @Test
     public void testTrainResNet() throws ModelException, IOException, TranslateException {
+        TestRequirements.engine("MXNet");
+
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
         String[] args = {"-e", "2", "-g", "4", "-m", "10", "-s", "-p"};
@@ -39,6 +41,7 @@ public class TrainResNetTest {
     @Test
     public void testTrainResNetSymbolicNightly()
             throws ModelException, IOException, TranslateException {
+        TestRequirements.engine("MXNet");
         TestRequirements.nightly();
         TestRequirements.gpu();
 

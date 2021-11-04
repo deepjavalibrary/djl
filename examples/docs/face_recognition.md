@@ -27,7 +27,7 @@ Use the following command to run the project:
 
 ```
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.face.FeatureExtraction -Dai.djl.default_engine=PyTorch
+./gradlew run -Dmain=ai.djl.examples.inference.face.FeatureExtraction
 ```
 
 Your output should look like the following:
@@ -38,7 +38,7 @@ Your output should look like the following:
 
 ```
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.face.FeatureComparison -Dai.djl.default_engine=PyTorch
+./gradlew run -Dmain=ai.djl.examples.inference.face.FeatureComparison
 ```
 
 Your output should look like the following:

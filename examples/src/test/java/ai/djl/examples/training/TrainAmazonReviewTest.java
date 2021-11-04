@@ -26,6 +26,7 @@ public class TrainAmazonReviewTest {
     @Test
     public void testRankTraining()
             throws ModelException, TranslateException, IOException, URISyntaxException {
+        TestRequirements.engine("MXNet", "PyTorch");
         TestRequirements.nightly();
 
         String[] args;

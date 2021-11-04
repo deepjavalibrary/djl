@@ -45,7 +45,7 @@ Use the following command to run the project:
 
 ```
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.ObjectDetectionWithTensorflowSavedModel -Dai.djl.default_engine=TensorFlow
+./gradlew run -Dmain=ai.djl.examples.inference.ObjectDetectionWithTensorflowSavedModel
 ```
 
 Your output should look like the following:
