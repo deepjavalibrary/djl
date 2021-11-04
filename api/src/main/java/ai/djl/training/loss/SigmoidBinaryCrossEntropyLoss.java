@@ -69,16 +69,25 @@ public class SigmoidBinaryCrossEntropyLoss extends Loss {
                             .sub(pred.mul(lab))
                             .add(Activation.softPlus(pred.abs().neg()));
         } else {
-            double eps = 1e-12;
             loss =
-                    pred.add(eps)
-                            .log()
+                    epsLog(pred)
                             .mul(lab)
-                            .add(NDArrays.sub(1., pred).add(eps).mul(NDArrays.sub(1., lab)));
+                            .add(epsLog(NDArrays.sub(1., pred)).mul(NDArrays.sub(1., lab)));
         }
         if (weight != 1f) {
             loss = loss.mul(weight);
         }
         return loss.mean();
+    }
+
+    /**
+     * Computes a log with added epsilon to avoid errors.
+     *
+     * @param a the input array
+     * @return the computed value
+     */
+    private NDArray epsLog(NDArray a) {
+        double eps = 1e-12;
+        return a.add(eps).log();
     }
 }
