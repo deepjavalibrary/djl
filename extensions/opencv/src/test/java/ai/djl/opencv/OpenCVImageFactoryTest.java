@@ -22,6 +22,7 @@ import ai.djl.modality.cv.output.Landmark;
 import ai.djl.modality.cv.output.Mask;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.testing.TestRequirements;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -37,6 +38,8 @@ public class OpenCVImageFactoryTest {
 
     @Test
     public void testImage() throws IOException {
+        TestRequirements.notWindows(); // failed on Windows ServerCore container
+
         ImageFactory factory = ImageFactory.getInstance();
         ImageFactory defFactory = new BufferedImageFactory();
         Path path = Paths.get("../../examples/src/test/resources/kitten.jpg");
