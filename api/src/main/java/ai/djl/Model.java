@@ -204,14 +204,27 @@ public interface Model extends AutoCloseable {
     Trainer newTrainer(TrainingConfig trainingConfig);
 
     /**
-     * Creates a new Predictor based on the model.
+     * Creates a new Predictor based on the model on the current device.
      *
      * @param translator the object used for pre-processing and postprocessing
      * @param <I> the input object for pre-processing
      * @param <O> the output object from postprocessing
      * @return an instance of {@code Predictor}
      */
-    <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator);
+    default <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
+        return newPredictor(translator, getNDManager().getDevice());
+    }
+
+    /**
+     * Creates a new Predictor based on the model.
+     *
+     * @param translator the object used for pre-processing and postprocessing
+     * @param device the device to use for prediction
+     * @param <I> the input object for pre-processing
+     * @param <O> the output object from postprocessing
+     * @return an instance of {@code Predictor}
+     */
+    <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device);
 
     /**
      * Returns the input descriptor of the model.

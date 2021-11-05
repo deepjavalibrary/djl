@@ -12,6 +12,7 @@
  */
 package ai.djl.inference;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.LazyNDArray;
@@ -94,11 +95,17 @@ public class Predictor<I, O> implements AutoCloseable {
      *
      * @param model the model on which the predictions are based
      * @param translator the translator to be used
-     * @param copy whether to copy the parameters to the parameter store
+     * @param device the device for prediction
+     * @param copy whether to copy the parameters to the parameter store. If the device changes, it
+     *     will copy regardless
      */
-    public Predictor(Model model, Translator<I, O> translator, boolean copy) {
+    public Predictor(Model model, Translator<I, O> translator, Device device, boolean copy) {
+        if (!device.equals(model.getNDManager().getDevice())) {
+            // Always copy during device changes
+            copy = true;
+        }
         this.model = model;
-        this.manager = model.getNDManager().newSubManager();
+        this.manager = model.getNDManager().newSubManager(device);
         this.manager.setName("predictor");
         this.translator = translator;
         block = model.getBlock();

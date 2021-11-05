@@ -12,6 +12,7 @@
  */
 package ai.djl.paddlepaddle.engine;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.translate.Translator;
@@ -31,9 +32,11 @@ public class PpPredictor<I, O> extends Predictor<I, O> {
      * @param model the model on which the predictions are based
      * @param predictor the C++ Paddle Predictor handle
      * @param translator the translator to be used
+     * @param device the device to be used
      */
-    public PpPredictor(Model model, PaddlePredictor predictor, Translator<I, O> translator) {
-        super(model, translator, false);
+    public PpPredictor(
+            Model model, PaddlePredictor predictor, Translator<I, O> translator, Device device) {
+        super(model, translator, device, false);
         this.predictor = predictor;
         block = new PpSymbolBlock(predictor, (PpNDManager) model.getNDManager());
     }

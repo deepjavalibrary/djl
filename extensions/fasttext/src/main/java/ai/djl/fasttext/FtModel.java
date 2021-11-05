@@ -12,6 +12,7 @@
  */
 package ai.djl.fasttext;
 
+import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.RawDataset;
@@ -203,8 +204,8 @@ public class FtModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator) {
-        return new Predictor<>(this, translator, false);
+    public <I, O> Predictor<I, O> newPredictor(Translator<I, O> translator, Device device) {
+        return new Predictor<>(this, translator, device, false);
     }
 
     /** {@inheritDoc} */
