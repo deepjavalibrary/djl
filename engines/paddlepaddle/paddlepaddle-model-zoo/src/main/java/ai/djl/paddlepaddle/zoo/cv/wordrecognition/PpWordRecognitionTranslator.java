@@ -35,8 +35,7 @@ public class PpWordRecognitionTranslator implements NoBatchifyTranslator<Image, 
     /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws IOException {
-        try (InputStream is =
-                ctx.getModel().getArtifact("rec_crnn/ppocr_keys_v1.txt").openStream()) {
+        try (InputStream is = ctx.getModel().getArtifact("ppocr_keys_v1.txt").openStream()) {
             table = Utils.readLines(is, true);
             table.add(0, "blank");
             table.add("");

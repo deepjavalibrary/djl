@@ -50,7 +50,7 @@ public class DlrModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options) throws IOException {
-        modelDir = modelPath.toAbsolutePath();
+        setModelDir(modelPath);
         if (prefix == null) {
             prefix = modelName;
         }
