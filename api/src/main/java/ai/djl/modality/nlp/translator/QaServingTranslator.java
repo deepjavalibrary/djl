@@ -18,10 +18,12 @@ import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.ndarray.BytesSupplier;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Batchifier;
+import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.PairList;
+import com.google.gson.JsonParseException;
 
 /**
  * A {@link Translator} that can handle generic question answering {@link Input} and {@link Output}.
@@ -61,7 +63,15 @@ public class QaServingTranslator implements Translator<Input, Output> {
             String paragraph = input.getAsString("paragraph");
             qa = new QAInput(question, paragraph);
         } else {
-            qa = JsonUtils.GSON.fromJson(input.getData().getAsString(), QAInput.class);
+            BytesSupplier data = input.getData();
+            if (data == null) {
+                throw new TranslateException("Input data is empty.");
+            }
+            try {
+                qa = JsonUtils.GSON.fromJson(data.getAsString(), QAInput.class);
+            } catch (JsonParseException e) {
+                throw new TranslateException("Input is not a valid json.", e);
+            }
         }
         return translator.processInput(ctx, qa);
     }

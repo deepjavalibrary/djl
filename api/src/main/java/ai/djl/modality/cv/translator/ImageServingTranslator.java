@@ -67,6 +67,9 @@ public class ImageServingTranslator implements Translator<Input, Output> {
     public NDList processInput(TranslatorContext ctx, Input input) throws Exception {
         BytesSupplier data = input.getData();
         try {
+            if (data == null) {
+                throw new TranslateException("Input data is empty.");
+            }
             Image image = factory.fromInputStream(new ByteArrayInputStream(data.getAsBytes()));
             return translator.processInput(ctx, image);
         } catch (IOException e) {
