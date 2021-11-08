@@ -49,10 +49,10 @@ public class TrtModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options) throws IOException {
+        setModelDir(modelPath);
         if (block != null) {
             throw new UnsupportedOperationException("TensorRT does not support dynamic blocks");
         }
-        modelDir = modelPath.toAbsolutePath();
         if (prefix == null) {
             prefix = modelName;
         }

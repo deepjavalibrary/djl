@@ -60,7 +60,7 @@ public class PtModel extends BaseModel {
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws IOException, MalformedModelException {
-        modelDir = modelPath.toAbsolutePath();
+        setModelDir(modelPath);
         if (prefix == null) {
             prefix = modelName;
         }

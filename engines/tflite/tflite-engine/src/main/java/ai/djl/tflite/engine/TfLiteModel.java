@@ -47,7 +47,7 @@ public class TfLiteModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options) throws IOException {
-        modelDir = modelPath.toAbsolutePath();
+        setModelDir(modelPath);
         if (block != null) {
             throw new UnsupportedOperationException("TFLite does not support dynamic blocks");
         }

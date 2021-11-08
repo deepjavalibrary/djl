@@ -55,7 +55,7 @@ public class TfModel extends BaseModel {
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws FileNotFoundException, MalformedModelException {
-        modelDir = modelPath.toAbsolutePath();
+        setModelDir(modelPath);
         if (prefix == null) {
             prefix = modelName;
         }
