@@ -31,6 +31,7 @@ public final class MxDataType {
         map.put(DataType.INT32, "int32");
         map.put(DataType.INT64, "int64");
         map.put(DataType.UINT8, "uint8");
+        map.put(DataType.BOOLEAN, "bool");
         return map;
     }
 
@@ -41,6 +42,7 @@ public final class MxDataType {
         map.put("int32", DataType.INT32);
         map.put("int64", DataType.INT64);
         map.put("uint8", DataType.UINT8);
+        map.put("bool", DataType.BOOLEAN);
         return map;
     }
 
@@ -61,6 +63,10 @@ public final class MxDataType {
      * @return the converted MXNet type string
      */
     public static String toMx(DataType jType) {
-        return toMx.get(jType);
+        String dType = toMx.get(jType);
+        if (dType == null) {
+            throw new UnsupportedOperationException("Unsupported DataType: " + jType);
+        }
+        return dType;
     }
 }
