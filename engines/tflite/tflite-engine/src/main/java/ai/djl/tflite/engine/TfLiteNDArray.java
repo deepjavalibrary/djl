@@ -25,7 +25,7 @@ import org.tensorflow.lite.Tensor;
 /** {@code TfLiteNDArray} is the TFLite implementation of {@link NDArray}. */
 public class TfLiteNDArray extends NDArrayAdapter {
 
-    private Tensor tensor;
+    private Tensor tensor; // this tensor was used in Interpreter, and should not be closed
     private ByteBuffer data;
 
     TfLiteNDArray(NDManager manager, NDManager alternativeManager, Tensor tensor) {
@@ -128,15 +128,6 @@ public class TfLiteNDArray extends NDArrayAdapter {
                         "Negative shape is not supported for TFLite");
             }
             return new TfLiteNDArray(manager, alternativeManager, data, shape, dataType);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void close() {
-        super.close();
-        if (tensor != null) {
-            tensor.close();
         }
     }
 }
