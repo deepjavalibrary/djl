@@ -84,7 +84,8 @@ public class OpenCVImageFactoryTest {
                     Collections.singletonList(new Landmark(0.35, 0.15, 0.5, 0.6, points));
 
             DetectedObjects detectedObjects = new DetectedObjects(list, prob, boundingBoxes);
-            img.drawBoundingBoxes(detectedObjects);
+            Image imgCopy = img.duplicate();
+            imgCopy.drawBoundingBoxes(detectedObjects);
 
             float[][] maskProb = {
                 {1f, 1f, 1f, 1f, 1f, 1f, 1f},
@@ -98,15 +99,15 @@ public class OpenCVImageFactoryTest {
                     Collections.singletonList(new Mask(0.1, 0.5, 0.1, 0.1, maskProb));
 
             DetectedObjects mask = new DetectedObjects(list, prob, masks);
-            img.drawBoundingBoxes(mask);
+            imgCopy.drawBoundingBoxes(mask);
 
             List<Joints.Joint> jointList =
                     Collections.singletonList(new Joints.Joint(0.2, 0.2, 0.8));
             Joints joints = new Joints(jointList);
-            img.drawJoints(joints);
+            imgCopy.drawJoints(joints);
 
             try (OutputStream os = Files.newOutputStream(Paths.get("build/newImage.png"))) {
-                img.save(os, "png");
+                imgCopy.save(os, "png");
             }
 
             Assert.assertThrows(

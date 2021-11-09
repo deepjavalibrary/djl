@@ -31,6 +31,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -163,6 +164,17 @@ public class BufferedImageFactory extends ImageFactory {
         @Override
         public Image getSubImage(int x, int y, int w, int h) {
             return new BufferedImageWrapper(image.getSubimage(x, y, w, h));
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Image duplicate() {
+            BufferedImage copy =
+                    new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+            byte[] sourceData = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+            byte[] biData = ((DataBufferByte) copy.getRaster().getDataBuffer()).getData();
+            System.arraycopy(sourceData, 0, biData, 0, sourceData.length);
+            return new BufferedImageWrapper(copy);
         }
 
         private void convertIdNeeded() {
