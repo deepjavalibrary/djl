@@ -124,3 +124,7 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | [ai.djl.hadoop](https://search.maven.org/search?q=g:ai.djl.hadoop) | [hadoop](../../extensions/hadoop/README.md#installation) | Contains classes that make it easy for DJL access HDFS |
 | | | |
 | [ai.djl.sentencepiece](https://search.maven.org/search?q=g:ai.djl.sentencepiece) | [sentencepiece](../../extensions/sentencepiece/README.md#installation) | Contains NLP utility classes NLP for SentencePiece |
+| | | |
+| [ai.djl.opencv](https://search.maven.org/search?q=g:ai.djl.opencv) | [opencv](../../extensions/opencv/README.md#installation) | DJL OpenCV extension for high performance image processing |
+| | | |
+| [ai.djl.serving](https://search.maven.org/search?q=g:ai.djl.serving) | [wlm](https://github.com/deepjavalibrary/djl-serving/tree/master/wlm) | DJL Serving WorkLoadManager |

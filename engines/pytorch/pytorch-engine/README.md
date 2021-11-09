@@ -38,13 +38,17 @@ You can pull the PyTorch engine from the central Maven repository by including t
 Besides the `pytorch-engine` library, you may also need to include the PyTorch native library in your project.
 All current provided PyTorch native libraries are downloaded from [PyTorch C++ distribution](https://pytorch.org/get-started/locally/#start-locally).
 
-In current implementation, one version of pytorch-engine can only load a specific version of pytorch native library.
+Since DJL 0.14.0, `pytorch-engine` can load older version of pytorch native library. There are two
+ways to specify PyTorch version:
+
+1. Explicitly specify `pytorch-native-xxx` package version to override the version in the [BOM](../../../bom/README.md).
+2. Sets environment variable: `PYTORCH_VERSION` to override the package version defined by `pytorch-native-auto`.
 
 The following table illustrates which pytorch version that DJL supports:
 
 | PyTorch engine version | PyTorch native library version           |
 |------------------------|------------------------------------------|
-| pytorch-engine:0.14.0  | pytorch-native-auto:1.9.1                |
+| pytorch-engine:0.14.0  | pytorch-native-auto: 1.8.1, 1.9.0, 1.9.1 |
 | pytorch-engine:0.13.0  | pytorch-native-auto:1.9.0                |
 | pytorch-engine:0.12.0  | pytorch-native-auto:1.8.1                |
 | pytorch-engine:0.11.0  | pytorch-native-auto:1.8.1                |
@@ -65,13 +69,16 @@ Choose a native library based on your platform and needs:
 We offer an automatic option that will download the native libraries into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
 
-- ai.djl.pytorch:pytorch-native-auto:1.9.0
+Since DJL 0.14.0, the auto package is optional, DJL will download the latest pytorch native library
+if no `pytorch-native-auto` package is included.
+
+- ai.djl.pytorch:pytorch-native-auto:1.9.1
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-auto</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -79,14 +86,14 @@ It will automatically determine the appropriate jars for your system based on th
 ### macOS
 For macOS, you can use the following library:
 
-- ai.djl.pytorch:pytorch-native-cpu:1.9.0:osx-x86_64
+- ai.djl.pytorch:pytorch-native-cpu:1.9.1:osx-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cpu</artifactId>
     <classifier>osx-x86_64</classifier>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -97,15 +104,15 @@ installed on your GPU machine, you can use one of the following library:
 
 #### Linux GPU
 
-- ai.djl.pytorch:pytorch-native-cu111:1.9.0:linux-x86_64 - CUDA 11.1
-- ai.djl.pytorch:pytorch-native-cu102:1.9.0:linux-x86_64 - CUDA 10.2
+- ai.djl.pytorch:pytorch-native-cu111:1.9.1:linux-x86_64 - CUDA 11.1
+- ai.djl.pytorch:pytorch-native-cu102:1.9.1:linux-x86_64 - CUDA 10.2
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cu111</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -115,14 +122,14 @@ installed on your GPU machine, you can use one of the following library:
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cu102</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
 ### Linux CPU
 
-- ai.djl.pytorch:pytorch-native-cpu:1.9.0:linux-x86_64
+- ai.djl.pytorch:pytorch-native-cpu:1.9.1:linux-x86_64
 
 ```xml
 <dependency>
@@ -130,7 +137,7 @@ installed on your GPU machine, you can use one of the following library:
     <artifactId>pytorch-native-cpu</artifactId>
     <classifier>linux-x86_64</classifier>
     <scope>runtime</scope>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
 </dependency>
 ```
 
@@ -139,14 +146,14 @@ installed on your GPU machine, you can use one of the following library:
 We also provide packages for the system like CentOS 7/Ubuntu 14.04 with GLIBC >= 2.17.
 All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` in the package that contains `CXXABI_1.3.9` to use the package successfully.
 
-- ai.djl.pytorch:pytorch-native-cpu-precxx11:1.9.0:linux-x86_64
+- ai.djl.pytorch:pytorch-native-cpu-precxx11:1.9.1:linux-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cpu-precxx11</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -161,15 +168,15 @@ For the Windows platform, you can choose between CPU and GPU.
 
 #### Windows GPU
 
-- ai.djl.pytorch:pytorch-native-cu111:1.9.0:win-x86_64
-- ai.djl.pytorch:pytorch-native-cu102:1.9.0:win-x86_64
+- ai.djl.pytorch:pytorch-native-cu111:1.9.1:win-x86_64
+- ai.djl.pytorch:pytorch-native-cu102:1.9.1:win-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cu111</artifactId>
     <classifier>win-x86_64</classifier>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -179,14 +186,14 @@ For the Windows platform, you can choose between CPU and GPU.
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cu102</artifactId>
     <classifier>win-x86_64</classifier>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
 ### Windows CPU
 
-- ai.djl.pytorch:pytorch-native-cpu:1.9.0:win-x86_64
+- ai.djl.pytorch:pytorch-native-cpu:1.9.1:win-x86_64
 
 ```xml
 <dependency>
@@ -194,6 +201,6 @@ For the Windows platform, you can choose between CPU and GPU.
     <artifactId>pytorch-native-cpu</artifactId>
     <classifier>win-x86_64</classifier>
     <scope>runtime</scope>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
 </dependency>
 ```
