@@ -1,0 +1,1 @@
+../../../../../../../testing/src/main/java/ai/djl/testing/TestRequirements.java
