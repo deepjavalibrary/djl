@@ -83,6 +83,14 @@ class OpenCVImage implements Image {
 
     /** {@inheritDoc} */
     @Override
+    public Image duplicate() {
+        Mat mat = new Mat();
+        image.copyTo(mat);
+        return new OpenCVImage(mat);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray toNDArray(NDManager manager, Flag flag) {
         Mat mat = new Mat();
         if (flag == Flag.GRAYSCALE) {

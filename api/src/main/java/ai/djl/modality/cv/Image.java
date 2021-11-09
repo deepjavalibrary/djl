@@ -58,6 +58,13 @@ public interface Image {
     Image getSubImage(int x, int y, int w, int h);
 
     /**
+     * Gets a deep copy of the original image.
+     *
+     * @return the copy of the original image.
+     */
+    Image duplicate();
+
+    /**
      * Converts image to a RGB {@link NDArray}.
      *
      * @param manager a {@link NDManager} to create the new NDArray with
