@@ -7,7 +7,7 @@ group = "ai.djl.pytorch"
 apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
 String VERSION = "${pytorch_version}"
-if (project.hasProperty("pt_version")) {
+if (project.hasProperty("pt_version") && project.property("pt_version") != "") {
     VERSION = project.property("pt_version")
 }
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
