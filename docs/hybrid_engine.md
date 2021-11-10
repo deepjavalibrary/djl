@@ -22,20 +22,17 @@ to run in a hybrid mode:
 To use it along with Apache MXNet for additional API support, add the following two dependencies:
 
 ```
-runtimeOnly "ai.djl.mxnet:mxnet-engine:0.13.0"
-runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.8.0"
+runtimeOnly "ai.djl.mxnet:mxnet-engine:0.14.0"
 ```
 
 You can also use PyTorch or TensorFlow Engine as the supplemental engine by adding their corresponding dependencies.
 
 ```
-runtimeOnly "ai.djl.pytorch:pytorch-engine:0.13.0"
-runtimeOnly "ai.djl.pytorch:pytorch-native-auto:1.9.0"
+runtimeOnly "ai.djl.pytorch:pytorch-engine:0.14.0"
 ```
 
 ```
-runtimeOnly "ai.djl.tensorflow:tensorflow-engine:0.13.0"
-runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:2.4.1"
+runtimeOnly "ai.djl.tensorflow:tensorflow-engine:0.14.0"
 ```
 
 ## How Hybrid works

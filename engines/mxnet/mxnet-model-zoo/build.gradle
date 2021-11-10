@@ -4,7 +4,6 @@ dependencies {
     api project(":api")
     api project(":engines:mxnet:mxnet-engine")
 
-    testRuntimeOnly "ai.djl.mxnet:mxnet-native-auto:${mxnet_version}"
     testImplementation project(":basicdataset")
     testImplementation project(":model-zoo")
     testImplementation(project(":testing"))

@@ -21,7 +21,7 @@ provides a suite of image manipulation functions to let you pre- and post-proces
 ```java
 int width = img.getWidth();
 int height = img.getHeight();
-Image leftHalfImg = img.getSubimage(0, 0, width / 2, height); // get left half of the image
+Image leftHalfImg = img.getSubImage(0, 0, width / 2, height); // get left half of the image
 NDManager manager = NDManager.newBaseManager();
 NDArray imageArray = leftHalfImg.toNDArray(manager); // convert to NDArray
 ```
