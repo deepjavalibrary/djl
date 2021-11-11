@@ -20,6 +20,7 @@ on:
 
 jobs:
   analyze:
+    if: github.repository == 'deepjavalibrary/djl'
     name: Analyze
     runs-on: ubuntu-latest
 
