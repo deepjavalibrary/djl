@@ -16,6 +16,7 @@ on:
 
 jobs:
   publish:
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-18.04
 
     steps:
