@@ -30,6 +30,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
+        shell: bash
         run: |
           ./gradlew :engines:pytorch:pytorch-native:releaseJNI -Ppt_version=${{ github.event.inputs.pt_version }}
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
