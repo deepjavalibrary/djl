@@ -15,25 +15,26 @@ compileJava.dependsOn(processResources)
 processResources {
     outputs.dir file("${project.buildDir}/classes/java/main/jnilib")
     doLast {
-        def url = "https://publish.djl.ai/pytorch-${pytorch_version}/jnilib"
+        String url = "https://publish.djl.ai/pytorch/${pytorch_version}/jnilib/${djl_version}"
         def files = [
-                "${djl_version}/linux-x86_64/cpu/libdjl_torch.so"         : "linux-x86_64/cpu/libdjl_torch.so",
-                "${djl_version}/linux-x86_64/cu102/libdjl_torch.so"       : "linux-x86_64/cu102/libdjl_torch.so",
-                "${djl_version}/linux-x86_64/cu111/libdjl_torch.so"       : "linux-x86_64/cu111/libdjl_torch.so",
-                "precxx11/${djl_version}/linux-x86_64/cpu/libdjl_torch.so": "linux-x86_64/cpu-precxx11/libdjl_torch.so",
-                "${djl_version}/osx-x86_64/cpu/libdjl_torch.dylib"        : "osx-x86_64/cpu/libdjl_torch.dylib",
-                "${djl_version}/win-x86_64/cpu/djl_torch.dll"             : "win-x86_64/cpu/djl_torch.dll",
-                "${djl_version}/win-x86_64/cu102/djl_torch.dll"           : "win-x86_64/cu102/djl_torch.dll",
-                "${djl_version}/win-x86_64/cu111/djl_torch.dll"           : "win-x86_64/cu111/djl_torch.dll"
+                "linux-x86_64/cpu/libdjl_torch.so",
+                "linux-x86_64/cu102/libdjl_torch.so",
+                "linux-x86_64/cu113/libdjl_torch.so",
+                "linux-x86_64/cpu-precxx11/libdjl_torch.so",
+                "linux-x86_64/cu113-precxx11/libdjl_torch.so",
+                "osx-x86_64/cpu/libdjl_torch.dylib",
+                "win-x86_64/cpu/djl_torch.dll",
+                "win-x86_64/cu102/djl_torch.dll",
+                "win-x86_64/cu113/djl_torch.dll"
         ]
-        def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
+        String jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
-            def file = new File("${jnilibDir}/${entry.value}")
+            def file = new File("${jnilibDir}/${entry}")
             if (file.exists()) {
-                project.logger.lifecycle("prebuilt or cached file found for ${entry.value}")
+                project.logger.lifecycle("prebuilt or cached file found for ${entry}")
             } else {
-                def nativeDir = "${project.parent.projectDir}/pytorch-native/jnilib/${djl_version}/"
-                def jnilibFile = new File("${nativeDir}/${entry.value}")
+                String nativeDir = "${project.parent.projectDir}/pytorch-native/jnilib/${djl_version}/"
+                def jnilibFile = new File("${nativeDir}/${entry}")
                 if (jnilibFile.exists()) {
                     project.logger.lifecycle("Copying " + jnilibFile)
                     copy {
@@ -41,9 +42,9 @@ processResources {
                         into file.getParent()
                     }
                 } else if (!project.hasProperty("jni")) {
-                    project.logger.lifecycle("Downloading ${url}/${entry.key}")
+                    project.logger.lifecycle("Downloading ${url}/${entry}")
                     file.getParentFile().mkdirs()
-                    new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
+                    new URL("${url}/${entry}").withInputStream { i -> file.withOutputStream { it << i } }
                 }
             }
         }
@@ -53,8 +54,12 @@ processResources {
         }
 
         // write properties
+        String ptVersion = "${pytorch_version}"
+        if (project.hasProperty("pt_version") && project.property("pt_version") != "") {
+            ptVersion = project.property("pt_version")
+        }
         def propFile = file("${project.buildDir}/classes/java/main/jnilib/pytorch.properties")
-        propFile.text = "version=${version}\njni_version=${pytorch_version}"
+        propFile.text = "version=${version}\njni_version=${ptVersion}"
     }
 }
 

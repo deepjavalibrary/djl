@@ -20,12 +20,11 @@ fi
 
 if [[ ! -d "libtorch" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
-    if [[ $FLAVOR == "cpu" ]] || [[ $FLAVOR == "cu111" ]] || [[ $FLAVOR == "cu102" ]]; then
-      curl -s https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip | jar xv
-    else
-      echo "$1 is not supported."
+    if [[ ! "$FLAVOR" =~ ^(cpu|cu102|cu111|cu113)$ ]]; then
+      echo "$FLAVOR is not supported."
       exit 1
     fi
+    curl -s https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip | jar xv
   elif [[ $PLATFORM == 'darwin' ]]; then
     curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip | jar xv
   else
