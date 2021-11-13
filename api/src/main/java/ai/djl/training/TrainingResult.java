@@ -12,6 +12,7 @@
  */
 package ai.djl.training;
 
+import ai.djl.util.JsonUtils;
 import java.util.Collections;
 import java.util.Map;
 
@@ -93,5 +94,11 @@ public class TrainingResult {
      */
     public void setEvaluations(Map<String, Float> evaluations) {
         this.evaluations = evaluations;
+    }
+
+    /** {@inheritDoc} * */
+    @Override
+    public String toString() {
+        return JsonUtils.GSON_PRETTY.toJson(this);
     }
 }
