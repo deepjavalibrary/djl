@@ -2,7 +2,7 @@ group "ai.djl.opencv"
 
 dependencies {
     api project(":api")
-    implementation "org.openpnp:opencv:4.5.1-2"
+    api "org.openpnp:opencv:4.5.1-2"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
