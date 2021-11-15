@@ -35,6 +35,9 @@ public enum DataType {
     /** Bool. */
     BOOL(6),
 
+    /** 16-bit signed integer. */
+    INT16(7),
+
     /** 8-bit signed integer. */
     INT8(9);
 
@@ -44,12 +47,18 @@ public enum DataType {
         this.value = value;
     }
 
-    /** Returns the size of an element of this type, in bytes, or -1 if element size is variable. */
+    /**
+     * Returns the size of an element of this type, in bytes, or -1 if element size is variable.
+     *
+     * @return the size of an element of this type
+     */
     public int byteSize() {
         switch (this) {
             case FLOAT32:
             case INT32:
                 return 4;
+            case INT16:
+                return 2;
             case INT8:
             case UINT8:
                 return 1;
@@ -92,6 +101,8 @@ public enum DataType {
                 return "float";
             case INT32:
                 return "int";
+            case INT16:
+                return "short";
             case INT8:
             case UINT8:
                 return "byte";

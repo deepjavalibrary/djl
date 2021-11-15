@@ -22,154 +22,85 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
 import java.util.Arrays;
 
-/**
- * A typed multi-dimensional array used in Tensorflow Lite.
- *
- * <p>The native handle of a {@code Tensor} is managed by {@code NativeInterpreterWrapper}, and does
- * not needed to be closed by the client. However, once the {@code NativeInterpreterWrapper} has
- * been closed, the tensor handle will be invalidated.
- */
 // TODO(b/153882978): Add scalar getters similar to TF's Java API.
+@SuppressWarnings("MissingJavadocMethod")
 public final class Tensor {
 
-    /**
-     * Creates a Tensor wrapper from the provided interpreter instance and tensor index.
-     *
-     * <p>The caller is responsible for closing the created wrapper, and ensuring the provided
-     * native interpreter is valid until the tensor is closed.
-     */
     static Tensor fromIndex(long nativeInterpreterHandle, int tensorIndex) {
         return new Tensor(create(nativeInterpreterHandle, tensorIndex));
     }
 
-    /**
-     * Quantization parameters that corresponds to the table, {@code QuantizationParameters}, in the
-     * <a
-     * href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/schema/schema.fbs">TFLite
-     * Model schema file.</a>
-     *
-     * <p>Since per-channel quantization does not apply to input and output tensors, {@code scale}
-     * and {@code zero_point} are both single values instead of arrays.
-     *
-     * <p>For tensor that are not quantized, the values of scale and zero_point are both 0.
-     *
-     * <p>Given a quantized value q, the corresponding float value f should be: <br>
-     * f = scale * (q - zero_point) <br>
-     */
     public static class QuantizationParams {
-        /** The scale value used in quantization. */
+
         private final float scale;
-        /** The zero point value used in quantization. */
+
         private final int zeroPoint;
 
-        /**
-         * Creates a {@link QuantizationParams} with {@code scale} and {@code zero_point}.
-         *
-         * @param scale The scale value used in quantization.
-         * @param zeroPoint The zero point value used in quantization.
-         */
         public QuantizationParams(final float scale, final int zeroPoint) {
             this.scale = scale;
             this.zeroPoint = zeroPoint;
         }
 
-        /** Returns the scale value. */
         public float getScale() {
             return scale;
         }
 
-        /** Returns the zero point value. */
         public int getZeroPoint() {
             return zeroPoint;
         }
     }
 
-    /** Disposes of any resources used by the Tensor wrapper. */
     public void close() {
         delete(nativeHandle);
         nativeHandle = 0;
     }
 
-    /** Returns the {@link DataType} of elements stored in the Tensor. */
     public DataType dataType() {
         return dtype;
     }
 
-    /**
-     * Returns the number of dimensions (sometimes referred to as <a
-     * href="https://www.tensorflow.org/resources/dims_types.html#rank">rank</a>) of the Tensor.
-     *
-     * <p>Will be 0 for a scalar, 1 for a vector, 2 for a matrix, 3 for a 3-dimensional tensor etc.
-     */
     public int numDimensions() {
         return shapeCopy.length;
     }
 
-    /** Returns the size, in bytes, of the tensor data. */
     public int numBytes() {
         return numBytes(nativeHandle);
     }
 
-    /** Returns the number of elements in a flattened (1-D) view of the tensor. */
     public int numElements() {
         return computeNumElements(shapeCopy);
     }
 
-    /**
-     * Returns the <a href="https://www.tensorflow.org/resources/dims_types.html#shape">shape</a> of
-     * the Tensor, i.e., the sizes of each dimension.
-     *
-     * @return an array where the i-th element is the size of the i-th dimension of the tensor.
-     */
     public int[] shape() {
         return shapeCopy;
     }
 
-    /**
-     * Returns the original <a
-     * href="https://www.tensorflow.org/resources/dims_types.html#shape">shape</a> of the Tensor,
-     * i.e., the sizes of each dimension - before any resizing was performed. Unknown dimensions are
-     * designated with a value of -1.
-     *
-     * @return an array where the i-th element is the size of the i-th dimension of the tensor.
-     */
     public int[] shapeSignature() {
         return shapeSignatureCopy;
     }
 
-    /** Returns the (global) index of the tensor within the owning {@link Interpreter}. */
     public int index() {
         return index(nativeHandle);
     }
 
-    /** Returns the name of the tensor within the owning {@link Interpreter}. */
     public String name() {
         return name(nativeHandle);
     }
 
-    /**
-     * Returns the quantization parameters of the tensor within the owning {@link Interpreter}.
-     *
-     * <p>Only quantized tensors have valid {@code QuantizationParameters}. For tensor that are not
-     * quantized, the values of scale and zero_point are both 0.
-     */
     public QuantizationParams quantizationParams() {
         return quantizationParamsCopy;
     }
 
-    /**
-     * Copies the contents of the provided {@code src} object to the Tensor.
-     *
-     * <p>The {@code src} should either be a (multi-dimensional) array with a shape matching that of
-     * this tensor, a {@link ByteBuffer} of compatible primitive type with a matching flat size, or
-     * {@code null} iff the tensor has an underlying delegate buffer handle.
-     *
-     * @throws IllegalArgumentException if the tensor is a scalar or if {@code src} is not
-     *     compatible with the tensor (for example, mismatched data types or shapes).
-     */
-    public void setTo(Object src) {
+    public ByteBuffer asReadOnlyBuffer() {
+        // Note that the ByteBuffer order is not preserved when duplicated or marked read only, so
+        // we have to repeat the call.
+        return buffer().asReadOnlyBuffer().order(ByteOrder.nativeOrder());
+    }
+
+    void setTo(Object src) {
         if (src == null) {
             if (hasDelegateBufferHandle(nativeHandle)) {
                 return;
@@ -181,6 +112,9 @@ public final class Tensor {
         throwIfSrcShapeIsIncompatible(src);
         if (isBuffer(src)) {
             setTo((Buffer) src);
+        } else if (dtype == DataType.STRING && shapeCopy.length == 0) {
+            // Update scalar string input with 1-d byte array.
+            writeScalar(nativeHandle, src);
         } else if (src.getClass().isArray()) {
             writeMultiDimensionalArray(nativeHandle, src);
         } else {
@@ -188,7 +122,7 @@ public final class Tensor {
         }
     }
 
-    public void setTo(Buffer src) {
+    private void setTo(Buffer src) {
         // Note that we attempt to use a direct memcpy optimization for direct, native-ordered
         // buffers.
         // There are no base Buffer#order() or Buffer#put() methods, so again we have to ugly cast.
@@ -220,20 +154,19 @@ public final class Tensor {
             } else {
                 buffer().asIntBuffer().put(srcBuffer);
             }
+        } else if (src instanceof ShortBuffer) {
+            ShortBuffer srcBuffer = (ShortBuffer) src;
+            if (srcBuffer.isDirect() && srcBuffer.order() == ByteOrder.nativeOrder()) {
+                writeDirectBuffer(nativeHandle, src);
+            } else {
+                buffer().asShortBuffer().put(srcBuffer);
+            }
         } else {
             throw new IllegalArgumentException("Unexpected input buffer type: " + src);
         }
     }
 
-    /**
-     * Copies the contents of the tensor to {@code dst} and returns {@code dst}.
-     *
-     * @param dst the destination buffer, either an explicitly-typed array, a {@link ByteBuffer} or
-     *     {@code null} iff the tensor has an underlying delegate buffer handle.
-     * @throws IllegalArgumentException if {@code dst} is not compatible with the tensor (for
-     *     example, mismatched data types or shapes).
-     */
-    public Object copyTo(Object dst) {
+    Object copyTo(Object dst) {
         if (dst == null) {
             if (hasDelegateBufferHandle(nativeHandle)) {
                 return dst;
@@ -251,7 +184,7 @@ public final class Tensor {
         return dst;
     }
 
-    public void copyTo(Buffer dst) {
+    private void copyTo(Buffer dst) {
         // There is no base Buffer#put() method, so we have to ugly cast.
         if (dst instanceof ByteBuffer) {
             ((ByteBuffer) dst).put(buffer());
@@ -261,12 +194,13 @@ public final class Tensor {
             ((LongBuffer) dst).put(buffer().asLongBuffer());
         } else if (dst instanceof IntBuffer) {
             ((IntBuffer) dst).put(buffer().asIntBuffer());
+        } else if (dst instanceof ShortBuffer) {
+            ((ShortBuffer) dst).put(buffer().asShortBuffer());
         } else {
             throw new IllegalArgumentException("Unexpected output buffer type: " + dst);
         }
     }
 
-    /** Returns the provided buffer's shape if specified and different from this Tensor's shape. */
     // TODO(b/80431971): Remove this method after deprecating multi-dimensional array inputs.
     int[] getInputShapeIfDifferent(Object input) {
         if (input == null) {
@@ -286,16 +220,10 @@ public final class Tensor {
         return inputShape;
     }
 
-    /**
-     * Forces a refresh of the tensor's cached shape.
-     *
-     * <p>This is useful if the tensor is resized or has a dynamic shape.
-     */
     void refreshShape() {
         this.shapeCopy = shape(nativeHandle);
     }
 
-    /** Returns the type of the data. */
     DataType dataTypeOf(Object o) {
         if (o != null) {
             Class<?> c = o.getClass();
@@ -309,6 +237,8 @@ public final class Tensor {
                     return DataType.FLOAT32;
                 } else if (int.class.equals(c)) {
                     return DataType.INT32;
+                } else if (short.class.equals(c)) {
+                    return DataType.INT16;
                 } else if (byte.class.equals(c)) {
                     // Byte array can be used for storing string tensors, especially for
                     // ParseExample op.
@@ -329,6 +259,8 @@ public final class Tensor {
                     return DataType.FLOAT32;
                 } else if (Integer.class.equals(c) || o instanceof IntBuffer) {
                     return DataType.INT32;
+                } else if (Short.class.equals(c) || o instanceof ShortBuffer) {
+                    return DataType.INT16;
                 } else if (Byte.class.equals(c)) {
                     // Note that we don't check for ByteBuffer here; ByteBuffer payloads
                     // are allowed to map to any type, and should be handled earlier
@@ -347,7 +279,6 @@ public final class Tensor {
                 "DataType error: cannot resolve DataType of " + o.getClass().getName());
     }
 
-    /** Returns the shape of an object as an int array. */
     int[] computeShapeOf(Object o) {
         int size = computeNumDimensions(o);
         if (dtype == DataType.STRING) {
@@ -369,7 +300,6 @@ public final class Tensor {
         return dimensions;
     }
 
-    /** Returns the number of elements in a flattened (1-D) view of the tensor's shape. */
     static int computeNumElements(int[] shape) {
         int n = 1;
         for (int i = 0; i < shape.length; ++i) {
@@ -378,7 +308,6 @@ public final class Tensor {
         return n;
     }
 
-    /** Returns the number of dimensions of a multi-dimensional array, otherwise 0. */
     static int computeNumDimensions(Object o) {
         if (o == null || !o.getClass().isArray()) {
             return 0;
@@ -389,7 +318,6 @@ public final class Tensor {
         return 1 + computeNumDimensions(Array.get(o, 0));
     }
 
-    /** Recursively populates the shape dimensions for a given (multi-dimensional) array. */
     static void fillShape(Object o, int dim, int[] shape) {
         if (shape == null || dim == shape.length) {
             return;

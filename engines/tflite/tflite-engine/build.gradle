@@ -2,7 +2,6 @@ group "ai.djl.tflite"
 
 dependencies {
     api project(":api")
-    implementation "ai.djl.tflite:tflite-native-auto:${tflite_version}"
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
@@ -10,6 +9,15 @@ dependencies {
 
     testImplementation(project(":testing"))
     testRuntimeOnly "org.slf4j:slf4j-simple:${slf4j_version}"
+}
+
+processResources {
+    doFirst {
+        def classesDir = file("${project.buildDir}/classes/java/main/")
+        classesDir.mkdirs()
+        def file = new File(classesDir, "tflite-engine.properties")
+        file.text = "tflite_version=${tflite_version}"
+    }
 }
 
 publishing {
@@ -20,16 +28,13 @@ publishing {
                 name = "DJL Engine Adapter for TFLite"
                 description = "Deep Java Library (DJL) Engine Adapter for TFLite"
                 url = "http://www.djl.ai/engines/tflite/${project.name}"
-
-                withXml {
-                    Node pomNode = asNode()
-                    pomNode.dependencies."*".findAll() {
-                        it.artifactId.text().startsWith("tflite-native-auto")
-                    }.each() {
-                        it.parent().remove(it)
-                    }
-                }
             }
         }
     }
+}
+
+pmdMain {
+    excludes = [
+            '**/org/tensorflow/lite/**'
+    ]
 }

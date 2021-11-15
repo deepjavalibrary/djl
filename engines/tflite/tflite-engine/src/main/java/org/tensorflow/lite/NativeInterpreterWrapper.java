@@ -22,14 +22,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import org.tensorflow.lite.nnapi.NnApiDelegate;
 
-/**
- * An internal wrapper that wraps native interpreter and controls model execution.
- *
- * <p><b>WARNING:</b> Resources consumed by the {@code NativeInterpreterWrapper} object must be
- * explicitly freed by invoking the {@link #close()} method when the {@code
- * NativeInterpreterWrapper} object is no longer needed.
- */
 final class NativeInterpreterWrapper implements AutoCloseable {
 
     NativeInterpreterWrapper(String modelPath) {
@@ -83,18 +78,22 @@ final class NativeInterpreterWrapper implements AutoCloseable {
                     interpreterHandle, options.allowBufferHandleOutput.booleanValue());
         }
         applyDelegates(options);
+
+        // Simply use "-1" to represent the default mode.
+        int applyXNNPACKMode = -1;
         if (options.useXNNPACK != null) {
-            useXNNPACK(
-                    interpreterHandle,
-                    errorHandle,
-                    options.useXNNPACK.booleanValue(),
-                    options.numThreads);
+            applyXNNPACKMode = options.useXNNPACK.booleanValue() ? 1 : 0;
+        }
+
+        // TODO(b/171856982): uncomment the following when applying XNNPACK delegate by default is
+        // enabled for C++ TfLite library on Android platform.
+        if (applyXNNPACKMode == 1 /*|| applyXNNPACKMode == -1*/) {
+            useXNNPACK(interpreterHandle, errorHandle, applyXNNPACKMode, options.numThreads);
         }
         allocateTensors(interpreterHandle, errorHandle);
         this.isMemoryAllocated = true;
     }
 
-    /** Releases resources associated with this {@code NativeInterpreterWrapper}. */
     @Override
     public void close() {
         // Close the tensors first as they may reference the native interpreter.
@@ -131,11 +130,44 @@ final class NativeInterpreterWrapper implements AutoCloseable {
         ownedDelegates.clear();
     }
 
-    /** Sets inputs, runs model inference and returns outputs. */
-    void run(Object[] inputs) {
+    public void runSignature(
+            Map<String, Object> inputs, Map<String, Object> outputs, String methodName) {
+        if (inputs == null || inputs.isEmpty()) {
+            throw new IllegalArgumentException("Input error: Inputs should not be null or empty.");
+        }
+        if (outputs == null) {
+            throw new IllegalArgumentException("Input error: Outputs should not be null.");
+        }
+        initTensorIndexesMaps();
+        // Map inputs/output to input indexes.
+        Map<Integer, Object> inputsWithInputIndex = new TreeMap<>();
+        Map<Integer, Object> outputsWithOutputIndex = new TreeMap<>();
+        for (Map.Entry<String, Object> input : inputs.entrySet()) {
+            int tensorIndex =
+                    getInputTensorIndexFromSignature(interpreterHandle, input.getKey(), methodName);
+            inputsWithInputIndex.put(tensorToInputsIndexes.get(tensorIndex), input.getValue());
+        }
+        for (Map.Entry<String, Object> output : outputs.entrySet()) {
+            int tensorIndex =
+                    getOutputTensorIndexFromSignature(
+                            interpreterHandle, output.getKey(), methodName);
+            outputsWithOutputIndex.put(tensorToOutputsIndexes.get(tensorIndex), output.getValue());
+        }
+        Object[] inputsList = new Object[inputs.size()];
+        int index = 0;
+        for (Map.Entry<Integer, Object> input : inputsWithInputIndex.entrySet()) {
+            inputsList[index++] = input.getValue();
+        }
+        run(inputsList, outputsWithOutputIndex);
+    }
+
+    void run(Object[] inputs, Map<Integer, Object> outputs) {
         inferenceDurationNanoseconds = -1;
         if (inputs == null || inputs.length == 0) {
             throw new IllegalArgumentException("Input error: Inputs should not be null or empty.");
+        }
+        if (outputs == null) {
+            throw new IllegalArgumentException("Input error: Outputs should not be null.");
         }
 
         // TODO(b/80431971): Remove implicit resize after deprecating multi-dimensional array
@@ -173,6 +205,12 @@ final class NativeInterpreterWrapper implements AutoCloseable {
                 }
             }
         }
+        for (Map.Entry<Integer, Object> output : outputs.entrySet()) {
+            // Null output placeholders are allowed and ignored.
+            if (output.getValue() != null) {
+                getOutputTensor(output.getKey()).copyTo(output.getValue());
+            }
+        }
 
         // Only set if the entire operation succeeds.
         this.inferenceDurationNanoseconds = inferenceDurationNanoseconds;
@@ -180,12 +218,10 @@ final class NativeInterpreterWrapper implements AutoCloseable {
 
     private static native void run(long interpreterHandle, long errorHandle);
 
-    /** Resizes dimensions of a specific input. */
     void resizeInput(int idx, int[] dims) {
         resizeInput(idx, dims, false);
     }
 
-    /** Resizes dimensions of a specific input. */
     void resizeInput(int idx, int[] dims, boolean strict) {
         if (resizeInput(interpreterHandle, errorHandle, idx, dims, strict)) {
             // Tensor allocation is deferred until either an explicit `allocateTensors()` call or
@@ -201,7 +237,6 @@ final class NativeInterpreterWrapper implements AutoCloseable {
     private static native boolean resizeInput(
             long interpreterHandle, long errorHandle, int inputIdx, int[] dims, boolean strict);
 
-    /** Triggers explicit allocation of tensors. */
     void allocateTensors() {
         if (isMemoryAllocated) {
             return;
@@ -218,20 +253,10 @@ final class NativeInterpreterWrapper implements AutoCloseable {
 
     private static native long allocateTensors(long interpreterHandle, long errorHandle);
 
-    void setNumThreads(int numThreads) {
-        numThreads(interpreterHandle, numThreads);
-    }
-
-    void modifyGraphWithDelegate(Delegate delegate) {
-        applyDelegate(interpreterHandle, errorHandle, delegate.getNativeHandle());
-        delegates.add(delegate);
-    }
-
     void resetVariableTensors() {
         resetVariableTensors(interpreterHandle, errorHandle);
     }
 
-    /** Gets index of an input given its name. */
     int getInputIndex(String name) {
         if (inputsIndexes == null) {
             String[] names = getInputNames(interpreterHandle);
@@ -249,11 +274,28 @@ final class NativeInterpreterWrapper implements AutoCloseable {
                     String.format(
                             "Input error: '%s' is not a valid name for any input. Names of inputs and their "
                                     + "indexes are %s",
-                            name, inputsIndexes.toString()));
+                            name, inputsIndexes));
         }
     }
 
-    /** Gets index of an output given its name. */
+    private void initTensorIndexesMaps() {
+        if (tensorToInputsIndexes != null) {
+            return;
+        }
+        tensorToInputsIndexes = new HashMap<>();
+        tensorToOutputsIndexes = new HashMap<>();
+        int inputCount = getInputTensorCount();
+        for (int i = 0; i < inputCount; ++i) {
+            int tensorIndex = getInputTensorIndex(interpreterHandle, i);
+            tensorToInputsIndexes.put(tensorIndex, i);
+        }
+        int outputCount = getOutputTensorCount();
+        for (int i = 0; i < outputCount; ++i) {
+            int tensorIndex = getOutputTensorIndex(interpreterHandle, i);
+            tensorToOutputsIndexes.put(tensorIndex, i);
+        }
+    }
+
     int getOutputIndex(String name) {
         if (outputsIndexes == null) {
             String[] names = getOutputNames(interpreterHandle);
@@ -271,28 +313,18 @@ final class NativeInterpreterWrapper implements AutoCloseable {
                     String.format(
                             "Input error: '%s' is not a valid name for any output. Names of outputs and their "
                                     + "indexes are %s",
-                            name, outputsIndexes.toString()));
+                            name, outputsIndexes));
         }
     }
 
-    /**
-     * Gets the last inference duration in nanoseconds. It returns null if there is no previous
-     * inference run or the last inference run failed.
-     */
     Long getLastNativeInferenceDurationNanoseconds() {
         return (inferenceDurationNanoseconds < 0) ? null : inferenceDurationNanoseconds;
     }
 
-    /** Gets the number of input tensors. */
     int getInputTensorCount() {
         return inputTensors.length;
     }
 
-    /**
-     * Gets the input {@link Tensor} for the provided input index.
-     *
-     * @throws IllegalArgumentException if the input index is invalid.
-     */
     Tensor getInputTensor(int index) {
         if (index < 0 || index >= inputTensors.length) {
             throw new IllegalArgumentException("Invalid input Tensor index: " + index);
@@ -308,16 +340,44 @@ final class NativeInterpreterWrapper implements AutoCloseable {
         return inputTensor;
     }
 
-    /** Gets the number of output tensors. */
+    Tensor getInputTensor(String inputName, String methodName) {
+        if (inputName == null) {
+            throw new IllegalArgumentException("Invalid input tensor name provided (null)");
+        }
+        initTensorIndexesMaps();
+        int tensorIndex =
+                getInputTensorIndexFromSignature(interpreterHandle, inputName, methodName);
+        if (!tensorToInputsIndexes.containsKey(tensorIndex)) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Invalid input tensor name (%s) for signature (%s).",
+                            inputName, methodName));
+        }
+        return getInputTensor(tensorToInputsIndexes.get(tensorIndex));
+    }
+
+    public String[] getSignatureDefNames() {
+        return getSignatureDefNames(interpreterHandle);
+    }
+
+    private static native String[] getSignatureDefNames(long interpreterHandle);
+
+    String[] getSignatureInputs(String methodName) {
+        return getSignatureInputs(interpreterHandle, methodName);
+    }
+
+    private static native String[] getSignatureInputs(long interpreterHandle, String methodName);
+
+    String[] getSignatureOutputs(String methodName) {
+        return getSignatureOutputs(interpreterHandle, methodName);
+    }
+
+    private static native String[] getSignatureOutputs(long interpreterHandle, String methodName);
+
     int getOutputTensorCount() {
         return outputTensors.length;
     }
 
-    /**
-     * Gets the output {@link Tensor} for the provided output index.
-     *
-     * @throws IllegalArgumentException if the output index is invalid.
-     */
     Tensor getOutputTensor(int index) {
         if (index < 0 || index >= outputTensors.length) {
             throw new IllegalArgumentException("Invalid output Tensor index: " + index);
@@ -333,15 +393,26 @@ final class NativeInterpreterWrapper implements AutoCloseable {
         return outputTensor;
     }
 
-    /** Gets the number of ops in the execution plan. */
+    Tensor getOutputTensor(String outputName, String methodName) {
+        if (outputName == null) {
+            throw new IllegalArgumentException("Invalid output tensor name provided (null)");
+        }
+        initTensorIndexesMaps();
+        int tensorIndex =
+                getOutputTensorIndexFromSignature(interpreterHandle, outputName, methodName);
+        if (!tensorToOutputsIndexes.containsKey(tensorIndex)) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Invalid output tensor name (%s) for signature (%s).",
+                            outputName, methodName));
+        }
+        return getOutputTensor(tensorToOutputsIndexes.get(tensorIndex));
+    }
+
     int getExecutionPlanLength() {
         return getExecutionPlanLength(interpreterHandle);
     }
 
-    /**
-     * Sets internal cancellation flag. If it's true, the interpreter will try to interrupt any
-     * invocation between ops.
-     */
     void setCancelled(boolean value) {
         if (cancellationFlagHandle == 0) {
             throw new IllegalStateException(
@@ -374,12 +445,10 @@ final class NativeInterpreterWrapper implements AutoCloseable {
                 delegates.add(delegate);
             }
             if (options.useNNAPI != null && options.useNNAPI.booleanValue()) {
-                //        Could not determine what the NnApiDelegate are because no such class
-                // exists
-                //        NnApiDelegate optionalNnApiDelegate = new NnApiDelegate();
-                //        ownedDelegates.add(optionalNnApiDelegate);
-                //        applyDelegate(interpreterHandle, errorHandle,
-                // optionalNnApiDelegate.getNativeHandle());
+                NnApiDelegate optionalNnApiDelegate = new NnApiDelegate();
+                ownedDelegates.add(optionalNnApiDelegate);
+                applyDelegate(
+                        interpreterHandle, errorHandle, optionalNnApiDelegate.getNativeHandle());
             }
         } catch (IllegalArgumentException e) {
             // Suppress exceptions where a delegate fails to apply after the flex delegate is
@@ -402,7 +471,7 @@ final class NativeInterpreterWrapper implements AutoCloseable {
 
     private static Delegate maybeCreateFlexDelegate(List<Delegate> delegates) {
         try {
-            Class<?> clazz = Class.forName("org.tensorflow.org.tensorflow.lite.flex.FlexDelegate");
+            Class<?> clazz = Class.forName("org.tensorflow.lite.flex.FlexDelegate");
             // No need to create the Flex delegate if one has already been provided.
             for (Delegate delegate : delegates) {
                 if (clazz.isInstance(delegate)) {
@@ -435,6 +504,9 @@ final class NativeInterpreterWrapper implements AutoCloseable {
     // Lazily constructed maps of input and output names to input and output Tensor indexes.
     private Map<String, Integer> inputsIndexes;
     private Map<String, Integer> outputsIndexes;
+    // Lazily constructed maps of tensor index to index in input and output indexes.
+    private Map<Integer, Integer> tensorToInputsIndexes;
+    private Map<Integer, Integer> tensorToOutputsIndexes;
 
     // Lazily constructed and populated arrays of input and output Tensor wrappers.
     private Tensor[] inputTensors;
@@ -453,6 +525,12 @@ final class NativeInterpreterWrapper implements AutoCloseable {
 
     private static native int getInputTensorIndex(long interpreterHandle, int inputIdx);
 
+    private static native int getInputTensorIndexFromSignature(
+            long interpreterHandle, String signatureInputName, String methodName);
+
+    private static native int getOutputTensorIndexFromSignature(
+            long interpreterHandle, String signatureInputName, String methodName);
+
     private static native int getOutputTensorIndex(long interpreterHandle, int outputIdx);
 
     private static native int getInputCount(long interpreterHandle);
@@ -465,14 +543,12 @@ final class NativeInterpreterWrapper implements AutoCloseable {
 
     private static native String[] getOutputNames(long interpreterHandle);
 
-    private static native void numThreads(long interpreterHandle, int numThreads);
-
     private static native void allowFp16PrecisionForFp32(long interpreterHandle, boolean allow);
 
     private static native void allowBufferHandleOutput(long interpreterHandle, boolean allow);
 
     private static native void useXNNPACK(
-            long interpreterHandle, long errorHandle, boolean state, int numThreads);
+            long interpreterHandle, long errorHandle, int state, int numThreads);
 
     private static native long createErrorReporter(int size);
 

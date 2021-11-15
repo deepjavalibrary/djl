@@ -25,6 +25,7 @@ public final class TensorFlowLite {
     /**
      * Returns the version of the underlying TensorFlowLite model schema.
      *
+     * @return the version of the underlying TensorFlowLite model schema
      * @deprecated Prefer using {@link #runtimeVersion() or #schemaVersion()}.
      */
     @Deprecated
@@ -32,13 +33,21 @@ public final class TensorFlowLite {
         return schemaVersion();
     }
 
-    /** Returns the version of the underlying TensorFlowLite runtime. */
+    /**
+     * Returns the version of the underlying TensorFlowLite runtime.
+     *
+     * @return the version of the underlying TensorFlowLite runtime
+     */
     public static String runtimeVersion() {
         init();
         return nativeRuntimeVersion();
     }
 
-    /** Returns the version of the underlying TensorFlowLite model schema. */
+    /**
+     * Returns the version of the underlying TensorFlowLite model schema.
+     *
+     * @return the version of the underlying TensorFlowLite model schema
+     */
     public static String schemaVersion() {
         init();
         return nativeSchemaVersion();
@@ -58,7 +67,7 @@ public final class TensorFlowLite {
         isInit = true;
     }
 
-    public static native String nativeRuntimeVersion();
+    private static native String nativeRuntimeVersion();
 
-    public static native String nativeSchemaVersion();
+    private static native String nativeSchemaVersion();
 }

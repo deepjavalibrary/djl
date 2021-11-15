@@ -19,6 +19,8 @@ import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.tensorflow.lite.Interpreter;
 
 /**
@@ -31,6 +33,8 @@ public class TfLiteSymbolBlock extends AbstractSymbolBlock implements AutoClosea
 
     private TfLiteNDManager manager;
     private Interpreter interpreter;
+
+    private static final Map<Integer, Object> EMPTY = new ConcurrentHashMap<>();
 
     TfLiteSymbolBlock(Interpreter interpreter, TfLiteNDManager manager) {
         this.interpreter = interpreter;
@@ -45,7 +49,7 @@ public class TfLiteSymbolBlock extends AbstractSymbolBlock implements AutoClosea
             boolean training,
             PairList<String, Object> params) {
         Object[] intInput = inputs.stream().map(NDArray::toByteBuffer).toArray();
-        interpreter.runForMultipleInputsOutputs(intInput);
+        interpreter.runForMultipleInputsOutputs(intInput, EMPTY);
 
         int outputSize = interpreter.getOutputTensorCount();
         NDList result = new NDList(outputSize);

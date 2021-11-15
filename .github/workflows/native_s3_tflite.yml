@@ -42,7 +42,7 @@ jobs:
           mkdir -p jnilib/${{ runner.os }}
           cp bazel-bin/tensorflow/lite/java/libtensorflowlite_jni.so jnilib/${{ runner.os }}
           cp bazel-bin/tensorflow/lite/java/libtensorflowlitelib.jar jnilib
-          aws s3 sync jnilib s3://djl-ai/publish/tflite-${TFLITE_VERSION}/jnilib
+          aws s3 sync jnilib s3://djl-ai/publish/tflite/${TFLITE_VERSION}/jnilib
 
   build-linux:
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
         run: |
           yum -y update
           yum -y groupinstall "Development Tools"
-          yum -y install patch cmake3
+          yum -y install patch cmake3 unzip which java-11-amazon-corretto
           ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
           pip3 install numpy --upgrade
@@ -66,14 +66,11 @@ jobs:
           repository: tensorflow/tensorflow
           ref: v${{ env.TFLITE_VERSION }}
           submodules: 'recursive'
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
       - name: build package
         run: |
           cd tensorflow
-          curl -L https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel-3.1.0-installer-linux-x86_64.sh -o bazel.sh --retry 10
+          export JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto.x86_64/
+          curl -L https://github.com/bazelbuild/bazel/releases/download/3.7.2/bazel-3.7.2-installer-linux-x86_64.sh -o bazel.sh --retry 10
           bash bazel.sh
           bazel build -c opt //tensorflow/lite/java:tensorflowlitelib  //tensorflow/lite/delegates/flex:delegate
       - name: Configure AWS Credentials
@@ -87,4 +84,4 @@ jobs:
           mkdir -p jnilib/${{ runner.os }}
           cp bazel-bin/tensorflow/lite/java/libtensorflowlite_jni.so jnilib/${{ runner.os }}
           cp bazel-bin/tensorflow/lite/java/libtensorflowlitelib.jar jnilib
-          aws s3 sync jnilib s3://djl-ai/publish/tflite-${TFLITE_VERSION}/jnilib
+          aws s3 sync jnilib s3://djl-ai/publish/tflite/${TFLITE_VERSION}/jnilib
