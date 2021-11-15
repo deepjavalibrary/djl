@@ -273,7 +273,10 @@ public final class LibUtils {
         if (overrideVersion == null) {
             overrideVersion = System.getProperty("PYTORCH_VERSION");
         }
-        if (overrideVersion != null) {
+        if (overrideVersion != null
+                && !overrideVersion.isEmpty()
+                && !overrideVersion.equals(version)) {
+            logger.warn("Override PyTorch version: {}.", overrideVersion);
             version = overrideVersion;
             Platform auto = Platform.fromSystem(overrideVersion);
             return downloadPyTorch(auto, fallback);
@@ -407,7 +410,7 @@ public final class LibUtils {
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
         }
-        String link = "https://publish.djl.ai/pytorch-" + matcher.group(1);
+        String link = "https://publish.djl.ai/pytorch/" + matcher.group(1);
         Path tmp = null;
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
             // if files not found
@@ -474,12 +477,10 @@ public final class LibUtils {
         }
 
         StringBuilder sb = new StringBuilder(100);
-        sb.append("https://publish.djl.ai/pytorch-").append(matcher.group(1)).append("/jnilib/");
-        if (flavor.contains("-precxx11")) {
-            flavor = flavor.substring(0, flavor.length() - 9);
-            sb.append("precxx11/");
-        }
-        sb.append(djlVersion)
+        sb.append("https://publish.djl.ai/pytorch/")
+                .append(matcher.group(1))
+                .append("/jnilib/")
+                .append(djlVersion)
                 .append('/')
                 .append(classifier)
                 .append('/')
