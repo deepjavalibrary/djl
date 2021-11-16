@@ -232,31 +232,9 @@ public final class LibUtils {
                         flavor = "mkl";
                     }
                 } else if ("linux".equals(os)) {
-                    boolean match =
-                            lines.contains(os + '/' + flavor + "/libmxnet.so.gz")
-                                    && supported(platform);
-                    if (!match) {
-                        String cudaMajor = flavor.substring(0, 4);
-                        Pattern pattern =
-                                Pattern.compile(
-                                        '('
-                                                + cudaMajor
-                                                + ".+)/"
-                                                + classifier
-                                                + "/native/lib/"
-                                                + libName
-                                                + ".gz");
-                        for (String line : lines) {
-                            Matcher m = pattern.matcher(line);
-                            if (m.matches()) {
-                                flavor = m.group(1);
-                                match = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!match) {
+                    // MXNet must use exactly matched cuda minor version
+                    if (!lines.contains(os + '/' + flavor + "/libmxnet.so.gz")
+                            || !supported(platform)) {
                         logger.warn(
                                 "No matching cuda flavor for {} found: {}/sm_{}.",
                                 os,
@@ -320,11 +298,15 @@ public final class LibUtils {
     private static boolean supported(Platform platform) {
         // mxnet-native-cu102mkl:1.8.0: 3.0, 5.0, 6.0, 7.0, 7.5
         // mxnet-native-cu110mkl:1.8.0: 5.0, 6.0, 7.0, 8.0
-        if (platform.getVersion().startsWith("1.8.")) {
+        String version = platform.getVersion();
+        if (version.startsWith("1.8.") || version.startsWith("1.9.")) {
             String flavor = platform.getFlavor();
             String cudaArch = platform.getCudaArch();
             if (flavor.startsWith("cu11")) {
-                return Arrays.asList("50", "60", "70", "80").contains(cudaArch);
+                if (version.startsWith("1.8.")) {
+                    return Arrays.asList("50", "60", "70", "80").contains(cudaArch);
+                }
+                return Arrays.asList("50", "60", "70", "75", "80").contains(cudaArch);
             } else if (flavor.startsWith("cu10")) {
                 return Arrays.asList("30", "50", "60", "70", "75").contains(cudaArch);
             }
