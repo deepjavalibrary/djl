@@ -23,7 +23,6 @@ dependencies {
         runtimeOnly project(":engines:onnxruntime:onnxruntime-engine")
     } else if (System.getProperty("ai.djl.default_engine") == "TFLite") {
         runtimeOnly project(":engines:tflite:tflite-engine")
-        runtimeOnly "ai.djl.tflite:tflite-native-auto:${tflite_version}"
     } else if (System.getProperty("ai.djl.default_engine") == "DLR") {
         runtimeOnly project(":engines:dlr:dlr-engine")
     } else if (System.getProperty("ai.djl.default_engine") == "PaddlePaddle") {

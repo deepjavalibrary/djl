@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -73,8 +74,19 @@ public final class LibUtils {
 
         // No native jars
         if (!urls.hasMoreElements()) {
-            logger.debug("tflite.properties not found in class path.");
-            return null;
+            // No native jars
+            try (InputStream is = LibUtils.class.getResourceAsStream("/tflite-engine.properties")) {
+                if (is == null) {
+                    throw new IllegalStateException("Cannot find tflite-engine property file");
+                }
+                Properties prop = new Properties();
+                prop.load(is);
+                String preferredVersion = prop.getProperty("tflite_version");
+                Platform platform = Platform.fromSystem(preferredVersion);
+                return downloadTfLite(platform);
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to download tflite native library", e);
+            }
         }
 
         Platform systemPlatform = Platform.fromSystem();
@@ -170,7 +182,7 @@ public final class LibUtils {
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Unexpected version: " + version);
         }
-        String link = "https://publish.djl.ai/tflite-" + matcher.group(1);
+        String link = "https://publish.djl.ai/tflite/" + matcher.group(1);
 
         Files.createDirectories(cacheDir);
         Path tmp = null;
