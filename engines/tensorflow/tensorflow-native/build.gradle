@@ -352,7 +352,5 @@ task downloadTensorflowNativeLib() {
             file.getParentFile().mkdirs()
             new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << new GZIPInputStream(i) } }
         }
-
-        new File("${BINARY_ROOT}/auto").mkdirs()
     }
 }

@@ -204,7 +204,5 @@ task downloadMxnetNativeLib() {
             }
             into("${BINARY_ROOT}/cu110mkl/linux/native/lib")
         }
-
-        new File("${BINARY_ROOT}/auto").mkdirs()
     }
 }

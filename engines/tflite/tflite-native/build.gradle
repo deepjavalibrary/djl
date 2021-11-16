@@ -92,7 +92,6 @@ task downloadTfliteNativeLib() {
     doLast {
         delete "${BINARY_ROOT}"
         downloadJni("${BINARY_ROOT}")
-        new File("${BINARY_ROOT}/auto").mkdirs()
     }
 }
 
