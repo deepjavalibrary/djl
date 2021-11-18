@@ -122,7 +122,6 @@ task downloadDlrNativeLib() {
             file.getParentFile().mkdirs()
             new URL("${url}/${entry.key}").withInputStream { i -> file.withOutputStream { it << i } }
         }
-        new File("${BINARY_ROOT}/auto").mkdirs()
     }
 }
 

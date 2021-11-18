@@ -108,7 +108,6 @@ task prepareNativeLibs() {
         exec {
             commandLine "sh", "-c", "find ${buildDir}/native -type d -empty -delete"
         }
-        new File("${buildDir}/native/auto").mkdirs()
     }
 }
 

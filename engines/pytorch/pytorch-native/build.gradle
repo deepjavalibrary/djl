@@ -236,9 +236,6 @@ publishing.repositories {
 task downloadPyTorchNativeLib() {
     doLast {
         prepareNativeLib("${BINARY_ROOT}", "${VERSION}", isPrecxx11, true)
-        if (!isPrecxx11) {
-            new File("${BINARY_ROOT}/auto").mkdirs()
-        }
     }
 }
 
