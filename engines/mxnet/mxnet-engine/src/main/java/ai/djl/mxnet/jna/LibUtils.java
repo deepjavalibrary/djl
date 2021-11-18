@@ -25,10 +25,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,9 +77,6 @@ public final class LibUtils {
         String libName = LibUtils.findOverrideLibrary();
         if (libName == null) {
             libName = LibUtils.findLibraryInClasspath();
-            if (libName == null) {
-                libName = LIB_NAME;
-            }
         }
         return libName;
     }
@@ -112,60 +107,12 @@ public final class LibUtils {
             return downloadMxnet(platform);
         }
 
-        Enumeration<URL> urls;
-        try {
-            urls =
-                    Thread.currentThread()
-                            .getContextClassLoader()
-                            .getResources("native/lib/mxnet.properties");
-        } catch (IOException e) {
-            logger.warn("", e);
-            return null;
-        }
-
-        // No native jars
-        if (!urls.hasMoreElements()) {
-            String preferredVersion;
-            try (InputStream is = LibUtils.class.getResourceAsStream("/mxnet-engine.properties")) {
-                Properties prop = new Properties();
-                prop.load(is);
-                preferredVersion = prop.getProperty("mxnet_version");
-            } catch (IOException e) {
-                throw new IllegalStateException("mxnet-engine.properties not found.", e);
-            }
-            Platform platform = Platform.fromSystem(preferredVersion);
+        Platform platform =
+                Platform.detectPlatform("mxnet", "/mxnet-engine.properties", "mxnet_version");
+        if (platform.isPlaceholder()) {
             return downloadMxnet(platform);
         }
-
-        Platform systemPlatform = Platform.fromSystem();
-        try {
-            Platform matching = null;
-            Platform placeholder = null;
-            while (urls.hasMoreElements()) {
-                URL url = urls.nextElement();
-                Platform platform = Platform.fromUrl(url);
-                if (platform.isPlaceholder()) {
-                    placeholder = platform;
-                } else if (platform.matches(systemPlatform)) {
-                    matching = platform;
-                    break;
-                }
-            }
-
-            if (matching != null) {
-                return loadLibraryFromClasspath(matching);
-            }
-
-            if (placeholder != null) {
-                return downloadMxnet(placeholder);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(
-                    "Failed to read MXNet native library jar properties", e);
-        }
-
-        throw new IllegalStateException(
-                "Your MXNet native library jar does not match your operating system. Make sure that the Maven Dependency Classifier matches your system type.");
+        return loadLibraryFromClasspath(platform);
     }
 
     private static String loadLibraryFromClasspath(Platform platform) {
@@ -310,8 +257,10 @@ public final class LibUtils {
                 }
             }
 
+            boolean found = false;
             for (String line : lines) {
                 if (line.startsWith(os + "/common/") || line.startsWith(os + '/' + flavor + '/')) {
+                    found = true;
                     URL url = new URL(link + '/' + line);
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
                     if ("win".equals(os)) {
@@ -329,6 +278,10 @@ public final class LibUtils {
                         Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
+            }
+            if (!found) {
+                throw new IllegalStateException(
+                        "No MXNet native library matches your operating system: " + platform);
             }
 
             Utils.moveQuietly(tmp, dir);

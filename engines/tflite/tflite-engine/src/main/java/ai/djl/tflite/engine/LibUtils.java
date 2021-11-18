@@ -20,9 +20,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -52,76 +50,17 @@ public final class LibUtils {
 
     public static void loadLibrary() {
         String libName = findLibraryInClasspath();
-        if (libName == null) {
-            System.loadLibrary(LIB_NAME); // NOPMD
-            return;
-        }
         logger.debug("Loading TFLite native library from: {}", libName);
         System.load(libName); // NOPMD
     }
 
     private static synchronized String findLibraryInClasspath() {
-        Enumeration<URL> urls;
-        try {
-            urls =
-                    Thread.currentThread()
-                            .getContextClassLoader()
-                            .getResources("native/lib/tflite.properties");
-        } catch (IOException e) {
-            logger.warn("", e);
-            return null;
+        Platform platform =
+                Platform.detectPlatform("tflite", "/tflite-engine.properties", "tflite_version");
+        if (platform.isPlaceholder()) {
+            return downloadTfLite(platform);
         }
-
-        // No native jars
-        if (!urls.hasMoreElements()) {
-            // No native jars
-            try (InputStream is = LibUtils.class.getResourceAsStream("/tflite-engine.properties")) {
-                if (is == null) {
-                    throw new IllegalStateException("Cannot find tflite-engine property file");
-                }
-                Properties prop = new Properties();
-                prop.load(is);
-                String preferredVersion = prop.getProperty("tflite_version");
-                Platform platform = Platform.fromSystem(preferredVersion);
-                return downloadTfLite(platform);
-            } catch (IOException e) {
-                throw new IllegalStateException("Failed to download tflite native library", e);
-            }
-        }
-
-        Platform systemPlatform = Platform.fromSystem();
-        try {
-            Platform matching = null;
-            Platform placeholder = null;
-            while (urls.hasMoreElements()) {
-                URL url = urls.nextElement();
-                Platform platform = Platform.fromUrl(url);
-                if (platform.isPlaceholder()) {
-                    placeholder = platform;
-                } else if (platform.matches(systemPlatform)) {
-                    matching = platform;
-                    break;
-                }
-            }
-
-            if (matching != null) {
-                return loadLibraryFromClasspath(matching);
-            }
-
-            if (placeholder != null) {
-                try {
-                    return downloadTfLite(placeholder);
-                } catch (IOException e) {
-                    throw new IllegalStateException("Failed to download TFLite native library", e);
-                }
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(
-                    "Failed to read TFLite native library jar properties", e);
-        }
-
-        throw new IllegalStateException(
-                "Your TFLite native library jar does not match your operating system. Make sure that the Maven Dependency Classifier matches your system type.");
+        return loadLibraryFromClasspath(platform);
     }
 
     private static String loadLibraryFromClasspath(Platform platform) {
@@ -163,7 +102,7 @@ public final class LibUtils {
         }
     }
 
-    private static String downloadTfLite(Platform platform) throws IOException {
+    private static String downloadTfLite(Platform platform) {
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
         String classifier = platform.getClassifier();
@@ -184,9 +123,9 @@ public final class LibUtils {
         }
         String link = "https://publish.djl.ai/tflite/" + matcher.group(1);
 
-        Files.createDirectories(cacheDir);
         Path tmp = null;
         try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            Files.createDirectories(cacheDir);
             List<String> lines = Utils.readLines(is);
             if (flavor.startsWith("cu")
                     && !lines.contains(flavor + '/' + classifier + '/' + libName + ".gz")) {
@@ -203,8 +142,10 @@ public final class LibUtils {
             }
 
             tmp = Files.createTempDirectory(cacheDir, "tmp");
+            boolean found = false;
             for (String line : lines) {
                 if (line.startsWith(flavor + '/' + classifier + '/')) {
+                    found = true;
                     URL url = new URL(link + '/' + line);
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
                     logger.info("Downloading {} ...", url);
@@ -213,9 +154,15 @@ public final class LibUtils {
                     }
                 }
             }
+            if (!found) {
+                throw new IllegalStateException(
+                        "No TFLite native library matches your operating system: " + platform);
+            }
 
             Utils.moveQuietly(tmp, dir);
             return path.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to download TensorflowLite native library", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);

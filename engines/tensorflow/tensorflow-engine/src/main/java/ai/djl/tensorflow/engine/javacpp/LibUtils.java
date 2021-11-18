@@ -22,9 +22,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -59,9 +57,6 @@ public final class LibUtils {
         String libName = LibUtils.findOverrideLibrary();
         if (libName == null) {
             libName = LibUtils.findLibraryInClasspath();
-            if (libName == null) {
-                libName = LIB_NAME;
-            }
         }
         return libName;
     }
@@ -84,61 +79,13 @@ public final class LibUtils {
 
     private static synchronized String findLibraryInClasspath() {
         // TensorFlow doesn't support native library override
-        Enumeration<URL> urls;
-        try {
-            urls =
-                    Thread.currentThread()
-                            .getContextClassLoader()
-                            .getResources("native/lib/tensorflow.properties");
-        } catch (IOException e) {
-            logger.warn("", e);
-            return null;
-        }
-
-        // No native jars
-        if (!urls.hasMoreElements()) {
-            String preferredVersion;
-            try (InputStream is =
-                    LibUtils.class.getResourceAsStream("/tensorflow-engine.properties")) {
-                Properties prop = new Properties();
-                prop.load(is);
-                preferredVersion = prop.getProperty("tensorflow_version");
-            } catch (IOException e) {
-                throw new IllegalStateException("tensorflow-engine.properties not found.", e);
-            }
-            Platform platform = Platform.fromSystem(preferredVersion);
+        Platform platform =
+                Platform.detectPlatform(
+                        "tensorflow", "/tensorflow-engine.properties", "tensorflow_version");
+        if (platform.isPlaceholder()) {
             return downloadTensorFlow(platform);
         }
-
-        Platform systemPlatform = Platform.fromSystem();
-        try {
-            Platform matching = null;
-            Platform placeholder = null;
-            while (urls.hasMoreElements()) {
-                URL url = urls.nextElement();
-                Platform platform = Platform.fromUrl(url);
-                if (platform.isPlaceholder()) {
-                    placeholder = platform;
-                } else if (platform.matches(systemPlatform)) {
-                    matching = platform;
-                    break;
-                }
-            }
-
-            if (matching != null) {
-                return loadLibraryFromClasspath(matching);
-            }
-
-            if (placeholder != null) {
-                return downloadTensorFlow(placeholder);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(
-                    "Failed to read Tensorflow native library jar properties", e);
-        }
-
-        throw new IllegalStateException(
-                "Your Tensorflow native library jar does not match your operating system. Make sure that the Maven Dependency Classifier matches your system type.");
+        return loadLibraryFromClasspath(platform);
     }
 
     private static String loadLibraryFromClasspath(Platform platform) {
@@ -247,8 +194,8 @@ public final class LibUtils {
             }
 
             if (!found) {
-                throw new UnsupportedOperationException(
-                        "TensorFlow engine does not support this platform: " + os);
+                throw new IllegalStateException(
+                        "No TensorFlow native library matches your operating system: " + platform);
             }
 
             Utils.moveQuietly(tmp, dir);

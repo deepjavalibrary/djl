@@ -298,34 +298,30 @@ public final class LibUtils {
         }
 
         Platform systemPlatform = Platform.fromSystem();
-        try {
-            Platform matching = null;
-            Platform placeholder = null;
-            while (urls.hasMoreElements()) {
-                URL url = urls.nextElement();
-                Platform platform = Platform.fromUrl(url);
-                if (platform.isPlaceholder()) {
-                    placeholder = platform;
-                } else if (platform.matches(systemPlatform, false)) {
-                    matching = platform;
-                    break;
-                }
+        Platform matching = null;
+        Platform placeholder = null;
+        while (urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            Platform platform = Platform.fromUrl(url);
+            if (platform.isPlaceholder()) {
+                placeholder = platform;
+            } else if (platform.matches(systemPlatform, false)) {
+                matching = platform;
+                break;
             }
-
-            if (matching != null) {
-                if ("cpu".equals(matching.getFlavor())) {
-                    fallback.set(true);
-                }
-                return copyNativeLibraryFromClasspath(matching);
-            }
-
-            if (placeholder != null) {
-                return downloadPyTorch(placeholder, fallback);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(
-                    "Failed to read PyTorch native library jar properties", e);
         }
+
+        if (matching != null) {
+            if ("cpu".equals(matching.getFlavor())) {
+                fallback.set(true);
+            }
+            return copyNativeLibraryFromClasspath(matching);
+        }
+
+        if (placeholder != null) {
+            return downloadPyTorch(placeholder, fallback);
+        }
+
         throw new IllegalStateException(
                 "Your PyTorch native library jar does not match your operating system. Make sure the Maven Dependency Classifier matches your system type.");
     }
@@ -391,7 +387,6 @@ public final class LibUtils {
         version = platform.getVersion();
         String flavor = platform.getFlavor();
         String classifier = platform.getClassifier();
-        String os = platform.getOsPrefix();
         if (Boolean.getBoolean("PYTORCH_PRECXX11")
                 || Boolean.parseBoolean(System.getenv("PYTORCH_PRECXX11"))) {
             flavor += "-precxx11";
@@ -417,9 +412,9 @@ public final class LibUtils {
             Files.createDirectories(cacheDir);
 
             List<String> lines = Utils.readLines(is);
-            if (!lines.contains(flavor + '/' + os + "/native/lib/" + libName + ".gz")) {
+            if (!lines.contains(flavor + '/' + classifier + "/native/lib/" + libName + ".gz")) {
                 if (flavor.startsWith("cu")) {
-                    logger.warn("No matching cuda flavor for {} found: {}.", os, flavor);
+                    logger.warn("No matching cuda flavor for {} found: {}.", classifier, flavor);
                     // fallback to CPU
                     flavor = "cpu";
                     fallback.set(true);
@@ -430,14 +425,14 @@ public final class LibUtils {
                     if (Files.exists(path)) {
                         return dir.toAbsolutePath().toString();
                     }
-                } else {
-                    throw new IOException("No matching flavor for " + os + " found: " + flavor);
                 }
             }
 
             tmp = Files.createTempDirectory(cacheDir, "tmp");
+            boolean found = false;
             for (String line : lines) {
-                if (line.startsWith(flavor + '/' + os + '/')) {
+                if (line.startsWith(flavor + '/' + classifier + '/')) {
+                    found = true;
                     URL url = new URL(link + '/' + line);
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
                     fileName = URLDecoder.decode(fileName, "UTF-8");
@@ -446,6 +441,10 @@ public final class LibUtils {
                         Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
+            }
+            if (!found) {
+                throw new IllegalStateException(
+                        "No PyTorch native library matches your operating system: " + platform);
             }
 
             Utils.moveQuietly(tmp, dir);
