@@ -109,7 +109,10 @@ configure(javaProjects()) {
 
     jar {
         manifest {
-            attributes("Automatic-Module-Name": "ai.djl.${project.name.replace('-', '_')}")
+            attributes(
+                    "Automatic-Module-Name": "ai.djl.${project.name.replace('-', '_')}",
+                    "Specification-Version": "${djl_version}"
+            )
         }
     }
 }

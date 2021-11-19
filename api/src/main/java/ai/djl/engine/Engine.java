@@ -366,15 +366,11 @@ public abstract class Engine {
 
         System.out.println();
         System.out.println("----------------- Engines ---------------");
+        System.out.println("DJL version: " + Engine.class.getPackage().getSpecificationVersion());
         System.out.println("Default Engine: " + DEFAULT_ENGINE);
-        System.out.println("Default Device: " + Engine.getInstance().defaultDevice);
+        System.out.println("Default Device: " + Engine.getInstance().defaultDevice());
         for (EngineProvider provider : ALL_ENGINES.values()) {
             System.out.println(provider.getEngineName() + ": " + provider.getEngineRank());
-            try {
-                provider.getEngine();
-            } catch (EngineException e) {
-                e.printStackTrace(System.out);
-            }
         }
     }
 }
