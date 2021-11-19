@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,16 +51,10 @@ public final class LibUtils {
 
     private static String copyJniLibraryFromClasspath() {
         String name = System.mapLibraryName(LIB_NAME);
-        Platform platform = Platform.fromSystem();
+        Platform platform =
+                Platform.detectPlatform("tensorrt", "/jnilib/tensorrt.properties", "version");
         String classifier = platform.getClassifier();
-        Properties prop = new Properties();
-        try (InputStream stream =
-                LibUtils.class.getResourceAsStream("/jnilib/tensorrt.properties")) {
-            prop.load(stream);
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot find TensorRT property file", e);
-        }
-        String version = prop.getProperty("version");
+        String version = platform.getVersion();
         Path cacheDir = Utils.getEngineCacheDir("tensorrt");
         Path dir = cacheDir.resolve(version + '-' + classifier);
         Path path = dir.resolve(name);

@@ -16,11 +16,11 @@ import ai.djl.util.cuda.CudaUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.Properties;
 
 /**
- * The platform contains information regarding the version, os, and build flavor of the MXNet native
- * code.
+ * The platform contains information regarding the version, os, and build flavor of the native code.
  */
 public final class Platform {
 
@@ -36,13 +36,67 @@ public final class Platform {
     private Platform() {}
 
     /**
+     * Returns the platform that matches current operating system.
+     *
+     * @param engine the name of the engine
+     * @param path the path to the placeholder properties file
+     * @param key the version key in the "engine".properties file
+     * @return the platform that matches current operating system
+     */
+    public static Platform detectPlatform(String engine, String path, String key) {
+        Enumeration<URL> urls;
+        try {
+            urls =
+                    Thread.currentThread()
+                            .getContextClassLoader()
+                            .getResources("native/lib/" + engine + ".properties");
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Failed to list property files.", e);
+        }
+
+        Platform systemPlatform = Platform.fromSystem();
+        Platform placeholder = null;
+        while (urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            Platform platform = Platform.fromUrl(url);
+            if (platform.isPlaceholder()) {
+                placeholder = platform;
+            } else if (platform.matches(systemPlatform)) {
+                return platform;
+            }
+        }
+        if (placeholder != null) {
+            return placeholder;
+        }
+
+        if (path == null) {
+            throw new IllegalArgumentException("No property file found for engine: " + engine);
+        }
+
+        URL url = Platform.class.getResource(path);
+        if (url == null) {
+            throw new IllegalArgumentException("Property file not found: " + path);
+        }
+        try (InputStream is = url.openStream()) {
+            Properties prop = new Properties();
+            prop.load(is);
+            String preferredVersion = prop.getProperty(key);
+            if (preferredVersion == null) {
+                throw new IllegalArgumentException("No version found in property file: " + key);
+            }
+            return fromSystem(preferredVersion);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to read " + path, e);
+        }
+    }
+
+    /**
      * Returns the platform that parsed from "engine".properties file.
      *
      * @param url the url to the "engine".properties file
-     * @return the platform that parsed from mxnet.properties file
-     * @throws IOException if the file could not be read
+     * @return the platform that parsed from "engine".properties file
      */
-    public static Platform fromUrl(URL url) throws IOException {
+    public static Platform fromUrl(URL url) {
         Platform platform = Platform.fromSystem();
         try (InputStream conf = url.openStream()) {
             Properties prop = new Properties();
@@ -68,6 +122,8 @@ public final class Platform {
                 platform.osPrefix = tokens[1];
                 platform.osArch = tokens[2];
             }
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to read property file: " + url, e);
         }
         return platform;
     }
@@ -81,6 +137,7 @@ public final class Platform {
     public static Platform fromSystem(String version) {
         Platform platform = fromSystem();
         platform.version = version;
+        platform.placeholder = true;
         return platform;
     }
 
@@ -142,9 +199,9 @@ public final class Platform {
     }
 
     /**
-     * Returns the MXNet build flavor.
+     * Returns the engine build flavor.
      *
-     * @return the MXNet build flavor
+     * @return the engine build flavor
      */
     public String getFlavor() {
         return flavor;
@@ -216,5 +273,11 @@ public final class Platform {
                     || (!strictModel && flavor.compareTo(system.flavor) <= 0);
         }
         return "cpu".equals(flavor) || "mkl".equals(flavor);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return flavor + '-' + getClassifier() + ':' + version;
     }
 }

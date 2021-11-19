@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,16 +55,9 @@ public final class LibUtils {
     private static String copyJniLibraryFromClasspath() {
         String name = System.mapLibraryName(LIB_NAME);
         Path nativeDir = Utils.getEngineCacheDir("sentencepiece");
-        Properties prop = new Properties();
-        Platform platform = Platform.fromSystem();
+        Platform platform = Platform.detectPlatform("sentencepiece", null, null);
         String classifier = platform.getClassifier();
-        try (InputStream stream =
-                LibUtils.class.getResourceAsStream("/native/lib/sentencepiece.properties")) {
-            prop.load(stream);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to read files", e);
-        }
-        String version = prop.getProperty("version");
+        String version = platform.getVersion();
         Path path = nativeDir.resolve(version).resolve(name);
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
