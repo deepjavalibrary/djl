@@ -51,8 +51,7 @@ public final class LibUtils {
 
     private static String copyJniLibraryFromClasspath() {
         String name = System.mapLibraryName(LIB_NAME);
-        Platform platform =
-                Platform.detectPlatform("tensorrt", "/jnilib/tensorrt.properties", "version");
+        Platform platform = Platform.detectPlatform("tensorrt");
         String classifier = platform.getClassifier();
         String version = platform.getVersion();
         Path cacheDir = Utils.getEngineCacheDir("tensorrt");

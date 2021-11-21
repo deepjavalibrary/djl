@@ -79,9 +79,7 @@ public final class LibUtils {
 
     private static synchronized String findLibraryInClasspath() {
         // TensorFlow doesn't support native library override
-        Platform platform =
-                Platform.detectPlatform(
-                        "tensorflow", "/tensorflow-engine.properties", "tensorflow_version");
+        Platform platform = Platform.detectPlatform("tensorflow");
         if (platform.isPlaceholder()) {
             return downloadTensorFlow(platform);
         }

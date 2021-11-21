@@ -16,7 +16,7 @@ processResources {
         def classesDir = file("${project.buildDir}/classes/java/main/")
         classesDir.mkdirs()
         def file = new File(classesDir, "tflite-engine.properties")
-        file.text = "tflite_version=${tflite_version}"
+        file.text = "djl_version=${djl_version}\ntflite_version=${tflite_version}"
     }
 }
 

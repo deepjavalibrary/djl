@@ -48,8 +48,8 @@ processResources {
         }
 
         // write properties
-        def propFile = file("${project.buildDir}/classes/java/main/jnilib/dlr.properties")
-        propFile.text = "version=${version}\ndlr_version=${dlr_version}"
+        def propFile = file("${project.buildDir}/classes/java/main/dlr-engine.properties")
+        propFile.text = "djl_version=${version}\ndlr_version=${dlr_version}"
     }
 }
 

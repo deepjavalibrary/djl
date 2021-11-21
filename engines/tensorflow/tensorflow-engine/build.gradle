@@ -16,10 +16,9 @@ processResources {
         def classesDir = file("${project.buildDir}/classes/java/main/")
         classesDir.mkdirs()
         def file = new File(classesDir, "tensorflow-engine.properties")
-        file.text = "tensorflow_version=${tensorflow_version}"
+        file.text = "djl_version=${djl_version}\ntensorflow_version=${tensorflow_version}"
     }
 }
-
 
 publishing {
     publications {

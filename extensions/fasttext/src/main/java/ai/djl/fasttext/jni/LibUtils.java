@@ -55,7 +55,7 @@ public final class LibUtils {
     private static String copyJniLibraryFromClasspath() {
         String name = System.mapLibraryName(LIB_NAME);
         Path nativeDir = Utils.getEngineCacheDir("fasttext");
-        Platform platform = Platform.detectPlatform("fasttext", null, null);
+        Platform platform = Platform.detectPlatform("fasttext");
         String classifier = platform.getClassifier();
         String version = platform.getVersion();
         Path path = nativeDir.resolve(version).resolve(name);

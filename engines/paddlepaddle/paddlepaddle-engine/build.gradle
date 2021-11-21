@@ -47,8 +47,8 @@ processResources {
         }
 
         // write properties
-        def propFile = file("${project.buildDir}/classes/java/main/jnilib/paddlepaddle.properties")
-        propFile.text = "version=${version}\npaddlepaddle_version=${paddlepaddle_version}"
+        def propFile = file("${project.buildDir}/classes/java/main/paddlepaddle-engine.properties")
+        propFile.text = "djl_version=${djl_version}\npaddlepaddle_version=${paddlepaddle_version}"
     }
 }
 

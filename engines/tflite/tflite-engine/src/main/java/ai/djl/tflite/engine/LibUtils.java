@@ -55,8 +55,7 @@ public final class LibUtils {
     }
 
     private static synchronized String findLibraryInClasspath() {
-        Platform platform =
-                Platform.detectPlatform("tflite", "/tflite-engine.properties", "tflite_version");
+        Platform platform = Platform.detectPlatform("tflite");
         if (platform.isPlaceholder()) {
             return downloadTfLite(platform);
         }

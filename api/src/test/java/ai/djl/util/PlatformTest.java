@@ -41,14 +41,26 @@ public class PlatformTest {
         Assert.assertEquals(system.getOsPrefix(), "linux");
         Assert.assertEquals(system.getOsArch(), "x86_64");
 
-        url = createPropertyFile("version=1.8.0\nplaceholder=true");
+        url = createPropertyFile("version=1.8.0\nflavor=cpu-precxx11\nclassifier=linux-x86_64");
         Platform platform = Platform.fromUrl(url);
+        Assert.assertEquals(platform.getFlavor(), "cpu-precxx11");
+        Assert.assertEquals(platform.getClassifier(), "linux-x86_64");
+        Assert.assertEquals(platform.getOsPrefix(), "linux");
+        Assert.assertEquals(platform.getOsArch(), "x86_64");
+        Assert.assertTrue(platform.matches(system));
+        Assert.assertFalse(system.matches(platform));
+
+        url = createPropertyFile("version=1.8.0\nplaceholder=true");
+        platform = Platform.fromUrl(url);
         Assert.assertTrue(platform.isPlaceholder());
 
         url = createPropertyFile("version=1.8.0\nclassifier=cu111-linux-x86_64");
         platform = Platform.fromUrl(url);
+        Assert.assertTrue(platform.matches(system));
+
+        url = createPropertyFile("version=1.8.0\nclassifier=cu102-linux-x86_64");
+        platform = Platform.fromUrl(url);
         Assert.assertFalse(platform.matches(system));
-        Assert.assertTrue(platform.matches(system, false));
 
         // MXNet
         url = createPropertyFile("version=1.8.0\nclassifier=cu113mkl-linux-x86_64");

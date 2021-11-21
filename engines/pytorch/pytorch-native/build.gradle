@@ -68,11 +68,11 @@ def downloadBuildAndroid(String ver) {
                 from "${project.buildDir}/libdjl_torch.so"
                 into ciDir
             }
-            cleanBuild()
+            delete "${project.buildDir}/"
     }
 }
 
-def prepareNativeLib(String binaryRoot, String ver, boolean precxx11, boolean publish) {
+def prepareNativeLib(String binaryRoot, String ver) {
     def url = "https://download.pytorch.org/libtorch"
     String cu11
     if (ver.startsWith("1.8.") || ver.startsWith("1.9.")) {
@@ -82,27 +82,16 @@ def prepareNativeLib(String binaryRoot, String ver, boolean precxx11, boolean pu
     }
 
     def files = [
-            "cpu/libtorch-cxx11-abi-shared-with-deps-${ver}%2Bcpu.zip"        : "cpu/linux",
-            "cpu/libtorch-macos-${ver}.zip"                                   : "cpu/osx",
-            "cpu/libtorch-win-shared-with-deps-${ver}%2Bcpu.zip"              : "cpu/win",
-            "cu102/libtorch-cxx11-abi-shared-with-deps-${ver}%2Bcu102.zip"    : "cu102/linux",
-            "${cu11}/libtorch-cxx11-abi-shared-with-deps-${ver}%2B${cu11}.zip": "${cu11}/linux",
-            "cu102/libtorch-win-shared-with-deps-${ver}%2Bcu102.zip"          : "cu102/win",
-            "${cu11}/libtorch-win-shared-with-deps-${ver}%2B${cu11}.zip"      : "${cu11}/win"
+            "cpu/libtorch-cxx11-abi-shared-with-deps-${ver}%2Bcpu.zip"        : "cpu/linux-x86_64",
+            "cpu/libtorch-macos-${ver}.zip"                                   : "cpu/osx-x86_64",
+            "cpu/libtorch-win-shared-with-deps-${ver}%2Bcpu.zip"              : "cpu/win-x86_64",
+            "cu102/libtorch-cxx11-abi-shared-with-deps-${ver}%2Bcu102.zip"    : "cu102/linux-x86_64",
+            "${cu11}/libtorch-cxx11-abi-shared-with-deps-${ver}%2B${cu11}.zip": "${cu11}/linux-x86_64",
+            "cu102/libtorch-win-shared-with-deps-${ver}%2Bcu102.zip"          : "cu102/win-x86_64",
+            "${cu11}/libtorch-win-shared-with-deps-${ver}%2B${cu11}.zip"      : "${cu11}/win-x86_64",
+            "cpu/libtorch-shared-with-deps-${ver}%2Bcpu.zip"                  : "cpu-precxx11/linux-x86_64",
+            "${cu11}/libtorch-shared-with-deps-${ver}%2B${cu11}.zip"          : "${cu11}-precxx11/linux-x86_64"
     ]
-    if (precxx11) {
-        if (publish) {
-            files = [
-                    "cpu/libtorch-shared-with-deps-${ver}%2Bcpu.zip"        : "cpu/linux",
-                    "${cu11}/libtorch-shared-with-deps-${ver}%2B${cu11}.zip": "${cu11}/linux"
-            ]
-        } else {
-            files = [
-                    "cpu/libtorch-shared-with-deps-${ver}%2Bcpu.zip"        : "cpu-precxx11/linux",
-                    "${cu11}/libtorch-shared-with-deps-${ver}%2B${cu11}.zip": "${cu11}-precxx11/linux"
-            ]
-        }
-    }
     files.each { entry ->
         project.logger.lifecycle("Downloading ${url}/${entry.key}")
         def outputDir = new File("${binaryRoot}/${entry.value}")
@@ -127,7 +116,7 @@ def prepareNativeLib(String binaryRoot, String ver, boolean precxx11, boolean pu
             }
             into("${outputDir}/native/lib")
         }
-        if (precxx11) {
+        if (entry.value.contains("-precxx11")) {
             def libstd = new File("${outputDir}/native/lib/libstdc++.so.6")
             new URL("https://publish.djl.ai/extra/libstdc%2B%2B.so.6").withInputStream {
                 i -> libstd.withOutputStream { it << i }
@@ -180,14 +169,10 @@ jar {
     // when there is no java code inside src/main
     outputs.dir file("build/libs")
     doFirst {
-        def versionName = project.version
-        if (!isRelease) {
-            versionName += String.format("-%s", new Date().format('yyyyMMdd'))
-        }
         def dir = file("${placeholder}/native/lib")
         dir.mkdirs()
         def propFile = file("${placeholder}/native/lib/pytorch.properties")
-        propFile.text = "placeholder=true\nversion=${versionName}\n"
+        propFile.text = "placeholder=true\nversion=${project.version}\n"
     }
 
     from placeholder
@@ -235,30 +220,29 @@ publishing.repositories {
 
 task downloadPyTorchNativeLib() {
     doLast {
-        prepareNativeLib("${BINARY_ROOT}", "${VERSION}", isPrecxx11, true)
+        prepareNativeLib("${BINARY_ROOT}", "${VERSION}")
     }
 }
 
 task uploadS3 {
     doLast {
         delete "${BINARY_ROOT}"
-        prepareNativeLib("${BINARY_ROOT}", "${VERSION}", false, false)
-        prepareNativeLib("${BINARY_ROOT}", "${VERSION}", true, false)
+        prepareNativeLib("${BINARY_ROOT}", "${version}")
 
         exec {
             commandLine "sh", "-c", "find ${BINARY_ROOT} -type f | xargs gzip"
         }
         def f = new File("${BINARY_ROOT}/files.txt")
         def uploadDirs = [
-                "${BINARY_ROOT}/cpu/linux/native/lib/",
-                "${BINARY_ROOT}/cpu/osx/native/lib/",
-                "${BINARY_ROOT}/cpu/win/native/lib/",
-                "${BINARY_ROOT}/cpu-precxx11/linux/native/lib/",
+                "${BINARY_ROOT}/cpu/linux-x86_64/native/lib/",
+                "${BINARY_ROOT}/cpu/osx-x86_64/native/lib/",
+                "${BINARY_ROOT}/cpu/win-x86_64/native/lib/",
+                "${BINARY_ROOT}/cpu-precxx11/linux-x86_64/native/lib/",
                 "${BINARY_ROOT}/cu102/linux/native/lib/",
-                "${BINARY_ROOT}/cu102/win/native/lib/",
-                "${BINARY_ROOT}/cu113/linux/native/lib/",
-                "${BINARY_ROOT}/cu113/win/native/lib/",
-                "${BINARY_ROOT}/cu113-precxx11/linux/native/lib/"
+                "${BINARY_ROOT}/cu102/win-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu113/linux-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu113/win-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu113-precxx11/linux-x86_64/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
@@ -289,10 +273,10 @@ flavorNames.each { flavor ->
                 def dsStore = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/.DS_Store")
                 dsStore.delete()
 
-                def versionName = String.format("${version}-%s", new Date().format('yyyyMMdd'))
+                def versionName = String.format("${project.version}-%s", new Date().format('yyyyMMdd'))
                 def dir = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib")
                 def sb = new StringBuilder()
-                sb.append("version=${versionName}\nclassifier=${flavor}-${osName}-x86_64\nlibraries=")
+                sb.append("version=${versionName}\nflavor=${flavor}\nclassifier=${osName}\nlibraries=")
                 def first = true
                 for (String name : dir.list().sort()) {
                     if (first) {
@@ -311,14 +295,14 @@ flavorNames.each { flavor ->
                 def binaryLicenseFile = new File(metaInf, "NOTICE")
                 binaryLicenseFile.text = new URL("https://raw.githubusercontent.com/pytorch/pytorch/master/NOTICE").text
 
-                if (isPrecxx11) {
+                if (flavor.contains("-precxx11")) {
                     def libstd = new File(metaInf, "ATTRIBUTION")
                     libstd.text = new URL("https://publish.djl.ai/extra/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt").text
                 }
             }
             from file("${BINARY_ROOT}/${flavor}/${osName}")
             from file("src/main/resources")
-            archiveClassifier = "${osName}-x86_64"
+            archiveClassifier = "${osName}"
 
             manifest {
                 attributes("Automatic-Module-Name": "ai.djl.pytorch_native_${flavor}_${osName}")
@@ -332,7 +316,7 @@ flavorNames.each { flavor ->
     // and the native jars have to be published separately
     if (project.getProjectDir().toString() == System.getProperty("user.dir")) {
         publishing.publications.create("${flavor}", MavenPublication) {
-            artifactId "pytorch-native-${flavor}" + (isPrecxx11 ? "-precxx11" : "")
+            artifactId "pytorch-native-${flavor}"
             from components.java
             artifacts = artifactsNames
             artifact jar
