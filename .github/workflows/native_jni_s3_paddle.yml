@@ -28,7 +28,7 @@ jobs:
       - name: Release JNI prep
         run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Upload compiled jni library
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: always()
         with:
           name: jnilib-${{ runner.os }}
@@ -68,7 +68,7 @@ jobs:
         run: |
           ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Upload compiled jni library
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: always()
         with:
           name: jnilib-${{ runner.os }}

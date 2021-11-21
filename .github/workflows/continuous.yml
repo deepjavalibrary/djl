@@ -43,72 +43,12 @@ jobs:
         run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Build with Gradle
         run: ./gradlew build jRR jRV
-      - name: API test results
-        uses: actions/upload-artifact@v1
+      - name: Upload test results
+        uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: api
-          path: api/build/reports
-      - name: basicdataset test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: basicdataset
-          path: basicdataset/build/reports
-      - name: examples test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: examples
-          path: examples/build/reports
-      - name: integration test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: integration
-          path: integration/build/reports
-      - name: model-zoo test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: model-zoo
-          path: model-zoo/build/reports
-      - name: mxnet-engine test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: mxnet-engine
-          path: engines/mxnet/mxnet-engine/build/reports
-      - name: mxnet-model-zoo test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: mxnet-model-zoo
-          path: engines/mxnet/mxnet-model-zoo/build/reports
-      - name: pytorch-engine test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: pytorch-engine
-          path: engines/pytorch/pytorch-engine/build/reports
-      - name: pytorch-model-zoo test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: pytorch-model-zoo
-          path: engines/pytorch/pytorch-model-zoo/build/reports
-      - name: tensorflow-engine test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: tensorflow-engine
-          path: engines/tensorflow/tensorflow-engine/build/reports
-      - name: tensorflow-model-zoo test results
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: tensorflow-model-zoo
-          path: engines/tensorflow/tensorflow-model-zoo/build/reports
+          name: reports
+          path: ${{ github.workspace }}/**/build/reports/**/*
       - name: upload to codecov
         uses: codecov/codecov-action@v1.5.0
         with:
