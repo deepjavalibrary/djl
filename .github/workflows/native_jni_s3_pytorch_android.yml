@@ -28,7 +28,7 @@ jobs:
           export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}
           ./gradlew :engines:pytorch:pytorch-native:compileAndroidJNI
       - name: Upload compiled jni library
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: always()
         with:
           name: jnilib-Android
