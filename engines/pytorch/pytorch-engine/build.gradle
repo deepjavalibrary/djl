@@ -8,58 +8,18 @@ dependencies {
     }
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
     testRuntimeOnly project(":engines:pytorch:pytorch-model-zoo")
+    testRuntimeOnly project(":engines:pytorch:pytorch-jni")
 }
 
 compileJava.dependsOn(processResources)
 
 processResources {
-    outputs.dir file("${project.buildDir}/classes/java/main/jnilib")
-    doLast {
-        String url = "https://publish.djl.ai/pytorch/${pytorch_version}/jnilib/${djl_version}"
-        def files = [
-                "linux-x86_64/cpu/libdjl_torch.so",
-                "linux-x86_64/cu102/libdjl_torch.so",
-                "linux-x86_64/cu113/libdjl_torch.so",
-                "linux-x86_64/cpu-precxx11/libdjl_torch.so",
-                "linux-x86_64/cu113-precxx11/libdjl_torch.so",
-                "osx-x86_64/cpu/libdjl_torch.dylib",
-                "win-x86_64/cpu/djl_torch.dll",
-                "win-x86_64/cu102/djl_torch.dll",
-                "win-x86_64/cu113/djl_torch.dll"
-        ]
-        String jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
-        files.each { entry ->
-            def file = new File("${jnilibDir}/${entry}")
-            if (file.exists()) {
-                project.logger.lifecycle("prebuilt or cached file found for ${entry}")
-            } else {
-                String nativeDir = "${project.parent.projectDir}/pytorch-native/jnilib/${djl_version}/"
-                def jnilibFile = new File("${nativeDir}/${entry}")
-                if (jnilibFile.exists()) {
-                    project.logger.lifecycle("Copying " + jnilibFile)
-                    copy {
-                        from jnilibFile
-                        into file.getParent()
-                    }
-                } else if (!project.hasProperty("jni")) {
-                    project.logger.lifecycle("Downloading ${url}/${entry}")
-                    file.getParentFile().mkdirs()
-                    new URL("${url}/${entry}").withInputStream { i -> file.withOutputStream { it << i } }
-                }
-            }
-        }
-        copy {
-            from jnilibDir
-            into "${project.buildDir}/classes/java/main/jnilib"
-        }
-
-        // write properties
-        String ptVersion = "${pytorch_version}"
-        if (project.hasProperty("pt_version") && project.property("pt_version") != "") {
-            ptVersion = project.property("pt_version")
-        }
-        def propFile = file("${project.buildDir}/classes/java/main/jnilib/pytorch.properties")
-        propFile.text = "version=${version}\njni_version=${ptVersion}"
+    outputs.file file("${project.buildDir}/classes/java/main/pytorch-engine.properties")
+    doFirst {
+        def classesDir = file("${project.buildDir}/classes/java/main/")
+        classesDir.mkdirs()
+        def propFile = new File(classesDir, "pytorch-engine.properties");
+        propFile.text = "djl_version=${djl_version}\npytorch_version=${pytorch_version}"
     }
 }
 

@@ -26,7 +26,7 @@ processResources {
         def classesDir = file("${project.buildDir}/classes/java/main/")
         classesDir.mkdirs()
         def file = new File(classesDir, "mxnet-engine.properties")
-        file.text = "mxnet_version=${mxnet_version}"
+        file.text = "djl_version=${djl_version}\nmxnet_version=${mxnet_version}"
     }
 }
 

@@ -103,12 +103,11 @@ public final class LibUtils {
             overrideVersion = System.getProperty("MXNET_VERSION");
         }
         if (overrideVersion != null) {
-            Platform platform = Platform.fromSystem(overrideVersion);
+            Platform platform = Platform.detectPlatform("mxnet", overrideVersion);
             return downloadMxnet(platform);
         }
 
-        Platform platform =
-                Platform.detectPlatform("mxnet", "/mxnet-engine.properties", "mxnet_version");
+        Platform platform = Platform.detectPlatform("mxnet");
         if (platform.isPlaceholder()) {
             return downloadMxnet(platform);
         }
@@ -201,10 +200,10 @@ public final class LibUtils {
 
         String libName = System.mapLibraryName(LIB_NAME);
         Path cacheFolder = Utils.getEngineCacheDir("mxnet");
-        logger.debug("Using cache dir: {}", cacheFolder);
         Path dir = cacheFolder.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(libName);
         if (Files.exists(path)) {
+            logger.debug("Using cache dir: {}", dir);
             return path.toAbsolutePath().toString();
         }
 
@@ -233,8 +232,31 @@ public final class LibUtils {
                         flavor = "mkl";
                     }
                 } else if ("linux".equals(os)) {
-                    if (!lines.contains(os + '/' + flavor + "/libmxnet.so.gz")
-                            || notSupported(platform)) {
+                    boolean match =
+                            lines.contains(os + '/' + flavor + "/libmxnet.so.gz")
+                                    && supported(platform);
+                    if (!match) {
+                        String cudaMajor = flavor.substring(0, 4);
+                        Pattern pattern =
+                                Pattern.compile(
+                                        '('
+                                                + cudaMajor
+                                                + ".+)/"
+                                                + classifier
+                                                + "/native/lib/"
+                                                + libName
+                                                + ".gz");
+                        for (String line : lines) {
+                            Matcher m = pattern.matcher(line);
+                            if (m.matches()) {
+                                flavor = m.group(1);
+                                match = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!match) {
                         logger.warn(
                                 "No matching cuda flavor for {} found: {}/sm_{}.",
                                 os,
@@ -247,15 +269,15 @@ public final class LibUtils {
                     throw new AssertionError("Unsupported GPU operating system: " + os);
                 }
 
-                // check again in case fallback to cpu
-                if ("mkl".equals(flavor)) {
-                    dir = cacheFolder.resolve(version + '-' + flavor + '-' + classifier);
-                    path = dir.resolve(libName);
-                    if (Files.exists(path)) {
-                        return path.toAbsolutePath().toString();
-                    }
+                // check again in case fallback to cpu or different cuda minor version
+                dir = cacheFolder.resolve(version + '-' + flavor + '-' + classifier);
+                path = dir.resolve(libName);
+                if (Files.exists(path)) {
+                    return path.toAbsolutePath().toString();
                 }
             }
+
+            logger.debug("Using cache dir: {}", dir);
 
             boolean found = false;
             for (String line : lines) {
@@ -295,18 +317,18 @@ public final class LibUtils {
         }
     }
 
-    private static boolean notSupported(Platform platform) {
+    private static boolean supported(Platform platform) {
         // mxnet-native-cu102mkl:1.8.0: 3.0, 5.0, 6.0, 7.0, 7.5
         // mxnet-native-cu110mkl:1.8.0: 5.0, 6.0, 7.0, 8.0
         if (platform.getVersion().startsWith("1.8.")) {
             String flavor = platform.getFlavor();
             String cudaArch = platform.getCudaArch();
-            if ("cu110".equals(flavor)) {
-                return !Arrays.asList("50", "60", "70", "80").contains(cudaArch);
-            } else if ("cu102".equals(flavor)) {
-                return !Arrays.asList("30", "50", "60", "70", "75").contains(cudaArch);
+            if (flavor.startsWith("cu11")) {
+                return Arrays.asList("50", "60", "70", "80").contains(cudaArch);
+            } else if (flavor.startsWith("cu10")) {
+                return Arrays.asList("30", "50", "60", "70", "75").contains(cudaArch);
             }
         }
-        return false;
+        return true;
     }
 }

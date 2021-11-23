@@ -25,7 +25,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,7 +76,7 @@ public final class LibUtils {
         if (nativeLibDir == null || !nativeLibDir.toFile().isDirectory()) {
             throw new IllegalStateException("Native folder cannot be found");
         }
-        libName = copyJniLibraryFromClasspath(nativeLibDir, fallback.get());
+        libName = copyJniLibraryFromClasspath(nativeLibDir);
         logger.debug("Loading paddle library from: {}", libName);
         System.load(libName); // NOPMD
     }
@@ -132,23 +131,12 @@ public final class LibUtils {
         return null;
     }
 
-    private static String copyJniLibraryFromClasspath(Path nativeDir, boolean fallback) {
+    private static String copyJniLibraryFromClasspath(Path nativeDir) {
         String name = System.mapLibraryName(LIB_NAME);
-        Platform platform = Platform.fromSystem();
+        Platform platform = Platform.detectPlatform("paddlepaddle");
         String classifier = platform.getClassifier();
-        String flavor = platform.getFlavor();
-        if (fallback) {
-            flavor = "cpu";
-        }
-        Properties prop = new Properties();
-        try (InputStream stream =
-                LibUtils.class.getResourceAsStream("/jnilib/paddlepaddle.properties")) {
-            prop.load(stream);
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot find paddle property file", e);
-        }
-        String version = prop.getProperty("version");
-        Path path = nativeDir.resolve(version + '-' + flavor + '-' + name);
+        String djlVersion = platform.getApiVersion();
+        Path path = nativeDir.resolve(djlVersion + '-' + name);
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
         }
@@ -175,9 +163,7 @@ public final class LibUtils {
     }
 
     private static synchronized String findLibraryInClasspath(AtomicBoolean fallback) {
-        Platform platform =
-                Platform.detectPlatform(
-                        "paddlepaddle", "/jnilib/paddlepaddle.properties", "paddlepaddle_version");
+        Platform platform = Platform.detectPlatform("paddlepaddle");
         if (platform.isPlaceholder()) {
             return downloadLibrary(platform, fallback);
         }

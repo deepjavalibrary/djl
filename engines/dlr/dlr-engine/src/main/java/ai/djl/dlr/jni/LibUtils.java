@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
@@ -73,7 +72,7 @@ public final class LibUtils {
     }
 
     private static synchronized String findNativeLibrary() {
-        Platform platform = Platform.detectPlatform("dlr", "/jnilib/dlr.properties", "dlr_version");
+        Platform platform = Platform.detectPlatform("dlr");
         if (platform.isPlaceholder()) {
             return downloadDlr(platform);
         }
@@ -157,29 +156,22 @@ public final class LibUtils {
 
     private static String copyJniLibraryFromClasspath(Path nativeDir) {
         String name = System.mapLibraryName(LIB_NAME);
-        Platform platform = Platform.fromSystem();
+        Platform platform = Platform.detectPlatform("dlr");
         String classifier = platform.getClassifier();
-        String flavor = platform.getFlavor();
-        Properties prop = new Properties();
-        try (InputStream stream = LibUtils.class.getResourceAsStream("/jnilib/dlr.properties")) {
-            prop.load(stream);
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot find DLR property file", e);
-        }
-        String version = prop.getProperty("version");
-        Path path = nativeDir.resolve(version + '-' + flavor + '-' + name);
+        String djlVersion = platform.getApiVersion();
+        Path path = nativeDir.resolve(djlVersion + '-' + name);
         if (Files.exists(path)) {
             return path.toAbsolutePath().toString();
         }
         Path tmp = null;
-        try (InputStream stream =
-                // both cpu & gpu share the same jnilib
-                LibUtils.class.getResourceAsStream("/jnilib/" + classifier + '/' + name)) {
-            if (stream == null) {
+        // both cpu & gpu share the same jnilib
+        String lib = "/jnilib/" + classifier + '/' + name;
+        try (InputStream is = LibUtils.class.getResourceAsStream(lib)) {
+            if (is == null) {
                 throw new UnsupportedOperationException("DLR is not supported by this platform");
             }
             tmp = Files.createTempFile(nativeDir, "jni", "tmp");
-            Files.copy(stream, tmp, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
             Utils.moveQuietly(tmp, path);
             return path.toAbsolutePath().toString();
         } catch (IOException e) {

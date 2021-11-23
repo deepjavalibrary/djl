@@ -55,7 +55,7 @@ public final class LibUtils {
     private static String copyJniLibraryFromClasspath() {
         String name = System.mapLibraryName(LIB_NAME);
         Path nativeDir = Utils.getEngineCacheDir("sentencepiece");
-        Platform platform = Platform.detectPlatform("sentencepiece", null, null);
+        Platform platform = Platform.detectPlatform("sentencepiece");
         String classifier = platform.getClassifier();
         String version = platform.getVersion();
         Path path = nativeDir.resolve(version).resolve(name);
