@@ -34,8 +34,7 @@ public abstract class ModelZoo {
     static {
         ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
         for (ZooProvider provider : providers) {
-            ModelZoo zoo = provider.getModelZoo();
-            MODEL_ZOO_MAP.put(zoo.getGroupId(), zoo);
+            registerModelZoo(provider);
         }
     }
 
@@ -77,6 +76,16 @@ public abstract class ModelZoo {
      * @return all supported engine names
      */
     public abstract Set<String> getSupportedEngines();
+
+    /**
+     * Refreshes model zoo.
+     *
+     * @param provider the {@code ZooProvider}
+     */
+    public static void registerModelZoo(ZooProvider provider) {
+        ModelZoo zoo = provider.getModelZoo();
+        MODEL_ZOO_MAP.putIfAbsent(zoo.getGroupId(), zoo);
+    }
 
     /**
      * Returns available model zoos.
