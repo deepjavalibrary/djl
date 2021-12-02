@@ -24,6 +24,8 @@ public final class SentencePieceLibrary {
 
     public native void loadModel(long handle, String filePath);
 
+    public native void loadModelFromBytes(long handle, byte[] bytes);
+
     public native void deleteSentencePieceProcessor(long handle);
 
     public native String[] tokenize(long handle, String text);

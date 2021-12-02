@@ -44,6 +44,10 @@ final class SpProcessor extends NativeResource<Long> {
         SentencePieceLibrary.LIB.loadModel(getHandle(), path);
     }
 
+    void loadModelFromBytes(byte[] serializedProto) {
+        SentencePieceLibrary.LIB.loadModelFromBytes(getHandle(), serializedProto);
+    }
+
     /**
      * Tokenize a sentence into array of tokens.
      *
