@@ -50,6 +50,16 @@ public class SpTokenizer implements Tokenizer, AutoCloseable {
         loadModel(modelPath, prefix);
     }
 
+    /**
+     * Creates a SentencePiece Tokenizer from byte array.
+     *
+     * @param serializedModel the serialized model
+     */
+    public SpTokenizer(byte[] serializedModel) {
+        this.processor = SpProcessor.newInstance();
+        processor.loadModelFromBytes(serializedModel);
+    }
+
     /** {@inheritDoc} */
     @Override
     public List<String> tokenize(String sentence) {

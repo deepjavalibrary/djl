@@ -38,6 +38,22 @@ public class SpTokenizerTest {
     }
 
     @Test
+    public void testLoadFromBytes() throws IOException {
+        TestRequirements.notWindows();
+
+        Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
+        byte[] bytes = Files.readAllBytes(modelPath);
+        try (SpTokenizer tokenizer = new SpTokenizer(bytes)) {
+            String original = "Hello World";
+            List<String> tokens = tokenizer.tokenize(original);
+            List<String> expected = Arrays.asList("▁He", "ll", "o", "▁", "W", "or", "l", "d");
+            Assert.assertEquals(tokens, expected);
+            String recovered = tokenizer.buildSentence(tokens);
+            Assert.assertEquals(original, recovered);
+        }
+    }
+
+    @Test
     public void testTokenize() throws IOException {
         TestRequirements.notWindows();
 
