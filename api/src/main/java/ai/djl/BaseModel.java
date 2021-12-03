@@ -118,6 +118,13 @@ public abstract class BaseModel implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public void load(InputStream is, Map<String, ?> options)
+            throws IOException, MalformedModelException {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void close() {
         manager.close();
     }

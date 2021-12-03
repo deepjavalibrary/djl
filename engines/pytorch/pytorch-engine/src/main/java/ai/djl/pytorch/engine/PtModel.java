@@ -108,16 +108,14 @@ public class PtModel extends BaseModel {
         }
     }
 
-    /**
-     * Load PyTorch model from {@link InputStream}.
-     *
-     * <p>Currently, only TorchScript file are supported
-     *
-     * @param modelStream the stream of the model file
-     * @throws IOException model loading error
-     */
-    public void load(InputStream modelStream) throws IOException {
-        load(modelStream, true);
+    /** {@inheritDoc} */
+    @Override
+    public void load(InputStream modelStream, Map<String, ?> options) throws IOException {
+        boolean mapLocation = false;
+        if (options != null) {
+            mapLocation = Boolean.parseBoolean((String) options.get("mapLocation"));
+        }
+        load(modelStream, mapLocation);
     }
 
     /**
@@ -128,6 +126,8 @@ public class PtModel extends BaseModel {
      * @throws IOException model loading error
      */
     public void load(InputStream modelStream, boolean mapLocation) throws IOException {
+        modelDir = Files.createTempDirectory("pt-model");
+        modelDir.toFile().deleteOnExit();
         block = JniUtils.loadModule((PtNDManager) manager, modelStream, mapLocation, false);
     }
 

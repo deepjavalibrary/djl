@@ -134,6 +134,27 @@ public interface Model extends AutoCloseable {
             throws IOException, MalformedModelException;
 
     /**
+     * Loads the model from the {@code InputStream}.
+     *
+     * @param is the {@code InputStream} to load the model from
+     * @throws IOException when IO operation fails in loading a resource
+     * @throws MalformedModelException if model file is corrupted
+     */
+    default void load(InputStream is) throws IOException, MalformedModelException {
+        load(is, null);
+    }
+
+    /**
+     * Loads the model from the {@code InputStream} with the options provided.
+     *
+     * @param is the {@code InputStream} to load the model from
+     * @param options engine specific load model options, see documentation for each engine
+     * @throws IOException when IO operation fails in loading a resource
+     * @throws MalformedModelException if model file is corrupted
+     */
+    void load(InputStream is, Map<String, ?> options) throws IOException, MalformedModelException;
+
+    /**
      * Saves the model to the specified {@code modelPath} with the name provided.
      *
      * @param modelPath the directory or file path of the model location
