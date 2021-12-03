@@ -13,6 +13,7 @@
 package ai.djl.tflite.engine;
 
 import ai.djl.MalformedModelException;
+import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
@@ -23,6 +24,9 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -47,6 +51,14 @@ public class TfLiteTest {
                             .fromUrl("https://resources.djl.ai/images/sachertorte.jpg");
             Classifications prediction = predictor.predict(image);
             Assert.assertEquals(prediction.best().getClassName(), "Sachertorte");
+
+            Path modelPath = model.getModelPath();
+            Path modelFile = modelPath.resolve("aiyDish.tflite");
+            Model m = Model.newInstance("aiyDish", "TFLite");
+            try (InputStream is = Files.newInputStream(modelFile)) {
+                m.load(is);
+            }
+            m.close();
         }
     }
 }

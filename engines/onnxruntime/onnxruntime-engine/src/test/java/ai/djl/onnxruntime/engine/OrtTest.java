@@ -27,6 +27,8 @@ import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -58,6 +60,13 @@ public class OrtTest {
                 m.load(modelFile);
 
                 m.close();
+
+                // Test load model from stream
+                Model stream = Model.newInstance("model", "OnnxRuntime");
+                try (InputStream is = Files.newInputStream(modelFile)) {
+                    stream.load(is);
+                }
+                stream.close();
             }
         } catch (UnsatisfiedLinkError e) {
             /*

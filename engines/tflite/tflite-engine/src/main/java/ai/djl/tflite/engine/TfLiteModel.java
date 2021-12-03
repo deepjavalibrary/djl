@@ -14,10 +14,14 @@ package ai.djl.tflite.engine;
 
 import ai.djl.BaseModel;
 import ai.djl.Model;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.util.Utils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -59,6 +63,22 @@ public class TfLiteModel extends BaseModel {
             }
         }
         Interpreter interpreter = new Interpreter(modelFile.toFile());
+        setBlock(new TfLiteSymbolBlock(interpreter, getNDManager()));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void load(InputStream is, Map<String, ?> options) throws IOException {
+        if (block != null) {
+            throw new UnsupportedOperationException("TFLite does not support dynamic blocks");
+        }
+        modelDir = Files.createTempDirectory("tflite-model");
+        modelDir.toFile().deleteOnExit();
+        byte[] buf = Utils.toByteArray(is);
+        Engine engine = Engine.getEngine(TfLiteEngine.ENGINE_NAME);
+        ByteBuffer bb = engine.newBaseManager().allocateDirect(buf.length);
+        bb.put(buf);
+        Interpreter interpreter = new Interpreter(bb);
         setBlock(new TfLiteSymbolBlock(interpreter, getNDManager()));
     }
 
