@@ -93,6 +93,12 @@ public class FtModel implements Model {
         properties.put("model-type", fta.getModelType());
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void load(InputStream modelStream, Map<String, ?> options) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
     private Path findModelFile(String prefix) {
         if (Files.isRegularFile(modelDir)) {
             Path file = modelDir;

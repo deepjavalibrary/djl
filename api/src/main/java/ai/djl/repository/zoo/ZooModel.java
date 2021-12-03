@@ -59,6 +59,12 @@ public class ZooModel<I, O> implements Model {
         throw new IllegalArgumentException("ZooModel should not be re-loaded.");
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void load(InputStream modelStream, Map<String, ?> options) throws IOException {
+        throw new IllegalArgumentException("ZooModel should not be re-loaded.");
+    }
+
     /**
      * Returns the wrapped model.
      *
