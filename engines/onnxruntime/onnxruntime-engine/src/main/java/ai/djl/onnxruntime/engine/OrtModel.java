@@ -18,11 +18,13 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.util.Utils;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -77,6 +79,32 @@ public class OrtModel extends BaseModel {
                 session = env.createSession(modelFile.toString(), sessionOptions);
             } else {
                 session = env.createSession(modelFile.toString());
+            }
+            block = new OrtSymbolBlock(session, (OrtNDManager) manager);
+        } catch (OrtException e) {
+            throw new MalformedModelException("ONNX Model cannot be loaded", e);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void load(InputStream is, Map<String, ?> options)
+            throws IOException, MalformedModelException {
+        if (block != null) {
+            throw new UnsupportedOperationException("ONNX Runtime does not support dynamic blocks");
+        }
+        modelDir = Files.createTempDirectory("ort-model");
+        modelDir.toFile().deleteOnExit();
+        try {
+            byte[] buf = Utils.toByteArray(is);
+            Device device = manager.getDevice();
+            OrtSession session;
+            if (device.isGpu()) {
+                OrtSession.SessionOptions sessionOptions = new OrtSession.SessionOptions();
+                sessionOptions.addCUDA(manager.getDevice().getDeviceId());
+                session = env.createSession(buf, sessionOptions);
+            } else {
+                session = env.createSession(buf);
             }
             block = new OrtSymbolBlock(session, (OrtNDManager) manager);
         } catch (OrtException e) {
