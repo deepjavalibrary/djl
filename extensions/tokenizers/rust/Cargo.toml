@@ -2,7 +2,7 @@
 name = "djl"
 version = "0.1.0"
 authors = ["Frank Liu <frankfliu2000@gmail.com>"]
-edition = "2021"
+edition = "2018"
 
 [dependencies]
 jni = "0.19.0"
