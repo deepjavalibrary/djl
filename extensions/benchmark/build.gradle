@@ -4,6 +4,7 @@ plugins {
 }
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
+version = "0.14.1"
 
 dependencies {
     implementation "commons-cli:commons-cli:${commons_cli_version}"
