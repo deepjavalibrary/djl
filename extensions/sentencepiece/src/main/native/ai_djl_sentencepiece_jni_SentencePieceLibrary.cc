@@ -96,7 +96,7 @@ JNIEXPORT jstring JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_idT
   return env->NewStringUTF(processor_ptr->IdToPiece(jid).c_str());
 }
 
-JNIEXPORT int JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_pieceToId(
+JNIEXPORT jint JNICALL Java_ai_djl_sentencepiece_jni_SentencePieceLibrary_pieceToId(
     JNIEnv* env, jobject jthis, jlong jhandle, jstring jpiece) {
   auto* processor_ptr = reinterpret_cast<sentencepiece::SentencePieceProcessor*>(jhandle);
   return processor_ptr->PieceToId(djl::utils::jni::GetStringFromJString(env, jpiece));

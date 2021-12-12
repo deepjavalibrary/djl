@@ -73,6 +73,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: Compile Sentencepiece JNI
+        run: ./gradlew :extensions:sentencepiece:compileJNI
       - name: Compile PyTorch JNI
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
       - name: Compile PaddlePaddle JNI

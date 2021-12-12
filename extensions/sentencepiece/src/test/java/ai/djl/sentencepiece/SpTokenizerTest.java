@@ -39,8 +39,6 @@ public class SpTokenizerTest {
 
     @Test
     public void testLoadFromBytes() throws IOException {
-        TestRequirements.notWindows();
-
         Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
         byte[] bytes = Files.readAllBytes(modelPath);
         try (SpTokenizer tokenizer = new SpTokenizer(bytes)) {
