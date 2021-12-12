@@ -39,7 +39,4 @@ if [[ $PLATFORM == 'darwin' ]]; then
 elif [[ $PLATFORM == 'linux' ]]; then
   mkdir -p build/jnilib/linux-x86_64
   cp -f build/libsentencepiece_native.so build/jnilib/linux-x86_64/
-elif [[ $PLATFORM == 'windows' ]]; then
-  mkdir -p build/jnilib/windows-x86_64
-  cp -f build/libsentencepiece_native.so build/jnilib/windows-x86_64/
 fi
