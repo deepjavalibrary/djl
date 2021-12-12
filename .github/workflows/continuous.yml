@@ -33,12 +33,14 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: check disk space
         run: df -h
+      - name: Compile Sentencepiece JNI
+        run: ./gradlew :extensions:sentencepiece:compileJNI
+      - name: Compile fastText JNI
+        run: ./gradlew :extensions:fasttext:compileJNI
+      - name: Compile tokenizers JNI
+        run: ./gradlew :extensions:tokenizers:compileJNI
       - name: Compile PyTorch JNI
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
-      - name: Compile Sentencepiece JNI
-        run: ./gradlew :extension:sentencepiece:compileJNI
-      - name: Compile fastText JNI
-        run: ./gradlew :extension:fasttext:compileJNI
       - name: Compile PaddlePaddle JNI
         run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Build with Gradle
@@ -77,6 +79,8 @@ jobs:
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
       - name: Compile PaddlePaddle JNI
         run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
+      - name: Compile tokenizers JNI
+        run: ./gradlew :extensions:tokenizers:compileJNI
       - name: Integration tests
         # MXNet integration test on Github Action fail due to memory limitation on Windows
         run: |

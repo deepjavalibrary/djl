@@ -50,16 +50,25 @@ public final class LibUtils {
     }
 
     private static void loadLibrary() {
-        if (System.getProperty("os.name").startsWith("Win")) {
-            throw new UnsupportedOperationException("Windows is not supported.");
+        String[] libs;
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            libs =
+                    new String[] {
+                        "libwinpthread-1.dll", "libgcc_s_seh-1.dll", "libstdc++-6.dll", LIB_NAME
+                    };
+        } else {
+            libs = new String[] {LIB_NAME};
         }
 
-        String libName = copyJniLibraryFromClasspath();
-        logger.debug("Loading huggingface library from: {}", libName);
-        System.load(libName); // NOPMD
+        Path dir = copyJniLibraryFromClasspath(libs);
+        logger.debug("Loading huggingface library from: {}", dir);
+
+        for (String libName : libs) {
+            System.load(dir.resolve(libName).toString()); // NOPMD
+        }
     }
 
-    private static String copyJniLibraryFromClasspath() {
+    private static Path copyJniLibraryFromClasspath(String[] libs) {
         Path cacheDir = Utils.getEngineCacheDir("tokenizers");
         Platform platform = Platform.detectPlatform("tokenizers");
         String classifier = platform.getClassifier();
@@ -68,20 +77,27 @@ public final class LibUtils {
         Path path = dir.resolve(LIB_NAME);
         logger.debug("Using cache dir: {}", dir);
         if (Files.exists(path)) {
-            return path.toAbsolutePath().toString();
+            return dir.toAbsolutePath();
         }
+
         Path tmp = null;
-        String libPath = "/native/lib/" + classifier + "/" + LIB_NAME;
-        logger.info("Extracting {} to cache ...", libPath);
-        try (InputStream stream = LibUtils.class.getResourceAsStream(libPath)) {
-            if (stream == null) {
-                throw new IllegalStateException("Huggingface library not found: " + libPath);
+        try {
+            Files.createDirectories(cacheDir);
+            tmp = Files.createTempDirectory(cacheDir, "tmp");
+
+            for (String libName : libs) {
+                String libPath = "/native/lib/" + classifier + "/" + libName;
+                logger.info("Extracting {} to cache ...", libPath);
+                try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
+                    if (is == null) {
+                        throw new IllegalStateException("tokenizers library not found: " + libPath);
+                    }
+                    Path target = tmp.resolve(libName);
+                    Files.copy(is, target, StandardCopyOption.REPLACE_EXISTING);
+                }
             }
-            Files.createDirectories(dir);
-            tmp = Files.createTempFile(dir, "jni", "tmp");
-            Files.copy(stream, tmp, StandardCopyOption.REPLACE_EXISTING);
-            Utils.moveQuietly(tmp, path);
-            return path.toAbsolutePath().toString();
+            Utils.moveQuietly(tmp, dir);
+            return dir.toAbsolutePath();
         } catch (IOException e) {
             throw new IllegalStateException("Cannot copy jni files", e);
         } finally {

@@ -16,20 +16,24 @@ compileJava.dependsOn(processResources)
 processResources {
     outputs.dir file("${project.buildDir}/classes/java/main/native/lib")
     doLast {
-        def url = "https://publish.djl.ai/tokenizers/${tokenizers_version}/jnilib/${djl_version}"
+        def url = "https://publish.djl.ai/tokenizers"
         def files = [
-                "linux-x86_64/libtokenizers.so",
-                "osx-x86_64/libtokenizers.dylib"
+                "win-x86_64/libwinpthread-1.dll": "extra",
+                "win-x86_64/libgcc_s_seh-1.dll" : "extra",
+                "win-x86_64/libstdc%2B%2B-6.dll": "extra",
+                "win-x86_64/tokenizers.dll"     : "${tokenizers_version}/jnilib/${djl_version}",
+                "linux-x86_64/libtokenizers.so" : "${tokenizers_version}/jnilib/${djl_version}",
+                "osx-x86_64/libtokenizers.dylib": "${tokenizers_version}/jnilib/${djl_version}"
         ]
         def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
-            def file = new File("${jnilibDir}/${entry}")
+            def file = new File("${jnilibDir}/${URLDecoder.decode(entry.key, "UTF-8")}")
             if (file.exists()) {
-                project.logger.lifecycle("prebuilt or cached file found for ${entry}")
-            } else if (!project.hasProperty("jni")) {
-                project.logger.lifecycle("Downloading ${url}/${entry}")
+                project.logger.lifecycle("prebuilt or cached file found for ${entry.key}")
+            } else if ("extra" == entry.value || !project.hasProperty("jni")) {
+                project.logger.lifecycle("Downloading ${url}/${entry.value}/${entry.key}")
                 file.getParentFile().mkdirs()
-                def downloadPath = new URL("${url}/${entry}")
+                def downloadPath = new URL("${url}/${entry.value}/${entry.key}")
                 downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
             }
         }
@@ -63,19 +67,21 @@ task compileJNI {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
                 || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
             exec {
-                commandLine 'bash', 'build.sh'
+                commandLine "bash", "build.sh", "${tokenizers_version}"
             }
-
-            // for ci to upload to S3
-            def ciDir = "${project.projectDir}/jnilib/${djl_version}/"
-            copy {
-                from "${project.buildDir}/jnilib"
-                into ciDir
-            }
-            delete System.getProperty("user.home") + "/.djl.ai/tokenizers"
         } else {
-            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+            exec {
+                commandLine "${project.projectDir}/build.cmd", "${tokenizers_version}"
+            }
         }
+
+        // for ci to upload to S3
+        def ciDir = "${project.projectDir}/jnilib/${djl_version}/"
+        copy {
+            from "${project.buildDir}/jnilib"
+            into ciDir
+        }
+        delete System.getProperty("user.home") + "/.djl.ai/tokenizers"
     }
 }
 
