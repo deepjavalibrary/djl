@@ -22,17 +22,17 @@ jobs:
         run: |
           ./gradlew :extensions:sentencepiece:compileJNI
           ./gradlew -Pjni :extensions:sentencepiece:test
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+      #- name: Configure AWS Credentials
+      #  uses: aws-actions/configure-aws-credentials@v1
+      #  with:
+      #    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #    aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           SENTENCEPIECE_VERSION="$(cat gradle.properties | awk -F '=' '/sentencepiece_version/ {print $2}')"
-          aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"
+          # aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
+          # aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"
 
   build-sentencepiece-jni-linux:
     runs-on: ubuntu-latest
@@ -60,17 +60,17 @@ jobs:
         run: |
           ./gradlew :extensions:sentencepiece:compileJNI
           ./gradlew -Pjni :extensions:sentencepiece:test
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+      #- name: Configure AWS Credentials
+      #  uses: aws-actions/configure-aws-credentials@v1
+      #  with:
+      #    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #    aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           SENTENCEPIECE_VERSION="$(cat gradle.properties | awk -F '=' '/sentencepiece_version/ {print $2}')"
-          aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"
+          # aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
+          # aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"
   
   build-sentencepiece-jni-windows:
     runs-on: windows-latest
@@ -91,16 +91,15 @@ jobs:
         run: |
           ./gradlew :extensions:sentencepiece:compileJNI
           ./gradlew -Pjni :extensions:sentencepiece:test
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
+          shell: bash
           SENTENCEPIECE_VERSION="$(cat gradle.properties | awk -F '=' '/sentencepiece_version/ {print $2}')"
-          aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"
-        shell: bash
-    
+          # aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
+          # aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"

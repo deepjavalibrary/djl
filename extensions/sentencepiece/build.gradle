@@ -61,7 +61,7 @@ apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
 task compileJNI {
     doFirst {
-        if (os == "win") {
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("win")) {
             commandLine "${project.projectDir}/build.cmd"
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
                 || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
