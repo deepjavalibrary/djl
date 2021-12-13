@@ -9,6 +9,14 @@ set(SPM_ENABLE_TCMALLOC OFF CACHE BOOL "Build sentencepiece static library")
 # disable shared library as we only link static library
 set(SPM_ENABLE_SHARED OFF CACHE BOOL "Build sentencepiece static library")
 
+if (MSVC)
+  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_DEBUG          ${CMAKE_CXX_FLAGS_DEBUG})
+  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_MINSIZEREL     ${CMAKE_CXX_FLAGS_MINSIZEREL})
+  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS_RELEASE})
+  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
+  add_definitions("/wd4267 /wd4244 /wd4305 /Zc:strictStrings /utf-8")
+endif()
+
 find_package(JNI REQUIRED)
 find_path(UTILS_INCLUDE_DIR NAMES djl/utils.h PATHS ${PROJECT_SOURCE_DIR}/../../api/src/main/native REQUIRED)
 

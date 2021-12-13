@@ -18,7 +18,8 @@ javac -sourcepath ../src/main/java/ ../src/main/java/ai/djl/sentencepiece/jni/Se
 cmake ..
 cmake --build . --config Release
 
-@ECHO OFF
 :: for nightly ci
 md jnilib\win-x86_64
-copy sentencepiece_native.dll jnilib\win-x86_64
+copy Release\sentencepiece_native.dll jnilib\win-x86_64
+
+cd ..
