@@ -35,11 +35,10 @@ public class BinaryAccuracy extends AbstractAccuracy {
      *
      * @param name the name of the evaluator, default is "Accuracy"
      * @param threshold the value differentiating the posive and negative classes (usually 0 or .5)
-     * @param index the index of the NDArray in labels to compute accuracy for
      * @param axis the axis that represent classes in prediction, default 1
      */
-    public BinaryAccuracy(String name, float threshold, int index, int axis) {
-        super(name, index, axis);
+    public BinaryAccuracy(String name, float threshold, int axis) {
+        super(name, axis);
         this.threshold = threshold;
     }
 
@@ -49,10 +48,9 @@ public class BinaryAccuracy extends AbstractAccuracy {
      *
      * @param name the name of the evaluator, default is "Accuracy"
      * @param threshold the value differentiating the posive and negative classes (usually 0 or .5)
-     * @param index the index of the NDArray in labels to compute accuracy for
      */
-    public BinaryAccuracy(String name, float threshold, int index) {
-        this(name, threshold, index, 1);
+    public BinaryAccuracy(String name, float threshold) {
+        this(name, threshold, 1);
     }
 
     /**
@@ -62,7 +60,7 @@ public class BinaryAccuracy extends AbstractAccuracy {
      * @param threshold the value differentiating the posive and negative classes (usually 0 or .5)
      */
     public BinaryAccuracy(float threshold) {
-        this("BinaryAccuracy", threshold, 0, 1);
+        this("BinaryAccuracy", threshold, 1);
     }
 
     /** Creates a binary (two class) accuracy evaluator with 0 threshold. */
@@ -76,8 +74,8 @@ public class BinaryAccuracy extends AbstractAccuracy {
         Preconditions.checkArgument(
                 labels.size() == predictions.size(),
                 "labels and prediction length does not match.");
-        NDArray label = labels.get(index);
-        NDArray prediction = predictions.get(index);
+        NDArray label = labels.head();
+        NDArray prediction = predictions.head();
         checkLabelShapes(label, prediction, false);
         NDArray predictionReduced = prediction.gte(threshold);
         // result of sum is int64 now

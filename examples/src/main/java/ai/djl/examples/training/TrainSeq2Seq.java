@@ -149,7 +149,7 @@ public final class TrainSeq2Seq {
                 });
 
         return new DefaultTrainingConfig(new MaskedSoftmaxCrossEntropyLoss())
-                .addEvaluator(new Accuracy("Accuracy", 0, 2))
+                .addEvaluator(new Accuracy("Accuracy", 2))
                 .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
                 .optExecutorService(executorService)
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))

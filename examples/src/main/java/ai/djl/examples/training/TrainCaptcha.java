@@ -31,8 +31,10 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Dataset.Usage;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
+import ai.djl.training.evaluator.IndexEvaluator;
 import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
+import ai.djl.training.loss.IndexLoss;
 import ai.djl.training.loss.SimpleCompositeLoss;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
 import ai.djl.training.util.ProgressBar;
@@ -99,17 +101,18 @@ public final class TrainCaptcha {
                 });
         SimpleCompositeLoss loss = new SimpleCompositeLoss();
         for (int i = 0; i < CaptchaDataset.CAPTCHA_LENGTH; i++) {
-            loss.addLoss(new SoftmaxCrossEntropyLoss("loss_digit_" + i), i);
+            loss.addLoss(new IndexLoss(new SoftmaxCrossEntropyLoss("loss_digit_" + i), i));
         }
 
         DefaultTrainingConfig config =
                 new DefaultTrainingConfig(loss)
                         .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                        .addEvaluators(loss.getComponents())
                         .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                         .addTrainingListeners(listener);
 
         for (int i = 0; i < CaptchaDataset.CAPTCHA_LENGTH; i++) {
-            config.addEvaluator(new Accuracy("acc_digit_" + i, i));
+            config.addEvaluator(new IndexEvaluator(new Accuracy("acc_digit_" + i), i));
         }
 
         return config;

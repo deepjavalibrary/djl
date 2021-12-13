@@ -24,6 +24,7 @@ import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.PairList;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
@@ -133,6 +134,18 @@ public class DefaultTrainingConfig implements TrainingConfig {
      */
     public DefaultTrainingConfig optExecutorService(ExecutorService executorService) {
         this.executorService = executorService;
+        return this;
+    }
+
+    /**
+     * Adds multiple {@link Evaluator}s that needs to be computed during training.
+     *
+     * @param evaluators the evaluators to be added
+     * @param <T> the type of evaluator to be added
+     * @return this {@code DefaultTrainingConfig}
+     */
+    public <T extends Evaluator> DefaultTrainingConfig addEvaluators(Collection<T> evaluators) {
+        evaluators.forEach(this::addEvaluator);
         return this;
     }
 
