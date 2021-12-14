@@ -19,6 +19,7 @@ processResources {
     doLast {
         def url = "https://publish.djl.ai/sentencepiece-${sentencepiece_version}/jnilib/${djl_version}"
         def files = [
+                "win-x86_64"  : "sentencepiece_native.dll",
                 "linux-x86_64": "libsentencepiece_native.so",
                 "osx-x86_64"  : "libsentencepiece_native.dylib"
         ]
@@ -61,22 +62,26 @@ apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
 task compileJNI {
     doFirst {
-        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("win")) {
+            exec {
+                commandLine "${project.projectDir}/build.cmd", "v${sentencepiece_version}"
+            }
+        } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
                 || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
             exec {
-                commandLine 'bash', 'build.sh'
+                commandLine "bash", "build.sh", "v${sentencepiece_version}"
             }
-
-            // for ci to upload to S3
-            def ciDir = "${project.projectDir}/jnilib/${djl_version}/"
-            copy {
-                from "${project.buildDir}/jnilib"
-                into ciDir
-            }
-            delete System.getProperty("user.home") + "/.djl.ai/sentencepiece"
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
         }
+
+        // for ci to upload to S3
+        def ciDir = "${project.projectDir}/jnilib/${djl_version}/"
+        copy {
+            from "${project.buildDir}/jnilib"
+            into ciDir
+        }
+        delete System.getProperty("user.home") + "/.djl.ai/sentencepiece"
     }
 }
 

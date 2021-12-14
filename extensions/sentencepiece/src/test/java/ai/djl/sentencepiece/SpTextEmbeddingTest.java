@@ -12,7 +12,6 @@
  */
 package ai.djl.sentencepiece;
 
-import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,8 +35,6 @@ public class SpTextEmbeddingTest {
 
     @Test
     public void testEmbedding() throws IOException {
-        TestRequirements.notWindows();
-
         Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
         try (SpTokenizer tokenizer = new SpTokenizer(modelPath)) {
             SpTextEmbedding embedding = SpTextEmbedding.from(tokenizer);
