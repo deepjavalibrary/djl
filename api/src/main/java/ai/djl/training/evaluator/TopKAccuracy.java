@@ -34,11 +34,10 @@ public class TopKAccuracy extends AbstractAccuracy {
      * Creates a {@code TopKAccuracy} instance.
      *
      * @param name the accuracy name, default "Top_K_Accuracy"
-     * @param index the index of the {@link NDArray} in labels to compute topK accuracy for
      * @param topK the value of K
      */
-    public TopKAccuracy(String name, int index, int topK) {
-        super(name, index);
+    public TopKAccuracy(String name, int topK) {
+        super(name);
         if (topK > 1) {
             this.topK = topK;
         } else {
@@ -48,30 +47,19 @@ public class TopKAccuracy extends AbstractAccuracy {
 
     /**
      * Creates an instance of {@code TopKAccuracy} evaluator that computes topK accuracy across axis
-     * 1 along the given index.
-     *
-     * @param index the index of the {@link NDArray} in labels to compute topK accuracy for
-     * @param topK the value of K
-     */
-    public TopKAccuracy(int index, int topK) {
-        this("Top_" + topK + "_Accuracy", index, topK);
-    }
-
-    /**
-     * Creates an instance of {@code TopKAccuracy} evaluator that computes topK accuracy across axis
      * 1 along the 0th index.
      *
      * @param topK the value of K
      */
     public TopKAccuracy(int topK) {
-        this("Top_" + topK + "_Accuracy", 0, topK);
+        this("Top_" + topK + "_Accuracy", topK);
     }
 
     /** {@inheritDoc} */
     @Override
     protected Pair<Long, NDArray> accuracyHelper(NDList labels, NDList predictions) {
-        NDArray label = labels.get(index);
-        NDArray prediction = predictions.get(index);
+        NDArray label = labels.head();
+        NDArray prediction = predictions.head();
         // number of labels and predictions should be the same
         checkLabelShapes(label, prediction);
         // ascending by default

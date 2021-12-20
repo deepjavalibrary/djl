@@ -29,30 +29,26 @@ public abstract class AbstractAccuracy extends Evaluator {
 
     protected Map<String, Long> correctInstances;
     protected int axis;
-    protected int index;
 
     /**
-     * Creates an accuracy evaluator that computes accuracy across axis 1 along given index.
+     * Creates an accuracy evaluator that computes accuracy across axis 1.
      *
      * @param name the name of the evaluator, default is "Accuracy"
-     * @param index the index of the NDArray in labels to compute accuracy for
      */
-    public AbstractAccuracy(String name, int index) {
-        this(name, index, 1);
+    public AbstractAccuracy(String name) {
+        this(name, 1);
     }
 
     /**
      * Creates an accuracy evaluator.
      *
      * @param name the name of the evaluator, default is "Accuracy"
-     * @param index the index of the NDArray in labels to compute accuracy for
      * @param axis the axis that represent classes in prediction, default 1
      */
-    public AbstractAccuracy(String name, int index, int axis) {
+    public AbstractAccuracy(String name, int axis) {
         super(name);
         correctInstances = new ConcurrentHashMap<>();
         this.axis = axis;
-        this.index = index;
     }
 
     /**
