@@ -1,0 +1,15 @@
+[package]
+name = "djl"
+version = "0.1.0"
+authors = ["Frank Liu <frankfliu2000@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+jni = "0.19.0"
+tokenizers = { path = "../tokenizers/tokenizers", version = "*" }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
+
+[lib]
+crate_type = ["cdylib"]

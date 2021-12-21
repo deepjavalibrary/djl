@@ -1,0 +1,91 @@
+group "ai.djl.huggingface"
+
+dependencies {
+    api project(":api")
+
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+
+    testImplementation(project(":testing"))
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+}
+
+compileJava.dependsOn(processResources)
+
+processResources {
+    outputs.dir file("${project.buildDir}/classes/java/main/native/lib")
+    doLast {
+        def url = "https://publish.djl.ai/tokenizers"
+        def files = [
+                "win-x86_64/libwinpthread-1.dll": "extra",
+                "win-x86_64/libgcc_s_seh-1.dll" : "extra",
+                "win-x86_64/libstdc%2B%2B-6.dll": "extra",
+                "win-x86_64/tokenizers.dll"     : "${tokenizers_version}/jnilib/${djl_version}",
+                "linux-x86_64/libtokenizers.so" : "${tokenizers_version}/jnilib/${djl_version}",
+                "osx-x86_64/libtokenizers.dylib": "${tokenizers_version}/jnilib/${djl_version}"
+        ]
+        def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
+        files.each { entry ->
+            def file = new File("${jnilibDir}/${URLDecoder.decode(entry.key, "UTF-8")}")
+            if (file.exists()) {
+                project.logger.lifecycle("prebuilt or cached file found for ${entry.key}")
+            } else if ("extra" == entry.value || !project.hasProperty("jni")) {
+                project.logger.lifecycle("Downloading ${url}/${entry.value}/${entry.key}")
+                file.getParentFile().mkdirs()
+                def downloadPath = new URL("${url}/${entry.value}/${entry.key}")
+                downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
+            }
+        }
+        copy {
+            from jnilibDir
+            into "${project.buildDir}/classes/java/main/native/lib"
+        }
+
+        // write properties
+        def propFile = file("${project.buildDir}/classes/java/main/native/lib/tokenizers.properties")
+        propFile.text = "version=${tokenizers_version}-${version}\n"
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "DJL NLP utilities for Huggingface tokenizers"
+                description = "Deep Java Library (DJL) NLP utilities for Huggingface tokenizers"
+                url = "http://www.djl.ai/extensions/${project.name}"
+            }
+        }
+    }
+}
+
+apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
+
+task compileJNI {
+    doFirst {
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
+                || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            exec {
+                commandLine "bash", "build.sh", "${tokenizers_version}"
+            }
+        } else {
+            exec {
+                commandLine "${project.projectDir}/build.cmd", "${tokenizers_version}"
+            }
+        }
+
+        // for ci to upload to S3
+        def ciDir = "${project.projectDir}/jnilib/${djl_version}/"
+        copy {
+            from "${project.buildDir}/jnilib"
+            into ciDir
+        }
+        delete System.getProperty("user.home") + "/.djl.ai/tokenizers"
+    }
+}
+
+clean.doFirst {
+    delete System.getProperty("user.home") + "/.djl.ai/tokenizers"
+    delete "rust/target"
+}
