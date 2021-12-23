@@ -12,6 +12,7 @@
  */
 package ai.djl.pytorch.integration;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
@@ -42,7 +43,8 @@ public class PtModelTest {
                         .build();
         try (ZooModel<NDList, NDList> zooModel = criteria.loadModel()) {
             Path modelFile = zooModel.getModelPath().resolve("traced_resnet18.pt");
-            try (PtModel model = (PtModel) Model.newInstance("test model")) {
+            // This model only support CPU
+            try (PtModel model = (PtModel) Model.newInstance("test model", Device.cpu())) {
                 model.load(Files.newInputStream(modelFile));
                 try (Predictor<NDList, NDList> predictor =
                         model.newPredictor(new NoopTranslator())) {
