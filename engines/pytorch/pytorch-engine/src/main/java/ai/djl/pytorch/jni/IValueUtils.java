@@ -73,7 +73,7 @@ public final class IValueUtils {
                 });
     }
 
-    private static IValue[] getInputs(NDList ndList) {
+    static IValue[] getInputs(NDList ndList) {
         List<PairList<String, PtNDArray>> outputs = new ArrayList<>();
         Map<String, Integer> indexMap = new ConcurrentHashMap<>();
         for (NDArray array : ndList) {
@@ -87,6 +87,10 @@ public final class IValueUtils {
                 int index = addToMap(indexMap, name, outputs);
                 PairList<String, PtNDArray> pl = outputs.get(index);
                 pl.add("[]", (PtNDArray) array);
+            } else if (name != null && Pattern.matches("\\w+\\(\\)", name)) {
+                int index = addToMap(indexMap, name, outputs);
+                PairList<String, PtNDArray> pl = outputs.get(index);
+                pl.add("()", (PtNDArray) array);
             } else {
                 PairList<String, PtNDArray> pl = new PairList<>();
                 pl.add(null, (PtNDArray) array);
@@ -98,12 +102,16 @@ public final class IValueUtils {
             PairList<String, PtNDArray> pl = outputs.get(i);
             String key = pl.get(0).getKey();
             if (key == null) {
-                // not List, Dict input
+                // not List, Dict, Tuple input
                 ret[i] = IValue.from(pl.get(0).getValue());
             } else if ("[]".equals(key)) {
                 // list
                 PtNDArray[] arrays = pl.values().toArray(new PtNDArray[0]);
                 ret[i] = IValue.listFrom(arrays);
+            } else if ("()".equals(key)) {
+                // Tuple
+                IValue[] arrays = pl.values().stream().map(IValue::from).toArray(IValue[]::new);
+                ret[i] = IValue.tupleFrom(arrays);
             } else {
                 Map<String, PtNDArray> map = new ConcurrentHashMap<>();
                 for (Pair<String, PtNDArray> pair : pl) {
