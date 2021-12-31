@@ -250,6 +250,9 @@ public class IValue extends NativeResource<Long> {
      * @return a new {@code IValue} of type {@code NDArray[]}
      */
     public static IValue listFrom(IValue... list) {
+        if (list.length == 0) {
+            throw new IllegalArgumentException("Empty IValue list is not supported.");
+        }
         long[] tensors = Arrays.stream(list).mapToLong(IValue::getHandle).toArray();
         return new IValue(PyTorchLibrary.LIB.iValueFromList(tensors));
     }
