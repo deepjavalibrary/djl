@@ -137,6 +137,7 @@ public class IValueTest {
                 NDList list = ivalue.toNDList(manager);
                 Assert.assertEquals(list.size(), 3);
             }
+            Assert.assertThrows(() -> IValue.listFrom(new IValue[0]));
 
             try (IValue iv1 = IValue.from(array1);
                     IValue iv2 = IValue.from(array2);
