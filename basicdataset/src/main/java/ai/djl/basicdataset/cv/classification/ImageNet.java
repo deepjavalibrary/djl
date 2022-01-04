@@ -15,6 +15,7 @@ package ai.djl.basicdataset.cv.classification;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.translate.Pipeline;
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
 import java.io.IOException;
@@ -101,7 +102,7 @@ public class ImageNet extends AbstractImageFolder {
     }
 
     private void loadSynset() {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        ClassLoader cl = ClassLoaderUtils.getContextClassLoader();
         try (InputStream classStream = cl.getResourceAsStream("imagenet/classes.json")) {
             if (classStream == null) {
                 throw new AssertionError("Missing imagenet/classes.json in jar resource");

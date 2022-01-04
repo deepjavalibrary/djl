@@ -20,6 +20,7 @@ import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.translator.ImageServingTranslator;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Pair;
 import java.io.File;
 import java.io.IOException;
@@ -107,7 +108,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
                 urls.add(p.toUri().toURL());
             }
 
-            ClassLoader parentCl = Thread.currentThread().getContextClassLoader();
+            ClassLoader parentCl = ClassLoaderUtils.getContextClassLoader();
             ClassLoader cl = new URLClassLoader(urls.toArray(new URL[0]), parentCl);
             if (className != null && !className.isEmpty()) {
                 return initTranslator(cl, className);

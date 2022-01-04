@@ -228,7 +228,7 @@ public class BaseModelLoader implements ModelLoader {
 
         String factoryClass = (String) arguments.get("translatorFactory");
         if (factoryClass != null) {
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            ClassLoader cl = ClassLoaderUtils.getContextClassLoader();
             factory = ClassLoaderUtils.initClass(cl, factoryClass);
         }
         return factory;

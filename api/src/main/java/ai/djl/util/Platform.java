@@ -59,7 +59,7 @@ public final class Platform {
         String nativeProp = "native/lib/" + engine + ".properties";
         Enumeration<URL> urls;
         try {
-            urls = Thread.currentThread().getContextClassLoader().getResources(nativeProp);
+            urls = ClassLoaderUtils.getContextClassLoader().getResources(nativeProp);
         } catch (IOException e) {
             throw new AssertionError("Failed to list property files.", e);
         }
