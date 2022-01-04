@@ -12,6 +12,7 @@
  */
 package ai.djl.testing;
 
+import ai.djl.util.ClassLoaderUtils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -98,13 +99,13 @@ public final class CoverageUtils {
 
     private static List<Class<?>> getClasses(Class<?> clazz)
             throws IOException, ReflectiveOperationException, URISyntaxException {
-        ClassLoader appClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader appClassLoader = ClassLoaderUtils.getContextClassLoader();
         Field field = appClassLoader.getClass().getDeclaredField("ucp");
         field.setAccessible(true);
         Object ucp = field.get(appClassLoader);
         Method method = ucp.getClass().getDeclaredMethod("getURLs");
         URL[] urls = (URL[]) method.invoke(ucp);
-        ClassLoader cl = new TestClassLoader(urls, Thread.currentThread().getContextClassLoader());
+        ClassLoader cl = new TestClassLoader(urls, ClassLoaderUtils.getContextClassLoader());
 
         URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
         String path = url.getPath();

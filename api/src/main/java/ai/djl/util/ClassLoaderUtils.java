@@ -68,7 +68,7 @@ public final class ClassLoaderUtils {
                 urls[index++] = p.toUri().toURL();
             }
 
-            final ClassLoader contextCl = Thread.currentThread().getContextClassLoader();
+            final ClassLoader contextCl = getContextClassLoader();
             ClassLoader cl =
                     AccessController.doPrivileged(
                             (PrivilegedAction<ClassLoader>)
@@ -153,5 +153,18 @@ public final class ClassLoaderUtils {
             logger.trace("Not able to load Object", e);
         }
         return null;
+    }
+
+    /**
+     * Returns the context class loader if available.
+     *
+     * @return the context class loader if available
+     */
+    public static ClassLoader getContextClassLoader() {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl == null) {
+            return ClassLoaderUtils.class.getClassLoader(); // NOPMD
+        }
+        return cl;
     }
 }
