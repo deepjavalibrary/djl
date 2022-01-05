@@ -10,7 +10,7 @@ You need to install `cmake` and C++ compiler on your machine in order to build
 ### Linux
 
 ```
-apt install cmake g++
+apt-get install -y locales cmake curl unzip software-properties-common
 ```
 
 ## CPU Build
@@ -39,19 +39,15 @@ Use the following task to build pytorch JNI library for GPU:
 ### Mac/Linux
 
 ```
-./gradlew compileJNIGPU
+# compile CUDA 10.2 version of JNI
+./gradlew compileJNI -Pcu10
 ```
 
 ## Windows
 
 ```
-gradlew compileJNIGPU
-```
-
-The task will build CUDA 10.1 by default, you can change the flavor in `compileJNIGPU` to `cu102` to use CUDA 10.2.
-
-```
-downloadBuild("win", "cu102")
+# compile CUDA 11.X version of JNI
+gradlew compileJNI -Pcu11
 ```
 
 ### Format C++ code
@@ -66,7 +62,7 @@ It uses clang-format to format the code.
 ### Step 1: Build new JNI on top of new libtorch on osx, linux-cpu, linux-gpu, windows
 
 1. Spin up a EC2 instance for linux, linux-gpu, windows, windows-gpu and cd pytorch/pytorch-native.
-2. Run ./gradlew compileJNI for CPU ./gradlew compileJNIGPU and resolve all the issues you are facing.
+2. Run ./gradlew compileJNI and resolve all the issues you are facing.
 3. Raise a PR for the JNI code change and don’t merge it until we have the rest things ready.
 
 ### Step 2: Check dependencies of each JNI
