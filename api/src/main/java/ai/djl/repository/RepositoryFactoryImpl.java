@@ -154,6 +154,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                 throw new IllegalArgumentException("Only archive file is supported for res URL.");
             }
 
+            fileName = FilenameUtils.getNamePart(fileName);
             return new JarRepository(name, uri, fileName);
         }
 
