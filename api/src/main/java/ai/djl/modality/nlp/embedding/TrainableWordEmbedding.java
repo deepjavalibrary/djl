@@ -50,12 +50,12 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
      * @param embeddingSize the required embedding size
      */
     public TrainableWordEmbedding(Vocabulary vocabulary, int embeddingSize) {
-        super(
+        this(
                 builder()
+                        .setVocabulary(vocabulary)
                         .setEmbeddingSize(embeddingSize)
                         .optDefaultItem(DEFAULT_UNKNOWN_TOKEN)
                         .optUseDefault(false));
-        this.vocabulary = vocabulary;
     }
 
     /**
