@@ -29,7 +29,7 @@ interface. See: [MyTranslator](https://github.com/deepjavalibrary/djl/blob/maste
 DJL will look into `libs` folder to search for Translator implementation.
 
 ### Step 3: Copy Translator into `libs` folder
-DJL can loading Translator from the following source:
+DJL can load Translator from the following source:
 
 - from jar files directly locate in `libs` folder
 - from compiled java .class file in `libs/classes` folder
@@ -40,21 +40,32 @@ DJL provides several built-in Translator for well-know ML applications, such as 
 and `Object Detection`. You can customize those built-in Translators' behavior by providing
 configuration parameters.
 
-There are two ways to supply configurations to the default Translator:
+There are two ways to supply configurations to the `Translator`:
 
 - Add a `serving.properties` file in the model's folder
 
     Here is an example:
 
 ```
-# specify model's application
-application=cv/image_classification
+# serving.properties can be used to define model's metadata, all the arguments will be
+# passed to TranslatorFactory to create proper Translator
+
+# defines model's application
+application=nlp/question_answer
+
+# defines the model's engine, can be overrid by Criteria.optEngine()
+engine=PyTorch
+
+# defines TranslatorFactory, can be overrid by Criteria.optTranslator() or Criteria.optTranslatorFactory()
+translatorFactory=ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory
+
+# Add Translator specific arguments here to customize pre-processing and post-processing
 # specify image size to be cropped
 width=224
 height=224
-# spcifiy the input image should be treated as grayscale image
+# specify the input image should be treated as grayscale image
 flag=GRAYSCALE
-# spcficy if apply softmax for post processing
+# specify if apply softmax for post-processing
 softmax=true
 ```
 
