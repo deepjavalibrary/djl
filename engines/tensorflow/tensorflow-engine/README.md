@@ -28,35 +28,20 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 
 You can pull the TensorFlow engine from the central Maven repository by including the following dependency:
 
-- ai.djl.tensorflow:tensorflow-engine:0.14.0
+- ai.djl.tensorflow:tensorflow-engine:0.15.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-engine</artifactId>
-    <version>0.14.0</version>
+    <version>0.15.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
-Besides the `tensorflow-engine` library, you may also need to include the TensorFlow native library in your project.
-
-Choose a native library based on your platform and needs:
-
-### Automatic (Recommended)
-
-We offer an automatic option that will download the native libraries into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
+By default, DJL will download the TensorFlow native libraries into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
 
-- ai.djl.tensorflow:tensorflow-native-auto:2.4.1
-
-```xml
-<dependency>
-    <groupId>ai.djl.tensorflow</groupId>
-    <artifactId>tensorflow-native-auto</artifactId>
-    <version>2.4.1</version>
-    <scope>runtime</scope>
-</dependency>
-```
+You can choose a native library based on your platform if you don't have network access at runtime.
 
 ### macOS
 For macOS, you can use the following library:

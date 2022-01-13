@@ -32,29 +32,15 @@ You can pull the MXNet engine from the central Maven repository by including the
 <dependency>
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-engine</artifactId>
-    <version>0.14.0</version>
+    <version>0.15.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
-Besides the `mxnet-engine` library, you may also need to include the MXNet native library in your project.
-All current provided MXNet native libraries are built with [MKLDNN](https://github.com/intel/mkl-dnn).
-
-Choose a native library based on your platform and needs:
-
-### Automatic (Recommended)
-
-We offer an automatic option that will download the native libraries into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
+By default, DJL will download the Apache MXNet native libraries into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
 
-```xml
-<dependency>
-    <groupId>ai.djl.mxnet</groupId>
-    <artifactId>mxnet-native-auto</artifactId>
-    <version>1.8.0</version>
-    <scope>runtime</scope>
-</dependency>
-```
+You can choose a native library based on your platform if you don't have network access at runtime.
 
 ### macOS
 For macOS, you can use the following library:
