@@ -12,6 +12,7 @@
  */
 package ai.djl.tensorflow.integration;
 
+import ai.djl.engine.Engine;
 import ai.djl.tensorflow.engine.TfEngine;
 import ai.djl.testing.CoverageUtils;
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class TfCoverageTest {
     @Test
     public void test() throws IOException, ReflectiveOperationException, URISyntaxException {
         // tensorflow-engine
+        Engine.getEngine("TensorFlow");
         CoverageUtils.testGetterSetters(TfEngine.class);
     }
 }
