@@ -178,8 +178,8 @@ public class TfNDManager extends BaseNDManager {
                 NDArray kArr = create(k);
                 NDArray rowsArr = create(rows);
                 NDArray colsArr = create(cols);
-                NDArray zeros = zeros(new Shape(1))) {
-            return opExecutor("MatrixDiagV2")
+                NDArray zeros = zeros(new Shape(), dataType)) {
+            return opExecutor("MatrixDiagV3")
                     .addInput(ones)
                     .addInput(kArr)
                     .addInput(rowsArr)
