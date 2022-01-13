@@ -8,7 +8,8 @@ dependencies {
     testImplementation "org.apache.hadoop:hadoop-minicluster:${hadoop_version}"
     testImplementation(project(":testing"))
 
-    testImplementation("org.testng:testng:${testng_version}");
+    testImplementation "org.testng:testng:${testng_version}"
+    testRuntimeOnly "junit:junit:${junit_version}" // hadoop-client test depends on junit
 }
 
 publishing {

@@ -1,6 +1,4 @@
 dependencies {
     api project(":api")
-    api("org.testng:testng:${testng_version}") {
-        exclude group: "junit", module: "junit"
-    }
+    api "org.testng:testng:${testng_version}"
 }
