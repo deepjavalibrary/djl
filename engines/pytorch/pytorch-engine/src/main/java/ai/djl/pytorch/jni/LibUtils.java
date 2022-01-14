@@ -93,6 +93,10 @@ public final class LibUtils {
 
     private static void loadLibTorch(LibTorch libTorch) {
         Path libDir = libTorch.dir.toAbsolutePath();
+        if ("1.8.1".equals(getVersion()) && System.getProperty("os.name").startsWith("Mac")) {
+            // PyTorch 1.8.1 libtorch_cpu.dylib cannot be loaded individually
+            return;
+        }
         List<String> deferred =
                 Arrays.asList(
                         System.mapLibraryName("fbgemm"),
