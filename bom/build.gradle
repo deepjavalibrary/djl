@@ -117,8 +117,8 @@ publishing {
                     addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cu102", "linux-x86_64", "${paddlepaddle_version}")
                     addDependency(dependencies, "ai.djl.dlr", "dlr-native-cpu", "osx-x86_64", "${dlr_version}")
                     addDependency(dependencies, "ai.djl.dlr", "dlr-native-cpu", "linux-x86_64", "${dlr_version}")
-                    addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "osx-x86_64", "${tflite_version}-SNAPSHOT")
-                    addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "linux-x86_64", "${tflite_version}-SNAPSHOT")
+                    addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "osx-x86_64", "${tflite_version}")
+                    addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "linux-x86_64", "${tflite_version}")
                 }
             }
         }
