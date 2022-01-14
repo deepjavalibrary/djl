@@ -1,12 +1,15 @@
-group "ai.djl.pytorch"
+String ptVersion
 if (project.hasProperty("pt_version") && project.property("pt_version") != "") {
-    version = project.property("pt_version") + "-${djl_version}"
+    ptVersion = project.property("pt_version")
 } else {
-    version = "${pytorch_version}-${djl_version}"
+    ptVersion = "${pytorch_version}"
 }
+
+group "ai.djl.pytorch"
+version = ptVersion + "-${djl_version}"
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 if (!isRelease) {
-    version = version + "-SNAPSHOT"
+    version = ptVersion + "-${djl_version}-SNAPSHOT"
 }
 
 compileJava.dependsOn(processResources)
@@ -14,18 +17,24 @@ compileJava.dependsOn(processResources)
 processResources {
     outputs.dir file("${project.buildDir}/classes/java/main/jnilib")
     doFirst {
-        String url = "https://publish.djl.ai/pytorch/${pytorch_version}/jnilib/${djl_version}"
+        String url = "https://publish.djl.ai/pytorch/${ptVersion}/jnilib/${djl_version}"
         def files = [
                 "linux-x86_64/cpu/libdjl_torch.so",
                 "linux-x86_64/cu102/libdjl_torch.so",
-                "linux-x86_64/cu113/libdjl_torch.so",
                 "linux-x86_64/cpu-precxx11/libdjl_torch.so",
-                "linux-x86_64/cu113-precxx11/libdjl_torch.so",
                 "osx-x86_64/cpu/libdjl_torch.dylib",
                 "win-x86_64/cpu/djl_torch.dll",
-                "win-x86_64/cu102/djl_torch.dll",
-                "win-x86_64/cu113/djl_torch.dll"
+                "win-x86_64/cu102/djl_torch.dll"
         ]
+        if (ptVersion.startsWith("1.10.")) {
+            files.add("linux-x86_64/cu113/libdjl_torch.so")
+            files.add("linux-x86_64/cu113-precxx11/libdjl_torch.so")
+            files.add("win-x86_64/cu113/djl_torch.dll")
+        } else {
+            files.add("linux-x86_64/cu111/libdjl_torch.so")
+            files.add("linux-x86_64/cu111-precxx11/libdjl_torch.so")
+            files.add("win-x86_64/cu111/djl_torch.dll")
+        }
         String jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
             def file = new File("${jnilibDir}/${entry}")

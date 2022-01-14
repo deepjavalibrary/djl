@@ -108,7 +108,9 @@ jobs:
       - name: Publish to snapshot repository
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
         run: |
-          ./gradlew publish -Psnapshot
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.8.1 -Psnapshot
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.9.1 -Psnapshot
+          ./gradlew clean publish -Psnapshot
           cd bom
           ./gradlew publish -Psnapshot
         env:
@@ -119,7 +121,9 @@ jobs:
       - name: Publish to staging repository
         if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
-          ./gradlew publish -P${{ github.event.inputs.mode }}
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.8.1 -P${{ github.event.inputs.mode }}
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.9.1 -P${{ github.event.inputs.mode }}
+          ./gradlew clean publish -P${{ github.event.inputs.mode }}
           cd bom
           ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
