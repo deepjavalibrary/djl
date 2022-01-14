@@ -62,8 +62,8 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [pytorch-native-cu102(linux-x86_64)](../../engines/pytorch/pytorch-engine/README.md#linux-gpu) | Contains PyTorch native library for Linux with CUDA 10.2 |
 | | [pytorch-native-cu102(win-x86_64)](../../engines/pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 10.2 |
 | | [pytorch-native-cu113-precxx11(linux-x86_64)](../../engines/pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | Contains PyTorch native library for Linux with CUDA 11.3 |
-| | [pytorch-native-cu102-precxx11(linux-x86_64)](../../engines/pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | Contains PyTorch native library for Windows with CUDA 10.2 |
 | | [pytorch-native-cpu-precxx11(linux-x86_64)](../../engines/pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
+| | [pytorch-jni](../../engines/pytorch/pytorch-engine/README.md) | Contains PyTorch JNI native library |
 | | pytorch-native-auto (deprecated) | No longer needed since DJL 0.15.0 |
 | | pytorch-native-cu111(linux-x86_64) (deprecated) | Contains PyTorch native library for Linux with CUDA 11.1 |
 | | pytorch-native-cu111(win-x86_64) (deprecated) | Contains PyTorch native library for Windows with CUDA 11.1 |
