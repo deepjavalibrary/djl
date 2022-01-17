@@ -192,7 +192,7 @@ flavorNames.each { flavor ->
                 def dsStore = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/.DS_Store")
                 dsStore.delete()
 
-                def versionName = String.format("${version}-%s", new Date().format('yyyyMMdd'))
+                def versionName = String.format("${project.version}-%s", new Date().format('yyyyMMdd'))
                 def dir = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib")
                 def sb = new StringBuilder()
                 sb.append("version=${versionName}\nclassifier=${flavor}-${osName}-x86_64\nlibraries=")
