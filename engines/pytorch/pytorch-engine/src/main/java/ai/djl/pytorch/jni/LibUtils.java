@@ -84,6 +84,10 @@ public final class LibUtils {
     }
 
     public static String getVersion() {
+        Matcher m = VERSION_PATTERN.matcher(libTorch.version);
+        if (m.matches()) {
+            return m.group(1);
+        }
         return libTorch.version;
     }
 
@@ -251,7 +255,8 @@ public final class LibUtils {
         }
         if (overrideVersion != null
                 && !overrideVersion.isEmpty()
-                && !overrideVersion.equals(platform.getVersion())) {
+                && !platform.getVersion().startsWith(overrideVersion)) {
+            // platform.version can be 1.8.1-20210421
             logger.warn("Override PyTorch version: {}.", overrideVersion);
             platform = Platform.detectPlatform("pytorch", overrideVersion);
             return downloadPyTorch(platform);
