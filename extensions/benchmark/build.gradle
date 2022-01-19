@@ -1,6 +1,6 @@
 plugins {
     id 'application'
-    id "nebula.ospackage" version "8.5.6"
+    id "nebula.ospackage" version "9.0.0"
 }
 
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
