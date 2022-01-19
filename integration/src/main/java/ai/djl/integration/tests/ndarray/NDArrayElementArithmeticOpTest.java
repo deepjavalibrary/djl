@@ -55,7 +55,7 @@ public class NDArrayElementArithmeticOpTest {
             array1 = manager.create(new float[] {x1, x1});
             array2 = manager.create(x2);
             NDArray expected = manager.create(new float[] {y, y});
-            Assert.assertEquals(arrayArithmeticOp.apply(array1, array2), expected);
+            Assertions.assertAlmostEquals(arrayArithmeticOp.apply(array1, array2), expected);
 
             // test zero-dim with zero-dim
             array1 = manager.create(new Shape(4, 0, 1));
@@ -119,7 +119,7 @@ public class NDArrayElementArithmeticOpTest {
         float x2 = 3f;
         NDArray ndArray = manager.create(x1);
         NDArray result = arrayArithmeticOp.apply(x2, ndArray);
-        Assert.assertEquals(result.getFloat(), arithmeticOp.apply(x2, x1).floatValue());
+        Assertions.assertAlmostEquals(result.getFloat(), arithmeticOp.apply(x2, x1));
         if (inplace) {
             Assert.assertSame(ndArray, result);
         } else {
