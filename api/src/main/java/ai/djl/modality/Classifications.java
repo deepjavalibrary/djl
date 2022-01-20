@@ -45,6 +45,7 @@ public class Classifications implements JsonSerializable {
 
     protected List<String> classNames;
     protected List<Double> probabilities;
+    private int topK;
 
     /**
      * Constructs a {@code Classifications} using a parallel list of classNames and probabilities.
@@ -55,6 +56,7 @@ public class Classifications implements JsonSerializable {
     public Classifications(List<String> classNames, List<Double> probabilities) {
         this.classNames = classNames;
         this.probabilities = probabilities;
+        this.topK = 5;
     }
 
     /**
@@ -65,11 +67,33 @@ public class Classifications implements JsonSerializable {
      * @param probabilities the probabilities for each class for the input
      */
     public Classifications(List<String> classNames, NDArray probabilities) {
+        this(classNames, probabilities, 5);
+    }
+
+    /**
+     * Constructs a {@code Classifications} using list of classNames parallel to an NDArray of
+     * probabilities.
+     *
+     * @param classNames the names of the classes
+     * @param probabilities the probabilities for each class for the input
+     * @param topK the number of top classes to return
+     */
+    public Classifications(List<String> classNames, NDArray probabilities, int topK) {
         this.classNames = classNames;
         NDArray array = probabilities.toType(DataType.FLOAT64, false);
         this.probabilities =
                 Arrays.stream(array.toDoubleArray()).boxed().collect(Collectors.toList());
         array.close();
+        this.topK = topK;
+    }
+
+    /**
+     * Set the topK number of classes to be displayed.
+     *
+     * @param topK the number of top classes to return
+     */
+    public final void setTopK(int topK) {
+        this.topK = topK;
     }
 
     /**
@@ -97,6 +121,16 @@ public class Classifications implements JsonSerializable {
     @SuppressWarnings("unchecked")
     public <T extends Classification> T item(int index) {
         return (T) new Classification(classNames.get(index), probabilities.get(index));
+    }
+
+    /**
+     * Returns a list of the top classes.
+     *
+     * @param <T> the type of the classification item for the task
+     * @return the list of classification items for the best classes in order of best to worst
+     */
+    public <T extends Classification> List<T> topK() {
+        return topK(topK);
     }
 
     /**
@@ -163,7 +197,7 @@ public class Classifications implements JsonSerializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[').append(System.lineSeparator());
-        for (Classification item : topK(5)) {
+        for (Classification item : topK(topK)) {
             sb.append('\t').append(item).append(System.lineSeparator());
         }
         sb.append(']');
@@ -227,7 +261,7 @@ public class Classifications implements JsonSerializable {
         /** {@inheritDoc} */
         @Override
         public JsonElement serialize(Classifications src, Type type, JsonSerializationContext ctx) {
-            List<?> list = src.topK(5);
+            List<?> list = src.topK();
             return ctx.serialize(list);
         }
     }
