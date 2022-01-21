@@ -27,6 +27,7 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
 
     private SynsetLoader synsetLoader;
     private boolean applySoftmax;
+    private int topK;
 
     private List<String> classes;
 
@@ -39,6 +40,7 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
         super(builder);
         this.synsetLoader = builder.synsetLoader;
         this.applySoftmax = builder.applySoftmax;
+        this.topK = builder.topK;
     }
 
     /** {@inheritDoc} */
@@ -56,7 +58,7 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
         if (applySoftmax) {
             probabilitiesNd = probabilitiesNd.softmax(0);
         }
-        return new Classifications(classes, probabilitiesNd);
+        return new Classifications(classes, probabilitiesNd, topK);
     }
 
     /**
@@ -85,8 +87,20 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
     public static class Builder extends ClassificationBuilder<Builder> {
 
         private boolean applySoftmax;
+        private int topK = 5;
 
         Builder() {}
+
+        /**
+         * Set the topK number of classes to be displayed.
+         *
+         * @param topK the number of top classes to return
+         * @return the builder
+         */
+        public Builder optTopK(int topK) {
+            this.topK = topK;
+            return this;
+        }
 
         /**
          * Sets whether to apply softmax when processing output. Some models already include softmax
@@ -111,6 +125,7 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
         protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
             applySoftmax = ArgumentsUtil.booleanValue(arguments, "applySoftmax");
+            topK = ArgumentsUtil.intValue(arguments, "topK", 5);
         }
 
         /**
