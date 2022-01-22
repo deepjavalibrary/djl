@@ -43,6 +43,11 @@ public class OrtTest {
                     Criteria.builder()
                             .setTypes(IrisFlower.class, Classifications.class)
                             .optEngine("OnnxRuntime") // use OnnxRuntime engine
+                            .optOption("interOpNumThreads", "1")
+                            .optOption("intraOpNumThreads", "1")
+                            .optOption("executionMode", "SEQUENTIAL")
+                            .optOption("optLevel", "NO_OPT")
+                            .optOption("memoryPatternOptimization", "true")
                             .build();
 
             IrisFlower virginica = new IrisFlower(1.0f, 2.0f, 3.0f, 4.0f);
