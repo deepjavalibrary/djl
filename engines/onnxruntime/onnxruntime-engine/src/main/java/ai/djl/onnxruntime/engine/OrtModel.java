@@ -22,6 +22,9 @@ import ai.djl.util.Utils;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
+import ai.onnxruntime.OrtSession.SessionOptions;
+import ai.onnxruntime.OrtSession.SessionOptions.ExecutionMode;
+import ai.onnxruntime.OrtSession.SessionOptions.OptLevel;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +41,7 @@ import java.util.Map;
 public class OrtModel extends BaseModel {
 
     private OrtEnvironment env;
+    private SessionOptions sessionOptions;
 
     /**
      * Constructs a new Model on a given device.
@@ -52,6 +56,7 @@ public class OrtModel extends BaseModel {
         this.manager.setName("ortModel");
         this.env = env;
         dataType = DataType.FLOAT32;
+        sessionOptions = new SessionOptions();
     }
 
     /** {@inheritDoc} */
@@ -71,15 +76,12 @@ public class OrtModel extends BaseModel {
         }
 
         try {
+            SessionOptions ortOptions = getSessionOptions(options);
             Device device = manager.getDevice();
-            OrtSession session;
             if (device.isGpu()) {
-                OrtSession.SessionOptions sessionOptions = new OrtSession.SessionOptions();
-                sessionOptions.addCUDA(manager.getDevice().getDeviceId());
-                session = env.createSession(modelFile.toString(), sessionOptions);
-            } else {
-                session = env.createSession(modelFile.toString());
+                ortOptions.addCUDA(manager.getDevice().getDeviceId());
             }
+            OrtSession session = env.createSession(modelFile.toString(), ortOptions);
             block = new OrtSymbolBlock(session, (OrtNDManager) manager);
         } catch (OrtException e) {
             throw new MalformedModelException("ONNX Model cannot be loaded", e);
@@ -97,15 +99,12 @@ public class OrtModel extends BaseModel {
         modelDir.toFile().deleteOnExit();
         try {
             byte[] buf = Utils.toByteArray(is);
+            SessionOptions ortOptions = getSessionOptions(options);
             Device device = manager.getDevice();
-            OrtSession session;
             if (device.isGpu()) {
-                OrtSession.SessionOptions sessionOptions = new OrtSession.SessionOptions();
-                sessionOptions.addCUDA(manager.getDevice().getDeviceId());
-                session = env.createSession(buf, sessionOptions);
-            } else {
-                session = env.createSession(buf);
+                ortOptions.addCUDA(manager.getDevice().getDeviceId());
             }
+            OrtSession session = env.createSession(buf, ortOptions);
             block = new OrtSymbolBlock(session, (OrtNDManager) manager);
         } catch (OrtException e) {
             throw new MalformedModelException("ONNX Model cannot be loaded", e);
@@ -138,5 +137,49 @@ public class OrtModel extends BaseModel {
             }
         }
         return modelFile;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        super.close();
+        try {
+            sessionOptions.close();
+        } catch (IllegalArgumentException ignore) {
+            // ignore
+        }
+    }
+
+    private SessionOptions getSessionOptions(Map<String, ?> options) throws OrtException {
+        if (options == null) {
+            return sessionOptions;
+        }
+
+        SessionOptions ortSession = sessionOptions;
+        if (options.containsKey("sessionOptions")) {
+            ortSession = (SessionOptions) options.get("sessionOptions");
+        }
+
+        String interOpNumThreads = (String) options.get("interOpNumThreads");
+        if (interOpNumThreads != null) {
+            ortSession.setInterOpNumThreads(Integer.parseInt(interOpNumThreads));
+        }
+        String intraOpNumThreads = (String) options.get("intraOpNumThreads");
+        if (interOpNumThreads != null) {
+            ortSession.setIntraOpNumThreads(Integer.parseInt(intraOpNumThreads));
+        }
+        String executionMode = (String) options.get("executionMode");
+        if (executionMode != null) {
+            ortSession.setExecutionMode(ExecutionMode.valueOf(executionMode));
+        }
+        String optLevel = (String) options.get("optLevel");
+        if (optLevel != null) {
+            ortSession.setOptimizationLevel(OptLevel.valueOf(optLevel));
+        }
+        String memoryOptimization = (String) options.get("memoryPatternOptimization");
+        if (Boolean.parseBoolean(memoryOptimization)) {
+            ortSession.setMemoryPatternOptimization(true);
+        }
+        return ortSession;
     }
 }
