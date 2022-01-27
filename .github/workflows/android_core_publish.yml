@@ -1,15 +1,15 @@
-name: Native Publish PyTorch Android
+name: Android core API Publish
 
 on:
   workflow_dispatch:
     inputs:
-        mode:
-          description: 'staging/snapshot, default is snapshot'
-          required: true
-          default: 'snapshot'
+      mode:
+        description: 'staging/snapshot, default is snapshot'
+        required: true
+        default: 'snapshot'
 
 jobs:
-  release-android:
+  publish-android-core:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -17,7 +17,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
       - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
@@ -25,10 +24,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: publish android core to staging
-        working-directory: android
-        run: |
-          ./gradlew :pytorch-native:assemble
-          ./gradlew publish -P${{ github.event.inputs.mode }}
+        working-directory: android/core
+        run: ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}

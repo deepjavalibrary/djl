@@ -147,6 +147,10 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNBatchNorm(
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLayerNorm(
     JNIEnv* env, jobject jthis, jlong jinput, jlongArray jnormalizedshape, jlong jweight, jlong jbias, jdouble jeps) {
   API_BEGIN()
+#if defined(__ANDROID__)
+  env->ThrowNew(ENGINE_EXCEPTION_CLASS, "layerNorm is not supported on Android.");
+  return 0;
+#else
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
   const auto normalized_shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jnormalizedshape);
   torch::Tensor weight = {};
@@ -160,6 +164,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLayerNorm(
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::layer_norm(*tensor_ptr,
       torch::nn::functional::LayerNormFuncOptions(normalized_shape_vec).weight(weight).bias(bias).eps(jeps)));
   return reinterpret_cast<uintptr_t>(result_ptr);
+#endif
   API_END_RETURN()
 }
 
