@@ -23,6 +23,7 @@ dependencies {
         api "ai.djl.dlr:dlr-engine:${version}"
         api "ai.djl.fasttext:fasttext-engine:${version}"
         api "ai.djl.hadoop:hadoop:${version}"
+        api "ai.djl.huggingface:tokenizers:${version}"
         api "ai.djl.mxnet:mxnet-engine:${version}"
         api "ai.djl.mxnet:mxnet-model-zoo:${version}"
         api "ai.djl.opencv:opencv:${version}"
