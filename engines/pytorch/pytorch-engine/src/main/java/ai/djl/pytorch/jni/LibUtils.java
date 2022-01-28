@@ -65,7 +65,7 @@ public final class LibUtils {
         // TODO workaround to make it work on Android Studio
         // It should search for several places to find the native library
         if ("http://www.android.com/".equals(System.getProperty("java.vendor.url"))) {
-            System.loadLibrary(JNI_LIB_NAME); // NOPMD
+            System.loadLibrary("djl_torch"); // NOPMD
             return;
         }
         libTorch = getLibTorch();
