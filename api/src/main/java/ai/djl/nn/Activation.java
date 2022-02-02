@@ -313,7 +313,7 @@ public final class Activation {
      *     function
      */
     public static Block reluBlock() {
-        return new LambdaBlock(Activation::relu);
+        return new LambdaBlock(Activation::relu, "ReLU");
     }
 
     /**
@@ -324,7 +324,7 @@ public final class Activation {
      *     function
      */
     public static Block sigmoidBlock() {
-        return new LambdaBlock(Activation::sigmoid);
+        return new LambdaBlock(Activation::sigmoid, "sigmoid");
     }
 
     /**
@@ -335,7 +335,7 @@ public final class Activation {
      *     function
      */
     public static Block tanhBlock() {
-        return new LambdaBlock(Activation::tanh);
+        return new LambdaBlock(Activation::tanh, "Tanh");
     }
 
     /**
@@ -346,7 +346,7 @@ public final class Activation {
      *     function
      */
     public static Block softPlusBlock() {
-        return new LambdaBlock(Activation::softPlus);
+        return new LambdaBlock(Activation::softPlus, "softPlus");
     }
 
     /**
@@ -357,7 +357,7 @@ public final class Activation {
      *     function
      */
     public static Block softSignBlock() {
-        return new LambdaBlock(Activation::softSign);
+        return new LambdaBlock(Activation::softSign, "softSign");
     }
 
     /**
@@ -369,7 +369,7 @@ public final class Activation {
      *     activation function
      */
     public static Block leakyReluBlock(float alpha) {
-        return new LambdaBlock(arrays -> Activation.leakyRelu(arrays, alpha));
+        return new LambdaBlock(arrays -> Activation.leakyRelu(arrays, alpha), "LeakyReLU");
     }
 
     /**
@@ -381,7 +381,7 @@ public final class Activation {
      *     function
      */
     public static Block eluBlock(float alpha) {
-        return new LambdaBlock(arrays -> Activation.elu(arrays, alpha));
+        return new LambdaBlock(arrays -> Activation.elu(arrays, alpha), "ELU");
     }
 
     /**
@@ -392,7 +392,7 @@ public final class Activation {
      *     function
      */
     public static Block seluBlock() {
-        return new LambdaBlock(Activation::selu);
+        return new LambdaBlock(Activation::selu, "SELU");
     }
 
     /**
@@ -403,7 +403,7 @@ public final class Activation {
      *     function
      */
     public static Block geluBlock() {
-        return new LambdaBlock(Activation::gelu);
+        return new LambdaBlock(Activation::gelu, "GELU");
     }
 
     /**
@@ -415,7 +415,7 @@ public final class Activation {
      *     activation function
      */
     public static Block swishBlock(float beta) {
-        return new LambdaBlock(arrays -> Activation.swish(arrays, beta));
+        return new LambdaBlock(arrays -> Activation.swish(arrays, beta), "Swish");
     }
 
     /**
@@ -426,7 +426,7 @@ public final class Activation {
      *     function
      */
     public static Block mishBlock() {
-        return new LambdaBlock(Activation::mish);
+        return new LambdaBlock(Activation::mish, "Mish");
     }
 
     /**

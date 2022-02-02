@@ -196,6 +196,69 @@ public abstract class Convolution extends AbstractBlock {
     }
 
     /**
+     * Returns the shape of the kernel.
+     *
+     * @return the shape of the kernel
+     */
+    public Shape getKernelShape() {
+        return kernelShape;
+    }
+
+    /**
+     * Returns the stride of the convolution.
+     *
+     * @return the stride of the convolution
+     */
+    public Shape getStride() {
+        return stride;
+    }
+
+    /**
+     * Returns the padding along each dimension.
+     *
+     * @return the padding along each dimension
+     */
+    public Shape getPadding() {
+        return padding;
+    }
+
+    /**
+     * Returns the dilation along each dimension.
+     *
+     * @return the dilation along each dimension
+     */
+    public Shape getDilation() {
+        return dilation;
+    }
+
+    /**
+     * Returns the required number of filters.
+     *
+     * @return the required number of filters
+     */
+    public int getFilters() {
+        return filters;
+    }
+
+    /**
+     * Returns the number of group partitions.
+     *
+     * @return the number of group partitions
+     */
+    public int getGroups() {
+        return groups;
+    }
+
+    /**
+     * Returns whether to include a bias vector.
+     *
+     * @return whether to include a bias vector
+     */
+    public boolean isIncludeBias() {
+        return includeBias;
+    }
+
+    /**
      * Applies N-D convolution over an input signal composed of several input planes.
      *
      * @param input the input {@code NDArray} of shape (batchSize, inputChannel, ...)
