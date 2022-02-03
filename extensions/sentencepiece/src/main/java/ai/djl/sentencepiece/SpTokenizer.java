@@ -93,13 +93,13 @@ public class SpTokenizer implements Tokenizer, AutoCloseable {
                     "Model path doesn't exist: " + modelPath.toAbsolutePath());
         }
         Path modelDir = modelPath.toAbsolutePath();
+        if (prefix == null || prefix.isEmpty()) {
+            prefix = modelDir.toFile().getName();
+        }
         Path modelFile = findModelFile(modelDir, prefix);
         if (modelFile == null) {
             // TODO: support proto and IOStream model
-            modelFile = findModelFile(modelDir, modelDir.toFile().getName());
-            if (modelFile == null) {
-                throw new FileNotFoundException("No .model found in : " + modelPath);
-            }
+            throw new FileNotFoundException("No .model found in : " + modelPath);
         }
 
         String modelFilePath = modelFile.toString();
