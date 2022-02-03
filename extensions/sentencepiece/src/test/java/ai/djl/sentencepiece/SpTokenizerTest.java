@@ -29,17 +29,17 @@ public class SpTokenizerTest {
 
     @BeforeTest
     public void downloadModel() throws IOException {
-        Path modelFile = Paths.get("build/test/models/sententpiece_test_model.model");
+        Path modelFile = Paths.get("build/test/sp_model/sp_model.model");
         if (Files.notExists(modelFile)) {
             DownloadUtils.download(
                     "https://resources.djl.ai/test-models/sententpiece_test_model.model",
-                    "build/test/models/sententpiece_test_model.model");
+                    "build/test/sp_model/sp_model.model");
         }
     }
 
     @Test
     public void testLoadFromBytes() throws IOException {
-        Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
+        Path modelPath = Paths.get("build/test/sp_model/sp_model.model");
         byte[] bytes = Files.readAllBytes(modelPath);
         try (SpTokenizer tokenizer = new SpTokenizer(bytes)) {
             String original = "Hello World";
@@ -55,7 +55,7 @@ public class SpTokenizerTest {
     public void testTokenize() throws IOException {
         TestRequirements.notWindows();
 
-        Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
+        Path modelPath = Paths.get("build/test/sp_model");
         try (SpTokenizer tokenizer = new SpTokenizer(modelPath)) {
             String original = "Hello World";
             List<String> tokens = tokenizer.tokenize(original);
@@ -71,7 +71,7 @@ public class SpTokenizerTest {
     public void testUtf16Tokenize() throws IOException {
         TestRequirements.notWindows();
 
-        Path modelPath = Paths.get("build/test/models/sententpiece_test_model.model");
+        Path modelPath = Paths.get("build/test/sp_model/sp_model.model");
         try (SpTokenizer tokenizer = new SpTokenizer(modelPath)) {
             String original = "\uD83D\uDC4B\uD83D\uDC4B";
             List<String> tokens = tokenizer.tokenize(original);
@@ -84,8 +84,8 @@ public class SpTokenizerTest {
     public void testEncodeDecode() throws IOException {
         TestRequirements.notWindows();
 
-        Path modelPath = Paths.get("build/test/models");
-        String prefix = "sententpiece_test_model";
+        Path modelPath = Paths.get("build/test/sp_model");
+        String prefix = "sp_model";
         try (SpTokenizer tokenizer = new SpTokenizer(modelPath, prefix)) {
             String original = "Hello World";
             SpProcessor processor = tokenizer.getProcessor();
@@ -95,5 +95,25 @@ public class SpTokenizerTest {
             String recovered = processor.decode(ids);
             Assert.assertEquals(recovered, original);
         }
+    }
+
+    @Test
+    public void testModelNotFound() throws IOException {
+        TestRequirements.notWindows();
+
+        Assert.assertThrows(
+                () -> {
+                    new SpTokenizer(Paths.get("build/test/non-exists"));
+                });
+
+        Assert.assertThrows(
+                () -> {
+                    new SpTokenizer(Paths.get("build/test/sp_model"), "non-exists.model");
+                });
+
+        Assert.assertThrows(
+                () -> {
+                    new SpTokenizer(Paths.get("build/test/sp_model"), "non-exists");
+                });
     }
 }
