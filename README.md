@@ -50,7 +50,7 @@ The following pseudocode demonstrates running training:
 
 ```java
     // Construct your neural network with built-in blocks
-    Block block = new Mlp(28, 28);
+    Block block = new Mlp(28 * 28, 10, new int[] {128, 64});
 
     try (Model model = Model.newInstance("mlp")) { // Create an empty model
         model.setBlock(block); // set neural network to model
