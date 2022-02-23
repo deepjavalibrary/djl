@@ -180,6 +180,12 @@ public class OrtModel extends BaseModel {
         if (Boolean.parseBoolean(memoryOptimization)) {
             ortSession.setMemoryPatternOptimization(true);
         }
+
+        String cpuArena = (String) options.get("memoryPatternOptimization");
+        if (Boolean.parseBoolean(cpuArena)) {
+            ortSession.setCPUArenaAllocator(true);
+        }        
+
         return ortSession;
     }
 }
