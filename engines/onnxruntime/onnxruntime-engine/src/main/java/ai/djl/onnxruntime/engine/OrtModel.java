@@ -184,7 +184,7 @@ public class OrtModel extends BaseModel {
         String cpuArena = (String) options.get("cpuArenaAllocator");
         if (Boolean.parseBoolean(cpuArena)) {
             ortSession.setCPUArenaAllocator(true);
-        }        
+        }
 
         return ortSession;
     }
