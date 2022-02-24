@@ -48,6 +48,7 @@ public class OrtTest {
                             .optOption("executionMode", "SEQUENTIAL")
                             .optOption("optLevel", "NO_OPT")
                             .optOption("memoryPatternOptimization", "true")
+                            .optOption("cpuArenaAllocator", "true")
                             .build();
 
             IrisFlower virginica = new IrisFlower(1.0f, 2.0f, 3.0f, 4.0f);
