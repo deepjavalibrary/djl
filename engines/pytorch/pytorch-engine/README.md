@@ -107,7 +107,7 @@ installed on your GPU machine, you can use one of the following library:
 </dependency>
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-jni</artifactId>
+    <artifactId>pytorch-jni</artifactId>
     <version>1.10.0-0.15.0</version>
     <scope>runtime</scope>
 </dependency>
@@ -123,7 +123,7 @@ installed on your GPU machine, you can use one of the following library:
 </dependency>
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-jni</artifactId>
+    <artifactId>pytorch-jni</artifactId>
     <version>1.10.0-0.15.0</version>
     <scope>runtime</scope>
 </dependency>
@@ -144,7 +144,7 @@ installed on your GPU machine, you can use one of the following library:
 </dependency>
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-jni</artifactId>
+    <artifactId>pytorch-jni</artifactId>
     <version>1.10.0-0.15.0</version>
     <scope>runtime</scope>
 </dependency>
@@ -169,7 +169,7 @@ All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` i
 </dependency>
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-jni</artifactId>
+    <artifactId>pytorch-jni</artifactId>
     <version>1.10.0-0.15.0</version>
     <scope>runtime</scope>
 </dependency>
@@ -185,7 +185,7 @@ All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` i
 </dependency>
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-jni</artifactId>
+    <artifactId>pytorch-jni</artifactId>
     <version>1.10.0-0.15.0</version>
     <scope>runtime</scope>
 </dependency>
@@ -215,7 +215,7 @@ For the Windows platform, you can choose between CPU and GPU.
 </dependency>
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-jni</artifactId>
+    <artifactId>pytorch-jni</artifactId>
     <version>1.10.0-0.15.0</version>
     <scope>runtime</scope>
 </dependency>
@@ -231,7 +231,7 @@ For the Windows platform, you can choose between CPU and GPU.
 </dependency>
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-jni</artifactId>
+    <artifactId>pytorch-jni</artifactId>
     <version>1.10.0-0.15.0</version>
     <scope>runtime</scope>
 </dependency>
@@ -252,7 +252,7 @@ For the Windows platform, you can choose between CPU and GPU.
 </dependency>
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-jni</artifactId>
+    <artifactId>pytorch-jni</artifactId>
     <version>1.10.0-0.15.0</version>
     <scope>runtime</scope>
 </dependency>
