@@ -40,6 +40,7 @@ public abstract class BaseNDManager implements NDManager {
     private static final Logger logger = LoggerFactory.getLogger(BaseNDManager.class);
 
     protected NDManager parent;
+    protected NDManager alternativeManager;
     protected String uid;
     protected String name;
     protected Device device;
@@ -53,6 +54,10 @@ public abstract class BaseNDManager implements NDManager {
         resources = new ConcurrentHashMap<>();
         tempResources = new ConcurrentHashMap<>();
         uid = UUID.randomUUID().toString();
+        Engine engine = getEngine().getAlternativeEngine();
+        if (engine != null) {
+            alternativeManager = engine.newBaseManager(Device.cpu());
+        }
     }
 
     /** {@inheritDoc} */
@@ -368,12 +373,8 @@ public abstract class BaseNDManager implements NDManager {
         }
     }
 
-    protected NDManager getAlternativeManager() {
-        Engine engine = getEngine().getAlternativeEngine();
-        if (engine != null) {
-            return engine.newBaseManager(Device.cpu());
-        }
-        return null;
+    NDManager getAlternativeManager() {
+        return alternativeManager;
     }
 
     /**

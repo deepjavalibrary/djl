@@ -29,11 +29,8 @@ public class TrtNDManager extends BaseNDManager {
 
     private static final TrtNDManager SYSTEM_MANAGER = new SystemManager();
 
-    private NDManager alternativeManager;
-
     private TrtNDManager(NDManager parent, Device device) {
         super(parent, device);
-        alternativeManager = getAlternativeManager();
     }
 
     static TrtNDManager getSystemManager() {

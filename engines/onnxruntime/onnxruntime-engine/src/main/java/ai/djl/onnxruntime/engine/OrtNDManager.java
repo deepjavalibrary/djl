@@ -34,12 +34,10 @@ public class OrtNDManager extends BaseNDManager {
     private static final OrtNDManager SYSTEM_MANAGER = new SystemManager();
 
     private OrtEnvironment env;
-    private NDManager alternativeManager;
 
     private OrtNDManager(NDManager parent, Device device, OrtEnvironment env) {
         super(parent, device);
         this.env = env;
-        alternativeManager = getAlternativeManager();
     }
 
     static OrtNDManager getSystemManager() {

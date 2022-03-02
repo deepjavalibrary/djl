@@ -29,11 +29,8 @@ public class TfLiteNDManager extends BaseNDManager {
 
     private static final TfLiteNDManager SYSTEM_MANAGER = new SystemManager();
 
-    private NDManager alternativeManager;
-
     private TfLiteNDManager(NDManager parent, Device device) {
         super(parent, device);
-        alternativeManager = getAlternativeManager();
     }
 
     static TfLiteNDManager getSystemManager() {

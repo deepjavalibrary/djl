@@ -71,6 +71,10 @@ public abstract class NDArrayAdapter implements NDArray {
         detach();
         this.manager = manager;
         manager.attachInternal(getUid(), this);
+        alternativeManager = ((BaseNDManager) manager).getAlternativeManager();
+        if (alternativeManager == null) {
+            alternativeManager = manager;
+        }
     }
 
     /** {@inheritDoc} */

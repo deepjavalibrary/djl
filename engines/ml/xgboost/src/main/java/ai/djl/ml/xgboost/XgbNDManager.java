@@ -32,11 +32,8 @@ public class XgbNDManager extends BaseNDManager {
 
     private static final XgbNDManager SYSTEM_MANAGER = new SystemManager();
 
-    private NDManager alternativeManager;
-
     private XgbNDManager(NDManager parent, Device device) {
         super(parent, device);
-        alternativeManager = getAlternativeManager();
     }
 
     static XgbNDManager getSystemManager() {
