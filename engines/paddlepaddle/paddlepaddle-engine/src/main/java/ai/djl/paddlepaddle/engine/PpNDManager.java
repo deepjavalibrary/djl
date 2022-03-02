@@ -29,11 +29,8 @@ public class PpNDManager extends BaseNDManager {
 
     private static final PpNDManager SYSTEM_MANAGER = new SystemManager();
 
-    private NDManager alternativeManager;
-
     private PpNDManager(NDManager parent, Device device) {
         super(parent, device);
-        alternativeManager = getAlternativeManager();
     }
 
     static PpNDManager getSystemManager() {

@@ -29,11 +29,8 @@ public class DlrNDManager extends BaseNDManager {
 
     private static final DlrNDManager SYSTEM_MANAGER = new SystemManager();
 
-    private NDManager alternativeManager;
-
     private DlrNDManager(NDManager parent, Device device) {
         super(parent, device);
-        alternativeManager = getAlternativeManager();
     }
 
     static DlrNDManager getSystemManager() {
