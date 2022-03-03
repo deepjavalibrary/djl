@@ -30,7 +30,7 @@ import java.util.Map;
  * Unlike in Maven, the data doesn't need to be located within the repository. Instead, the
  * repository only stores metadata including the URL and checksum of the actual data. When the
  * artifact is prepared, the data is downloaded, checked, and then stored in the {@code
- * ~/.djo-ai/cache} folder.
+ * ~/.djl.ai/cache} folder.
  *
  * <p>The artifacts are first divided into a number of {@link Metadata} files that can each have
  * multiple artifacts. The metadata files are identified by an {@link MRL} which contains:
