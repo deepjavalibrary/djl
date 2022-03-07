@@ -59,25 +59,26 @@ public final class FtWrapper extends NativeResource<Long> {
     }
 
     public Classifications predictProba(String text, int topK, String labelPrefix) {
-        String[] labels = new String[topK];
-        float[] probs = new float[topK];
+        int cap = topK != -1 ? topK : 10;
+        ArrayList<String> labels = new ArrayList<>(cap);
+        ArrayList<Float> probs = new ArrayList<>(cap);
 
         int size = FastTextLibrary.LIB.predictProba(getHandle(), text, topK, labels, probs);
 
         List<String> classes = new ArrayList<>(size);
         List<Double> probabilities = new ArrayList<>(size);
         for (int i = 0; i < size; ++i) {
-            String label = labels[i];
+            String label = labels.get(i);
             if (label.startsWith(labelPrefix)) {
                 label = label.substring(labelPrefix.length());
             }
             classes.add(label);
-            probabilities.add((double) probs[i]);
+            probabilities.add((double) probs.get(i));
         }
         return new Classifications(classes, probabilities);
     }
 
-    public float[] getDataVector(String word) {
+    public float[] getWordVector(String word) {
         return FastTextLibrary.LIB.getWordVector(getHandle(), word);
     }
 

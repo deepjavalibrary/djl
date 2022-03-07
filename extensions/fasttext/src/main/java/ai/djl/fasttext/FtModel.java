@@ -15,19 +15,19 @@ package ai.djl.fasttext;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.basicdataset.RawDataset;
 import ai.djl.fasttext.jni.FtWrapper;
+import ai.djl.fasttext.zoo.nlp.textclassification.FtTextClassification;
+import ai.djl.fasttext.zoo.nlp.word_embedding.FtWordEmbeddingBlock;
 import ai.djl.inference.Predictor;
-import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
-import ai.djl.training.TrainingResult;
 import ai.djl.translate.Translator;
 import ai.djl.util.PairList;
+import ai.djl.util.passthrough.PassthroughNDManager;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +45,7 @@ import java.util.function.Function;
  */
 public class FtModel implements Model {
 
-    FtWrapper fta;
+    FtAbstractBlock block;
 
     private Path modelDir;
     private String modelName;
@@ -58,7 +58,6 @@ public class FtModel implements Model {
      */
     public FtModel(String name) {
         this.modelName = name;
-        fta = FtWrapper.newInstance();
         properties = new ConcurrentHashMap<>();
     }
 
@@ -80,6 +79,7 @@ public class FtModel implements Model {
         }
 
         String modelFilePath = modelFile.toString();
+        FtWrapper fta = FtWrapper.newInstance();
         if (!fta.checkModel(modelFilePath)) {
             throw new MalformedModelException("Malformed FastText model file:" + modelFilePath);
         }
@@ -90,7 +90,21 @@ public class FtModel implements Model {
                 properties.put(entry.getKey(), entry.getValue().toString());
             }
         }
-        properties.put("model-type", fta.getModelType());
+        String modelType = fta.getModelType();
+        properties.put("model-type", modelType);
+
+        if ("sup".equals(modelType)) {
+            String labelPrefix =
+                    properties.getOrDefault(
+                            "label-prefix", FtTextClassification.DEFAULT_LABEL_PREFIX);
+            block = new FtTextClassification(fta, labelPrefix);
+            modelDir = block.getModelFile();
+        } else if ("cbow".equals(modelType) || "sg".equals(modelType)) {
+            block = new FtWordEmbeddingBlock(fta);
+            modelDir = block.getModelFile();
+        } else {
+            throw new MalformedModelException("Unexpected FastText model type: " + modelType);
+        }
     }
 
     /** {@inheritDoc} */
@@ -130,49 +144,6 @@ public class FtModel implements Model {
         return modelFile;
     }
 
-    /**
-     * Returns top K number of classifications of the input text.
-     *
-     * @param text the input text to be classified
-     * @param topK the value of K
-     * @return classifications of the input text
-     */
-    public Classifications classify(String text, int topK) {
-        String labelPrefix = properties.getOrDefault("label-prefix", "__label__");
-        return fta.predictProba(text, topK, labelPrefix);
-    }
-
-    /**
-     * Train the fastText model.
-     *
-     * @param config the training configuration to use
-     * @param dataset the training dataset
-     * @return the result of the training
-     * @throws IOException when IO operation fails in loading a resource
-     */
-    public TrainingResult fit(FtTrainingConfig config, RawDataset<Path> dataset)
-            throws IOException {
-        Path outputDir = config.getOutputDir();
-        if (Files.notExists(outputDir)) {
-            Files.createDirectory(outputDir);
-        }
-        String fitModelName = config.getModelName();
-        Path modelFile = outputDir.resolve(fitModelName).toAbsolutePath();
-
-        String[] args = config.toCommand(dataset.getData().toString());
-
-        fta.runCmd(args);
-        setModelFile(modelFile);
-
-        TrainingResult result = new TrainingResult();
-        int epoch = config.getEpoch();
-        if (epoch <= 0) {
-            epoch = 5;
-        }
-        result.setEpoch(epoch);
-        return result;
-    }
-
     /** {@inheritDoc} */
     @Override
     public void save(Path modelDir, String newModelName) {}
@@ -185,14 +156,17 @@ public class FtModel implements Model {
 
     /** {@inheritDoc} */
     @Override
-    public Block getBlock() {
-        throw new UnsupportedOperationException("Fasttext doesn't support Block.");
+    public FtAbstractBlock getBlock() {
+        return block;
     }
 
     /** {@inheritDoc} */
     @Override
     public void setBlock(Block block) {
-        throw new UnsupportedOperationException("Fasttext doesn't support setting the Block.");
+        if (!(block instanceof FtAbstractBlock)) {
+            throw new IllegalArgumentException("Expected a FtAbstractBlock Block");
+        }
+        this.block = (FtAbstractBlock) block;
     }
 
     /** {@inheritDoc} */
@@ -205,7 +179,7 @@ public class FtModel implements Model {
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         throw new UnsupportedOperationException(
-                "FastText only supports training using FtModel.fit");
+                "FastText only supports training using the FtAbstractBlocks");
     }
 
     /** {@inheritDoc} */
@@ -263,7 +237,7 @@ public class FtModel implements Model {
     /** {@inheritDoc} */
     @Override
     public NDManager getNDManager() {
-        return null;
+        return PassthroughNDManager.INSTANCE;
     }
 
     /** {@inheritDoc} */
@@ -278,15 +252,10 @@ public class FtModel implements Model {
         return properties.get(key);
     }
 
-    void setModelFile(Path modelFile) {
-        this.modelDir = modelFile;
-    }
-
     /** {@inheritDoc} */
     @Override
     public void close() {
-        fta.unloadModel();
-        fta.close();
+        block.close();
     }
 
     /** {@inheritDoc} */
