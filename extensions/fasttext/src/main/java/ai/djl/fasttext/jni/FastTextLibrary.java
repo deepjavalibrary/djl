@@ -34,6 +34,7 @@ final class FastTextLibrary {
 
     native String getModelType(long handle);
 
+    @SuppressWarnings("PMD.LooseCoupling")
     native int predictProba(
             long handle,
             String text,
