@@ -66,7 +66,7 @@ public class CookingStackExchangeTest {
                         .optLoss(FtTrainingConfig.FtLoss.HS)
                         .build();
 
-        FtTextClassification block = FtTextClassification.fit(config, dataset);
+        FtTextClassification block = TrainFastText.textClassification(config, dataset);
         TrainingResult result = block.getTrainingResult();
         Assert.assertEquals(result.getEpoch(), 5);
         Assert.assertTrue(Files.exists(Paths.get("build/cooking.bin")));

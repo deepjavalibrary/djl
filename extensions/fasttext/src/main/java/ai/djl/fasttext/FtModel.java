@@ -41,7 +41,8 @@ import java.util.function.Function;
 /**
  * {@code FtModel} is the fastText implementation of {@link Model}.
  *
- * <p>FtModel contains all the methods in Model to load and process a model.
+ * <p>FtModel contains all the methods in Model to load and process a model. However, it only
+ * supports training by using {@link TrainFastText}.
  */
 public class FtModel implements Model {
 
