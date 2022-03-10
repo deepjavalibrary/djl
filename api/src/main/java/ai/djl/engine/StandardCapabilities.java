@@ -20,6 +20,7 @@ public final class StandardCapabilities {
     public static final String MKL = "MKL";
     public static final String MKLDNN = "MKLDNN";
     public static final String OPENMP = "OPENMP";
+    public static final String SINGLETHREADED = "SINGLETHREADED";
 
     private StandardCapabilities() {}
 }
