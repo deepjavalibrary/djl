@@ -12,19 +12,26 @@
  */
 package ai.djl.fasttext;
 
+import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.nlp.CookingStackExchange;
+import ai.djl.fasttext.zoo.nlp.textclassification.FtTextClassification;
+import ai.djl.fasttext.zoo.nlp.word_embedding.FtWord2VecWordEmbedding;
+import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
+import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -33,6 +40,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -43,30 +52,30 @@ public class CookingStackExchangeTest {
     private static final Logger logger = LoggerFactory.getLogger(CookingStackExchangeTest.class);
 
     @Test
-    public void testTrainTextClassification() throws IOException {
+    public void testTrainTextClassification() throws IOException, TranslateException {
         TestRequirements.notWindows(); // fastText is not supported on windows
 
-        try (FtModel model = new FtModel("cooking")) {
-            CookingStackExchange dataset = CookingStackExchange.builder().build();
+        CookingStackExchange dataset = CookingStackExchange.builder().build();
 
-            // setup training configuration
-            FtTrainingConfig config =
-                    FtTrainingConfig.builder()
-                            .setOutputDir(Paths.get("build"))
-                            .setModelName("cooking")
-                            .optEpoch(5)
-                            .optLoss(FtTrainingConfig.FtLoss.HS)
-                            .build();
+        // setup training configuration
+        FtTrainingConfig config =
+                FtTrainingConfig.builder()
+                        .setOutputDir(Paths.get("build"))
+                        .setModelName("cooking")
+                        .optEpoch(5)
+                        .optLoss(FtTrainingConfig.FtLoss.HS)
+                        .build();
 
-            TrainingResult result = model.fit(config, dataset);
-            Assert.assertEquals(result.getEpoch(), 5);
-            Assert.assertTrue(Files.exists(Paths.get("build/cooking.bin")));
-        }
+        FtTextClassification block = TrainFastText.textClassification(config, dataset);
+        TrainingResult result = block.getTrainingResult();
+        Assert.assertEquals(result.getEpoch(), 5);
+        Assert.assertTrue(Files.exists(Paths.get("build/cooking.bin")));
     }
 
     @Test
     public void testTextClassification()
-            throws IOException, MalformedModelException, ModelNotFoundException {
+            throws IOException, MalformedModelException, ModelNotFoundException,
+                    TranslateException {
         TestRequirements.notWindows(); // fastText is not supported on windows
 
         Criteria<String, Classifications> criteria =
@@ -75,11 +84,18 @@ public class CookingStackExchangeTest {
                         .optArtifactId("ai.djl.fasttext:cooking_stackexchange")
                         .optOption("label-prefix", "__label")
                         .build();
+        Map<Application, List<Artifact>> models = ModelZoo.listModels(criteria);
+        models.forEach(
+                (app, list) -> {
+                    String appName = app.toString();
+                    list.forEach(artifact -> logger.info("{} {}", appName, artifact));
+                });
         try (ZooModel<String, Classifications> model = criteria.loadModel()) {
             String input = "Which baking dish is best to bake a banana bread ?";
-            FtModel ftModel = (FtModel) model.getWrappedModel();
-            Classifications result = ftModel.classify(input, 8);
-            Assert.assertEquals(result.item(0).getClassName(), "__bread");
+            try (Predictor<String, Classifications> predictor = model.newPredictor()) {
+                Classifications result = predictor.predict(input);
+                Assert.assertEquals(result.item(0).getClassName(), "__bread");
+            }
         }
     }
 
@@ -95,10 +111,9 @@ public class CookingStackExchangeTest {
         try (ZooModel<String, Classifications> model = criteria.loadModel();
                 NDManager manager = NDManager.newBaseManager()) {
 
-            FtModel ftModel = (FtModel) model.getWrappedModel();
             FtWord2VecWordEmbedding fasttextWord2VecWordEmbedding =
                     new FtWord2VecWordEmbedding(
-                            ftModel, new DefaultVocabulary(Collections.singletonList("bread")));
+                            model, new DefaultVocabulary(Collections.singletonList("bread")));
             long index = fasttextWord2VecWordEmbedding.preprocessWordToEmbed("bread");
             NDArray embedding = fasttextWord2VecWordEmbedding.embedWord(manager, index);
             Assert.assertEquals(embedding.getShape(), new Shape(100));
@@ -125,7 +140,7 @@ public class CookingStackExchangeTest {
             model.load(modelFile);
             String text =
                     "Convair was an american aircraft manufacturing company which later expanded into rockets and spacecraft .";
-            Classifications result = model.classify(text, 5);
+            Classifications result = ((FtTextClassification) model.getBlock()).classify(text, 5);
 
             logger.info("{}", result);
             Assert.assertEquals(result.item(0).getClassName(), "Company");

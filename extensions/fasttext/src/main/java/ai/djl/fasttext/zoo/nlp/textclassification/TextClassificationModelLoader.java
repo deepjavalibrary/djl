@@ -24,6 +24,7 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.util.Progress;
+import ai.djl.util.passthrough.PassthroughTranslator;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -66,6 +67,6 @@ public class TextClassificationModelLoader extends BaseModelLoader {
         Model model = new FtModel(modelName);
         Path modelPath = mrl.getRepository().getResourceDirectory(artifact);
         model.load(modelPath, modelName, criteria.getOptions());
-        return new ZooModel<>(model, null);
+        return new ZooModel<>(model, new PassthroughTranslator<>());
     }
 }

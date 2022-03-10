@@ -10,27 +10,50 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.fasttext;
+package ai.djl.fasttext.zoo.nlp.word_embedding;
 
+import ai.djl.Model;
+import ai.djl.fasttext.FtAbstractBlock;
+import ai.djl.fasttext.FtModel;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.WordEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.repository.zoo.ZooModel;
 
 /** An implementation of {@link WordEmbedding} for FastText word embeddings. */
 public class FtWord2VecWordEmbedding implements WordEmbedding {
 
-    private FtModel model;
+    private FtAbstractBlock embedding;
     private Vocabulary vocabulary;
 
     /**
      * Constructs a {@link FtWord2VecWordEmbedding}.
      *
-     * @param model a loaded FastText model
+     * @param model a loaded FastText wordEmbedding model or a ZooModel containing one
      * @param vocabulary the {@link Vocabulary} to get indices from
      */
-    public FtWord2VecWordEmbedding(FtModel model, Vocabulary vocabulary) {
-        this.model = model;
+    public FtWord2VecWordEmbedding(Model model, Vocabulary vocabulary) {
+        if (model instanceof ZooModel) {
+            model = ((ZooModel<?, ?>) model).getWrappedModel();
+        }
+
+        if (!(model instanceof FtModel)) {
+            throw new IllegalArgumentException("The FtWord2VecWordEmbedding requires an FtModel");
+        }
+
+        this.embedding = (FtAbstractBlock) model.getBlock();
+        this.vocabulary = vocabulary;
+    }
+
+    /**
+     * Constructs a {@link FtWord2VecWordEmbedding}.
+     *
+     * @param embedding the word embedding
+     * @param vocabulary the {@link Vocabulary} to get indices from
+     */
+    public FtWord2VecWordEmbedding(FtAbstractBlock embedding, Vocabulary vocabulary) {
+        this.embedding = embedding;
         this.vocabulary = vocabulary;
     }
 
@@ -56,7 +79,7 @@ public class FtWord2VecWordEmbedding implements WordEmbedding {
     @Override
     public NDArray embedWord(NDManager manager, long index) {
         String word = vocabulary.getToken(index);
-        float[] buf = model.fta.getDataVector(word);
+        float[] buf = embedding.embedWord(word);
         return manager.create(buf);
     }
 

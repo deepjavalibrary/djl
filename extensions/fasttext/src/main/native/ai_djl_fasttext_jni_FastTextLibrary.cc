@@ -97,9 +97,9 @@ JNIEXPORT jstring JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_getModelType(
   if (modelName == model_name::cbow) {
     return env->NewStringUTF("cbow");
   } else if (modelName == model_name::sg) {
-    return env->NewStringUTF("cbow");
+    return env->NewStringUTF("sg");
   } else if (modelName == model_name::sup) {
-    return env->NewStringUTF("cbow");
+    return env->NewStringUTF("sup");
   } else {
     jclass jexception = env->FindClass("ai/djl/engine/EngineException");
     env->ThrowNew(jexception, "Unrecognized model type");
@@ -108,7 +108,7 @@ JNIEXPORT jstring JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_getModelType(
 }
 
 JNIEXPORT jint JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_predictProba(
-    JNIEnv* env, jobject jthis, jlong jhandle, jstring jtext, jint top_k, jobjectArray jclasses, jfloatArray jprob) {
+    JNIEnv* env, jobject jthis, jlong jhandle, jstring jtext, jint top_k, jobject jclasses, jobject jprob) {
   auto* fasttext_ptr = reinterpret_cast<fasttext::FastText*>(jhandle);
   std::string text = djl::utils::jni::GetStringFromJString(env, jtext);
   std::istringstream in(text);
@@ -116,13 +116,15 @@ JNIEXPORT jint JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_predictProba(
   fasttext_ptr->predictLine(in, predictions, top_k, 0.0);
 
   int size = predictions.size();
-  std::vector<float> prob;
+   jclass java_lang_Float = static_cast<jclass>(env->NewGlobalRef(env->FindClass("java/lang/Float")));
+   jmethodID java_lang_Float_ = env->GetMethodID(java_lang_Float, "<init>", "(F)V");
+  jclass java_util_ArrayList = static_cast<jclass>(env->NewGlobalRef(env->FindClass("java/util/ArrayList")));
+  jmethodID java_util_ArrayList_add = env->GetMethodID(java_util_ArrayList, "add", "(Ljava/lang/Object;)Z");
   for (int i = 0; i < size; ++i) {
     std::pair<real, std::string> pair = predictions[i];
-    env->SetObjectArrayElement(jclasses, i, env->NewStringUTF(pair.second.c_str()));
-    prob.push_back(pair.first);
+     env->CallBooleanMethod(jclasses, java_util_ArrayList_add, env->NewStringUTF(pair.second.c_str()));
+     env->CallBooleanMethod(jprob, java_util_ArrayList_add, env->NewObject(java_lang_Float, java_lang_Float_, pair.first));
   }
-  env->SetFloatArrayRegion(jprob, 0, size, prob.data());
 
   return size;
 }

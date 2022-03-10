@@ -5,8 +5,10 @@
 This module contains the NLP support with fastText implementation.
 
 fastText module's implementation in DJL is not considered as an Engine, it doesn't support Trainer and Predictor.
-The training and inference functionality is directly provided through [FtModel](https://javadoc.io/doc/ai.djl.fasttext/fasttext-engine/latest/ai/djl/fasttext/FtModel.html)
-class. You can find examples [here](https://github.com/deepjavalibrary/djl/blob/master/extensions/fasttext/src/test/java/ai/djl/fasttext/CookingStackExchangeTest.java).
+Training is only supported by using [TrainFastText](https://javadoc.io/doc/ai.djl.fasttext/fasttext-engine/latest/ai/djl/fasttext/TrainFastText.html).
+This produces a special block which can perform inference on its own or by using a model and predictor.
+Pre-trained FastText models can also be loaded by using the standard DJL criteria.
+You can find examples [here](https://github.com/deepjavalibrary/djl/blob/master/extensions/fasttext/src/test/java/ai/djl/fasttext/CookingStackExchangeTest.java).
 
 Current implementation has the following limitations:
 

@@ -12,6 +12,8 @@
  */
 package ai.djl.fasttext.jni;
 
+import java.util.ArrayList;
+
 /** A class containing utilities to interact with the SentencePiece Engine's JNI layer. */
 @SuppressWarnings("MissingJavadocMethod")
 final class FastTextLibrary {
@@ -32,8 +34,13 @@ final class FastTextLibrary {
 
     native String getModelType(long handle);
 
+    @SuppressWarnings("PMD.LooseCoupling")
     native int predictProba(
-            long handle, String text, int topK, String[] classes, float[] probabilities);
+            long handle,
+            String text,
+            int topK,
+            ArrayList<String> classes,
+            ArrayList<Float> probabilities);
 
     native float[] getWordVector(long handle, String word);
 
