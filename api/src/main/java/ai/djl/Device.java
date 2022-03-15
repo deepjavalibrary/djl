@@ -12,6 +12,7 @@
  */
 package ai.djl;
 
+import ai.djl.engine.Engine;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,21 +69,35 @@ public final class Device {
     }
 
     /**
+     * Parses a deviceName string into a device for the default engine.
+     *
+     * @param deviceName deviceName String to parse
+     * @return the parsed device
+     * @see #fromName(String, Engine)
+     */
+    public static Device fromName(String deviceName) {
+        return fromName(deviceName, Engine.getInstance());
+    }
+
+    /**
      * Parses a deviceName string into a device.
      *
      * <p>The main format of a device name string is "cpu", "gpu0", or "nc1". This is simply
      * deviceType concatenated with the deviceId. If no deviceId is used, -1 will be assumed.
      *
-     * <p>There are also several simplified formats. "-1", "", and null deviceNames correspond to
-     * cpu. Non-negative integer deviceNames such as "0", "1", or "2" correspond to gpus with those
+     * <p>There are also several simplified formats. The "-1", deviceNames corresponds to cpu.
+     * Non-negative integer deviceNames such as "0", "1", or "2" correspond to gpus with those
      * deviceIds.
      *
+     * <p>Finally, unspecified deviceNames (null or "") are parsed into the engine's default device.
+     *
      * @param deviceName deviceName string
+     * @param engine the engine the devie is for
      * @return the device
      */
-    public static Device fromName(String deviceName) {
+    public static Device fromName(String deviceName, Engine engine) {
         if (deviceName == null || deviceName.isEmpty()) {
-            return Device.cpu();
+            return engine.defaultDevice();
         }
 
         Matcher matcher = DEVICE_NAME.matcher(deviceName);
