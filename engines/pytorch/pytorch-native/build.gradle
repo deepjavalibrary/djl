@@ -32,12 +32,12 @@ def downloadBuild(String ver, String os, String flavor, Boolean isPrecxx11 = fal
     def arch = isAarch64 ? "aarch64" : "x86_64"
     exec {
         if (os == "win") {
-            commandLine "${project.projectDir}/build.cmd", "${ver}", "${flavor}", isPrecxx11
+            commandLine "${project.projectDir}/build.cmd", "${ver}", "${flavor}"
         } else {
             if (isPrecxx11) {
                 commandLine 'bash', 'build.sh', "${ver}", "${flavor}", "precxx11", "${arch}"
             } else {
-                commandLine 'bash', 'build.sh', "${ver}", "${flavor}", "", "${arch}"
+                commandLine 'bash', 'build.sh', "${ver}", "${flavor}", "cxx11", "${arch}"
             }
         }
     }
@@ -75,9 +75,9 @@ def downloadBuildAndroid(String ver) {
     }
 }
 
-def prepareNativeLib(String binaryRoot, String ver, Boolean isAarch64) {
+def prepareNativeLib(String binaryRoot, String ver) {
     def officialPytorchUrl = "https://download.pytorch.org/libtorch"
-    def aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch/"
+    def aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
     String cu11
     if (ver.startsWith("1.8.") || ver.startsWith("1.9.")) {
         cu11 = "cu111"
@@ -102,10 +102,7 @@ def prepareNativeLib(String binaryRoot, String ver, Boolean isAarch64) {
     ]
 
     copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
-
-    if (isAarch64) {
-        copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
-    }
+    copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
 }
 
 def copyNativeLibToOutputDir(Map<String, String> fileStoreMap, String binaryRoot, String url) {
@@ -237,14 +234,14 @@ publishing.repositories {
 
 task downloadPyTorchNativeLib() {
     doLast {
-        prepareNativeLib("${BINARY_ROOT}", "${VERSION}", isAarch64)
+        prepareNativeLib("${BINARY_ROOT}", "${VERSION}")
     }
 }
 
 task uploadS3 {
     doLast {
         delete "${BINARY_ROOT}"
-        prepareNativeLib("${BINARY_ROOT}", "${version}", isAarch64)
+        prepareNativeLib("${BINARY_ROOT}", "${VERSION}")
 
         exec {
             commandLine "sh", "-c", "find ${BINARY_ROOT} -type f | xargs gzip"
