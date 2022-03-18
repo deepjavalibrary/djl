@@ -57,6 +57,7 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
+          export PYTORCH_PRECXX11=true
           ./gradlew :extensions:fasttext:compileJNI
           ./gradlew -Pjni :extensions:fasttext:test
       - name: Configure AWS Credentials
