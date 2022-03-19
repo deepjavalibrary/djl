@@ -112,7 +112,13 @@ public class AmesRandomAccess extends CsvDataset {
             artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
             csvFormat =
-                    CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim();
+                    CSVFormat.DEFAULT
+                            .builder()
+                            .setHeader()
+                            .setSkipHeaderRecord(true)
+                            .setIgnoreHeaderCase(true)
+                            .setTrim(true)
+                            .build();
         }
 
         /** {@inheritDoc} */

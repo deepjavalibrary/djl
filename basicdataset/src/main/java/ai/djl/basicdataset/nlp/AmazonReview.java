@@ -22,6 +22,7 @@ import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.csv.CSVFormat;
 
@@ -58,7 +59,7 @@ public class AmazonReview extends CsvDataset {
 
         Map<String, String> filter = new ConcurrentHashMap<>();
         filter.put("dataset", datasetName);
-        Artifact artifact = mrl.match(filter);
+        Artifact artifact = Objects.requireNonNull(mrl.match(filter));
         mrl.prepare(artifact, progress);
 
         Path dir = mrl.getRepository().getResourceDirectory(artifact);
@@ -90,7 +91,7 @@ public class AmazonReview extends CsvDataset {
             repository = BasicDatasets.REPOSITORY;
             groupId = BasicDatasets.GROUP_ID;
             artifactId = ARTIFACT_ID;
-            csvFormat = CSVFormat.TDF.withQuote(null).withHeader();
+            csvFormat = CSVFormat.TDF.builder().setQuote(null).setHeader().build();
             datasetName = "us_Digital_Software";
         }
 

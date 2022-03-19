@@ -124,7 +124,7 @@ public final class TrainAmazonReviewRanking {
         float paddingToken = tokenizer.getVocabulary().getIndex("[PAD]");
         return CsvDataset.builder()
                 .optCsvUrl(amazonReview)
-                .setCsvFormat(CSVFormat.TDF.withQuote(null).withHeader())
+                .setCsvFormat(CSVFormat.TDF.builder().setQuote(null).setHeader().build())
                 .setSampling(arguments.getBatchSize(), true)
                 .addFeature(
                         new CsvDataset.Feature(
