@@ -4,22 +4,24 @@ set -e
 WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NUM_PROC=1
 if [[ -n $(command -v nproc) ]]; then
-    NUM_PROC=$(nproc)
+  NUM_PROC=$(nproc)
 elif [[ -n $(command -v sysctl) ]]; then
-    NUM_PROC=$(sysctl -n hw.ncpu)
+  NUM_PROC=$(sysctl -n hw.ncpu)
 fi
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 
 VERSION=v0.9.2
 
 pushd "$WORK_DIR"
-if [ ! -d "fastText" ];
-then
+if [ ! -d "fastText" ]; then
   git clone https://github.com/facebookresearch/fastText.git -b $VERSION
+  if [[ $PLATFORM == 'linux' ]]; then
+    # Workaround SIGILL issue running on ubuntu while we compiled on AL2
+    sed -i "s/-march=native/-mtune=generic/g" fastText/CMakeLists.txt
+  fi
 fi
 
-if [ ! -d "build" ];
-then
+if [ ! -d "build" ]; then
   mkdir build
 fi
 cd build
