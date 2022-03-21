@@ -120,7 +120,6 @@ public final class AirfoilRandomAccess extends CsvDataset {
         int length = selected.size();
         ByteBuffer bb = manager.allocateDirect(length * 4);
         FloatBuffer buf = bb.asFloatBuffer();
-        int index = 0;
         for (Feature feature : selected) {
             String name = feature.getName();
             float value = Float.parseFloat(record.get(name));
@@ -128,7 +127,6 @@ public final class AirfoilRandomAccess extends CsvDataset {
                 value = (value - mean.get(name)) / std.get(name);
             }
             buf.put(value);
-            ++index;
         }
         buf.rewind();
         return new NDList(manager.create(buf, new Shape(length)));
@@ -179,7 +177,13 @@ public final class AirfoilRandomAccess extends CsvDataset {
             groupId = BasicDatasets.GROUP_ID;
             artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
-            csvFormat = CSVFormat.TDF.withHeader(COLUMNS).withIgnoreHeaderCase().withTrim();
+            csvFormat =
+                    CSVFormat.TDF
+                            .builder()
+                            .setHeader(COLUMNS)
+                            .setIgnoreHeaderCase(true)
+                            .setTrim(true)
+                            .build();
         }
 
         /** {@inheritDoc} */
