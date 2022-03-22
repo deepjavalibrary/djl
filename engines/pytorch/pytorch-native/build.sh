@@ -17,6 +17,7 @@ CXX11ABI="-cxx11-abi"
 if [[ $3 == "precxx11" ]]; then
   CXX11ABI=""
 fi
+ARCH=$4
 
 if [[ ! -d "libtorch" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
@@ -24,7 +25,13 @@ if [[ ! -d "libtorch" ]]; then
       echo "$FLAVOR is not supported."
       exit 1
     fi
-    curl -s https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip | jar xv
+
+    if [[ $ARCH == 'aarch64' ]]; then
+      curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-cxx11-shared-with-deps-${VERSION}-aarch64.zip | jar xv
+    else
+      curl -s https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip | jar xv
+    fi
+
   elif [[ $PLATFORM == 'darwin' ]]; then
     curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip | jar xv
   else
