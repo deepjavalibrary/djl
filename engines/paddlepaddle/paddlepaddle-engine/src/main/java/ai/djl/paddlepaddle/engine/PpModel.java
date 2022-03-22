@@ -67,7 +67,7 @@ public class PpModel extends BaseModel {
     public void load(Path modelPath, String prefix, Map<String, ?> options) throws IOException {
         setModelDir(modelPath);
         String[] modelFiles = findModelFile(modelDir);
-        if (modelFiles == null) {
+        if (modelFiles.length == 0) {
             throw new FileNotFoundException("no __model__ or model file found in: " + modelDir);
         }
         long config = JniUtils.createConfig(modelFiles[0], modelFiles[1], device);
@@ -116,7 +116,7 @@ public class PpModel extends BaseModel {
                 return paths;
             }
         }
-        return null;
+        return new String[0];
     }
 
     /** {@inheritDoc} */

@@ -1257,7 +1257,7 @@ public final class JnaUtils {
                     recoverShape(outShapeSize, outShapeNDim, outShapeData),
                     recoverShape(auxShapeSize, auxShapeNDim, auxShapeData));
         }
-        return null;
+        throw new IllegalArgumentException("Cannot infer shape based on the data provided!");
     }
 
     public static void loadLib(String path, boolean verbose) {

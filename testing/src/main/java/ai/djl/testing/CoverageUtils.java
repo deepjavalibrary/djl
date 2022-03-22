@@ -38,6 +38,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class CoverageUtils {
 
     private CoverageUtils() {}

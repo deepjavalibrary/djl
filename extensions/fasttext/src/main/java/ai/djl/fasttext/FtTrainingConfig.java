@@ -23,6 +23,7 @@ import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.PairList;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
@@ -276,13 +277,13 @@ public class FtTrainingConfig implements TrainingConfig {
     /** {@inheritDoc} */
     @Override
     public List<Evaluator> getEvaluators() {
-        return null;
+        return Collections.emptyList();
     }
 
     /** {@inheritDoc} */
     @Override
     public List<TrainingListener> getTrainingListeners() {
-        return null;
+        return Collections.emptyList();
     }
 
     /**
