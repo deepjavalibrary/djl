@@ -235,7 +235,7 @@
         <exclude name="LoggerIsNotStaticFinal"/>
         <exclude name="MethodWithSameNameAsEnclosingClass"/>
         <exclude name="MisplacedNullCheck"/>
-        <exclude name="MissingBreakInSwitch"/>
+        <exclude name="ImplicitSwitchFallThrough"/>
         <exclude name="MissingSerialVersionUID"/>
         <exclude name="MissingStaticMethodInNonInstantiatableClass"/>
         <exclude name="MoreThanOneLogger"/>
@@ -416,7 +416,7 @@
         <exclude name="EmptyIfStmt"/>
         <exclude name="JumbledIncrementer"/>
         <exclude name="LoggerIsNotStaticFinal"/>
-        <exclude name="MissingBreakInSwitch"/>
+        <exclude name="ImplicitSwitchFallThrough"/>
         <exclude name="MoreThanOneLogger"/>
         <exclude name="NonCaseLabelInSwitchStatement"/>
         <exclude name="NonStaticInitializer"/>

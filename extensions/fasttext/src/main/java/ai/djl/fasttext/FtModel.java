@@ -214,7 +214,7 @@ public class FtModel implements Model {
     /** {@inheritDoc} */
     @Override
     public String[] getArtifactNames() {
-        return null;
+        return new String[0];
     }
 
     /** {@inheritDoc} */
