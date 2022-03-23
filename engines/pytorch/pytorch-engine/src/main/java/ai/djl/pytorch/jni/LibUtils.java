@@ -12,6 +12,7 @@
  */
 package ai.djl.pytorch.jni;
 
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
 import java.io.File;
@@ -205,11 +206,14 @@ public final class LibUtils {
         }
         version = matcher.group(1);
 
-        try (InputStream is = LibUtils.class.getResourceAsStream("/jnilib/pytorch.properties")) {
+        try {
+            URL url = ClassLoaderUtils.getResource("jnilib/pytorch.properties");
             String jniVersion = null;
-            if (is != null) {
+            if (url != null) {
                 Properties prop = new Properties();
-                prop.load(is);
+                try (InputStream is = url.openStream()) {
+                    prop.load(is);
+                }
                 jniVersion = prop.getProperty("jni_version");
                 if (jniVersion == null) {
                     throw new AssertionError("No PyTorch jni version found.");
@@ -228,12 +232,9 @@ public final class LibUtils {
         }
 
         Path tmp = null;
-        String libPath = "/jnilib/" + classifier + '/' + flavor + '/' + JNI_LIB_NAME;
+        String libPath = "jnilib/" + classifier + '/' + flavor + '/' + JNI_LIB_NAME;
         logger.info("Extracting {} to cache ...", libPath);
-        try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
-            if (is == null) {
-                throw new AssertionError("PyTorch jni not found: " + libPath);
-            }
+        try (InputStream is = ClassLoaderUtils.getResourceAsStream(libPath)) {
             tmp = Files.createTempFile(dir, "jni", "tmp");
             Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
             Utils.moveQuietly(tmp, path);
@@ -292,12 +293,9 @@ public final class LibUtils {
             Files.createDirectories(cacheDir);
             tmp = Files.createTempDirectory(cacheDir, "tmp");
             for (String file : platform.getLibraries()) {
-                String libPath = "/native/lib/" + file;
+                String libPath = "native/lib/" + file;
                 logger.info("Extracting {} to cache ...", libPath);
-                try (InputStream is = LibUtils.class.getResourceAsStream(libPath)) {
-                    if (is == null) {
-                        throw new IllegalStateException("PyTorch library not found: " + libPath);
-                    }
+                try (InputStream is = ClassLoaderUtils.getResourceAsStream(libPath)) {
                     Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
                 }
             }

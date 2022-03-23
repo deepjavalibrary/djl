@@ -136,21 +136,23 @@ public final class Platform {
     }
 
     private static Platform fromSystem(String engine) {
-        String engineProp = '/' + engine + "-engine.properties";
+        String engineProp = engine + "-engine.properties";
         String versionKey = engine + "_version";
         Platform platform = fromSystem();
         platform.placeholder = true;
 
-        URL url = Platform.class.getResource(engineProp);
-        if (url != null) {
-            try (InputStream is = url.openStream()) {
-                Properties prop = new Properties();
-                prop.load(is);
-                platform.version = prop.getProperty(versionKey);
-                platform.apiVersion = prop.getProperty("djl_version");
-            } catch (IOException e) {
-                throw new AssertionError("Failed to read property file: " + engineProp, e);
+        try {
+            URL url = ClassLoaderUtils.getResource(engineProp);
+            if (url != null) {
+                try (InputStream is = url.openStream()) {
+                    Properties prop = new Properties();
+                    prop.load(is);
+                    platform.version = prop.getProperty(versionKey);
+                    platform.apiVersion = prop.getProperty("djl_version");
+                }
             }
+        } catch (IOException e) {
+            throw new AssertionError("Failed to read property file: " + engineProp, e);
         }
         return platform;
     }

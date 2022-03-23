@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.csv.CSVFormat;
 
@@ -237,7 +238,9 @@ public class AmesRandomAccess extends CsvDataset {
 
         private void parseFeatures() {
             if (af == null) {
-                try (InputStream is = AmesRandomAccess.class.getResourceAsStream("ames.json");
+                try (InputStream is =
+                                Objects.requireNonNull(
+                                        AmesRandomAccess.class.getResourceAsStream("ames.json"));
                         Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                     af = JsonUtils.GSON.fromJson(reader, AmesFeatures.class);
                 } catch (IOException e) {

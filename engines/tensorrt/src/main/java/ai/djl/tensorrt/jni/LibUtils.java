@@ -12,6 +12,7 @@
  */
 package ai.djl.tensorrt.jni;
 
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
 import java.io.IOException;
@@ -63,13 +64,10 @@ public final class LibUtils {
         Path tmp = null;
         String libPath = "/jnilib/" + classifier + "/" + name;
         logger.info("Extracting {} to cache ...", libPath);
-        try (InputStream stream = LibUtils.class.getResourceAsStream(libPath)) {
-            if (stream == null) {
-                throw new IllegalStateException("TensorRT library not found: " + libPath);
-            }
+        try (InputStream is = ClassLoaderUtils.getResourceAsStream(libPath)) {
             Files.createDirectories(dir);
             tmp = Files.createTempFile(cacheDir, "jni", "tmp");
-            Files.copy(stream, tmp, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
             Utils.moveQuietly(tmp, path);
             return path.toAbsolutePath().toString();
         } catch (IOException e) {
