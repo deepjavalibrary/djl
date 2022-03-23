@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
@@ -302,7 +303,7 @@ public final class SageMaker {
 
     private void addToTar(Path root, Path file, TarArchiveOutputStream tos) throws IOException {
         Path relative = root.relativize(file);
-        String name = modelName + '/' + relative.toString();
+        String name = modelName + '/' + relative;
         if (Files.isDirectory(file)) {
             File[] files = file.toFile().listFiles();
             if (files != null) {
@@ -433,7 +434,7 @@ public final class SageMaker {
     }
 
     private static String readPolicyDocument(String path) {
-        try (InputStream is = SageMaker.class.getResourceAsStream(path)) {
+        try (InputStream is = Objects.requireNonNull(SageMaker.class.getResourceAsStream(path))) {
             return Utils.toString(is);
         } catch (IOException e) {
             throw new AssertionError("Failed to read " + path, e);

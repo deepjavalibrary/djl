@@ -14,6 +14,7 @@ package ai.djl.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -166,5 +167,46 @@ public final class ClassLoaderUtils {
             return ClassLoaderUtils.class.getClassLoader(); // NOPMD
         }
         return cl;
+    }
+
+    /**
+     * Finds all the resources with the given name.
+     *
+     * @param name the resource name
+     * @return An enumeration of {@link java.net.URL URL} objects for the resource
+     * @throws IOException if I/O errors occur
+     */
+    public static Enumeration<URL> getResources(String name) throws IOException {
+        return getContextClassLoader().getResources(name);
+    }
+
+    /**
+     * Finds the first resource in class path with the given name.
+     *
+     * @param name the resource name
+     * @return an enumeration of {@link java.net.URL URL} objects for the resource
+     * @throws IOException if I/O errors occur
+     */
+    public static URL getResource(String name) throws IOException {
+        Enumeration<URL> en = getResources(name);
+        if (en.hasMoreElements()) {
+            return en.nextElement();
+        }
+        return null;
+    }
+
+    /**
+     * Returns an {@code InputStream} for reading from the resource.
+     *
+     * @param name the resource name
+     * @return an {@code InputStream} for reading
+     * @throws IOException if I/O errors occur
+     */
+    public static InputStream getResourceAsStream(String name) throws IOException {
+        URL url = getResource(name);
+        if (url == null) {
+            throw new IOException("Resource not found in classpath: " + name);
+        }
+        return url.openStream();
     }
 }
