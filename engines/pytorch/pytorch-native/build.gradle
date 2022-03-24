@@ -12,7 +12,7 @@ if (project.hasProperty("pt_version") && project.property("pt_version") != "") {
 }
 boolean isRelease = project.hasProperty("release") || project.hasProperty("staging")
 boolean isPrecxx11 = project.hasProperty("precxx11")
-boolean isAarch64 = project.hasProperty("aarch64")
+boolean isAarch64 = project.hasProperty("aarch64") || System.properties["os.arch"] == "aarch64"
 
 String FLAVOR = "cpu"
 if (project.hasProperty("cu10")) {
@@ -97,8 +97,7 @@ def prepareNativeLib(String binaryRoot, String ver) {
     ]
 
     def aarch64Files = [
-            "${ver}/libtorch-cxx11-shared-with-deps-${ver}-aarch64.zip": "cpu/linux-aarch64",
-            "${ver}/libtorch-shared-with-deps-${ver}-aarch64.zip"      : "cpu-precxx11/linux-aarch64"
+            "${ver}/libtorch-cxx11-shared-with-deps-${ver}-aarch64.zip": "cpu/linux-aarch64"
     ]
 
     copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
@@ -256,8 +255,7 @@ task uploadS3 {
                 "${BINARY_ROOT}/cu113/linux-x86_64/native/lib/",
                 "${BINARY_ROOT}/cu113/win-x86_64/native/lib/",
                 "${BINARY_ROOT}/cu113-precxx11/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cpu/linux-aarch64/native/lib/",
-                "${BINARY_ROOT}/cpu-precxx11/linux-aarch64/native/lib/"
+                "${BINARY_ROOT}/cpu/linux-aarch64/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
@@ -315,11 +313,11 @@ flavorNames.each { flavor ->
                     libstd.text = new URL("https://publish.djl.ai/extra/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt").text
                 }
             }
-            from ("${BINARY_ROOT}/${flavor}/${osName}/native/lib") {
-                into ("pytorch/${flavor}/${osName}")
+            from("${BINARY_ROOT}/${flavor}/${osName}/native/lib") {
+                into("pytorch/${flavor}/${osName}")
             }
-            from ("${BINARY_ROOT}/pytorch.properties") {
-                into ("native/lib")
+            from("${BINARY_ROOT}/pytorch.properties") {
+                into("native/lib")
             }
             from "src/main/resources"
             archiveClassifier = "${osName}"

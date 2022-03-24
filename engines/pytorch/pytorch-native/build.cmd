@@ -5,7 +5,7 @@
 @rem choco install jdk8 -y
 
 set FILEPATH="libtorch"
-set VERSION="%1"
+set VERSION=%1
 if "%2" == "cpu" (
     set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-%VERSION%%%2Bcpu.zip"
 ) else if "%2" == "cu102" (
@@ -28,9 +28,19 @@ if exist %FILEPATH% (
     echo Finished downloading libtorch
 )
 
+if "%VERSION%" == "1.11.0" (
+    copy /y src\main\patch\cuda.cmake libtorch\share\cmake\Caffe2\public\
+)
+if "%VERSION%" == "1.10.0" (
+    set PT_OLD_VERSION=1
+)
+if "%VERSION%" == "1.9.1" (
+    set PT_OLD_VERSION=1
+)
+
 if exist build rd /q /s build
 md build\classes
 cd build
 javac -sourcepath ..\..\pytorch-engine\src\main\java\ ..\..\pytorch-engine\src\main\java\ai\djl\pytorch\jni\PyTorchLibrary.java -h include -d classes
-cmake -DCMAKE_PREFIX_PATH=libtorch ..
+cmake -DCMAKE_PREFIX_PATH=libtorch -DPT_OLD_VERSION=%PT_OLD_VERSION% ..
 cmake --build . --config Release
