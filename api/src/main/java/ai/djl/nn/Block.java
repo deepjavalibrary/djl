@@ -272,9 +272,9 @@ public interface Block {
      * Freezes or unfreezes all parameters inside the block for training.
      *
      * @param freeze true if the parameter should be frozen
-     * @see Parameter#freeze(Boolean)
+     * @see Parameter#freeze(boolean)
      */
-    default void freezeParameters(Boolean freeze) {
+    default void freezeParameters(boolean freeze) {
         for (Parameter parameter : getParameters().values()) {
             parameter.freeze(freeze);
         }

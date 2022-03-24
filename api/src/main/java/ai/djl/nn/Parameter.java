@@ -144,7 +144,7 @@ public class Parameter implements AutoCloseable {
      *
      * @param freeze true if the parameter should be frozen ({@code freeze == !requiresGradient()})
      */
-    public void freeze(Boolean freeze) {
+    public void freeze(boolean freeze) {
         requiresGrad = !freeze;
         array.setRequiresGradient(requiresGrad);
     }
