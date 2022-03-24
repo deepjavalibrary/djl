@@ -91,14 +91,14 @@ def prepareNativeLib(String binaryRoot, String ver) {
             "cpu/libtorch-win-shared-with-deps-${ver}%2Bcpu.zip"              : "cpu/win-x86_64",
             "cu102/libtorch-cxx11-abi-shared-with-deps-${ver}%2Bcu102.zip"    : "cu102/linux-x86_64",
             "${cu11}/libtorch-cxx11-abi-shared-with-deps-${ver}%2B${cu11}.zip": "${cu11}/linux-x86_64",
-            "cu102/libtorch-win-shared-with-deps-${ver}%2Bcu102.zip"          : "cu102/win-x86_64",
             "${cu11}/libtorch-win-shared-with-deps-${ver}%2B${cu11}.zip"      : "${cu11}/win-x86_64",
             "cpu/libtorch-shared-with-deps-${ver}%2Bcpu.zip"                  : "cpu-precxx11/linux-x86_64",
             "${cu11}/libtorch-shared-with-deps-${ver}%2B${cu11}.zip"          : "${cu11}-precxx11/linux-x86_64"
     ]
 
     def aarch64Files = [
-            "${ver}/libtorch-cxx11-shared-with-deps-${ver}-aarch64.zip"       : "cpu/linux-aarch64"
+            "${ver}/libtorch-cxx11-shared-with-deps-${ver}-aarch64.zip": "cpu/linux-aarch64",
+            "${ver}/libtorch-shared-with-deps-${ver}-aarch64.zip"      : "cpu-precxx11/linux-aarch64"
     ]
 
     copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
@@ -130,7 +130,7 @@ def copyNativeLibToOutputDir(Map<String, String> fileStoreMap, String binaryRoot
             }
             into("${outputDir}/native/lib")
         }
-        if (entry.value.contains("-precxx11")) {
+        if (entry.value.contains("-precxx11") && !entry.value.contains("aarch64")) {
             def libstd = new File("${outputDir}/native/lib/libstdc++.so.6")
             new URL("https://publish.djl.ai/extra/libstdc%2B%2B.so.6").withInputStream {
                 i -> libstd.withOutputStream { it << i }
@@ -253,11 +253,11 @@ task uploadS3 {
                 "${BINARY_ROOT}/cpu/win-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-x86_64/native/lib/",
                 "${BINARY_ROOT}/cu102/linux/native/lib/",
-                "${BINARY_ROOT}/cu102/win-x86_64/native/lib/",
                 "${BINARY_ROOT}/cu113/linux-x86_64/native/lib/",
                 "${BINARY_ROOT}/cu113/win-x86_64/native/lib/",
                 "${BINARY_ROOT}/cu113-precxx11/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cpu/linux-aarch64/native/lib"
+                "${BINARY_ROOT}/cpu/linux-aarch64/native/lib/",
+                "${BINARY_ROOT}/cpu-precxx11/linux-aarch64/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
