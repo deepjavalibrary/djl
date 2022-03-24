@@ -283,7 +283,7 @@ flavorNames.each { flavor ->
     platformNames.each { osName ->
         tasks.create(name: "${flavor}-${osName}Jar", type: Jar) {
             doFirst {
-                def propFile = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/pytorch.properties")
+                def propFile = file("${BINARY_ROOT}/pytorch.properties")
                 propFile.delete()
                 def dsStore = file("${BINARY_ROOT}/${flavor}/${osName}/native/lib/.DS_Store")
                 dsStore.delete()
@@ -315,8 +315,13 @@ flavorNames.each { flavor ->
                     libstd.text = new URL("https://publish.djl.ai/extra/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt").text
                 }
             }
-            from file("${BINARY_ROOT}/${flavor}/${osName}")
-            from file("src/main/resources")
+            from ("${BINARY_ROOT}/${flavor}/${osName}/native/lib") {
+                into ("pytorch/${flavor}/${osName}")
+            }
+            from ("${BINARY_ROOT}/pytorch.properties") {
+                into ("native/lib")
+            }
+            from "src/main/resources"
             archiveClassifier = "${osName}"
 
             manifest {
