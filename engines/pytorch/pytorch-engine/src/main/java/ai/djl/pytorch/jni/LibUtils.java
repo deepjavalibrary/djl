@@ -290,10 +290,24 @@ public final class LibUtils {
                 return new LibTorch(dir.toAbsolutePath(), platform, flavor);
             }
 
+            Matcher m = VERSION_PATTERN.matcher(version);
+            if (!m.matches()) {
+                throw new IllegalArgumentException("Unexpected version: " + version);
+            }
+            String[] versions = m.group(1).split("\\.");
+            int minorVersion = Integer.parseInt(versions[1]);
+            int buildVersion = Integer.parseInt(versions[2]);
+            String pathPrefix;
+            if (minorVersion > 10 || (minorVersion == 10 && buildVersion == 2)) {
+                pathPrefix = "pytorch/" + flavor + '/' + classifier;
+            } else {
+                pathPrefix = "native/lib";
+            }
+
             Files.createDirectories(cacheDir);
             tmp = Files.createTempDirectory(cacheDir, "tmp");
             for (String file : platform.getLibraries()) {
-                String libPath = "native/lib/" + file;
+                String libPath = pathPrefix + '/' + file;
                 logger.info("Extracting {} to cache ...", libPath);
                 try (InputStream is = ClassLoaderUtils.getResourceAsStream(libPath)) {
                     Files.copy(is, tmp.resolve(file), StandardCopyOption.REPLACE_EXISTING);
