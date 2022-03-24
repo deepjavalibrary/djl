@@ -13,13 +13,17 @@
 package ai.djl.integration.tests.training;
 
 import ai.djl.Model;
+import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
+import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.testing.Assertions;
 import ai.djl.testing.TestRequirements;
@@ -69,6 +73,61 @@ public class GradientCollectorIntegrationTest {
                     NDArray grad2 = lhs.getGradient();
                     Assertions.assertAlmostEquals(grad2, expected);
                 }
+            }
+        }
+    }
+
+    @Test
+    public void testFreezeParameters() {
+        try (Model model = Model.newInstance("model")) {
+            Block blockFrozen = new Mlp(10, 10, new int[] {10});
+            Block blockNormal = new Mlp(10, 10, new int[] {10});
+            Block combined = new SequentialBlock().add(blockFrozen).add(blockNormal);
+            model.setBlock(combined);
+
+            TrainingConfig config =
+                    new DefaultTrainingConfig(Loss.l2Loss())
+                            .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(1, 10));
+
+                blockFrozen.freezeParameters(true);
+
+                // Find total params
+                Float frozenVal =
+                        blockFrozen.getParameters().valueAt(0).getArray().sum().getFloat();
+                Float normalVal =
+                        blockNormal.getParameters().valueAt(0).getArray().sum().getFloat();
+
+                // Run training step
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.arange(100.0f).reshape(new Shape(10, 10));
+                NDArray labels = manager.arange(100.0f).reshape(new Shape(10, 10));
+                Batch batch =
+                        new Batch(
+                                manager, new NDList(data), new NDList(labels), 1, null, null, 0, 1);
+                EasyTrain.trainBatch(trainer, batch);
+                trainer.step();
+
+                // Check updated total params
+                // The frozen one should not have changed, but normal one should
+                Float newFrozenVal =
+                        blockFrozen.getParameters().valueAt(0).getArray().sum().getFloat();
+                Float newNormalVal =
+                        blockNormal.getParameters().valueAt(0).getArray().sum().getFloat();
+                Assert.assertEquals(newFrozenVal, frozenVal);
+                Assert.assertNotEquals(newNormalVal, normalVal);
+
+                blockFrozen.freezeParameters(false);
+
+                // Check that unfreezing the block now makes it update
+                EasyTrain.trainBatch(trainer, batch);
+                trainer.step();
+
+                Float nowUnfrozenVal =
+                        blockFrozen.getParameters().valueAt(0).getArray().sum().getFloat();
+                Assert.assertNotEquals(nowUnfrozenVal, frozenVal);
             }
         }
     }

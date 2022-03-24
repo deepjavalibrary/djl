@@ -269,6 +269,18 @@ public interface Block {
             throws IOException, MalformedModelException;
 
     /**
+     * Freezes or unfreezes all parameters inside the block for training.
+     *
+     * @param freeze true if the parameter should be frozen
+     * @see Parameter#freeze(boolean)
+     */
+    default void freezeParameters(boolean freeze) {
+        for (Parameter parameter : getParameters().values()) {
+            parameter.freeze(freeze);
+        }
+    }
+
+    /**
      * Validates that actual layout matches the expected layout.
      *
      * @param expectedLayout the expected layout

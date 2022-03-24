@@ -134,6 +134,22 @@ public class Parameter implements AutoCloseable {
     }
 
     /**
+     * Freezes or unfreezes the parameter for training.
+     *
+     * <p>Sometimes during training, especially during transfer learning, it is typical to train
+     * only part of the model. For this, the freeze can be used to prevent certain parts from being
+     * trained.
+     *
+     * <p>This modifies the {@link #requiresGradient()} of the parameter.
+     *
+     * @param freeze true if the parameter should be frozen ({@code freeze == !requiresGradient()})
+     */
+    public void freeze(boolean freeze) {
+        requiresGrad = !freeze;
+        array.setRequiresGradient(requiresGrad);
+    }
+
+    /**
      * Checks if this {@code Parameter} is initialized.
      *
      * @return {@code true} if this {@code Parameter} is initialized
