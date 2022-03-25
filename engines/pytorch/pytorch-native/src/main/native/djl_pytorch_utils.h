@@ -31,7 +31,7 @@ namespace utils {
 #if !defined(__ANDROID__)
 // for image interpolation
 typedef torch::variant<torch::enumtype::kNearest, torch::enumtype::kLinear, torch::enumtype::kBilinear,
-    torch::enumtype::kBicubic, torch::enumtype::kTrilinear, torch::enumtype::kArea>
+    torch::enumtype::kBicubic, torch::enumtype::kTrilinear, torch::enumtype::kArea, torch::enumtype::kNearestExact>
     mode_t;
 #endif
 
@@ -108,6 +108,8 @@ inline mode_t GetInterpolationMode(jint jmode) {
       return torch::kTrilinear;
     case 5:
       return torch::kArea;
+    case 6:
+      return torch::kNearestExact;
     default:
       throw;
   }

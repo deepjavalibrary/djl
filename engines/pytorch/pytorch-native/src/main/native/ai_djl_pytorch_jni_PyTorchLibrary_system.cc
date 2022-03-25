@@ -12,7 +12,10 @@
  */
 #include <torch/torch.h>
 // clang-format off
-#include <torch/csrc/jit/frontend/code_template.h>
+//#include <torch/csrc/jit/frontend/code_template.h>
+#include <ATen/code_template.h>
+#include <ATen/core/jit_type.h>
+
 // clang-format on
 
 #include <sstream>
@@ -163,7 +166,7 @@ inline std::string FormatMemory(int64_t bytes) {
 }
 
 // the code snippet is copied from torch/csrc/autograd/profiler.cpp
-static torch::jit::CodeTemplate event_template(R"(
+static at::jit::CodeTemplate event_template(R"(
 {
   "name": "${name}",
   "ph": "X",
@@ -227,7 +230,7 @@ void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vecto
         LegacyEvent* start = it->second;
         int64_t memory_usage = mem_it->second;
 
-        torch::jit::TemplateEnv env;
+        at::jit::TemplateEnv env;
         env.s("name", start->name());
         env.d("ts", profiler_start->cpuElapsedUs(*start));
         env.d("dur", start->cpuElapsedUs(*evt));

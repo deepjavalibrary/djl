@@ -27,11 +27,15 @@ if [[ ! -d "libtorch" ]]; then
     fi
 
     if [[ $ARCH == 'aarch64' ]]; then
-      curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-cxx11-shared-with-deps-${VERSION}-aarch64.zip | jar xv
-    else
-      curl -s https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip | jar xv
-    fi
-
+      if [[ $3 == 'precxx11' ]]; then
+        jar -xvf 'torch2.zip'
+        mv torch/ libtorch/
+      else
+        #TODO: Uncomment when finished building 1.11.0
+         #curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-cxx11-shared-with-deps-${VERSION}-aarch64.zip | jar xv
+        jar -xvf 'torch3.zip'
+        mv torch/ libtorch/
+      fi
   elif [[ $PLATFORM == 'darwin' ]]; then
     curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip | jar xv
   else
