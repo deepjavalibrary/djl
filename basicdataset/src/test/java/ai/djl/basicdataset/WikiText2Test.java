@@ -22,6 +22,14 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class WikiText2Test {
+    
+    @Test
+    public void testWikiTest2TrainRemote() throws IOException {
+        WikiText2 trainingSet = WikiText2.builder().optUsage(Dataset.Usage.TRAIN).build();
+        Path path = trainingSet.getData();
+        Assert.assertTrue(Files.isRegularFile(path));
+    }
+    
     @Test
     public void testWikiTest2TrainLocal() throws IOException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");

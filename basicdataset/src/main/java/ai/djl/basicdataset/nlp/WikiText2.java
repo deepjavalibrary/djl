@@ -33,7 +33,7 @@ import java.nio.file.Path;
 public class WikiText2 implements RawDataset<Path> {
 
     private static final String VERSION = "1.0";
-    private static final String ARTIFACT_ID = "WikiText-2";
+    private static final String ARTIFACT_ID = "wikitext-2";
 
     private Dataset.Usage usage;
     private Path root;
@@ -70,7 +70,7 @@ public class WikiText2 implements RawDataset<Path> {
         Artifact artifact = mrl.getDefaultArtifact();
         mrl.prepare(artifact, progress);
         Artifact.Item item;
-        item = artifact.getFiles().get("WikiText-2");
+        item = artifact.getFiles().get("wikitext-2");
         String path;
         switch (usage) {
             case TRAIN:
