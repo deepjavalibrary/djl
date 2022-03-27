@@ -22,16 +22,14 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class WikiText2Test {
-    
     @Test
-    public void testWikiTest2TrainRemote() throws IOException {
+    public void testWikiText2TrainRemote() throws IOException {
         WikiText2 trainingSet = WikiText2.builder().optUsage(Dataset.Usage.TRAIN).build();
         Path path = trainingSet.getData();
         Assert.assertTrue(Files.isRegularFile(path));
     }
-    
     @Test
-    public void testWikiTest2TrainLocal() throws IOException {
+    public void testWikiText2TrainLocal() throws IOException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
 
         WikiText2 trainingSet =
@@ -41,7 +39,7 @@ public class WikiText2Test {
     }
 
     @Test
-    public void testWikiTest2TestLocal() throws IOException {
+    public void testWikiText2TestLocal() throws IOException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
 
         WikiText2 trainingSet =
@@ -51,7 +49,7 @@ public class WikiText2Test {
     }
 
     @Test
-    public void testWikiTest2ValidationLocal() throws IOException {
+    public void testWikiText2ValidationLocal() throws IOException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
 
         WikiText2 trainingSet =
