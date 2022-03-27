@@ -28,6 +28,7 @@ public class WikiText2Test {
         Path path = trainingSet.getData();
         Assert.assertTrue(Files.isRegularFile(path));
     }
+
     @Test
     public void testWikiText2TrainLocal() throws IOException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
