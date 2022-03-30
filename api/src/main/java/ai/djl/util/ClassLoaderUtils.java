@@ -45,11 +45,12 @@ public final class ClassLoaderUtils {
      * <p>For .class file, this function expects them in classes/your/package/ClassName.class
      *
      * @param path the path to scan from
+     * @param type the type of the class
      * @param className the name of the classes, pass null if name is unknown
      * @param <T> the Template T for the output Class
      * @return the Class implementation
      */
-    public static <T> T findImplementation(Path path, String className) {
+    public static <T> T findImplementation(Path path, Class<T> type, String className) {
         try {
             Path classesDir = path.resolve("classes");
             // we only consider .class files and skip .java files
@@ -75,16 +76,16 @@ public final class ClassLoaderUtils {
                             (PrivilegedAction<ClassLoader>)
                                     () -> new URLClassLoader(urls, contextCl));
             if (className != null && !className.isEmpty()) {
-                return initClass(cl, className);
+                return initClass(cl, type, className);
             }
 
-            T implemented = scanDirectory(cl, classesDir);
+            T implemented = scanDirectory(cl, type, classesDir);
             if (implemented != null) {
                 return implemented;
             }
 
             for (Path p : jarFiles) {
-                implemented = scanJarFile(cl, p);
+                implemented = scanJarFile(cl, type, p);
                 if (implemented != null) {
                     return implemented;
                 }
@@ -95,7 +96,7 @@ public final class ClassLoaderUtils {
         return null;
     }
 
-    private static <T> T scanDirectory(ClassLoader cl, Path dir) throws IOException {
+    private static <T> T scanDirectory(ClassLoader cl, Class<T> type, Path dir) throws IOException {
         if (!Files.isDirectory(dir)) {
             logger.trace("Directory not exists: {}", dir);
             return null;
@@ -109,7 +110,7 @@ public final class ClassLoaderUtils {
             String className = p.toString();
             className = className.substring(0, className.lastIndexOf('.'));
             className = className.replace(File.separatorChar, '.');
-            T implemented = initClass(cl, className);
+            T implemented = initClass(cl, type, className);
             if (implemented != null) {
                 return implemented;
             }
@@ -117,7 +118,7 @@ public final class ClassLoaderUtils {
         return null;
     }
 
-    private static <T> T scanJarFile(ClassLoader cl, Path path) throws IOException {
+    private static <T> T scanJarFile(ClassLoader cl, Class<T> type, Path path) throws IOException {
         try (JarFile jarFile = new JarFile(path.toFile())) {
             Enumeration<JarEntry> en = jarFile.entries();
             while (en.hasMoreElements()) {
@@ -126,7 +127,7 @@ public final class ClassLoaderUtils {
                 if (fileName.endsWith(".class")) {
                     fileName = fileName.substring(0, fileName.lastIndexOf('.'));
                     fileName = fileName.replace('/', '.');
-                    T implemented = initClass(cl, fileName);
+                    T implemented = initClass(cl, type, fileName);
                     if (implemented != null) {
                         return implemented;
                     }
@@ -140,15 +141,16 @@ public final class ClassLoaderUtils {
      * Loads the specified class and constructs an instance.
      *
      * @param cl the {@code ClassLoader} to use
+     * @param type the type of the class
      * @param className the class to be loaded
      * @param <T> the type of the class
      * @return an instance of the class, null if the class not found
      */
-    @SuppressWarnings("unchecked")
-    public static <T> T initClass(ClassLoader cl, String className) {
+    public static <T> T initClass(ClassLoader cl, Class<T> type, String className) {
         try {
             Class<?> clazz = Class.forName(className, true, cl);
-            Constructor<T> constructor = (Constructor<T>) clazz.getConstructor();
+            Class<? extends T> sub = clazz.asSubclass(type);
+            Constructor<? extends T> constructor = sub.getConstructor();
             return constructor.newInstance();
         } catch (Throwable e) {
             logger.trace("Not able to load Object", e);
