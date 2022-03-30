@@ -187,7 +187,8 @@ public class BaseModelLoader implements ModelLoader {
         Model model = Model.newInstance(name, device, engine);
         if (block == null) {
             String className = (String) arguments.get("blockFactory");
-            BlockFactory factory = ClassLoaderUtils.findImplementation(modelPath, className);
+            BlockFactory factory =
+                    ClassLoaderUtils.findImplementation(modelPath, BlockFactory.class, className);
             if (factory != null) {
                 block = factory.newBlock(model, modelPath, arguments);
             }
@@ -229,7 +230,7 @@ public class BaseModelLoader implements ModelLoader {
         String factoryClass = (String) arguments.get("translatorFactory");
         if (factoryClass != null) {
             ClassLoader cl = ClassLoaderUtils.getContextClassLoader();
-            factory = ClassLoaderUtils.initClass(cl, factoryClass);
+            factory = ClassLoaderUtils.initClass(cl, TranslatorFactory.class, factoryClass);
         }
         return factory;
     }
