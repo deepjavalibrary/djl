@@ -109,6 +109,7 @@ jobs:
           yum -y update
           yum -y install centos-release-scl-rh epel-release
           yum -y install devtoolset-7 rh-git218 patch cmake3
+          yum -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
       - uses: actions/checkout@v2
@@ -134,7 +135,7 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu11 -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
-#         TODO: Add precxx11 support here
+          CXX=aarch64-linux-gnu-gcc ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Paarch64 -Ppt_version=$PYTORCH_VERSION
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
