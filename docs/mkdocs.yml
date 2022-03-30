@@ -42,6 +42,7 @@ plugins:
 nav:
   - Home:
       - Main: 'README.md'
+      - 'docs/get.md'
       - 'docs/quick_start.md'
       - 'docs/README.md'
       - 'examples/README.md'
