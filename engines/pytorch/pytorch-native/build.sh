@@ -13,9 +13,11 @@ fi
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 VERSION=$1
 FLAVOR=$2
+AARCH64_CXX11ABI="-cxx11"
 CXX11ABI="-cxx11-abi"
 if [[ $3 == "precxx11" ]]; then
   CXX11ABI=""
+  AARCH64_CXX11ABI=""
 fi
 ARCH=$4
 
@@ -27,15 +29,7 @@ if [[ ! -d "libtorch" ]]; then
     fi
 
     if [[ $ARCH == 'aarch64' ]]; then
-      if [[ $3 == 'precxx11' ]]; then
-         jar -xvf 'torch2.zip'
-         mv torch/ libtorch/
-      else
-         #TODO: Uncomment when finished building 1.11.0
-         #curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-cxx11-shared-with-deps-${VERSION}-aarch64.zip | jar xv
-         jar -xvf 'torch3.zip'
-         mv torch/ libtorch/
-      fi
+      curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch${AARCH64_CXX11ABI}-shared-with-deps-${VERSION}-aarch64.zip | jar xv
     else
       curl -s https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip | jar xv
     fi
