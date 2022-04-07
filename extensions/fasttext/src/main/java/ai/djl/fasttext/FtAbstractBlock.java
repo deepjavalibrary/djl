@@ -14,6 +14,7 @@ package ai.djl.fasttext;
 
 import ai.djl.fasttext.jni.FtWrapper;
 import ai.djl.nn.AbstractSymbolBlock;
+import ai.djl.nn.ParameterList;
 import java.nio.file.Path;
 
 /**
@@ -53,6 +54,12 @@ public abstract class FtAbstractBlock extends AbstractSymbolBlock implements Aut
      */
     public float[] embedWord(String word) {
         return fta.getWordVector(word);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ParameterList getDirectParameters() {
+        throw new UnsupportedOperationException("Not yet supported");
     }
 
     @Override

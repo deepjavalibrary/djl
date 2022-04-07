@@ -18,6 +18,8 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
+import ai.djl.nn.Parameter;
+import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.IValue;
 import ai.djl.pytorch.jni.IValueUtils;
@@ -27,6 +29,8 @@ import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +53,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
     private PairList<String, Shape> inputDescriptions;
     private PairList<String, Shape> outputDescriptions;
     private boolean first;
+    private Map<String, Parameter> parameters;
 
     /**
      * Constructs a {@code PtSymbolBlock}.
@@ -144,6 +149,42 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
                             + "and call describeInput again.");
         }
         return inputDescriptions;
+    }
+
+    @Override
+    public ParameterList getDirectParameters() {
+        if (parameters == null) {
+            NDList params = JniUtils.moduleGetParams(this, manager);
+            parameters = new LinkedHashMap<>(params.size());
+            for (NDArray param : params) {
+                parameters.put(
+                        param.getName(),
+                        Parameter.builder()
+                                .setName(param.getName())
+                                .setType(inferType(param.getName()))
+                                .optArray(param)
+                                .build());
+            }
+        }
+        // Defensive copy
+        return new ParameterList(parameters);
+    }
+
+    private static Parameter.Type inferType(String name) {
+        if (name.contains("bias")) {
+            return Parameter.Type.BIAS;
+        } else if (name.contains("gamma")) {
+            return Parameter.Type.GAMMA;
+        } else if (name.contains("beta")) {
+            return Parameter.Type.BETA;
+        } else if (name.contains("moving_mean") || name.contains("running_mean")) {
+            return Parameter.Type.RUNNING_MEAN;
+        } else if (name.contains("moving_var") || name.contains("running_var")) {
+            return Parameter.Type.RUNNING_VAR;
+        } else if (name.contains("weight")) {
+            return Parameter.Type.WEIGHT;
+        }
+        return Parameter.Type.OTHER;
     }
 
     /** {@inheritDoc} */

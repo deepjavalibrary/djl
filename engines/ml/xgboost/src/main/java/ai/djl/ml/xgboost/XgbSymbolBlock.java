@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
+import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
@@ -103,6 +104,12 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
 
     void setTreeLimit(int treeLimit) {
         this.treeLimit = treeLimit;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ParameterList getDirectParameters() {
+        throw new UnsupportedOperationException("Not yet supported");
     }
 
     /** The mode of inference for OptionMask. */
