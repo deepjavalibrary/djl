@@ -91,9 +91,6 @@ public class TfModel extends BaseModel {
                 } catch (InvalidProtocolBufferException e) {
                     throw new MalformedModelException("Invalid ConfigProto: " + config, e);
                 }
-            } else {
-                // default one
-                configProto = JavacppUtils.getSessionConfig();
             }
             Object run = options.get("RunOptions");
             if (run instanceof RunOptions) {
@@ -112,6 +109,10 @@ public class TfModel extends BaseModel {
         }
         if (tags == null) {
             tags = new String[] {"serve"};
+        }
+        if (configProto == null) {
+            // default one
+            configProto = JavacppUtils.getSessionConfig();
         }
 
         SavedModelBundle bundle =
