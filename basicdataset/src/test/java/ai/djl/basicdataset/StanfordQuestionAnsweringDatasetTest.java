@@ -15,7 +15,6 @@ package ai.djl.basicdataset;
 import ai.djl.basicdataset.nlp.StanfordQuestionAnsweringDataset;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.ndarray.NDManager;
-import ai.djl.repository.Repository;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
@@ -31,7 +30,6 @@ public class StanfordQuestionAnsweringDatasetTest {
 
     @Test
     public void testGetDataWithPreTrainedEmbedding() throws TranslateException, IOException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
 
         try (NDManager manager = NDManager.newBaseManager()) {
             StanfordQuestionAnsweringDataset stanfordQuestionAnsweringDataset =
@@ -48,7 +46,6 @@ public class StanfordQuestionAnsweringDatasetTest {
                                                             manager, EMBEDDING_SIZE)))
                             .setSampling(32, true)
                             .optLimit(10)
-                            .optRepository(repository)
                             .optUsage(Dataset.Usage.TEST)
                             .build();
 
@@ -62,7 +59,6 @@ public class StanfordQuestionAnsweringDatasetTest {
 
     @Test
     public void testGetDataWithTrainableEmbedding() throws IOException, TranslateException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
         try (NDManager manager = NDManager.newBaseManager()) {
             StanfordQuestionAnsweringDataset stanfordQuestionAnsweringDataset =
                     StanfordQuestionAnsweringDataset.builder()
@@ -72,7 +68,6 @@ public class StanfordQuestionAnsweringDatasetTest {
                                     new TextData.Configuration().setEmbeddingSize(EMBEDDING_SIZE))
                             .setSampling(32, true)
                             .optLimit(10)
-                            .optRepository(repository)
                             .build();
 
             stanfordQuestionAnsweringDataset.prepare();
@@ -85,7 +80,6 @@ public class StanfordQuestionAnsweringDatasetTest {
 
     @Test
     public void testInvalidUsage() throws TranslateException, IOException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
 
         try (NDManager manager = NDManager.newBaseManager()) {
             StanfordQuestionAnsweringDataset stanfordQuestionAnsweringDataset =
@@ -103,7 +97,6 @@ public class StanfordQuestionAnsweringDatasetTest {
                             .setSampling(32, true)
                             .optLimit(10)
                             .optUsage(Dataset.Usage.VALIDATION)
-                            .optRepository(repository)
                             .build();
 
             stanfordQuestionAnsweringDataset.prepare();
@@ -114,7 +107,6 @@ public class StanfordQuestionAnsweringDatasetTest {
 
     @Test
     public void testMisc() throws TranslateException, IOException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
 
         try (NDManager manager = NDManager.newBaseManager()) {
             StanfordQuestionAnsweringDataset stanfordQuestionAnsweringDataset =
@@ -132,7 +124,6 @@ public class StanfordQuestionAnsweringDatasetTest {
                             .setSampling(32, true)
                             .optLimit(350)
                             .optUsage(Dataset.Usage.TEST)
-                            .optRepository(repository)
                             .build();
 
             stanfordQuestionAnsweringDataset.prepare();
@@ -150,8 +141,37 @@ public class StanfordQuestionAnsweringDatasetTest {
     }
 
     @Test
+    public void testLimitBoundary() throws TranslateException, IOException {
+
+        try (NDManager manager = NDManager.newBaseManager()) {
+            StanfordQuestionAnsweringDataset stanfordQuestionAnsweringDataset =
+                    StanfordQuestionAnsweringDataset.builder()
+                            .setSourceConfiguration(
+                                    new TextData.Configuration()
+                                            .setTextEmbedding(
+                                                    TestUtils.getTextEmbedding(
+                                                            manager, EMBEDDING_SIZE)))
+                            .setTargetConfiguration(
+                                    new TextData.Configuration()
+                                            .setTextEmbedding(
+                                                    TestUtils.getTextEmbedding(
+                                                            manager, EMBEDDING_SIZE)))
+                            .setSampling(32, true)
+                            .optLimit(3)
+                            .optUsage(Dataset.Usage.TEST)
+                            .build();
+
+            stanfordQuestionAnsweringDataset.prepare();
+            Assert.assertEquals(stanfordQuestionAnsweringDataset.size(), 3);
+            Record record = stanfordQuestionAnsweringDataset.get(manager, 2);
+            Assert.assertEquals(record.getData().get("title").getShape().dimension(), 2);
+            Assert.assertEquals(record.getData().get("context").getShape().get(0), 140);
+            Assert.assertEquals(record.getLabels().size(), 4);
+        }
+    }
+
+    @Test
     public void testRawData() throws IOException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
 
         try (NDManager manager = NDManager.newBaseManager()) {
             StanfordQuestionAnsweringDataset stanfordQuestionAnsweringDataset =
@@ -169,7 +189,6 @@ public class StanfordQuestionAnsweringDatasetTest {
                             .setSampling(32, true)
                             .optLimit(350)
                             .optUsage(Dataset.Usage.TEST)
-                            .optRepository(repository)
                             .build();
 
             Map<String, Object> data =
