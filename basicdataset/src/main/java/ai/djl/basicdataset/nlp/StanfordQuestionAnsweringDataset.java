@@ -14,6 +14,7 @@ package ai.djl.basicdataset.nlp;
 
 import ai.djl.Application.NLP;
 import ai.djl.basicdataset.RawDataset;
+import ai.djl.basicdataset.utils.TextData;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -225,6 +226,28 @@ public class StanfordQuestionAnsweringDataset extends TextDataset implements Raw
             data = JsonUtils.GSON_PRETTY.fromJson(reader, new TypeToken<Object>() {}.getType());
         }
         return data;
+    }
+
+    /**
+     * Performs pre-processing steps on text data such as tokenising, applying {@link
+     * ai.djl.modality.nlp.preprocess.TextProcessor}s, creating vocabulary, and word embeddings.
+     * Since the record number in this dataset is not equivalent to the length of {@code
+     * sourceTextData} and {@code targetTextData}, the limit should be processed.
+     *
+     * @param newTextData list of all unprocessed sentences in the dataset
+     * @param source whether the text data provided is source or target
+     * @throws EmbeddingException if there is an error while embedding input
+     */
+    @Override
+    protected void preprocess(List<String> newTextData, boolean source) throws EmbeddingException {
+        TextData textData = source ? sourceTextData : targetTextData;
+        QuestionInfo questionInfo = questionInfoList.get(Math.toIntExact(this.limit) - 1);
+        int lastIndex =
+                source
+                        ? questionInfo.questionIndex
+                        : questionInfo.answerIndexList.get(questionInfo.answerIndexList.size() - 1);
+        textData.preprocess(
+                manager, newTextData.subList(0, Math.min(lastIndex + 1, newTextData.size())));
     }
 
     /** A builder for a {@link StanfordQuestionAnsweringDataset}. */
