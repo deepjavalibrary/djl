@@ -20,6 +20,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.tensorflow.engine.SavedModelBundle;
 import ai.djl.tensorflow.engine.TfDataType;
 import ai.djl.util.Pair;
+import ai.djl.util.cuda.CudaUtils;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -438,8 +439,20 @@ public final class JavacppUtils {
         if (intraop != null) {
             configBuilder.setIntraOpParallelismThreads(intraop);
         }
-        GPUOptions gpuOptions = GPUOptions.newBuilder().setVisibleDeviceList("0").build();
-        configBuilder.setGpuOptions(gpuOptions);
+        int gpuCount = CudaUtils.getGpuCount();
+        if (gpuCount > 0) {
+            StringBuilder sb = new StringBuilder("0");
+            for (int i = 1; i < gpuCount; ++i) {
+                sb.append(',').append(i);
+            }
+            GPUOptions gpuOptions =
+                    GPUOptions.newBuilder().setVisibleDeviceList(sb.toString()).build();
+            configBuilder.setGpuOptions(gpuOptions);
+            configBuilder.setAllowSoftPlacement(true);
+            if (Boolean.getBoolean("ai.djl.tensorflow.debug")) {
+                configBuilder.setLogDevicePlacement(true);
+            }
+        }
         return configBuilder.build();
     }
 
