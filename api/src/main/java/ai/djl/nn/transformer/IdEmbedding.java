@@ -115,6 +115,7 @@ public final class IdEmbedding extends AbstractBlock {
         return ps.getValue(embedding, device, training);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         inputNames = Collections.singletonList("tokenIds");

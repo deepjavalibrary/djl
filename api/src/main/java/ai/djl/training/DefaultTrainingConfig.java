@@ -198,6 +198,7 @@ public class DefaultTrainingConfig implements TrainingConfig {
         return loss;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ExecutorService getExecutorService() {
         return executorService;

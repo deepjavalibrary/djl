@@ -37,6 +37,7 @@ public class BertNextSentenceLoss extends Loss {
         this.nextSentencePredictionIdx = nextSentencePredictionIdx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray evaluate(NDList labels, NDList predictions) {
         try (NDManager scope = NDManager.subManagerOf(labels)) {
