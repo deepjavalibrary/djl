@@ -16,6 +16,7 @@ package ai.djl.tflite.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.nn.AbstractSymbolBlock;
+import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
@@ -64,5 +65,11 @@ public class TfLiteSymbolBlock extends AbstractSymbolBlock implements AutoClosea
     @Override
     public void close() {
         interpreter.close();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ParameterList getDirectParameters() {
+        throw new UnsupportedOperationException("Not yet supported");
     }
 }

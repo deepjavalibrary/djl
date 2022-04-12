@@ -15,6 +15,7 @@ package ai.djl.tensorrt.engine;
 
 import ai.djl.ndarray.NDList;
 import ai.djl.nn.AbstractSymbolBlock;
+import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.tensorrt.jni.JniUtils;
 import ai.djl.training.ParameterStore;
@@ -65,5 +66,11 @@ public class TrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
     TrtSession createSession(TrtNDManager manager) {
         long session = JniUtils.createSession(handle.get());
         return new TrtSession(manager, handle.get(), session);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ParameterList getDirectParameters() {
+        throw new UnsupportedOperationException("Not yet supported");
     }
 }

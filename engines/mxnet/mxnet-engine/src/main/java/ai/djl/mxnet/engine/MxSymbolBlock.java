@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.Parameter;
+import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
@@ -31,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,6 +55,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
     private CachedOp op;
     private Symbol symbol;
     private List<Parameter> mxNetParams; // includes input data
+    private Map<String, Parameter> parameters;
     private Map<String, Shape> paramShapes;
     private Shape[] outputShapes;
     private PairList<String, Shape> inputDescriptions;
@@ -94,9 +97,10 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
         // now that we know which of the parameters are just input placeholders and which
         // are trainable, add them properly so they are correctly handled
         Set<String> nameLookup = new HashSet<>(inputNames);
+        parameters = new LinkedHashMap<>(mxNetParams.size());
         for (Parameter mxNetParameter : mxNetParams) {
             if (!nameLookup.contains(mxNetParameter.getName())) {
-                addParameter(mxNetParameter);
+                parameters.put(mxNetParameter.getName(), mxNetParameter);
             }
         }
     }
@@ -154,6 +158,12 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
             }
         }
         return inputDescriptions;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ParameterList getDirectParameters() {
+        return new ParameterList(parameters);
     }
 
     /** {@inheritDoc} */

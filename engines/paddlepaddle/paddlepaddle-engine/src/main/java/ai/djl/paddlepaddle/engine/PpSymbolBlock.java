@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
+import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.training.ParameterStore;
@@ -71,6 +72,12 @@ public class PpSymbolBlock extends AbstractSymbolBlock {
             inputArray[i] = sub.from(inputs.get(i));
         }
         return inputArray;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ParameterList getDirectParameters() {
+        throw new UnsupportedOperationException("Not yet supported");
     }
 
     /** {@inheritDoc} */
