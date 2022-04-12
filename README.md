@@ -104,6 +104,8 @@ The following pseudocode demonstrates running training:
 * [0.2.1](https://github.com/deepjavalibrary/djl/releases/tag/v0.2.1) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.2.1))
 * [0.2.0 Initial release](https://github.com/deepjavalibrary/djl/releases/tag/v0.2.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.2.0))
 
+The release of DJL 0.17.0 is planned for April or May 2022.
+
 ## Building From Source
 
 To build from source, begin by checking out the code.
