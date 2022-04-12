@@ -45,6 +45,7 @@ public class TruncatedNormalInitializer implements Initializer {
         this.sigma = sigma;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray initialize(
             final NDManager baseManager, final Shape shape, final DataType dataType) {

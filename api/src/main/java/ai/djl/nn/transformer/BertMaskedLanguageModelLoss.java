@@ -39,6 +39,7 @@ public class BertMaskedLanguageModelLoss extends Loss {
         this.logProbsIdx = logProbsIdx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray evaluate(NDList labels, NDList predictions) {
         try (NDManager scope = NDManager.subManagerOf(labels)) {

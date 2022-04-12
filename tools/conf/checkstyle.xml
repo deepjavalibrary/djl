@@ -294,7 +294,9 @@
         <module name="JavadocTagContinuationIndentation"/>
         <module name="NonEmptyAtclauseDescription"/>
         <module name="SummaryJavadoc"/>
-        <module name="MissingJavadocMethod"/>
+        <module name="MissingJavadocMethod">
+            <property name="allowedAnnotations" value="" />
+        </module>
         <module name="MissingJavadocPackage"/>
         <module name="MissingJavadocType"/>
         <!--

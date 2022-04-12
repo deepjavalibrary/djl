@@ -28,8 +28,8 @@ public class NDIndexPick implements NDIndexElement {
         this.indices = indices;
     }
 
-    @Override
     /** {@inheritDoc} */
+    @Override
     public int getRank() {
         return 1;
     }

@@ -27,8 +27,8 @@ package ai.djl.translate;
  */
 public interface NoBatchifyTranslator<I, O> extends Translator<I, O> {
 
+    /** {@inheritDoc} */
     @Override
-    /** {@inheritDoc} * */
     default Batchifier getBatchifier() {
         return null;
     }

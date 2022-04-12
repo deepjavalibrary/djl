@@ -62,6 +62,7 @@ public abstract class FtAbstractBlock extends AbstractSymbolBlock implements Aut
         throw new UnsupportedOperationException("Not yet supported");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
         fta.unloadModel();

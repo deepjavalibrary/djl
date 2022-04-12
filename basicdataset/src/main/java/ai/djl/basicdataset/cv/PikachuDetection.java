@@ -112,6 +112,7 @@ public class PikachuDetection extends ObjectDetectionDataset {
         prepared = true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public PairList<Long, Rectangle> getObjects(long index) {
         return new PairList<>(Collections.singletonList(labels.get((int) index)));
@@ -129,11 +130,13 @@ public class PikachuDetection extends ObjectDetectionDataset {
         return ImageFactory.getInstance().fromFile(imagePaths.get(idx));
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<Integer> getImageWidth() {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<Integer> getImageHeight() {
         return Optional.empty();

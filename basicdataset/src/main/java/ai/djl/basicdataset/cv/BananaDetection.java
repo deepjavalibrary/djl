@@ -80,6 +80,7 @@ public class BananaDetection extends ObjectDetectionDataset {
         return new Builder();
     }
 
+    /** {@inheritDoc} */
     @Override
     public PairList<Long, Rectangle> getObjects(long index) {
         return new PairList<>(Collections.singletonList(labels.get((int) index)));
@@ -134,17 +135,20 @@ public class BananaDetection extends ObjectDetectionDataset {
         prepared = true;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Image getImage(long index) throws IOException {
         int idx = Math.toIntExact(index);
         return ImageFactory.getInstance().fromFile(imagePaths.get(idx));
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<Integer> getImageWidth() {
         return Optional.of(256);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<Integer> getImageHeight() {
         return Optional.of(256);

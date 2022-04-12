@@ -24,11 +24,13 @@ import ai.djl.translate.TranslatorContext;
  */
 public class PassthroughTranslator<I, O> implements NoBatchifyTranslator<I, O> {
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, I input) throws Exception {
         return new NDList(new PassthroughNDArray(input));
     }
 
+    /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
     public O processOutput(TranslatorContext ctx, NDList list) {
