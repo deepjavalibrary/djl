@@ -151,6 +151,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         return inputDescriptions;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ParameterList getDirectParameters() {
         if (parameters == null) {

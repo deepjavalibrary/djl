@@ -160,6 +160,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
         return inputDescriptions;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ParameterList getDirectParameters() {
         return new ParameterList(parameters);

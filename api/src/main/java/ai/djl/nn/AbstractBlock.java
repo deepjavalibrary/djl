@@ -78,9 +78,7 @@ public abstract class AbstractBlock extends AbstractBaseBlock {
     protected LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<>();
 
     /** Constructs a new {@code AbstractBlock} instance. */
-    public AbstractBlock() {
-        super();
-    }
+    public AbstractBlock() {}
 
     /**
      * Builds an empty block with the given version for parameter serialization.
