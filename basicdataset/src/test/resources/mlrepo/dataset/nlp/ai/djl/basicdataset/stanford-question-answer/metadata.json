@@ -1,0 +1,34 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "nlp",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "stanford-question-answer",
+  "name": "stanford-question-answer",
+  "description": "A reading comprehension dataset, consisting of questions posed by crowdworkers on a set of Wikipedia articles",
+  "website": "https://rajpurkar.github.io/SQuAD-explorer/",
+  "licenses": {
+    "license": {
+      "name": "Creative Commons Attribution-ShareAlike License",
+      "url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "2.0",
+      "snapshot": false,
+      "files": {
+        "train": {
+          "uri": "https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v2.0.json",
+          "sha1Hash": "ceb2acdea93b9d82ab1829c7b1e03bee9e302c99",
+          "size": 42123633
+        },
+        "test": {
+          "uri": "https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v2.0.json",
+          "sha1Hash": "53ebaeb15bc5cab36645150f6f65d074348e2f3d",
+          "size": 4370528
+        }
+      }
+    }
+  ]
+}
