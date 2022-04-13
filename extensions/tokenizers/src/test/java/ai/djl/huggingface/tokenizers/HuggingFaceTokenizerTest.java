@@ -48,6 +48,8 @@ public class HuggingFaceTokenizerTest {
             Assert.assertEquals(wordIds, encoding.getWordIds());
             Assert.assertEquals(attentionMask, encoding.getAttentionMask());
             Assert.assertEquals(specialTokenMask, encoding.getSpecialTokenMask());
+            Assert.assertEquals(null, encoding.getCharTokenSpans());
+
 
             Encoding[] encodings = tokenizer.batchEncode(Arrays.asList(inputs));
             Assert.assertEquals(encodings.length, 2);

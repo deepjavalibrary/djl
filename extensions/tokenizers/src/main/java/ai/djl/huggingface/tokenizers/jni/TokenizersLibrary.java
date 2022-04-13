@@ -45,4 +45,7 @@ public final class TokenizersLibrary {
     public native long[] getAttentionMask(long encoding);
 
     public native long[] getSpecialTokenMask(long encoding);
+
+    public native CharSpan[] getTokenCharSpans(long encoding);
+
 }
