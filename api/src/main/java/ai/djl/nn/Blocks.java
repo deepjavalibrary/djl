@@ -29,6 +29,10 @@ public final class Blocks {
      */
     public static NDArray batchFlatten(NDArray array) {
         long batch = array.size(0);
+		if (batch == 0) {
+			// calculate the size of second dimension manually as using -1 would not work here
+			return array.reshape(batch, array.getShape().slice(1).size());
+		}
         return array.reshape(batch, -1);
     }
 
