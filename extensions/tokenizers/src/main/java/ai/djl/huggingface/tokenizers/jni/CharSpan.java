@@ -1,7 +1,7 @@
-package ai.djl.huggingface.tokenizers;
+package ai.djl.huggingface.tokenizers.jni;
 
 
-public static class CharSpan {
+public class CharSpan {
     private double start;
     private double end;
 

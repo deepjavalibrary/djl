@@ -311,7 +311,7 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     let len = tokens.len() as jsize;
 
     let array: jobjectArray = env
-        .new_object_array(len, "ai/djl/huggingface/tokenizers/CharSpan", JObject::null())
+        .new_object_array(len, "ai/djl/huggingface/tokenizers/jni/CharSpan", JObject::null())
         .unwrap();
     for (i, _) in tokens.iter().enumerate() {
         let opt_offsets: Option<(usize, Offsets)> = encoding.token_to_chars(i);
@@ -332,6 +332,7 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
                 env.set_object_array_element(array, i as jsize, obj).unwrap();
             }
             None => {
+                //set Object null here
                 println!("no char spans!");
                 //no spans, set as empty array
                 // let item: jintArray = env.new_int_array(0).unwrap();

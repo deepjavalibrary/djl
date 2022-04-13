@@ -12,6 +12,7 @@
  */
 package ai.djl.huggingface.tokenizers;
 
+import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.djl.huggingface.tokenizers.jni.LibUtils;
 import ai.djl.huggingface.tokenizers.jni.TokenizersLibrary;
 import ai.djl.modality.nlp.preprocess.Tokenizer;
