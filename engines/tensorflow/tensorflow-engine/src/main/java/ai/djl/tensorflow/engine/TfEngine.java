@@ -61,6 +61,14 @@ public final class TfEngine extends Engine implements AutoCloseable {
             TensorFlow.version();
             return new TfEngine();
         } catch (Throwable t) {
+            if (t.getMessage().contains("libstdc++")) {
+                // Does not mention .so to work with osx .dylib
+                String msg =
+                        "There was an issue with your libstdc++ file required for the Tensorflow native library.\n"
+                                + "It can be installed or upgraded through gcc by following the instructions on the TensorFlow install page: https://docs.djl.ai/engines/tensorflow/index.html#note";
+                throw new EngineException(msg, t);
+            }
+
             throw new EngineException("Failed to load TensorFlow native library", t);
         }
     }
