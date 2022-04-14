@@ -32,12 +32,23 @@ public class XgbNDManager extends BaseNDManager {
 
     private static final XgbNDManager SYSTEM_MANAGER = new SystemManager();
 
+    private float missingValue = Float.NaN;
+
     private XgbNDManager(NDManager parent, Device device) {
         super(parent, device);
     }
 
     static XgbNDManager getSystemManager() {
         return SYSTEM_MANAGER;
+    }
+
+    /**
+     * Sets the default missing value.
+     *
+     * @param missingValue the default missing value
+     */
+    public void setMissingValue(float missingValue) {
+        this.missingValue = missingValue;
     }
 
     /** {@inheritDoc} */
@@ -95,7 +106,7 @@ public class XgbNDManager extends BaseNDManager {
 
         if (data.isDirect() && data instanceof ByteBuffer) {
             // TODO: allow user to set missing value
-            long handle = JniUtils.createDMatrix(data, shape, 0.0f);
+            long handle = JniUtils.createDMatrix(data, shape, missingValue);
             return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.DENSE);
         }
 
@@ -109,7 +120,7 @@ public class XgbNDManager extends BaseNDManager {
         ByteBuffer buf = allocateDirect(size);
         buf.asFloatBuffer().put((FloatBuffer) data);
         buf.rewind();
-        long handle = JniUtils.createDMatrix(buf, shape, 0.0f);
+        long handle = JniUtils.createDMatrix(buf, shape, missingValue);
         return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.DENSE);
     }
 
