@@ -68,6 +68,7 @@ public final class ImageClassification {
                     ImageClassificationTranslator.builder()
                             .addTransform(new ToTensor())
                             .optSynset(classes)
+                            .optApplySoftmax(true)
                             .build();
 
             try (Predictor<Image, Classifications> predictor = model.newPredictor(translator)) {
