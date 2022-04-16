@@ -50,7 +50,7 @@ jobs:
   build-pytorch-jni-linux:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    container: nvidia/cuda:11.1-cudnn8-devel-ubuntu18.04
+    container: nvidia/cuda:11.3.1-cudnn8-devel-ubuntu18.04
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -102,7 +102,7 @@ jobs:
   build-pytorch-jni-precxx11:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    container: nvidia/cuda:11.1-cudnn8-devel-centos7
+    container: nvidia/cuda:11.3.1-cudnn8-devel-centos7
     steps:
       - name: Install Environment
         run: |
