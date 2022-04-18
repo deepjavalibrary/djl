@@ -37,7 +37,7 @@ The PaddlePaddle model zoo contains Computer Vision (CV) models.
 * CV
   * Face Detection: Detect faces in the image
   * Mask Classification: Detect mask 
-  * Word Recognition: Find word blocks in the image
+  * Word Detection: Find word blocks in the image
   * Word Orientation Classification: Find if rotate image is needed
   * Word Recognition: Recognize text from image
 
