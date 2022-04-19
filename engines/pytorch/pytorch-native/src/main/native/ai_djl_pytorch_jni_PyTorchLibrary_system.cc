@@ -12,7 +12,12 @@
  */
 #include <torch/torch.h>
 // clang-format off
-#include <torch/csrc/jit/frontend/code_template.h>
+#ifdef V1_10_X
+    #include <torch/csrc/jit/frontend/code_template.h>
+#else
+    #include <ATen/code_template.h>
+#endif
+#include <ATen/core/jit_type.h>
 // clang-format on
 
 #include <sstream>
@@ -162,7 +167,8 @@ inline std::string FormatMemory(int64_t bytes) {
   return oss.str();
 }
 
-// the code snippet is copied from torch/csrc/autograd/profiler.cpp
+// the code snippet is copied from torch/csrc/autograd/profiler_legacy.cpp
+#ifdef V1_10_X
 static torch::jit::CodeTemplate event_template(R"(
 {
   "name": "${name}",
@@ -175,6 +181,20 @@ static torch::jit::CodeTemplate event_template(R"(
   "cpu mem": "${cpu_mem}",
   "args": {}
 })");
+#else
+static const at::jit::CodeTemplate event_template(R"(
+{
+  "name": "${name}",
+  "ph": "X",
+  "ts": ${ts},
+  "dur": ${dur},
+  "tid": ${tid},
+  "pid": "CPU Functions",
+  "shape": ${shape},
+  "cpu mem": "${cpu_mem}",
+  "args": {}
+})");
+#endif
 
 // The function doesn't support GPU yet
 // You can refer to
@@ -227,7 +247,11 @@ void WriteProfilerEventsToStream(std::ostream& out, const std::vector<std::vecto
         LegacyEvent* start = it->second;
         int64_t memory_usage = mem_it->second;
 
+#ifdef V1_10_X
         torch::jit::TemplateEnv env;
+#else
+        at::jit::TemplateEnv env;
+#endif
         env.s("name", start->name());
         env.d("ts", profiler_start->cpuElapsedUs(*start));
         env.d("dur", start->cpuElapsedUs(*evt));

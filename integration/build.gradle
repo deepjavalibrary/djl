@@ -15,6 +15,7 @@ dependencies {
 
     runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
     runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
+    runtimeOnly project(":engines:pytorch:pytorch-jni")
     runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
     runtimeOnly project(":engines:ml:xgboost")
 

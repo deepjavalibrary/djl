@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import java.util.Arrays;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 /** The file is for testing PyTorch MKLDNN functionalities. */
@@ -24,6 +25,10 @@ public class MkldnnTest {
 
     @Test
     public void testMkldnn() {
+        if (!"amd64".equals(System.getProperty("os.arch"))) {
+            throw new SkipException("MKLDNN Test requires x86_64 arch.");
+        }
+
         System.setProperty("ai.djl.pytorch.use_mkldnn", "true");
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray[] arrays = {

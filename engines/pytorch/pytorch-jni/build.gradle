@@ -23,17 +23,23 @@ processResources {
                 "linux-x86_64/cu102/libdjl_torch.so",
                 "linux-x86_64/cpu-precxx11/libdjl_torch.so",
                 "osx-x86_64/cpu/libdjl_torch.dylib",
-                "win-x86_64/cpu/djl_torch.dll",
-                "win-x86_64/cu102/djl_torch.dll"
+                "win-x86_64/cpu/djl_torch.dll"
         ]
-        if (ptVersion.startsWith("1.10.")) {
+        if (ptVersion.startsWith("1.11.")) {
+            files.add("linux-aarch64/cpu/libdjl_torch.so")
             files.add("linux-x86_64/cu113/libdjl_torch.so")
             files.add("linux-x86_64/cu113-precxx11/libdjl_torch.so")
             files.add("win-x86_64/cu113/djl_torch.dll")
+        } else if (ptVersion.startsWith("1.10.")) {
+            files.add("linux-x86_64/cu113/libdjl_torch.so")
+            files.add("linux-x86_64/cu113-precxx11/libdjl_torch.so")
+            files.add("win-x86_64/cu113/djl_torch.dll")
+            files.add("win-x86_64/cu102/djl_torch.dll")
         } else {
             files.add("linux-x86_64/cu111/libdjl_torch.so")
             files.add("linux-x86_64/cu111-precxx11/libdjl_torch.so")
             files.add("win-x86_64/cu111/djl_torch.dll")
+            files.add("win-x86_64/cu102/djl_torch.dll")
         }
         String jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
