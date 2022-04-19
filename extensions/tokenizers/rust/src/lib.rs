@@ -14,14 +14,15 @@
 
 extern crate tokenizers as tk;
 
-use std::borrow::Borrow;
 use std::str::FromStr;
 use tk::tokenizer::{EncodeInput, Encoding};
-use tk::{FromPretrainedParameters, Offsets};
 use tk::Tokenizer;
+use tk::{FromPretrainedParameters, Offsets};
 
 use jni::objects::{JClass, JMethodID, JObject, JString, JValue};
-use jni::sys::{jboolean, jlong, jlongArray, jobjectArray, jsize, JNI_TRUE, jintArray, jint, jvalue};
+use jni::sys::{
+    jboolean, jint, jlong, jlongArray, jobjectArray, jsize, JNI_TRUE,
+};
 use jni::JNIEnv;
 
 #[no_mangle]
@@ -257,7 +258,8 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
         .unwrap();
     for (i, token) in tokens.iter().enumerate() {
         let item: JString = env.new_string(&token).unwrap();
-        env.set_object_array_element(array, i as jsize, item).unwrap();
+        env.set_object_array_element(array, i as jsize, item)
+            .unwrap();
     }
     array
 }
@@ -311,37 +313,34 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     let len = tokens.len() as jsize;
 
     let array: jobjectArray = env
-        .new_object_array(len, "ai/djl/huggingface/tokenizers/jni/CharSpan", JObject::null())
+        .new_object_array(
+            len,
+            "ai/djl/huggingface/tokenizers/jni/CharSpan",
+            JObject::null(),
+        )
         .unwrap();
     for (i, _) in tokens.iter().enumerate() {
         let opt_offsets: Option<(usize, Offsets)> = encoding.token_to_chars(i);
-        //let spans: Option<(usize, Offsets)> = encoding.token_to_chars(i);
-        //maybe check if rust has something like getOrElse?
         match &opt_offsets {
             Some((_, offsets)) => {
-                println!("char spans: {:?}", offsets);
-               // offsets_vec.push((*offsets).0 as jint);
-               // offsets_vec.push((*offsets).1 as jint);
-                let classId = "ai/djl/huggingface/tokenizers/CharSpan";
-                let methodId = "<init>";
+                let class_id = "ai/djl/huggingface/tokenizers/jni/CharSpan";
+                let method_id = "<init>";
                 let params = "(II)V";
-                let cls: JClass = env.find_class(classId).unwrap();
-                let constructor: JMethodID = env.get_method_id(cls, methodId, params).unwrap();
-                let offsets_vec: Vec<JValue> = vec![JValue::Int((*offsets).0 as jint), JValue::Int((*offsets).0 as jint) ];
-                let obj = env.new_object_unchecked(cls, constructor, &offsets_vec[..] ).unwrap();
-                env.set_object_array_element(array, i as jsize, obj).unwrap();
+                let cls: JClass = env.find_class(class_id).unwrap();
+                let constructor: JMethodID = env.get_method_id(cls, method_id, params).unwrap();
+                let offsets_vec: Vec<JValue> = vec![
+                    JValue::Int((*offsets).0 as jint),
+                    JValue::Int((*offsets).1 as jint),
+                ];
+                let obj = env
+                    .new_object_unchecked(cls, constructor, &offsets_vec[..])
+                    .unwrap();
+                env.set_object_array_element(array, i as jsize, obj)
+                    .unwrap();
             }
-            None => {
-                //set Object null here
-                println!("no char spans!");
-                //no spans, set as empty array
-                // let item: jintArray = env.new_int_array(0).unwrap();
-                // env.set_int_array_region(item, 0, &offsets_vec).unwrap();
-                // env.set_object_array_element(array, i as jsize, item).unwrap();
-            }
+            None => {}
         }
-
-        }
+    }
     array
 }
 

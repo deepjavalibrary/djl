@@ -104,6 +104,4 @@ public class Encoding {
     public CharSpan[] getCharTokenSpans() {
         return charTokenSpans;
     }
-
 }
-

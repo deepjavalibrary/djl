@@ -13,6 +13,7 @@
 
 package ai.djl.huggingface.tokenizers;
 
+import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +49,34 @@ public class HuggingFaceTokenizerTest {
             Assert.assertEquals(wordIds, encoding.getWordIds());
             Assert.assertEquals(attentionMask, encoding.getAttentionMask());
             Assert.assertEquals(specialTokenMask, encoding.getSpecialTokenMask());
-           // Assert.assertEquals(null, encoding.getCharTokenSpans());
 
+            CharSpan[] charSpansExpected = {
+                null,
+                new CharSpan(0, 5),
+                new CharSpan(5, 6),
+                new CharSpan(7, 8),
+                new CharSpan(8, 9),
+                new CharSpan(9, 12),
+                new CharSpan(12, 13),
+                new CharSpan(14, 17),
+                new CharSpan(18, 21),
+                new CharSpan(22, 25),
+                new CharSpan(26, 30),
+                new CharSpan(31, 32),
+                null
+            };
+            int expectedLength = charSpansExpected.length;
+            CharSpan[] charSpansResult = encoding.getCharTokenSpans();
+
+            Assert.assertEquals(expectedLength, charSpansResult.length);
+            Assert.assertEquals(charSpansExpected[0], charSpansResult[0]);
+            Assert.assertEquals(
+                    charSpansExpected[expectedLength - 1], charSpansResult[expectedLength - 1]);
+
+            for (int i = 1; i < expectedLength - 1; i++) {
+                Assert.assertEquals(charSpansExpected[i].getStart(), charSpansResult[i].getStart());
+                Assert.assertEquals(charSpansExpected[i].getEnd(), charSpansResult[i].getEnd());
+            }
 
             Encoding[] encodings = tokenizer.batchEncode(Arrays.asList(inputs));
             Assert.assertEquals(encodings.length, 2);

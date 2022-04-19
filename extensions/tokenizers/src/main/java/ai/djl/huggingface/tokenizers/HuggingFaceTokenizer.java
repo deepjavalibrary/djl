@@ -204,6 +204,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         CharSpan[] charSpans = TokenizersLibrary.LIB.getTokenCharSpans(encoding);
 
         TokenizersLibrary.LIB.deleteEncoding(encoding);
-        return new Encoding(ids, typeIds, tokens, wordIds, attentionMask, specialTokenMask, charSpans);
+        return new Encoding(
+                ids, typeIds, tokens, wordIds, attentionMask, specialTokenMask, charSpans);
     }
 }
