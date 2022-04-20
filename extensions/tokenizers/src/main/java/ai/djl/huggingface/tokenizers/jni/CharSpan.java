@@ -14,7 +14,9 @@
 /** A class holds character span information. */
 package ai.djl.huggingface.tokenizers.jni;
 
+/** A class holds character span information. */
 public class CharSpan {
+
     private final int start;
     private final int end;
 
