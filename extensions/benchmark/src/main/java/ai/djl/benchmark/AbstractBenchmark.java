@@ -239,7 +239,7 @@ public abstract class AbstractBenchmark {
             return true;
         } catch (ParseException e) {
             Arguments.printHelp(e.getMessage(), options);
-        } catch (Throwable t) {
+        } catch (TranslateException | ModelException | IOException | ClassNotFoundException t) {
             logger.error("Unexpected error", t);
         }
         return false;
