@@ -16,11 +16,13 @@ extern crate tokenizers as tk;
 
 use std::str::FromStr;
 use tk::tokenizer::{EncodeInput, Encoding};
-use tk::FromPretrainedParameters;
 use tk::Tokenizer;
+use tk::{FromPretrainedParameters, Offsets};
 
-use jni::objects::{JObject, JString};
-use jni::sys::{jboolean, jlong, jlongArray, jobjectArray, jsize, JNI_TRUE};
+use jni::objects::{JClass, JMethodID, JObject, JString, JValue};
+use jni::sys::{
+    jboolean, jint, jlong, jlongArray, jobjectArray, jsize, JNI_TRUE,
+};
 use jni::JNIEnv;
 
 #[no_mangle]
@@ -256,7 +258,8 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
         .unwrap();
     for (i, token) in tokens.iter().enumerate() {
         let item: JString = env.new_string(&token).unwrap();
-        env.set_object_array_element(array, i as jsize, item).unwrap();
+        env.set_object_array_element(array, i as jsize, item)
+            .unwrap();
     }
     array
 }
@@ -296,6 +299,48 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 
     let array: jlongArray = env.new_long_array(len).unwrap();
     env.set_long_array_region(array, 0, &long_ids).unwrap();
+    array
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getTokenCharSpans(
+    env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) -> jobjectArray {
+    let encoding = cast_handle::<Encoding>(handle);
+    let tokens = encoding.get_tokens();
+    let len = tokens.len() as jsize;
+
+    let array: jobjectArray = env
+        .new_object_array(
+            len,
+            "ai/djl/huggingface/tokenizers/jni/CharSpan",
+            JObject::null(),
+        )
+        .unwrap();
+    for (i, _) in tokens.iter().enumerate() {
+        let opt_offsets: Option<(usize, Offsets)> = encoding.token_to_chars(i);
+        match &opt_offsets {
+            Some((_, offsets)) => {
+                let class_id = "ai/djl/huggingface/tokenizers/jni/CharSpan";
+                let method_id = "<init>";
+                let params = "(II)V";
+                let cls: JClass = env.find_class(class_id).unwrap();
+                let constructor: JMethodID = env.get_method_id(cls, method_id, params).unwrap();
+                let offsets_vec: Vec<JValue> = vec![
+                    JValue::Int((*offsets).0 as jint),
+                    JValue::Int((*offsets).1 as jint),
+                ];
+                let obj = env
+                    .new_object_unchecked(cls, constructor, &offsets_vec[..])
+                    .unwrap();
+                env.set_object_array_element(array, i as jsize, obj)
+                    .unwrap();
+            }
+            None => {}
+        }
+    }
     array
 }
 
