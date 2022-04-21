@@ -61,6 +61,17 @@ You can enable it by
 
 You might see the exception if certain data type or operator is not supported with the oneDNN device.
 
+#### CuDNN acceleration
+PyTorch has a special flags that used for CNN or related network speed up. If your input size won't change frequently,
+you may benefit from enabling this configuration in your model:
+
+```
+-Dai.djl.pytorch.cudnn_benchmark=true
+```
+
+If your input shape changed frequently, this change may stall your performance. For more information, check this 
+[article](https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#enable-cudnn-auto-tuner).
+
 #### Thread configuration
 There are two configurations you can set to optimize the inference performance.
 

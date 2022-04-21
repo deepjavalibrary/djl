@@ -161,6 +161,13 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_setGraphExecutorOp
   API_END()
 }
 
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetBenchmarkCuDNN(
+        JNIEnv* env, jobject jthis, jboolean jenabled) {
+    API_BEGIN()
+    torch::globalContext().setBenchmarkCuDNN(jenabled);
+    API_END()
+}
+
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleEval(
     JNIEnv* env, jobject jthis, jlong module_handle) {
   API_BEGIN()
