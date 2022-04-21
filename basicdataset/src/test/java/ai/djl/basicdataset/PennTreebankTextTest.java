@@ -19,17 +19,13 @@ import ai.djl.repository.Repository;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
-
 import java.io.IOException;
-
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PennTreebankTextTest {
 
     private static final int EMBEDDING_SIZE = 15;
-
 
     @Test
     public void testPennTreebankTextTrainLocal() throws IOException, TranslateException {
@@ -57,7 +53,7 @@ public class PennTreebankTextTest {
 
             dataset.prepare();
             Record record = dataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(),2);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
             Assert.assertNull(record.getLabels());
         }
     }
@@ -88,7 +84,7 @@ public class PennTreebankTextTest {
 
             dataset.prepare();
             Record record = dataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(),2);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
             Assert.assertNull(record.getLabels());
         }
     }
@@ -119,9 +115,8 @@ public class PennTreebankTextTest {
 
             dataset.prepare();
             Record record = dataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(),2);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
             Assert.assertNull(record.getLabels());
         }
     }
-
 }

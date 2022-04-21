@@ -11,6 +11,7 @@
  * and limitations under the License.
  */
 package ai.djl.basicdataset.nlp;
+
 import ai.djl.Application;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
@@ -30,7 +31,8 @@ import java.util.List;
 
 /**
  * The Penn Treebank (PTB) project selected 2,499 stories from a three year Wall Street Journal
- * (WSJ) collection of 98,732 stories for syntactic annotation.
+ * (WSJ) collection of 98,732 stories for syntactic annotation. see <a *
+ * href="https://catalog.ldc.upenn.edu/docs/LDC95T7/cl93.html">here</a> for details
  */
 public class PennTreebankText extends TextDataset {
 
@@ -38,8 +40,7 @@ public class PennTreebankText extends TextDataset {
     private static final String ARTIFACT_ID = "penntreebank-unlabeled-processed";
 
     /**
-     * Creates a new instance of {@link PennTreebankText} with the given necessary
-     * configurations.
+     * Creates a new instance of {@link PennTreebankText} with the given necessary configurations.
      *
      * @param builder a builder with the necessary configurations
      */
@@ -108,12 +109,12 @@ public class PennTreebankText extends TextDataset {
                 lineArray.add(row);
             }
         }
-        preprocess(lineArray,true);
+        preprocess(lineArray, true);
         prepared = true;
     }
 
     /** A builder to construct a {@link PennTreebankText} . */
-    public static class Builder extends TextDataset.Builder<Builder>{
+    public static class Builder extends TextDataset.Builder<Builder> {
 
         /** Constructs a new builder. */
         public Builder() {

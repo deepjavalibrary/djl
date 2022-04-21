@@ -6,11 +6,11 @@
   "artifactId": "penntreebank-unlabeled-processed",
   "name": "penntreebank-unlabeled-processed",
   "description": "The Penn Treebank (PTB) project selected 2,499 stories from a three year Wall Street Journal (WSJ) collection of 98,732 stories for syntactic annotation.",
-  "website": "https://github.com/wojzaremba/lstm/tree/master/data",
+  "website": "https://catalog.ldc.upenn.edu/docs/LDC95T7/cl93.html",
   "licenses": {
     "license": {
-      "name": "LDC User Agreement for Non-Members",
-      "url": "https://catalog.ldc.upenn.edu/license/ldc-non-members-agreement.pdf"
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
     }
   },
   "artifacts": [
