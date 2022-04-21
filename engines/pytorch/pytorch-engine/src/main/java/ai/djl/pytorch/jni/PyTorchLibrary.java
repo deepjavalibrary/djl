@@ -32,6 +32,8 @@ final class PyTorchLibrary {
 
     native void torchSetNumThreads(int threads);
 
+    native void torchSetBenchmarkCuDNN(boolean enable);
+
     native void torchManualSeed(long seed);
 
     native void torchShowConfig(Set<String> set);

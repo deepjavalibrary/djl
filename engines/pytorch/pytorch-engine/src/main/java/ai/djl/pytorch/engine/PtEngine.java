@@ -55,6 +55,10 @@ public final class PtEngine extends Engine {
             if (Integer.getInteger("ai.djl.pytorch.num_threads") != null) {
                 JniUtils.setNumThreads(Integer.getInteger("ai.djl.pytorch.num_threads"));
             }
+            // for ConvNN related model speed up
+            if (Boolean.getBoolean("ai.djl.pytorch.cudnn_benchmark")) {
+                JniUtils.setBenchmarkCuDNN(true);
+            }
             logger.info("Number of inter-op threads is " + JniUtils.getNumInteropThreads());
             logger.info("Number of intra-op threads is " + JniUtils.getNumThreads());
 
