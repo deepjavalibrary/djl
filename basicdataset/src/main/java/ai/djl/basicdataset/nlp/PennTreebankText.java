@@ -31,8 +31,8 @@ import java.util.List;
 
 /**
  * The Penn Treebank (PTB) project selected 2,499 stories from a three year Wall Street Journal
- * (WSJ) collection of 98,732 stories for syntactic annotation. see <a *
- * href="https://catalog.ldc.upenn.edu/docs/LDC95T7/cl93.html">here</a> for details
+ * (WSJ) collection of 98,732 stories for syntactic annotation (see <a
+ * href="https://catalog.ldc.upenn.edu/docs/LDC95T7/cl93.html">here</a> for details).
  */
 public class PennTreebankText extends TextDataset {
 
