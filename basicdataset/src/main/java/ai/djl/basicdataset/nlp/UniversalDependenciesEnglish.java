@@ -105,11 +105,11 @@ public class UniversalDependenciesEnglish extends TextDataset {
             while ((row = reader.readLine()) != null) {
                 if (("").equals(row)) {
                     sourceTextData.add(sentence.toString());
+                    System.out.println(universalPosTag);
                     universalPosTags.add(universalPosTag);
 
                     sentence.delete(0, sentence.length());
-                    universalPosTag.clear();
-
+                    universalPosTag = new ArrayList<>();
                     continue;
                 }
                 String[] splits = row.split("\t");
