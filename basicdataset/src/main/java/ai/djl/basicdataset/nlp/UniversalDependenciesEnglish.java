@@ -167,20 +167,21 @@ public class UniversalDependenciesEnglish extends TextDataset {
      */
     @Override
     public Record get(NDManager manager, long index) {
-        NDList data = new NDList();
         List<Long> range = index2Range.get(index);
-        for (long i = range.get(0); i < range.get(1); i++) {
-            data.add(sourceTextData.getEmbedding(manager, i));
+        NDArray embeddings = sourceTextData.getEmbedding(manager, range.get(0));
+        for (long i = range.get(0) + 1; i < range.get(1); i++) {
+            embeddings = embeddings.concat(sourceTextData.getEmbedding(manager, i), 0);
         }
-        NDList labels = new NDList();
-        labels.add(
-                manager.create(
-                                universalPosTags
-                                        .get(Math.toIntExact(index))
-                                        .stream()
-                                        .mapToInt(Integer::intValue)
-                                        .toArray())
-                        .toType(DataType.INT32, false));
+        NDList data = new NDList(embeddings);
+        NDList labels =
+                new NDList(
+                        manager.create(
+                                        universalPosTags
+                                                .get(Math.toIntExact(index))
+                                                .stream()
+                                                .mapToInt(Integer::intValue)
+                                                .toArray())
+                                .toType(DataType.INT32, false));
         return new Record(data, labels);
     }
 
