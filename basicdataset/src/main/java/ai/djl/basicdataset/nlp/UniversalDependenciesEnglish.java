@@ -30,9 +30,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Gold Standard Universal Dependencies Corpus for English, built over the source material of the
@@ -51,7 +51,7 @@ public class UniversalDependenciesEnglish extends TextDataset {
      * A mapping between the index of each text and the range of tokens it contains, so that when
      * function {@code get()} is called, all tokens in one text can be found by the text index.
      */
-    private Map<Long, List<Long>> index2Range = new HashMap<>();
+    private Map<Long, List<Long>> index2Range = new ConcurrentHashMap<>();
 
     /**
      * Creates a new instance of {@code UniversalDependenciesEnglish}.
