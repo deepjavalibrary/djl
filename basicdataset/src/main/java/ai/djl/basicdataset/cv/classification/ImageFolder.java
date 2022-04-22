@@ -24,6 +24,8 @@ import java.util.Arrays;
 /**
  * A dataset for loading image files stored in a folder structure.
  *
+ * <p>Below is an example directory layout for the image folder:
+ *
  * <pre>
  *  The image folder should be structured as follows:
  *       root/shoes/Aerobic Shoes1.png
@@ -32,11 +34,35 @@ import java.util.Arrays;
  *       root/boots/Black Boots.png
  *       root/boots/White Boots.png
  *       ...
- *       root/pumps/Red Pumps
- *       root/pumps/Pink Pumps
+ *       root/pumps/Red Pumps.png
+ *       root/pumps/Pink Pumps.png
  *       ...
+ *
  *  here shoes, boots, pumps are your labels
  *  </pre>
+ *
+ * <p>Here, the dataset will take the folder names (shoes, boots, bumps) in sorted order as your
+ * labels. Nested folder structures are not currently supported.
+ *
+ * <p>Then, you can create your instance of the dataset as follows:
+ *
+ * <pre>
+ * // set the image folder path
+ * Repository repository = Repository.newInstance("folder", Paths.get("/path/to/imagefolder/root");
+ * ImageFolder dataset =
+ *     new ImageFolder.Builder()
+ *         .setRepository(repository)
+ *         .addTransform(new Resize(100, 100)) // Use image transforms as necessary for your data
+ *         .addTransform(new ToTensor()) // Usually required as the last transform to convert images to tensors
+ *         .setSampling(batchSize, true)
+ *         .build();
+ *
+ * // call prepare before using
+ * dataset.prepare();
+ *
+ * // to get the synset or label names
+ * List&gt;String&lt; synset = dataset.getSynset();
+ * </pre>
  */
 public final class ImageFolder extends AbstractImageFolder {
 
