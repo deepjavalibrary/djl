@@ -15,6 +15,7 @@ package ai.djl.basicdataset.nlp;
 
 /**
  * An enum class for Universal POS tags which mark the core part-of-speech categories.
+ *
  * @see <a href="https://universaldependencies.org/u/pos/">Universal POS tags</a>
  */
 public enum UniversalPosTag {

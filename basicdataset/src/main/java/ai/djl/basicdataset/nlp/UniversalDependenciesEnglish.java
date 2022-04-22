@@ -28,11 +28,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A Gold Standard Universal Dependencies Corpus for English, built over the source material of the
  * English Web Treebank LDC2012T13.
+ *
  * @see <a href="https://catalog.ldc.upenn.edu/LDC2012T13">English Web Treebank LDC2012T13</a>
  */
 public class UniversalDependenciesEnglish extends TextDataset {
@@ -43,8 +48,8 @@ public class UniversalDependenciesEnglish extends TextDataset {
     private List<List<Integer>> universalPosTags;
 
     /**
-     * A mapping between the index of each text and the range of tokens it contains, so that
-     * when function {@code get()} is called, all tokens in one text can be found by the text index.
+     * A mapping between the index of each text and the range of tokens it contains, so that when
+     * function {@code get()} is called, all tokens in one text can be found by the text index.
      */
     private Map<Long, List<Long>> index2Range = new HashMap<>();
 
@@ -70,8 +75,8 @@ public class UniversalDependenciesEnglish extends TextDataset {
 
     /**
      * Prepares the dataset for use with tracked progress. In this method the TXT file will be
-     * parsed. The tokens will be added to {@code sourceTextData} and the Universal POS tags
-     * will be added to {@code universalPosTags}. Only {@code sourceTextData} will then be preprocessed.
+     * parsed. The tokens will be added to {@code sourceTextData} and the Universal POS tags will be
+     * added to {@code universalPosTags}. Only {@code sourceTextData} will then be preprocessed.
      *
      * @param progress the progress tracker
      * @throws IOException for various exceptions depending on the dataset
@@ -113,7 +118,7 @@ public class UniversalDependenciesEnglish extends TextDataset {
                 if (("").equals(row)) {
                     universalPosTags.add(universalPosTag);
                     universalPosTag = new ArrayList<>();
-                    index2Range.put(index, Arrays.asList(start, (long)sourceTextData.size()));
+                    index2Range.put(index, Arrays.asList(start, (long) sourceTextData.size()));
                     index++;
                     start = sourceTextData.size();
                     continue;
@@ -142,7 +147,11 @@ public class UniversalDependenciesEnglish extends TextDataset {
     protected void preprocess(List<String> newTextData, boolean source) throws EmbeddingException {
         TextData textData = source ? sourceTextData : targetTextData;
         textData.preprocess(
-                manager, newTextData.subList(0, Math.toIntExact(Math.min(index2Range.get(limit).get(1), newTextData.size()))));
+                manager,
+                newTextData.subList(
+                        0,
+                        Math.toIntExact(
+                                Math.min(index2Range.get(limit).get(1), newTextData.size()))));
     }
 
     /**
@@ -153,8 +162,8 @@ public class UniversalDependenciesEnglish extends TextDataset {
      * @return a {@link Record} that contains the data and label of the requested data item. The
      *     data {@link NDList} contains multiple {@link NDArray}s representing the token embeddings
      *     in one text, The label {@link NDList} contains one {@link NDArray} including the indices
-     *     of the Universal POS tags of each token. For the index of each Universal POS tag, see
-     *     the enum class {@link UniversalPosTag}.
+     *     of the Universal POS tags of each token. For the index of each Universal POS tag, see the
+     *     enum class {@link UniversalPosTag}.
      */
     @Override
     public Record get(NDManager manager, long index) {
@@ -166,7 +175,8 @@ public class UniversalDependenciesEnglish extends TextDataset {
         NDList labels = new NDList();
         labels.add(
                 manager.create(
-                                universalPosTags.get(Math.toIntExact(index))
+                                universalPosTags
+                                        .get(Math.toIntExact(index))
                                         .stream()
                                         .mapToInt(Integer::intValue)
                                         .toArray())
@@ -175,8 +185,9 @@ public class UniversalDependenciesEnglish extends TextDataset {
     }
 
     /**
-     * Returns the number of records available to be read in this {@code Dataset}. In this implementation,
-     * the actual size of available records is equivalent to that of {@code index2Range}.
+     * Returns the number of records available to be read in this {@code Dataset}. In this
+     * implementation, the actual size of available records is equivalent to that of {@code
+     * index2Range}.
      *
      * @return the number of records available to be read in this {@code Dataset}
      */
