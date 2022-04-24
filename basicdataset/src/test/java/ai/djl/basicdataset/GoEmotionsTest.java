@@ -12,15 +12,13 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.basicdataset.tabular.GoEmotions;
+import ai.djl.basicdataset.nlp.GoEmotions;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Repository;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import java.util.List;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -28,7 +26,8 @@ public class GoEmotionsTest {
     @Test
     public void testGoEmotionTrainRemote() throws IOException, TranslateException {
         GoEmotions trainingSet =
-                GoEmotions.builder().optUsage(Dataset.Usage.TRAIN).setSampling(32, true).build();
+                GoEmotions.builder().optUsage(Dataset.Usage.TRAIN).setSampling(32,
+ true).build();
         trainingSet.prepare();
 
         long size = trainingSet.size();
@@ -36,8 +35,11 @@ public class GoEmotionsTest {
 
         NDManager manager = NDManager.newBaseManager();
         Record record = trainingSet.get(manager, 0);
-        Assert.assertEquals(record.getData().get(0).getFloat(), 0);
-        Assert.assertEquals(record.getLabels().get(0).getFloat(), 27.0);
+
+        Assert.assertEquals(record.getData().size(), 1);
+        Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
+        Assert.assertEquals(record.getLabels().size(), 1);
+        Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
     }
 
     @Test
@@ -49,9 +51,7 @@ public class GoEmotionsTest {
                         .optRepository(repository)
                         .optUsage(Dataset.Usage.TRAIN)
                         .setSampling(32, true)
-                        .optArtifactId("goemotions")
                         .build();
-        List<String> l = GoEmotions.builder().getAvailableFeatures();
         trainingSet.prepare();
 
         long size = trainingSet.size();
@@ -59,9 +59,11 @@ public class GoEmotionsTest {
 
         NDManager manager = NDManager.newBaseManager();
         Record record = trainingSet.get(manager, 0);
-        Assert.assertEquals(record.getData().get(0).getFloat(), 0);
-        Assert.assertEquals(record.getData().get(0).getShape().get(0), 1);
-        Assert.assertEquals(record.getLabels().get(0).getFloat(), 27.0);
+
+        Assert.assertEquals(record.getData().size(), 1);
+        Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
+        Assert.assertEquals(record.getLabels().size(), 1);
+        Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
     }
 
     @Test
@@ -81,9 +83,11 @@ public class GoEmotionsTest {
 
         NDManager manager = NDManager.newBaseManager();
         Record record = trainingSet.get(manager, 0);
-        Assert.assertEquals(record.getData().get(0).getFloat(), 0);
-        Assert.assertEquals(record.getData().get(0).getShape().get(0), 1);
-        Assert.assertEquals(record.getLabels().get(0).getFloat(), 25.0);
+
+        Assert.assertEquals(record.getData().size(), 1);
+        Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
+        Assert.assertEquals(record.getLabels().size(), 1);
+        Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
     }
 
     @Test
@@ -103,8 +107,10 @@ public class GoEmotionsTest {
 
         NDManager manager = NDManager.newBaseManager();
         Record record = trainingSet.get(manager, 0);
-        Assert.assertEquals(record.getData().get(0).getFloat(), 0);
-        Assert.assertEquals(record.getData().get(0).getShape().get(0), 1);
-        Assert.assertEquals(record.getLabels().get(0).getFloat(), 27.0);
+
+        Assert.assertEquals(record.getData().size(), 1);
+        Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
+        Assert.assertEquals(record.getLabels().size(), 1);
+        Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
     }
 }
