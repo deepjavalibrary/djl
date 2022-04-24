@@ -13,6 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.basicdataset.nlp.GoEmotions;
+import ai.djl.basicdataset.utils.TextData;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Repository;
 import ai.djl.training.dataset.Dataset;
@@ -23,94 +24,93 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class GoEmotionsTest {
-    @Test
-    public void testGoEmotionTrainRemote() throws IOException, TranslateException {
-        GoEmotions trainingSet =
-                GoEmotions.builder().optUsage(Dataset.Usage.TRAIN).setSampling(32,
- true).build();
-        trainingSet.prepare();
 
-        long size = trainingSet.size();
-        Assert.assertEquals(size, 43410);
-
-        NDManager manager = NDManager.newBaseManager();
-        Record record = trainingSet.get(manager, 0);
-
-        Assert.assertEquals(record.getData().size(), 1);
-        Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
-        Assert.assertEquals(record.getLabels().size(), 1);
-        Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
-    }
+    private static final int EMBEDDING_SIZE = 15;
 
     @Test
     public void testGoEmotionTrainLocal() throws IOException, TranslateException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
+        try (NDManager manager = NDManager.newBaseManager()) {
+            GoEmotions trainingSet =
+                    GoEmotions.builder()
+                            .setSourceConfiguration(
+                                    new TextData.Configuration()
+                                            .setTextEmbedding(
+                                                    TestUtils.getTextEmbedding(
+                                                            manager, EMBEDDING_SIZE)))
+                            .optRepository(repository)
+                            .optUsage(Dataset.Usage.TRAIN)
+                            .setSampling(32, true)
+                            .build();
+            trainingSet.prepare();
 
-        GoEmotions trainingSet =
-                GoEmotions.builder()
-                        .optRepository(repository)
-                        .optUsage(Dataset.Usage.TRAIN)
-                        .setSampling(32, true)
-                        .build();
-        trainingSet.prepare();
+            long size = trainingSet.size();
+            Assert.assertEquals(size, 43410);
 
-        long size = trainingSet.size();
-        Assert.assertEquals(size, 43410);
+            Record record = trainingSet.get(manager, 0);
 
-        NDManager manager = NDManager.newBaseManager();
-        Record record = trainingSet.get(manager, 0);
-
-        Assert.assertEquals(record.getData().size(), 1);
-        Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
-        Assert.assertEquals(record.getLabels().size(), 1);
-        Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
+            Assert.assertEquals(record.getData().size(), 1);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
+            Assert.assertEquals(record.getLabels().size(), 1);
+            Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
+        }
     }
 
     @Test
     public void testGoEmotionTestLocal() throws IOException, TranslateException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
+        try (NDManager manager = NDManager.newBaseManager()) {
+            GoEmotions trainingSet =
+                    GoEmotions.builder()
+                            .setSourceConfiguration(
+                                    new TextData.Configuration()
+                                            .setTextEmbedding(
+                                                    TestUtils.getTextEmbedding(
+                                                            manager, EMBEDDING_SIZE)))
+                            .optRepository(repository)
+                            .optUsage(Dataset.Usage.TEST)
+                            .setSampling(32, true)
+                            .build();
+            trainingSet.prepare();
 
-        GoEmotions trainingSet =
-                GoEmotions.builder()
-                        .optRepository(repository)
-                        .optUsage(Dataset.Usage.TEST)
-                        .setSampling(32, true)
-                        .build();
-        trainingSet.prepare();
+            long size = trainingSet.size();
+            Assert.assertEquals(size, 5427);
 
-        long size = trainingSet.size();
-        Assert.assertEquals(size, 5427);
+            Record record = trainingSet.get(manager, 0);
 
-        NDManager manager = NDManager.newBaseManager();
-        Record record = trainingSet.get(manager, 0);
-
-        Assert.assertEquals(record.getData().size(), 1);
-        Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
-        Assert.assertEquals(record.getLabels().size(), 1);
-        Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
+            Assert.assertEquals(record.getData().size(), 1);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
+            Assert.assertEquals(record.getLabels().size(), 1);
+            Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
+        }
     }
 
     @Test
     public void testGoEmotionValidationLocal() throws IOException, TranslateException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
+        try (NDManager manager = NDManager.newBaseManager()) {
+            GoEmotions trainingSet =
+                    GoEmotions.builder()
+                            .setSourceConfiguration(
+                                    new TextData.Configuration()
+                                            .setTextEmbedding(
+                                                    TestUtils.getTextEmbedding(
+                                                            manager, EMBEDDING_SIZE)))
+                            .optRepository(repository)
+                            .optUsage(Dataset.Usage.VALIDATION)
+                            .setSampling(32, true)
+                            .build();
+            trainingSet.prepare();
 
-        GoEmotions trainingSet =
-                GoEmotions.builder()
-                        .optRepository(repository)
-                        .optUsage(Dataset.Usage.VALIDATION)
-                        .setSampling(32, true)
-                        .build();
-        trainingSet.prepare();
+            long size = trainingSet.size();
+            Assert.assertEquals(size, 5426);
 
-        long size = trainingSet.size();
-        Assert.assertEquals(size, 5426);
+            Record record = trainingSet.get(manager, 0);
 
-        NDManager manager = NDManager.newBaseManager();
-        Record record = trainingSet.get(manager, 0);
-
-        Assert.assertEquals(record.getData().size(), 1);
-        Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
-        Assert.assertEquals(record.getLabels().size(), 1);
-        Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
+            Assert.assertEquals(record.getData().size(), 1);
+            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
+            Assert.assertEquals(record.getLabels().size(), 1);
+            Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
+        }
     }
 }
