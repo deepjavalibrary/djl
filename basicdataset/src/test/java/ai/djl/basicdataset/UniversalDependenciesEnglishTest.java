@@ -15,12 +15,16 @@ package ai.djl.basicdataset;
 import ai.djl.basicdataset.nlp.UniversalDependenciesEnglish;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.basicdataset.utils.TextData.Configuration;
+import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
+import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Repository;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Locale;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -38,11 +42,10 @@ public class UniversalDependenciesEnglishTest {
                             .optUsage(Dataset.Usage.TRAIN)
                             .setSourceConfiguration(
                                     new Configuration()
-                                            .setTextEmbedding(
-                                                    TestUtils.getTextEmbedding(
-                                                            manager, EMBEDDING_SIZE)))
-                            .setTargetConfiguration(
-                                    new Configuration()
+                                            .setTextProcessors(
+                                                    Arrays.asList(
+                                                            new SimpleTokenizer(),
+                                                            new LowerCaseConvertor(Locale.ENGLISH)))
                                             .setTextEmbedding(
                                                     TestUtils.getTextEmbedding(
                                                             manager, EMBEDDING_SIZE)))
@@ -66,9 +69,12 @@ public class UniversalDependenciesEnglishTest {
                             .optRepository(repository)
                             .optUsage(Dataset.Usage.TEST)
                             .setSourceConfiguration(
-                                    new Configuration().setEmbeddingSize(EMBEDDING_SIZE))
-                            .setTargetConfiguration(
-                                    new Configuration().setEmbeddingSize(EMBEDDING_SIZE))
+                                    new Configuration()
+                                            .setTextProcessors(
+                                                    Arrays.asList(
+                                                            new SimpleTokenizer(),
+                                                            new LowerCaseConvertor(Locale.ENGLISH)))
+                                            .setEmbeddingSize(EMBEDDING_SIZE))
                             .setSampling(32, true)
                             .optLimit(10)
                             .build();
@@ -92,11 +98,10 @@ public class UniversalDependenciesEnglishTest {
                             .optUsage(Dataset.Usage.VALIDATION)
                             .setSourceConfiguration(
                                     new TextData.Configuration()
-                                            .setTextEmbedding(
-                                                    TestUtils.getTextEmbedding(
-                                                            manager, EMBEDDING_SIZE)))
-                            .setTargetConfiguration(
-                                    new TextData.Configuration()
+                                            .setTextProcessors(
+                                                    Arrays.asList(
+                                                            new SimpleTokenizer(),
+                                                            new LowerCaseConvertor(Locale.ENGLISH)))
                                             .setTextEmbedding(
                                                     TestUtils.getTextEmbedding(
                                                             manager, EMBEDDING_SIZE)))
