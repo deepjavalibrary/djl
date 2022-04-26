@@ -36,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
     private Shape[] outputShapes;
     private PairList<String, Shape> inputDescriptions;
     private PairList<String, Shape> outputDescriptions;
-    private boolean first;
+    private AtomicBoolean first = new AtomicBoolean(false);
 
     /**
      * Constructs a {@code MxSymbolBlock} for a {@link Symbol}.
@@ -184,9 +185,9 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        if (first) {
+        if (first.get()) {
             synchronized (MxSymbolBlock.class) {
-                if (first) {
+                if (first.get()) {
                     // create CachedOp is not thread-safe
                     // add synchronized block to avoid creating multiple CachedOps
                     op = JnaUtils.createCachedOp(this, (MxNDManager) manager, training);
@@ -199,7 +200,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
                     for (NDArray array : outputs) {
                         outputDescriptions.add(array.getName(), array.getShape());
                     }
-                    first = false;
+                    first.set(false);
                     return outputs;
                 }
             }
@@ -326,7 +327,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
                             .optRequiresGrad(requireGrad)
                             .build());
         }
-        first = true;
+        first.set(true);
     }
 
     private static Parameter.Type inferType(String name) {
