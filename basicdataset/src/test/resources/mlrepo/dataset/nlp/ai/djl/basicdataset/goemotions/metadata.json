@@ -7,6 +7,12 @@
   "name": "goemotions",
   "description": "GoEmotions contains 58k carefully curated Reddit comments labeled for 27 emotion categories or Neutral.",
   "website": "https://github.com/google-research/google-research/tree/master/goemotions",
+  "licenses": {
+    "license": {
+      "name": "Creative Commons Attribution-ShareAlike License",
+      "url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode"
+    }
+  },
   "artifacts": [
     {
       "version": "1.0",
