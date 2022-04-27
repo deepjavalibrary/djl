@@ -9,8 +9,8 @@
   "website": "https://github.com/google-research/google-research/tree/master/goemotions",
   "licenses": {
     "license": {
-      "name": "Creative Commons Attribution-ShareAlike License",
-      "url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode"
+      "name": "Creative Commons Attribution License",
+      "url": "https://creativecommons.org/licenses/by/4.0/legalcode"
     }
   },
   "artifacts": [
