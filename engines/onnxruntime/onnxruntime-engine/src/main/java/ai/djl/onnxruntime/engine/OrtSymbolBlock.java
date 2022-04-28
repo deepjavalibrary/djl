@@ -88,8 +88,16 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             // If input data has name
             if (inputs.get(0).getName() != null) {
                 for (NDArray input : inputs) {
+                    String name = input.getName();
+                    if (name == null) {
+                        throw new IllegalArgumentException(
+                                "All or none of input tensors must have a name.");
+                    }
+                    if (!inputNames.contains(name)) {
+                        throw new IllegalArgumentException("Invalid input tensor name: " + name);
+                    }
                     OrtNDArray ortNDArray = sub.from(input);
-                    container.put(input.getName(), ortNDArray.getTensor());
+                    container.put(name, ortNDArray.getTensor());
                 }
             } else {
                 // feed data in to match names
