@@ -2,8 +2,6 @@
 ![DeepJavaLibrary](website/img/deepjavalibrary.png?raw=true "Deep Java Library")
 
 ![Continuous](https://github.com/deepjavalibrary/djl/workflows/Continuous/badge.svg)
-![Continuous PyTorch](https://github.com/deepjavalibrary/djl/workflows/Continous%20PyTorch/badge.svg)
-![Continuous Tensorflow](https://github.com/deepjavalibrary/djl/workflows/Continuous%20Tensorflow/badge.svg)
 ![Docs](https://github.com/deepjavalibrary/djl/workflows/Docs/badge.svg)
 ![Nightly Publish](https://github.com/deepjavalibrary/djl/workflows/Nightly%20Publish/badge.svg)
 
