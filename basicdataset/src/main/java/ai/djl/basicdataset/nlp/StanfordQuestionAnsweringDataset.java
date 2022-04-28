@@ -238,18 +238,16 @@ public class StanfordQuestionAnsweringDataset extends TextDataset implements Raw
      * @return the last index of the answer in {@code TargetTextData} that needs to be preprocessed
      */
     private int getLastAnswerIndex(int questionInfoIndex) {
-        boolean endAtHead = false;
-        QuestionInfo questionInfo = questionInfoList.get(questionInfoIndex);
-        while (questionInfo.answerIndexList.isEmpty()) {
-            if (questionInfoIndex == 0) {
-                endAtHead = true;
-                break;
+        // Go backwards through the questionInfoList until it finds one with an answer
+        for (; questionInfoIndex >= 0; questionInfoIndex--) {
+            QuestionInfo questionInfo = questionInfoList.get(questionInfoIndex);
+            if (!questionInfo.answerIndexList.isEmpty()) {
+                return questionInfo.answerIndexList.get(questionInfo.answerIndexList.size() - 1);
             }
-            questionInfo = questionInfoList.get(--questionInfoIndex);
         }
-        return endAtHead
-                ? 0
-                : questionInfo.answerIndexList.get(questionInfo.answerIndexList.size() - 1);
+
+        // Could not find a QuestionInfo with an answer
+        return 0;
     }
 
     /**
