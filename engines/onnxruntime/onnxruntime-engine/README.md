@@ -85,3 +85,11 @@ Gradle:
     }
     implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.11.0"
 ```
+
+#### Enable TensorRT execution
+
+ONNXRuntime offers TensorRT execution as the backend. In DJL, user can specify the followings in the Criteria to enable:
+
+```
+optOption("ortDevice", "TensorRT")
+```

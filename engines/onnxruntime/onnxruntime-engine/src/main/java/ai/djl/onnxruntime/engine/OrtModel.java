@@ -77,10 +77,6 @@ public class OrtModel extends BaseModel {
 
         try {
             SessionOptions ortOptions = getSessionOptions(options);
-            Device device = manager.getDevice();
-            if (device.isGpu()) {
-                ortOptions.addCUDA(manager.getDevice().getDeviceId());
-            }
             OrtSession session = env.createSession(modelFile.toString(), ortOptions);
             block = new OrtSymbolBlock(session, (OrtNDManager) manager);
         } catch (OrtException e) {
@@ -100,10 +96,6 @@ public class OrtModel extends BaseModel {
         try {
             byte[] buf = Utils.toByteArray(is);
             SessionOptions ortOptions = getSessionOptions(options);
-            Device device = manager.getDevice();
-            if (device.isGpu()) {
-                ortOptions.addCUDA(manager.getDevice().getDeviceId());
-            }
             OrtSession session = env.createSession(buf, ortOptions);
             block = new OrtSymbolBlock(session, (OrtNDManager) manager);
         } catch (OrtException e) {
@@ -186,6 +178,25 @@ public class OrtModel extends BaseModel {
             ortSession.setCPUArenaAllocator(true);
         }
 
+        Device device = manager.getDevice();
+        if (options.containsKey("ortDevice")) {
+            String ortDevice = (String) options.get("ortDevice");
+            switch (ortDevice) {
+                case "TensorRT":
+                    ortSession.addTensorrt(manager.getDevice().getDeviceId());
+                    break;
+                case "ROCM":
+                    ortSession.addROCM();
+                    break;
+                case "CoreML":
+                    ortSession.addCoreML();
+                    break;
+                default:
+                    throw new UnsupportedOperationException(ortDevice + " not supported by DJL");
+            }
+        } else if (device.isGpu()) {
+            ortSession.addCUDA(manager.getDevice().getDeviceId());
+        }
         return ortSession;
     }
 }
