@@ -229,6 +229,28 @@ public class StanfordQuestionAnsweringDataset extends TextDataset implements Raw
     }
 
     /**
+     * Since a question might have no answer, we need extra logic to find the last index of the
+     * answer in the {@code TargetTextData}. There are not many consecutive questions without
+     * answer, so this logic will not cause a high cost.
+     *
+     * @param questionInfoIndex the last index of the record in {@code questionInfoList} that needs
+     *     to be preprocessed
+     * @return the last index of the answer in {@code TargetTextData} that needs to be preprocessed
+     */
+    private int getLastAnswerIndex(int questionInfoIndex) {
+        // Go backwards through the questionInfoList until it finds one with an answer
+        for (; questionInfoIndex >= 0; questionInfoIndex--) {
+            QuestionInfo questionInfo = questionInfoList.get(questionInfoIndex);
+            if (!questionInfo.answerIndexList.isEmpty()) {
+                return questionInfo.answerIndexList.get(questionInfo.answerIndexList.size() - 1);
+            }
+        }
+
+        // Could not find a QuestionInfo with an answer
+        return 0;
+    }
+
+    /**
      * Performs pre-processing steps on text data such as tokenising, applying {@link
      * ai.djl.modality.nlp.preprocess.TextProcessor}s, creating vocabulary, and word embeddings.
      * Since the record number in this dataset is not equivalent to the length of {@code
@@ -241,13 +263,10 @@ public class StanfordQuestionAnsweringDataset extends TextDataset implements Raw
     @Override
     protected void preprocess(List<String> newTextData, boolean source) throws EmbeddingException {
         TextData textData = source ? sourceTextData : targetTextData;
-        QuestionInfo questionInfo = questionInfoList.get(Math.toIntExact(this.limit) - 1);
+        int index = (int) Math.min(limit, questionInfoList.size()) - 1;
         int lastIndex =
-                source
-                        ? questionInfo.questionIndex
-                        : questionInfo.answerIndexList.get(questionInfo.answerIndexList.size() - 1);
-        textData.preprocess(
-                manager, newTextData.subList(0, Math.min(lastIndex + 1, newTextData.size())));
+                source ? questionInfoList.get(index).questionIndex : getLastAnswerIndex(index);
+        textData.preprocess(manager, newTextData.subList(0, lastIndex + 1));
     }
 
     /** A builder for a {@link StanfordQuestionAnsweringDataset}. */
