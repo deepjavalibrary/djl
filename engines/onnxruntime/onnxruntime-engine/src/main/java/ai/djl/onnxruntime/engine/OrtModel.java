@@ -183,7 +183,10 @@ public class OrtModel extends BaseModel {
             String ortDevice = (String) options.get("ortDevice");
             switch (ortDevice) {
                 case "TensorRT":
-                    ortSession.addTensorrt(manager.getDevice().getDeviceId());
+                    if (!device.isGpu()) {
+                        throw new IllegalArgumentException("TensorRT required GPU device.");
+                    }
+                    ortSession.addTensorrt(device.getDeviceId());
                     break;
                 case "ROCM":
                     ortSession.addROCM();
@@ -192,10 +195,10 @@ public class OrtModel extends BaseModel {
                     ortSession.addCoreML();
                     break;
                 default:
-                    throw new UnsupportedOperationException(ortDevice + " not supported by DJL");
+                    throw new IllegalArgumentException("Invalid ortDevice: " + ortDevice);
             }
         } else if (device.isGpu()) {
-            ortSession.addCUDA(manager.getDevice().getDeviceId());
+            ortSession.addCUDA(device.getDeviceId());
         }
         return ortSession;
     }
