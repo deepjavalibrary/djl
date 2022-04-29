@@ -86,7 +86,6 @@ public class TatoebaEnglishFrenchDataset extends TextDataset {
         List<String> targetTextData = new ArrayList<>();
         try (BufferedReader reader = Files.newBufferedReader(usagePath)) {
             String row;
-
             while ((row = reader.readLine()) != null) {
                 String[] text = row.split("\t");
                 sourceTextData.add(text[0]);

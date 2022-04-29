@@ -89,6 +89,7 @@ public class AirfoilRandomAccessTest {
                         .optLimit(1500)
                         .setSampling(10, true)
                         .build();
+
         airfoil.prepare();
 
         NDManager manager = NDManager.newBaseManager();

@@ -9,8 +9,8 @@
   "website": "https://catalog.ldc.upenn.edu/docs/LDC95T7/cl93.html",
   "licenses": {
     "license": {
-      "name": "The Apache License, Version 2.0",
-      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+      "name": "LDC User Agreement for Non-Members",
+      "url": "https://catalog.ldc.upenn.edu/license/ldc-non-members-agreement.pdf"
     }
   },
   "artifacts": [
