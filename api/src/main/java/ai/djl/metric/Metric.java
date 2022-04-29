@@ -15,8 +15,6 @@ package ai.djl.metric;
 import com.google.gson.annotations.SerializedName;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,9 +27,9 @@ public class Metric {
 
     private static final Pattern PATTERN =
             Pattern.compile(
-                    "\\s*([\\w\\s]+)\\.([\\w\\s]+):([0-9\\-,.e]+)\\|#([^|]*)\\|#hostname:([^,]+),([^,]+)(,.*)?");
+                    "\\s*([\\w\\s]+)\\.([\\w\\s]+):([0-9\\-,.e]+)(?>\\|#([^|]*))?(?>\\|(\\d+))?");
 
-    private static final String LOCALHOST = getLocalHostName();
+    private static final Dimension HOST = new Dimension("Host", getLocalHostName());
 
     @SerializedName("MetricName")
     private String metricName;
@@ -43,13 +41,10 @@ public class Metric {
     private String unit;
 
     @SerializedName("Dimensions")
-    private List<Dimension> dimensions;
+    private Dimension[] dimensions;
 
     @SerializedName("Timestamp")
     private String timestamp;
-
-    @SerializedName("HostName")
-    private String hostName;
 
     /**
      * Constructs a {@code Metric} instance with the specified {@code metricName} and <code>
@@ -71,28 +66,42 @@ public class Metric {
      * @param unit the metric unit
      */
     public Metric(String metricName, Number value, Unit unit) {
-        this.metricName = metricName;
-        this.value = value.toString();
-        this.unit = unit.getValue();
-        this.hostName = LOCALHOST;
+        this(metricName, value.toString(), unit.getValue(), null, HOST);
+    }
+
+    /**
+     * Constructs a {@code Metric} instance with the specified {@code metricName}, <code>value
+     * </code>, and {@code unit}.
+     *
+     * @param metricName the metric name
+     * @param value the metric value
+     * @param unit the metric unit
+     * @param dimensions the metric dimensions
+     */
+    public Metric(String metricName, Number value, Unit unit, Dimension... dimensions) {
+        this(metricName, value.toString(), unit.getValue(), null, dimensions);
     }
 
     /**
      * Constructs a new {@code Metric} instance.
      *
      * @param metricName the metric name
-     * @param unit the metric unit
      * @param value the metric value
-     * @param hostName the host name
+     * @param unit the metric unit
      * @param timestamp the metric timestamp
+     * @param dimensions the metric dimensions
      */
     private Metric(
-            String metricName, String unit, String value, String hostName, String timestamp) {
+            String metricName,
+            String value,
+            String unit,
+            String timestamp,
+            Dimension... dimensions) {
         this.metricName = metricName;
         this.unit = unit;
         this.value = value;
-        this.hostName = hostName;
         this.timestamp = timestamp;
+        this.dimensions = dimensions;
     }
 
     /**
@@ -132,12 +141,12 @@ public class Metric {
     }
 
     /**
-     * Returns the timestamp of the {@code Metric}.
+     * Returns the metric dimensions.
      *
-     * @return the metric timestamp
+     * @return the metric dimensions
      */
-    public String getHostName() {
-        return hostName;
+    public Dimension[] getDimensions() {
+        return dimensions;
     }
 
     /**
@@ -147,45 +156,44 @@ public class Metric {
      * @return a {@code Metric} object
      */
     public static Metric parse(String line) {
-        // DiskAvailable.Gigabytes:311|#Level:Host|#hostname:localhost,1650953744320,request_id
+        // DiskAvailable.Gigabytes:311|#Host:localhost|1650953744320
         Matcher matcher = PATTERN.matcher(line);
         if (!matcher.matches()) {
             return null;
         }
 
-        Metric metric =
-                new Metric(
-                        matcher.group(1),
-                        matcher.group(2),
-                        matcher.group(3),
-                        matcher.group(5),
-                        matcher.group(6));
+        String metricName = matcher.group(1);
+        String unit = matcher.group(2);
+        String value = matcher.group(3);
+        String dimension = matcher.group(4);
+        String timestamp = matcher.group(5);
 
-        String dimensions = matcher.group(4);
-        if (dimensions != null) {
-            String[] dimension = dimensions.split(",");
-            List<Dimension> list = new ArrayList<>(dimension.length);
-            for (String dime : dimension) {
-                String[] pair = dime.split(":");
+        Dimension[] dimensions = null;
+        if (dimension != null) {
+            String[] dims = dimension.split(",");
+            dimensions = new Dimension[dims.length];
+            int index = 0;
+            for (String dim : dims) {
+                String[] pair = dim.split(":");
                 if (pair.length == 2) {
-                    list.add(new Dimension(pair[0], pair[1]));
+                    dimensions[index++] = new Dimension(pair[0], pair[1]);
                 }
             }
-            metric.dimensions = list;
         }
 
-        return metric;
+        return new Metric(metricName, value, unit, timestamp, dimensions);
     }
 
     /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
-        sb.append(metricName).append('.').append(unit).append(':').append(value).append("|#");
+        sb.append(metricName).append('.').append(unit).append(':').append(value);
         if (dimensions != null) {
             boolean first = true;
             for (Dimension dimension : dimensions) {
                 if (first) {
+                    sb.append("|#");
                     first = false;
                 } else {
                     sb.append(',');
@@ -193,8 +201,9 @@ public class Metric {
                 sb.append(dimension.getName()).append(':').append(dimension.getValue());
             }
         }
-        sb.append("|#hostname:").append(hostName);
-        sb.append(',').append(timestamp);
+        if (timestamp != null) {
+            sb.append('|').append(timestamp);
+        }
         return sb.toString();
     }
 
