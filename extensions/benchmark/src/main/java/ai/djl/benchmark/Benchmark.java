@@ -18,6 +18,7 @@ import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
+import ai.djl.metric.Unit;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.translate.TranslateException;
@@ -75,14 +76,14 @@ public final class Benchmark extends AbstractBenchmark {
                 predictor.predict(null); // warmup
 
                 predictor.setMetrics(metrics); // Let predictor collect metrics
-                metrics.addMetric("start", System.currentTimeMillis(), "mills");
+                metrics.addMetric("start", System.currentTimeMillis(), Unit.MILLISECONDS);
                 for (int i = 0; i < iteration; ++i) {
                     predictResult = predictor.predict(null);
 
                     progressBar.update(i);
                     MemoryTrainingListener.collectMemoryInfo(metrics);
                 }
-                metrics.addMetric("end", System.currentTimeMillis(), "mills");
+                metrics.addMetric("end", System.currentTimeMillis(), Unit.MILLISECONDS);
             }
             return predictResult;
         }

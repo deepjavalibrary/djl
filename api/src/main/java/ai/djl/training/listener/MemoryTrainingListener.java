@@ -15,6 +15,7 @@ package ai.djl.training.listener;
 import ai.djl.Device;
 import ai.djl.metric.Metric;
 import ai.djl.metric.Metrics;
+import ai.djl.metric.Unit;
 import ai.djl.training.Trainer;
 import ai.djl.util.cuda.CudaUtils;
 import java.io.BufferedWriter;
@@ -101,8 +102,8 @@ public class MemoryTrainingListener extends TrainingListenerAdapter {
             long nonHeapUsed = nonHeap.getUsed();
             getProcessInfo(metrics);
 
-            metrics.addMetric("Heap", heapUsed, "bytes");
-            metrics.addMetric("NonHeap", nonHeapUsed, "bytes");
+            metrics.addMetric("Heap", heapUsed, Unit.BYTES);
+            metrics.addMetric("NonHeap", nonHeapUsed, Unit.BYTES);
             int gpuCount = CudaUtils.getGpuCount();
 
             // CudaUtils.getGpuMemory() will allocates memory on GPUs if CUDA runtime is not
@@ -110,7 +111,7 @@ public class MemoryTrainingListener extends TrainingListenerAdapter {
             for (int i = 0; i < gpuCount; ++i) {
                 Device device = Device.gpu(i);
                 MemoryUsage mem = CudaUtils.getGpuMemory(device);
-                metrics.addMetric("GPU-" + i, mem.getCommitted(), "bytes");
+                metrics.addMetric("GPU-" + i, mem.getCommitted(), Unit.BYTES);
             }
         }
     }
@@ -170,8 +171,8 @@ public class MemoryTrainingListener extends TrainingListenerAdapter {
                     }
                     float cpu = Float.parseFloat(tokens[0]);
                     long rss = Long.parseLong(tokens[1]) * 1024;
-                    metrics.addMetric("cpu", cpu, "%");
-                    metrics.addMetric("rss", rss, "bytes");
+                    metrics.addMetric("cpu", cpu, Unit.PERCENT);
+                    metrics.addMetric("rss", rss, Unit.BYTES);
                 }
             } catch (IOException e) {
                 logger.error("Failed execute cmd: " + cmd, e);
