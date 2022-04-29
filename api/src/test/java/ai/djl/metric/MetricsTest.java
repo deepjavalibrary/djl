@@ -23,22 +23,25 @@ public class MetricsTest {
     public void testMetrics() {
         Metrics metrics = new Metrics();
         metrics.addMetric(new Metric("m1", 1L));
-        metrics.addMetric("m1", 3L, "count");
+        metrics.addMetric("m1", 3L, Unit.COUNT);
         metrics.addMetric("m1", 2L);
         Metric p50 = metrics.percentile("m1", 50);
         Assert.assertEquals(p50.getValue().longValue(), 2L);
 
         metrics.addMetric(new Metric("m2", 1f));
-        metrics.addMetric("m2", 3f, "count");
+        metrics.addMetric("m2", 3f, Unit.COUNT);
         metrics.addMetric("m2", 2f);
         p50 = metrics.percentile("m2", 50);
         Assert.assertEquals(p50.getValue().floatValue(), 2f);
 
         metrics.addMetric(new Metric("m3", 1d));
-        metrics.addMetric("m3", 3d, "count");
+        metrics.addMetric("m3", 3d, Unit.COUNT);
         metrics.addMetric("m3", 2d);
         p50 = metrics.percentile("m3", 50);
         Assert.assertEquals(p50.getValue().doubleValue(), 2d);
+        Assert.assertTrue(metrics.hasMetric("m1"));
+        Assert.assertEquals(2L, metrics.latestMetric("m1").getValue().longValue());
+        Assert.assertThrows(() -> metrics.latestMetric("none"));
 
         List<Metric> list = metrics.getMetric("m1");
         Assert.assertEquals(list.size(), 3);
@@ -52,6 +55,23 @@ public class MetricsTest {
         Assert.assertTrue(metricNames.contains("m2"));
         Assert.assertTrue(metricNames.contains("m3"));
         Assert.assertFalse(metricNames.contains("m4"));
+    }
+
+    @Test
+    public void testParseMetrics() {
+        String line = "Disk.Gigabytes:311|#Level:Host|#hostname:localhost,1650953744320";
+        Metric metric = Metric.parse(line);
+        Assert.assertNotNull(metric);
+        Assert.assertEquals(metric.getValue().intValue(), 311);
+        Assert.assertEquals(metric.getTimestamp(), "1650953744320");
+        Assert.assertEquals(metric.getUnit(), Unit.GIGABYTES);
+        Assert.assertEquals(metric.getHostName(), "localhost");
+        Assert.assertEquals(line, metric.toString());
+
+        Assert.assertNull(Metric.parse("DiskAvailable.Gigabytes:311"));
+        Metric invalid = Metric.parse("Disk.InvalidUnits:311|#Level:Host|#hostname:localhost,1,X");
+        Assert.assertNotNull(invalid);
+        Assert.expectThrows(IllegalArgumentException.class, invalid::getUnit);
     }
 
     @Test

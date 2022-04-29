@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.metric.Metrics;
+import ai.djl.metric.Unit;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -149,40 +150,28 @@ public abstract class AbstractBenchmark {
                             metrics.getMetric("LoadModel").get(0).getValue().longValue();
                     logger.info(
                             "Model loading time: {} ms.",
-                            String.format("%.3f", loadModelTime / 1_000_000f));
+                            String.format("%.3f", loadModelTime / 1000f));
                 }
 
                 if (metrics.hasMetric("Inference") && iteration > 1) {
-                    float totalP50 =
-                            metrics.percentile("Total", 50).getValue().longValue() / 1_000_000f;
-                    float totalP90 =
-                            metrics.percentile("Total", 90).getValue().longValue() / 1_000_000f;
-                    float totalP99 =
-                            metrics.percentile("Total", 99).getValue().longValue() / 1_000_000f;
-                    float p50 =
-                            metrics.percentile("Inference", 50).getValue().longValue() / 1_000_000f;
-                    float p90 =
-                            metrics.percentile("Inference", 90).getValue().longValue() / 1_000_000f;
-                    float p99 =
-                            metrics.percentile("Inference", 99).getValue().longValue() / 1_000_000f;
+                    float totalP50 = metrics.percentile("Total", 50).getValue().longValue() / 1000f;
+                    float totalP90 = metrics.percentile("Total", 90).getValue().longValue() / 1000f;
+                    float totalP99 = metrics.percentile("Total", 99).getValue().longValue() / 1000f;
+                    float p50 = metrics.percentile("Inference", 50).getValue().longValue() / 1000f;
+                    float p90 = metrics.percentile("Inference", 90).getValue().longValue() / 1000f;
+                    float p99 = metrics.percentile("Inference", 99).getValue().longValue() / 1000f;
                     float preP50 =
-                            metrics.percentile("Preprocess", 50).getValue().longValue()
-                                    / 1_000_000f;
+                            metrics.percentile("Preprocess", 50).getValue().longValue() / 1000f;
                     float preP90 =
-                            metrics.percentile("Preprocess", 90).getValue().longValue()
-                                    / 1_000_000f;
+                            metrics.percentile("Preprocess", 90).getValue().longValue() / 1000f;
                     float preP99 =
-                            metrics.percentile("Preprocess", 99).getValue().longValue()
-                                    / 1_000_000f;
+                            metrics.percentile("Preprocess", 99).getValue().longValue() / 1000f;
                     float postP50 =
-                            metrics.percentile("Postprocess", 50).getValue().longValue()
-                                    / 1_000_000f;
+                            metrics.percentile("Postprocess", 50).getValue().longValue() / 1000f;
                     float postP90 =
-                            metrics.percentile("Postprocess", 90).getValue().longValue()
-                                    / 1_000_000f;
+                            metrics.percentile("Postprocess", 90).getValue().longValue() / 1000f;
                     float postP99 =
-                            metrics.percentile("Postprocess", 99).getValue().longValue()
-                                    / 1_000_000f;
+                            metrics.percentile("Postprocess", 99).getValue().longValue() / 1000f;
                     logger.info(
                             String.format(
                                     "total P50: %.3f ms, P90: %.3f ms, P99: %.3f ms",
@@ -266,12 +255,12 @@ public abstract class AbstractBenchmark {
 
         ZooModel<Void, float[]> model = criteria.loadModel();
         if (device == Device.cpu() || device == Device.gpu()) {
-            long delta = System.nanoTime() - begin;
+            long delta = (System.nanoTime() - begin) / 1000;
             logger.info(
                     "Model {} loaded in: {} ms.",
                     model.getName(),
-                    String.format("%.3f", delta / 1_000_000f));
-            metrics.addMetric("LoadModel", delta);
+                    String.format("%.3f", delta / 1000f));
+            metrics.addMetric("LoadModel", delta, Unit.MICROSECONDS);
         }
         return model;
     }

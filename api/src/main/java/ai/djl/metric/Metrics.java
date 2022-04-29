@@ -12,7 +12,6 @@
  */
 package ai.djl.metric;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,8 +39,6 @@ import java.util.stream.Collectors;
  * tutorial</a>.
  */
 public class Metrics {
-
-    private static final MetricValueComparator VALUE_COMPARATOR = new MetricValueComparator();
 
     private Map<String, List<Metric>> metrics;
 
@@ -80,7 +77,7 @@ public class Metrics {
      * @param value the metric value
      * @param unit the metric unit
      */
-    public void addMetric(String name, Number value, String unit) {
+    public void addMetric(String name, Number value, Unit unit) {
         addMetric(new Metric(name, value, unit));
     }
 
@@ -146,7 +143,7 @@ public class Metrics {
         }
 
         List<Metric> list = new ArrayList<>(metric);
-        list.sort(VALUE_COMPARATOR);
+        list.sort(Comparator.comparingDouble(Metric::getValue));
         int index = metric.size() * percentile / 100;
         return list.get(index);
     }
@@ -163,23 +160,6 @@ public class Metrics {
             throw new IllegalArgumentException("Metric name not found: " + metricName);
         }
 
-        return metric.stream().collect(Collectors.averagingDouble(m -> m.getValue().doubleValue()));
-    }
-
-    /** Comparator based on {@code Metric}'s value field. */
-    private static final class MetricValueComparator implements Comparator<Metric>, Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        /** {@inheritDoc} */
-        @Override
-        public int compare(Metric o1, Metric o2) {
-            Number n1 = o1.getValue();
-            Number n2 = o2.getValue();
-            if (n1 instanceof Double || n1 instanceof Float) {
-                return Double.compare(n1.doubleValue(), n2.doubleValue());
-            }
-            return Long.compare(n1.longValue(), n2.longValue());
-        }
+        return metric.stream().collect(Collectors.averagingDouble(Metric::getValue));
     }
 }
