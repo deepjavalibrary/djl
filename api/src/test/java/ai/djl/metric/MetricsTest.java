@@ -34,7 +34,7 @@ public class MetricsTest {
         p50 = metrics.percentile("m2", 50);
         Assert.assertEquals(p50.getValue().floatValue(), 2f);
 
-        metrics.addMetric(new Metric("m3", 1d));
+        metrics.addMetric(new Metric("m3", 1d, Unit.NONE, new Dimension("model", "mlp")));
         metrics.addMetric("m3", 3d, Unit.COUNT);
         metrics.addMetric("m3", 2d);
         p50 = metrics.percentile("m3", 50);
@@ -59,17 +59,18 @@ public class MetricsTest {
 
     @Test
     public void testParseMetrics() {
-        String line = "Disk.Gigabytes:311|#Level:Host|#hostname:localhost,1650953744320";
+        String line = "Disk.Gigabytes:311|#Host:localhost,Model:resnet|1650953744320";
         Metric metric = Metric.parse(line);
         Assert.assertNotNull(metric);
         Assert.assertEquals(metric.getValue().intValue(), 311);
         Assert.assertEquals(metric.getTimestamp(), "1650953744320");
         Assert.assertEquals(metric.getUnit(), Unit.GIGABYTES);
-        Assert.assertEquals(metric.getHostName(), "localhost");
+        Assert.assertEquals(metric.getDimensions()[0].getName(), "Host");
+        Assert.assertEquals(metric.getDimensions()[0].getValue(), "localhost");
         Assert.assertEquals(line, metric.toString());
 
-        Assert.assertNull(Metric.parse("DiskAvailable.Gigabytes:311"));
-        Metric invalid = Metric.parse("Disk.InvalidUnits:311|#Level:Host|#hostname:localhost,1,X");
+        Assert.assertNull(Metric.parse("DiskAvailable.Gigabytes:311#"));
+        Metric invalid = Metric.parse("Disk.InvalidUnits:311");
         Assert.assertNotNull(invalid);
         Assert.expectThrows(IllegalArgumentException.class, invalid::getUnit);
     }
