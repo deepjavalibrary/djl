@@ -15,7 +15,6 @@ package ai.djl.basicdataset;
 import ai.djl.basicdataset.nlp.PennTreebankText;
 import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.ndarray.NDManager;
-import ai.djl.repository.Repository;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
@@ -28,95 +27,35 @@ public class PennTreebankTextTest {
     private static final int EMBEDDING_SIZE = 15;
 
     @Test
-    public void testPennTreebankTextTrainLocal() throws IOException, TranslateException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
-        try (NDManager manager = NDManager.newBaseManager()) {
-            PennTreebankText dataset =
-                    PennTreebankText.builder()
-                            .setSourceConfiguration(
-                                    new Configuration()
-                                            .setTextEmbedding(
-                                                    TestUtils.getTextEmbedding(
-                                                            manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE))
-                            .setTargetConfiguration(
-                                    new Configuration()
-                                            .setTextEmbedding(
-                                                    TestUtils.getTextEmbedding(
-                                                            manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE))
-                            .setSampling(32, true)
-                            .optLimit(100)
-                            .optRepository(repository)
-                            .optUsage(Dataset.Usage.TRAIN)
-                            .build();
-
-            dataset.prepare();
-            Record record = dataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
-            Assert.assertNull(record.getLabels());
-        }
-    }
-
-    @Test
-    public void testPennTreebankTextTestLocal() throws IOException, TranslateException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
-        try (NDManager manager = NDManager.newBaseManager()) {
-            PennTreebankText dataset =
-                    PennTreebankText.builder()
-                            .setSourceConfiguration(
-                                    new Configuration()
-                                            .setTextEmbedding(
-                                                    TestUtils.getTextEmbedding(
-                                                            manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE))
-                            .setTargetConfiguration(
-                                    new Configuration()
-                                            .setTextEmbedding(
-                                                    TestUtils.getTextEmbedding(
-                                                            manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE))
-                            .setSampling(32, true)
-                            .optLimit(100)
-                            .optRepository(repository)
-                            .optUsage(Dataset.Usage.TEST)
-                            .build();
-
-            dataset.prepare();
-            Record record = dataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
-            Assert.assertNull(record.getLabels());
-        }
-    }
-
-    @Test
-    public void testPennTreebankTextValidationLocal() throws IOException, TranslateException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
-        try (NDManager manager = NDManager.newBaseManager()) {
-            PennTreebankText dataset =
-                    PennTreebankText.builder()
-                            .setSourceConfiguration(
-                                    new Configuration()
-                                            .setTextEmbedding(
-                                                    TestUtils.getTextEmbedding(
-                                                            manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE))
-                            .setTargetConfiguration(
-                                    new Configuration()
-                                            .setTextEmbedding(
-                                                    TestUtils.getTextEmbedding(
-                                                            manager, EMBEDDING_SIZE))
-                                            .setEmbeddingSize(EMBEDDING_SIZE))
-                            .setSampling(32, true)
-                            .optLimit(100)
-                            .optRepository(repository)
-                            .optUsage(Dataset.Usage.VALIDATION)
-                            .build();
-
-            dataset.prepare();
-            Record record = dataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
-            Assert.assertNull(record.getLabels());
+    public void testPennTreebankText() throws IOException, TranslateException {
+        for (Dataset.Usage usage :
+                new Dataset.Usage[] {
+                    Dataset.Usage.TRAIN, Dataset.Usage.VALIDATION, Dataset.Usage.TEST
+                }) {
+            try (NDManager manager = NDManager.newBaseManager()) {
+                PennTreebankText dataset =
+                        PennTreebankText.builder()
+                                .setSourceConfiguration(
+                                        new Configuration()
+                                                .setTextEmbedding(
+                                                        TestUtils.getTextEmbedding(
+                                                                manager, EMBEDDING_SIZE))
+                                                .setEmbeddingSize(EMBEDDING_SIZE))
+                                .setTargetConfiguration(
+                                        new Configuration()
+                                                .setTextEmbedding(
+                                                        TestUtils.getTextEmbedding(
+                                                                manager, EMBEDDING_SIZE))
+                                                .setEmbeddingSize(EMBEDDING_SIZE))
+                                .setSampling(32, true)
+                                .optLimit(100)
+                                .optUsage(usage)
+                                .build();
+                dataset.prepare();
+                Record record = dataset.get(manager, 0);
+                Assert.assertEquals(record.getData().get(0).getShape().get(1), 15);
+                Assert.assertNull(record.getLabels());
+            }
         }
     }
 }
