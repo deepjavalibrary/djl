@@ -13,6 +13,7 @@
 package ai.djl.pytorch.jni;
 
 import ai.djl.Device;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -342,7 +343,14 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchSet(self.getHandle(), data);
     }
 
-    public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {
+    public static PtNDArray gather(PtNDArray ndArray, PtNDArray index, long dim) {  // dim was originally int. Why long here or inside torchGather?
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchGather(ndArray.getHandle(), index.getHandle(), dim, false)
+        );
+    }
+
+    public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {  // dim was originally int. Why long here?
         Shape indexShape = index.getShape();
         Shape ndShape = ndArray.getShape();
         int shapeDims = indexShape.dimension();

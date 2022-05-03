@@ -90,9 +90,17 @@ If you build following the above instructions, you will use the version of the c
 
 You can look here to find the [list of DJL releases](https://github.com/deepjavalibrary/djl/releases).
 
-### Using build from source in another project
+### Using built-from-source version in another project
 
-If you have another project and want to use a custom version of DJL in it, you can do this by building from source. Once you have built DJL from source, run `./gradlew publishToMavenLocal`. This will install DJL to your local maven repository cache located on your filesystem at `~/.m2/repository`. When you publish here, it will use the same snapshot versions as used by the snapshot repository above for adding the DJL dependencies.
+If you have another project and want to use a custom version of DJL in it, you can do the following. First, build DJL from source by running `./gradlew build` inside djl folder. Then run `./gradlew publishToMavenLocal`, which will install DJL to your local maven repository cache, located on your filesystem at `~/.m2/repository`. After publishing it here, you can add the DJL snapshot version dependencies as shown below 
+```groovy
+dependencies {
+    implementation platform("ai.djl:bom:0.17.0-SNAPSHOT")
+}
+```
+This snapshot version is the same as the custom DJL repository. 
+
+You also need to change directory to `djl/bom`. Then build and publish it to maven local same as was done in `djl`.
 
 From there, you may have to update the Maven or Gradle build of the project importing DJL to also look at the local maven repository cache for your locally published versions of DJL. For Maven, no changes are necessary. If you are using Gradle, you will have to add the maven local repository such as this [example](https://github.com/deepjavalibrary/djl-demo/blob/135c969d66d98d1672852e53a37e52ca1da3e325/pneumonia-detection/build.gradle#L11):
 
@@ -101,3 +109,4 @@ repositories {
     mavenLocal()
 }
 ```
+Note that `mavenCentral()` may still be needed for applications like log4j and json.

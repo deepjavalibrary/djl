@@ -14,6 +14,7 @@ package ai.djl.ndarray;
 
 import ai.djl.Device;
 import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.index.NDIndexFullGather;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
@@ -509,6 +510,16 @@ public interface NDArray extends NDResource, BytesSupplier {
      */
     default NDArray get(NDIndex index) {
         return getNDArrayInternal().getIndexer().get(this, index);
+    }
+
+    /**
+     * Returns a partial {@code NDArray} pointed by the indexed array.
+     *
+     * @param gather: {index, axis}
+     * @return the partial {@code NDArray}
+     */
+    default NDArray get(NDIndexFullGather gather) {
+        return getNDArrayInternal().getIndexer().get(this, gather);
     }
 
     /**
