@@ -26,7 +26,7 @@ processResources {
                 "win-x86_64/cpu/djl_torch.dll"
         ]
         if (ptVersion.startsWith("1.11.")) {
-            files.add("linux-aarch64/cpu/libdjl_torch.so")
+            files.add("linux-aarch64/cpu-precxx11/libdjl_torch.so")
             files.add("linux-x86_64/cu113/libdjl_torch.so")
             files.add("linux-x86_64/cu113-precxx11/libdjl_torch.so")
             files.add("win-x86_64/cu113/djl_torch.dll")

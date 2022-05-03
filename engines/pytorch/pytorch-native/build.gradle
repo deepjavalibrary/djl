@@ -97,7 +97,7 @@ def prepareNativeLib(String binaryRoot, String ver) {
     ]
 
     def aarch64Files = [
-            "${ver}/libtorch-cxx11-shared-with-deps-${ver}-aarch64.zip": "cpu/linux-aarch64"
+            "${ver}/libtorch-shared-with-deps-${ver}-aarch64.zip": "cpu-precxx11/linux-aarch64"
     ]
 
     copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
@@ -250,12 +250,12 @@ task uploadS3 {
                 "${BINARY_ROOT}/cpu/linux-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu/osx-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu/win-x86_64/native/lib/",
+                "${BINARY_ROOT}/cpu-precxx11/linux-aarch64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-x86_64/native/lib/",
                 "${BINARY_ROOT}/cu102/linux/native/lib/",
                 "${BINARY_ROOT}/cu113/linux-x86_64/native/lib/",
                 "${BINARY_ROOT}/cu113/win-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu113-precxx11/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cpu/linux-aarch64/native/lib/"
+                "${BINARY_ROOT}/cu113-precxx11/linux-x86_64/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
