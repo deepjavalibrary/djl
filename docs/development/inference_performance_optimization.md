@@ -142,3 +142,26 @@ TVM internally leverages full hardware resource. Based on our experiment, settin
 ```bash
 export TVM_NUM_THREADS=1
 ```
+
+### ONNXRuntime
+
+#### Thread configuration
+
+You can use the following settings for thread optimization in Criteria
+
+```
+.optOption("interOpNumThreads", <num_of_thread>)
+.optOption("intraOpNumThreads", <num_of_thread>)
+```
+
+Tips: Set to 1 on both of them at the beginning to see the performance. 
+Then set to total_cores/total_java_inference_thread on one of them to see how performance goes.
+
+#### (GPU) TensorRT Backend
+
+If you have tensorRT installed, you can try with the following backend on ONNXRuntime for performance optimization in Criteria
+
+```
+.optOption("ortDevice", "TensorRT")
+```
+
