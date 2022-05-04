@@ -12,7 +12,6 @@
  */
 package ai.djl.integration.tests.ndarray;
 
-import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
