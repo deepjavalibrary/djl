@@ -54,19 +54,6 @@ public class NDIndexTest {
     }
 
     @Test
-    public void testGather() {
-        Engine engine = Engine.getEngine("PyTorch");
-        try (NDManager manager = engine.newBaseManager()) {
-            NDArray arr = manager.arange(20f).reshape(-1, 4);
-            long[] idx = {0, 0, 2, 1, 1, 2};
-            NDArray sel = manager.create(idx, new Shape(3, 2));
-            NDArray actual = arr.get(new NDIndex().gather(sel, 1));
-            NDArray expected = manager.create(new float[]{0, 0, 6, 5, 9, 10}, new Shape(3, 2));
-            Assert.assertEquals(actual, expected);
-        }
-    }
-
-    @Test
     public void testGet() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
