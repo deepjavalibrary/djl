@@ -513,11 +513,9 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
-     * Returns a partial {@code NDArray} pointed by the indexed array.
-     * Given NDArray arr, NDArray idx, and long axis, the output is
-     * out_{ijk} = arr_{idx_{ijk}, j, k} if axis=0
-     *          or arr_{i, idx_{ijk}, k} if axis=1
-     *          or arr_{i, j, idx_{ijk}} if axis=2
+     * Returns a partial {@code NDArray} pointed by the indexed array. Given NDArray arr, NDArray
+     * idx, and long axis, the output is out_{ijk} = arr_{idx_{ijk}, j, k} if axis=0 or arr_{i,
+     * idx_{ijk}, k} if axis=1 or arr_{i, j, idx_{ijk}} if axis=2
      *
      * @param gather includes {index, axis} to specify the argument to gather
      * @return the partial {@code NDArray}

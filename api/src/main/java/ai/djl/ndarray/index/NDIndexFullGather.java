@@ -14,12 +14,11 @@ package ai.djl.ndarray.index;
 
 import ai.djl.ndarray.NDArray;
 
-
 /** A simplified representation of a gather-based {@link NDIndex}-like class. */
 public final class NDIndexFullGather {
 
-    private final NDArray indices;
-    private final int axis;
+    private NDArray indices;
+    private int axis;
 
     /**
      * Constructs a new {@link NDIndexFullGather}.
