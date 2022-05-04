@@ -78,10 +78,11 @@ public abstract class NDArrayIndexer {
     }
 
     /**
-     * Gets the values of the array at the fullGather: (indices, axis).
+     * Gets the values of the array according to NDIndexFullGather.
      *
-     * @param array the array to set
-     * @param gather the fullGather: (indices, axis)
+     * @param array the array to get from
+     * @param gather an NDIndexFullGather {NDArray indices, long axis}
+     * @return the subarray
      */
     public abstract NDArray get(NDArray array, NDIndexFullGather gather);
 

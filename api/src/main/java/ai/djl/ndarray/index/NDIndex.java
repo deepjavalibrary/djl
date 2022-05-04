@@ -407,6 +407,11 @@ public class NDIndex {
         }
     }
 
+    /**
+     * Returns the argument for gather
+     *
+     * @return NDIndexFullGather which includes {index, axis}
+     */
     public NDIndexFullGather gather(NDArray index, int axis) {
         return new NDIndexFullGather(index, axis);
     }
