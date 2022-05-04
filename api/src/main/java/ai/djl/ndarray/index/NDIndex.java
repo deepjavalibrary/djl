@@ -13,7 +13,12 @@
 package ai.djl.ndarray.index;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.index.dim.*;
+import ai.djl.ndarray.index.dim.NDIndexBooleans;
+import ai.djl.ndarray.index.dim.NDIndexFixed;
+import ai.djl.ndarray.index.dim.NDIndexAll;
+import ai.djl.ndarray.index.dim.NDIndexElement;
+import ai.djl.ndarray.index.dim.NDIndexPick;
+import ai.djl.ndarray.index.dim.NDIndexSlice;
 import ai.djl.ndarray.types.DataType;
 import java.util.ArrayList;
 import java.util.List;
