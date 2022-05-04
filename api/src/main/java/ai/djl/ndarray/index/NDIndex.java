@@ -408,8 +408,11 @@ public class NDIndex {
     }
 
     /**
-     * Returns the argument for gather
+     * Returns the argument for gather.
      *
+     * @param index the indices should be NDArray. Each entry is an index of the axis specified
+     *              next. The shape of the returned NDArray is according to the shape of index.
+     * @param axis specifies the axis of the index entry.
      * @return NDIndexFullGather which includes {index, axis}
      */
     public NDIndexFullGather gather(NDArray index, int axis) {

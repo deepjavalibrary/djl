@@ -61,13 +61,13 @@ public class NDIndexTest {
             long[] idx = {0, 0, 2, 1, 1, 2};
             NDArray sel = manager.create(idx, new Shape(3, 2));
             NDArray actual = arr.get(new NDIndex().gather(sel, 1));
-            NDArray expected = manager.create(new int[]{0, 0, 6, 5, 9, 10}, new Shape(3, 2));
+            NDArray expected = manager.create(new float[]{0f, 0, 6, 5, 9, 10}, new Shape(3, 2));
             try {
                 Assert.assertEquals(actual, expected);
-            } catch (Exception e) {
-                System.out.println(e);
-                System.out.println(actual);
-                System.out.println(expected);
+            }
+            catch (AssertionError e) {
+                System.out.println(e.getMessage());
+                throw new AssertionError(e);
             }
         }
     }
