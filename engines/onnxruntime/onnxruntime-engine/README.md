@@ -37,13 +37,13 @@ for the official ONNX Runtime project.
 ## Installation
 You can pull the ONNX Runtime engine from the central Maven repository by including the following dependency:
 
-- ai.djl.onnxruntime:onnxruntime-engine:0.16.0
+- ai.djl.onnxruntime:onnxruntime-engine:0.17.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.onnxruntime</groupId>
     <artifactId>onnxruntime-engine</artifactId>
-    <version>0.16.0</version>
+    <version>0.17.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -61,7 +61,7 @@ Maven:
 <dependency>
     <groupId>ai.djl.onnxruntime</groupId>
     <artifactId>onnxruntime-engine</artifactId>
-    <version>0.16.0</version>
+    <version>0.17.0</version>
     <scope>runtime</scope>
     <exclusions>
         <exclusion>
@@ -80,7 +80,7 @@ Maven:
 
 Gradle:
 ```
-    implementation("ai.djl.onnxruntime:onnxruntime-engine:0.16.0") {
+    implementation("ai.djl.onnxruntime:onnxruntime-engine:0.17.0") {
         exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
     }
     implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.11.0"

@@ -21,6 +21,6 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl.opencv</groupId>
     <artifactId>opencv</artifactId>
-    <version>0.16.0</version>
+    <version>0.17.0</version>
 </dependency>
 ```

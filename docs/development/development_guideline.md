@@ -159,7 +159,7 @@ You can create your own NDArray renderer as follows:
 Please make sure to:
 
 - Check the "On-demand" option, which causes IntelliJ to only render the NDArray when you click on the variable.
-- Change the "Use following expression" field to something like [toDebugString(100, 10, 10, 20)](https://javadoc.io/static/ai.djl/api/0.16.0/ai/djl/ndarray/NDArray.html#toDebugString-int-int-int-int-)
+- Change the "Use following expression" field to something like [toDebugString(100, 10, 10, 20)](https://javadoc.io/static/ai.djl/api/0.17.0/ai/djl/ndarray/NDArray.html#toDebugString-int-int-int-int-)
 if you want to adjust the range of NDArray's debug output.
 
 ## Common Problems
