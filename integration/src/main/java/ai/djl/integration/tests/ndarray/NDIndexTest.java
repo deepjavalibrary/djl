@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
@@ -61,10 +62,21 @@ public class NDIndexTest {
         TestRequirements.notWindows();
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray arr = manager.arange(20f).reshape(-1, 4);
-            long[] idx = {0, 0, 2, 1, 1, 2};
-            NDArray index = manager.create(idx, new Shape(3, 2));
+            NDArray index = manager.create(new long[] {0, 0, 2, 1, 1, 2}, new Shape(3, 2));
             NDArray actual = arr.gather(index, 1);
             NDArray expected = manager.create(new float[] {0, 0, 6, 5, 9, 10}, new Shape(3, 2));
+            Assert.assertEquals(actual, expected);
+        }
+    }
+
+    @Test
+    public void testTake() {
+        Engine engine = Engine.getEngine("PyTorch");
+        try (NDManager manager = engine.newBaseManager()) {
+            NDArray arr = manager.arange(6f).reshape(-1, 3);
+            NDArray index = manager.create(new long[] {0, 4, 1, 2}, new Shape(2, 2));
+            NDArray actual = arr.take(index);
+            NDArray expected = manager.create(new float[] {1, 5, 2, 3}, new Shape(2, 2));
             Assert.assertEquals(actual, expected);
         }
     }
