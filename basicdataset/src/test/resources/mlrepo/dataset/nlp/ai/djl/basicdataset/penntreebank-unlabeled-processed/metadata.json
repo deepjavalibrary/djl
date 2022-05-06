@@ -1,0 +1,40 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "nlp",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "penntreebank-unlabeled-processed",
+  "name": "penntreebank-unlabeled-processed",
+  "description": "The Penn Treebank (PTB) project selected 2,499 stories from a three year Wall Street Journal (WSJ) collection of 98,732 stories for syntactic annotation.",
+  "website": "https://catalog.ldc.upenn.edu/docs/LDC95T7/cl93.html",
+  "licenses": {
+    "license": {
+      "name": "LDC User Agreement for Non-Members",
+      "url": "https://catalog.ldc.upenn.edu/license/ldc-non-members-agreement.pdf"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "name": "penntreebank-unlabeled-processed",
+      "files": {
+        "train":{
+          "uri" : "https://raw.githubusercontent.com/wojzaremba/lstm/master/data/ptb.train.txt",
+          "sha1Hash": "f9ffb014fa33bd5730e5029697ad245184f3a678",
+          "size": 5101618
+        },
+        "test":{
+          "uri" : "https://raw.githubusercontent.com/wojzaremba/lstm/master/data/ptb.test.txt",
+          "sha1Hash": "5c15c548b42d80bce9332b788514e6635fb0226e",
+          "size": 449945
+        },
+        "valid":{
+          "uri" : "https://raw.githubusercontent.com/wojzaremba/lstm/master/data/ptb.valid.txt",
+          "sha1Hash": "d9f5fed6afa5e1b82cd1e3e5f5040f6852940228",
+          "size": 399782
+        }
+      }
+    }
+  ]
+}

@@ -122,13 +122,12 @@ public class StanfordQuestionAnsweringDatasetTest {
                                                     TestUtils.getTextEmbedding(
                                                             manager, EMBEDDING_SIZE)))
                             .setSampling(32, true)
-                            .optLimit(350)
                             .optUsage(Dataset.Usage.TEST)
                             .build();
 
             stanfordQuestionAnsweringDataset.prepare();
             stanfordQuestionAnsweringDataset.prepare();
-            Assert.assertEquals(stanfordQuestionAnsweringDataset.size(), 350);
+            Assert.assertEquals(stanfordQuestionAnsweringDataset.size(), 11873);
 
             Record record0 = stanfordQuestionAnsweringDataset.get(manager, 0);
             Record record6 = stanfordQuestionAnsweringDataset.get(manager, 6);

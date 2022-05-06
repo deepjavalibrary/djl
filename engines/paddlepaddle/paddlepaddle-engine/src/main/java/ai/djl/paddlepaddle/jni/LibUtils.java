@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -107,12 +106,17 @@ public final class LibUtils {
 
     public static void loadWindowsDependencies(String libName) {
         Path libDir = Paths.get(libName).getParent();
-        List<String> names = Collections.singletonList("openblas.dll");
+        List<String> names = Arrays.asList("openblas.dll", "mkldnn.dll");
         names.forEach(
                 name -> {
-                    String lib = libDir.resolve(name).toAbsolutePath().toString();
-                    logger.debug("Now loading " + lib);
-                    System.load(libDir.resolve(name).toAbsolutePath().toString());
+                    Path path = libDir.resolve(name);
+                    if (Files.isRegularFile(path)) {
+                        String lib = path.toAbsolutePath().toString();
+                        logger.debug("Now loading " + lib);
+                        System.load(lib);
+                    } else {
+                        logger.debug(name + " is not found, skip loading...");
+                    }
                 });
     }
 

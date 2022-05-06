@@ -84,6 +84,10 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchSetNumThreads(threads);
     }
 
+    public static void setBenchmarkCuDNN(boolean enable) {
+        PyTorchLibrary.LIB.torchSetBenchmarkCuDNN(enable);
+    }
+
     public static synchronized Set<String> getFeatures() {
         if (configs != null) {
             return configs;
