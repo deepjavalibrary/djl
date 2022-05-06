@@ -546,6 +546,17 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
+     * Returns a partial {@code NDArray} pointed by the indexed array. Given NDArray arr, NDArray
+     * idx, and long axis, the output is out_{ijk} = arr_{idx_{ijk}, j, k} if axis=0 or arr_{i,
+     * idx_{ijk}, k} if axis=1 or arr_{i, j, idx_{ijk}} if axis=2
+     *
+     * @param index picks the elements of an NDArray to the same position as index
+     * @param axis the entries of index are indices of axis
+     * @return the partial {@code NDArray} of the same shape as index
+     */
+    NDArray gather(NDArray index, int axis);
+
+    /**
      * Returns a scalar {@code NDArray} corresponding to a single element.
      *
      * @param indices the indices of the scalar to return. Must return only a single element

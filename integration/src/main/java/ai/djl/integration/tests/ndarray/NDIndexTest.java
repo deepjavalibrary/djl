@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.TestRequirements;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -48,6 +49,22 @@ public class NDIndexTest {
             NDArray actual =
                     original.get(
                             new NDIndex().addAllDim().addPickDim(manager.create(new int[] {0, 1})));
+            Assert.assertEquals(actual, expected);
+        }
+    }
+
+    @Test
+    public void testGather() {
+        // Currently in windows gradle cannot find all the engines.
+        // In the dependencies, changing runtimeOnly to api however will remedy the problem.
+        // TODO: remove this when gradle problem is fixed.
+        TestRequirements.notWindows();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray arr = manager.arange(20f).reshape(-1, 4);
+            long[] idx = {0, 0, 2, 1, 1, 2};
+            NDArray index = manager.create(idx, new Shape(3, 2));
+            NDArray actual = arr.gather(index, 1);
+            NDArray expected = manager.create(new float[] {0, 0, 6, 5, 9, 10}, new Shape(3, 2));
             Assert.assertEquals(actual, expected);
         }
     }
