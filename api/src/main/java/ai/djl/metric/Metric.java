@@ -192,6 +192,9 @@ public class Metric {
         if (dimensions != null) {
             boolean first = true;
             for (Dimension dimension : dimensions) {
+                if (dimension == null) {
+                    continue;
+                }
                 if (first) {
                     sb.append("|#");
                     first = false;
