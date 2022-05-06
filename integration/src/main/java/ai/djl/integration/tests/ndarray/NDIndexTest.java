@@ -55,7 +55,7 @@ public class NDIndexTest {
 
     @Test
     public void testGather() {
-        Engine engine = Engine.getEngine("PyTorch");
+        Engine engine = Engine.getEngine("MXNet");
         try (NDManager manager = engine.newBaseManager()) {
             NDArray arr = manager.arange(20f).reshape(-1, 4);
             long[] idx = {0, 0, 2, 1, 1, 2};
