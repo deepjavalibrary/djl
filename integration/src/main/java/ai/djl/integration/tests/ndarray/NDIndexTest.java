@@ -57,11 +57,10 @@ public class NDIndexTest {
     @Test
     public void testGather() {
         // Currently in windows gradle cannot find all the engines.
-        // In the dependency, changing runtimeOnly to api however will remedy the problem.
+        // In the dependencies, changing runtimeOnly to api however will remedy the problem.
         // TODO: remove this when gradle problem is fixed.
         TestRequirements.notWindows();
-        Engine engine = Engine.getEngine("PyTorch");
-        try (NDManager manager = engine.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager()) {
             NDArray arr = manager.arange(20f).reshape(-1, 4);
             long[] idx = {0, 0, 2, 1, 1, 2};
             NDArray index = manager.create(idx, new Shape(3, 2));
