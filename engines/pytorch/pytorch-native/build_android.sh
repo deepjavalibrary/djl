@@ -26,12 +26,15 @@ if [[ ! -d libtorch_android/"$FLAVOR" ]]; then
   fi
 fi
 
+if [[ "$VERSION" =~ ^1\.10\..*|^1\.9\..* ]]; then
+  PT_OLD_VERSION=1
+fi
 pushd .
 
 rm -rf build
 mkdir build && cd build
 mkdir classes
 javac -sourcepath ../../pytorch-engine/src/main/java/ ../../pytorch-engine/src/main/java/ai/djl/pytorch/jni/PyTorchLibrary.java -h include -d classes
-cmake -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK"/build/cmake/android.toolchain.cmake -DANDROID_ABI="$FLAVOR" -DANDROID_NATIVE_API_LEVEL=21 -DBUILD_ANDROID=ON ..
+cmake -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK"/build/cmake/android.toolchain.cmake -DANDROID_ABI="$FLAVOR" -DANDROID_NATIVE_API_LEVEL=21 -DBUILD_ANDROID=ON -DPT_OLD_VERSION=${PT_OLD_VERSION} ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
 popd
