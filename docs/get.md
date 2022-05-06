@@ -93,11 +93,13 @@ You can look here to find the [list of DJL releases](https://github.com/deepjava
 ### Using built-from-source version in another project
 
 If you have another project and want to use a custom version of DJL in it, you can do the following. First, build DJL from source by running `./gradlew build` inside djl folder. Then run `./gradlew publishToMavenLocal`, which will install DJL to your local maven repository cache, located on your filesystem at `~/.m2/repository`. After publishing it here, you can add the DJL snapshot version dependencies as shown below 
+
 ```groovy
 dependencies {
     implementation platform("ai.djl:bom:0.17.0-SNAPSHOT")
 }
 ```
+
 This snapshot version is the same as the custom DJL repository. 
 
 You also need to change directory to `djl/bom`. Then build and publish it to maven local same as was done in `djl`.
@@ -109,4 +111,5 @@ repositories {
     mavenLocal()
 }
 ```
+
 Note that `mavenCentral()` may still be needed for applications like log4j and json.

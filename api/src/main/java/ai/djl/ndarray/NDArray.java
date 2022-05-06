@@ -14,7 +14,6 @@ package ai.djl.ndarray;
 
 import ai.djl.Device;
 import ai.djl.ndarray.index.NDIndex;
-import ai.djl.ndarray.index.NDIndexFullGather;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.internal.NDFormat;
 import ai.djl.ndarray.types.DataType;
@@ -513,18 +512,6 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
-     * Returns a partial {@code NDArray} pointed by the indexed array. Given NDArray arr, NDArray
-     * idx, and long axis, the output is out_{ijk} = arr_{idx_{ijk}, j, k} if axis=0 or arr_{i,
-     * idx_{ijk}, k} if axis=1 or arr_{i, j, idx_{ijk}} if axis=2
-     *
-     * @param gather includes {index, axis} to specify the argument to gather
-     * @return the partial {@code NDArray}
-     */
-    default NDArray get(NDIndexFullGather gather) {
-        return getNDArrayInternal().getIndexer().get(this, gather);
-    }
-
-    /**
      * Returns a partial {@code NDArray}.
      *
      * @param indices the indices used to indicate what to get
@@ -557,6 +544,17 @@ public interface NDArray extends NDResource, BytesSupplier {
     default NDArray get(NDArray index) {
         return get(new NDIndex().addBooleanIndex(index));
     }
+
+    /**
+     * Returns a partial {@code NDArray} pointed by the indexed array. Given NDArray arr, NDArray
+     * idx, and long axis, the output is out_{ijk} = arr_{idx_{ijk}, j, k} if axis=0 or arr_{i,
+     * idx_{ijk}, k} if axis=1 or arr_{i, j, idx_{ijk}} if axis=2
+     *
+     * @param index picks the elements of an NDArray to the same position as index
+     * @param axis the entries of index are indices of axis
+     * @return the partial {@code NDArray} of the same shape as index
+     */
+    NDArray gather(NDArray index, int axis);
 
     /**
      * Returns a scalar {@code NDArray} corresponding to a single element.

@@ -14,7 +14,6 @@ package ai.djl.tensorflow.engine;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.index.NDArrayIndexer;
-import ai.djl.ndarray.index.NDIndexFullGather;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
 
@@ -31,12 +30,6 @@ public class TfNDArrayIndexer extends NDArrayIndexer {
     @Override
     public NDArray get(NDArray array, NDIndexFullPick fullPick) {
         throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(NDArray array, NDIndexFullGather gather) {
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */
