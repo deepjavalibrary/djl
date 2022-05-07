@@ -10,8 +10,8 @@ jobs:
       matrix:
         format: ["armeabi-v7a", "arm64-v8a", "x86" ,"x86_64"]
     env:
-      PYTORCH_VERSION: "1.8.1"
-      NDK_VERSION: "20.0.5594570"
+      PYTORCH_VERSION: "1.11.0"
+      NDK_VERSION: "21.0.6113669"
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -19,9 +19,7 @@ jobs:
         with:
           java-version: 11
       - name: Set up Python3
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.x'
+        uses: actions/setup-python@v3
       - name: clone pytorch
         run: |
           git clone https://github.com/pytorch/pytorch android_pytorch_tmp -b "v${PYTORCH_VERSION}" --recursive
@@ -34,7 +32,7 @@ jobs:
           export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}
           export ANDROID_ABI=${{ matrix.format }}
           cd android_pytorch_tmp
-          bash ./scripts/build_android.sh
+          BUILD_LITE_INTERPRETER=0 ./scripts/build_android.sh
           cd build_android
           zip -r ${{ matrix.format }}_native.zip install/include lib
       - name: Configure AWS Credentials
