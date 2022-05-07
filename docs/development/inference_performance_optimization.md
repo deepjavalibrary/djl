@@ -61,6 +61,17 @@ You can enable it by
 
 You might see the exception if certain data type or operator is not supported with the oneDNN device.
 
+#### CuDNN acceleration
+PyTorch has a special flags that used for CNN or related network speed up. If your input size won't change frequently,
+you may benefit from enabling this configuration in your model:
+
+```
+-Dai.djl.pytorch.cudnn_benchmark=true
+```
+
+If your input shape changed frequently, this change may stall your performance. For more information, check this 
+[article](https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#enable-cudnn-auto-tuner).
+
 #### Thread configuration
 There are two configurations you can set to optimize the inference performance.
 
@@ -131,3 +142,26 @@ TVM internally leverages full hardware resource. Based on our experiment, settin
 ```bash
 export TVM_NUM_THREADS=1
 ```
+
+### ONNXRuntime
+
+#### Thread configuration
+
+You can use the following settings for thread optimization in Criteria
+
+```
+.optOption("interOpNumThreads", <num_of_thread>)
+.optOption("intraOpNumThreads", <num_of_thread>)
+```
+
+Tips: Set to 1 on both of them at the beginning to see the performance. 
+Then set to total_cores/total_java_inference_thread on one of them to see how performance goes.
+
+#### (GPU) TensorRT Backend
+
+If you have tensorRT installed, you can try with the following backend on ONNXRuntime for performance optimization in Criteria
+
+```
+.optOption("ortDevice", "TensorRT")
+```
+

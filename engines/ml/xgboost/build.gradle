@@ -40,7 +40,7 @@ jar {
             it.isDirectory() ? [] : zipTree(it).matching {
                 include "lib/**",
                         "ml/dmlc/xgboost4j/java/DMatrix*",
-                        "ml/dmlc/xgboost4j/java/NativeLibLoader.*",
+                        "ml/dmlc/xgboost4j/java/NativeLibLoader*",
                         "ml/dmlc/xgboost4j/java/XGBoost*",
                         "ml/dmlc/xgboost4j/java/util/*",
                         "ml/dmlc/xgboost4j/LabeledPoint.*",

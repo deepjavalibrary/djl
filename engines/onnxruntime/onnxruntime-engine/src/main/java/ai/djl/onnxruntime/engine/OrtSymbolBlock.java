@@ -85,10 +85,26 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
         Map<String, OnnxTensor> container = new ConcurrentHashMap<>();
         // forward
         try (OrtNDManager sub = (OrtNDManager) manager.newSubManager()) {
-            // feed data in to match names
-            for (int i = 0; i < inputNames.size(); ++i) {
-                OrtNDArray ortNDArray = sub.from(inputs.get(i));
-                container.put(inputNames.get(i), ortNDArray.getTensor());
+            // If input data has name
+            if (inputs.get(0).getName() != null) {
+                for (NDArray input : inputs) {
+                    String name = input.getName();
+                    if (name == null) {
+                        throw new IllegalArgumentException(
+                                "All or none of input tensors must have a name.");
+                    }
+                    if (!inputNames.contains(name)) {
+                        throw new IllegalArgumentException("Invalid input tensor name: " + name);
+                    }
+                    OrtNDArray ortNDArray = sub.from(input);
+                    container.put(name, ortNDArray.getTensor());
+                }
+            } else {
+                // feed data in to match names
+                for (int i = 0; i < inputNames.size(); ++i) {
+                    OrtNDArray ortNDArray = sub.from(inputs.get(i));
+                    container.put(inputNames.get(i), ortNDArray.getTensor());
+                }
             }
 
             OrtSession.Result results = session.run(container);
@@ -98,6 +114,16 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
         } catch (OrtException e) {
             throw new EngineException(e);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PairList<String, Shape> describeInput() {
+        PairList<String, Shape> result = new PairList<>();
+        for (String name : session.getInputNames()) {
+            result.add(name, null);
+        }
+        return result;
     }
 
     private NDList evaluateOutput(OrtSession.Result results) {

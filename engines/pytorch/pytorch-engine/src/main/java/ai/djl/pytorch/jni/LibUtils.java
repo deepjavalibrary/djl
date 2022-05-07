@@ -15,6 +15,7 @@ package ai.djl.pytorch.jni;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
+import ai.djl.util.cuda.CudaUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,6 +103,7 @@ public final class LibUtils {
             // PyTorch 1.8.1 libtorch_cpu.dylib cannot be loaded individually
             return;
         }
+        boolean isCuda = libTorch.flavor.contains("cu");
         List<String> deferred =
                 Arrays.asList(
                         System.mapLibraryName("fbgemm"),
@@ -118,6 +120,12 @@ public final class LibUtils {
             paths.filter(
                             path -> {
                                 String name = path.getFileName().toString();
+                                if (!isCuda
+                                        && name.contains("nvrtc")
+                                        && name.contains("cudart")
+                                        && name.contains("nvTools")) {
+                                    return false;
+                                }
                                 return !loadLater.contains(name)
                                         && Files.isRegularFile(path)
                                         && !name.endsWith(JNI_LIB_NAME)
@@ -137,6 +145,14 @@ public final class LibUtils {
                 loadNativeLibrary(libDir.resolve("cudnn_adv_train64_8.dll").toString());
             } else if (Files.exists((libDir.resolve("cudnn64_7.dll")))) {
                 loadNativeLibrary(libDir.resolve("cudnn64_7.dll").toString());
+            }
+
+            if (!isCuda) {
+                deferred =
+                        Arrays.asList(
+                                System.mapLibraryName("fbgemm"),
+                                System.mapLibraryName("torch_cpu"),
+                                System.mapLibraryName("torch"));
             }
 
             for (String dep : deferred) {
@@ -289,6 +305,7 @@ public final class LibUtils {
             if (Files.exists(path)) {
                 return new LibTorch(dir.toAbsolutePath(), platform, flavor);
             }
+            Utils.deleteQuietly(dir);
 
             Matcher m = VERSION_PATTERN.matcher(version);
             if (!m.matches()) {
@@ -346,7 +363,8 @@ public final class LibUtils {
         String classifier = platform.getClassifier();
         String precxx11;
         if (Boolean.getBoolean("PYTORCH_PRECXX11")
-                || Boolean.parseBoolean(System.getenv("PYTORCH_PRECXX11"))) {
+                || Boolean.parseBoolean(System.getenv("PYTORCH_PRECXX11"))
+                || "aarch64".equals(platform.getOsArch())) {
             precxx11 = "-precxx11";
         } else {
             precxx11 = "";
@@ -498,7 +516,11 @@ public final class LibUtils {
             if (flavor == null) {
                 flavor = System.getProperty("PYTORCH_FLAVOR");
                 if (flavor == null) {
-                    flavor = "cpu-precxx11";
+                    if (CudaUtils.getGpuCount() > 0) {
+                        flavor = "cu" + CudaUtils.getCudaVersionString() + "-precxx11";
+                    } else {
+                        flavor = "cpu-precxx11";
+                    }
                 }
             }
         }

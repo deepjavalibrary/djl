@@ -15,6 +15,7 @@ package ai.djl.inference;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.metric.Metrics;
+import ai.djl.metric.Unit;
 import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -228,9 +229,9 @@ public class Predictor<I, O> implements AutoCloseable {
         if (metrics != null) {
             waitToRead(list);
             long tmp = System.nanoTime();
-            long duration = tmp - timestamp;
+            long duration = (tmp - timestamp) / 1000;
             timestamp = tmp;
-            metrics.addMetric("Preprocess", duration, "nano");
+            metrics.addMetric("Preprocess", duration, Unit.MICROSECONDS);
         }
     }
 
@@ -238,19 +239,19 @@ public class Predictor<I, O> implements AutoCloseable {
         if (metrics != null) {
             waitToRead(list);
             long tmp = System.nanoTime();
-            long duration = tmp - timestamp;
+            long duration = (tmp - timestamp) / 1000;
             timestamp = tmp;
-            metrics.addMetric("Inference", duration, "nano");
+            metrics.addMetric("Inference", duration, Unit.MICROSECONDS);
         }
     }
 
     private void postProcessEnd(long begin) {
         if (metrics != null) {
             long tmp = System.nanoTime();
-            long duration = tmp - timestamp;
+            long duration = (tmp - timestamp) / 1000;
             timestamp = tmp;
-            metrics.addMetric("Postprocess", duration, "nano");
-            metrics.addMetric("Total", tmp - begin, "nano");
+            metrics.addMetric("Postprocess", duration, Unit.MICROSECONDS);
+            metrics.addMetric("Total", (tmp - begin) / 1000, Unit.MICROSECONDS);
         }
     }
 

@@ -12,6 +12,7 @@
  */
 package ai.djl.huggingface.tokenizers;
 
+import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.djl.huggingface.tokenizers.jni.LibUtils;
 import ai.djl.huggingface.tokenizers.jni.TokenizersLibrary;
 import ai.djl.modality.nlp.preprocess.Tokenizer;
@@ -200,8 +201,10 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         long[] wordIds = TokenizersLibrary.LIB.getWordIds(encoding);
         long[] attentionMask = TokenizersLibrary.LIB.getAttentionMask(encoding);
         long[] specialTokenMask = TokenizersLibrary.LIB.getSpecialTokenMask(encoding);
+        CharSpan[] charSpans = TokenizersLibrary.LIB.getTokenCharSpans(encoding);
 
         TokenizersLibrary.LIB.deleteEncoding(encoding);
-        return new Encoding(ids, typeIds, tokens, wordIds, attentionMask, specialTokenMask);
+        return new Encoding(
+                ids, typeIds, tokens, wordIds, attentionMask, specialTokenMask, charSpans);
     }
 }

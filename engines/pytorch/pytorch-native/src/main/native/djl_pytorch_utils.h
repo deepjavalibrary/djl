@@ -30,9 +30,15 @@ namespace utils {
 
 #if !defined(__ANDROID__)
 // for image interpolation
+#ifdef V1_10_X
 typedef torch::variant<torch::enumtype::kNearest, torch::enumtype::kLinear, torch::enumtype::kBilinear,
     torch::enumtype::kBicubic, torch::enumtype::kTrilinear, torch::enumtype::kArea>
     mode_t;
+#else
+typedef torch::variant<torch::enumtype::kNearest, torch::enumtype::kLinear, torch::enumtype::kBilinear,
+    torch::enumtype::kBicubic, torch::enumtype::kTrilinear, torch::enumtype::kArea, torch::enumtype::kNearestExact>
+    mode_t;
+#endif
 #endif
 
 inline jint GetDTypeFromScalarType(const torch::ScalarType& type) {
@@ -108,6 +114,10 @@ inline mode_t GetInterpolationMode(jint jmode) {
       return torch::kTrilinear;
     case 5:
       return torch::kArea;
+    case 6:
+#ifndef V1_10_X
+      return torch::kNearestExact;
+#endif
     default:
       throw;
   }

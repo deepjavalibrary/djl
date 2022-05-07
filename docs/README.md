@@ -4,6 +4,8 @@ This folder contains examples and documentation for the Deep Java Library (DJL) 
 
 ## [JavaDoc API Reference](https://javadoc.djl.ai/)
 
+Note: when searching in JavaDoc, if your access is denied, please try removing the string `undefined` in the url.
+
 ## [Demos](https://djl.ai/website/demo.html)
 
 ## Cheat sheet

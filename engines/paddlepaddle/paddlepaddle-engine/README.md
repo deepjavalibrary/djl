@@ -30,7 +30,7 @@ You can pull the PaddlePaddle engine from the central Maven repository by includ
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
     <artifactId>paddlepaddle-engine</artifactId>
-    <version>0.16.0</version>
+    <version>0.17.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -43,28 +43,28 @@ You can choose a native library based on your platform if you don't have network
 ### macOS
 For macOS, you can use the following library:
 
-- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.0.2:osx-x86_64
+- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.2.2:osx-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
     <artifactId>paddlepaddle-native-cpu</artifactId>
     <classifier>osx-x86_64</classifier>
-    <version>2.0.2</version>
+    <version>2.2.2</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
 ### Linux
 
-- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.0.2:linux-x86_64
+- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.2.2:linux-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
     <artifactId>paddlepaddle-native-cpu</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>2.0.2</version>
+    <version>2.2.2</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -74,18 +74,18 @@ For macOS, you can use the following library:
 To use Linux packages, users are also required to set `LD_LIBRARY_PATH` to the folder:
 
 ```
-LD_LIBRARY_PATH=$HOME/.djl.ai/paddle/2.0.2-<cuda-flavor>-linux-x86_64
+LD_LIBRARY_PATH=$HOME/.djl.ai/paddle/2.2.2-<cuda-flavor>-linux-x86_64
 ```
 
-- ai.djl.paddlepaddle:paddlepaddle-native-cu101:2.0.2:linux-x86_64 - CUDA 10.1
-- ai.djl.paddlepaddle:paddlepaddle-native-cu102:2.0.2:linux-x86_64 - CUDA 10.2
+- ai.djl.paddlepaddle:paddlepaddle-native-cu102:2.2.2:linux-x86_64 - CUDA 10.2
+- ai.djl.paddlepaddle:paddlepaddle-native-cu112:2.2.2:linux-x86_64 - CUDA 11.2
 
 ```xml
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
-    <artifactId>paddlepaddle-native-cu101</artifactId>
+    <artifactId>paddlepaddle-native-cu102</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>2.0.2</version>
+    <version>2.2.2</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -93,9 +93,9 @@ LD_LIBRARY_PATH=$HOME/.djl.ai/paddle/2.0.2-<cuda-flavor>-linux-x86_64
 ```xml
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
-    <artifactId>paddlepaddle-native-cu102</artifactId>
+    <artifactId>paddlepaddle-native-cu112</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>2.0.2</version>
+    <version>2.2.2</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -103,14 +103,28 @@ LD_LIBRARY_PATH=$HOME/.djl.ai/paddle/2.0.2-<cuda-flavor>-linux-x86_64
 
 ### Windows
 
-- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.0.2:win-x86_64
+- ai.djl.paddlepaddle:paddlepaddle-native-cpu:2.2.2:win-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
     <artifactId>paddlepaddle-native-cpu</artifactId>
     <classifier>win-x86_64</classifier>
-    <version>2.0.2</version>
+    <version>2.2.2</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+#### Windows GPU (Experimental)
+
+- ai.djl.paddlepaddle:paddlepaddle-native-cu110:2.2.2:win-x86_64
+
+```xml
+<dependency>
+    <groupId>ai.djl.paddlepaddle</groupId>
+    <artifactId>paddlepaddle-native-cu110</artifactId>
+    <classifier>win-x86_64</classifier>
+    <version>2.2.2</version>
     <scope>runtime</scope>
 </dependency>
 ```

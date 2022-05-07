@@ -84,6 +84,10 @@ public final class JniUtils {
         PyTorchLibrary.LIB.torchSetNumThreads(threads);
     }
 
+    public static void setBenchmarkCuDNN(boolean enable) {
+        PyTorchLibrary.LIB.torchSetBenchmarkCuDNN(enable);
+    }
+
     public static synchronized Set<String> getFeatures() {
         if (configs != null) {
             return configs;
@@ -340,6 +344,12 @@ public final class JniUtils {
     public static void set(PtNDArray self, ByteBuffer data) {
         // Note the ByteBuffer here is directByteBuffer
         PyTorchLibrary.LIB.torchSet(self.getHandle(), data);
+    }
+
+    public static PtNDArray gather(PtNDArray ndArray, PtNDArray index, long dim) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchGather(ndArray.getHandle(), index.getHandle(), dim, false));
     }
 
     public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {

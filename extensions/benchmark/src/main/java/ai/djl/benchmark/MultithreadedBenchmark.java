@@ -17,6 +17,7 @@ import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
+import ai.djl.metric.Unit;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.translate.TranslateException;
@@ -83,7 +84,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
                 callable.warmup();
             }
 
-            metrics.addMetric("start", System.currentTimeMillis(), "mills");
+            metrics.addMetric("start", System.currentTimeMillis(), Unit.MILLISECONDS);
             try {
                 List<Future<float[]>> futures;
                 if (delay > 0) {
@@ -105,7 +106,7 @@ public class MultithreadedBenchmark extends AbstractBenchmark {
             } catch (InterruptedException | ExecutionException e) {
                 logger.error("", e);
             }
-            metrics.addMetric("end", System.currentTimeMillis(), "mills");
+            metrics.addMetric("end", System.currentTimeMillis(), Unit.MILLISECONDS);
             for (PredictorCallable callable : callables) {
                 callable.close();
             }

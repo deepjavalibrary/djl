@@ -12,6 +12,7 @@
  */
 package ai.djl.benchmark;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -56,7 +57,7 @@ final class NDListGenerator {
             boolean ones = cmd.hasOption("ones");
             Path path = Paths.get(output);
 
-            try (NDManager manager = NDManager.newBaseManager()) {
+            try (NDManager manager = NDManager.newBaseManager(Device.cpu(), "PyTorch")) {
                 NDList list = new NDList();
                 for (Pair<DataType, Shape> pair : parseShape(inputShapes)) {
                     DataType dataType = pair.getKey();

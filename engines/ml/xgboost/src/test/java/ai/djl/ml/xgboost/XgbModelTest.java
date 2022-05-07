@@ -68,6 +68,7 @@ public class XgbModelTest {
 
         try (XgbNDManager manager =
                 (XgbNDManager) XgbNDManager.getSystemManager().newSubManager()) {
+            manager.setMissingValue(Float.NaN);
             NDArray zeros = manager.zeros(new Shape(1, 2));
             Assert.expectThrows(UnsupportedOperationException.class, zeros::toFloatArray);
 

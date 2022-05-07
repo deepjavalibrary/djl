@@ -12,6 +12,8 @@
  */
 package ai.djl.huggingface.tokenizers;
 
+import ai.djl.huggingface.tokenizers.jni.CharSpan;
+
 /** A class holds token encoding information. */
 public class Encoding {
 
@@ -21,6 +23,7 @@ public class Encoding {
     private long[] wordIds;
     private long[] attentionMask;
     private long[] specialTokenMask;
+    private CharSpan[] charTokenSpans;
 
     Encoding(
             long[] ids,
@@ -28,13 +31,15 @@ public class Encoding {
             String[] tokens,
             long[] wordIds,
             long[] attentionMask,
-            long[] specialTokenMask) {
+            long[] specialTokenMask,
+            CharSpan[] charTokenSpans) {
         this.ids = ids;
         this.typeIds = typeIds;
         this.tokens = tokens;
         this.wordIds = wordIds;
         this.attentionMask = attentionMask;
         this.specialTokenMask = specialTokenMask;
+        this.charTokenSpans = charTokenSpans;
     }
 
     /**
@@ -89,5 +94,14 @@ public class Encoding {
      */
     public long[] getSpecialTokenMask() {
         return specialTokenMask;
+    }
+
+    /**
+     * Returns char token spans.
+     *
+     * @return char token spans
+     */
+    public CharSpan[] getCharTokenSpans() {
+        return charTokenSpans;
     }
 }

@@ -39,6 +39,7 @@ import ai.djl.training.listener.EvaluatorTrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.tracker.Tracker;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import org.testng.Assert;
@@ -106,7 +107,14 @@ public class GradientCollectorIntegrationTest {
                 NDArray labels = manager.arange(100.0f).reshape(new Shape(10, 10));
                 Batch batch =
                         new Batch(
-                                manager, new NDList(data), new NDList(labels), 1, null, null, 0, 1);
+                                manager,
+                                new NDList(data),
+                                new NDList(labels),
+                                1,
+                                Batchifier.STACK,
+                                Batchifier.STACK,
+                                0,
+                                1);
                 EasyTrain.trainBatch(trainer, batch);
                 trainer.step();
 

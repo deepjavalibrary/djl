@@ -15,8 +15,10 @@ package ai.djl.benchmark;
 import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.engine.Engine;
+import ai.djl.engine.EngineException;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
+import ai.djl.metric.Unit;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.listener.MemoryTrainingListener;
 import ai.djl.translate.TranslateException;
@@ -37,26 +39,28 @@ public final class Benchmark extends AbstractBenchmark {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        String arch = System.getProperty("os.arch");
-        if (!"x86_64".equals(arch) && !"amd64".equals(arch)) {
-            logger.warn("{} is not supported.", arch);
-            return;
-        }
         List<String> list = Arrays.asList(args);
-        boolean success;
-        if (!list.isEmpty() && "ndlist-gen".equals(list.get(0))) {
-            success = NDListGenerator.generate(Arrays.copyOfRange(args, 1, args.length));
-        } else {
-            boolean multithreading = list.contains("-t") || list.contains("--threads");
-            configEngines(multithreading);
-            if (multithreading) {
-                success = new MultithreadedBenchmark().runBenchmark(args);
+        try {
+            boolean success;
+            if (!list.isEmpty() && "ndlist-gen".equals(list.get(0))) {
+                success = NDListGenerator.generate(Arrays.copyOfRange(args, 1, args.length));
             } else {
-                success = new Benchmark().runBenchmark(args);
+                boolean multithreading = list.contains("-t") || list.contains("--threads");
+                configEngines(multithreading);
+                if (multithreading) {
+                    success = new MultithreadedBenchmark().runBenchmark(args);
+                } else {
+                    success = new Benchmark().runBenchmark(args);
+                }
             }
-        }
-        if (!success) {
-            System.exit(-1); // NOPMD
+            if (!success) {
+                System.exit(-1); // NOPMD
+            }
+        } catch (EngineException e) {
+            String osName = System.getProperty("os.name");
+            String arch = System.getProperty("os.arch");
+            logger.warn("Engine is not supported on {}:{}.", osName, arch);
+            logger.debug("Failed to load engine", e);
         }
     }
 
@@ -72,14 +76,14 @@ public final class Benchmark extends AbstractBenchmark {
                 predictor.predict(null); // warmup
 
                 predictor.setMetrics(metrics); // Let predictor collect metrics
-                metrics.addMetric("start", System.currentTimeMillis(), "mills");
+                metrics.addMetric("start", System.currentTimeMillis(), Unit.MILLISECONDS);
                 for (int i = 0; i < iteration; ++i) {
                     predictResult = predictor.predict(null);
 
                     progressBar.update(i);
                     MemoryTrainingListener.collectMemoryInfo(metrics);
                 }
-                metrics.addMetric("end", System.currentTimeMillis(), "mills");
+                metrics.addMetric("end", System.currentTimeMillis(), Unit.MILLISECONDS);
             }
             return predictResult;
         }
