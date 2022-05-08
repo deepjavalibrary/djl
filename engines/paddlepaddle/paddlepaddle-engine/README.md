@@ -115,7 +115,7 @@ LD_LIBRARY_PATH=$HOME/.djl.ai/paddle/2.2.2-<cuda-flavor>-linux-x86_64
 </dependency>
 ```
 
-#### Windows GPU (Experimental)
+#### Windows GPU Experimental
 
 - ai.djl.paddlepaddle:paddlepaddle-native-cu110:2.2.2:win-x86_64
 
