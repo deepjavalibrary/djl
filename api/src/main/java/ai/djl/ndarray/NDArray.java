@@ -514,6 +514,21 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Returns a partial {@code NDArray}.
      *
+     * @param index the boolean or int {@code NDArray} that indicates what to get
+     * @return the partial {@code NDArray}
+     */
+    default NDArray get(NDArray index) {
+        DataType indexType = index.getDataType();
+        if (indexType == DataType.BOOLEAN) {
+            return get(new NDIndex().addBooleanIndex(index));
+        } else {
+            return take(index);
+        }
+    }
+
+    /**
+     * Returns a partial {@code NDArray}.
+     *
      * @param indices the indices used to indicate what to get
      * @param args arguments to replace the varaible "{}" in the indices string. Can be an integer,
      *     long, boolean {@link NDArray}, or integer {@link NDArray}.
@@ -533,16 +548,6 @@ public interface NDArray extends NDResource, BytesSupplier {
      */
     default NDArray get(long... indices) {
         return get(new NDIndex(indices));
-    }
-
-    /**
-     * Returns a partial {@code NDArray}.
-     *
-     * @param index the boolean {@code NDArray} that indicates what to get
-     * @return the partial {@code NDArray}
-     */
-    default NDArray get(NDArray index) {
-        return get(new NDIndex().addBooleanIndex(index));
     }
 
     /**
