@@ -12,11 +12,11 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.testing.TestRequirements;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -55,11 +55,6 @@ public class NDIndexTest {
 
     @Test
     public void testGather() {
-        // Currently in windows gradle cannot find all the engines to fill in -classpath, except for
-        // MXNet.
-        // In the dependencies, changing runtimeOnly to api however will remedy the problem.
-        // TODO: remove this when gradle problem is fixed.
-        TestRequirements.notWindows();
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray arr = manager.arange(20f).reshape(-1, 4);
             NDArray index = manager.create(new long[] {0, 0, 2, 1, 1, 2}, new Shape(3, 2));
@@ -71,8 +66,6 @@ public class NDIndexTest {
 
     @Test
     public void testTake() {
-        // TODO: remove this when gradle problem in windows shown above is fixed.
-        TestRequirements.notWindows();
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray arr = manager.arange(1, 7f).reshape(-1, 3);
             NDArray index = manager.create(new long[] {0, 4, 1, 2}, new Shape(2, 2));
