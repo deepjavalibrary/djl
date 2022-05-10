@@ -109,10 +109,10 @@ def prepareNativeLib(String binaryRoot, String ver) {
 
 
     exec {
-        commandLine 'install_name_tool', '-add_rpath', '"@loader_path"', "${binaryRoot}/cpu/osx-x86_64/native/lib/libtorch_cpu.dylib"
+        commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-x86_64/native/lib/libtorch_cpu.dylib"
     }
     exec {
-        commandLine 'install_name_tool', '-add_rpath', '"@loader_path"', "${binaryRoot}/cpu/osx-x86_64/native/lib/libtorch.dylib"
+        commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-x86_64/native/lib/libtorch.dylib"
     }
 }
 
