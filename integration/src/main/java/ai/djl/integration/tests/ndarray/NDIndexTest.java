@@ -121,7 +121,7 @@ public class NDIndexTest {
             // get from int array
             original = manager.arange(1, 7f).reshape(-1, 3);
             NDArray index = manager.create(new long[] {0, 4, 1, 2}, new Shape(2, 2));
-            NDArray actual = original.take(index);
+            NDArray actual = original.get(index);
             expected = manager.create(new float[] {1, 5, 2, 3}, new Shape(2, 2));
             Assert.assertEquals(actual, expected);
         }
