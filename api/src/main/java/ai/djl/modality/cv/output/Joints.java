@@ -23,6 +23,8 @@ import java.util.List;
 public class Joints implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("serial")
     private List<Joint> joints;
 
     /**
