@@ -28,6 +28,7 @@ public class Rectangle implements BoundingBox {
 
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("serial")
     private List<Point> corners;
 
     private double width;
