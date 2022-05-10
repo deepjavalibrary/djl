@@ -518,8 +518,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return the partial {@code NDArray}
      */
     default NDArray get(NDArray index) {
-        DataType indexType = index.getDataType();
-        if (indexType == DataType.BOOLEAN) {
+        if (index.getDataType() == DataType.BOOLEAN) {
             return get(new NDIndex().addBooleanIndex(index));
         } else {
             return take(index);
