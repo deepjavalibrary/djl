@@ -69,10 +69,8 @@ public class NDIndexTest {
             NDArray arr = manager.arange(1, 7f).reshape(-1, 3);
             NDArray index = manager.create(new long[] {0, 4, 1, 2}, new Shape(2, 2));
             NDArray actual = arr.take(index);
-            NDArray actual2 = arr.get(index);
             NDArray expected = manager.create(new float[] {1, 5, 2, 3}, new Shape(2, 2));
             Assert.assertEquals(actual, expected);
-            Assert.assertEquals(actual2, expected);
         }
     }
 
@@ -119,6 +117,13 @@ public class NDIndexTest {
             NDArray bool = manager.create(new boolean[] {true, false});
             expected = manager.arange(5).reshape(1, 5);
             Assert.assertEquals(original.get(bool), expected);
+
+            // get from int array
+            original = manager.arange(1, 7f).reshape(-1, 3);
+            NDArray index = manager.create(new long[] {0, 4, 1, 2}, new Shape(2, 2));
+            NDArray actual = original.take(index);
+            expected = manager.create(new float[] {1, 5, 2, 3}, new Shape(2, 2));
+            Assert.assertEquals(actual, expected);
         }
     }
 
