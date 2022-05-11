@@ -427,7 +427,7 @@ public final class JavacppUtils {
                     tensorflow.TFE_TensorHandleCopyToDevice(
                             handle, eagerSessionHandle, deviceName, status);
             status.throwExceptionIfNotOK();
-            return newHandle;
+            return newHandle.retainReference();
         }
     }
 
