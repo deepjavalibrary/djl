@@ -330,7 +330,9 @@ public final class JavacppUtils {
             TFE_TensorHandle handle = AbstractTFE_TensorHandle.newTensor(tensor, status);
             status.throwExceptionIfNotOK();
             if (device.isGpu()) {
-                return toDevice(handle, eagerSessionHandle, device);
+                TFE_TensorHandle deviceTensorHandle = toDevice(handle, eagerSessionHandle, device);
+                handle.close();
+                return deviceTensorHandle;
             }
             return handle.retainReference();
         }
