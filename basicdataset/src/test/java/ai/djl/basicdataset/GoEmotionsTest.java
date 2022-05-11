@@ -29,8 +29,8 @@ public class GoEmotionsTest {
     @Test
     public void testGoEmotions() throws IOException, TranslateException {
         for (Dataset.Usage usage :
-                new Dataset.Usage[]{
-                        Dataset.Usage.TRAIN, Dataset.Usage.VALIDATION, Dataset.Usage.TEST
+                new Dataset.Usage[] {
+                    Dataset.Usage.TRAIN, Dataset.Usage.VALIDATION, Dataset.Usage.TEST
                 }) {
             try (NDManager manager = NDManager.newBaseManager()) {
                 GoEmotions testDataSet =
