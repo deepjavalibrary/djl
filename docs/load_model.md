@@ -130,7 +130,7 @@ Criteria<Image, Classifications> criteria = Criteria.builder()
 ZooModel<Image, Classifications> model = criteria.loadModel();
 ```
 
-You can [customize the artifactId and modelName](#customize-artifactid-and-modelname) the same way as loading model from the local file system.
+You can customize the artifactId and modelName the same way as loading model from the local file system.
 
 ### Load model from AWS S3 bucket
 DJL supports loading a model from an S3 bucket using `s3://` URL and the AWS plugin. See [here](../extensions/aws-ai/README.md) for details.

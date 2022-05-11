@@ -26,6 +26,7 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 
 
 ## Installation
+
 You can pull the MXNet engine from the central Maven repository by including the following dependency:
 
 ```xml
@@ -43,6 +44,7 @@ It will automatically determine the appropriate jars for your system based on th
 You can choose a native library based on your platform if you don't have network access at runtime.
 
 ### macOS
+
 For macOS, you can use the following library:
 
 - ai.djl.mxnet:mxnet-native-mkl:1.8.0:osx-x86_64
@@ -59,6 +61,7 @@ For macOS, you can use the following library:
 ```
 
 ### Linux
+
 For the Linux platform, you can choose between CPU, GPU. If you have Nvidia [CUDA](https://en.wikipedia.org/wiki/CUDA)
 installed on your GPU machine, you can use one of the following library:
 
@@ -115,7 +118,7 @@ DJL on Windows, please download and install
 
 For the Windows platform, you can use CPU package. MXNet windows GPU native
 library size are large, we no longer provide GPU package, instead you have to
-use [Automatic](#automatic-(recommended)) package.
+use the Automatic package.
 
 #### Windows GPU
 
