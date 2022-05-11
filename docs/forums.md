@@ -34,7 +34,7 @@ If you want to talk about the development of DJL itself, look at our [developmen
 
 ## Pull Request
 
-If you have an idea that you want to implement for changes to DJL, a bug fix, new datasets, new models, or anything else, open a new [pull request](https://github.com/deepjavalibrary/djl/compare). You can view this guide on [git and how to fork the project and make a pull request](https://guides.github.com/activities/forking/). We also have [documentation for contributors](development/README.md) that can help setup development, explain DJL coding conventions, working with DJL CI, and troubleshooting common problems.
+If you have an idea that you want to implement for changes to DJL, a bug fix, new datasets, new models, or anything else, open a new [pull request](https://github.com/deepjavalibrary/djl/compare). You can view this guide on [git and how to fork the project and make a pull request](https://docs.github.com/en/get-started/quickstart/contributing-to-projects). We also have [documentation for contributors](development/README.md) that can help setup development, explain DJL coding conventions, working with DJL CI, and troubleshooting common problems.
 
 ## Follow DJL
 
