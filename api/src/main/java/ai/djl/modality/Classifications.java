@@ -43,8 +43,12 @@ public class Classifications implements JsonSerializable {
                     .registerTypeAdapter(Classifications.class, new ClassificationsSerializer())
                     .create();
 
+    @SuppressWarnings("serial")
     protected List<String> classNames;
+
+    @SuppressWarnings("serial")
     protected List<Double> probabilities;
+
     private int topK;
 
     /**

@@ -46,9 +46,10 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [mxnet-native-mkl(osx-x86_64)](../../engines/mxnet/mxnet-engine/README.md#macos) | Contains Apache MXNet native library for macOS |
 | | [mxnet-native-mkl(win-x86_64)](../../engines/mxnet/mxnet-engine/README.md#windows-cpu) | Contains Apache MXNet native library for Windows |
 | | [mxnet-native-mkl(linux-x86_64)](../../engines/mxnet/mxnet-engine/README.md#linux-cpu) | Contains Apache MXNet native library for Linux |
-| | [mxnet-native-cu110(linux-x86_64)](../../engines/mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 11.0|
+| | [mxnet-native-cu112(linux-x86_64)](../../engines/mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 11.2|
 | | [mxnet-native-cu102(linux-x86_64)](../../engines/mxnet/mxnet-engine/README.md#linux-gpu) | Contains Apache MXNet native library for Linux with CUDA 10.2|
 | | mxnet-native-auto (deprecated) | No longer needed since DJL 0.15.0 |
+| | mxnet-native-cu110(linux-x86_64) (deprecated) | Contains Apache MXNet native library <= 1.8.1 for Linux with CUDA 11.0|
 | | mxnet-native-cu101(linux-x86_64) (deprecated) | Contains Apache MXNet native library <= 1.7.0 for Linux with CUDA 10.1 |
 | | mxnet-native-cu92(linux-x86_64) (deprecated) | Contains Apache MXNet native library <= 1.6.0 for Linux with CUDA 9.2 |
 | | | |
@@ -63,6 +64,7 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [pytorch-native-cu102(win-x86_64)](../../engines/pytorch/pytorch-engine/README.md#windows-gpu) | Contains PyTorch native library for Windows with CUDA 10.2 |
 | | [pytorch-native-cu113-precxx11(linux-x86_64)](../../engines/pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | Contains PyTorch native library for Linux with CUDA 11.3 |
 | | [pytorch-native-cpu-precxx11(linux-x86_64)](../../engines/pytorch/pytorch-engine/README.md#for-pre-cxx11-build) | Contains PyTorch native library for centOS 7 and Ubuntu 14.04 |
+| | [pytorch-native-cpu-precxx11(linux-aarch64)](../../engines/pytorch/pytorch-engine/README.md#for-aarch64-build) | Contains PyTorch native library for Linux ARM |
 | | [pytorch-jni](../../engines/pytorch/pytorch-engine/README.md) | Contains PyTorch JNI native library |
 | | pytorch-native-auto (deprecated) | No longer needed since DJL 0.15.0 |
 | | pytorch-native-cu111(linux-x86_64) (deprecated) | Contains PyTorch native library for Linux with CUDA 11.1 |
@@ -89,7 +91,9 @@ See [How to use DJL's BOM](../../bom/README.md#how-to-use-djls-bom) for detail.
 | | [paddlepaddle-native-cpu(linux-x86_64)](../../engines/paddlepaddle/paddlepaddle-engine/README.md#linux) | Contains PaddlePaddle native library for Linux |
 | | [paddlepaddle-native-cpu(win-x86_64)](../../engines/paddlepaddle/paddlepaddle-engine/README.md#windows) | Contains PaddlePaddle native library for Windows |
 | | [paddlepaddle-native-cu102(linux-x86_64)](../../engines/paddlepaddle/paddlepaddle-engine/README.md#Linux-GPU) | Contains PaddlePaddle native library for Linux with CUDA 10.2 |
-| | [paddlepaddle-native-cu101(linux-x86_64)](../../engines/paddlepaddle/paddlepaddle-engine/README.md#Linux-GPU) | Contains PaddlePaddle native library for Linux with CUDA 10.1 |
+| | [paddlepaddle-native-cu112(linux-x86_64)](../../engines/paddlepaddle/paddlepaddle-engine/README.md#Linux-GPU) | Contains PaddlePaddle native library for Linux with CUDA 11.2 |
+| | [paddlepaddle-native-cu110(win-x86_64)](../../engines/paddlepaddle/paddlepaddle-engine/README.md#Windows-GPU-Experimental) | Contains PaddlePaddle native library for Windows with CUDA 11.0 |
+| | paddlepaddle-native-cu101 (deprecated) | Contains PaddlePaddle native library <= 2.0.2 for Linux with CUDA 10.1 |
 | | paddlepaddle-native-auto (deprecated) | No longer needed since DJL 0.15.0 |
 | | | |
 | [ai.djl.onnxruntime](https://search.maven.org/search?q=g:ai.djl.onnxruntime) | [onnxruntime-engine](../../engines/onnxruntime/onnxruntime-engine/README.md#installation) | ONNX Runtime engine adapter |
