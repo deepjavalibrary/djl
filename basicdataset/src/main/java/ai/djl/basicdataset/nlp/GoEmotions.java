@@ -36,8 +36,8 @@ import org.apache.commons.csv.CSVRecord;
 
 /**
  * GoEmotions is a corpus of 58k carefully curated comments extracted from Reddit, with human
- * annotations to 27 emotion categories or Neutral. On top of the raw data, we also include a
- * version filtered based on reter-agreement, which contains a train/test/validation split. The
+ * annotations to 27 emotion categories or Neutral. This version of data is filtered based on
+ * rater-agreement on top of the raw data, and contains a train/test/validation split. The
  * emotion categories are: admiration, amusement, anger, annoyance, approval, caring, confusion,
  * curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear,
  * gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness,
