@@ -425,7 +425,9 @@ public final class JavacppUtils {
                     tensorflow.TFE_TensorHandleCopyToDevice(
                             handle, eagerSessionHandle, deviceName, status);
             status.throwExceptionIfNotOK();
-            return newHandle;
+            // C API does not have deallocator by default
+            newHandle.withDeallocator();
+            return newHandle.retainReference();
         }
     }
 
