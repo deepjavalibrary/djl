@@ -301,7 +301,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             // Result is flattened since shape is undetermined
             return JniUtils.booleanMask(this, manager.from(index));
         } else if (indexShape.equals(getShape().slice(axis))) {
-            // index will be broadcasted by default
+            // index will be broadcast by default
             try (PtNDArray flattedResult = JniUtils.booleanMask(this, manager.from(index))) {
                 // Shape recovery
                 Shape remainder = getShape().slice(0, axis);
