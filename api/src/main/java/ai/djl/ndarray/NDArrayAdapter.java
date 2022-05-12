@@ -184,6 +184,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray take(NDArray index) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void set(Buffer data) {
         NDArray array = manager.create(data, getShape(), getDataType());
         intern(array);

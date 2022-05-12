@@ -514,6 +514,20 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Returns a partial {@code NDArray}.
      *
+     * @param index the boolean or int {@code NDArray} that indicates what to get
+     * @return the partial {@code NDArray}
+     */
+    default NDArray get(NDArray index) {
+        if (index.getDataType() == DataType.BOOLEAN) {
+            return get(new NDIndex().addBooleanIndex(index));
+        } else {
+            return take(index);
+        }
+    }
+
+    /**
+     * Returns a partial {@code NDArray}.
+     *
      * @param indices the indices used to indicate what to get
      * @param args arguments to replace the varaible "{}" in the indices string. Can be an integer,
      *     long, boolean {@link NDArray}, or integer {@link NDArray}.
@@ -536,16 +550,6 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
-     * Returns a partial {@code NDArray}.
-     *
-     * @param index the boolean {@code NDArray} that indicates what to get
-     * @return the partial {@code NDArray}
-     */
-    default NDArray get(NDArray index) {
-        return get(new NDIndex().addBooleanIndex(index));
-    }
-
-    /**
      * Returns a partial {@code NDArray} pointed by the indexed array. Given NDArray arr, NDArray
      * idx, and long axis, the output is out_{ijk} = arr_{idx_{ijk}, j, k} if axis=0 or arr_{i,
      * idx_{ijk}, k} if axis=1 or arr_{i, j, idx_{ijk}} if axis=2
@@ -555,6 +559,14 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return the partial {@code NDArray} of the same shape as index
      */
     NDArray gather(NDArray index, int axis);
+
+    /**
+     * Returns a partial {@code NDArray} pointed by the indexed array, according to linear indexing.
+     *
+     * @param index picks the elements of an NDArray to the same position as index
+     * @return the partial {@code NDArray} of the same shape as index
+     */
+    NDArray take(NDArray index);
 
     /**
      * Returns a scalar {@code NDArray} corresponding to a single element.

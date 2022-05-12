@@ -198,6 +198,8 @@ final class PyTorchLibrary {
 
     native long torchGather(long handle, long index, long dim, boolean sparseGrad);
 
+    native long torchTake(long handle, long index);
+
     native long torchMaskedSelect(long handle, long maskHandle);
 
     native void torchMaskedPut(long handle, long valueHandle, long maskHandle);

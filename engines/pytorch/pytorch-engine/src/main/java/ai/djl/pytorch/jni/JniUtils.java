@@ -347,9 +347,21 @@ public final class JniUtils {
     }
 
     public static PtNDArray gather(PtNDArray ndArray, PtNDArray index, long dim) {
+        if (index.getDataType() != DataType.INT64) {
+            index = index.toType(DataType.INT64, true);
+        }
         return new PtNDArray(
                 ndArray.getManager(),
                 PyTorchLibrary.LIB.torchGather(ndArray.getHandle(), index.getHandle(), dim, false));
+    }
+
+    public static PtNDArray take(PtNDArray ndArray, PtNDArray index) {
+        if (index.getDataType() != DataType.INT64) {
+            index = index.toType(DataType.INT64, true);
+        }
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchTake(ndArray.getHandle(), index.getHandle()));
     }
 
     public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {

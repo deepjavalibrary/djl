@@ -250,6 +250,15 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray take(NDArray index) {
+        if (!(index instanceof PtNDArray)) {
+            throw new IllegalArgumentException("Only PtNDArray is supported.");
+        }
+        return JniUtils.take(this, (PtNDArray) index);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void copyTo(NDArray array) {
         throw new UnsupportedOperationException("Not implemented");
     }
