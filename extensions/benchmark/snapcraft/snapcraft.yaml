@@ -1,5 +1,5 @@
 name: djlbench
-version: '0.16.0'
+version: '0.17.0'
 title: DJL Benhmark
 license: Apache-2.0
 summary: A machine learning benchmarking toolkit

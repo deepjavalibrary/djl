@@ -30,6 +30,7 @@ public class DetectedObjects extends Classifications {
                     .registerTypeAdapter(DetectedObjects.class, new ClassificationsSerializer())
                     .create();
 
+    @SuppressWarnings("serial")
     private List<BoundingBox> boundingBoxes;
 
     /**

@@ -7,8 +7,8 @@ jobs:
   build-pytorch-jni-android:
     runs-on: ubuntu-18.04
     env:
-      PYTORCH_VERSION: "1.8.1"
-      NDK_VERSION: "20.0.5594570"
+      PYTORCH_VERSION: "1.11.0"
+      NDK_VERSION: "21.0.6113669"
 
     steps:
       - uses: actions/checkout@v2

@@ -175,8 +175,8 @@ public final class LibUtils {
             boolean found = downloadFiles(lines, link, os, flavor, tmp);
             if (!found && cudaArch != null) {
                 // fallback to cpu
-                flavor = "cpu";
-                dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
+                String cpuFlavor = "cpu";
+                dir = cacheDir.resolve(version + '-' + cpuFlavor + '-' + classifier);
                 path = dir.resolve(libName);
                 if (Files.exists(path)) {
                     logger.warn(

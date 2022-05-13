@@ -108,8 +108,8 @@ api group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
 In order to extend the dataset, the following dependencies are required:
 
 ```
-api "ai.djl:api:0.16.0"
-api "ai.djl:basicdataset:0.16.0"
+api "ai.djl:api:0.17.0"
+api "ai.djl:basicdataset:0.17.0"
 ```
 
 There are four parts we need to implement for CSVDataset.

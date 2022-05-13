@@ -48,25 +48,25 @@ sudo snap alias djlbench djl-bench
 - Or download .deb package from S3
 
 ```
-curl -O https://publish.djl.ai/djl-bench/0.16.0/djl-bench_0.16.0-1_all.deb
-sudo dpkg -i djl-bench_0.16.0-1_all.deb
+curl -O https://publish.djl.ai/djl-bench/0.17.0/djl-bench_0.17.0-1_all.deb
+sudo dpkg -i djl-bench_0.17.0-1_all.deb
 ```
 
 For centOS or Amazon Linux 2
 
-You can download djl-bench zip file from [here](https://publish.djl.ai/djl-bench/0.16.0/benchmark-0.16.0.zip).
+You can download djl-bench zip file from [here](https://publish.djl.ai/djl-bench/0.17.0/benchmark-0.17.0.zip).
 
 ```
-curl -O https://publish.djl.ai/djl-bench/0.16.0/benchmark-0.16.0.zip
-unzip benchmark-0.16.0.zip
-rm benchmark-0.16.0.zip
-sudo ln -s $PWD/benchmark-0.16.0/bin/benchmark /usr/bin/djl-bench
+curl -O https://publish.djl.ai/djl-bench/0.17.0/benchmark-0.17.0.zip
+unzip benchmark-0.17.0.zip
+rm benchmark-0.17.0.zip
+sudo ln -s $PWD/benchmark-0.17.0/bin/benchmark /usr/bin/djl-bench
 ```
 
 For Windows
 
 We are considering to create a `chocolatey` package for Windows. For the time being, you can
-download djl-bench zip file from [here](https://publish.djl.ai/djl-bench/0.16.0/benchmark-0.16.0.zip).
+download djl-bench zip file from [here](https://publish.djl.ai/djl-bench/0.17.0/benchmark-0.17.0.zip).
 
 Or you can run benchmark using gradle:
 
@@ -77,6 +77,7 @@ gradlew benchmark --args="--help"
 ```
 
 ## Prerequisite
+
 Please ensure Java 8+ is installed and you are using an OS that DJL supported with.
 
 After that, you need to clone the djl project and `cd` into the folder.
@@ -93,6 +94,7 @@ If you are trying to use GPU, please ensure the CUDA driver is installed. You ca
 ```
 nvcc -V
 ```
+
 to checkout the version. For different Deep Learning engine you are trying to run the benchmark,
 they have different CUDA version to support. Please check the individual Engine documentation to ensure your CUDA version is supported.
 
@@ -289,6 +291,7 @@ You can also do multi-threading inference with DJL. For example, if you would li
 ```
 -t 10
 ```
+
 Best thread number for your system: The same number of cores your system have or double of the total cores.
 
 You can also add `-l` to simulate the increment load for your inference server. It will add threads with the delay of time.

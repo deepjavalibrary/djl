@@ -34,6 +34,6 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>djl-zero</artifactId>
-    <version>0.16.0</version>
+    <version>0.17.0</version>
 </dependency>
 ```

@@ -76,6 +76,10 @@ def downloadBuildAndroid(String ver) {
 }
 
 def prepareNativeLib(String binaryRoot, String ver) {
+    if (!System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")) {
+        throw new GradleException("This command must be run from osx")
+    }
+
     def officialPytorchUrl = "https://download.pytorch.org/libtorch"
     def aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
     String cu11
@@ -102,6 +106,14 @@ def prepareNativeLib(String binaryRoot, String ver) {
 
     copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
     copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
+
+
+    exec {
+        commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-x86_64/native/lib/libtorch_cpu.dylib"
+    }
+    exec {
+        commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-x86_64/native/lib/libtorch.dylib"
+    }
 }
 
 def copyNativeLibToOutputDir(Map<String, String> fileStoreMap, String binaryRoot, String url) {
