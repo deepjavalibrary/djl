@@ -30,6 +30,7 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
     protected List<String> classes;
     protected double imageWidth;
     protected double imageHeight;
+    protected boolean applyRatio;
 
     /**
      * Creates the {@link ObjectDetectionTranslator} from the given builder.
@@ -42,6 +43,7 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
         this.synsetLoader = builder.synsetLoader;
         this.imageWidth = builder.imageWidth;
         this.imageHeight = builder.imageHeight;
+        this.applyRatio = builder.applyRatio;
     }
 
     /** {@inheritDoc} */
@@ -60,6 +62,7 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
         protected float threshold = 0.2f;
         protected double imageWidth;
         protected double imageHeight;
+        protected boolean applyRatio = false;
 
         /**
          * Sets the threshold for prediction accuracy.
@@ -84,6 +87,23 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
         public T optRescaleSize(double imageWidth, double imageHeight) {
             this.imageWidth = imageWidth;
             this.imageHeight = imageHeight;
+            return self();
+        }
+
+        /**
+         * Determine Whether to divide output object width/height on the inference result. Default
+         * false.
+         *
+         * <p>DetectedObject value should always bring a ratio based on the width/height instead of
+         * actual width/height. Most of the model will produce ratio as the inference output. This
+         * function is aimed to cover those who produce the pixel value. Make this to true to divide
+         * the width/height in postprocessing in order to get ratio in detectedObjects.
+         *
+         * @param value whether to apply ratio
+         * @return this builder
+         */
+        public T optApplyRatio(boolean value) {
+            this.applyRatio = value;
             return self();
         }
 
