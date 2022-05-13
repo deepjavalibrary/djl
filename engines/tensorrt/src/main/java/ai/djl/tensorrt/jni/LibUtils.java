@@ -62,7 +62,7 @@ public final class LibUtils {
             return path.toAbsolutePath().toString();
         }
         Path tmp = null;
-        String libPath = "/jnilib/" + classifier + "/" + name;
+        String libPath = "native/lib/" + classifier + "/" + name;
         logger.info("Extracting {} to cache ...", libPath);
         try (InputStream is = ClassLoaderUtils.getResourceAsStream(libPath)) {
             Files.createDirectories(dir);
