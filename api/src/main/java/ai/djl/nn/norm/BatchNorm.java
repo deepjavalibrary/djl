@@ -281,7 +281,7 @@ public class BatchNorm extends AbstractBlock {
     }
 
     /** The Builder to construct a {@link BatchNorm}. */
-    public static final class Builder {
+    public static class Builder {
 
         private int axis = 1;
         private float epsilon = 1E-5f;
