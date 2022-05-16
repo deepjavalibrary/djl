@@ -125,7 +125,17 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
                 Rectangle rec = detections[0].getLocation();
                 retClasses.add(detections[0].id);
                 retProbs.add(detections[0].confidence);
-                retBB.add(new Rectangle(rec.getX(), rec.getY(), rec.getWidth(), rec.getHeight()));
+                if (applyRatio) {
+                    retBB.add(
+                            new Rectangle(
+                                    rec.getX() / imageWidth,
+                                    rec.getY() / imageHeight,
+                                    rec.getWidth() / imageWidth,
+                                    rec.getHeight() / imageHeight));
+                } else {
+                    retBB.add(
+                            new Rectangle(rec.getX(), rec.getY(), rec.getWidth(), rec.getHeight()));
+                }
                 pq.clear();
                 for (int j = 1; j < detections.length; j++) {
                     IntermediateResult detection = detections[j];
