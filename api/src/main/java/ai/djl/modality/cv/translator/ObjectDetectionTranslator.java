@@ -62,7 +62,7 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
         protected float threshold = 0.2f;
         protected double imageWidth;
         protected double imageHeight;
-        protected boolean applyRatio = false;
+        protected boolean applyRatio;
 
         /**
          * Sets the threshold for prediction accuracy.
