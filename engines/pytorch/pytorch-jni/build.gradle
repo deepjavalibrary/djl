@@ -30,6 +30,7 @@ processResources {
             files.add("linux-x86_64/cu113/libdjl_torch.so")
             files.add("linux-x86_64/cu113-precxx11/libdjl_torch.so")
             files.add("win-x86_64/cu113/djl_torch.dll")
+            files.add("osx-aarch64/cpu/libdjl_torch.dylib")
         } else if (ptVersion.startsWith("1.10.")) {
             files.add("linux-x86_64/cu113/libdjl_torch.so")
             files.add("linux-x86_64/cu113-precxx11/libdjl_torch.so")
