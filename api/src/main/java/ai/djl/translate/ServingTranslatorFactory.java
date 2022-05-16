@@ -251,6 +251,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         public NDList processInput(TranslatorContext ctx, Input input) throws TranslateException {
             NDManager manager = ctx.getNDManager();
             try {
+                ctx.setAttachment("properties", input.getProperties());
                 return input.getDataAsNDList(manager);
             } catch (IllegalArgumentException e) {
                 throw new TranslateException("Input is not a NDList data type", e);
@@ -259,11 +260,19 @@ public class ServingTranslatorFactory implements TranslatorFactory {
 
         /** {@inheritDoc} */
         @Override
+        @SuppressWarnings("unchecked")
         public Output processOutput(TranslatorContext ctx, NDList list) {
+            Map<String, String> prop = (Map<String, String>) ctx.getAttachment("properties");
+            String contentType = prop.get("Content-Type");
+
             Output output = new Output();
-            // TODO: find a way to pass NDList out
-            output.add(list.getAsBytes());
-            output.addProperty("Content-Type", "tensor/ndlist");
+            if ("tensor/npz".equalsIgnoreCase(contentType)) {
+                output.add(list.encode(true));
+                output.addProperty("Content-Type", "tensor/npz");
+            } else {
+                output.add(list.encode(false));
+                output.addProperty("Content-Type", "tensor/ndlist");
+            }
             return output;
         }
     }
