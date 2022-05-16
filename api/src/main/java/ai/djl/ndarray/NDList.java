@@ -292,8 +292,18 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
      * @return the byte array
      */
     public byte[] encode() {
+        return encode(false);
+    }
+
+    /**
+     * Encodes the NDList to byte array.
+     *
+     * @param numpy encode in npz format if true
+     * @return the byte array
+     */
+    public byte[] encode(boolean numpy) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            encode(baos);
+            encode(baos, numpy);
             return baos.toByteArray();
         } catch (IOException e) {
             throw new AssertionError("NDList is not writable", e);

@@ -364,7 +364,8 @@ public final class LibUtils {
         String precxx11;
         if (Boolean.getBoolean("PYTORCH_PRECXX11")
                 || Boolean.parseBoolean(System.getenv("PYTORCH_PRECXX11"))
-                || "aarch64".equals(platform.getOsArch())) {
+                || ("aarch64".equals(platform.getOsArch())
+                        && "linux".equals(platform.getOsPrefix()))) {
             precxx11 = "-precxx11";
         } else {
             precxx11 = "";

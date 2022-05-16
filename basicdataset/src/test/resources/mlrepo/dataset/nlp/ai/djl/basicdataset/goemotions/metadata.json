@@ -1,0 +1,39 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "nlp",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "goemotions",
+  "name": "goemotions",
+  "description": "GoEmotions contains 58k carefully curated Reddit comments labeled for 27 emotion categories or Neutral.",
+  "website": "https://github.com/google-research/google-research/tree/master/goemotions",
+  "licenses": {
+    "license": {
+      "name": "Creative Commons Attribution License",
+      "url": "https://creativecommons.org/licenses/by/4.0/legalcode"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "files": {
+        "dev": {
+          "uri": "https://raw.githubusercontent.com/google-research/google-research/master/goemotions/data/dev.tsv",
+          "sha1Hash": "9535c6ac3d7740961f6033f31b3a7e78d011c870",
+          "size": 439059
+        },
+        "test": {
+          "uri": "https://raw.githubusercontent.com/google-research/google-research/master/goemotions/data/test.tsv",
+          "sha1Hash": "449ca0301eb6003c1fedfeaee9b28405da4b86c1",
+          "size": 436706
+        },
+        "train": {
+          "uri": "https://raw.githubusercontent.com/google-research/google-research/master/goemotions/data/train.tsv",
+          "sha1Hash": "ee854651cc9a474972960647c7ffc7dd6c12da6c",
+          "size": 3519053
+        }
+      }
+    }
+  ]
+}
