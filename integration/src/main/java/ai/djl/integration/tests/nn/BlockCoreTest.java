@@ -301,7 +301,7 @@ public class BlockCoreTest {
                 model.setBlock(block);
 
                 try (Trainer trainer = model.newTrainer(config)) {
-                    long[] splitAxis = new long[] {3, 1, 2};
+                    long[] splitAxis = {3, 1, 2};
                     Assert.assertEquals(splitSize, new Shape(splitAxis).size());
                     Shape inputShape = new Shape(batchSize).add(splitAxis).add(featureSize);
                     trainer.initialize(inputShape);
