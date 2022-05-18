@@ -31,10 +31,13 @@ import java.awt.image.DataBufferByte;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -178,6 +181,25 @@ class OpenCVImage implements Image {
             Point point = new Point(x, y);
             Imgproc.circle(image, point, 6, color, -1, Imgproc.LINE_AA);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<BoundingBox> findBoundingBoxes() {
+        List<MatOfPoint> points = new ArrayList<>();
+        Imgproc.findContours(
+                image, points, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+        return points.parallelStream()
+                .map(
+                        point -> {
+                            Rect rect = Imgproc.boundingRect(point);
+                            return new Rectangle(
+                                    rect.x * 1.0 / image.width(),
+                                    rect.y * 1.0 / image.height(),
+                                    rect.width * 1.0 / image.width(),
+                                    rect.height * 1.0 / image.height());
+                        })
+                .collect(Collectors.toList());
     }
 
     private void drawLandmarks(BoundingBox box) {

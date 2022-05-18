@@ -91,43 +91,28 @@ public class BufferedImageFactory extends ImageFactory {
         } else if (array.getDataType() != DataType.UINT8 && array.getDataType() != DataType.INT8) {
             throw new IllegalArgumentException("Datatype should be INT8 or UINT8");
         }
+        int height = (int) shape.get(0);
+        int width = (int) shape.get(1);
         if (NDImageUtils.isCHW(shape)) {
-            int height = (int) shape.get(1);
-            int width = (int) shape.get(2);
-            int imageArea = width * height;
-            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            int[] raw = array.toUint8Array();
-            IntStream.range(0, imageArea)
-                    .forEach(
-                            ele -> {
-                                int x = ele % width;
-                                int y = ele / width;
-                                int red = raw[ele] & 0xFF;
-                                int green = raw[ele + imageArea] & 0xFF;
-                                int blue = raw[ele + imageArea * 2] & 0xFF;
-                                int rgb = (red << 16) | (green << 8) | blue;
-                                image.setRGB(x, y, rgb);
-                            });
-            return new BufferedImageWrapper(image);
-        } else {
-            int height = (int) shape.get(0);
-            int width = (int) shape.get(1);
-            int imageArea = width * height;
-            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            int[] raw = array.toUint8Array();
-            IntStream.range(0, imageArea)
-                    .forEach(
-                            ele -> {
-                                int x = ele % width;
-                                int y = ele / width;
-                                int red = raw[ele * 3] & 0xFF;
-                                int green = raw[ele * 3 + 1] & 0xFF;
-                                int blue = raw[ele * 3 + 2] & 0xFF;
-                                int rgb = (red << 16) | (green << 8) | blue;
-                                image.setRGB(x, y, rgb);
-                            });
-            return new BufferedImageWrapper(image);
+            height = (int) shape.get(1);
+            width = (int) shape.get(2);
         }
+        int imageArea = width * height;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        int[] raw = array.toUint8Array();
+        int finalWidth = width;
+        IntStream.range(0, imageArea)
+                .forEach(
+                        ele -> {
+                            int x = ele % finalWidth;
+                            int y = ele / finalWidth;
+                            int red = raw[ele] & 0xFF;
+                            int green = raw[ele + imageArea] & 0xFF;
+                            int blue = raw[ele + imageArea * 2] & 0xFF;
+                            int rgb = (red << 16) | (green << 8) | blue;
+                            image.setRGB(x, y, rgb);
+                        });
+        return new BufferedImageWrapper(image);
     }
 
     protected void save(BufferedImage image, OutputStream os, String type) throws IOException {
@@ -241,6 +226,13 @@ public class BufferedImageFactory extends ImageFactory {
         @Override
         public void save(OutputStream os, String type) throws IOException {
             BufferedImageFactory.this.save(image, os, type);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public List<BoundingBox> findBoundingBoxes() {
+            // TODO: Add grayscale conversion and use BoundFinder to implement
+            throw new UnsupportedOperationException("Not supported for BufferedImage");
         }
 
         /** {@inheritDoc} */
