@@ -17,6 +17,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.BufferedImageFactory;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.BoundingBox;
@@ -39,7 +40,11 @@ public class OCRTest {
     public void testOCR() throws IOException, ModelException, TranslateException {
         String url = "https://resources.djl.ai/images/flight_ticket.jpg";
         Image img = ImageFactory.getInstance().fromUrl(url);
-        List<DetectedObjects.DetectedObject> boxes = detectWords(img).items();
+        DetectedObjects objects = detectWords(img);
+        if (ImageFactory.getInstance() instanceof BufferedImageFactory) {
+            objects = detectWords(img);
+        }
+        List<DetectedObjects.DetectedObject> boxes = objects.items();
 
         // load Character model
         Predictor<Image, String> recognizer = getRecognizer();

@@ -20,8 +20,10 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Landmark;
 import ai.djl.modality.cv.output.Mask;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.testing.TestRequirements;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.testng.Assert;
@@ -120,6 +123,33 @@ public class OpenCVImageFactoryTest {
                     () -> {
                         factory.fromUrl("file:build.gradle");
                     });
+        }
+    }
+
+    @Test
+    public void testBoundingBoxes() {
+        TestRequirements.notWindows(); // failed on Windows ServerCore container
+        ImageFactory factory = ImageFactory.getInstance();
+        try (NDManager manager = NDManager.newBaseManager()) {
+            int[][] arr =
+                    new int[][] {
+                        {0, 1, 1, 1, 0},
+                        {0, 0, 1, 0, 0},
+                        {0, 0, 0, 0, 0},
+                        {1, 1, 0, 0, 0},
+                        {1, 0, 0, 0, 1}
+                    };
+            NDArray array = manager.create(arr).muli(255).toType(DataType.INT8, true).expandDims(0);
+            OpenCVImage image = (OpenCVImage) factory.fromNDArray(array);
+            List<BoundingBox> rectangles = image.findBoundingBoxes();
+            List<Rectangle> expected =
+                    Arrays.asList(
+                            new Rectangle(0.8, 0.8, 0.2, 0.2),
+                            new Rectangle(0, 0.6, 0.4, 0.4),
+                            new Rectangle(0.2, 0, 0.6, 0.4));
+            for (int i = 0; i < rectangles.size(); i++) {
+                Assert.assertEquals(rectangles.get(i).toString(), expected.get(i).toString());
+            }
         }
     }
 }

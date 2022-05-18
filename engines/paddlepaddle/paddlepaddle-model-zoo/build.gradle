@@ -3,7 +3,7 @@ group 'ai.djl.paddlepaddle'
 
 dependencies {
     api project(":engines:paddlepaddle:paddlepaddle-engine")
-
+    api project(":extensions:opencv")
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }

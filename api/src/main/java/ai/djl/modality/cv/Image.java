@@ -12,12 +12,14 @@
  */
 package ai.djl.modality.cv;
 
+import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * {@code Image} is a container of an image in DJL. The storage type of the image depends on the
@@ -91,6 +93,13 @@ public interface Image {
      * @throws IOException image cannot be saved through output stream
      */
     void save(OutputStream os, String type) throws IOException;
+
+    /**
+     * Find bounding boxes from a masked image with 0/1 or 0/255.
+     *
+     * @return the List of bounding boxes of the images
+     */
+    List<BoundingBox> findBoundingBoxes();
 
     /**
      * Draws the bounding boxes on the image.
