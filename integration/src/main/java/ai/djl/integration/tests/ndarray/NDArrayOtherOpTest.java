@@ -906,6 +906,7 @@ public class NDArrayOtherOpTest {
                     manager.create(
                             new float[][] {{0f, 1f, 0f}, {1f, 0f, 0f}, {0f, 0f, 1f}, {1f, 0f, 0f}});
             Assert.assertEquals(array.oneHot(3), expected);
+            Assert.assertEquals(array.oneHot(3, DataType.FLOAT32), expected);
             // test with all parameters
             array = manager.create(new int[] {1, 0, 2, 0});
             expected = manager.create(new int[][] {{1, 8, 1}, {8, 1, 1}, {1, 1, 8}, {8, 1, 1}});

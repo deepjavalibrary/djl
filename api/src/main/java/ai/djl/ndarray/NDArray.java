@@ -4683,7 +4683,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      *     href=https://d2l.djl.ai/chapter_linear-networks/softmax-regression.html#classification-problems>Classification-problems</a>
      */
     default NDArray oneHot(int depth, DataType dataType) {
-        return oneHot(depth, 0f, 1f, dataType);
+        return oneHot(depth, 1f, 0f, dataType);
     }
 
     /**
