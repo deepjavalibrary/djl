@@ -11,12 +11,6 @@ import org.testng.annotations.Test;
 public class GhostBatchNormTest {
 
     private GhostBatchNorm gbn;
-    private NDManager manager;
-
-    @BeforeTest
-    void initialize() {
-        this.manager = NDManager.newBaseManager();
-    }
 
     private void testSubBatchingShapeSize(Shape shape, int vbs, int expectedSize) {
         NDList[] zeroSubList = generateZerosArrayAndSubBatch(shape, vbs);
@@ -24,9 +18,11 @@ public class GhostBatchNormTest {
     }
 
     private NDList[] generateZerosArrayAndSubBatch(Shape shape, int vbs) {
-        this.gbn = new GhostBatchNorm(GhostBatchNorm.builder().optVirtualBatchSize(vbs));
-        NDArray zerosInput = manager.zeros(shape);
-        return gbn.split(new NDList(zerosInput));
+        try (NDManager manager = NDManager.newBaseManager()) {
+            this.gbn = new GhostBatchNorm(GhostBatchNorm.builder().optVirtualBatchSize(vbs));
+            NDArray zerosInput = manager.zeros(shape);
+            return gbn.split(new NDList(zerosInput));
+        }
     }
 
     @Test
