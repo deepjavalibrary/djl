@@ -11,6 +11,8 @@ import ai.djl.util.PairList;
  * smaller sub-batches aka <em>ghost batches</em>, and normalize them individually to have a mean of
  * 0 and variance of 1 and finally concatenate them again to a single batch. Each of the
  * mini-batches contains a virtualBatchSize samples.
+ *
+ * @see <a href="https://arxiv.org/abs/1705.08741">Ghost Batch Normalization Paper</a>
  */
 public class GhostBatchNorm extends BatchNorm {
 
