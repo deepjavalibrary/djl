@@ -77,7 +77,7 @@ public class BatchNorm extends AbstractBlock {
     private Parameter runningMean;
     private Parameter runningVar;
 
-    BatchNorm(Builder builder) {
+    BatchNorm(BaseBuilder<?> builder) {
         super(VERSION);
         axis = builder.axis;
         epsilon = builder.epsilon;
@@ -276,20 +276,49 @@ public class BatchNorm extends AbstractBlock {
      *
      * @return a new builder
      */
-    public static Builder builder() {
+    public static BaseBuilder<?> builder() {
         return new Builder();
     }
 
     /** The Builder to construct a {@link BatchNorm}. */
-    public static class Builder {
-
-        private int axis = 1;
-        private float epsilon = 1E-5f;
-        private float momentum = .9f;
-        private boolean center = true;
-        private boolean scale = true;
-
+    public static class Builder extends BaseBuilder<Builder> {
+        /**
+         * Builds a {@link BatchNorm} block.
+         *
+         * @return the {@link BatchNorm} block
+         */
         Builder() {}
+
+        /**
+         * Builds the new {@link BatchNorm}.
+         *
+         * @return the new {@link BatchNorm}
+         */
+        @Override
+        public BatchNorm build() {
+            return new BatchNorm(this);
+        }
+
+        /**
+         * Returns this {code Builder} object.
+         *
+         * @return this {@code BaseBuilder}
+         */
+        @Override
+        public Builder self() {
+            return this;
+        }
+    }
+
+    public abstract static class BaseBuilder<T extends BaseBuilder<T>> {
+
+        protected int axis = 1;
+        protected float epsilon = 1E-5f;
+        protected float momentum = .9f;
+        protected boolean center = true;
+        protected boolean scale = true;
+
+        public BaseBuilder() {}
 
         /**
          * Set the axis in which channel is specified. Defaults to 1.
@@ -297,9 +326,9 @@ public class BatchNorm extends AbstractBlock {
          * @param axis the axis in which channel is specified
          * @return this Builder
          */
-        public Builder optAxis(int axis) {
+        public T optAxis(int axis) {
             this.axis = axis;
-            return this;
+            return self();
         }
 
         /**
@@ -308,9 +337,9 @@ public class BatchNorm extends AbstractBlock {
          * @param val True or False on whether to add and train offset value
          * @return this Builder
          */
-        public Builder optCenter(boolean val) {
+        public T optCenter(boolean val) {
             center = val;
-            return this;
+            return self();
         }
 
         /**
@@ -319,9 +348,9 @@ public class BatchNorm extends AbstractBlock {
          * @param val True or False on whether to add and train scale value
          * @return this Builder
          */
-        public Builder optScale(boolean val) {
+        public T optScale(boolean val) {
             scale = val;
-            return this;
+            return self();
         }
 
         /**
@@ -330,9 +359,9 @@ public class BatchNorm extends AbstractBlock {
          * @param val the epsilon value
          * @return this Builder
          */
-        public Builder optEpsilon(float val) {
+        public T optEpsilon(float val) {
             epsilon = val;
-            return this;
+            return self();
         }
 
         /**
@@ -341,18 +370,15 @@ public class BatchNorm extends AbstractBlock {
          * @param val the momentum for moving average
          * @return this Builder
          */
-        public Builder optMomentum(float val) {
+        public T optMomentum(float val) {
             momentum = val;
-            return this;
+            return self();
         }
 
-        /**
-         * Builds a {@link BatchNorm} block.
-         *
-         * @return the {@link BatchNorm} block
-         */
-        public BatchNorm build() {
-            return new BatchNorm(this);
-        }
+        /** {@inheritDoc} */
+        public abstract BatchNorm build();
+
+        /** {@inheritDoc} */
+        public abstract T self();
     }
 }

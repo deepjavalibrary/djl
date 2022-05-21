@@ -1,6 +1,5 @@
 package ai.djl.nn.norm;
 
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.ParameterStore;
 import ai.djl.translate.Batchifier;
@@ -18,8 +17,8 @@ public class GhostBatchNorm extends BatchNorm {
     private int virtualBatchSize;
     private Batchifier batchifier;
 
-    GhostBatchNorm(Builder builder) {
-        super(new BatchNorm.Builder());
+    protected GhostBatchNorm(Builder builder) {
+        super(builder);
 
         this.virtualBatchSize = builder.virtualBatchSize;
         this.batchifier = new StackBatchifier();
@@ -68,53 +67,34 @@ public class GhostBatchNorm extends BatchNorm {
     }
 
     /** The Builder to construct a {@link GhostBatchNorm} */
-    public static class Builder extends BatchNorm.Builder {
+    public static class Builder extends BatchNorm.BaseBuilder<Builder> {
         private int virtualBatchSize = 128;
 
         Builder() {}
 
-        /** {@inheritDoc} */
+        /**
+         * Set the size of virtual batches in which to use when sub-batching. Defaults to 128.
+         *
+         * @param virtualBatchSize
+         * @return this Builder
+         */
         public Builder optVirtualBatchSize(int virtualBatchSize) {
             this.virtualBatchSize = virtualBatchSize;
             return this;
         }
 
+        /**
+         * Builds the new {@link BatchNorm}.
+         *
+         * @return the new {@link BatchNorm}
+         */
         public GhostBatchNorm build() {
             return new GhostBatchNorm(this);
         }
 
         /** {@inheritDoc} */
         @Override
-        public Builder optAxis(int axis) {
-            super.optAxis(axis);
-            return this;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Builder optCenter(boolean val) {
-            super.optCenter(val);
-            return this;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Builder optScale(boolean val) {
-            super.optScale(val);
-            return this;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Builder optEpsilon(float val) {
-            super.optEpsilon(val);
-            return this;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Builder optMomentum(float val) {
-            super.optMomentum(val);
+        public Builder self() {
             return this;
         }
     }
