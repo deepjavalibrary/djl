@@ -12,7 +12,7 @@ import ai.djl.util.PairList;
  * 0 and variance of 1 and finally concatenate them again to a single batch. Each of the
  * mini-batches contains a virtualBatchSize samples.
  *
- * @see <a href="https://arxiv.org/abs/1705.08741">Ghost Batch Normalization Paper</a>
+ * @see <a href="https://arxiv.org/abs/1705.08741">Ghost Normalization Paper</a>
  */
 public class GhostBatchNorm extends BatchNorm {
 
@@ -86,9 +86,9 @@ public class GhostBatchNorm extends BatchNorm {
         }
 
         /**
-         * Builds the new {@link BatchNorm}.
+         * Builds the new {@link GhostBatchNorm}.
          *
-         * @return the new {@link BatchNorm}
+         * @return the new {@link GhostBatchNorm}
          */
         public GhostBatchNorm build() {
             return new GhostBatchNorm(this);
