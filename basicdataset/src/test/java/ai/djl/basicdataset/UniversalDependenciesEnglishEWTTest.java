@@ -12,7 +12,7 @@
  */
 package ai.djl.basicdataset;
 
-import ai.djl.basicdataset.nlp.UniversalDependenciesEnglish;
+import ai.djl.basicdataset.nlp.UniversalDependenciesEnglishEWT;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
@@ -28,7 +28,7 @@ import java.util.Locale;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class UniversalDependenciesEnglishTest {
+public class UniversalDependenciesEnglishEWTTest {
 
     private static final int EMBEDDING_SIZE = 15;
 
@@ -36,8 +36,8 @@ public class UniversalDependenciesEnglishTest {
     public void testGetDataWithPreTrainedEmbedding() throws IOException, TranslateException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
         try (NDManager manager = NDManager.newBaseManager()) {
-            UniversalDependenciesEnglish universalDependenciesEnglish =
-                    UniversalDependenciesEnglish.builder()
+            UniversalDependenciesEnglishEWT universalDependenciesEnglishEWT =
+                    UniversalDependenciesEnglishEWT.builder()
                             .optRepository(repository)
                             .optUsage(Dataset.Usage.TRAIN)
                             .setSourceConfiguration(
@@ -53,8 +53,8 @@ public class UniversalDependenciesEnglishTest {
                             .optLimit(10)
                             .build();
 
-            universalDependenciesEnglish.prepare();
-            Record record = universalDependenciesEnglish.get(manager, 0);
+            universalDependenciesEnglishEWT.prepare();
+            Record record = universalDependenciesEnglishEWT.get(manager, 0);
             Assert.assertEquals(record.getData().get(0).getShape().dimension(), 2);
             Assert.assertEquals(record.getLabels().get(0).getShape().dimension(), 1);
         }
@@ -64,8 +64,8 @@ public class UniversalDependenciesEnglishTest {
     public void testGetDataWithTrainableEmbedding() throws IOException, TranslateException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
         try (NDManager manager = NDManager.newBaseManager()) {
-            UniversalDependenciesEnglish universalDependenciesEnglish =
-                    UniversalDependenciesEnglish.builder()
+            UniversalDependenciesEnglishEWT universalDependenciesEnglishEWT =
+                    UniversalDependenciesEnglishEWT.builder()
                             .optRepository(repository)
                             .optUsage(Dataset.Usage.TEST)
                             .setSourceConfiguration(
@@ -79,8 +79,8 @@ public class UniversalDependenciesEnglishTest {
                             .optLimit(10)
                             .build();
 
-            universalDependenciesEnglish.prepare();
-            Record record = universalDependenciesEnglish.get(manager, 0);
+            universalDependenciesEnglishEWT.prepare();
+            Record record = universalDependenciesEnglishEWT.get(manager, 0);
             Assert.assertEquals(record.getData().size(), 1);
             Assert.assertEquals(record.getData().get(0).getShape().dimension(), 1);
             Assert.assertEquals(record.getLabels().size(), 1);
@@ -92,8 +92,8 @@ public class UniversalDependenciesEnglishTest {
     public void testMisc() throws TranslateException, IOException {
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
         try (NDManager manager = NDManager.newBaseManager()) {
-            UniversalDependenciesEnglish universalDependenciesEnglish =
-                    UniversalDependenciesEnglish.builder()
+            UniversalDependenciesEnglishEWT universalDependenciesEnglishEWT =
+                    UniversalDependenciesEnglishEWT.builder()
                             .optRepository(repository)
                             .optUsage(Dataset.Usage.VALIDATION)
                             .setSourceConfiguration(
@@ -109,9 +109,9 @@ public class UniversalDependenciesEnglishTest {
                             .optLimit(350)
                             .build();
 
-            universalDependenciesEnglish.prepare();
-            universalDependenciesEnglish.prepare();
-            Assert.assertEquals(universalDependenciesEnglish.size(), 350);
+            universalDependenciesEnglishEWT.prepare();
+            universalDependenciesEnglishEWT.prepare();
+            Assert.assertEquals(universalDependenciesEnglishEWT.size(), 350);
         }
     }
 }

@@ -3,10 +3,10 @@
   "resourceType": "dataset",
   "application": "nlp",
   "groupId": "ai.djl.basicdataset",
-  "artifactId": "universal-dependencies-en",
-  "name": "universal-dependencies-en",
+  "artifactId": "universal-dependencies-en-ewt",
+  "name": "universal-dependencies-en-ewt",
   "description": "A Gold Standard Universal Dependencies Corpus for English, built over the source material of the English Web Treebank LDC2012T13.",
-  "website": "https://universaldependencies.org/",
+  "website": "https://universaldependencies.org/treebanks/en_ewt/index.html",
   "licenses": {
     "license": {
       "name": "Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)",
@@ -18,7 +18,7 @@
       "version": "2.0",
       "snapshot": false,
       "files": {
-        "universal-dependencies-en": {
+        "universal-dependencies-en-ewt": {
           "uri": "https://bitbucket.org/sivareddyg/public/downloads/en-ud-v2.zip",
           "sha1Hash": "27a39d8d2686c9945842d26c53c2e51d1ce48226",
           "size": 688379

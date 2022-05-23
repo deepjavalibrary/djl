@@ -36,10 +36,10 @@ import java.util.List;
  *
  * @see <a href="https://catalog.ldc.upenn.edu/LDC2012T13">English Web Treebank LDC2012T13</a>
  */
-public class UniversalDependenciesEnglish extends TextDataset {
+public class UniversalDependenciesEnglishEWT extends TextDataset {
 
     private static final String VERSION = "2.0";
-    private static final String ARTIFACT_ID = "universal-dependencies-en";
+    private static final String ARTIFACT_ID = "universal-dependencies-en-ewt";
 
     private List<List<Integer>> universalPosTags;
 
@@ -48,14 +48,14 @@ public class UniversalDependenciesEnglish extends TextDataset {
      *
      * @param builder the builder object to build from
      */
-    protected UniversalDependenciesEnglish(Builder builder) {
+    protected UniversalDependenciesEnglishEWT(Builder builder) {
         super(builder);
         this.usage = builder.usage;
         mrl = builder.getMrl();
     }
 
     /**
-     * Creates a new builder to build a {@link UniversalDependenciesEnglish}.
+     * Creates a new builder to build a {@link UniversalDependenciesEnglishEWT}.
      *
      * @return a new builder
      */
@@ -115,7 +115,7 @@ public class UniversalDependenciesEnglish extends TextDataset {
                 }
                 String[] splits = row.split("\t");
                 if (sourceTextDatum.length() != 0) {
-                    sourceTextDatum.append(" ");
+                    sourceTextDatum.append(' ');
                 }
                 sourceTextDatum.append(splits[0]);
                 universalPosTag.add(UniversalPosTag.valueOf(splits[1]).ordinal());
@@ -162,7 +162,7 @@ public class UniversalDependenciesEnglish extends TextDataset {
         return sourceTextData.getSize();
     }
 
-    /** A builder for a {@link UniversalDependenciesEnglish}. */
+    /** A builder for a {@link UniversalDependenciesEnglishEWT}. */
     public static class Builder extends TextDataset.Builder<Builder> {
 
         /** Constructs a new builder. */
@@ -177,16 +177,41 @@ public class UniversalDependenciesEnglish extends TextDataset {
         }
 
         /**
-         * Builds the {@link UniversalDependenciesEnglish}.
+         * Builds the {@link UniversalDependenciesEnglishEWT}.
          *
-         * @return the {@link UniversalDependenciesEnglish}
+         * @return the {@link UniversalDependenciesEnglishEWT}
          */
-        public UniversalDependenciesEnglish build() {
-            return new UniversalDependenciesEnglish(this);
+        public UniversalDependenciesEnglishEWT build() {
+            return new UniversalDependenciesEnglishEWT(this);
         }
 
         MRL getMrl() {
             return repository.dataset(NLP.ANY, groupId, artifactId, VERSION);
         }
+    }
+
+    /**
+     * An enum class for Universal POS tags which mark the core part-of-speech categories.
+     *
+     * @see <a href="https://universaldependencies.org/u/pos/">Universal POS tags</a>
+     */
+    enum UniversalPosTag {
+        ADJ,
+        ADV,
+        INTJ,
+        NOUN,
+        PROPN,
+        VERB,
+        ADP,
+        AUX,
+        CCONJ,
+        DET,
+        NUM,
+        PART,
+        PRON,
+        SCONJ,
+        PUNCT,
+        SYM,
+        X;
     }
 }
