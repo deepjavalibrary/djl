@@ -1,0 +1,34 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "tabular",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "daily-delhi-climate",
+  "name": "daily-delhi-climate",
+  "description": "This dataset provides data from 1st January 2013 to 24th April 2017 in the city of Delhi, India. The 4 parameters here are meantemp, humidity, wind_speed, meanpressure.",
+  "website": "https://www.kaggle.com/datasets/sumanthvrao/daily-climate-time-series-data",
+  "licenses": {
+    "license": {
+      "name": "CC0 1.0 Universal",
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "3.0",
+      "snapshot": false,
+      "files": {
+        "train": {
+          "uri": "3.0/DailyDelhiClimateTrain.csv",
+          "sha1Hash": "7e2b6ebf11015280bfd9308acf49567eca262b94",
+          "size": 78199
+        },
+        "test": {
+          "uri": "3.0/DailyDelhiClimateTest.csv",
+          "sha1Hash": "ca462410900d18037059fde452b4e084ef620d6d",
+          "size": 7100
+        }
+      }
+    }
+  ]
+}
