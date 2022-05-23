@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
-import ai.djl.repository.Repository;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -33,53 +32,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class DailyDelhiClimateTest {
-    @Test
-    public void testDailyDelhiClimateLocal() throws IOException, TranslateException {
-
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
-
-        TrainingConfig config =
-                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-
-        try (Model model = Model.newInstance("model")) {
-            model.setBlock(Blocks.identityBlock());
-
-            NDManager manager = model.getNDManager();
-            // path of directory
-            DailyDelhiClimate dailyDelhiClimate =
-                    DailyDelhiClimate.builder()
-                            .optUsage(Dataset.Usage.TRAIN)
-                            .optRepository(repository)
-                            .setSampling(32, true)
-                            .build();
-
-            dailyDelhiClimate.prepare();
-
-            long size = dailyDelhiClimate.size();
-            Assert.assertEquals(size, 1462);
-
-            Record record = dailyDelhiClimate.get(manager, 0);
-            NDList data = record.getData();
-            NDList labels = record.getLabels();
-            Assert.assertEquals(
-                    data.head().toFloatArray(), new float[] {15706, 10, 84.5f, 0, 1015.6667f});
-            Assert.assertEquals(labels.size(), 0);
-
-            try (Trainer trainer = model.newTrainer(config)) {
-                Batch batch = trainer.iterateDataset(dailyDelhiClimate).iterator().next();
-                Assert.assertEquals(batch.getData().size(), 1);
-                Assert.assertEquals(batch.getLabels().size(), 0);
-                batch.close();
-            }
-        }
-    }
 
     @Test
-    public void testAmesRandomAccessRemote() throws IOException, TranslateException {
-
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
-
+    public void testDailyDelhiClimateRemote() throws IOException, TranslateException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
@@ -94,7 +49,6 @@ public class DailyDelhiClimateTest {
                             .optUsage(Dataset.Usage.TEST)
                             .addFeature("humidity")
                             .addFeature("wind_speed")
-                            .optRepository(repository)
                             .setSampling(32, true)
                             .build();
 
