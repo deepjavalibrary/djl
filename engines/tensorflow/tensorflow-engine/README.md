@@ -46,14 +46,14 @@ You can choose a native library based on your platform if you don't have network
 ### macOS
 For macOS, you can use the following library:
 
-- ai.djl.tensorflow:tensorflow-native-cpu:2.4.1:osx-x86_64
+- ai.djl.tensorflow:tensorflow-native-cpu:2.7.0:osx-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-native-cpu</artifactId>
     <classifier>osx-x86_64</classifier>
-    <version>2.4.1</version>
+    <version>2.7.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -64,21 +64,21 @@ installed on your GPU machine, you can use one of the following library:
 
 #### Linux GPU
 
-- ai.djl.tensorflow:tensorflow-native-cu110:2.4.1:linux-x86_64 - CUDA 11.0
+- ai.djl.tensorflow:tensorflow-native-cu110:2.7.0:linux-x86_64 - CUDA 11.3
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
-    <artifactId>tensorflow-native-cu110</artifactId>
+    <artifactId>tensorflow-native-cu113</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>2.4.1</version>
+    <version>2.7.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
 ### Linux CPU
 
-- ai.djl.tensorflow:tensorflow-native-cpu:2.4.1:linux-x86_64
+- ai.djl.tensorflow:tensorflow-native-cpu:2.7.0:linux-x86_64
 
 ```xml
 <dependency>
@@ -86,7 +86,7 @@ installed on your GPU machine, you can use one of the following library:
     <artifactId>tensorflow-native-cpu</artifactId>
     <classifier>linux-x86_64</classifier>
     <scope>runtime</scope>
-    <version>2.4.1</version>
+    <version>2.7.0</version>
 </dependency>
 ```
 
@@ -96,21 +96,21 @@ For the Windows platform, you can choose between CPU and GPU.
 
 #### Windows GPU
 
-- ai.djl.tensorflow:tensorflow-native-cu110:2.4.1:win-x86_64
+- ai.djl.tensorflow:tensorflow-native-cu113:2.7.0:win-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
-    <artifactId>tensorflow-native-cu110</artifactId>
+    <artifactId>tensorflow-native-cu113</artifactId>
     <classifier>win-x86_64</classifier>
-    <version>2.4.1</version>
+    <version>2.7.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
 ### Windows CPU
 
-- ai.djl.tensorflow:tensorflow-native-cpu:2.4.1:win-x86_64
+- ai.djl.tensorflow:tensorflow-native-cpu:2.7.0:win-x86_64
 
 ```xml
 <dependency>
@@ -118,6 +118,6 @@ For the Windows platform, you can choose between CPU and GPU.
     <artifactId>tensorflow-native-cpu</artifactId>
     <classifier>win-x86_64</classifier>
     <scope>runtime</scope>
-    <version>2.4.1</version>
+    <version>2.7.0</version>
 </dependency>
 ```
