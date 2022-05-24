@@ -101,7 +101,12 @@ public final class CoverageUtils {
     private static List<Class<?>> getClasses(Class<?> clazz)
             throws IOException, ReflectiveOperationException, URISyntaxException {
         ClassLoader appClassLoader = ClassLoaderUtils.getContextClassLoader();
-        Field field = appClassLoader.getClass().getDeclaredField("ucp");
+        Field field;
+        try {
+            field = appClassLoader.getClass().getDeclaredField("ucp");
+        } catch (NoSuchFieldException e) {
+            field = appClassLoader.getClass().getSuperclass().getDeclaredField("ucp");
+        }
         field.setAccessible(true);
         Object ucp = field.get(appClassLoader);
         Method method = ucp.getClass().getDeclaredMethod("getURLs");
@@ -131,7 +136,7 @@ public final class CoverageUtils {
 
                 try {
                     classList.add(Class.forName(className, true, cl));
-                } catch (Error ignore) {
+                } catch (Throwable ignore) {
                     // ignore
                 }
             }
@@ -146,7 +151,7 @@ public final class CoverageUtils {
                         fileName = fileName.replace('/', '.');
                         try {
                             classList.add(Class.forName(fileName, true, cl));
-                        } catch (Error ignore) {
+                        } catch (Throwable ignore) {
                             // ignore
                         }
                     }
