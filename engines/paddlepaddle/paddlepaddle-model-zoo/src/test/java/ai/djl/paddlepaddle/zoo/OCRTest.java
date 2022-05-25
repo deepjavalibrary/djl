@@ -17,7 +17,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.BufferedImageFactory;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.BoundingBox;
@@ -38,17 +37,15 @@ public class OCRTest {
 
     @Test
     public void testOCR() throws IOException, ModelException, TranslateException {
-        String url = "https://resources.djl.ai/images/flight_ticket.jpg";
-        Image img = ImageFactory.getInstance().fromUrl(url);
-        DetectedObjects objects = detectWords(img);
-        if (ImageFactory.getInstance() instanceof BufferedImageFactory) {
-            objects = detectWords(img);
-        }
-        List<DetectedObjects.DetectedObject> boxes = objects.items();
-
         // load Character model
+        Predictor<Image, DetectedObjects> detector = getWordDetector();
         Predictor<Image, String> recognizer = getRecognizer();
         Predictor<Image, Classifications> rotator = getRotateClassifer();
+
+        String url = "https://resources.djl.ai/images/flight_ticket.jpg";
+        Image img = ImageFactory.getInstance().fromUrl(url);
+        DetectedObjects objects = detector.predict(img);
+        List<DetectedObjects.DetectedObject> boxes = objects.items();
         for (DetectedObjects.DetectedObject box : boxes) {
             Image subImg = getSubImage(img, box.getBoundingBox());
             if (subImg.getHeight() * 1.0 / subImg.getWidth() > 1.5) {
@@ -63,18 +60,15 @@ public class OCRTest {
         }
     }
 
-    private static DetectedObjects detectWords(Image img)
-            throws ModelException, IOException, TranslateException {
+    private static Predictor<Image, DetectedObjects> getWordDetector()
+            throws ModelNotFoundException, MalformedModelException, IOException {
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)
                         .optArtifactId("ai.djl.paddlepaddle:word_detection")
                         .optFilter("flavor", "mobile")
                         .build();
-        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel();
-                Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
-            return predictor.predict(img);
-        }
+        return criteria.loadModel().newPredictor();
     }
 
     private static Predictor<Image, String> getRecognizer()
