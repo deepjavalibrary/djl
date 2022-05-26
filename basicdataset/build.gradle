@@ -11,6 +11,9 @@ dependencies {
 
     testImplementation project(":testing")
     testImplementation project(":engines:mxnet:mxnet-engine")
+
+    // https://mavenlibs.com/maven/dependency/org.bytedeco/javacv-platform
+    implementation group: 'org.bytedeco', name: 'javacv-platform', version: '1.5.7'
 }
 
 task syncS3(type: Exec) {
