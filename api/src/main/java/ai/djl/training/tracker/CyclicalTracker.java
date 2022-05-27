@@ -32,9 +32,9 @@ public class CyclicalTracker implements Tracker {
     private boolean scaleModeCycle;
 
     /**
-     * Creates a new instance of {@code CosineTracker}.
+     * Creates a new instance of {@code CyclicalTracker}.
      *
-     * @param builder the builder to create a new instance of {@code CosineTracker}
+     * @param builder the builder to create a new instance of {@code CyclicalTracker}
      */
     public CyclicalTracker(Builder builder) {
         this.baseValue = builder.baseValue;
