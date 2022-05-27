@@ -23,8 +23,6 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
      */
     public SpeechRecognitionDataset(BaseBuilder<?> builder) {
         super(builder);
-        sourceAudioData = new AudioData();
-        recognition = new TextData(TextData.getDefaultConfiguration());
     }
 
     @Override
