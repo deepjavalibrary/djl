@@ -62,10 +62,10 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
     public SpeechRecognitionDataset(AudioBuilder<?> builder) {
         super(builder);
         sourceAudioData =
-                new AudioData(getDefaultConfiguration().update(builder.sourceConfiguration));
+                new AudioData(AudioData.getDefaultConfiguration());
         targetTextData =
                 new TextData(
-                        TextData.getDefaultConfiguration().update(builder.targetConfiguration));
+                        TextData.getDefaultConfiguration());
         manager = builder.manager;
         usage = builder.usage;
     }
@@ -87,11 +87,6 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
      */
     protected void sourcePreprocess(List<String> audioPathList) {
         sourceAudioData.setAudioPaths(audioPathList);
-    }
-
-    /** @return A default {@link ai.djl.audio.dataset.AudioData.Configuration}. */
-    public static AudioData.Configuration getDefaultConfiguration() {
-        return AudioData.getDefaultConfiguration();
     }
 
     /** Abstract AudioBuilder that helps build a {@link SpeechRecognitionDataset}. */

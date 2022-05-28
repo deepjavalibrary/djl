@@ -22,11 +22,9 @@ public class LibrispeechTest {
                         .setSampling(32, true)
                         .build();
         dataset.prepare();
-        List<String> list = dataset.sourceAudioData.getAudioPaths();
-        for (String path: list) {
-            System.out.println(path);
-        }
         System.out.println(dataset.get(manager,0).getData());
-        System.out.println(dataset.get(manager,0).getLabels());
+        for (long i :dataset.get(manager,0).getLabels().get(0).toLongArray()) {
+            System.out.println(i);
+        }
     }
 }

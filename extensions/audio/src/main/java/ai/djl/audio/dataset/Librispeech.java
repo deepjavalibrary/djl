@@ -106,7 +106,7 @@ public class Librispeech extends SpeechRecognitionDataset {
                             String audioPath =
                                     String.format(
                                             "%s/%s-%s-%s.flac",
-                                            transFile.getAbsolutePath(),
+                                            subSubDir.getAbsolutePath(),
                                             subDirName,
                                             subSubDirName,
                                             audioIndex);
