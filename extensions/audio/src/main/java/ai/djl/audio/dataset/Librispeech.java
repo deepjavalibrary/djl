@@ -115,7 +115,7 @@ public class Librispeech extends SpeechRecognitionDataset {
     public Record get(NDManager manager, long index) throws IOException {
         NDList data = new NDList();
         NDList labels = new NDList();
-        data.add(sourceAudioData.getPreprocessedData(manager, audioPaths.get((int)index)));
+        data.add(sourceAudioData.getPreprocessedData(manager, audioPaths.get((int) index)));
         labels.add(targetTextData.getEmbedding(manager, index));
         return new Record(data, labels);
     }

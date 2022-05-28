@@ -29,18 +29,19 @@ import ai.djl.training.dataset.RandomAccessDataset;
 import java.util.List;
 
 /**
- * {@code SpeechRecognitionDataset} is an abstract dataset that can be used for
- * datasets for Automatic Speech Recognition (ASR)
- * where the source data is {@link AudioData} and the target data is {@link TextData}.
+ * {@code SpeechRecognitionDataset} is an abstract dataset that can be used for datasets for
+ * Automatic Speech Recognition (ASR) where the source data is {@link AudioData} and the target data
+ * is {@link TextData}.
  *
- * <p> For the target data, it will create embeddings for the target data. Embeddings can be either pre-trained or trained
- * on the go. Pre-trained {@link TextEmbedding} must be set in the {@link TextDataset.Builder}. If no embeddings
- * are set, the dataset creates {@link TrainableWordEmbedding} based {@link TrainableWordEmbedding}
- * from the {@link Vocabulary} created within the dataset.</p>
+ * <p>For the target data, it will create embeddings for the target data. Embeddings can be either
+ * pre-trained or trained on the go. Pre-trained {@link TextEmbedding} must be set in the {@link
+ * TextDataset.Builder}. If no embeddings are set, the dataset creates {@link
+ * TrainableWordEmbedding} based {@link TrainableWordEmbedding} from the {@link Vocabulary} created
+ * within the dataset.
  *
- * <p> For the source data, it will use the {@link ai.djl.audio.processor.AudioProcessor} to featurize data,
- * if users want to write their own featurizer, they can get the original {@link NDArray} from {@link AudioData}
- * without using any {@link ai.djl.audio.processor.AudioProcessor}.</p>
+ * <p>For the source data, it will use the {@link ai.djl.audio.processor.AudioProcessor} to
+ * featurize data, if users want to write their own featurizer, they can get the original {@link
+ * NDArray} from {@link AudioData} without using any {@link ai.djl.audio.processor.AudioProcessor}.
  */
 public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
 
@@ -69,7 +70,6 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         usage = builder.usage;
     }
 
-
     /**
      * @param newTextData list of all unprocessed sentences in the dataset.
      * @throws EmbeddingException if there is an error while embedding input.
@@ -80,18 +80,20 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
                 manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));
     }
 
-    /** This method is to use the methods in the {@link AudioData} to process the original audio data.
+    /**
+     * This method is to use the methods in the {@link AudioData} to process the original audio
+     * data.
+     *
      * @param path The path of original audio data.
-     * @return The {@link NDArray} of audio data that processed by the {@link ai.djl.audio.processor.AudioProcessor}
+     * @return The {@link NDArray} of audio data that processed by the {@link
+     *     ai.djl.audio.processor.AudioProcessor}
      */
     public NDArray getProcessedAudioData(String path) {
         AudioData audioData = sourceAudioData;
         return audioData.getPreprocessedData(manager, path);
     }
 
-    /**
-     * @return A default {@link ai.djl.audio.dataset.AudioData.Configuration}.
-     */
+    /** @return A default {@link ai.djl.audio.dataset.AudioData.Configuration}. */
     public static AudioData.Configuration getDefaultConfiguration() {
         return new AudioData.Configuration();
     }
