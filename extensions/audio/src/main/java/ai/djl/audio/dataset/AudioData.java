@@ -16,6 +16,8 @@ package ai.djl.audio.dataset;
 import ai.djl.audio.processor.AudioNormalizer;
 import ai.djl.audio.processor.AudioProcessor;
 import ai.djl.audio.processor.LinearSpecgram;
+import ai.djl.basicdataset.nlp.TextDataset;
+import ai.djl.basicdataset.utils.TextData;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import java.nio.Buffer;
@@ -25,12 +27,25 @@ import java.util.Arrays;
 import java.util.List;
 import org.bytedeco.javacv.*;
 
+/**
+ * {@link AudioData} is a utility for managing audio data within a {@link
+ * ai.djl.training.dataset.Dataset}. It contains some basic information of an audio file and provide
+ * some method to preprocess the original audio file.
+ * <p> This class provides a list of {@link AudioProcessor} for user to featurize the data.</p>
+ * <p> See {@link SpeechRecognitionDataset} for an example.</p>
+ */
 public class AudioData {
     private int sampleRate;
     private int audioChannels;
 
-    private List<AudioProcessor> processorList;
+    private final List<AudioProcessor> processorList;
 
+
+    /**
+     * Constructs a new {@link AudioData}.
+     *
+     * @param configuration the configuration for the {@link AudioData}.
+     */
     public AudioData(Configuration configuration) {
         this.sampleRate = configuration.sampleRate;
         this.processorList = configuration.processorList;
@@ -41,7 +56,7 @@ public class AudioData {
      * defaults.
      *
      * @return a good default {@link AudioData.Configuration} to use for the constructor with
-     *     defaults
+     * defaults.
      */
     public static AudioData.Configuration getDefaultConfiguration() {
         float targetDb = -20f;
@@ -57,6 +72,11 @@ public class AudioData {
                 .setSampleRate(sampleRate);
     }
 
+    /**
+     * This method is used for decoding the original audio data and converting it to a float array.
+     * @param path The path of the original audio data.
+     * @return A float array.
+     */
     private float[] toFloat(String path) {
         List<Float> list = new ArrayList<>();
         float scale = (float) 1.0 / (float) (1 << (8 * 2) - 1);
@@ -67,10 +87,6 @@ public class AudioData {
             Frame frame;
             while ((frame = audioGrabber.grabFrame()) != null) {
                 Buffer[] buffers = frame.samples;
-                //                ShortBuffer[] copiedBuffer = new ShortBuffer[buffers.length];
-                //                for (int i = 0; i < buffers.length; i++) {
-                //                    deepCopy(buffers[i], copiedBuffer[i]);
-                //                }
                 ShortBuffer sb = (ShortBuffer) buffers[0];
                 for (int i = 0; i < sb.limit(); i++) {
                     list.add(sb.get() * scale);
@@ -79,7 +95,6 @@ public class AudioData {
         } catch (FrameGrabber.Exception e) {
             e.printStackTrace();
         }
-
         float[] floatArray = new float[list.size()];
         int i = 0;
         for (Float f : list) {
@@ -88,6 +103,11 @@ public class AudioData {
         return floatArray;
     }
 
+    /** This method will use a list of {@link AudioProcessor} as featurizer to process the float array.
+     * @param manager the manager for converting the float array to {@link NDArray}.
+     * @param path The path of the original audio data.
+     * @return An {@link NDArray} that represent the processed audio data.
+     */
     public NDArray getPreprocessedData(NDManager manager, String path) {
         float[] floatArray = toFloat(path);
         NDArray samples = manager.create(floatArray);
@@ -97,30 +117,22 @@ public class AudioData {
         return samples;
     }
 
-    private static ShortBuffer deepCopy(ShortBuffer source, ShortBuffer target) {
-        int sourceP = source.position();
-        int sourceL = source.limit();
-        if (null == target) {
-            target = ShortBuffer.allocate(source.remaining());
-        }
-        target.put(source);
-        target.flip();
-        source.position(sourceP);
-        source.limit(sourceL);
-        return target;
-    }
-
+    /**
+     * @return The number of channels of an audio file.
+     */
     public int getAudioChannels() {
         return audioChannels;
     }
 
+    /**
+     * @return The sample rate used by {@link FFmpegFrameGrabber} when sampling the audio file.
+     */
     public int getSampleRate() {
         return sampleRate;
     }
 
     /**
-     * The configuration for creating a {@link AudioData} value in a {@link *
-     * ai.djl.training.dataset.Dataset}.
+     * The configuration for creating a {@link AudioData} value in a {@link ai.djl.audio.dataset.AudioData}.
      */
     public static final class Configuration {
 
