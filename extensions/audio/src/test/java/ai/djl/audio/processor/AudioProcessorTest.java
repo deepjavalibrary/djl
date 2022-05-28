@@ -6,7 +6,6 @@ import ai.djl.audio.dataset.AudioData;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-
 import java.util.Arrays;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -42,5 +41,4 @@ public class AudioProcessorTest {
         Assert.assertTrue(samples.getShape().equals(new Shape(161, 838)));
         Assert.assertEquals(samples.get("0,0").toFloatArray()[0], -15.4571f, eps);
     }
-
 }
