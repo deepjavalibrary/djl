@@ -9,10 +9,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.training.dataset.RandomAccessDataset;
-import ai.djl.training.dataset.Record;
-import ai.djl.translate.TranslateException;
-import ai.djl.util.Progress;
-import java.io.IOException;
 import java.util.List;
 
 public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
@@ -42,37 +38,25 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         usage = builder.usage;
     }
 
-    protected void targetPreprocess(List<String> newTextData, boolean source)
-            throws EmbeddingException {
+    protected void targetPreprocess(List<String> newTextData, boolean source) throws EmbeddingException {
         TextData textData = targetTextData;
         textData.preprocess(
                 manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));
     }
 
-//        public NDArray getProcessedData(long index, ){
-//            TextData textData = targetTextData;
-//            AudioData audioData = sourceAudioData;
-//            return source ? textData.getRawText(index) : audioData.getPreprocessedData( manager, path);
-//        }
-
-    @Override
-    public void prepare(Progress progress) throws IOException, TranslateException {}
-
-    @Override
-    public Record get(NDManager manager, long index) throws IOException {
-        return null;
+    public NDArray getProcessedAudioData(String path) {
+        AudioData audioData = sourceAudioData;
+        return audioData.getPreprocessedData(manager, path);
     }
 
-    @Override
-    protected long availableSize() {
-        return 0;
-    }
 
     public static AudioData.Configuration getDefaultConfiguration() {
         return new AudioData.Configuration();
     }
 
-    /** Abstract AudioBuilder that helps build a {@link SpeechRecognitionDataset}. */
+    /**
+     * Abstract AudioBuilder that helps build a {@link SpeechRecognitionDataset}.
+     */
     public abstract static class AudioBuilder<T extends AudioBuilder<T>> extends BaseBuilder<T> {
 
         protected AudioData.Configuration sourceConfiguration;
@@ -85,7 +69,9 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         protected Usage usage;
         protected String artifactId;
 
-        /** Constructs a new builder. */
+        /**
+         * Constructs a new builder.
+         */
         AudioBuilder() {
             repository = BasicDatasets.REPOSITORY;
             groupId = BasicDatasets.GROUP_ID;

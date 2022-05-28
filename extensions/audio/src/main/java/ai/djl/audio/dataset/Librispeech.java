@@ -3,8 +3,20 @@ package ai.djl.audio.dataset;
 import ai.djl.Application;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.nlp.PennTreebankText;
+import ai.djl.ndarray.NDManager;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.dataset.Record;
+import ai.djl.translate.TranslateException;
+import ai.djl.util.Progress;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Librispeech extends SpeechRecognitionDataset {
 
@@ -17,12 +29,53 @@ public class Librispeech extends SpeechRecognitionDataset {
      *
      * @param builder a builder with the necessary configurations
      */
-    public Librispeech(AudioBuilder<?> builder) {
+    public Librispeech(Builder builder) {
         super(builder);
+        this.usage = builder.usage;
+        this.mrl = builder.getMrl();
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
 
+    @Override
+    public void prepare(Progress progress) throws IOException, TranslateException {
+        if (prepared){
+            return;
+        }
+        Artifact artifact = mrl.getDefaultArtifact();
+        mrl.prepare(artifact,progress);
+        Artifact.Item item;
+        switch (usage){
+            case TRAIN:
+                item = artifact.getFiles().get("train");
+                break;
+            case TEST:
+                item = artifact.getFiles().get("test");
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported usage type.");
+        }
+        Path path = mrl.getRepository().getFile(item,"").toAbsolutePath();
+        List<String> lineArray = new ArrayList<>();
+        try (BufferedReader reader = Files.newBufferedReader(path)){
+            String row;
+            while((row = reader.readLine()) != null){
+                lineArray.add(row);
+            }
+        }
+    }
 
+    @Override
+    public Record get(NDManager manager, long index) throws IOException {
+        return null;
+    }
+
+    @Override
+    protected long availableSize() {
+        return 0;
+    }
 
 
     /** A builder to construct a {@link Librispeech} . */

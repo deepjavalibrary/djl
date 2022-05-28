@@ -21,13 +21,13 @@
       "files": {
         "train":{
           "uri" : "http://www.openslr.org/resources/12/train-clean-100.tar.gz",
-          "sha1Hash": "f9ffb014fa33bd5730e5029697ad245184f3a678",
-          "size": 5101618
+          "sha1Hash": "cf83135102b2958182e26ef3b554b439338aa48e",
+          "size": 6387309499
         },
         "test":{
           "uri" : "http://www.openslr.org/resources/12/test-clean.tar.gz",
-          "sha1Hash": "5c15c548b42d80bce9332b788514e6635fb0226e",
-          "size": 449945
+          "sha1Hash": "2978149c5fa469821a02171e1d547cf1065f1213",
+          "size": 346663984
         }
       }
     }
