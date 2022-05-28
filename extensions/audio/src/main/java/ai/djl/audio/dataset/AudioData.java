@@ -2,7 +2,7 @@ package ai.djl.audio.dataset;
 
 import ai.djl.audio.featurizer.AudioNormalizer;
 import ai.djl.audio.featurizer.AudioProcessor;
-import ai.djl.audio.featurizer.SpecgramFeaturizer;
+import ai.djl.audio.featurizer.LinearSpecgram;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import java.nio.Buffer;
@@ -19,6 +19,7 @@ public class AudioData {
     private List<AudioProcessor> processorList;
 
     public AudioData(Configuration configuration) {
+        this.sampleRate = configuration.sampleRate;
         this.processorList = configuration.processorList;
     }
 
@@ -30,9 +31,17 @@ public class AudioData {
      *     defaults
      */
     public static AudioData.Configuration getDefaultConfiguration() {
+        float targetDb = -20f;
+        float strideMs = 10f;
+        float windowsMs = 20f;
+        int sampleRate = 16000;
         List<AudioProcessor> defaultProcessors =
-                Arrays.asList(new AudioNormalizer(-20f), new SpecgramFeaturizer());
-        return new AudioData.Configuration().setProcessorList(defaultProcessors);
+                Arrays.asList(
+                        new AudioNormalizer(targetDb),
+                        new LinearSpecgram(strideMs, windowsMs, sampleRate));
+        return new AudioData.Configuration()
+                .setProcessorList(defaultProcessors)
+                .setSampleRate(sampleRate);
     }
 
     private float[] toFloat(String path) {
@@ -42,7 +51,7 @@ public class AudioData {
         try (FFmpegFrameGrabber audioGrabber = new FFmpegFrameGrabber(path)) {
             audioGrabber.start();
             audioChannels = audioGrabber.getAudioChannels();
-            sampleRate = audioGrabber.getSampleRate();
+            audioGrabber.setSampleRate(sampleRate);
             Frame frame;
             while ((frame = audioGrabber.grabFrame()) != null) {
                 Buffer[] buffers = frame.samples;
@@ -103,39 +112,21 @@ public class AudioData {
      */
     public static final class Configuration {
 
-        /** This parameter is used for setting normalized value. */
-        private Double target_dB;
-        /** This parameter is used for setting stride value. */
-        private Double stride_ms;
-        /** This parameter is used for setting window frame size value. */
-        private Double windows_ms;
+        private int sampleRate;
 
         private List<AudioProcessor> processorList;
-
-        public Configuration setStride_ms(Double stride_ms) {
-            this.stride_ms = stride_ms;
-            return this;
-        }
-
-        public Configuration setTarget_dB(Double target_dB) {
-            this.target_dB = target_dB;
-            return this;
-        }
-
-        public Configuration setWindows_ms(Double windows_ms) {
-            this.windows_ms = windows_ms;
-            return this;
-        }
 
         public Configuration setProcessorList(List<AudioProcessor> processorList) {
             this.processorList = processorList;
             return this;
         }
 
+        public Configuration setSampleRate(int sampleRate) {
+            this.sampleRate = sampleRate;
+            return this;
+        }
+
         public AudioData.Configuration update(AudioData.Configuration other) {
-            target_dB = other.target_dB;
-            stride_ms = other.stride_ms;
-            windows_ms = other.windows_ms;
             processorList = other.processorList;
             return this;
         }

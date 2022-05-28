@@ -4,6 +4,7 @@ dependencies {
     api project(":api")
     api project(":basicdataset")
     api group: 'org.bytedeco', name: 'javacv-platform', version: '1.5.7'
+    implementation 'com.github.wendykierp:JTransforms:3.1'
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
