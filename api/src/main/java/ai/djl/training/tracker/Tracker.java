@@ -71,6 +71,16 @@ public interface Tracker {
     }
 
     /**
+     * Returns a new instance of {@link ai.djl.training.tracker.CyclicalTracker.Builder} that can
+     * build an {@link CyclicalTracker}.
+     *
+     * @return the {@link CyclicalTracker} {@link ai.djl.training.tracker.CyclicalTracker.Builder}
+     */
+    static CyclicalTracker.Builder cyclical() {
+        return CyclicalTracker.builder();
+    }
+
+    /**
      * Returns a new instance of {@link Tracker} with a fixed value.
      *
      * @param value the fixed value
