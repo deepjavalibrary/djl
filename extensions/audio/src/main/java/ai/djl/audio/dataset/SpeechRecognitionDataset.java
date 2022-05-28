@@ -61,11 +61,8 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
      */
     public SpeechRecognitionDataset(AudioBuilder<?> builder) {
         super(builder);
-        sourceAudioData =
-                new AudioData(AudioData.getDefaultConfiguration());
-        targetTextData =
-                new TextData(
-                        TextData.getDefaultConfiguration());
+        sourceAudioData = new AudioData(AudioData.getDefaultConfiguration());
+        targetTextData = new TextData(TextData.getDefaultConfiguration());
         manager = builder.manager;
         usage = builder.usage;
     }

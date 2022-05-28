@@ -12,12 +12,14 @@
  */
 
 package ai.djl.audio.processor;
+
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import org.jtransforms.fft.FloatFFT_1D;
 
+/** Calculate linear spectrogram by short-time fourier transform. */
 public class LinearSpecgram implements AudioProcessor {
 
     static float eps = 1e-14f;
@@ -37,7 +39,6 @@ public class LinearSpecgram implements AudioProcessor {
     public NDArray extractFeatures(NDManager manager, NDArray samples) {
         return stft(samples);
     }
-
 
     private NDArray stft(NDArray samples) {
         NDManager manager = samples.getManager();

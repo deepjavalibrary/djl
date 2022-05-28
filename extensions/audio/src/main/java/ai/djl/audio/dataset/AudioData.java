@@ -23,7 +23,9 @@ import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.bytedeco.javacv.*;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.FrameGrabber;
 
 /**
  * {@link AudioData} is a utility for managing audio data within a {@link
@@ -137,10 +139,8 @@ public class AudioData {
         this.audioPaths = audioPaths;
     }
 
-    /**
-     * @return The original audio path.
-     */
-    public List<String> getAudioPaths(){
+    /** @return The original audio path. */
+    public List<String> getAudioPaths() {
         return audioPaths;
     }
 
