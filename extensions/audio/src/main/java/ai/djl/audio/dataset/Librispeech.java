@@ -30,11 +30,15 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * LibriSpeech is a corpus of approximately 1000 hours of 16kHz read English speech, prepared by
+ * Vassil Panayotov with the assistance of Daniel Povey. The data is derived from read audiobooks
+ * from the LibriVox project, and has been carefully segmented and aligned.
+ */
 public class Librispeech extends SpeechRecognitionDataset {
 
     private static final String VERSION = "1.0";
     private static final String ARTIFACT_ID = "librispeech";
-    private ArrayList<String> audioPaths = new ArrayList<>();
 
     /**
      * Creates a new instance of {@link SpeechRecognitionDataset} with the given necessary
@@ -48,6 +52,11 @@ public class Librispeech extends SpeechRecognitionDataset {
         this.mrl = builder.getMrl();
     }
 
+    /**
+     * Creates a builder to build a {@link Librispeech}.
+     *
+     * @return a new {@link Librispeech.Builder} object
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -76,6 +85,7 @@ public class Librispeech extends SpeechRecognitionDataset {
         File mainDir = mrl.getRepository().getFile(item, subPath).toFile();
         File[] subDirs = mainDir.listFiles();
         List<String> lineArray = new ArrayList<>();
+        List<String> audioPaths = new ArrayList<>();
         for (File subDir : subDirs) {
             File[] subSubDirs = subDir.listFiles();
             String subDirName = subDir.getName();
@@ -108,21 +118,24 @@ public class Librispeech extends SpeechRecognitionDataset {
             }
         }
         targetPreprocess(lineArray);
+        sourcePreprocess(audioPaths);
         prepared = true;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) throws IOException {
+    public Record get(NDManager manager, long index) {
         NDList data = new NDList();
         NDList labels = new NDList();
-        data.add(sourceAudioData.getPreprocessedData(manager, audioPaths.get((int) index)));
+        data.add(sourceAudioData.getPreprocessedData(manager, (int) index));
         labels.add(targetTextData.getEmbedding(manager, index));
         return new Record(data, labels);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected long availableSize() {
-        return 0;
+        return sourceAudioData.getTotalSize();
     }
 
     /** A builder to construct a {@link Librispeech} . */
@@ -145,6 +158,11 @@ public class Librispeech extends SpeechRecognitionDataset {
             return new Librispeech(this);
         }
 
+        /**
+         * Builds a new {@link Librispeech} object.
+         *
+         * @return the new {@link Librispeech} object
+         */
         MRL getMrl() {
             return repository.dataset(Application.Audio.ANY, groupId, artifactId, VERSION);
         }

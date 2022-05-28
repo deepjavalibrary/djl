@@ -81,21 +81,17 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
     }
 
     /**
-     * This method is to use the methods in the {@link AudioData} to process the original audio
-     * data.
+     * This method is used to set the audio data path.
      *
-     * @param path The path of original audio data.
-     * @return The {@link NDArray} of audio data that processed by the {@link
-     *     ai.djl.audio.processor.AudioProcessor}
+     * @param audioPathList The path list of all original audio data
      */
-    public NDArray getProcessedAudioData(String path) {
-        AudioData audioData = sourceAudioData;
-        return audioData.getPreprocessedData(manager, path);
+    protected void sourcePreprocess(List<String> audioPathList) {
+        sourceAudioData.setAudioPaths(audioPathList);
     }
 
     /** @return A default {@link ai.djl.audio.dataset.AudioData.Configuration}. */
     public static AudioData.Configuration getDefaultConfiguration() {
-        return new AudioData.Configuration();
+        return AudioData.getDefaultConfiguration();
     }
 
     /** Abstract AudioBuilder that helps build a {@link SpeechRecognitionDataset}. */

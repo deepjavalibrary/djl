@@ -28,7 +28,8 @@ import org.bytedeco.javacv.*;
 /**
  * {@link AudioData} is a utility for managing audio data within a {@link
  * ai.djl.training.dataset.Dataset}. It contains some basic information of an audio file and provide
- * some method to preprocess the original audio file.
+ * some method to preprocess the original audio file. Since storing all the data into the memory is
+ * impossible, this class will only store the path of the original audio data.
  *
  * <p>This class provides a list of {@link AudioProcessor} for user to featurize the data.
  *
@@ -38,7 +39,8 @@ public class AudioData {
     private int sampleRate;
     private int audioChannels;
 
-    private final List<AudioProcessor> processorList;
+    private List<AudioProcessor> processorList;
+    private List<String> audioPaths;
 
     /**
      * Constructs a new {@link AudioData}.
@@ -108,11 +110,11 @@ public class AudioData {
      * array.
      *
      * @param manager the manager for converting the float array to {@link NDArray}.
-     * @param path The path of the original audio data.
+     * @param index The index of path of the original audio data.
      * @return An {@link NDArray} that represent the processed audio data.
      */
-    public NDArray getPreprocessedData(NDManager manager, String path) {
-        float[] floatArray = toFloat(path);
+    public NDArray getPreprocessedData(NDManager manager, int index) {
+        float[] floatArray = toFloat(audioPaths.get(index));
         NDArray samples = manager.create(floatArray);
         for (AudioProcessor processor : processorList) {
             samples = processor.extractFeatures(manager, samples);
@@ -128,6 +130,23 @@ public class AudioData {
     /** @return The sample rate used by {@link FFmpegFrameGrabber} when sampling the audio file. */
     public int getSampleRate() {
         return sampleRate;
+    }
+
+    /** @param audioPaths The path list of original audio data. */
+    public void setAudioPaths(List<String> audioPaths) {
+        this.audioPaths = audioPaths;
+    }
+
+    /**
+     * @return The original audio path.
+     */
+    public List<String> getAudioPaths(){
+        return audioPaths;
+    }
+
+    /** @return The total number of audio data in the dataset. */
+    public int getTotalSize() {
+        return audioPaths.size();
     }
 
     /**

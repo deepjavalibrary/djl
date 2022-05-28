@@ -22,7 +22,8 @@ public class AudioProcessorTest {
                 new AudioData.Configuration()
                         .setProcessorList(Arrays.asList(new AudioNormalizer(-20)));
         AudioData testData = new AudioData(configuration);
-        NDArray samples = testData.getPreprocessedData(manager, filePath);
+        testData.setAudioPaths(Arrays.asList(filePath));
+        NDArray samples = testData.getPreprocessedData(manager, 0);
         Assert.assertEquals(AudioUtils.rmsDb(samples), -20.0f, 1e-3);
     }
 
@@ -37,7 +38,8 @@ public class AudioProcessorTest {
                                         new AudioNormalizer(-20),
                                         new LinearSpecgram(10, 20, 16000)));
         AudioData testData = new AudioData(configuration);
-        NDArray samples = testData.getPreprocessedData(manager, filePath);
+        testData.setAudioPaths(Arrays.asList(filePath));
+        NDArray samples = testData.getPreprocessedData(manager, 0);
         Assert.assertTrue(samples.getShape().equals(new Shape(161, 838)));
         Assert.assertEquals(samples.get("0,0").toFloatArray()[0], -15.4571f, eps);
     }
