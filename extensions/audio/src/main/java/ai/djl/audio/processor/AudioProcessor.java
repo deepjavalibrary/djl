@@ -16,6 +16,16 @@ package ai.djl.audio.processor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 
+/**
+ * This interface is used for extracting features from origin audio samples.
+ */
 public interface AudioProcessor {
+
+
+    /**
+     * @param manager The manager used for extracting features.
+     * @param samples The Audio that needs to be extracting features.
+     * @return
+     */
     NDArray extractFeatures(NDManager manager, NDArray samples);
 }

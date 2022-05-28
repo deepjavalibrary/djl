@@ -17,6 +17,9 @@ import ai.djl.audio.AudioUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 
+/**
+ * Use the mean and standard values to calculate the normalized values for audio features.
+ */
 public class AudioNormalizer implements AudioProcessor {
 
     private float target_db;
@@ -26,6 +29,8 @@ public class AudioNormalizer implements AudioProcessor {
         this.target_db = target_db;
     }
 
+
+    /** {@inheritDoc} */
     @Override
     public NDArray extractFeatures(NDManager manager, NDArray samples) {
         float gain = target_db - AudioUtils.rmsDb(samples);

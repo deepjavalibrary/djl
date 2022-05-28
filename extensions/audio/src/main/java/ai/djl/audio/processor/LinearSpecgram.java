@@ -12,7 +12,6 @@
  */
 
 package ai.djl.audio.processor;
-
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -33,10 +32,12 @@ public class LinearSpecgram implements AudioProcessor {
         this.sampleRate = sampleRate;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray extractFeatures(NDManager manager, NDArray samples) {
         return stft(samples);
     }
+
 
     private NDArray stft(NDArray samples) {
         NDManager manager = samples.getManager();

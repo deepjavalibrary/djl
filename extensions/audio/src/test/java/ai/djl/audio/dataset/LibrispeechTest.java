@@ -23,8 +23,10 @@ public class LibrispeechTest {
                         .build();
         dataset.prepare();
         System.out.println(dataset.get(manager,0).getData());
+        System.out.println(dataset.sourceAudioData.getAudioPaths().get(0));
         for (long i :dataset.get(manager,0).getLabels().get(0).toLongArray()) {
-            System.out.println(i);
+            System.out.print(i);
+            System.out.print(" ");
         }
     }
 }
