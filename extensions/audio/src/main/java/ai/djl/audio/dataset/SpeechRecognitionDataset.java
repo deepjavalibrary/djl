@@ -38,7 +38,8 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         usage = builder.usage;
     }
 
-    protected void targetPreprocess(List<String> newTextData, boolean source) throws EmbeddingException {
+    protected void targetPreprocess(List<String> newTextData, boolean source)
+            throws EmbeddingException {
         TextData textData = targetTextData;
         textData.preprocess(
                 manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));
@@ -49,14 +50,11 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         return audioData.getPreprocessedData(manager, path);
     }
 
-
     public static AudioData.Configuration getDefaultConfiguration() {
         return new AudioData.Configuration();
     }
 
-    /**
-     * Abstract AudioBuilder that helps build a {@link SpeechRecognitionDataset}.
-     */
+    /** Abstract AudioBuilder that helps build a {@link SpeechRecognitionDataset}. */
     public abstract static class AudioBuilder<T extends AudioBuilder<T>> extends BaseBuilder<T> {
 
         protected AudioData.Configuration sourceConfiguration;
@@ -69,9 +67,7 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         protected Usage usage;
         protected String artifactId;
 
-        /**
-         * Constructs a new builder.
-         */
+        /** Constructs a new builder. */
         AudioBuilder() {
             repository = BasicDatasets.REPOSITORY;
             groupId = BasicDatasets.GROUP_ID;

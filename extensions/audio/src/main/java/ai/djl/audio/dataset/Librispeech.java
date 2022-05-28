@@ -2,7 +2,6 @@ package ai.djl.audio.dataset;
 
 import ai.djl.Application;
 import ai.djl.basicdataset.BasicDatasets;
-import ai.djl.basicdataset.nlp.PennTreebankText;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
@@ -10,7 +9,6 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,13 +39,13 @@ public class Librispeech extends SpeechRecognitionDataset {
 
     @Override
     public void prepare(Progress progress) throws IOException, TranslateException {
-        if (prepared){
+        if (prepared) {
             return;
         }
         Artifact artifact = mrl.getDefaultArtifact();
-        mrl.prepare(artifact,progress);
+        mrl.prepare(artifact, progress);
         Artifact.Item item;
-        switch (usage){
+        switch (usage) {
             case TRAIN:
                 item = artifact.getFiles().get("train");
                 break;
@@ -57,11 +55,11 @@ public class Librispeech extends SpeechRecognitionDataset {
             default:
                 throw new UnsupportedOperationException("Unsupported usage type.");
         }
-        Path path = mrl.getRepository().getFile(item,"").toAbsolutePath();
+        Path path = mrl.getRepository().getFile(item, "").toAbsolutePath();
         List<String> lineArray = new ArrayList<>();
-        try (BufferedReader reader = Files.newBufferedReader(path)){
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
             String row;
-            while((row = reader.readLine()) != null){
+            while ((row = reader.readLine()) != null) {
                 lineArray.add(row);
             }
         }
@@ -76,7 +74,6 @@ public class Librispeech extends SpeechRecognitionDataset {
     protected long availableSize() {
         return 0;
     }
-
 
     /** A builder to construct a {@link Librispeech} . */
     public static class Builder extends AudioBuilder<Librispeech.Builder> {
@@ -108,5 +105,4 @@ public class Librispeech extends SpeechRecognitionDataset {
             return this;
         }
     }
-
 }

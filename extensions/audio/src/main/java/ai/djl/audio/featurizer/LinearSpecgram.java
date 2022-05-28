@@ -37,7 +37,7 @@ public class LinearSpecgram implements AudioProcessor {
 
         NDList windowList = new NDList();
         for (int row = 0; row < rows; row++) {
-            windowList.add(samples.get(strideSize * row + ":" + (strideSize * (row + 1))));
+            windowList.add(samples.get(strideSize * row + ":" + (strideSize * row + windowSize)));
         }
         samples = NDArrays.stack(windowList);
 
