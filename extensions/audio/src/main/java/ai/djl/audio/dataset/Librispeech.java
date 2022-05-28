@@ -29,7 +29,7 @@ import java.util.ArrayList;
 public class Librispeech extends SpeechRecognitionDataset {
 
     private static final String VERSION = "1.0";
-    private static final String ARTIFACT_ID = "Librispeech";
+    private static final String ARTIFACT_ID = "librispeech";
     private static ArrayList<String> TextIndex = null;
 
     /**
@@ -115,7 +115,7 @@ public class Librispeech extends SpeechRecognitionDataset {
         }
 
         MRL getMrl() {
-            return repository.dataset(Application.NLP.ANY, groupId, artifactId, VERSION);
+            return repository.dataset(Application.Audio.ANY, groupId, artifactId, VERSION);
         }
 
         /** {@inheritDoc} */

@@ -11,5 +11,11 @@
  * and limitations under the License.
  */
 
-/** Contains multiple processors for audio and signal processing */
-package ai.djl.audio.featurizer;
+package ai.djl.audio.processor;
+
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDManager;
+
+public interface AudioProcessor {
+    NDArray extractFeatures(NDManager manager, NDArray samples);
+}

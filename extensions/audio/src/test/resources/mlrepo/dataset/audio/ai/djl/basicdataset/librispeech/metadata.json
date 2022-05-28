@@ -1,10 +1,10 @@
 {
   "metadataVersion": "0.2",
   "resourceType": "dataset",
-  "application": "asr",
-  "groupId": "ai.djl.audio",
-  "artifactId": "Librispeech",
-  "name": "Librispeech",
+  "application": "audio",
+  "groupId": "ai.djl.basicdata",
+  "artifactId": "librispeech",
+  "name": "librispeech",
   "description": "LibriSpeech is a corpus of approximately 1000 hours of 16kHz read English speech, prepared by Vassil Panayotov with the assistance of Daniel Povey. The data is derived from read audiobooks from the LibriVox project, and has been carefully segmented and aligned.",
   "website": "https://huggingface.co/datasets/librispeech_asr",
   "licenses": {

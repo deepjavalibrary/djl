@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.audio.featurizer;
+package ai.djl.audio.processor;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;

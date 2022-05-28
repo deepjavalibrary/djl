@@ -13,9 +13,9 @@
 
 package ai.djl.audio.dataset;
 
-import ai.djl.audio.featurizer.AudioNormalizer;
-import ai.djl.audio.featurizer.AudioProcessor;
-import ai.djl.audio.featurizer.LinearSpecgram;
+import ai.djl.audio.processor.AudioNormalizer;
+import ai.djl.audio.processor.AudioProcessor;
+import ai.djl.audio.processor.LinearSpecgram;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import java.nio.Buffer;
