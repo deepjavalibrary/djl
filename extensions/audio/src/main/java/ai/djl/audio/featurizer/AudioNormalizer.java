@@ -1,5 +1,6 @@
 package ai.djl.audio.featurizer;
 
+import ai.djl.audio.AudioUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 
@@ -14,16 +15,11 @@ public class AudioNormalizer implements AudioProcessor {
 
     @Override
     public NDArray extractFeatures(NDManager manager, NDArray samples) {
-        float gain = target_db - rmsDb(samples);
+        float gain = target_db - AudioUtils.rmsDb(samples);
         gain = Math.min(gain, max_gain_db);
 
         float factor = (float) Math.pow(10f, gain / 20f);
         samples = samples.mul(factor);
         return samples;
-    }
-
-    private float rmsDb(NDArray samples) {
-        samples = samples.pow(2).mean().log10().mul(10);
-        return samples.toFloatArray()[0];
     }
 }
