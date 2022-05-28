@@ -1,3 +1,16 @@
+/*
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package ai.djl.nn.norm;
 
 import ai.djl.ndarray.NDList;
@@ -35,9 +48,9 @@ public class GhostBatchNorm extends BatchNorm {
             PairList<String, Object> params) {
 
         NDList[] subBatches = split(inputs);
-        for (NDList batch : subBatches)
+        for (NDList batch : subBatches) {
             super.forwardInternal(parameterStore, batch, training, params);
-
+        }
         return batchifier.batchify(subBatches);
     }
 
@@ -60,7 +73,7 @@ public class GhostBatchNorm extends BatchNorm {
     }
 
     /**
-     * Creates a builder to build a {@code GhostBatchNorm.}
+     * Creates a builder to build a {@code GhostBatchNorm}.
      *
      * @return a new builder
      */
@@ -68,7 +81,7 @@ public class GhostBatchNorm extends BatchNorm {
         return new Builder();
     }
 
-    /** The Builder to construct a {@link GhostBatchNorm} */
+    /** The Builder to construct a {@link GhostBatchNorm}. */
     public static class Builder extends BatchNorm.BaseBuilder<Builder> {
         private int virtualBatchSize = 128;
 
@@ -77,7 +90,7 @@ public class GhostBatchNorm extends BatchNorm {
         /**
          * Set the size of virtual batches in which to use when sub-batching. Defaults to 128.
          *
-         * @param virtualBatchSize
+         * @param virtualBatchSize the virtual batch size
          * @return this Builder
          */
         public Builder optVirtualBatchSize(int virtualBatchSize) {

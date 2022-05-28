@@ -10,6 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+
 package ai.djl.nn.norm;
 
 import ai.djl.Device;
@@ -282,34 +283,22 @@ public class BatchNorm extends AbstractBlock {
 
     /** The Builder to construct a {@link BatchNorm}. */
     public static class Builder extends BaseBuilder<Builder> {
-        /**
-         * Builds a {@link BatchNorm} block.
-         *
-         * @return the {@link BatchNorm} block
-         */
         Builder() {}
 
-        /**
-         * Builds the new {@link BatchNorm}.
-         *
-         * @return the new {@link BatchNorm}
-         */
+        /** {@inheritDoc} */
         @Override
         public BatchNorm build() {
             return new BatchNorm(this);
         }
 
-        /**
-         * Returns this {code Builder} object.
-         *
-         * @return this {@code BaseBuilder}
-         */
+        /** {@inheritDoc} */
         @Override
         public Builder self() {
             return this;
         }
     }
 
+    /** The Builder to construct a {@link BatchNorm} type of {@link ai.djl.nn.Block}. */
     public abstract static class BaseBuilder<T extends BaseBuilder<T>> {
 
         protected int axis = 1;
@@ -318,7 +307,7 @@ public class BatchNorm extends AbstractBlock {
         protected boolean center = true;
         protected boolean scale = true;
 
-        public BaseBuilder() {}
+        protected BaseBuilder() {}
 
         /**
          * Set the axis in which channel is specified. Defaults to 1.
@@ -375,10 +364,18 @@ public class BatchNorm extends AbstractBlock {
             return self();
         }
 
-        /** {@inheritDoc} */
+        /**
+         * Builds the new {@link BatchNorm}.
+         *
+         * @return the new {@link BatchNorm}
+         */
         public abstract BatchNorm build();
 
-        /** {@inheritDoc} */
+        /**
+         * Returns this {code Builder} object.
+         *
+         * @return this {@code BaseBuilder}
+         */
         public abstract T self();
     }
 }
