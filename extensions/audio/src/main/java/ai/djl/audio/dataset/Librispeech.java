@@ -61,6 +61,12 @@ public class Librispeech extends SpeechRecognitionDataset {
         return new Builder();
     }
 
+    /**
+     * Prepares the dataset for use with tracked progress.
+     *
+     * @param progress the progress tracker
+     * @throws IOException for various exceptions depending on the dataset
+     */
     @Override
     public void prepare(Progress progress) throws IOException, TranslateException {
         if (prepared) {

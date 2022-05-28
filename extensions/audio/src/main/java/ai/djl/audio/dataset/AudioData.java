@@ -159,16 +159,32 @@ public class AudioData {
 
         private List<AudioProcessor> processorList;
 
+        /**
+         * @param processorList The list of processor which are used for extracting features from
+         *     audio data.
+         * @return this configuration.
+         */
         public Configuration setProcessorList(List<AudioProcessor> processorList) {
             this.processorList = processorList;
             return this;
         }
 
+        /**
+         * @param sampleRate The sampleRate for {@link FFmpegFrameGrabber} to use.
+         * @return this configuration.
+         */
         public Configuration setSampleRate(int sampleRate) {
             this.sampleRate = sampleRate;
             return this;
         }
 
+        /**
+         * Updates this {@link AudioData.Configuration} with the non-null values from another
+         * configuration.
+         *
+         * @param other the other configuration to use to update this
+         * @return this configuration after updating
+         */
         public AudioData.Configuration update(AudioData.Configuration other) {
             processorList = other.processorList;
             return this;
