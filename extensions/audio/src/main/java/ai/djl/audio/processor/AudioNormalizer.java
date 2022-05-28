@@ -20,18 +20,18 @@ import ai.djl.ndarray.NDManager;
 /** Use the mean and standard values to calculate the normalized values for audio features. */
 public class AudioNormalizer implements AudioProcessor {
 
-    private float target_db;
-    static float max_gain_db = 300.0f;
+    private float targetDb;
+    static float maxGainDb = 300.0f;
 
-    public AudioNormalizer(float target_db) {
-        this.target_db = target_db;
+    public AudioNormalizer(float targetDb) {
+        this.targetDb = targetDb;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray extractFeatures(NDManager manager, NDArray samples) {
-        float gain = target_db - AudioUtils.rmsDb(samples);
-        gain = Math.min(gain, max_gain_db);
+        float gain = targetDb - AudioUtils.rmsDb(samples);
+        gain = Math.min(gain, maxGainDb);
 
         float factor = (float) Math.pow(10f, gain / 20f);
         samples = samples.mul(factor);

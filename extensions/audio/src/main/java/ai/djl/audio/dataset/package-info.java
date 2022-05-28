@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains useful audio datasets */
+/** Contains useful audio datasets. */
 package ai.djl.audio.dataset;

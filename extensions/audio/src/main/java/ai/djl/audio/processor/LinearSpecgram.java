@@ -28,6 +28,13 @@ public class LinearSpecgram implements AudioProcessor {
     private float windowsMs;
     private float sampleRate;
 
+    /**
+     * Calculate linear spectrogram by short-time fourier transform.
+     *
+     * @param strideMs Stride size of window
+     * @param windowsMs Window size
+     * @param sampleRate Sample rate of raw data
+     */
     public LinearSpecgram(float strideMs, float windowsMs, int sampleRate) {
         this.strideMs = strideMs;
         this.windowsMs = windowsMs;

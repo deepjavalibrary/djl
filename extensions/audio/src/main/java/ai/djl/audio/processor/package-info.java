@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains multiple processors for audio and signal processing */
+/** Contains multiple processors for audio and signal processing. */
 package ai.djl.audio.processor;
