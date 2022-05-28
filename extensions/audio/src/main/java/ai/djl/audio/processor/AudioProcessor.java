@@ -20,9 +20,11 @@ import ai.djl.ndarray.NDManager;
 public interface AudioProcessor {
 
     /**
-     * @param manager The manager used for extracting features.
-     * @param samples The Audio that needs to be extracting features.
-     * @return
+     * Extract features by the processor.
+     *
+     * @param manager The manager used for extracting features
+     * @param samples The Audio that needs to be extracting features
+     * @return Target feature
      */
     NDArray extractFeatures(NDManager manager, NDArray samples);
 }

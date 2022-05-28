@@ -68,6 +68,8 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
     }
 
     /**
+     * Store and preprocess target text data.
+     *
      * @param newTextData list of all unprocessed sentences in the dataset.
      * @throws EmbeddingException if there is an error while embedding input.
      */

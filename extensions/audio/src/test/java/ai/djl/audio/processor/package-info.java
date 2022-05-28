@@ -11,23 +11,6 @@
  * and limitations under the License.
  */
 
-package ai.djl.audio;
 
-import ai.djl.ndarray.NDArray;
-
-/** Useful utils for audio process. */
-public final class AudioUtils {
-
-    private AudioUtils() {}
-
-    /**
-     * Calculate root mean square energy in decibels.
-     *
-     * @param samples input signal, should be 1 dimension array
-     * @return root mean square energy
-     */
-    public static float rmsDb(NDArray samples) {
-        samples = samples.pow(2).mean().log10().mul(10);
-        return samples.toFloatArray()[0];
-    }
-}
+/** Contains tests for the processor module. */
+package ai.djl.audio.processor;

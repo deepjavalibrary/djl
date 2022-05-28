@@ -17,12 +17,17 @@ import ai.djl.audio.AudioUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 
-/** Use the mean and standard values to calculate the normalized values for audio features. */
+/** Use the mean and standard values to calculate the normalized values for audio signal. */
 public class AudioNormalizer implements AudioProcessor {
 
     private float targetDb;
     static float maxGainDb = 300.0f;
 
+    /**
+     * Constructor for {@link AudioNormalizer}.
+     *
+     * @param targetDb target energy in decibels.
+     */
     public AudioNormalizer(float targetDb) {
         this.targetDb = targetDb;
     }

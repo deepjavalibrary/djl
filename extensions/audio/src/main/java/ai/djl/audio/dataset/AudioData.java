@@ -124,27 +124,47 @@ public class AudioData {
         return samples;
     }
 
-    /** @return The number of channels of an audio file. */
+    /**
+     * Get the number of channels of an audio file.
+     *
+     * @return The number of channels of an audio file.
+     */
     public int getAudioChannels() {
         return audioChannels;
     }
 
-    /** @return The sample rate used by {@link FFmpegFrameGrabber} when sampling the audio file. */
+    /**
+     * Get the sample rate used by {@link FFmpegFrameGrabber} when sampling the audio file.
+     *
+     * @return The sample rate used by {@link FFmpegFrameGrabber} when sampling the audio file.
+     */
     public int getSampleRate() {
         return sampleRate;
     }
 
-    /** @param audioPaths The path list of original audio data. */
+    /**
+     * Set the path list of original audio data.
+     *
+     * @param audioPaths The path list of original audio data.
+     */
     public void setAudioPaths(List<String> audioPaths) {
         this.audioPaths = audioPaths;
     }
 
-    /** @return The original audio path. */
+    /**
+     * Get the original audio path.
+     *
+     * @return The original audio path.
+     */
     public List<String> getAudioPaths() {
         return audioPaths;
     }
 
-    /** @return The total number of audio data in the dataset. */
+    /**
+     * Get the total number of audio data in the dataset.
+     *
+     * @return The total number of audio data in the dataset.
+     */
     public int getTotalSize() {
         return audioPaths.size();
     }
@@ -160,6 +180,8 @@ public class AudioData {
         private List<AudioProcessor> processorList;
 
         /**
+         * Set the list of processor which are used for extracting features from audio data.
+         *
          * @param processorList The list of processor which are used for extracting features from
          *     audio data.
          * @return this configuration.
@@ -170,6 +192,8 @@ public class AudioData {
         }
 
         /**
+         * Set the sampleRate for {@link FFmpegFrameGrabber} to use.
+         *
          * @param sampleRate The sampleRate for {@link FFmpegFrameGrabber} to use.
          * @return this configuration.
          */
