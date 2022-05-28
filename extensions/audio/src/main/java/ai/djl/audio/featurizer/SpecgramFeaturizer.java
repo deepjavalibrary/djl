@@ -6,7 +6,7 @@ import ai.djl.ndarray.NDManager;
 public class SpecgramFeaturizer implements AudioProcessor {
 
     @Override
-    public NDArray ExtractFeatures(NDManager manager, NDArray array) {
+    public NDArray extractFeatures(NDManager manager, NDArray samples) {
         return null;
     }
 }

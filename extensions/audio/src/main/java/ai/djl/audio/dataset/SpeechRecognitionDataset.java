@@ -4,7 +4,6 @@ import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.engine.Engine;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
@@ -33,30 +32,31 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
      */
     public SpeechRecognitionDataset(AudioBuilder<?> builder) {
         super(builder);
-        sourceAudioData = new AudioData(getDefaultConfiguration().update(builder.sourceConfiguration));
-        targetTextData = new TextData(TextData.getDefaultConfiguration().update(builder.targetConfiguration));
+        sourceAudioData =
+                new AudioData(getDefaultConfiguration().update(builder.sourceConfiguration));
+        targetTextData =
+                new TextData(
+                        TextData.getDefaultConfiguration().update(builder.targetConfiguration));
         manager = builder.manager;
         usage = builder.usage;
     }
 
-    protected void targetPreprocess(List<String> newTextData, boolean source) throws EmbeddingException {
+    protected void targetPreprocess(List<String> newTextData, boolean source)
+            throws EmbeddingException {
         TextData textData = targetTextData;
         textData.preprocess(
                 manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));
     }
 
-//    public NDArray getProcessedData(long index, boolean source){
-//        TextData textData = targetTextData;
-//        AudioData audioData = sourceAudioData;
-//        return source ? textData.getRawText(index) : audioData.getPreprocessedAudio(index, manager);
-//    }
-
-
+    //    public NDArray getProcessedData(long index, boolean source){
+    //        TextData textData = targetTextData;
+    //        AudioData audioData = sourceAudioData;
+    //        return source ? textData.getRawText(index) : audioData.getPreprocessedAudio(index,
+    // manager);
+    //    }
 
     @Override
-    public void prepare(Progress progress) throws IOException, TranslateException {
-
-    }
+    public void prepare(Progress progress) throws IOException, TranslateException {}
 
     @Override
     public Record get(NDManager manager, long index) throws IOException {
@@ -68,13 +68,12 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         return 0;
     }
 
-
-    public static AudioData.Configuration getDefaultConfiguration(){
+    public static AudioData.Configuration getDefaultConfiguration() {
         return new AudioData.Configuration();
     }
 
     /** Abstract AudioBuilder that helps build a {@link SpeechRecognitionDataset}. */
-    public abstract static class AudioBuilder<T extends AudioBuilder<T>> extends BaseBuilder<T>{
+    public abstract static class AudioBuilder<T extends AudioBuilder<T>> extends BaseBuilder<T> {
 
         protected AudioData.Configuration sourceConfiguration;
         protected TextData.Configuration targetConfiguration;
@@ -82,7 +81,7 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
 
         protected Repository repository;
         protected String groupId;
-//        protected String artifactId;
+        // protected String artifactId;
         protected Usage usage;
 
         /** Constructs a new builder. */
@@ -160,6 +159,5 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
             this.groupId = groupId;
             return self();
         }
-
     }
 }

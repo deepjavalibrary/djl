@@ -31,7 +31,7 @@ public class AudioData {
      */
     public static AudioData.Configuration getDefaultConfiguration() {
         List<AudioProcessor> defaultProcessors =
-                Arrays.asList(new AudioNormalizer(), new SpecgramFeaturizer());
+                Arrays.asList(new AudioNormalizer(-20f), new SpecgramFeaturizer());
         return new AudioData.Configuration().setProcessorList(defaultProcessors);
     }
 
@@ -71,7 +71,7 @@ public class AudioData {
         float[] floatArray = toFloat(path);
         NDArray samples = manager.create(floatArray);
         for (AudioProcessor processor : processorList) {
-            samples = processor.ExtractFeatures(manager, samples);
+            samples = processor.extractFeatures(manager, samples);
         }
         return samples;
     }
@@ -109,6 +109,7 @@ public class AudioData {
         private Double stride_ms;
         /** This parameter is used for setting window frame size value. */
         private Double windows_ms;
+
         private List<AudioProcessor> processorList;
 
         public Configuration setStride_ms(Double stride_ms) {
