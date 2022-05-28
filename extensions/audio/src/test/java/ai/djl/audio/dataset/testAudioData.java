@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 public class testAudioData {
-    
+
     @Test
     public void testAudioDatatofloat() throws FrameGrabber.Exception {
         String path = "src/test/resources/61-70968-0000.flac";

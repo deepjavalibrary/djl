@@ -5,6 +5,7 @@ import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import ai.djl.audio.featurizer.AudioFeaturizer;
 import org.bytedeco.javacv.*;
 
 public class AudioData {
@@ -98,7 +99,7 @@ public class AudioData {
          */
         private Double windows_ms;
 
-        private boolean isFeaturize;
+        private AudioFeaturizer Featurize;
 
         private Integer sampleRate;
 
@@ -124,8 +125,8 @@ public class AudioData {
         }
 
 
-        public Configuration setFeaturize(boolean featurize) {
-            isFeaturize = featurize;
+        public Configuration setFeaturize(AudioFeaturizer featurize) {
+            Featurize = featurize;
             return this;
         }
 
@@ -150,7 +151,7 @@ public class AudioData {
             target_dB = other.target_dB;
             stride_ms = other.stride_ms;
             windows_ms = other.windows_ms;
-            isFeaturize = other.isFeaturize;
+            Featurize = other.Featurize;
             sampleRate = other.sampleRate;
             audioChannels= other.audioChannels;
             return this;

@@ -1,3 +1,5 @@
 package ai.djl.audio.featurizer;
 
-public class DefaultFeaturizer implements AudioFeaturizer {}
+public class DefaultFeaturizer implements AudioFeaturizer {
+
+}
