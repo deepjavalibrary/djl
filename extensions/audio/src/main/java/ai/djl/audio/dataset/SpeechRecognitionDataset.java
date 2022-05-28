@@ -49,12 +49,11 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
                 manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));
     }
 
-        public NDArray getProcessedData(long index, boolean source){
-            TextData textData = targetTextData;
-            AudioData audioData = sourceAudioData;
-            return source ? textData.getRawText(index) : audioData.getPreprocessedAudio(index,
-     manager);
-        }
+//        public NDArray getProcessedData(long index, ){
+//            TextData textData = targetTextData;
+//            AudioData audioData = sourceAudioData;
+//            return source ? textData.getRawText(index) : audioData.getPreprocessedData( manager, path);
+//        }
 
     @Override
     public void prepare(Progress progress) throws IOException, TranslateException {}
