@@ -1,59 +1,55 @@
 package ai.djl.audio.dataset;
 
+import ai.djl.audio.featurizer.AudioNormalizer;
+import ai.djl.audio.featurizer.AudioProcessor;
+import ai.djl.audio.featurizer.SpecgramFeaturizer;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDManager;
 import java.nio.Buffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import ai.djl.audio.featurizer.AudioFeaturizer;
 import org.bytedeco.javacv.*;
 
 public class AudioData {
-    private List<Float> floatList;
-    private Integer sampleRate;
-    private Integer audioChannels;
+    private int sampleRate;
+    private int audioChannels;
 
-    public AudioData(Configuration configuration){
-        this.audioChannels = configuration.audioChannels;
-        this.sampleRate = configuration.sampleRate;
-        this.toFloat(configuration.path);
+    private List<AudioProcessor> processorList;
+
+    public AudioData(Configuration configuration) {
+        this.processorList = configuration.processorList;
     }
 
-    public Integer getAudioChannels() {
-        return audioChannels;
+    /**
+     * Returns a good default {@link AudioData.Configuration} to use for the constructor with
+     * defaults.
+     *
+     * @return a good default {@link AudioData.Configuration} to use for the constructor with
+     *     defaults
+     */
+    public static AudioData.Configuration getDefaultConfiguration() {
+        List<AudioProcessor> defaultProcessors =
+                Arrays.asList(new AudioNormalizer(), new SpecgramFeaturizer());
+        return new AudioData.Configuration().setProcessorList(defaultProcessors);
     }
 
-    public List<Float> getFloatList() {
-        return floatList;
-    }
-
-    public Integer getSampleRate() {
-        return sampleRate;
-    }
-
-    public void setFloatList(List<Float> floatList) {
-        this.floatList = floatList;
-    }
-
-    public void setAudioChannels(Integer channels) {
-        this.audioChannels = channels;
-    }
-
-    private AudioData toFloat(String path){
+    private float[] toFloat(String path) {
         List<Float> list = new ArrayList<>();
         float scale = (float) 1.0 / (float) (1 << (8 * 2) - 1);
         System.out.println("test");
         try (FFmpegFrameGrabber audioGrabber = new FFmpegFrameGrabber(path)) {
             audioGrabber.start();
-            audioGrabber.setSampleRate(sampleRate);
-            setAudioChannels(audioGrabber.getAudioChannels());
+            audioChannels = audioGrabber.getAudioChannels();
+            sampleRate = audioGrabber.getSampleRate();
             Frame frame;
             while ((frame = audioGrabber.grabFrame()) != null) {
                 Buffer[] buffers = frame.samples;
-//                ShortBuffer[] copiedBuffer = new ShortBuffer[buffers.length];
-//                for (int i = 0; i < buffers.length; i++) {
-//                    deepCopy(buffers[i], copiedBuffer[i]);
-//                }
+                //                ShortBuffer[] copiedBuffer = new ShortBuffer[buffers.length];
+                //                for (int i = 0; i < buffers.length; i++) {
+                //                    deepCopy(buffers[i], copiedBuffer[i]);
+                //                }
                 ShortBuffer sb = (ShortBuffer) buffers[0];
                 for (int i = 0; i < sb.limit(); i++) {
                     list.add(sb.get() * scale);
@@ -62,8 +58,22 @@ public class AudioData {
         } catch (FrameGrabber.Exception e) {
             e.printStackTrace();
         }
-        setFloatList(list);
-        return this;
+
+        float[] floatArray = new float[list.size()];
+        int i = 0;
+        for (Float f : list) {
+            floatArray[i++] = (f != null ? f : Float.NaN);
+        }
+        return floatArray;
+    }
+
+    public NDArray getPreprocessedData(NDManager manager, String path) {
+        float[] floatArray = toFloat(path);
+        NDArray samples = manager.create(floatArray);
+        for (AudioProcessor processor : processorList) {
+            samples = processor.ExtractFeatures(manager, samples);
+        }
+        return samples;
     }
 
     private static ShortBuffer deepCopy(ShortBuffer source, ShortBuffer target) {
@@ -79,34 +89,27 @@ public class AudioData {
         return target;
     }
 
+    public int getAudioChannels() {
+        return audioChannels;
+    }
+
+    public int getSampleRate() {
+        return sampleRate;
+    }
 
     /**
-     * The configuration for creating a {@link AudioData} value in a {@link
-     * * ai.djl.training.dataset.Dataset}.
+     * The configuration for creating a {@link AudioData} value in a {@link *
+     * ai.djl.training.dataset.Dataset}.
      */
     public static final class Configuration {
 
-        /**
-         * This parameter is used for setting normalized value.
-         */
+        /** This parameter is used for setting normalized value. */
         private Double target_dB;
-        /**
-         * This parameter is used for setting stride value.
-         */
+        /** This parameter is used for setting stride value. */
         private Double stride_ms;
-        /**
-         * This parameter is used for setting window frame size value.
-         */
+        /** This parameter is used for setting window frame size value. */
         private Double windows_ms;
-
-        private AudioFeaturizer Featurize;
-
-        private Integer sampleRate;
-
-        private Integer audioChannels;
-
-        private String path;
-
+        private List<AudioProcessor> processorList;
 
         public Configuration setStride_ms(Double stride_ms) {
             this.stride_ms = stride_ms;
@@ -118,32 +121,13 @@ public class AudioData {
             return this;
         }
 
-
         public Configuration setWindows_ms(Double windows_ms) {
             this.windows_ms = windows_ms;
             return this;
         }
 
-
-        public Configuration setFeaturize(AudioFeaturizer featurize) {
-            Featurize = featurize;
-            return this;
-        }
-
-
-        public Configuration setSampleRate(Integer sampleRate) {
-            this.sampleRate = sampleRate;
-            return this;
-        }
-
-
-        public Configuration setAudioChannels(Integer audioChannels) {
-            this.audioChannels = audioChannels;
-            return this;
-        }
-
-        public Configuration setPath(String path) {
-            this.path = path;
+        public Configuration setProcessorList(List<AudioProcessor> processorList) {
+            this.processorList = processorList;
             return this;
         }
 
@@ -151,11 +135,8 @@ public class AudioData {
             target_dB = other.target_dB;
             stride_ms = other.stride_ms;
             windows_ms = other.windows_ms;
-            Featurize = other.Featurize;
-            sampleRate = other.sampleRate;
-            audioChannels= other.audioChannels;
+            processorList = other.processorList;
             return this;
         }
     }
-
 }
