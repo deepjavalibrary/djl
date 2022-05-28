@@ -10,7 +10,7 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 public class LibrispeechTest {
-    @Test
+    @Test(enabled = false)
     public static void testLibrispeech() throws IOException, TranslateException {
 
         Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
