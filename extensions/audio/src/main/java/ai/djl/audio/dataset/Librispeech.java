@@ -90,11 +90,17 @@ public class Librispeech extends SpeechRecognitionDataset {
         }
         File mainDir = mrl.getRepository().getFile(item, subPath).toFile();
         File[] subDirs = mainDir.listFiles();
+        if (subDirs == null) {
+            return;
+        }
         List<String> lineArray = new ArrayList<>();
         List<String> audioPaths = new ArrayList<>();
         for (File subDir : subDirs) {
             File[] subSubDirs = subDir.listFiles();
             String subDirName = subDir.getName();
+            if (subSubDirs == null) {
+                return;
+            }
             for (File subSubDir : subSubDirs) {
                 String subSubDirName = subSubDir.getName();
                 File transFile =
@@ -106,8 +112,8 @@ public class Librispeech extends SpeechRecognitionDataset {
                     String row;
                     while ((row = reader.readLine()) != null) {
                         if (row.contains(" ")) {
-                            String trans = row.substring(row.indexOf(" ") + 1);
-                            String label = row.substring(0, row.indexOf(" "));
+                            String trans = row.substring(row.indexOf(' ') + 1);
+                            String label = row.substring(0, row.indexOf(' '));
                             String audioIndex = label.split("-")[2];
                             String audioPath =
                                     String.format(

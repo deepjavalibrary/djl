@@ -18,6 +18,7 @@ import ai.djl.audio.processor.AudioProcessor;
 import ai.djl.audio.processor.LinearSpecgram;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.repository.LocalRepository;
 import java.nio.Buffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ import java.util.List;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link AudioData} is a utility for managing audio data within a {@link
@@ -38,6 +41,7 @@ import org.bytedeco.javacv.FrameGrabber;
  * <p>See {@link SpeechRecognitionDataset} for an example.
  */
 public class AudioData {
+    private static final Logger logger = LoggerFactory.getLogger(LocalRepository.class);
     private int sampleRate;
     private int audioChannels;
 
@@ -97,7 +101,7 @@ public class AudioData {
                 }
             }
         } catch (FrameGrabber.Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         float[] floatArray = new float[list.size()];
         int i = 0;

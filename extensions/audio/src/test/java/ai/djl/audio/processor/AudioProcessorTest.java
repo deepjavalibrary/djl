@@ -16,6 +16,7 @@ package ai.djl.audio.processor;
 import ai.djl.Device;
 import ai.djl.audio.AudioUtils;
 import ai.djl.audio.dataset.AudioData;
+import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -29,7 +30,7 @@ public class AudioProcessorTest {
     private static float eps = 1e-3f;
 
     @Test
-    public void testAudioNormalizer() {
+    public void testAudioNormalizer() throws EmbeddingException {
         NDManager manager = NDManager.newBaseManager(Device.cpu());
         AudioData.Configuration configuration =
                 new AudioData.Configuration()
@@ -41,7 +42,7 @@ public class AudioProcessorTest {
     }
 
     @Test
-    public static void testLinearSpecgram() {
+    public static void testLinearSpecgram() throws EmbeddingException {
         NDManager manager = NDManager.newBaseManager(Device.cpu());
         AudioData.Configuration configuration =
                 new AudioData.Configuration()

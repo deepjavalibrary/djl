@@ -21,7 +21,7 @@ import ai.djl.ndarray.NDManager;
 public class AudioNormalizer implements AudioProcessor {
 
     private float targetDb;
-    static float maxGainDb = 300.0f;
+    private static float maxGainDb = 300.0f;
 
     /**
      * Constructor for {@link AudioNormalizer}.

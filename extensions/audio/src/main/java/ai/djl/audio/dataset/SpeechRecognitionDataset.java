@@ -14,14 +14,12 @@
 package ai.djl.audio.dataset;
 
 import ai.djl.basicdataset.BasicDatasets;
-import ai.djl.basicdataset.nlp.TextDataset;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.engine.Engine;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.modality.nlp.embedding.TextEmbedding;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
@@ -34,13 +32,13 @@ import java.util.List;
  * is {@link TextData}.
  *
  * <p>For the target data, it will create embeddings for the target data. Embeddings can be either
- * pre-trained or trained on the go. Pre-trained {@link TextEmbedding} must be set in the {@link
+ * pre-trained or trained on the go. Pre-trained {@link TextEmbedding} must be set in the {@code
  * TextDataset.Builder}. If no embeddings are set, the dataset creates {@link
  * TrainableWordEmbedding} based {@link TrainableWordEmbedding} from the {@link Vocabulary} created
  * within the dataset.
  *
  * <p>For the source data, it will use the {@link ai.djl.audio.processor.AudioProcessor} to
- * featurize data, if users want to write their own featurizer, they can get the original {@link
+ * featurize data, if users want to write their own featurizer, they can get the original {@code
  * NDArray} from {@link AudioData} without using any {@link ai.djl.audio.processor.AudioProcessor}.
  */
 public abstract class SpeechRecognitionDataset extends RandomAccessDataset {

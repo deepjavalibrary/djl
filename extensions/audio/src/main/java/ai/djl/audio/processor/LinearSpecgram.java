@@ -22,7 +22,7 @@ import org.jtransforms.fft.FloatFFT_1D;
 /** Calculate linear spectrogram by short-time fourier transform. */
 public class LinearSpecgram implements AudioProcessor {
 
-    static float eps = 1e-14f;
+    private static float eps = 1e-14f;
 
     private float strideMs;
     private float windowsMs;
