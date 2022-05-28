@@ -141,6 +141,7 @@ public abstract class TextDataset extends RandomAccessDataset {
      * @param source whether the text data provided is source or target
      * @throws EmbeddingException if there is an error while embedding input
      */
+
     protected void preprocess(List<String> newTextData, boolean source) throws EmbeddingException {
         TextData textData = source ? sourceTextData : targetTextData;
         textData.preprocess(

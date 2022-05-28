@@ -4,6 +4,7 @@ import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.engine.Engine;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
@@ -48,12 +49,12 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
                 manager, newTextData.subList(0, (int) Math.min(limit, newTextData.size())));
     }
 
-    //    public NDArray getProcessedData(long index, boolean source){
-    //        TextData textData = targetTextData;
-    //        AudioData audioData = sourceAudioData;
-    //        return source ? textData.getRawText(index) : audioData.getPreprocessedAudio(index,
-    // manager);
-    //    }
+        public NDArray getProcessedData(long index, boolean source){
+            TextData textData = targetTextData;
+            AudioData audioData = sourceAudioData;
+            return source ? textData.getRawText(index) : audioData.getPreprocessedAudio(index,
+     manager);
+        }
 
     @Override
     public void prepare(Progress progress) throws IOException, TranslateException {}
@@ -83,6 +84,7 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         protected String groupId;
         // protected String artifactId;
         protected Usage usage;
+        protected String artifactId;
 
         /** Constructs a new builder. */
         AudioBuilder() {
