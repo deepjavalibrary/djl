@@ -7,6 +7,8 @@ import ai.djl.audio.featurizer.LinearSpecgram;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.TranslateException;
+import java.io.IOException;
 import java.util.Arrays;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -42,4 +44,37 @@ public class AudioProcessorTest {
         Assert.assertTrue(samples.getShape().equals(new Shape(161, 838)));
         Assert.assertEquals(samples.get("0,0").toFloatArray()[0], -15.4571f, eps);
     }
+
+    @Test
+    public static void testLibrispeech() throws IOException, TranslateException {
+
+        Librispeech dataset = Librispeech.builder().setSampling(32, true).build();
+        dataset.prepare();
+    }
+    //        for (Dataset.Usage usage :
+    //                new Dataset.Usage[] {
+    //                        Dataset.Usage.TRAIN, Dataset.Usage.TEST
+    //                }) {
+    //            try (NDManager manager = NDManager.newBaseManager()) {
+    //                Librispeech dataset =
+    //                        Librispeech.builder()
+    //                                .setSourceConfiguration(
+    //                                        new AudioData.Configuration())
+    //                                .setTargetConfiguration(
+    //                                        new TextData.Configuration()
+    //                                                .setTextEmbedding(
+    //                                                        TestUtils.getTextEmbedding(
+    //                                                                manager, EMBEDDING_SIZE))
+    //                                                .setEmbeddingSize(EMBEDDING_SIZE))
+    //                                .setSampling(32, true)
+    //                                .optLimit(100)
+    //                                .optUsage(usage)
+    //                                .build();
+    //                dataset.prepare();
+    //                Record record = dataset.get(manager, 0);
+    //                Assert.assertEquals(record.getData().get(0).getShape().get(1), 15);
+    //                Assert.assertNull(record.getLabels());
+    //            }
+    //        }
+    //    }
 }

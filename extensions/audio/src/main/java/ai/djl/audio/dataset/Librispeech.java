@@ -22,17 +22,15 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Librispeech extends SpeechRecognitionDataset {
 
     private static final String VERSION = "1.0";
-    private static final String ARTIFACT_ID = "penntreebank-unlabeled-processed";
+    private static final String ARTIFACT_ID = "Librispeech";
+    private static ArrayList<String> TextIndex = null;
 
     /**
      * Creates a new instance of {@link SpeechRecognitionDataset} with the given necessary
@@ -44,6 +42,7 @@ public class Librispeech extends SpeechRecognitionDataset {
         super(builder);
         this.usage = builder.usage;
         this.mrl = builder.getMrl();
+        TextIndex = new ArrayList<>();
     }
 
     public static Builder builder() {
@@ -57,6 +56,7 @@ public class Librispeech extends SpeechRecognitionDataset {
         }
         Artifact artifact = mrl.getDefaultArtifact();
         mrl.prepare(artifact, progress);
+        System.out.println(mrl);
         Artifact.Item item;
         switch (usage) {
             case TRAIN:
@@ -69,13 +69,19 @@ public class Librispeech extends SpeechRecognitionDataset {
                 throw new UnsupportedOperationException("Unsupported usage type.");
         }
         Path path = mrl.getRepository().getFile(item, "").toAbsolutePath();
-        List<String> lineArray = new ArrayList<>();
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
-            String row;
-            while ((row = reader.readLine()) != null) {
-                lineArray.add(row);
-            }
-        }
+        System.out.println(path);
+        //        List<String> lineArray = new ArrayList<>();
+        //        try (BufferedReader reader = Files.newBufferedReader(path)){
+        //            String row;
+        //            while((row = reader.readLine()) != null){
+        //                if(row.contains(" ")){
+        //                    String index = row.substring(0,row.indexOf(" "));
+        //                    TextIndex.add(index);
+        //                }
+        //                lineArray.add(row);
+        //            }
+        //        }
+
     }
 
     @Override
