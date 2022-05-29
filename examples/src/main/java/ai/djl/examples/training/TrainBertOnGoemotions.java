@@ -58,9 +58,8 @@ public final class TrainBertOnGoemotions {
                 (TrainBertOnGoemotions.BertArguments)
                         new TrainBertOnGoemotions.BertArguments().parseArgs(args);
 
-        // get training and validation dataset
+        // get training dataset and teansform it to which could be used by bert model
         GoEmotions trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);
-
         BertGoemotionsDataset dataset =
                 new BertGoemotionsDataset(
                         arguments.getBatchSize(), arguments.getLimit(), trainingSet);

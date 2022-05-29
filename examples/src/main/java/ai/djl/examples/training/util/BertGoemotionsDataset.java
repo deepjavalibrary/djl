@@ -32,6 +32,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/** An example of transform goemotions datasetset into which could be used by Bert model. */
 public class BertGoemotionsDataset implements Dataset {
     private static final String CLS = "<cls>";
     private static final String SEP = "<sep>";
