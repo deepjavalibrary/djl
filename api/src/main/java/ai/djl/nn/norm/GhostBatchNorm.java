@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -34,7 +34,6 @@ public class GhostBatchNorm extends BatchNorm {
 
     protected GhostBatchNorm(Builder builder) {
         super(builder);
-
         this.virtualBatchSize = builder.virtualBatchSize;
         this.batchifier = new StackBatchifier();
     }
@@ -83,12 +82,13 @@ public class GhostBatchNorm extends BatchNorm {
 
     /** The Builder to construct a {@link GhostBatchNorm}. */
     public static class Builder extends BatchNorm.BaseBuilder<Builder> {
+
         private int virtualBatchSize = 128;
 
         Builder() {}
 
         /**
-         * Set the size of virtual batches in which to use when sub-batching. Defaults to 128.
+         * Sets the size of virtual batches in which to use when sub-batching. Defaults to 128.
          *
          * @param virtualBatchSize the virtual batch size
          * @return this Builder
@@ -103,6 +103,7 @@ public class GhostBatchNorm extends BatchNorm {
          *
          * @return the new {@link GhostBatchNorm}
          */
+        @Override
         public GhostBatchNorm build() {
             return new GhostBatchNorm(this);
         }
