@@ -17,6 +17,9 @@ import ai.djl.basicdataset.nlp.GoEmotions;
 import ai.djl.basicdataset.nlp.TextDataset;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
+import ai.djl.examples.training.util.BertCodeDataset;
+import ai.djl.examples.training.util.BertGoemotionsDataset;
+import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -54,22 +57,26 @@ public class TrainBertOnGoemotions {
         TrainBertOnGoemotions.BertArguments arguments = (TrainBertOnGoemotions.BertArguments) new TrainBertOnGoemotions.BertArguments().parseArgs(args);
 
         // get training and validation dataset
-        TextDataset trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);
-        TextDataset validateSet = getDataset(Dataset.Usage.TEST, arguments);
+        GoEmotions trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);
+        //TextDataset validateSet = getDataset(Dataset.Usage.TEST, arguments);
+
+        BertGoemotionsDataset dataset =
+                new BertGoemotionsDataset(arguments.getBatchSize(), arguments.getLimit(), trainingSet);
+        dataset.prepare();
 
         System.out.println("Dataset ready");
 
 
         // Create model & trainer
         // 这里不知道vocabulary应不应该设成true
-        try (Model model = createBertPretrainingModel(trainingSet.getVocabulary(true).size())) {
+        try (Model model = createBertPretrainingModel(dataset.getVocabularySize())) {
             TrainingConfig config = createTrainingConfig(arguments);
             try (Trainer trainer = model.newTrainer(config)) {
                 // Initialize training
-                Shape inputShape = new Shape(50, 512);
+                Shape inputShape = new Shape(dataset.getMaxSequenceLength(), 512);
                 trainer.initialize(inputShape, inputShape, inputShape, inputShape);
 
-                EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, null);
+                EasyTrain.fit(trainer, arguments.getEpoch(), dataset, null);
                 return trainer.getTrainingResult();
             }
         }
@@ -118,7 +125,7 @@ public class TrainBertOnGoemotions {
         return model;
     }
 
-    private static TextDataset getDataset(Dataset.Usage usage, Arguments arguments)
+    private static GoEmotions getDataset(Dataset.Usage usage, Arguments arguments)
             throws IOException, EmbeddingException {
         GoEmotions goemotions =
                 GoEmotions.builder()
