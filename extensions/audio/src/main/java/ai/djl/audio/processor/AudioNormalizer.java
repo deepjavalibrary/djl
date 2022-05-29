@@ -10,7 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
 package ai.djl.audio.processor;
 
 import ai.djl.audio.AudioUtils;
@@ -20,8 +19,9 @@ import ai.djl.ndarray.NDManager;
 /** Use the mean and standard values to calculate the normalized values for audio signal. */
 public class AudioNormalizer implements AudioProcessor {
 
+    private static final float MAX_GAIN_DB = 300.0f;
+
     private float targetDb;
-    private static float maxGainDb = 300.0f;
 
     /**
      * Constructor for {@link AudioNormalizer}.
@@ -36,7 +36,7 @@ public class AudioNormalizer implements AudioProcessor {
     @Override
     public NDArray extractFeatures(NDManager manager, NDArray samples) {
         float gain = targetDb - AudioUtils.rmsDb(samples);
-        gain = Math.min(gain, maxGainDb);
+        gain = Math.min(gain, MAX_GAIN_DB);
 
         float factor = (float) Math.pow(10f, gain / 20f);
         samples = samples.mul(factor);

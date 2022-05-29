@@ -10,7 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
 package ai.djl.audio.processor;
 
 import ai.djl.ndarray.NDArray;
@@ -22,7 +21,7 @@ import org.jtransforms.fft.FloatFFT_1D;
 /** Calculate linear spectrogram by short-time fourier transform. */
 public class LinearSpecgram implements AudioProcessor {
 
-    private static float eps = 1e-14f;
+    private static final float EPS = 1e-14f;
 
     private float strideMs;
     private float windowsMs;
@@ -97,7 +96,7 @@ public class LinearSpecgram implements AudioProcessor {
         }
         ind = ind + 1;
 
-        fft = fft.get(":" + ind + ",:").add(eps);
+        fft = fft.get(":" + ind + ",:").add(EPS);
         fft = fft.log();
 
         return fft;

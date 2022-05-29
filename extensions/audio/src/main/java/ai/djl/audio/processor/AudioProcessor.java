@@ -10,7 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
 package ai.djl.audio.processor;
 
 import ai.djl.ndarray.NDArray;
@@ -20,7 +19,7 @@ import ai.djl.ndarray.NDManager;
 public interface AudioProcessor {
 
     /**
-     * Extract features by the processor.
+     * Extracts features by the processor.
      *
      * @param manager The manager used for extracting features
      * @param samples The Audio that needs to be extracting features

@@ -41,7 +41,9 @@ import org.slf4j.LoggerFactory;
  * <p>See {@link SpeechRecognitionDataset} for an example.
  */
 public class AudioData {
+
     private static final Logger logger = LoggerFactory.getLogger(LocalRepository.class);
+
     private int sampleRate;
     private int audioChannels;
 
