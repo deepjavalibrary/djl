@@ -277,7 +277,7 @@ public class MxNDManager extends BaseNDManager {
     @Override
     public MxNDManager newSubManager(Device dev) {
         MxNDManager manager = new MxNDManager(this, dev, version);
-        attachInternal(manager.uid, manager);
+        attachUncappedInternal(manager.uid, manager);
         return manager;
     }
 

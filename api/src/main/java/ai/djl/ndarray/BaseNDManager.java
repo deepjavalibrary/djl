@@ -47,6 +47,7 @@ public abstract class BaseNDManager implements NDManager {
     protected ConcurrentHashMap<String, AutoCloseable> resources;
     protected ConcurrentHashMap<String, TempResource> tempResources;
     protected AtomicBoolean closed = new AtomicBoolean(false);
+    protected AtomicBoolean capped = new AtomicBoolean(false);
 
     protected BaseNDManager(NDManager parent, Device device) {
         this.parent = parent;
@@ -237,6 +238,12 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public void cap() {
+        this.capped.set(true);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDManager getParentManager() {
         return parent;
     }
@@ -270,6 +277,15 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public synchronized void attachInternal(String resourceId, AutoCloseable resource) {
+        if (capped.get()) {
+            throw new IllegalStateException("NDManager is capped for addition of resources.");
+        }
+        attachUncappedInternal(resourceId, resource);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public synchronized void attachUncappedInternal(String resourceId, AutoCloseable resource) {
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
@@ -452,7 +468,7 @@ public abstract class BaseNDManager implements NDManager {
             try {
                 if (!detached) {
                     if (manager.isOpen()) {
-                        resource.attach(manager);
+                        resource.returnResource(manager);
                     } else {
                         resource.close();
                     }
