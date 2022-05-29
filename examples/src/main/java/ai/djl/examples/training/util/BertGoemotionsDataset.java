@@ -13,28 +13,17 @@
 package ai.djl.examples.training.util;
 
 import ai.djl.basicdataset.nlp.GoEmotions;
-import ai.djl.basicdataset.nlp.TextDataset;
-import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
-import ai.djl.modality.nlp.embedding.EmbeddingException;
-import ai.djl.modality.nlp.preprocess.UnicodeNormalizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.nn.Parameter;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
-import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -44,16 +33,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class BertGoemotionsDataset implements Dataset {
-    private static final String UNK = "<unk>";
     private static final String CLS = "<cls>";
     private static final String SEP = "<sep>";
     private static final String MSK = "<msk>";
 
-    private static final List<String> RESERVED_TOKENS =
-            Collections.unmodifiableList(Arrays.asList(UNK, CLS, SEP, MSK));
-
-    private static final int MAX_VOCABULARY_SIZE = 35000;
-    private static final int MAX_SEQUENCE_LENGTH = 50;
+    private static final int MAX_SEQUENCE_LENGTH = 128;
     private static final int MAX_MASKING_PER_INSTANCE = 10;
 
     private ParsedFile parsedFiles;

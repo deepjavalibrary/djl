@@ -14,12 +14,9 @@ package ai.djl.examples.training;
 
 import ai.djl.Model;
 import ai.djl.basicdataset.nlp.GoEmotions;
-import ai.djl.basicdataset.nlp.TextDataset;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.examples.training.util.BertCodeDataset;
 import ai.djl.examples.training.util.BertGoemotionsDataset;
-import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -27,7 +24,11 @@ import ai.djl.nn.Parameter;
 import ai.djl.nn.transformer.BertBlock;
 import ai.djl.nn.transformer.BertPretrainingBlock;
 import ai.djl.nn.transformer.BertPretrainingLoss;
-import ai.djl.training.*;
+import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
+import ai.djl.training.Trainer;
+import ai.djl.training.TrainingConfig;
+import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.TruncatedNormalInitializer;
 import ai.djl.training.listener.TrainingListener;
@@ -40,11 +41,10 @@ import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 
-
 /** Example that performs Bert pretraining on the GoEmotions dataset. */
-public class TrainBertOnGoemotions {
+public final class TrainBertOnGoemotions {
 
-    private static final int DEFAULT_BATCH_SIZE = 16;
+    private static final int DEFAULT_BATCH_SIZE = 48;
     private static final int DEFAULT_EPOCHS = 4;
 
     private TrainBertOnGoemotions() {}
@@ -54,21 +54,19 @@ public class TrainBertOnGoemotions {
     }
 
     public static TrainingResult runExample(String[] args) throws IOException, TranslateException {
-        TrainBertOnGoemotions.BertArguments arguments = (TrainBertOnGoemotions.BertArguments) new TrainBertOnGoemotions.BertArguments().parseArgs(args);
+        TrainBertOnGoemotions.BertArguments arguments =
+                (TrainBertOnGoemotions.BertArguments)
+                        new TrainBertOnGoemotions.BertArguments().parseArgs(args);
 
         // get training and validation dataset
         GoEmotions trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);
-        //TextDataset validateSet = getDataset(Dataset.Usage.TEST, arguments);
 
         BertGoemotionsDataset dataset =
-                new BertGoemotionsDataset(arguments.getBatchSize(), arguments.getLimit(), trainingSet);
+                new BertGoemotionsDataset(
+                        arguments.getBatchSize(), arguments.getLimit(), trainingSet);
         dataset.prepare();
 
-        System.out.println("Dataset ready");
-
-
         // Create model & trainer
-        // 这里不知道vocabulary应不应该设成true
         try (Model model = createBertPretrainingModel(dataset.getVocabularySize())) {
             TrainingConfig config = createTrainingConfig(arguments);
             try (Trainer trainer = model.newTrainer(config)) {
@@ -82,8 +80,8 @@ public class TrainBertOnGoemotions {
         }
     }
 
-    // 参数的设置我不太确定
-    private static TrainingConfig createTrainingConfig(TrainBertOnGoemotions.BertArguments arguments) {
+    private static TrainingConfig createTrainingConfig(
+            TrainBertOnGoemotions.BertArguments arguments) {
 
         int warmUpStep = 43410 / arguments.getBatchSize() * arguments.getEpoch();
 
@@ -111,7 +109,6 @@ public class TrainBertOnGoemotions {
                 .addTrainingListeners(TrainingListener.Defaults.logging());
     }
 
-    // 这里的参数有点不确定怎么设置
     private static Model createBertPretrainingModel(long vocabularySize) {
         Block block =
                 new BertPretrainingBlock(
