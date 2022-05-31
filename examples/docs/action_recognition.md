@@ -2,7 +2,7 @@
 
 Action recognition is a computer vision technique to infer human actions (present state) in images or videos.
 
-In this example, you learn how to implement inference code with a [ModelZoo model](../../docs/model-zoo.md) to human actions in an image.
+In this example, you learn how to implement inference code with a [ModelZoo model](../../docs/model-zoo.md) to detect human actions in an image.
 
 The source code can be found at [ActionRecognition.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/ActionRecognition.java).
 
