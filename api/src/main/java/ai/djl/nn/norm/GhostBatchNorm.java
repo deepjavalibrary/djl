@@ -13,6 +13,7 @@
 
 package ai.djl.nn.norm;
 
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.ParameterStore;
 import ai.djl.translate.Batchifier;
@@ -51,7 +52,7 @@ public class GhostBatchNorm extends BatchNorm {
         for (NDList batch : subBatches) {
             super.forwardInternal(parameterStore, batch, training, params);
         }
-        return batchifier.batchify(subBatches);
+        return batchify(subBatches);
     }
 
     /**
@@ -70,6 +71,19 @@ public class GhostBatchNorm extends BatchNorm {
         int countBatches = (int) Math.ceil(batchSize / virtualBatchSize);
 
         return batchifier.split(list, countBatches, true);
+    }
+
+    protected NDList batchify(NDList[] subBatches) {
+        NDList batch = batchifier.batchify(subBatches);
+
+        return squeezeExtraDimensions(batch);
+    }
+
+    protected NDList squeezeExtraDimensions(NDList batch){
+        NDArray array = batch.singletonOrThrow().squeeze(0);
+        batch.set(0, array);
+
+        return batch;
     }
 
     /**
