@@ -16,6 +16,7 @@ configure([
         project(':engines:tensorflow:tensorflow-model-zoo'),
         project(':engines:tensorrt'),
         project(':engines:tflite:tflite-engine'),
+        project(':extensions:audio'),
         project(':extensions:aws-ai'),
         project(':extensions:fasttext'),
         project(':extensions:hadoop'),
