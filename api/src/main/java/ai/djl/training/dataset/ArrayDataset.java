@@ -25,8 +25,8 @@ import java.util.stream.Stream;
  * come in array formats. Otherwise, consider directly using the {@link RandomAccessDataset}
  * instead.
  *
- * <p><pThere can be multiple data and label {@link NDArray}s within the dataset. Each sample will
- * be retrieved by indexing each {@link NDArray} along the first dimension.
+ * <p>There can be multiple data and label {@link NDArray}s within the dataset. Each sample will be
+ * retrieved by indexing each {@link NDArray} along the first dimension.
  *
  * <p>The following is an example of how to use ArrayDataset:
  *
@@ -38,7 +38,7 @@ import java.util.stream.Stream;
  *                              .build();
  * </pre>
  *
- * Suppose you get a {@link Batch} from {@code trainer.iterateDataset(dataset)} or {@code
+ * <p>Suppose you get a {@link Batch} from {@code trainer.iterateDataset(dataset)} or {@code
  * dataset.getData(manager)}. In the data of this batch, it will be an NDList with one NDArray for
  * each data input. In this case, it would be 2 arrays. Similarly, the labels would have 3 arrays.
  *
