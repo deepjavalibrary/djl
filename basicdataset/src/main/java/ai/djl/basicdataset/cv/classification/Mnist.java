@@ -34,7 +34,11 @@ import java.util.Map;
 /**
  * MNIST handwritten digits dataset from http://yann.lecun.com/exdb/mnist.
  *
- * <p>Each sample is an image (in 3-D NDArray) with shape (28, 28, 1).
+ * <p>Each sample is a grayscale image (in 3-D NDArray) with shape (28, 28, 1).
+ *
+ * <p>It is a common starting dataset because it is small and can train within minutes. However, it
+ * is an overly easy task that even poor models can still perform very well on. Instead, consider
+ * {@link FashionMnist} which offers a comparable speed but a more reasonable difficulty task.
  */
 public final class Mnist extends ArrayDataset {
 

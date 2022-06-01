@@ -41,7 +41,10 @@ You can pull the MXNet engine from the central Maven repository by including the
 By default, DJL will download the Apache MXNet native libraries into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
 
-You can choose a native library based on your platform if you don't have network access at runtime.
+If you do not want to rely on the download because you don't have network access at runtime or for other reasons, there are additional options.
+The easiest option is to add a DJL native library package to your project dependencies.
+The available packages for your platform can be found below.
+Finally, you can also specify the path to a valid MXNet build using the `MXNET_LIBRARY_PATH` environment variable.
 
 ### macOS
 
@@ -116,15 +119,14 @@ Apache MXNet requires Visual C++ Redistributable Packages. If you encounter an U
 DJL on Windows, please download and install
 [Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot.
 
-For the Windows platform, you can use CPU package. MXNet windows GPU native
-library size are large, we no longer provide GPU package, instead you have to
-use the Automatic package.
+For the windows platform, we support both CPU and GPU.
+The CPU can be found using either the automatic runtime detection or through adding the CPU jar to your dependencies.
+However, due to the size of the windows GPU native library, we do not offer GPU support through a dependency jar.
+You can still access GPU on windows by using the [automatic runtime download](#Installation).
 
 #### Windows GPU
 
-- ai.djl.mxnet:mxnet-native-auto:1.8.0
-
-    This package supports CUDA 11.0 and CUDA 10.2 for Windows.
+This package supports CUDA 11.0 and CUDA 10.2 for Windows.
 
 ### Windows CPU
 

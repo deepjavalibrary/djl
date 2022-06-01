@@ -34,6 +34,13 @@ import java.util.Optional;
 /**
  * Coco image detection dataset from http://cocodataset.org/#home.
  *
+ * <p>Coco is a large-scale object detection, segmentation, and captioning dataset although only
+ * object detection is implemented at thsi time. It contains 1.5 million object instances and is one
+ * of the standard benchmark object detection datasets.
+ *
+ * <p>To use this dataset, you have to manually add {@code
+ * com.twelvemonkeys.imageio:imageio-jpeg:3.5} as a dependency in your project.
+ *
  * <p>Each image might have different {@link ai.djl.ndarray.types.Shape}s.
  */
 public class CocoDetection extends ObjectDetectionDataset {

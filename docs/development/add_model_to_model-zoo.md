@@ -1,6 +1,6 @@
-# Add a new model to the model zoo
+# Add a new model to the DJL model zoo
 
-This document outlines the procedure to add new models into the model zoo.
+This document outlines the procedure to add new models into the DJL model zoo.
 
 ## Step 1: Prepare the model files
 
@@ -31,6 +31,7 @@ For example, `image_classification/ai/djl/resnet`.
 3. Copy model files into the version folder.
 
 ### Step 3: Create a `metadata.json` file
+
 You need to create a `metadata.json` file for the model zoo to load the model. You can refer to the format in the `metadata.json` files for existing models to create your own.
 
 For a model built as a DJL block, you must recreate the block before loading the parameters. As part of your `metadata.json` file, you should use the `arguments` property to specify the arguments required for the model loader to create another `Block` matching the one used to train the model.
@@ -51,7 +52,7 @@ Verify that your folder has the following files (see Step 1 for additional files
 
 The official DJL ML repository is located on an S3 bucket managed by the AWS DJL team.
 
-For non-team members, coordinate with a team member in your pull request to coordinate adding the necessary files.
+For non-team members, coordinate with a team member in your pull request to add the necessary files.
 
 For AWS team members, run the following command to upload your model to the S3 bucket:
 

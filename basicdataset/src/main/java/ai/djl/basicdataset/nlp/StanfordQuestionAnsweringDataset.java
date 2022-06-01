@@ -39,6 +39,8 @@ import java.util.Map;
  * questions posed by crowdworkers on a set of Wikipedia articles, where the answer to every
  * question is a segment of text, or span, from the corresponding reading passage, or the question
  * might be unanswerable.
+ *
+ * @see <a href="https://rajpurkar.github.io/SQuAD-explorer/">Dataset website</a>
  */
 @SuppressWarnings("unchecked")
 public class StanfordQuestionAnsweringDataset extends TextDataset implements RawDataset<Object> {

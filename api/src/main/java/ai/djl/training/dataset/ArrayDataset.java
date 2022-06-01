@@ -21,18 +21,26 @@ import java.util.stream.Stream;
 
 /**
  * {@code ArrayDataset} is an implementation of {@link RandomAccessDataset} that consist entirely of
- * large {@link NDArray}s. There can be multiple data and label {@link NDArray}s within the dataset.
- * Each sample will be retrieved by indexing each {@link NDArray} along the first dimension.
+ * large {@link NDArray}s. It is recommended only for datasets small enough to fit in memory that
+ * come in array formats. Otherwise, consider directly using the {@link RandomAccessDataset}
+ * instead.
+ *
+ * <p>There can be multiple data and label {@link NDArray}s within the dataset. Each sample will be
+ * retrieved by indexing each {@link NDArray} along the first dimension.
  *
  * <p>The following is an example of how to use ArrayDataset:
  *
  * <pre>
  *     ArrayDataset dataset = new ArrayDataset.Builder()
- *                              .setData(data)
- *                              .optLabels(label)
+ *                              .setData(data1, data2)
+ *                              .optLabels(labels1, labels2, labels3)
  *                              .setSampling(20, false)
  *                              .build();
  * </pre>
+ *
+ * <p>Suppose you get a {@link Batch} from {@code trainer.iterateDataset(dataset)} or {@code
+ * dataset.getData(manager)}. In the data of this batch, it will be an NDList with one NDArray for
+ * each data input. In this case, it would be 2 arrays. Similarly, the labels would have 3 arrays.
  *
  * @see Dataset
  */
