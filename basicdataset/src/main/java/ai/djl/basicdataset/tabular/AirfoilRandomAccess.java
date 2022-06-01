@@ -14,6 +14,7 @@ package ai.djl.basicdataset.tabular;
 
 import ai.djl.Application.Tabular;
 import ai.djl.basicdataset.BasicDatasets;
+import ai.djl.basicdataset.utils.Feature;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -33,7 +34,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
 /**
- * Airfoil Self-Noise Data Set from https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise.
+ * Airfoil Self-Noise Data Set from <a
+ * href="https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise">https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise</a>.
  *
  * <p>1503 instances 6 attributes
  */

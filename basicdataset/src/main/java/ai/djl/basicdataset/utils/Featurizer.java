@@ -10,6 +10,16 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+package ai.djl.basicdataset.utils;
 
-/** Contains classes to support tabular datasets in Tablesaw format. */
-package ai.djl.tablesaw;
+/** An interface that convert String to numeric data. */
+public interface Featurizer {
+
+    /**
+     * Puts encoded data into the float buffer.
+     *
+     * @param buf the float buffer to be filled
+     * @param input the string input
+     */
+    void featurize(DynamicBuffer buf, String input);
+}

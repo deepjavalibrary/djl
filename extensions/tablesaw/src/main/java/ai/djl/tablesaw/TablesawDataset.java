@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -13,17 +13,16 @@
 package ai.djl.tablesaw;
 
 import ai.djl.basicdataset.utils.DynamicBuffer;
+import ai.djl.basicdataset.utils.Feature;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.util.Progress;
-import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import tech.tablesaw.api.Row;
@@ -33,7 +32,6 @@ import tech.tablesaw.io.ReadOptions;
 /** {@code CsvDataset} represents the dataset that stored in a .csv file. */
 public class TablesawDataset extends RandomAccessDataset {
 
-    private static final Featurizer NUMERIC_FEATURIZER = new NumericFeaturizer();
     protected ReadOptions readOptions;
     protected List<Feature> features;
     protected List<Feature> labels;
@@ -64,7 +62,7 @@ public class TablesawDataset extends RandomAccessDataset {
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(Progress progress) throws IOException {
+    public void prepare(Progress progress) {
         table = Table.read().usingOptions(readOptions);
     }
 
@@ -94,7 +92,7 @@ public class TablesawDataset extends RandomAccessDataset {
         for (Feature feature : selected) {
             String name = feature.getName();
             String value = row.getString(name);
-            feature.featurizer.featurize(bb, value);
+            feature.getFeaturizer().featurize(bb, value);
         }
         FloatBuffer buf = bb.getBuffer();
         return new NDList(manager.create(buf, new Shape(bb.getLength())));
@@ -236,131 +234,6 @@ public class TablesawDataset extends RandomAccessDataset {
                 throw new IllegalArgumentException("Missing labels.");
             }
             return new TablesawDataset(this);
-        }
-    }
-
-    /** An interface that convert String to numeric data. */
-    public interface Featurizer {
-
-        /**
-         * Puts encoded data into the float buffer.
-         *
-         * @param buf the float buffer to be filled
-         * @param input the string input
-         */
-        void featurize(DynamicBuffer buf, String input);
-    }
-
-    /** A class contains feature name and its {@code Featurizer}. */
-    public static final class Feature {
-
-        String name;
-        Featurizer featurizer;
-
-        /**
-         * Constructs a {@code Feature} instance.
-         *
-         * @param name the feature name
-         * @param featurizer the {@code Featurizer}
-         */
-        public Feature(String name, Featurizer featurizer) {
-            this.name = name;
-            this.featurizer = featurizer;
-        }
-
-        /**
-         * Constructs a {@code Feature} instance.
-         *
-         * @param name the feature name
-         * @param numeric true if input is numeric data
-         */
-        public Feature(String name, boolean numeric) {
-            this.name = name;
-            if (numeric) {
-                featurizer = NUMERIC_FEATURIZER;
-            } else {
-                featurizer = new StringFeaturizer();
-            }
-        }
-
-        /**
-         * Constructs a {@code Feature} instance.
-         *
-         * @param name the feature name
-         * @param map a map contains categorical value maps to index
-         * @param onehotEncode true if use onehot encode
-         */
-        public Feature(String name, Map<String, Integer> map, boolean onehotEncode) {
-            this.name = name;
-            this.featurizer = new StringFeaturizer(map, onehotEncode);
-        }
-
-        /**
-         * Returns the feature name.
-         *
-         * @return the feature name
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * Returns the {@code Featurizer}.
-         *
-         * @return the {@code Featurizer}
-         */
-        public Featurizer getFeaturizer() {
-            return featurizer;
-        }
-    }
-
-    private static final class NumericFeaturizer implements Featurizer {
-
-        /** {@inheritDoc} */
-        @Override
-        public void featurize(DynamicBuffer buf, String input) {
-            buf.put(Float.parseFloat(input));
-        }
-    }
-
-    private static final class StringFeaturizer implements Featurizer {
-
-        private Map<String, Integer> map;
-        private boolean onehotEncode;
-        private boolean autoMap;
-
-        StringFeaturizer() {
-            this.map = new HashMap<>();
-            this.autoMap = true;
-        }
-
-        StringFeaturizer(Map<String, Integer> map, boolean onehotEncode) {
-            this.map = map;
-            this.onehotEncode = onehotEncode;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void featurize(DynamicBuffer buf, String input) {
-            if (onehotEncode) {
-                for (int i = 0; i < map.size(); ++i) {
-                    buf.put(i == map.get(input) ? 1 : 0);
-                }
-                return;
-            }
-
-            Integer index = map.get(input);
-            if (index != null) {
-                buf.put(index);
-                return;
-            }
-
-            if (!autoMap) {
-                throw new IllegalArgumentException("Value: " + input + " not found in the map.");
-            }
-            int value = map.size();
-            map.put(input, value);
-            buf.put(value);
         }
     }
 }

@@ -21,6 +21,7 @@ configure([
         project(':extensions:hadoop'),
         project(':extensions:opencv'),
         project(':extensions:sentencepiece'),
+        project(':extensions:tablesaw'),
         project(':extensions:tokenizers'),
         project(':model-zoo')]) {
     apply plugin: "maven-publish"

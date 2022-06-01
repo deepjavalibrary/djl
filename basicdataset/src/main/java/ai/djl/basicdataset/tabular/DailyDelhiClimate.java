@@ -15,6 +15,8 @@ package ai.djl.basicdataset.tabular;
 import ai.djl.Application.Tabular;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.utils.DynamicBuffer;
+import ai.djl.basicdataset.utils.Feature;
+import ai.djl.basicdataset.utils.Featurizer;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
