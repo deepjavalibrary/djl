@@ -73,13 +73,27 @@ public class GhostBatchNorm extends BatchNorm {
         return batchifier.split(list, countBatches, true);
     }
 
+    /**
+     * Converts an array of {@link NDList} into an NDList using {@link StackBatchifier} and squeezes
+     * the first dimension created by it. This makes the final {@link NDArray} same size as the
+     * splitted one
+     *
+     * @param subBatches the input array of {@link NDList}
+     * @return the batchified {@link NDList}
+     */
     protected NDList batchify(NDList[] subBatches) {
         NDList batch = batchifier.batchify(subBatches);
 
         return squeezeExtraDimensions(batch);
     }
 
-    protected NDList squeezeExtraDimensions(NDList batch){
+    /**
+     * Squeezes first axes of {@link NDList}
+     *
+     * @param batch input array of {@link NDList}
+     * @return the squeezed {@link NDList}
+     */
+    protected NDList squeezeExtraDimensions(NDList batch) {
         NDArray array = batch.singletonOrThrow().squeeze(0);
         batch.set(0, array);
 
