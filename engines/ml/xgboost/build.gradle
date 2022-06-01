@@ -1,6 +1,8 @@
 import groovy.xml.QName
 
 group "ai.djl.ml.xgboost"
+boolean isGpu = project.hasProperty("gpu")
+def XGB_FLAVOR = isGpu ? "-gpu" : ""
 
 configurations {
     exclusion
@@ -9,7 +11,7 @@ configurations {
 dependencies {
     api project(":api")
     api "commons-logging:commons-logging:${commons_logging_version}"
-    api("ml.dmlc:xgboost4j_2.12:${xgboost_version}") {
+    api("ml.dmlc:xgboost4j${XGB_FLAVOR}_2.12:${xgboost_version}") {
         // get rid of the unused XGBoost Dependencies
         exclude group: "org.apache.hadoop", module: "hadoop-hdfs"
         exclude group: "org.apache.hadoop", module: "hadoop-common"
@@ -23,9 +25,13 @@ dependencies {
         exclude group: "org.scala-lang", module: "scala-reflect"
         exclude group: "org.scala-lang", module: "scala-library"
     }
+    if (isGpu) {
+        api "ai.rapids:cudf:${rapis_version}:cuda11"
+    }
 
     exclusion project(":api")
     exclusion "commons-logging:commons-logging:${commons_logging_version}"
+    exclusion "ai.rapids:cudf:${rapis_version}:cuda11"
     testImplementation(project(":testing"))
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
@@ -43,6 +49,7 @@ jar {
                         "ml/dmlc/xgboost4j/java/NativeLibLoader*",
                         "ml/dmlc/xgboost4j/java/XGBoost*",
                         "ml/dmlc/xgboost4j/java/util/*",
+                        "ml/dmlc/xgboost4j/gpu/java/*",
                         "ml/dmlc/xgboost4j/LabeledPoint.*",
                         "xgboost4j-version.properties"
             }
@@ -53,6 +60,7 @@ jar {
 publishing {
     publications {
         maven(MavenPublication) {
+            artifactId "${project.name}${XGB_FLAVOR}"
             pom {
                 name = "DJL Engine Adapter for XGBoost"
                 description = "Deep Java Library (DJL) Engine Adapter for XGBoost"
