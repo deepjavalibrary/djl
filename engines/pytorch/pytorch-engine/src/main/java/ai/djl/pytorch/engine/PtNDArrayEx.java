@@ -624,8 +624,8 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArrayIndexer getIndexer() {
-        return new PtNDArrayIndexer(array.getManager());
+    public NDArrayIndexer getIndexer(NDManager manager) {
+        return new PtNDArrayIndexer((PtNDManager) manager);
     }
 
     /** {@inheritDoc} */

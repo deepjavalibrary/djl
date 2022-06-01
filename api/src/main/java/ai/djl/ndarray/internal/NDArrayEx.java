@@ -486,9 +486,10 @@ public interface NDArrayEx {
     /**
      * Returns an {@link NDArrayIndexer}.
      *
+     * @param manager the manager used to create the arrays
      * @return an {@link NDArrayIndexer}
      */
-    NDArrayIndexer getIndexer();
+    NDArrayIndexer getIndexer(NDManager manager);
 
     /**
      * Returns elements chosen from the {@code NDArray} or the other {@code NDArray} depending on

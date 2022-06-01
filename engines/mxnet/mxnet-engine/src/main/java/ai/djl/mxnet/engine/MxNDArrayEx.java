@@ -984,8 +984,8 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArrayIndexer getIndexer() {
-        return new MxNDArrayIndexer(array.getManager());
+    public NDArrayIndexer getIndexer(NDManager manager) {
+        return new MxNDArrayIndexer((MxNDManager) manager);
     }
 
     ////////////////////////////////////////

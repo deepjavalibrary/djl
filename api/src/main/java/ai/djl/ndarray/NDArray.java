@@ -456,7 +456,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      *     index
      */
     default void set(NDIndex index, NDArray value) {
-        getNDArrayInternal().getIndexer().set(this, index, value);
+        getNDArrayInternal().getIndexer(getManager()).set(this, index, value);
     }
 
     /**
@@ -466,7 +466,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @param value the value to replace with
      */
     default void set(NDIndex index, Number value) {
-        getNDArrayInternal().getIndexer().set(this, index, value);
+        getNDArrayInternal().getIndexer(getManager()).set(this, index, value);
     }
 
     /**
@@ -498,7 +498,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @throws IllegalArgumentException thrown if the index does not correspond to a single element
      */
     default void setScalar(NDIndex index, Number value) {
-        getNDArrayInternal().getIndexer().setScalar(this, index, value);
+        getNDArrayInternal().getIndexer(getManager()).setScalar(this, index, value);
     }
 
     /**
@@ -508,7 +508,18 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return the partial {@code NDArray}
      */
     default NDArray get(NDIndex index) {
-        return getNDArrayInternal().getIndexer().get(this, index);
+        return get(index, getManager());
+    }
+
+    /**
+     * Returns a partial {@code NDArray}.
+     *
+     * @param manager the manager used to create the arrays
+     * @param index the section of this {@code NDArray} to return
+     * @return the partial {@code NDArray}
+     */
+    default NDArray get(NDIndex index, NDManager manager) {
+        return getNDArrayInternal().getIndexer(manager).get(this, index);
     }
 
     /**
@@ -547,6 +558,18 @@ public interface NDArray extends NDResource, BytesSupplier {
      */
     default NDArray get(long... indices) {
         return get(new NDIndex(indices));
+    }
+
+    /**
+     * Returns a partial {@code NDArray}.
+     *
+     * @param manager the manager used to create the arrays
+     * @param indices the indices with each index corresponding to the dimensions and negative
+     *     indices starting from the end
+     * @return the partial {@code NDArray}
+     */
+    default NDArray get(NDManager manager, long... indices) {
+        return get(new NDIndex(indices), manager);
     }
 
     /**

@@ -43,7 +43,7 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
         long[] min = fullSlice.getMin();
         long[] max = fullSlice.getMax();
         long[] step = fullSlice.getStep();
-        try (PtNDArray res = JniUtils.index(manager.from(array), min, max, step)) {
+        try (PtNDArray res = JniUtils.index(manager.from(array), min, max, step, manager)) {
             return res.squeeze(fullSlice.getToSqueeze());
         }
     }
