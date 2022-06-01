@@ -42,10 +42,10 @@ public class ManagerAttachmentTest {
             NDArray array4 = array3x4.get(1);
             Assert.assertEquals(array4.getManager(), manager);
             try (MxNDManager subManager = (MxNDManager) NDManager.newBaseManager()) {
-                NDArray array4_1 = array3x4.get(subManager, 1);
-                Assert.assertEquals(array4_1.getManager(), subManager);
-                NDArray array4_2 = array3x4.get(new NDIndex(1), subManager);
-                Assert.assertEquals(array4_2.getManager(), subManager);
+                NDArray array4sub1 = array3x4.get(subManager, 1);
+                Assert.assertEquals(array4sub1.getManager(), subManager);
+                NDArray array4sub2 = array3x4.get(new NDIndex(1), subManager);
+                Assert.assertEquals(array4sub2.getManager(), subManager);
             }
         }
     }
