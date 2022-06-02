@@ -89,7 +89,7 @@ public class GhostBatchNorm extends BatchNorm {
     }
 
     /**
-     * Squeezes first axes of {@link NDList}
+     * Squeezes first axes of {@link NDList}.
      *
      * @param batch input array of {@link NDList}
      * @return the squeezed {@link NDList}
