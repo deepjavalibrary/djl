@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset.tabular;
+package ai.djl.tablesaw;
 
 import ai.djl.basicdataset.utils.DynamicBuffer;
 import ai.djl.basicdataset.utils.Feature;
@@ -20,38 +20,26 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.util.Progress;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.FloatBuffer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
+import tech.tablesaw.io.ReadOptions;
 
-/** {@code CsvDataset} represents the dataset that stored in a .csv file. */
-public class CsvDataset extends RandomAccessDataset {
+/** {@code TablesawDataset} represents the dataset that stored in a .csv file. */
+public class TablesawDataset extends RandomAccessDataset {
 
-    protected URL csvUrl;
-    protected CSVFormat csvFormat;
+    protected ReadOptions readOptions;
     protected List<Feature> features;
     protected List<Feature> labels;
-    protected List<CSVRecord> csvRecords;
+    protected Table table;
 
-    protected CsvDataset(CsvBuilder<?> builder) {
+    protected TablesawDataset(TablesawBuilder<?> builder) {
         super(builder);
-        csvUrl = builder.csvUrl;
-        csvFormat = builder.csvFormat;
+        readOptions = builder.readOptions;
         features = builder.features;
         labels = builder.labels;
     }
@@ -59,9 +47,9 @@ public class CsvDataset extends RandomAccessDataset {
     /** {@inheritDoc} */
     @Override
     public Record get(NDManager manager, long index) {
-        CSVRecord csvRecord = csvRecords.get(Math.toIntExact(index));
-        NDList data = toNDList(manager, csvRecord, features);
-        NDList label = toNDList(manager, csvRecord, labels);
+        Row row = table.row(Math.toIntExact(index));
+        NDList data = toNDList(manager, row, features);
+        NDList label = toNDList(manager, row, labels);
 
         return new Record(data, label);
     }
@@ -69,66 +57,55 @@ public class CsvDataset extends RandomAccessDataset {
     /** {@inheritDoc} */
     @Override
     protected long availableSize() {
-        return csvRecords.size();
+        return table.rowCount();
     }
 
     /** {@inheritDoc} */
     @Override
-    public void prepare(Progress progress) throws IOException {
-        try (Reader reader = new InputStreamReader(getCsvStream(), StandardCharsets.UTF_8)) {
-            CSVParser csvParser = new CSVParser(reader, csvFormat);
-            csvRecords = csvParser.getRecords();
-        }
-    }
-
-    private InputStream getCsvStream() throws IOException {
-        if (csvUrl.getFile().endsWith(".gz")) {
-            return new GZIPInputStream(csvUrl.openStream());
-        }
-        return new BufferedInputStream(csvUrl.openStream());
+    public void prepare(Progress progress) {
+        table = Table.read().usingOptions(readOptions);
     }
 
     /**
-     * Creates a builder to build a {@link AmesRandomAccess}.
+     * Creates a builder to build a {@link TablesawDataset}.
      *
      * @return a new builder
      */
-    public static CsvBuilder<?> builder() {
-        return new CsvBuilder<>();
+    public static TablesawBuilder<?> builder() {
+        return new TablesawBuilder<>();
     }
 
     /**
-     * Returns the column names of the CSV file.
+     * Returns the column names of the Tablesaw file.
      *
      * @return a list of column name
      */
     public List<String> getColumnNames() {
-        if (csvRecords.isEmpty()) {
+        if (table.isEmpty()) {
             return Collections.emptyList();
         }
-        return csvRecords.get(0).getParser().getHeaderNames();
+        return table.columnNames();
     }
 
-    protected NDList toNDList(NDManager manager, CSVRecord record, List<Feature> selected) {
+    protected NDList toNDList(NDManager manager, Row row, List<Feature> selected) {
         DynamicBuffer bb = new DynamicBuffer();
         for (Feature feature : selected) {
             String name = feature.getName();
-            String value = record.get(name);
+            String value = row.getString(name);
             feature.getFeaturizer().featurize(bb, value);
         }
         FloatBuffer buf = bb.getBuffer();
         return new NDList(manager.create(buf, new Shape(bb.getLength())));
     }
 
-    /** Used to build a {@link CsvDataset}. */
-    public static class CsvBuilder<T extends CsvBuilder<T>> extends BaseBuilder<T> {
+    /** Used to build a {@link TablesawDataset}. */
+    public static class TablesawBuilder<T extends TablesawBuilder<T>> extends BaseBuilder<T> {
 
-        protected URL csvUrl;
-        protected CSVFormat csvFormat;
+        protected ReadOptions readOptions;
         protected List<Feature> features;
         protected List<Feature> labels;
 
-        protected CsvBuilder() {
+        protected TablesawBuilder() {
             features = new ArrayList<>();
             labels = new ArrayList<>();
         }
@@ -141,43 +118,13 @@ public class CsvDataset extends RandomAccessDataset {
         }
 
         /**
-         * Sets the optional CSV file path.
+         * Sets the reading options.
          *
-         * @param csvFile the CSV file path
+         * @param readOptions the {@code ReadOptions}
          * @return this builder
          */
-        public T optCsvFile(Path csvFile) {
-            try {
-                this.csvUrl = csvFile.toAbsolutePath().toUri().toURL();
-            } catch (MalformedURLException e) {
-                throw new IllegalArgumentException("Invalid file path: " + csvFile, e);
-            }
-            return self();
-        }
-
-        /**
-         * Sets the optional CSV file URL.
-         *
-         * @param csvUrl the CSV file URL
-         * @return this builder
-         */
-        public T optCsvUrl(String csvUrl) {
-            try {
-                this.csvUrl = new URL(csvUrl);
-            } catch (MalformedURLException e) {
-                throw new IllegalArgumentException("Invalid url: " + csvUrl, e);
-            }
-            return self();
-        }
-
-        /**
-         * Sets the CSV file format.
-         *
-         * @param csvFormat the {@code CSVFormat}
-         * @return this builder
-         */
-        public T setCsvFormat(CSVFormat csvFormat) {
-            this.csvFormat = csvFormat;
+        public T setReadOptions(ReadOptions readOptions) {
+            this.readOptions = readOptions;
             return self();
         }
 
@@ -275,18 +222,18 @@ public class CsvDataset extends RandomAccessDataset {
         }
 
         /**
-         * Builds the new {@link CsvDataset}.
+         * Builds the new {@link TablesawDataset}.
          *
-         * @return the new {@link CsvDataset}
+         * @return the new {@link TablesawDataset}
          */
-        public CsvDataset build() {
+        public TablesawDataset build() {
             if (features.isEmpty()) {
                 throw new IllegalArgumentException("Missing features.");
             }
             if (labels.isEmpty()) {
                 throw new IllegalArgumentException("Missing labels.");
             }
-            return new CsvDataset(this);
+            return new TablesawDataset(this);
         }
     }
 }

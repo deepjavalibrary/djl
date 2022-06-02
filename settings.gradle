@@ -33,7 +33,9 @@ include ':extensions:hadoop'
 include ':extensions:opencv'
 include ':extensions:sentencepiece'
 include ':extensions:tokenizers'
+include ':extensions:tablesaw'
 include ':integration'
 include ':model-zoo'
 include ':testing'
+
 
