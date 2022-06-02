@@ -48,9 +48,11 @@ public class GhostBatchNorm extends BatchNorm {
             PairList<String, Object> params) {
 
         NDList[] subBatches = split(inputs);
-        for (NDList batch : subBatches) {
-            super.forwardInternal(parameterStore, batch, training, params);
+
+        for (int i = 0; i < subBatches.length; i++) {
+            subBatches[i] = super.forwardInternal(parameterStore, subBatches[i], training, params);
         }
+
         return batchify(subBatches);
     }
 
