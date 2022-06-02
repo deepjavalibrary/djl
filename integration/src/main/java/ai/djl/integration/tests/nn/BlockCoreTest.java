@@ -36,6 +36,7 @@ import ai.djl.nn.convolutional.Conv3d;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.norm.Dropout;
+import ai.djl.nn.norm.GhostBatchNorm;
 import ai.djl.nn.norm.LayerNorm;
 import ai.djl.nn.recurrent.GRU;
 import ai.djl.nn.recurrent.LSTM;
@@ -197,6 +198,41 @@ public class BlockCoreTest {
                     NDArray data = manager.create(new float[] {1, 2, 3, 4}, inputShape);
                     NDArray expected = manager.create(new float[] {-1, -1, 1, 1}, inputShape);
                     NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                    Assertions.assertAlmostEquals(result, expected);
+                    testEncode(manager, block);
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("try")
+    @Test
+    public void testGhostBatchNorm() throws IOException, MalformedModelException {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+
+        Block block = GhostBatchNorm.builder().build();
+        try (Model model = Model.newInstance("model")) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                // the unused GradientCollector is for BatchNorm to know it is on training mode
+                try (GradientCollector collector = trainer.newGradientCollector()) {
+                    Shape inputShape = new Shape(1, 1, 10);
+                    trainer.initialize(inputShape);
+
+                    NDManager manager = trainer.getManager();
+                    NDArray data = manager.arange(10f).reshape(inputShape);
+                    NDArray expected =
+                            manager.create(
+                                    new float[] {
+                                        -1.5667f, -1.2185f, -0.8704f, -0.5222f, -0.1741f, 0.1741f,
+                                        0.5222f, 0.8704f, 1.2185f, 1.5667f
+                                    },
+                                    inputShape);
+                    NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+
                     Assertions.assertAlmostEquals(result, expected);
                     testEncode(manager, block);
                 }
