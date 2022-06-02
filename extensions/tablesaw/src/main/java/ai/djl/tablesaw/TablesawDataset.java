@@ -29,7 +29,7 @@ import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.ReadOptions;
 
-/** {@code CsvDataset} represents the dataset that stored in a .csv file. */
+/** {@code TablesawDataset} represents the dataset that stored in a .csv file. */
 public class TablesawDataset extends RandomAccessDataset {
 
     protected ReadOptions readOptions;
