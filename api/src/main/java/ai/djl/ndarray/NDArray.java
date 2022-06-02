@@ -508,7 +508,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return the partial {@code NDArray}
      */
     default NDArray get(NDIndex index) {
-        return get(index, getManager());
+        return get(getManager(), index);
     }
 
     /**
@@ -518,7 +518,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @param index the section of this {@code NDArray} to return
      * @return the partial {@code NDArray}
      */
-    default NDArray get(NDIndex index, NDManager manager) {
+    default NDArray get(NDManager manager, NDIndex index) {
         return getNDArrayInternal().getIndexer(manager).get(this, index);
     }
 
@@ -569,7 +569,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return the partial {@code NDArray}
      */
     default NDArray get(NDManager manager, long... indices) {
-        return get(new NDIndex(indices), manager);
+        return get(manager, new NDIndex(indices));
     }
 
     /**

@@ -43,7 +43,7 @@ public class NDArrayAttachmentTest {
             try (NDManager subManager = NDManager.newBaseManager()) {
                 NDArray array4sub1 = array3x4.get(subManager, 1);
                 Assert.assertEquals(array4sub1.getManager(), subManager);
-                NDArray array4sub2 = array3x4.get(new NDIndex(1), subManager);
+                NDArray array4sub2 = array3x4.get(subManager, new NDIndex(1));
                 Assert.assertEquals(array4sub2.getManager(), subManager);
             }
         }
