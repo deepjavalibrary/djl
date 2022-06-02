@@ -2,7 +2,7 @@
   "metadataVersion": "0.2",
   "resourceType": "dataset",
   "application": "nlp",
-  "groupId": "ai.djl.basicdataset",
+  "groupId": "ai.djl.basicdataset.universal-dependencies",
   "artifactId": "universal-dependencies-en-ewt",
   "name": "universal-dependencies-en-ewt",
   "description": "A Gold Standard Universal Dependencies Corpus for English, built over the source material of the English Web Treebank LDC2012T13.",

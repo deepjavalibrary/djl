@@ -13,6 +13,7 @@
 package ai.djl.basicdataset.nlp;
 
 import ai.djl.Application.NLP;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -167,6 +168,7 @@ public class UniversalDependenciesEnglishEWT extends TextDataset {
 
         /** Constructs a new builder. */
         public Builder() {
+            groupId = BasicDatasets.GROUP_ID + ".universal-dependencies";
             artifactId = ARTIFACT_ID;
         }
 

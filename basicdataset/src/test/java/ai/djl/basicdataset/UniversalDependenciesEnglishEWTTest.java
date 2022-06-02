@@ -34,11 +34,9 @@ public class UniversalDependenciesEnglishEWTTest {
 
     @Test
     public void testGetDataWithPreTrainedEmbedding() throws IOException, TranslateException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
         try (NDManager manager = NDManager.newBaseManager()) {
             UniversalDependenciesEnglishEWT universalDependenciesEnglishEWT =
                     UniversalDependenciesEnglishEWT.builder()
-                            .optRepository(repository)
                             .optUsage(Dataset.Usage.TRAIN)
                             .setSourceConfiguration(
                                     new Configuration()
@@ -62,11 +60,9 @@ public class UniversalDependenciesEnglishEWTTest {
 
     @Test
     public void testGetDataWithTrainableEmbedding() throws IOException, TranslateException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
         try (NDManager manager = NDManager.newBaseManager()) {
             UniversalDependenciesEnglishEWT universalDependenciesEnglishEWT =
                     UniversalDependenciesEnglishEWT.builder()
-                            .optRepository(repository)
                             .optUsage(Dataset.Usage.TEST)
                             .setSourceConfiguration(
                                     new Configuration()
@@ -90,11 +86,9 @@ public class UniversalDependenciesEnglishEWTTest {
 
     @Test
     public void testMisc() throws TranslateException, IOException {
-        Repository repository = Repository.newInstance("test", "src/test/resources/mlrepo");
         try (NDManager manager = NDManager.newBaseManager()) {
             UniversalDependenciesEnglishEWT universalDependenciesEnglishEWT =
                     UniversalDependenciesEnglishEWT.builder()
-                            .optRepository(repository)
                             .optUsage(Dataset.Usage.VALIDATION)
                             .setSourceConfiguration(
                                     new TextData.Configuration()
