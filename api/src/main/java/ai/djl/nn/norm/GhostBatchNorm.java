@@ -77,7 +77,7 @@ public class GhostBatchNorm extends BatchNorm {
     /**
      * Converts an array of {@link NDList} into an NDList using {@link StackBatchifier} and squeezes
      * the first dimension created by it. This makes the final {@link NDArray} same size as the
-     * splitted one
+     * splitted one.
      *
      * @param subBatches the input array of {@link NDList}
      * @return the batchified {@link NDList}
