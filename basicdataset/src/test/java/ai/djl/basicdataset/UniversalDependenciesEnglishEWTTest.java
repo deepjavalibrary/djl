@@ -18,7 +18,6 @@ import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.modality.nlp.preprocess.LowerCaseConvertor;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.ndarray.NDManager;
-import ai.djl.repository.Repository;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
