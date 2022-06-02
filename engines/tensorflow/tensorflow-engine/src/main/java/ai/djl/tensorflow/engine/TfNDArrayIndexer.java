@@ -36,14 +36,12 @@ public class TfNDArrayIndexer extends NDArrayIndexer {
     @Override
     public NDArray get(NDArray array, NDIndexFullSlice fullSlice) {
         array = manager.from(array);
-        TfNDManager tfManager = (TfNDManager) array.getManager();
         int[] toSqueeze = fullSlice.getToSqueeze();
-        try (NDArray begin = tfManager.create(fullSlice.getMin());
-                NDArray end = tfManager.create(fullSlice.getMax());
-                NDArray step = tfManager.create(fullSlice.getStep())) {
+        try (NDArray begin = manager.create(fullSlice.getMin());
+                NDArray end = manager.create(fullSlice.getMax());
+                NDArray step = manager.create(fullSlice.getStep())) {
             NDArray result =
-                    tfManager
-                            .opExecutor("StridedSlice")
+                    manager.opExecutor("StridedSlice")
                             .addInput(array)
                             .addInput(begin)
                             .addInput(end)

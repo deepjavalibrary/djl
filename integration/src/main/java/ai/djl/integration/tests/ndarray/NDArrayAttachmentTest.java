@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,23 +10,22 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.pytorch.integration;
+package ai.djl.integration.tests.ndarray;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.pytorch.engine.PtNDArray;
-import ai.djl.pytorch.engine.PtNDManager;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class ManagerAttachmentTest {
+public class NDArrayAttachmentTest {
+
     @Test
     public void testReturnResource() {
-        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
-            PtNDArray array3x4 = (PtNDArray) manager.ones(new Shape(3, 4));
-            try (PtNDManager subManager = (PtNDManager) NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array3x4 = manager.ones(new Shape(3, 4));
+            try (NDManager subManager = NDManager.newBaseManager()) {
                 array3x4.tempAttach(subManager);
                 Assert.assertEquals(array3x4.getManager(), subManager);
             }
@@ -36,12 +35,12 @@ public class ManagerAttachmentTest {
 
     @Test
     public void testIndexationUsesSpecificManager() {
-        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
-            PtNDArray array3x4 = (PtNDArray) manager.ones(new Shape(3, 4));
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array3x4 = manager.ones(new Shape(3, 4));
             array3x4.setName("Test()");
             NDArray array4 = array3x4.get(1);
             Assert.assertEquals(array4.getManager(), manager);
-            try (PtNDManager subManager = (PtNDManager) NDManager.newBaseManager()) {
+            try (NDManager subManager = NDManager.newBaseManager()) {
                 NDArray array4sub1 = array3x4.get(subManager, 1);
                 Assert.assertEquals(array4sub1.getManager(), subManager);
                 NDArray array4sub2 = array3x4.get(new NDIndex(1), subManager);

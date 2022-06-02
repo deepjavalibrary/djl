@@ -229,8 +229,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public void tempAttach(NDManager manager) {
-        detach();
         NDManager original = this.manager;
+        detach();
         this.manager = (TfNDManager) manager;
         manager.tempAttachInternal(original, getUid(), this);
     }
