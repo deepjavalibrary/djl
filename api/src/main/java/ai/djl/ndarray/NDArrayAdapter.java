@@ -80,8 +80,8 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void tempAttach(NDManager manager) {
-        detach();
         NDManager original = this.manager;
+        detach();
         this.manager = manager;
         manager.tempAttachInternal(original, getUid(), this);
     }

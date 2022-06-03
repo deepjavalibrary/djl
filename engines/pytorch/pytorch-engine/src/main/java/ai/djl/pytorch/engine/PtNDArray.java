@@ -235,8 +235,8 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray get(long... indices) {
-        return JniUtils.getItem(this, indices);
+    public NDArray get(NDManager manager, long... indices) {
+        return JniUtils.getItem(this, indices, (PtNDManager) manager);
     }
 
     /** {@inheritDoc} */
@@ -274,8 +274,8 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void tempAttach(NDManager manager) {
-        detach();
         NDManager original = this.manager;
+        detach();
         this.manager = (PtNDManager) manager;
         manager.tempAttachInternal(original, getUid(), this);
     }

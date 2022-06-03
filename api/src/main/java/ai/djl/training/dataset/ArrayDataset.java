@@ -84,15 +84,13 @@ public class ArrayDataset extends RandomAccessDataset {
         NDList datum = new NDList();
         NDList label = new NDList();
         for (NDArray array : data) {
-            datum.add(array.get(index));
+            datum.add(array.get(manager, index));
         }
         if (labels != null) {
             for (NDArray array : labels) {
-                label.add(array.get(index));
+                label.add(array.get(manager, index));
             }
         }
-        datum.attach(manager);
-        label.attach(manager);
         return new Record(datum, label);
     }
 
