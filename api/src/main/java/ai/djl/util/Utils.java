@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -243,7 +244,7 @@ public final class Utils {
     public static int getCurrentEpoch(Path modelDir, String modelName) throws IOException {
         final Pattern pattern = Pattern.compile(Pattern.quote(modelName) + "-(\\d{4}).params");
         List<Integer> checkpoints =
-                Files.walk(modelDir, 1)
+                Files.walk(modelDir, 1, FileVisitOption.FOLLOW_LINKS)
                         .map(
                                 p -> {
                                     Matcher m = pattern.matcher(p.toFile().getName());
