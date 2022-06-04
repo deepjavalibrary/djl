@@ -191,6 +191,13 @@ public class BitmapImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
+        public List<BoundingBox> findBoundingBoxes() {
+            // TODO: Add grayscale conversion and use BoundFinder to implement
+            throw new UnsupportedOperationException("Not supported for BitMapImage");
+        }
+
+        /** {@inheritDoc} */
+        @Override
         public void drawBoundingBoxes(DetectedObjects detections) {
             Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
             Canvas canvas =  new Canvas(mutableBitmap);
