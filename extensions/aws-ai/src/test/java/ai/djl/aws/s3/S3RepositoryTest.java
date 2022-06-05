@@ -51,13 +51,12 @@ public class S3RepositoryTest {
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
-                        .optModelUrls(
-                                "s3://djl-ai/mlrepo/model/cv/image_classification/ai/djl/mxnet/mlp/0.0.1")
-                        .optModelName("mlp")
+                        .optModelUrls("s3://djl-ai/resources/demo/pytorch/traced_resnet18")
+                        .optModelName("traced_resnet18")
                         .build();
 
         try (ZooModel<NDList, NDList> model = criteria.loadModel()) {
-            Assert.assertEquals(model.getName(), "mlp");
+            Assert.assertEquals(model.getName(), "traced_resnet18");
         }
     }
 
@@ -75,12 +74,12 @@ public class S3RepositoryTest {
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
-                        .optModelUrls("s3://djl-ai/resources/test-models/mlp.tar.gz")
-                        .optModelName("mlp")
+                        .optModelUrls("s3://djl-ai/resources/demo/pytorch/traced_resnet18.zip")
+                        .optModelName("traced_resnet18")
                         .build();
 
         try (ZooModel<NDList, NDList> model = criteria.loadModel()) {
-            Assert.assertEquals(model.getName(), "mlp");
+            Assert.assertEquals(model.getName(), "traced_resnet18");
         }
     }
 

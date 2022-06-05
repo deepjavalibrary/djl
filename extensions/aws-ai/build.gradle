@@ -9,7 +9,7 @@ dependencies {
     api "software.amazon.awssdk:sts"
     api project(":api")
 
-    testImplementation project(":engines:mxnet:mxnet-model-zoo")
+    testImplementation project(":engines:pytorch:pytorch-model-zoo")
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
