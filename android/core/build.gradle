@@ -27,12 +27,6 @@ android {
     }
 }
 
-repositories {
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-}
-
 signing {
     required(project.hasProperty("staging") || project.hasProperty("snapshot"))
     def signingKey = findProperty("signingKey")
