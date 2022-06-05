@@ -26,16 +26,16 @@ public class DjlRepositoryTest {
 
     @Test
     public void testResource() throws ModelNotFoundException, MalformedModelException, IOException {
-        Repository repo = Repository.newInstance("DJL", "djl://ai.djl.mxnet/mlp");
+        Repository repo = Repository.newInstance("DJL", "djl://ai.djl.pytorch/resnet");
         Assert.assertEquals(repo.getResources().size(), 1);
 
-        repo = Repository.newInstance("DJL", "djl://ai.djl.mxnet/resnet/0.0.1");
+        repo = Repository.newInstance("DJL", "djl://ai.djl.pytorch/resnet/0.0.1");
         Assert.assertEquals(repo.getResources().size(), 1);
 
-        repo = Repository.newInstance("DJL", "djl://ai.djl.mxnet/resnet/0.0.1/resnet18_v1");
+        repo = Repository.newInstance("DJL", "djl://ai.djl.pytorch/resnet/0.0.1/traced_resnet18");
         Assert.assertEquals(repo.getResources().size(), 1);
 
-        repo = Repository.newInstance("DJL", "djl://ai.djl.mxnet/fake/0.0.1");
+        repo = Repository.newInstance("DJL", "djl://ai.djl.pytorch/fake/0.0.1");
         Assert.assertEquals(repo.getResources().size(), 0);
 
         repo = Repository.newInstance("DJL", "djl://ai.djl.fake/mlp/0.0.1");
@@ -46,19 +46,19 @@ public class DjlRepositoryTest {
 
         Assert.expectThrows(
                 IllegalArgumentException.class,
-                () -> Repository.newInstance("DJL", "djl://ai.djl.mxnet"));
+                () -> Repository.newInstance("DJL", "djl://ai.djl.pytorch"));
 
         Assert.expectThrows(
                 IllegalArgumentException.class,
-                () -> Repository.newInstance("DJL", "djl://ai.djl.mxnet/"));
+                () -> Repository.newInstance("DJL", "djl://ai.djl.pytorch/"));
 
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
-                        .optModelUrls("djl://ai.djl.mxnet/resnet/0.0.1/resnet18_v1")
+                        .optModelUrls("djl://ai.djl.pytorch/resnet/0.0.1/traced_resnet18")
                         .build();
         try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
-            Assert.assertEquals(model.getName(), "resnet18_v1");
+            Assert.assertEquals(model.getName(), "traced_resnet18");
         }
     }
 }
