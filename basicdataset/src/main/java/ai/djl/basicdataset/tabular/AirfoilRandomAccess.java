@@ -118,7 +118,8 @@ public final class AirfoilRandomAccess extends CsvDataset {
 
     /** {@inheritDoc} */
     @Override
-    protected NDList toNDList(NDManager manager, CSVRecord record, List<Feature> selected) {
+    public NDList getRowFeatures(NDManager manager, long index, List<Feature> selected) {
+        CSVRecord record = csvRecords.get(Math.toIntExact(index));
         int length = selected.size();
         ByteBuffer bb = manager.allocateDirect(length * 4);
         FloatBuffer buf = bb.asFloatBuffer();
