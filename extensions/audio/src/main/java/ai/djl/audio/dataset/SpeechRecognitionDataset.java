@@ -51,7 +51,7 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
     protected boolean prepared;
 
     /**
-     * Creates a new instance of {@link SpeechRecognitionDataset} with the given necessary
+     * Creates a new instance of {@code SpeechRecognitionDataset} with the given necessary
      * configurations.
      *
      * @param builder a builder with the necessary configurations
@@ -85,7 +85,7 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         sourceAudioData.setAudioPaths(audioPathList);
     }
 
-    /** Abstract AudioBuilder that helps build a {@link SpeechRecognitionDataset}. */
+    /** Abstract AudioBuilder that helps build a {@code SpeechRecognitionDataset}. */
     public abstract static class AudioBuilder<T extends AudioBuilder<T>> extends BaseBuilder<T> {
 
         protected AudioData.Configuration sourceConfiguration;
@@ -108,7 +108,7 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         }
 
         /**
-         * Sets the {@link AudioData.Configuration} to use for the source text data.
+         * Sets the {@code AudioData.Configuration} to use for the source text data.
          *
          * @param sourceConfiguration the {@link AudioData.Configuration}
          * @return this builder
@@ -119,9 +119,9 @@ public abstract class SpeechRecognitionDataset extends RandomAccessDataset {
         }
 
         /**
-         * Sets the {@link TextData.Configuration} to use for the target text data.
+         * Sets the {@code TextData.Configuration} to use for the target text data.
          *
-         * @param targetConfiguration the {@link TextData.Configuration}
+         * @param targetConfiguration the {@code TextData.Configuration}
          * @return this builder
          */
         public T setTargetConfiguration(TextData.Configuration targetConfiguration) {
