@@ -14,6 +14,7 @@ package ai.djl.mxnet.integration;
 
 import ai.djl.mxnet.engine.MxEngine;
 import ai.djl.testing.CoverageUtils;
+import ai.djl.testing.TestRequirements;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;
@@ -22,6 +23,8 @@ public class MxCoverageTest {
 
     @Test
     public void test() throws IOException, ReflectiveOperationException, URISyntaxException {
+        TestRequirements.notArm();
+
         // mxnet-engine
         CoverageUtils.testGetterSetters(MxEngine.class);
     }

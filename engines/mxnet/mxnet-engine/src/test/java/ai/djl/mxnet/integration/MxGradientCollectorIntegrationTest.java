@@ -21,6 +21,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
 import ai.djl.testing.Assertions;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
@@ -33,6 +34,8 @@ public class MxGradientCollectorIntegrationTest {
 
     @Test
     public void testMxAutograd() {
+        TestRequirements.notArm();
+
         try (Model model = Model.newInstance("model");
                 NDManager manager = model.getNDManager()) {
             model.setBlock(Blocks.identityBlock());

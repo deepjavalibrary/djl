@@ -12,14 +12,13 @@
  */
 package ai.djl.tflite.engine;
 
-import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
@@ -33,10 +32,9 @@ import org.testng.annotations.Test;
 public class TfLiteTest {
 
     @Test
-    void testTflite()
-            throws IOException, MalformedModelException, TranslateException,
-                    ModelNotFoundException {
+    void testTflite() throws IOException, TranslateException, ModelException {
         TestRequirements.notWindows();
+        TestRequirements.notArm();
 
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()

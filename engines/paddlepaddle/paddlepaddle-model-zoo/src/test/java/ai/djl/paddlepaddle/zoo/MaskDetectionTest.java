@@ -24,6 +24,7 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,6 +39,8 @@ public class MaskDetectionTest {
 
     @Test
     public void testMaskDetection() throws IOException, ModelException, TranslateException {
+        TestRequirements.notArm();
+
         String url =
                 "https://raw.githubusercontent.com/PaddlePaddle/PaddleHub/release/v1.5/demo/mask_detection/python/images/mask.jpg";
         Image img = ImageFactory.getInstance().fromUrl(url);

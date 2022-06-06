@@ -33,6 +33,8 @@ public class IntegrationTests {
             // together
             if (System.getProperty("os.name").startsWith("Win")) {
                 engines = new String[] {"MXNet"};
+            } else if ("aarch64".equals(System.getProperty("os.arch"))) {
+                engines = new String[] {"PyTorch"};
             } else {
                 engines = new String[] {"MXNet", "PyTorch", "TensorFlow", "XGBoost"};
             }

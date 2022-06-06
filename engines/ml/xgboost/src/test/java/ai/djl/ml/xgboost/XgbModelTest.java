@@ -40,6 +40,8 @@ public class XgbModelTest {
 
     @BeforeClass
     public void downloadXGBoostModel() throws IOException {
+        TestRequirements.notArm();
+
         Path modelDir = Paths.get("build/model");
         DownloadUtils.download(
                 "https://resources.djl.ai/test-models/xgboost/regression.json",

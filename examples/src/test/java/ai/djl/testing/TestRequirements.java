@@ -13,6 +13,7 @@
 package ai.djl.testing;
 
 import ai.djl.engine.Engine;
+import ai.djl.engine.EngineException;
 import java.util.Arrays;
 import java.util.Calendar;
 import org.testng.SkipException;
@@ -56,6 +57,11 @@ public final class TestRequirements {
         String engineName = Engine.getDefaultEngineName();
         for (String e : engines) {
             if (engineName.equals(e)) {
+                try {
+                    Engine.getEngine(engineName);
+                } catch (EngineException ex) {
+                    throw new SkipException("Engine cannot be loaded.", ex);
+                }
                 return;
             }
         }

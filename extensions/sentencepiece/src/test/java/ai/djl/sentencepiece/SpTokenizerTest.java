@@ -29,6 +29,8 @@ public class SpTokenizerTest {
 
     @BeforeTest
     public void downloadModel() throws IOException {
+        TestRequirements.notArm();
+
         Path modelFile = Paths.get("build/test/sp_model/sp_model.model");
         if (Files.notExists(modelFile)) {
             DownloadUtils.download(

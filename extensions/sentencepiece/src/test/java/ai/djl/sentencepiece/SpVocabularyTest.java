@@ -13,6 +13,7 @@
 
 package ai.djl.sentencepiece;
 
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +27,8 @@ public class SpVocabularyTest {
 
     @BeforeTest
     public void downloadModel() throws IOException {
+        TestRequirements.notArm();
+
         Path modelFile = Paths.get("build/test/models/sententpiece_test_model.model");
         if (Files.notExists(modelFile)) {
             DownloadUtils.download(

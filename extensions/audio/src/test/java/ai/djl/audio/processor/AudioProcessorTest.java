@@ -19,6 +19,7 @@ import ai.djl.audio.dataset.AudioData;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,6 +34,7 @@ public class AudioProcessorTest {
 
     @BeforeClass
     public void setUp() throws IOException {
+        TestRequirements.notArm();
         DownloadUtils.download(URL, "build/test/test_01.wav");
     }
 

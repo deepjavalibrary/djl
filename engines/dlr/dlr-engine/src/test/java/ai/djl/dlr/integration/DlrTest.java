@@ -37,6 +37,7 @@ public class DlrTest {
     @Test
     public void testDlr() throws ModelException, IOException, TranslateException {
         TestRequirements.notWindows();
+        TestRequirements.notArm();
 
         String os;
         if (System.getProperty("os.name").toLowerCase().startsWith("mac")) {
