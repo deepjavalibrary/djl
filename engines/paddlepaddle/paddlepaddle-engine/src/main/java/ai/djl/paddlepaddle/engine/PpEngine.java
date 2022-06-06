@@ -17,9 +17,11 @@ import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
-import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.paddlepaddle.jni.LibUtils;
 import ai.djl.training.GradientCollector;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * The {@code PpEngine} is an implementation of the {@link Engine} based on the <a
@@ -36,11 +38,7 @@ public final class PpEngine extends Engine {
     private Engine alternativeEngine;
     private boolean initialized;
 
-    private String version;
-
-    private PpEngine() {
-        version = JniUtils.getVersion();
-    }
+    private PpEngine() {}
 
     static Engine newInstance() {
         LibUtils.loadLibrary();
@@ -76,7 +74,14 @@ public final class PpEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return version;
+        try (InputStream is =
+                PpEngine.class.getResourceAsStream("/paddlepaddle-engine.properties")) {
+            Properties prop = new Properties();
+            prop.load(is);
+            return prop.getProperty("paddlepaddle_version");
+        } catch (IOException e) {
+            throw new AssertionError("Failed to load paddlapaddle-engine.properties", e);
+        }
     }
 
     /** {@inheritDoc} */
