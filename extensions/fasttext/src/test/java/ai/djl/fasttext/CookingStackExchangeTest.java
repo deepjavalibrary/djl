@@ -52,8 +52,9 @@ public class CookingStackExchangeTest {
     private static final Logger logger = LoggerFactory.getLogger(CookingStackExchangeTest.class);
 
     @Test
-    public void testTrainTextClassification() throws IOException, TranslateException {
+    public void testTrainTextClassification() throws IOException {
         TestRequirements.notWindows(); // fastText is not supported on windows
+        TestRequirements.notArm();
 
         CookingStackExchange dataset = CookingStackExchange.builder().build();
 
@@ -77,6 +78,7 @@ public class CookingStackExchangeTest {
             throws IOException, MalformedModelException, ModelNotFoundException,
                     TranslateException {
         TestRequirements.notWindows(); // fastText is not supported on windows
+        TestRequirements.notArm();
 
         Criteria<String, Classifications> criteria =
                 Criteria.builder()
@@ -102,6 +104,7 @@ public class CookingStackExchangeTest {
     @Test
     public void testWord2Vec() throws IOException, MalformedModelException, ModelNotFoundException {
         TestRequirements.notWindows(); // fastText is not supported on windows
+        TestRequirements.notArm();
 
         Criteria<String, Classifications> criteria =
                 Criteria.builder()
@@ -124,6 +127,7 @@ public class CookingStackExchangeTest {
     @Test
     public void testBlazingText() throws IOException, ModelException {
         TestRequirements.notWindows(); // fastText is not supported on windows
+        TestRequirements.notArm();
         TestRequirements.nightly();
 
         URL url = new URL("https://resources.djl.ai/test-models/blazingtext_classification.bin");

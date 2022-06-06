@@ -14,6 +14,7 @@
 package ai.djl.huggingface.tokenizers;
 
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
+import ai.djl.testing.TestRequirements;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,8 @@ public class HuggingFaceTokenizerTest {
 
     @Test
     public void testTokenizer() {
+        TestRequirements.notArm();
+
         String input = "Hello, y'all! How are you 😁 ?";
         String[] inputs = {"Hello, y'all!", "How are you 😁 ?"};
 

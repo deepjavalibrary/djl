@@ -22,6 +22,7 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
@@ -38,6 +39,8 @@ public class TfSsdTest {
 
     @Test
     public void testTfSSD() throws IOException, ModelException, TranslateException {
+        TestRequirements.notArm();
+
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)

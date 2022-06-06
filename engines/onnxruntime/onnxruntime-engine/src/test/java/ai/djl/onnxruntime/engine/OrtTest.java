@@ -12,7 +12,6 @@
  */
 package ai.djl.onnxruntime.engine;
 
-import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
@@ -23,8 +22,8 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.onnxruntime.zoo.tabular.softmax_regression.IrisFlower;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +37,8 @@ public class OrtTest {
 
     @Test
     public void testOrt() throws TranslateException, ModelException, IOException {
+        TestRequirements.notArm();
+
         try {
             Criteria<IrisFlower, Classifications> criteria =
                     Criteria.builder()
@@ -86,6 +87,8 @@ public class OrtTest {
 
     @Test
     public void testNDArray() {
+        TestRequirements.notArm();
+
         try (NDManager manager = OrtNDManager.getSystemManager().newSubManager()) {
             NDArray zeros = manager.zeros(new Shape(1, 2));
             float[] data = zeros.toFloatArray();
@@ -110,9 +113,9 @@ public class OrtTest {
     }
 
     @Test
-    public void testStringTensor()
-            throws MalformedModelException, ModelNotFoundException, IOException,
-                    TranslateException {
+    public void testStringTensor() throws ModelException, IOException, TranslateException {
+        TestRequirements.notArm();
+
         System.setProperty("ai.djl.onnx.disable_alternative", "true");
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()

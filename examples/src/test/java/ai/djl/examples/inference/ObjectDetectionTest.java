@@ -15,6 +15,7 @@ package ai.djl.examples.inference;
 import ai.djl.ModelException;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.Arrays;
@@ -30,6 +31,8 @@ public class ObjectDetectionTest {
 
     @Test
     public void testObjectDetection() throws ModelException, TranslateException, IOException {
+        TestRequirements.engine("MXNet", "PyTorch", "TensorFlow");
+
         DetectedObjects result = ObjectDetection.predict();
         logger.info("{}", result);
 

@@ -25,6 +25,7 @@ public class DlrNDManagerTest {
     @Test
     public void testNDArray() {
         TestRequirements.notWindows();
+        TestRequirements.notArm();
 
         try (DlrNDManager manager =
                 (DlrNDManager) DlrNDManager.getSystemManager().newSubManager()) {

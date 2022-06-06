@@ -14,6 +14,7 @@ package ai.djl.mxnet.integration;
 
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.testing.CoverageUtils;
+import ai.djl.testing.TestRequirements;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;
@@ -22,6 +23,8 @@ public class MxModelZooCoverageTest {
 
     @Test
     public void test() throws IOException, ReflectiveOperationException, URISyntaxException {
+        TestRequirements.notArm();
+
         // mxnet-model-zoo
         CoverageUtils.testGetterSetters(MxModelZoo.class);
     }
