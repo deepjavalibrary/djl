@@ -12,11 +12,6 @@
  */
 package ai.djl.basicdataset.tabular;
 
-import ai.djl.basicdataset.utils.DynamicBuffer;
-import ai.djl.basicdataset.utils.Feature;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Progress;
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -25,7 +20,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -50,16 +44,9 @@ public class CsvDataset extends TabularDataset {
 
     /** {@inheritDoc} */
     @Override
-    public NDList getRowFeatures(NDManager manager, long index, List<Feature> selected) {
-        CSVRecord record = csvRecords.get(Math.toIntExact(index));
-        DynamicBuffer bb = new DynamicBuffer();
-        for (Feature feature : selected) {
-            String name = feature.getName();
-            String value = record.get(name);
-            feature.getFeaturizer().featurize(bb, value);
-        }
-        FloatBuffer buf = bb.getBuffer();
-        return new NDList(manager.create(buf, new Shape(bb.getLength())));
+    protected String getCell(long rowIndex, String featureName) {
+        CSVRecord record = csvRecords.get(Math.toIntExact(rowIndex));
+        return record.get(featureName);
     }
 
     /** {@inheritDoc} */
@@ -75,6 +62,7 @@ public class CsvDataset extends TabularDataset {
             CSVParser csvParser = new CSVParser(reader, csvFormat);
             csvRecords = csvParser.getRecords();
         }
+        prepareFeaturizers();
     }
 
     private InputStream getCsvStream() throws IOException {

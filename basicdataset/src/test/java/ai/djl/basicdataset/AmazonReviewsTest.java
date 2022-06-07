@@ -35,8 +35,9 @@ public class AmazonReviewsTest {
             dataset.prepare();
 
             Record record = dataset.get(manager, 0);
-            Assert.assertEquals(record.getData().get(0).getFloat(), 0);
-            Assert.assertEquals(record.getLabels().get(0).getFloat(), 4.0);
+            Assert.assertEquals(
+                    record.getData().singletonOrThrow().toFloatArray(), new float[] {1});
+            Assert.assertEquals(record.getLabels().singletonOrThrow().getFloat(), 4.0);
         }
     }
 }

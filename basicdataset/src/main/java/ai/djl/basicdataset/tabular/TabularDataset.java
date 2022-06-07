@@ -12,11 +12,15 @@
  */
 package ai.djl.basicdataset.tabular;
 
-import ai.djl.basicdataset.utils.Feature;
+import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
+import ai.djl.basicdataset.tabular.utils.Feature;
+import ai.djl.basicdataset.tabular.utils.PreparedFeaturizer;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +67,43 @@ public abstract class TabularDataset extends RandomAccessDataset {
      * @param selected the features to pull from the row
      * @return the features formatted as an {@link NDList}
      */
-    public abstract NDList getRowFeatures(NDManager manager, long index, List<Feature> selected);
+    public NDList getRowFeatures(NDManager manager, long index, List<Feature> selected) {
+        DynamicBuffer bb = new DynamicBuffer();
+        for (Feature feature : selected) {
+            String name = feature.getName();
+            String value = getCell(index, name);
+            feature.getFeaturizer().featurize(bb, value);
+        }
+        FloatBuffer buf = bb.getBuffer();
+        return new NDList(manager.create(buf, new Shape(bb.getLength())));
+    }
+
+    /** Prepares the {@link ai.djl.basicdataset.tabular.utils.PreparedFeaturizer}s. */
+    protected void prepareFeaturizers() {
+        int availableSize = Math.toIntExact(availableSize());
+        List<Feature> featuresToPrepare = new ArrayList<>(features.size() + labels.size());
+        featuresToPrepare.addAll(features);
+        featuresToPrepare.addAll(labels);
+        for (Feature feature : featuresToPrepare) {
+            if (feature.getFeaturizer() instanceof PreparedFeaturizer) {
+                PreparedFeaturizer featurizer = (PreparedFeaturizer) feature.getFeaturizer();
+                List<String> inputs = new ArrayList<>(Math.toIntExact(availableSize()));
+                for (int i = 0; i < availableSize; i++) {
+                    inputs.add(getCell(i, feature.getName()));
+                }
+                featurizer.prepare(inputs);
+            }
+        }
+    }
+
+    /**
+     * Returns a cell in the dataset.
+     *
+     * @param rowIndex the row index or record index for the cell
+     * @param featureName the feature or column of the cell
+     * @return the value of the cell at that row and column
+     */
+    protected abstract String getCell(long rowIndex, String featureName);
 
     /**
      * Used to build a {@link TabularDataset}.
