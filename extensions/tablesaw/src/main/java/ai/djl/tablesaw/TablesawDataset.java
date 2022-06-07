@@ -13,13 +13,7 @@
 package ai.djl.tablesaw;
 
 import ai.djl.basicdataset.tabular.TabularDataset;
-import ai.djl.basicdataset.utils.DynamicBuffer;
-import ai.djl.basicdataset.utils.Feature;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Progress;
-import java.nio.FloatBuffer;
 import java.util.Collections;
 import java.util.List;
 import tech.tablesaw.api.Row;
@@ -39,16 +33,9 @@ public class TablesawDataset extends TabularDataset {
 
     /** {@inheritDoc} */
     @Override
-    public NDList getRowFeatures(NDManager manager, long index, List<Feature> selected) {
-        Row row = table.row(Math.toIntExact(index));
-        DynamicBuffer bb = new DynamicBuffer();
-        for (Feature feature : selected) {
-            String name = feature.getName();
-            String value = row.getString(name);
-            feature.getFeaturizer().featurize(bb, value);
-        }
-        FloatBuffer buf = bb.getBuffer();
-        return new NDList(manager.create(buf, new Shape(bb.getLength())));
+    protected String getCell(long rowIndex, String featureName) {
+        Row row = table.row(Math.toIntExact(rowIndex));
+        return row.getString(featureName);
     }
 
     /** {@inheritDoc} */
@@ -61,6 +48,7 @@ public class TablesawDataset extends TabularDataset {
     @Override
     public void prepare(Progress progress) {
         table = Table.read().usingOptions(readOptions);
+        prepareFeaturizers();
     }
 
     /**

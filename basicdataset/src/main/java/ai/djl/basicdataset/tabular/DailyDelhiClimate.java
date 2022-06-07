@@ -14,17 +14,14 @@ package ai.djl.basicdataset.tabular;
 
 import ai.djl.Application.Tabular;
 import ai.djl.basicdataset.BasicDatasets;
-import ai.djl.basicdataset.utils.DynamicBuffer;
-import ai.djl.basicdataset.utils.Feature;
-import ai.djl.basicdataset.utils.Featurizer;
+import ai.djl.basicdataset.tabular.utils.Feature;
+import ai.djl.basicdataset.tabular.utils.Featurizers.EpochDayFeaturizer;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -188,22 +185,10 @@ public class DailyDelhiClimate extends CsvDataset {
          */
         public Builder addFeature(String name) {
             if ("date".equals(name)) {
-                return addDateFeature(name);
+                return addFeature(new Feature(name, new EpochDayFeaturizer("yyyy-MM-dd")));
             } else {
                 return addNumericFeature(name);
             }
-        }
-
-        /**
-         * Add a new feature of date type. Since the dataset is a time series dataset, the date is
-         * an important feature in String form, and we can't just treat it as a simple categorical
-         * feature.
-         *
-         * @param name the name of the feature
-         * @return this builder
-         */
-        private Builder addDateFeature(String name) {
-            return addFeature(new Feature(name, new DateFeaturizer()));
         }
 
         /**
@@ -232,25 +217,6 @@ public class DailyDelhiClimate extends CsvDataset {
 
         MRL getMrl() {
             return repository.dataset(Tabular.ANY, groupId, artifactId, VERSION);
-        }
-    }
-
-    /** A featurizer implemented for feature of date type. */
-    public static final class DateFeaturizer implements Featurizer {
-
-        /**
-         * Featurize the feature of date type to epoch day (the number of days passed since
-         * 1970-01-01) and put it into float buffer, so that it can be used for future training in a
-         * simple way.
-         *
-         * @param buf the float buffer to be filled
-         * @param input the date string in the format {@code yyyy-MM-dd}
-         */
-        @Override
-        public void featurize(DynamicBuffer buf, String input) {
-            LocalDate ld = LocalDate.parse(input, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            long day = ld.toEpochDay();
-            buf.put(day);
         }
     }
 }
