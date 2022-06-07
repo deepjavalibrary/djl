@@ -15,7 +15,7 @@ package ai.djl.basicdataset.tabular;
 import ai.djl.Application.Tabular;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.tabular.utils.Feature;
-import ai.djl.basicdataset.tabular.utils.Featurizers.EpochDayFeaturizer;
+import ai.djl.basicdataset.tabular.utils.Featurizers;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
@@ -185,7 +185,8 @@ public class DailyDelhiClimate extends CsvDataset {
          */
         public Builder addFeature(String name) {
             if ("date".equals(name)) {
-                return addFeature(new Feature(name, new EpochDayFeaturizer("yyyy-MM-dd")));
+                return addFeature(
+                        new Feature(name, Featurizers.getEpochDayFeaturizer("yyyy-MM-dd")));
             } else {
                 return addNumericFeature(name);
             }

@@ -74,6 +74,17 @@ public final class Featurizers {
         }
     }
 
+    /**
+     * Constructs an {@link EpochDayFeaturizer} for representing dates using the epoch day (number
+     * of days since 1970-01-01).
+     *
+     * @param datePattern the pattern that dates are found in the data table column
+     * @return a new instance of {@link EpochDayFeaturizer}
+     */
+    public static Featurizer getEpochDayFeaturizer(String datePattern) {
+        return new EpochDayFeaturizer(datePattern);
+    }
+
     private static final class NumericFeaturizer implements Featurizer {
 
         /** {@inheritDoc} */
@@ -154,7 +165,7 @@ public final class Featurizers {
      * A featurizer implemented for feature of date type using epoch day (number of days since
      * 1970-01-01).
      */
-    public static final class EpochDayFeaturizer implements Featurizer {
+    private static final class EpochDayFeaturizer implements Featurizer {
 
         String datePattern;
 
@@ -163,7 +174,7 @@ public final class Featurizers {
          *
          * @param datePattern the pattern that dates are found in the data table column
          */
-        public EpochDayFeaturizer(String datePattern) {
+        EpochDayFeaturizer(String datePattern) {
             this.datePattern = datePattern;
         }
 
