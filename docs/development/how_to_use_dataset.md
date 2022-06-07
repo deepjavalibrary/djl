@@ -23,9 +23,11 @@ If a helper is available, it can make it easier to implement the dataset then bu
 - [TextDataset](https://javadoc.io/doc/ai.djl/basicdataset/latest/ai/djl/basicdataset/nlp/TextDataset.html) - An abstract dataset for NLP where either the input or labels are text-based.
 - [TextData](https://javadoc.io/doc/ai.djl/basicdataset/latest/ai/djl/basicdataset/utils/TextData.html) - A utility for managing the text within a dataset
 
-### Other
+### Tabular
 
 - [CsvDataset](https://javadoc.io/doc/ai.djl/basicdataset/latest/ai/djl/basicdataset/tabular/CsvDataset.html) - An dataset for loading data from a .csv file
+- [TabularDataset](https://javadoc.io/doc/ai.djl/basicdataset/latest/ai/djl/basicdataset/tabular/TabularDataset.html) - An abstract dataset for loading tabular data with rows and feature columns
+- [TablesawDataset](https://javadoc.io/doc/ai.djl.tablesaw/tablesaw/latest/ai/djl/tablesaw/TablesawDataset.html) - An dataset for loading from [Tablesaw](https://jtablesaw.github.io/tablesaw/)
 
 ## Custom Datasets
 

@@ -17,8 +17,6 @@ import ai.djl.basicdataset.utils.Feature;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.training.dataset.RandomAccessDataset;
-import ai.djl.training.dataset.Record;
 import ai.djl.util.Progress;
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -30,40 +28,38 @@ import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 /** {@code CsvDataset} represents the dataset that stored in a .csv file. */
-public class CsvDataset extends RandomAccessDataset {
+public class CsvDataset extends TabularDataset {
 
     protected URL csvUrl;
     protected CSVFormat csvFormat;
-    protected List<Feature> features;
-    protected List<Feature> labels;
     protected List<CSVRecord> csvRecords;
 
     protected CsvDataset(CsvBuilder<?> builder) {
         super(builder);
         csvUrl = builder.csvUrl;
         csvFormat = builder.csvFormat;
-        features = builder.features;
-        labels = builder.labels;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Record get(NDManager manager, long index) {
-        CSVRecord csvRecord = csvRecords.get(Math.toIntExact(index));
-        NDList data = toNDList(manager, csvRecord, features);
-        NDList label = toNDList(manager, csvRecord, labels);
-
-        return new Record(data, label);
+    public NDList getRowFeatures(NDManager manager, long index, List<Feature> selected) {
+        CSVRecord record = csvRecords.get(Math.toIntExact(index));
+        DynamicBuffer bb = new DynamicBuffer();
+        for (Feature feature : selected) {
+            String name = feature.getName();
+            String value = record.get(name);
+            feature.getFeaturizer().featurize(bb, value);
+        }
+        FloatBuffer buf = bb.getBuffer();
+        return new NDList(manager.create(buf, new Shape(bb.getLength())));
     }
 
     /** {@inheritDoc} */
@@ -109,29 +105,11 @@ public class CsvDataset extends RandomAccessDataset {
         return csvRecords.get(0).getParser().getHeaderNames();
     }
 
-    protected NDList toNDList(NDManager manager, CSVRecord record, List<Feature> selected) {
-        DynamicBuffer bb = new DynamicBuffer();
-        for (Feature feature : selected) {
-            String name = feature.getName();
-            String value = record.get(name);
-            feature.getFeaturizer().featurize(bb, value);
-        }
-        FloatBuffer buf = bb.getBuffer();
-        return new NDList(manager.create(buf, new Shape(bb.getLength())));
-    }
-
     /** Used to build a {@link CsvDataset}. */
-    public static class CsvBuilder<T extends CsvBuilder<T>> extends BaseBuilder<T> {
+    public static class CsvBuilder<T extends CsvBuilder<T>> extends TabularDataset.BaseBuilder<T> {
 
         protected URL csvUrl;
         protected CSVFormat csvFormat;
-        protected List<Feature> features;
-        protected List<Feature> labels;
-
-        protected CsvBuilder() {
-            features = new ArrayList<>();
-            labels = new ArrayList<>();
-        }
 
         /** {@inheritDoc} */
         @Override
@@ -182,110 +160,12 @@ public class CsvDataset extends RandomAccessDataset {
         }
 
         /**
-         * Adds the features to the feature set.
-         *
-         * @param features the features
-         * @return this builder
-         */
-        public T addFeature(Feature... features) {
-            Collections.addAll(this.features, features);
-            return self();
-        }
-
-        /**
-         * Adds a numeric feature to the feature set.
-         *
-         * @param name the feature name
-         * @return this builder
-         */
-        public T addNumericFeature(String name) {
-            features.add(new Feature(name, true));
-            return self();
-        }
-
-        /**
-         * Adds a categorical feature to the feature set.
-         *
-         * @param name the feature name
-         * @return this builder
-         */
-        public T addCategoricalFeature(String name) {
-            features.add(new Feature(name, false));
-            return self();
-        }
-
-        /**
-         * Adds a categorical feature to the feature set with specified mapping.
-         *
-         * @param name the feature name
-         * @param map a map contains categorical value maps to index
-         * @param onehotEncode true if use onehot encode
-         * @return this builder
-         */
-        public T addCategoricalFeature(
-                String name, Map<String, Integer> map, boolean onehotEncode) {
-            features.add(new Feature(name, map, onehotEncode));
-            return self();
-        }
-
-        /**
-         * Adds the features to the label set.
-         *
-         * @param labels the labels
-         * @return this builder
-         */
-        public T addLabel(Feature... labels) {
-            Collections.addAll(this.labels, labels);
-            return self();
-        }
-
-        /**
-         * Adds a number feature to the label set.
-         *
-         * @param name the label name
-         * @return this builder
-         */
-        public T addNumericLabel(String name) {
-            labels.add(new Feature(name, true));
-            return self();
-        }
-
-        /**
-         * Adds a categorical feature to the label set.
-         *
-         * @param name the feature name
-         * @return this builder
-         */
-        public T addCategoricalLabel(String name) {
-            labels.add(new Feature(name, true));
-            return self();
-        }
-
-        /**
-         * Adds a categorical feature to the feature set with specified mapping.
-         *
-         * @param name the feature name
-         * @param map a map contains categorical value maps to index
-         * @param onehotEncode true if use onehot encode
-         * @return this builder
-         */
-        public T addCategoricalLabel(String name, Map<String, Integer> map, boolean onehotEncode) {
-            labels.add(new Feature(name, map, onehotEncode));
-            return self();
-        }
-
-        /**
          * Builds the new {@link CsvDataset}.
          *
          * @return the new {@link CsvDataset}
          */
         public CsvDataset build() {
-            if (features.isEmpty()) {
-                throw new IllegalArgumentException("Missing features.");
-            }
-            if (labels.isEmpty()) {
-                throw new IllegalArgumentException("Missing labels.");
-            }
+            validate();
             return new CsvDataset(this);
         }
     }

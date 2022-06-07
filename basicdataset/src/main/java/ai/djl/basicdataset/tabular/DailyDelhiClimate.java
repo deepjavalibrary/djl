@@ -17,12 +17,9 @@ import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.utils.DynamicBuffer;
 import ai.djl.basicdataset.utils.Feature;
 import ai.djl.basicdataset.utils.Featurizer;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.training.dataset.Record;
 import ai.djl.util.Progress;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -32,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 
 /**
  * Daily Delhi climate dataset from <a
@@ -56,16 +52,6 @@ public class DailyDelhiClimate extends CsvDataset {
         super(builder);
         usage = builder.usage;
         mrl = builder.getMrl();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Record get(NDManager manager, long index) {
-        CSVRecord csvRecord = csvRecords.get(Math.toIntExact(index));
-        NDList data = toNDList(manager, csvRecord, features);
-        NDList label = new NDList();
-
-        return new Record(data, label);
     }
 
     /** {@inheritDoc} */
