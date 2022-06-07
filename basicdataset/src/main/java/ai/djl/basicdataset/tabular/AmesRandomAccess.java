@@ -200,7 +200,7 @@ public class AmesRandomAccess extends CsvDataset {
             if (af.categorical.contains(name)) {
                 Map<String, Integer> map = af.featureToMap.get(name);
                 if (map == null) {
-                    return addCategoricalFeature(name);
+                    return addCategoricalFeature(name, onehotEncode);
                 }
                 return addCategoricalFeature(name, map, onehotEncode);
             }

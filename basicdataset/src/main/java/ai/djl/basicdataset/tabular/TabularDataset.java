@@ -14,6 +14,7 @@ package ai.djl.basicdataset.tabular;
 
 import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
 import ai.djl.basicdataset.tabular.utils.Feature;
+import ai.djl.basicdataset.tabular.utils.Featurizers;
 import ai.djl.basicdataset.tabular.utils.PreparedFeaturizer;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -87,7 +88,7 @@ public abstract class TabularDataset extends RandomAccessDataset {
         for (Feature feature : featuresToPrepare) {
             if (feature.getFeaturizer() instanceof PreparedFeaturizer) {
                 PreparedFeaturizer featurizer = (PreparedFeaturizer) feature.getFeaturizer();
-                List<String> inputs = new ArrayList<>(Math.toIntExact(availableSize()));
+                List<String> inputs = new ArrayList<>(Math.toIntExact(availableSize));
                 for (int i = 0; i < availableSize; i++) {
                     inputs.add(getCell(i, feature.getName()));
                 }
@@ -144,6 +145,18 @@ public abstract class TabularDataset extends RandomAccessDataset {
         }
 
         /**
+         * Adds a numeric feature to the feature set.
+         *
+         * @param name the feature name
+         * @param normalize true to normalize the column
+         * @return this builder
+         */
+        public T addNumericFeature(String name, boolean normalize) {
+            features.add(new Feature(name, Featurizers.getNumericFeaturizer(normalize)));
+            return self();
+        }
+
+        /**
          * Adds a categorical feature to the feature set.
          *
          * @param name the feature name
@@ -155,11 +168,23 @@ public abstract class TabularDataset extends RandomAccessDataset {
         }
 
         /**
+         * Adds a categorical feature to the feature set.
+         *
+         * @param name the feature name
+         * @param onehotEncode true to use onehot encode
+         * @return this builder
+         */
+        public T addCategoricalFeature(String name, boolean onehotEncode) {
+            features.add(new Feature(name, Featurizers.getStringFeaturizer(onehotEncode)));
+            return self();
+        }
+
+        /**
          * Adds a categorical feature to the feature set with specified mapping.
          *
          * @param name the feature name
          * @param map a map contains categorical value maps to index
-         * @param onehotEncode true if use onehot encode
+         * @param onehotEncode true to use onehot encode
          * @return this builder
          */
         public T addCategoricalFeature(
@@ -191,13 +216,37 @@ public abstract class TabularDataset extends RandomAccessDataset {
         }
 
         /**
+         * Adds a number feature to the label set.
+         *
+         * @param name the label name
+         * @param normalize true to normalize the column
+         * @return this builder
+         */
+        public T addNumericLabel(String name, boolean normalize) {
+            labels.add(new Feature(name, Featurizers.getNumericFeaturizer(normalize)));
+            return self();
+        }
+
+        /**
          * Adds a categorical feature to the label set.
          *
          * @param name the feature name
          * @return this builder
          */
         public T addCategoricalLabel(String name) {
-            labels.add(new Feature(name, true));
+            labels.add(new Feature(name, false));
+            return self();
+        }
+
+        /**
+         * Adds a categorical feature to the label set.
+         *
+         * @param name the feature name
+         * @param onehotEncode true if use onehot encode
+         * @return this builder
+         */
+        public T addCategoricalLabel(String name, boolean onehotEncode) {
+            labels.add(new Feature(name, Featurizers.getStringFeaturizer(onehotEncode)));
             return self();
         }
 
