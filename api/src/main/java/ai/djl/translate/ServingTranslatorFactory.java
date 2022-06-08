@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import org.slf4j.Logger;
@@ -81,7 +82,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         Path libPath = modelDir.resolve("libs");
         if (!Files.isDirectory(libPath)) {
             libPath = modelDir.resolve("lib");
-            if (!Files.isDirectory(libPath)) {
+            if (!Files.isDirectory(libPath) && className == null) {
                 return loadDefaultTranslator(arguments);
             }
         }
@@ -98,10 +99,17 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             Path classesDir = path.resolve("classes");
             compileJavaClass(classesDir);
 
-            List<Path> jarFiles =
-                    Files.list(path)
-                            .filter(p -> p.toString().endsWith(".jar"))
-                            .collect(Collectors.toList());
+            List<Path> jarFiles = new ArrayList<>();
+            if (Files.isDirectory(path)) {
+                try (Stream<Path> stream = Files.list(path)) {
+                    stream.forEach(
+                            p -> {
+                                if (p.toString().endsWith(".jar")) {
+                                    jarFiles.add(p);
+                                }
+                            });
+                }
+            }
             List<URL> urls = new ArrayList<>(jarFiles.size() + 1);
             urls.add(classesDir.toUri().toURL());
             for (Path p : jarFiles) {
@@ -136,10 +144,12 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             logger.debug("Directory not exists: {}", dir);
             return null;
         }
-        Collection<Path> files =
-                Files.walk(dir)
-                        .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
-                        .collect(Collectors.toList());
+        Collection<Path> files;
+        try (Stream<Path> stream = Files.walk(dir)) {
+            files =
+                    stream.filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
+                            .collect(Collectors.toList());
+        }
         for (Path file : files) {
             Path p = dir.relativize(file);
             String className = p.toString();
@@ -218,11 +228,13 @@ public class ServingTranslatorFactory implements TranslatorFactory {
                 logger.debug("Directory not exists: {}", dir);
                 return;
             }
-            String[] files =
-                    Files.walk(dir)
-                            .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
-                            .map(p -> p.toAbsolutePath().toString())
-                            .toArray(String[]::new);
+            String[] files;
+            try (Stream<Path> stream = Files.walk(dir)) {
+                files =
+                        stream.filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
+                                .map(p -> p.toAbsolutePath().toString())
+                                .toArray(String[]::new);
+            }
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
             if (files.length > 0) {
                 compiler.run(null, null, null, files);
