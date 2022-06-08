@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class Featurizers {
 
     private static final Featurizer NUMERIC_FEATURIZER = new NumericFeaturizer();
-    private static final Featurizer STRING_FEATURIZER = new StringFeaturizer();
 
     private Featurizers() {}
 
@@ -33,7 +32,21 @@ public final class Featurizers {
      * @return the default numeric {@link Featurizer}
      */
     public static Featurizer getNumericFeaturizer() {
-        return NUMERIC_FEATURIZER;
+        return getNumericFeaturizer(false);
+    }
+
+    /**
+     * Returns the default numeric {@link Featurizer}.
+     *
+     * @param normalize true to normalize (with mean and std) the values
+     * @return the default numeric {@link Featurizer}
+     */
+    public static Featurizer getNumericFeaturizer(boolean normalize) {
+        if (normalize) {
+            return new NormalizedNumericFeaturizer();
+        } else {
+            return NUMERIC_FEATURIZER;
+        }
     }
 
     /**
@@ -55,7 +68,7 @@ public final class Featurizers {
         if (onehotEncode) {
             return new PreparedOneHotStringFeaturizer();
         } else {
-            return STRING_FEATURIZER;
+            return new StringFeaturizer();
         }
     }
 
@@ -91,6 +104,42 @@ public final class Featurizers {
         @Override
         public void featurize(DynamicBuffer buf, String input) {
             buf.put(Float.parseFloat(input));
+        }
+    }
+
+    private static final class NormalizedNumericFeaturizer implements PreparedFeaturizer {
+
+        private float mean;
+        private float std;
+
+        /** {@inheritDoc} */
+        @Override
+        public void featurize(DynamicBuffer buf, String input) {
+            float value = (Float.parseFloat(input) - mean) / std;
+            buf.put(value);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void prepare(List<String> inputs) {
+            calculateMean(inputs);
+            calculateStd(inputs);
+        }
+
+        private void calculateMean(List<String> inputs) {
+            double sum = 0;
+            for (String input : inputs) {
+                sum += Float.parseFloat(input);
+            }
+            mean = (float) (sum / inputs.size());
+        }
+
+        private void calculateStd(List<String> inputs) {
+            double sum = 0;
+            for (String input : inputs) {
+                sum += Math.pow(Float.parseFloat(input) - mean, 2);
+            }
+            std = (float) Math.sqrt(sum / inputs.size());
         }
     }
 

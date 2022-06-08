@@ -15,23 +15,15 @@ package ai.djl.basicdataset.tabular;
 import ai.djl.Application.Tabular;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.tabular.utils.Feature;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.util.Progress;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 
 /**
  * Airfoil Self-Noise Data Set from <a
@@ -52,10 +44,6 @@ public final class AirfoilRandomAccess extends CsvDataset {
     private Usage usage;
     private boolean prepared;
 
-    private boolean normalize;
-    private Map<String, Float> mean;
-    private Map<String, Float> std;
-
     /**
      * Creates an instance of {@code RandomAccessDataset} with the arguments in {@link Builder}.
      *
@@ -65,7 +53,6 @@ public final class AirfoilRandomAccess extends CsvDataset {
         super(builder);
         usage = builder.usage;
         mrl = builder.getMrl();
-        normalize = builder.normalize;
     }
 
     /** {@inheritDoc} */
@@ -93,20 +80,6 @@ public final class AirfoilRandomAccess extends CsvDataset {
 
         csvUrl = csvFile.toUri().toURL();
         super.prepare(progress);
-
-        if (normalize) {
-            mean = new HashMap<>();
-            std = new HashMap<>();
-
-            for (Feature feature : features) {
-                calculateMean(feature.getName());
-                calculateStd(feature.getName());
-            }
-            for (Feature feature : labels) {
-                calculateMean(feature.getName());
-                calculateStd(feature.getName());
-            }
-        }
         prepared = true;
     }
 
@@ -114,46 +87,6 @@ public final class AirfoilRandomAccess extends CsvDataset {
     @Override
     public List<String> getColumnNames() {
         return Arrays.asList(COLUMNS).subList(0, 5);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList getRowFeatures(NDManager manager, long index, List<Feature> selected) {
-        CSVRecord record = csvRecords.get(Math.toIntExact(index));
-        int length = selected.size();
-        ByteBuffer bb = manager.allocateDirect(length * 4);
-        FloatBuffer buf = bb.asFloatBuffer();
-        for (Feature feature : selected) {
-            String name = feature.getName();
-            float value = Float.parseFloat(record.get(name));
-            if (normalize) {
-                value = (value - mean.get(name)) / std.get(name);
-            }
-            buf.put(value);
-        }
-        buf.rewind();
-        return new NDList(manager.create(buf, new Shape(length)));
-    }
-
-    private void calculateMean(String column) {
-        float sum = 0;
-        long size = size();
-        for (int i = 0; i < size; ++i) {
-            CSVRecord record = csvRecords.get(i);
-            sum += Float.parseFloat(record.get(column));
-        }
-        mean.put(column, sum / size);
-    }
-
-    private void calculateStd(String column) {
-        float average = mean.get(column);
-        float sum = 0;
-        long size = size();
-        for (int i = 0; i < size; ++i) {
-            CSVRecord record = csvRecords.get(i);
-            sum += (float) Math.pow(Float.parseFloat(record.get(column)) - average, 2);
-        }
-        std.put(column, (float) Math.sqrt(sum / size));
     }
 
     /**
@@ -280,11 +213,11 @@ public final class AirfoilRandomAccess extends CsvDataset {
         public AirfoilRandomAccess build() {
             if (features.isEmpty()) {
                 for (int i = 0; i < 5; ++i) {
-                    addFeature(COLUMNS[i]);
+                    addNumericFeature(COLUMNS[i], normalize);
                 }
             }
             if (labels.isEmpty()) {
-                addNumericLabel("ssoundpres");
+                addNumericLabel("ssoundpres", normalize);
             }
             return new AirfoilRandomAccess(this);
         }

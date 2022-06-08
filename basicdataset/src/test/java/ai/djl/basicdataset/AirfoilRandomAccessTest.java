@@ -100,8 +100,8 @@ public class AirfoilRandomAccessTest {
 
         float epsilon = (float) 1e-4;
 
-        float[] expected = {-0.6603f, -1.1448f, 1.797f, 1.3109f, -0.6443f};
+        float[] expected = {-0.6620f, -1.1464f, 1.7993f, 1.3129f, -0.6448f};
         Assert.assertEquals(data.head().toFloatArray(), expected, epsilon);
-        Assert.assertEquals(labels.head().toFloatArray(), new float[] {0.1937f}, epsilon);
+        Assert.assertEquals(labels.head().toFloatArray(), new float[] {0.1979f}, epsilon);
     }
 }
