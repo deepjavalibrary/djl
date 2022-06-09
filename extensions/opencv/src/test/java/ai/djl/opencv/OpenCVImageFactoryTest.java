@@ -42,6 +42,7 @@ public class OpenCVImageFactoryTest {
     @Test
     public void testImage() throws IOException {
         TestRequirements.notWindows(); // failed on Windows ServerCore container
+        TestRequirements.notArm();
 
         ImageFactory factory = ImageFactory.getInstance();
         ImageFactory defFactory = new BufferedImageFactory();
@@ -129,6 +130,8 @@ public class OpenCVImageFactoryTest {
     @Test
     public void testBoundingBoxes() {
         TestRequirements.notWindows(); // failed on Windows ServerCore container
+        TestRequirements.notArm();
+
         ImageFactory factory = ImageFactory.getInstance();
         try (NDManager manager = NDManager.newBaseManager()) {
             int[][] arr =

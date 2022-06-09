@@ -165,6 +165,14 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void returnResource(NDManager manager) {
+        detach();
+        this.manager = (MxNDManager) manager;
+        manager.attachUncappedInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void tempAttach(NDManager manager) {
         NDManager original = this.manager;
         detach();
@@ -315,7 +323,9 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray take(NDArray index) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        MxOpParams params = new MxOpParams();
+        params.add("mode", "wrap");
+        return manager.invoke("take", new NDList(this.flatten(), index), params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */

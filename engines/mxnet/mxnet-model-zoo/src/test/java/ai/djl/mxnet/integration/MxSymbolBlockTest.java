@@ -12,7 +12,7 @@
  */
 package ai.djl.mxnet.integration;
 
-import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
 import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -29,7 +29,6 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
 import ai.djl.testing.TestRequirements;
@@ -54,8 +53,9 @@ public class MxSymbolBlockTest {
 
     @Test
     public void testSymbolModelInputOutput()
-            throws IOException, ModelNotFoundException, MalformedModelException,
-                    TranslateException {
+            throws IOException, ModelException, TranslateException {
+        TestRequirements.notArm();
+
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
@@ -72,7 +72,9 @@ public class MxSymbolBlockTest {
     }
 
     @Test
-    public void testForward() throws IOException, ModelNotFoundException, MalformedModelException {
+    public void testForward() throws IOException, ModelException {
+        TestRequirements.notArm();
+
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
@@ -94,8 +96,9 @@ public class MxSymbolBlockTest {
     }
 
     @Test
-    public void trainWithNewParam()
-            throws IOException, ModelNotFoundException, MalformedModelException {
+    public void trainWithNewParam() throws IOException, ModelException {
+        TestRequirements.notArm();
+
         if ("MXNet".equals(Engine.getDefaultEngineName())) {
             // TODO: WARN The gradMeans (but not predictions or loss) changed during the upgrade
             // to MXNet 1.8. The issue affect only CPU, but GPU has not changed.
@@ -134,8 +137,9 @@ public class MxSymbolBlockTest {
     }
 
     @Test
-    public void trainWithExistParam()
-            throws IOException, ModelNotFoundException, MalformedModelException {
+    public void trainWithExistParam() throws IOException, ModelException {
+        TestRequirements.notArm();
+
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
@@ -167,8 +171,9 @@ public class MxSymbolBlockTest {
     }
 
     @Test
-    public void trainWithCustomLayer()
-            throws IOException, ModelNotFoundException, MalformedModelException {
+    public void trainWithCustomLayer() throws IOException, ModelException {
+        TestRequirements.notArm();
+
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
@@ -209,6 +214,8 @@ public class MxSymbolBlockTest {
     }
 
     private Pair<NDArray, NDArray> train(NDManager manager, Trainer trainer, Block block) {
+        TestRequirements.notArm();
+
         Shape inputShape = new Shape(10, 28 * 28);
         trainer.initialize(inputShape);
 

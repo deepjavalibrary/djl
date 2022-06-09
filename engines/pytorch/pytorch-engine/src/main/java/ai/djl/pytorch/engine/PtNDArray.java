@@ -235,8 +235,8 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray get(long... indices) {
-        return JniUtils.getItem(this, indices);
+    public NDArray get(NDManager manager, long... indices) {
+        return JniUtils.getItem(this, indices, (PtNDManager) manager);
     }
 
     /** {@inheritDoc} */
@@ -273,9 +273,17 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void tempAttach(NDManager manager) {
+    public void returnResource(NDManager manager) {
         detach();
+        this.manager = (PtNDManager) manager;
+        manager.attachUncappedInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void tempAttach(NDManager manager) {
         NDManager original = this.manager;
+        detach();
         this.manager = (PtNDManager) manager;
         manager.tempAttachInternal(original, getUid(), this);
     }
@@ -301,7 +309,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             // Result is flattened since shape is undetermined
             return JniUtils.booleanMask(this, manager.from(index));
         } else if (indexShape.equals(getShape().slice(axis))) {
-            // index will be broadcasted by default
+            // index will be broadcast by default
             try (PtNDArray flattedResult = JniUtils.booleanMask(this, manager.from(index))) {
                 // Shape recovery
                 Shape remainder = getShape().slice(0, axis);

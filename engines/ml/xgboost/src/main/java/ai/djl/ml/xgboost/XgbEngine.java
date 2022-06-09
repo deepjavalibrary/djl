@@ -15,9 +15,13 @@ package ai.djl.ml.xgboost;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
+import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import ml.dmlc.xgboost4j.java.JniUtils;
 
 /**
@@ -71,12 +75,27 @@ public final class XgbEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.3.1";
+        try (InputStream is =
+                XgbEngine.class.getResourceAsStream("/xgboost4j-version.properties")) {
+            Properties prop = new Properties();
+            prop.load(is);
+            return prop.getProperty("version");
+        } catch (IOException e) {
+            throw new AssertionError("Failed to load xgboost4j-version.properties", e);
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean hasCapability(String capability) {
+        if (StandardCapabilities.CUDA.equals(capability)) {
+            try {
+                Class.forName("ml.dmlc.xgboost4j.gpu.java.CudfColumn");
+                return true;
+            } catch (ClassNotFoundException ignore) {
+                return false;
+            }
+        }
         return false;
     }
 

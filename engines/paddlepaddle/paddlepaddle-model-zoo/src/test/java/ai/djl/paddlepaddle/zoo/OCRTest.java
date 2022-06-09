@@ -13,7 +13,6 @@
 
 package ai.djl.paddlepaddle.zoo;
 
-import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -26,8 +25,8 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
 import java.util.List;
@@ -37,6 +36,8 @@ public class OCRTest {
 
     @Test
     public void testOCR() throws IOException, ModelException, TranslateException {
+        TestRequirements.notArm();
+
         // load Character model
         Predictor<Image, DetectedObjects> detector = getWordDetector();
         Predictor<Image, String> recognizer = getRecognizer();
@@ -61,7 +62,9 @@ public class OCRTest {
     }
 
     private static Predictor<Image, DetectedObjects> getWordDetector()
-            throws ModelNotFoundException, MalformedModelException, IOException {
+            throws ModelException, IOException {
+        TestRequirements.notArm();
+
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)
@@ -71,8 +74,9 @@ public class OCRTest {
         return criteria.loadModel().newPredictor();
     }
 
-    private static Predictor<Image, String> getRecognizer()
-            throws MalformedModelException, ModelNotFoundException, IOException {
+    private static Predictor<Image, String> getRecognizer() throws ModelException, IOException {
+        TestRequirements.notArm();
+
         Criteria<Image, String> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, String.class)
@@ -85,7 +89,7 @@ public class OCRTest {
     }
 
     private static Predictor<Image, Classifications> getRotateClassifer()
-            throws MalformedModelException, ModelNotFoundException, IOException {
+            throws ModelException, IOException {
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)

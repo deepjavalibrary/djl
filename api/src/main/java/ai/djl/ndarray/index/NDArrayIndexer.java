@@ -59,7 +59,7 @@ public abstract class NDArrayIndexer {
         if (!indices.isEmpty() && indices.get(0) instanceof NDIndexBooleans) {
             if (indices.size() != 1) {
                 throw new IllegalArgumentException(
-                        "get() currently didn't support more that one boolean NDArray");
+                        "get() currently doesn't support more that one boolean NDArray");
             }
             return array.booleanMask(((NDIndexBooleans) indices.get(0)).getIndex());
         }

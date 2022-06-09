@@ -289,4 +289,11 @@ public class Application {
          */
         Application SOFTMAX_REGRESSION = new Application("tabular/softmax_regression");
     }
+
+    /** The common set of applications for audio data. */
+    public interface Audio {
+
+        /** Any audio application, including those in {@link Audio}. */
+        Application ANY = new Application("audio");
+    }
 }

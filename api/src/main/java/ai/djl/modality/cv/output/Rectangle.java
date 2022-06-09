@@ -89,7 +89,7 @@ public class Rectangle implements BoundingBox {
         Rectangle rec = (Rectangle) box;
         // caculate intesection lrtb
         double left = Math.max(getX(), rec.getX());
-        double top = Math.min(getY(), rec.getY());
+        double top = Math.max(getY(), rec.getY());
         double right = Math.min(getX() + getWidth(), rec.getX() + rec.getWidth());
         double bottom = Math.min(getY() + getHeight(), rec.getY() + rec.getHeight());
         double intersection = (right - left) * (bottom - top);

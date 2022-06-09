@@ -39,7 +39,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/** Pikachu image detection dataset that contains multiple Pikachus in each image. */
+/**
+ * Pikachu image detection dataset that contains multiple Pikachus in each image.
+ *
+ * <p>It was based on a section from the [Dive into Deep Learning
+ * book](http://d2l.ai/chapter_computer-vision/object-detection-dataset.html). It contains 1000
+ * Pikachu images of different angles and sizes created using an open source 3D Pikachu model. Each
+ * image contains only a single pikachu.
+ */
 public class PikachuDetection extends ObjectDetectionDataset {
 
     private static final String VERSION = "1.0";

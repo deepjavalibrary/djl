@@ -15,6 +15,7 @@ package ai.djl.ml.xgboost;
 
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -39,11 +40,37 @@ public class XgbModelTest {
 
     @BeforeClass
     public void downloadXGBoostModel() throws IOException {
+        TestRequirements.notArm();
+
         Path modelDir = Paths.get("build/model");
         DownloadUtils.download(
                 "https://resources.djl.ai/test-models/xgboost/regression.json",
                 modelDir.resolve("regression.json").toString());
     }
+
+    @Test
+    public void testVersion() {
+        Engine engine = Engine.getEngine("XGBoost");
+        Assert.assertEquals("1.6.1", engine.getVersion());
+    }
+
+    /*
+    This test depends on rapis, which doesn't work for CPU
+    @Test
+    public void testCudf() {
+        Engine engine = Engine.getEngine("XGBoost");
+        if (engine.hasCapability(StandardCapabilities.CUDA)) {
+            Float[] data = new Float[]{1.f, null, 5.f, 7.f, 9.f};
+            Table x = new Table.TestBuilder().column(data).build();
+            ColumnBatch columnBatch = new CudfColumnBatch(x, null, null, null);
+
+            try (XgbNDManager manager = (XgbNDManager)engine.newBaseManager()) {
+                NDArray array = manager.create(columnBatch,0, 1);
+                Assert.assertEquals(array.getShape().get(0), 5);
+            }
+        }
+    }
+    */
 
     @Test
     public void testLoad() throws MalformedModelException, IOException, TranslateException {

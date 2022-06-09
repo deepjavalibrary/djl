@@ -79,7 +79,14 @@ public class BenchmarkTest {
     @Test
     public void testBenchmark() {
         String[] args = {
-            "-u", "djl://ai.djl.mxnet/resnet/0.0.1/resnet18_v1", "-s", "1,3,224,224", "-c", "2"
+            "-e",
+            "PyTorch",
+            "-u",
+            "djl://ai.djl.pytorch/resnet/0.0.1/traced_resnet18",
+            "-s",
+            "1,3,224,224",
+            "-c",
+            "2"
         };
         new Benchmark().runBenchmark(args);
     }
@@ -90,9 +97,9 @@ public class BenchmarkTest {
         try {
             String[] args = {
                 "-e",
-                "MXNet",
+                "PyTorch",
                 "-u",
-                "djl://ai.djl.mxnet/resnet/0.0.1/resnet18_v1",
+                "djl://ai.djl.pytorch/resnet/0.0.1/traced_resnet18",
                 "-s",
                 "(1,3,224,224)f",
                 "-d",

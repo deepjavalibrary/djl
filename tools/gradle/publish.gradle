@@ -16,11 +16,13 @@ configure([
         project(':engines:tensorflow:tensorflow-model-zoo'),
         project(':engines:tensorrt'),
         project(':engines:tflite:tflite-engine'),
+        project(':extensions:audio'),
         project(':extensions:aws-ai'),
         project(':extensions:fasttext'),
         project(':extensions:hadoop'),
         project(':extensions:opencv'),
         project(':extensions:sentencepiece'),
+        project(':extensions:tablesaw'),
         project(':extensions:tokenizers'),
         project(':model-zoo')]) {
     apply plugin: "maven-publish"

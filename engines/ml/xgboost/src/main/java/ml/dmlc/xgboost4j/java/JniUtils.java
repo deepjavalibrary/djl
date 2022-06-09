@@ -52,6 +52,19 @@ public final class JniUtils {
         return handles[0];
     }
 
+    public static long createDMatrix(ColumnBatch columnBatch, float missing, int nthread) {
+        long[] handles = new long[1];
+        String json = columnBatch.getFeatureArrayInterface();
+        if (json == null || json.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Expecting non-empty feature columns' array interface");
+        }
+        checkCall(
+                XGBoostJNI.XGDMatrixCreateFromArrayInterfaceColumns(
+                        json, missing, nthread, handles));
+        return handles[0];
+    }
+
     public static long createDMatrixCSR(long[] indptr, int[] indices, float[] array) {
         long[] handles = new long[1];
         checkCall(XGBoostJNI.XGDMatrixCreateFromCSREx(indptr, indices, array, 0, handles));

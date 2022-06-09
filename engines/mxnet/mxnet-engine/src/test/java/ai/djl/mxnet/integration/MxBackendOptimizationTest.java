@@ -15,12 +15,15 @@ package ai.djl.mxnet.integration;
 import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.mxnet.engine.Symbol;
 import ai.djl.ndarray.NDManager;
+import ai.djl.testing.TestRequirements;
 import org.testng.annotations.Test;
 
 public class MxBackendOptimizationTest {
 
     @Test
     public void testOptimizedFor() {
+        TestRequirements.notArm();
+
         // TODO: Add Customized plugin test
         try (MxNDManager manager = (MxNDManager) NDManager.newBaseManager()) {
             Symbol symbol =

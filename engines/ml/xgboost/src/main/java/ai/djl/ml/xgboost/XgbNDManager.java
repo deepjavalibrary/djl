@@ -20,11 +20,14 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.util.JsonUtils;
+import com.google.gson.JsonArray;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
+import ml.dmlc.xgboost4j.java.ColumnBatch;
 import ml.dmlc.xgboost4j.java.JniUtils;
 
 /** {@code XgbNDManager} is the XGBoost implementation of {@link NDManager}. */
@@ -78,6 +81,30 @@ public class XgbNDManager extends BaseNDManager {
     @Override
     public Engine getEngine() {
         return Engine.getEngine(XgbEngine.ENGINE_NAME);
+    }
+
+    /**
+     * Creates {@link XgbNDArray} from column array interface.
+     *
+     * @param columnBatch – the XGBoost ColumnBatch to provide the cuda array interface of feature
+     *     columns
+     * @param missing – missing value
+     * @param nthread – threads number
+     * @return a new instance of {@link NDArray}
+     */
+    public NDArray create(ColumnBatch columnBatch, float missing, int nthread) {
+        columnBatch.getFeatureArrayInterface();
+        String json = columnBatch.getFeatureArrayInterface();
+        JsonArray array = JsonUtils.GSON.fromJson(json, JsonArray.class);
+        JsonArray shapeJson = array.get(0).getAsJsonObject().get("shape").getAsJsonArray();
+        long[] shapes = new long[shapeJson.size()];
+        for (int i = 0; i < shapes.length; ++i) {
+            shapes[i] = shapeJson.get(i).getAsLong();
+        }
+
+        Shape shape = new Shape(shapes);
+        long handle = JniUtils.createDMatrix(columnBatch, missing, nthread);
+        return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.DENSE);
     }
 
     /** {@inheritDoc} */

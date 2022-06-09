@@ -1,6 +1,6 @@
-import groovy.xml.QName
-
 group "ai.djl.ml.xgboost"
+boolean isGpu = project.hasProperty("gpu")
+def XGB_FLAVOR = isGpu ? "-gpu" : ""
 
 configurations {
     exclusion
@@ -9,7 +9,7 @@ configurations {
 dependencies {
     api project(":api")
     api "commons-logging:commons-logging:${commons_logging_version}"
-    api("ml.dmlc:xgboost4j_2.12:${xgboost_version}") {
+    api("ml.dmlc:xgboost4j${XGB_FLAVOR}_2.12:${xgboost_version}") {
         // get rid of the unused XGBoost Dependencies
         exclude group: "org.apache.hadoop", module: "hadoop-hdfs"
         exclude group: "org.apache.hadoop", module: "hadoop-common"
@@ -32,6 +32,9 @@ dependencies {
     }
 
     testRuntimeOnly "org.slf4j:slf4j-simple:${slf4j_version}"
+    if (isGpu) {
+        testRuntimeOnly "ai.rapids:cudf:${rapis_version}:cuda11"
+    }
 }
 
 jar {
@@ -43,6 +46,7 @@ jar {
                         "ml/dmlc/xgboost4j/java/NativeLibLoader*",
                         "ml/dmlc/xgboost4j/java/XGBoost*",
                         "ml/dmlc/xgboost4j/java/util/*",
+                        "ml/dmlc/xgboost4j/gpu/java/*",
                         "ml/dmlc/xgboost4j/LabeledPoint.*",
                         "xgboost4j-version.properties"
             }
@@ -53,17 +57,26 @@ jar {
 publishing {
     publications {
         maven(MavenPublication) {
+            artifactId "${project.name}${XGB_FLAVOR}"
             pom {
                 name = "DJL Engine Adapter for XGBoost"
                 description = "Deep Java Library (DJL) Engine Adapter for XGBoost"
                 url = "https://djl.ai/engines/ml/${project.name}"
 
                 withXml {
-                    Node pomNode = asNode()
+                    def pomNode = asNode()
                     pomNode.dependencies."*".findAll() {
                         it.artifactId.text().startsWith("xgboost")
                     }.each() {
                         it.parent().remove(it)
+                    }
+                    if (isGpu) {
+                        def dep = pomNode.dependencies[0].appendNode("dependency")
+                        dep.appendNode("groupId", "ai.rapids")
+                        dep.appendNode("artifactId", "cudf")
+                        dep.appendNode("version", "${rapis_version}")
+                        dep.appendNode("classifier", "cuda11")
+                        dep.appendNode("scope", "compile")
                     }
                 }
             }

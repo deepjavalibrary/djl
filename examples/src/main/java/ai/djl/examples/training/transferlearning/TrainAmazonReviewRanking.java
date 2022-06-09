@@ -16,7 +16,9 @@ import ai.djl.Application;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.tabular.CsvDataset;
-import ai.djl.basicdataset.utils.DynamicBuffer;
+import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
+import ai.djl.basicdataset.tabular.utils.Feature;
+import ai.djl.basicdataset.tabular.utils.Featurizer;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
@@ -126,11 +128,9 @@ public final class TrainAmazonReviewRanking {
                 .optCsvUrl(amazonReview)
                 .setCsvFormat(CSVFormat.TDF.builder().setQuote(null).setHeader().build())
                 .setSampling(arguments.getBatchSize(), true)
-                .addFeature(
-                        new CsvDataset.Feature(
-                                "review_body", new BertFeaturizer(tokenizer, maxLength)))
+                .addFeature(new Feature("review_body", new BertFeaturizer(tokenizer, maxLength)))
                 .addLabel(
-                        new CsvDataset.Feature(
+                        new Feature(
                                 "star_rating",
                                 (buf, data) -> buf.put(Float.parseFloat(data) - 1.0f)))
                 .optDataBatchifier(
@@ -211,7 +211,7 @@ public final class TrainAmazonReviewRanking {
                 .addTrainingListeners(listener);
     }
 
-    private static final class BertFeaturizer implements CsvDataset.Featurizer {
+    private static final class BertFeaturizer implements Featurizer {
 
         private final BertFullTokenizer tokenizer;
         private final int maxLength;

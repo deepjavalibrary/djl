@@ -1,0 +1,30 @@
+group 'ai.djl.tablesaw'
+
+dependencies {
+    api project(":api")
+    api project(":basicdataset")
+    api "tech.tablesaw:tablesaw-core:${tablesaw_version}"
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+    testImplementation project(":testing")
+
+//    testRuntimeOnly "tech.tablesaw:tablesaw-excel:${tablesaw_version}"
+//    testRuntimeOnly "tech.tablesaw:tablesaw-html:${tablesaw_version}"
+//    testRuntimeOnly "tech.tablesaw:tablesaw-json:${tablesaw_version}"
+    testRuntimeOnly project(":engines:pytorch:pytorch-engine")
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "Tablesaw toolkit for DJL"
+                description = "Tablesaw toolkit for DJL"
+                url = "http://www.djl.ai/extensions/${project.name}"
+            }
+        }
+    }
+}

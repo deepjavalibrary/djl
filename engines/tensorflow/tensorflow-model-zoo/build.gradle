@@ -3,6 +3,7 @@ group 'ai.djl.tensorflow'
 dependencies {
     api project(":engines:tensorflow:tensorflow-engine")
 
+    testImplementation(project(":testing"))
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }

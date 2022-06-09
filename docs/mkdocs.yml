@@ -54,6 +54,7 @@ nav:
           - 'docs/development/troubleshooting.md'
           - 'docs/development/dependency_management.md'
           - 'docs/development/add_model_to_model-zoo.md'
+          - 'docs/development/add_dataset_to_djl.md'
       - 'docs/roadmap.md'
       - 'docs/faq.md'
   - Tutorials:
@@ -66,7 +67,7 @@ nav:
       - 'jupyter/transfer_learning_on_cifar10.ipynb'
       - Load your own BERT:
           - BERT with MXNet: 'jupyter/mxnet/load_your_own_mxnet_bert.ipynb'
-          - BERT with PyTorch: 'jupyter/pytorch/load_your_own_pytorch.ipynb'
+          - BERT with PyTorch: 'jupyter/pytorch/load_your_own_pytorch_bert.ipynb'
   - Guides:
       - 'docs/engine.md'
       - Models:
