@@ -32,6 +32,18 @@ public interface NDResource extends AutoCloseable {
     void attach(NDManager manager);
 
     /**
+     * Attaches this {@link NDResource} to the specified {@link NDManager} from which it was
+     * previously detached and temp-attached to the current manager of this resource. This is
+     * functionally equivalent to the attach method, however the cap-state disregarded when adding
+     * the resource back to the original manager.
+     *
+     * @param manager the {@link NDManager} to be attached to
+     */
+    default void returnResource(NDManager manager) {
+        attach(manager);
+    }
+
+    /**
      * Temporarily attaches this {@link NDResource} to the specified {@link NDManager}.
      *
      * <p>Attached resource will be returned to the original manager when the {@link NDManager} is

@@ -160,7 +160,7 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public PtNDManager newSubManager(Device device) {
         PtNDManager manager = new PtNDManager(this, device);
-        attachInternal(manager.uid, manager);
+        attachUncappedInternal(manager.uid, manager);
         return manager;
     }
 

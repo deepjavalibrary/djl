@@ -178,6 +178,10 @@ public final class PassthroughNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public void cap() {}
+
+    /** {@inheritDoc} */
+    @Override
     public NDManager getParentManager() {
         return this;
     }
@@ -203,6 +207,12 @@ public final class PassthroughNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public void attachInternal(String resourceId, AutoCloseable resource) {
+        throw new UnsupportedOperationException(UNSUPPORTED);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void attachUncappedInternal(String resourceId, AutoCloseable resource) {
         throw new UnsupportedOperationException(UNSUPPORTED);
     }
 

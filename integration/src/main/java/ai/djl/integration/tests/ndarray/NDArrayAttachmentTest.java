@@ -48,4 +48,37 @@ public class NDArrayAttachmentTest {
             }
         }
     }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testCannotUseCappedManager() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            manager.cap();
+            manager.ones(new Shape(3, 4));
+        }
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testIndexationCannotUseCappedManager() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array3x4 = manager.ones(new Shape(3, 4));
+            array3x4.setName("Test()");
+            manager.cap();
+            array3x4.get(1);
+        }
+    }
+
+    @Test
+    public void testIndexationUsesSpecificUncappedManager() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array3x4 = manager.ones(new Shape(3, 4));
+            array3x4.setName("Test()");
+            manager.cap();
+            try (NDManager subManager = NDManager.newBaseManager()) {
+                NDArray array4sub1 = array3x4.get(subManager, 1);
+                Assert.assertEquals(array4sub1.getManager(), subManager);
+                array3x4.tempAttach(subManager);
+                Assert.assertEquals(array3x4.getManager(), subManager);
+            }
+        }
+    }
 }

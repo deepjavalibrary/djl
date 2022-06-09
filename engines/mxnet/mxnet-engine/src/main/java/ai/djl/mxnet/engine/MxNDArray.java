@@ -165,6 +165,14 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public void returnResource(NDManager manager) {
+        detach();
+        this.manager = (MxNDManager) manager;
+        manager.attachUncappedInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void tempAttach(NDManager manager) {
         NDManager original = this.manager;
         detach();
