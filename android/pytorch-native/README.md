@@ -65,11 +65,6 @@ echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin/sdkmanager --install
 
 See: [https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/native_s3_pytorch_android.yml](https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/native_s3_pytorch_android.yml)
 
-Prerequisites:
-* If you do not have `cmake` installed, run `brew install cmake`
-* If you do not have the python library `pyyaml` installed, run `pip install pyyaml`
-* If you have `python3` installed, run `export PYTHON=python3`
-
 ```
 # cd into whatever directory holds your djl directory
 export PYTORCH_VERSION=1.11.0
