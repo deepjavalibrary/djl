@@ -183,7 +183,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTake(
   const auto* index_ptr = reinterpret_cast<torch::Tensor*>(jindex_handle);
   const auto* result_ptr = new torch::Tensor(tensor_ptr->take(*index_ptr));
   return reinterpret_cast<uintptr_t>(result_ptr);
-  API_END_RETURN()  
+  API_END_RETURN()
 }
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMaskedSelect(
