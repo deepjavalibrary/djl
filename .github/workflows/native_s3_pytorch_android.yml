@@ -11,7 +11,7 @@ jobs:
         format: ["armeabi-v7a", "arm64-v8a", "x86" ,"x86_64"]
     env:
       PYTORCH_VERSION: "1.11.0"
-      NDK_VERSION: "21.0.6113669"
+      NDK_VERSION: "21.1.6352462"
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
