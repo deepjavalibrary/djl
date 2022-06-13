@@ -6,7 +6,7 @@ The model zoo contains symbolic models from Apache MXNet (incubating) that can b
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.io/doc/ai.djl.mxnet/mxnet-model-zoo/latest/index.html).
+The latest javadocs can be found on [here](https://javadoc.io/doc/ai.djl.mxnet/mxnet-model-zoo/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 

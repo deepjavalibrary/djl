@@ -34,7 +34,7 @@ If you want to customize your Hadoop configuration, you can manually register a 
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.io/ai.djl.hadoop/hadoop/latest/index.html).
+The latest javadocs can be found on [here](https://javadoc.io/ai.djl.hadoop/hadoop/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 
