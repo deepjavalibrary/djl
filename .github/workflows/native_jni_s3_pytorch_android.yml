@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       PYTORCH_VERSION: "1.11.0"
-      NDK_VERSION: "21.0.6113669"
+      NDK_VERSION: "21.1.6352462"
 
     steps:
       - uses: actions/checkout@v2

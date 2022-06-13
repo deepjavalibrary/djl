@@ -20,8 +20,13 @@
 // The file is the implementation for PyTorch inference operations
 
 struct JITCallGuard {
+#ifdef V1_10_X
   torch::autograd::AutoGradMode no_autograd_guard{false};
   torch::NoGradGuard no_grad;
+#else
+  c10::InferenceMode guard;
+  torch::jit::GraphOptimizerEnabledGuard no_optimizer_guard{false};
+#endif
 };
 
 JNIEXPORT jlong JNICALL
@@ -38,14 +43,18 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljav
     auto name = djl::utils::jni::GetStringFromJString(env, jname);
     map[name] = "";
   }
-  torch::jit::script::Module module;
+
+  JITCallGuard guard;
+  torch::jit::Module module;
   if (jmap_location) {
     module = torch::jit::load(path, device, map);
+    module.eval();
   } else {
     module = torch::jit::load(path, torch::nullopt, map);
+    module.eval();
     module.to(device);
   }
-  const auto* module_ptr = new torch::jit::script::Module(module);
+  const auto* module_ptr = new torch::jit::Module(module);
   for (size_t i = 0; i < len; ++i) {
     auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
     auto name = djl::utils::jni::GetStringFromJString(env, jname);
@@ -162,10 +171,10 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_setGraphExecutorOp
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetBenchmarkCuDNN(
-        JNIEnv* env, jobject jthis, jboolean jenabled) {
-    API_BEGIN()
-    torch::globalContext().setBenchmarkCuDNN(jenabled);
-    API_END()
+    JNIEnv* env, jobject jthis, jboolean jenabled) {
+  API_BEGIN()
+  torch::globalContext().setBenchmarkCuDNN(jenabled);
+  API_END()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleEval(
