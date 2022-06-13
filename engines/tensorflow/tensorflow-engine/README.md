@@ -11,7 +11,7 @@ couple your code with TensorFlow and make switching between frameworks difficult
 
 ## Documentation
 
-The latest javadocs can be found on the [djl.ai website](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-engine/latest/index.html).
+The latest javadocs can be found on [here](https://javadoc.io/doc/ai.djl.tensorflow/tensorflow-engine/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 
