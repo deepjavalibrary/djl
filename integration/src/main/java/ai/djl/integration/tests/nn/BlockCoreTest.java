@@ -21,6 +21,7 @@ import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -34,6 +35,7 @@ import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.convolutional.Conv2dTranspose;
 import ai.djl.nn.convolutional.Conv3d;
 import ai.djl.nn.core.Linear;
+import ai.djl.nn.core.LinearCollection;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.norm.Dropout;
 import ai.djl.nn.norm.GhostBatchNorm;
@@ -57,6 +59,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -173,6 +176,165 @@ public class BlockCoreTest {
                 Assert.assertEquals(result, expected);
 
                 testEncode(manager, block);
+            }
+        }
+    }
+
+    @Test
+    public void testLinearCollection() throws IOException, MalformedModelException {
+
+        // used to initialize both weight and bias
+        Initializer initializer =
+                (m, s, t) -> m.arange(0, s.size(), 1, DataType.FLOAT32).reshape(s);
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(initializer, Parameter.Type.WEIGHT)
+                        .optInitializer(initializer, Parameter.Type.BIAS);
+        int featureSize = 5;
+        int outSize = 7;
+        int batchSize = 11;
+        // number of linear transformations modeled by LinearCollection
+        int splitSize = 6;
+
+        // following ndarrays will be scoped to modelLinearCollection's ndmanager so they can be
+        // used later in the for-loop
+        NDArray expectedWeightForLinearCollection;
+        NDArray expectedBiasForLinearCollection;
+        NDArray expectedLabelsForLinearCollection;
+        NDArray dataForLinearCollection;
+
+        try (NDManager sharedManager = NDManager.newBaseManager()) {
+
+            // test expected output when using LinearCollection
+            try (Model model = Model.newInstance("model")) {
+                Block block = LinearCollection.builder().setUnits(outSize).build();
+                model.setBlock(block);
+
+                try (Trainer trainer = model.newTrainer(config)) {
+                    Shape inputShape = new Shape(batchSize, splitSize, featureSize);
+                    trainer.initialize(inputShape);
+
+                    NDManager manager = trainer.getManager();
+                    dataForLinearCollection =
+                            sharedManager.arange(inputShape.size()).reshape(inputShape);
+                    NDArray actualLabels =
+                            trainer.forward(new NDList(dataForLinearCollection)).singletonOrThrow();
+                    NDArray actualWeight = block.getParameters().get("weight").getArray();
+                    NDArray actualBias = block.getParameters().get("bias").getArray();
+                    expectedWeightForLinearCollection =
+                            initializer.initialize(
+                                    sharedManager,
+                                    new Shape(splitSize, featureSize, outSize),
+                                    DataType.FLOAT32);
+                    expectedBiasForLinearCollection =
+                            initializer.initialize(
+                                    sharedManager, new Shape(splitSize, outSize), DataType.FLOAT32);
+                    Assert.assertEquals(expectedWeightForLinearCollection, actualWeight);
+                    Assert.assertEquals(expectedBiasForLinearCollection, actualBias);
+                    expectedLabelsForLinearCollection =
+                            dataForLinearCollection
+                                    .transpose(1, 0, 2)
+                                    .matMul(expectedWeightForLinearCollection)
+                                    .transpose(1, 0, 2)
+                                    .add(expectedBiasForLinearCollection);
+                    Assert.assertEquals(expectedLabelsForLinearCollection, actualLabels);
+
+                    testEncode(manager, block);
+                }
+            }
+
+            // test expected output can be reproduced by using splitSize-many Linear blocks
+            for (int splitIndex : IntStream.range(0, splitSize).toArray()) {
+                try (Model model = Model.newInstance("model")) {
+                    Block block = Linear.builder().setUnits(outSize).build();
+                    model.setBlock(block);
+
+                    try (Trainer trainer = model.newTrainer(config)) {
+
+                        // copy initial weight/bias values from LinearCollection
+                        Shape inputShape = new Shape(batchSize, featureSize);
+                        block.setInitializer(
+                                (m, s, t) -> {
+                                    NDArray w =
+                                            expectedWeightForLinearCollection
+                                                    .get(splitIndex)
+                                                    .transpose();
+                                    w.attach(m);
+                                    return w;
+                                },
+                                Parameter.Type.WEIGHT);
+                        block.setInitializer(
+                                (m, s, t) -> {
+                                    NDArray w = expectedBiasForLinearCollection.get(splitIndex);
+                                    w.attach(m);
+                                    return w;
+                                },
+                                Parameter.Type.BIAS);
+                        trainer.initialize(inputShape);
+
+                        NDManager manager = trainer.getManager();
+                        NDArray data = dataForLinearCollection.transpose(1, 0, 2).get(splitIndex);
+                        NDArray actualLabels = trainer.forward(new NDList(data)).singletonOrThrow();
+                        NDArray actualWeight = block.getParameters().get("weight").getArray();
+                        NDArray actualBias = block.getParameters().get("bias").getArray();
+                        NDArray expectedWeight =
+                                expectedWeightForLinearCollection.get(splitIndex).transpose();
+                        NDArray expectedBias = expectedBiasForLinearCollection.get(splitIndex);
+                        Assert.assertEquals(expectedWeight, actualWeight);
+                        Assert.assertEquals(expectedBias, actualBias);
+                        NDArray expectedLabels =
+                                data.dot(expectedWeight.transpose()).add(expectedBias);
+                        Assert.assertEquals(expectedLabels, actualLabels);
+                        Assert.assertEquals(
+                                expectedLabelsForLinearCollection
+                                        .transpose(1, 0, 2)
+                                        .get(splitIndex),
+                                actualLabels);
+
+                        testEncode(manager, block);
+                    }
+                }
+            }
+
+            // test expected output when using multiple split axis
+            try (Model model = Model.newInstance("model")) {
+                Block block = LinearCollection.builder().setUnits(outSize).build();
+                model.setBlock(block);
+
+                try (Trainer trainer = model.newTrainer(config)) {
+                    long[] splitAxis = {3, 1, 2};
+                    Assert.assertEquals(splitSize, new Shape(splitAxis).size());
+                    Shape inputShape = new Shape(batchSize).add(splitAxis).add(featureSize);
+                    trainer.initialize(inputShape);
+
+                    NDManager manager = trainer.getManager();
+                    NDArray data = dataForLinearCollection.reshape(inputShape);
+                    NDArray actualLabels = trainer.forward(new NDList(data)).singletonOrThrow();
+                    NDArray actualWeight = block.getParameters().get("weight").getArray();
+                    NDArray actualBias = block.getParameters().get("bias").getArray();
+                    NDArray expectedWeight =
+                            initializer.initialize(
+                                    manager,
+                                    new Shape(splitAxis).add(featureSize, outSize),
+                                    DataType.FLOAT32);
+                    NDArray expectedBias =
+                            initializer.initialize(
+                                    manager, new Shape(splitAxis).add(outSize), DataType.FLOAT32);
+                    Assert.assertEquals(expectedWeight, actualWeight);
+                    Assert.assertEquals(expectedBias, actualBias);
+                    NDArray expectedLabels =
+                            data.transpose(1, 2, 3, 0, 4)
+                                    .matMul(expectedWeight)
+                                    .transpose(3, 0, 1, 2, 4)
+                                    .add(expectedBias);
+                    Assert.assertEquals(expectedLabels, actualLabels);
+                    Assert.assertEquals(
+                            expectedLabelsForLinearCollection.reshape(
+                                    new Shape(batchSize).add(splitAxis).add(outSize)),
+                            actualLabels);
+
+                    testEncode(manager, block);
+                }
             }
         }
     }
