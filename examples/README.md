@@ -1,7 +1,7 @@
 # Examples
 
 This module contains examples to demonstrate use of the Deep Java Library (DJL).
-You can find more examples from our [djl-demo github repo](https://github.com/aws-samples/djl-demo).
+You can find more examples from our [djl-demo github repo](https://github.com/deepjavalibrary/djl-demo).
 
 The following examples are included for training:
 
@@ -34,7 +34,7 @@ You may be able to find more translator examples in our engine specific model zo
 [PyTorch](https://github.com/deepjavalibrary/djl/tree/master/engines/pytorch/pytorch-model-zoo),
 and [TensorFlow](https://github.com/deepjavalibrary/djl/tree/master/engines/tensorflow/tensorflow-model-zoo).
 
-More examples and demos of applications featuring DJL are located in our [demo repository](https://github.com/aws-samples/djl-demo).
+More examples and demos of applications featuring DJL are located in our [demo repository](https://github.com/deepjavalibrary/djl-demo).
 
 ## Prerequisites
 
