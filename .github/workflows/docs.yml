@@ -44,7 +44,11 @@ jobs:
       - name: clone demos
         run: |
           cd docs
-          git clone https://github.com/aws-samples/djl-demo.git demos
+          git clone https://github.com/deepjavalibrary/djl-demo.git demos
+      - name: clone serving
+        run: |
+          cd docs
+          git clone https://github.com/deepjavalibrary/djl-serving.git serving
       - name: build docs
         run: |
           cd docs

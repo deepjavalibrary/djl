@@ -135,8 +135,18 @@ nav:
       - AWS S3 support: 'extensions/aws-ai/README.md'
       - fastText: 'extensions/fasttext/README.md'
       - Hadoop support: 'extensions/hadoop/README.md'
+      - Huggingface Tokenizers: 'extensions/tokenizers/README.md'
       - OpenCV: 'extensions/opencv/README.md'
       - SentencePiece: 'extensions/sentencepiece/README.md'
+      - Tablesaw: 'extensions/tablesaw/README.md'
+      - DJL Serving:
+          - 'docs/serving/README.md'
+          - 'docs/serving/serving/docs/workflows.md'
+          - 'docs/serving/serving/docs/configuration.md'
+          - 'docs/serving/serving/docs/inference_api.md'
+          - 'docs/serving/serving/docs/management_api.md'
+          - 'docs/serving/serving/docs/plugin_management.md'
+      - 'docs/serving/wlm/README.md'
   - Demos:
       - Demos: 'docs/demos/README.md'
       - AWS:
@@ -173,7 +183,7 @@ nav:
           - Footwear Classification: 'docs/demos/footwear_classification/README.md'
           - Live Object Detection: 'docs/demos/live-object-detection/README.md'
           - Pneumonia Detection: 'docs/demos/pneumonia-detection/README.md'
-          - MultiEngine on DJL: 'docs/demos/multi-engine/README.md'
+          - MultiEngine on DJL: 'docs/demos/development/multi-engine/README.md'
           - Interactive JShell and Block Runner for DJL: 'docs/demos/web-demo/interactive-console/README.md'
           - Malicious URL Detection: 'docs/demos/malicious-url-detector/README.md'
       - Extensions:
