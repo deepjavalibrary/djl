@@ -6,14 +6,13 @@ Follow this setup guide in order to run DJL apps on an Android. In order to succ
 ## Prerequisites
 
 ```
-# Run the following command if you don't have python3 installed
+# Run the following command if you have python3 installed
 export PYTHON=python3
 
-# install needed python library
+# install needed python libraries
 pip3 install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions
-
 ```
-## Only run the android-sdk install specific to your OS, then procede to installing command line tools below
+## Only run the android-sdk install specific to your OS, then proceed to installing command line tools below
 
 This will install the android-sdk on your machine as well as python3. It sets the ANDROID_HOME environment variable for use throughout this setup guide, and gives you ownership to the ANDROID_HOME directory which we need later.
 
