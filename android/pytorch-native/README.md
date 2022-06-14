@@ -39,7 +39,7 @@ brew install android-sdk
 export ANDROID_HOME=/Users/$USER/Library/Android/sdk
 
 # give user ownership of ANDROID_HOME path
-sudo chown -R $USER $ANDROIANDROID_HOMED_SDK_ROOT 
+sudo chown -R $USER $ANDROID_HOME 
 ```
 
 ## Install Command line only tools
