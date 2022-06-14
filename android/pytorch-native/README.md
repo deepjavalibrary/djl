@@ -1,6 +1,8 @@
 
 # Pytorch Android Build Procedure
 
+This procedure is meant only for developers who want to build PyTorch native binaries from source, this is not intended for regular users.
+
 Follow this setup guide in order to run DJL apps on an Android. In order to successfully run the apps, you must install several Android items and build Android ABIs outlined below.
 
 ## Prerequisites
