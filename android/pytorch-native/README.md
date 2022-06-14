@@ -6,7 +6,7 @@ Follow this setup guide in order to run DJL apps on an Android. In order to succ
 ## Prerequisites
 
 ```
-# Run the following command if you have python3 installed
+# Run the following command (assume you have python3 installed already)
 export PYTHON=python3
 
 # install needed python libraries
