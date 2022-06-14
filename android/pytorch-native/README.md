@@ -10,7 +10,7 @@ Follow this setup guide in order to run DJL apps on an Android. In order to succ
 export PYTHON=python3
 
 # install needed python libraries
-pip3 install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions
+python3 -m pip install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions
 ```
 ## Only run the android-sdk install specific to your OS, then proceed to installing command line tools below
 
