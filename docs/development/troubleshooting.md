@@ -232,7 +232,7 @@ No X11 DISPLAY variable was set, but this program performed an operation which r
 java.awt.HeadlessException:
 ```
 
-Follow the [steps here](https://github.com/aws-samples/d2l-java/blob/master/documentation/troubleshoot.md) to resolve it.
+Follow the [steps here](https://github.com/deepjavalibrary/d2l-java/blob/master/documentation/troubleshoot.md) to resolve it.
 
 
 ## 10. JVM crash
