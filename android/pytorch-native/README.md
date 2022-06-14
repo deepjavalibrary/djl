@@ -33,7 +33,7 @@ sudo chown -R ubuntu:ubuntu $ANDROID_HOME
 
 ```
 # install python and Android sdk
-brew install android-sdk python3
+brew install android-sdk
 
 # set Android home
 export ANDROID_HOME=/Users/$USER/Library/Android/sdk
