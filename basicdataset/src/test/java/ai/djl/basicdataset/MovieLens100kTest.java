@@ -29,7 +29,6 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
 import java.io.IOException;
-import java.nio.file.Paths;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -46,11 +45,7 @@ public class MovieLens100kTest {
 
             NDManager manager = model.getNDManager();
 
-            Repository repository =
-                    Repository.newInstance(
-                            "testrepo",
-                            Paths.get(
-                                    "/Users/siddhave/workplace/DeepJavaLibraryCore/djl/basicdataset/src/test/resources/mlrepo"));
+            Repository repository = Repository.newInstance("testrepo", "src/test/resources/mlrepo");
 
             MovieLens100k movieLens100k =
                     MovieLens100k.builder()
