@@ -354,6 +354,29 @@ public class Criteria<I, O> {
     }
 
     /**
+     * Creates a new {@link Builder} which starts with the values of this {@link Criteria}.
+     *
+     * @return a new {@link Builder}
+     */
+    public Builder<I, O> toBuilder() {
+        return Criteria.builder()
+                .setTypes(inputClass, outputClass)
+                .optApplication(application)
+                .optEngine(engine)
+                .optDevice(device)
+                .optGroupId(groupId)
+                .optArtifactId(artifactId)
+                .optModelZoo(modelZoo)
+                .optFilters(filters)
+                .optArguments(arguments)
+                .optOptions(options)
+                .optTranslatorFactory(factory)
+                .optBlock(block)
+                .optModelName(modelName)
+                .optProgress(progress);
+    }
+
+    /**
      * Creates a builder to build a {@code Criteria}.
      *
      * <p>The methods start with {@code set} are required fields, and {@code opt} for optional
@@ -626,6 +649,7 @@ public class Criteria<I, O> {
          * @return this {@code Builder}
          */
         public Builder<I, O> optTranslator(Translator<I, O> translator) {
+            this.factory = null;
             this.translator = translator;
             return this;
         }
@@ -637,6 +661,7 @@ public class Criteria<I, O> {
          * @return this {@code Builder}
          */
         public Builder<I, O> optTranslatorFactory(TranslatorFactory factory) {
+            this.translator = null;
             this.factory = factory;
             return this;
         }
