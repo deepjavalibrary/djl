@@ -1,0 +1,29 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "dataset",
+  "application": "tabular",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "movielens-100k",
+  "name": "movielens-100k",
+  "description": "Movie Ratings from 1000 Users on 1700 movies",
+  "website": "https://grouplens.org/datasets/movielens/100k/",
+  "licenses": {
+    "license": {
+      "name": "N/A",
+      "url": "https://files.grouplens.org/datasets/movielens/ml-100k-README.txt"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "files": {
+        "ml-100k": {
+          "uri": "https://files.grouplens.org/datasets/movielens/ml-100k.zip",
+          "sha1Hash": "cd4dcac4241c8a4ad7badc7ca635da8a69dddb83",
+          "size": "4924029"
+        }
+      }
+    }
+  ]
+}

@@ -71,6 +71,7 @@ This module contains the following datasets:
 
 - [Airfoil Self-Noise](https://javadoc.io/doc/ai.djl/basicdataset/latest/ai/djl/basicdataset/tabular/AirfoilRandomAccess.html) - A 6 feature dataset from NASA tests of airfoils
 - [Ames House Pricing](https://javadoc.io/doc/ai.djl/basicdataset/latest/ai/djl/basicdataset/tabular/AmesRandomAccess.html) - A 80 feature dataset to predict house prices
+- [Movielens 100k](https://javadoc.io/doc/ai.djl/basicdataset/latest/ai/djl/basicdataset/tabular/MovieLens100k.html) - A 6 feature dataset of movie ratings on 1682 movies from 943 users
 
 ### Time Series
 
