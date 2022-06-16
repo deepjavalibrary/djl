@@ -52,4 +52,15 @@ jobs:
           ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
           ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
           DJL_STAGING: ${{ github.event.inputs.repo-id }}
-
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Publish deb
+        run: |
+          cd serving
+          ./gradlew createDeb -P${{ github.event.inputs.mode }}
+          aws s3 cp build/distributions/*.deb s3://djl-ai/publish/djl-serving/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/*"
