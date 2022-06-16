@@ -21,6 +21,7 @@ import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
+import ai.djl.util.Utils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -356,25 +357,7 @@ public abstract class AbstractBaseBlock implements Block {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        // FIXME: This is a quick hack for display in jupyter notebook.
-        StringBuilder sb = new StringBuilder(200);
-        String className = getClass().getSimpleName();
-        if (className.endsWith("Block")) {
-            className = className.substring(0, className.length() - 5);
-        }
-        sb.append(className).append('(');
-        if (isInitialized()) {
-            PairList<String, Shape> inputShapeDescription = describeInput();
-            appendShape(sb, inputShapeDescription.values().toArray(new Shape[0]));
-            sb.append(" -> ");
-            Shape[] outputShapes =
-                    getOutputShapes(inputShapeDescription.values().toArray(new Shape[0]));
-            appendShape(sb, outputShapes);
-        } else {
-            sb.append("Uninitialized");
-        }
-        sb.append(')');
-        return sb.toString();
+        return Utils.describe(this, null, 0);
     }
 
     private void appendShape(StringBuilder sb, Shape[] shapes) {
@@ -412,5 +395,15 @@ public abstract class AbstractBaseBlock implements Block {
                 }
             }
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape[] getInputShapes() {
+        if (!isInitialized()) {
+            throw new IllegalStateException(
+                    "getInputShapes() can only be called after the initialization process");
+        }
+        return inputShapes;
     }
 }

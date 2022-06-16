@@ -251,6 +251,14 @@ public interface Block {
     Shape[] getOutputShapes(Shape[] inputShapes);
 
     /**
+     * Returns the input shapes of the block. The input shapes are only available after the block is
+     * initialized, otherwise an {@link IllegalStateException} is thrown.
+     *
+     * @return the input shapes of the block
+     */
+    Shape[] getInputShapes();
+
+    /**
      * Writes the parameters of the block to the given outputStream.
      *
      * @param os the outputstream to save the parameters to

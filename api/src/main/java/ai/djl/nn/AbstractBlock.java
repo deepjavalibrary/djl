@@ -12,6 +12,7 @@
  */
 package ai.djl.nn;
 
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -23,6 +24,7 @@ import ai.djl.util.PairList;
 import java.io.DataOutputStream;
 import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.function.Function;
 
 /**
  * {@code AbstractBlock} is an abstract implementation of {@link Block}.
@@ -93,17 +95,39 @@ public abstract class AbstractBlock extends AbstractBaseBlock {
     /**
      * Use this to add a child block to this block.
      *
-     * @param name Name of the block, must be unique or otherwise existing children with this name
-     *     are removed, must not be null.
+     * @param name Name of the block, must not be null.
      * @param block The block, must not be null.
      * @param <B> The type of block
      * @return the block given as a parameter - that way the block can be created and reassigned to
      *     a member variable more easily.
      */
-    protected final <B extends Block> B addChildBlock(String name, B block) {
+    public final <B extends Block> B addChildBlock(String name, B block) {
         int childNumber = children.size() + 1;
         children.add(String.format(Locale.ROOT, "%02d%s", childNumber, name), block);
         return block;
+    }
+
+    /**
+     * Adds a {@link LambdaBlock} as a child block to this block.
+     *
+     * @param name Name of the block, must not be null.
+     * @param f the function forms the {@link LambdaBlock}
+     * @return the child block
+     */
+    public LambdaBlock addChildBlock(String name, Function<NDList, NDList> f) {
+        return addChildBlock(name, new LambdaBlock(f));
+    }
+
+    /**
+     * Adds a {@link LambdaBlock#singleton(Function)} as a child block to this block.
+     *
+     * @param name Name of the block, must not be null.
+     * @param f the function forms the {@link LambdaBlock}
+     * @return the child block
+     * @see LambdaBlock#singleton(Function)
+     */
+    public final LambdaBlock addChildBlockSingleton(String name, Function<NDArray, NDArray> f) {
+        return addChildBlock(name, LambdaBlock.singleton(f));
     }
 
     /**
