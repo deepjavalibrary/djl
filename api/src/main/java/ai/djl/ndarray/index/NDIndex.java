@@ -13,12 +13,7 @@
 package ai.djl.ndarray.index;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.index.dim.NDIndexAll;
-import ai.djl.ndarray.index.dim.NDIndexBooleans;
-import ai.djl.ndarray.index.dim.NDIndexElement;
-import ai.djl.ndarray.index.dim.NDIndexFixed;
-import ai.djl.ndarray.index.dim.NDIndexPick;
-import ai.djl.ndarray.index.dim.NDIndexSlice;
+import ai.djl.ndarray.index.dim.*;
 import ai.djl.ndarray.types.DataType;
 
 import java.util.ArrayList;
@@ -50,7 +45,7 @@ public class NDIndex {
     /* Android regex requires escape } char as well */
     private static final Pattern ITEM_PATTERN =
             Pattern.compile(
-                    "(\\*)|((-?\\d+|\\{\\})?:(-?\\d+|\\{\\})?(:(-?\\d+|\\{\\}))?)|(-?\\d+|\\{\\})");
+                    "(\\*)|((-?\\d+|\\{\\})?:(-?\\d+|\\{\\})?(:(-?\\d+|\\{\\}))?)|(-?\\d+|\\{\\})|None");
 
     private int rank;
     private List<NDIndexElement> indices;
@@ -193,7 +188,7 @@ public class NDIndex {
      * @return the updated {@link NDIndex}
      * @see #NDIndex(String, Object...)
      */
-    public final NDIndex addIndices(String indices, Object... args) {
+    public final void addIndices(String indices, Object... args) {
         String[] indexItems = indices.split(",");
         rank += indexItems.length;
         int argIndex = 0;
@@ -215,7 +210,6 @@ public class NDIndex {
         if (argIndex != args.length) {
             throw new IllegalArgumentException("Incorrect number of index arguments");
         }
-        return this;
     }
 
     /**
@@ -334,6 +328,11 @@ public class NDIndex {
         Matcher m = ITEM_PATTERN.matcher(indexItem);
         if (!m.matches()) {
             throw new IllegalArgumentException("Invalid argument index: " + indexItem);
+        }
+        // None
+        if (indexItem.equals("None")) {
+            indices.add(new NDIndexNone());
+            return argIndex;
         }
         // "*" case
         String star = m.group(1);

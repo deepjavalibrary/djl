@@ -12,9 +12,12 @@
  */
 package ai.djl.pytorch.jni;
 
+import ai.djl.ndarray.index.dim.NDIndexElement;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Set;
 
 /** A class containing utilities to interact with the PyTorch Engine's JNI layer. */
@@ -184,6 +187,8 @@ final class PyTorchLibrary {
             boolean requiredGrad);
 
     native long torchIndex(long handle, long[] minIndices, long[] maxIndices, long[] stepIndices);
+
+    native long torchIndexAdv(long handle, List<NDIndexElement> indices);
 
     native void torchIndexPut(
             long handle,
@@ -600,4 +605,17 @@ final class PyTorchLibrary {
     native long torchNorm(long handle, int ord, long[] axis, boolean keepDims);
 
     native long torchNonZeros(long handle);
+
+    native long torchIndexInit(int size);
+
+    native long torchIndexReturn(long handle, long torchIndexHandle);
+
+    native void torchIndexAppendNoneEllipsis(long torchIndexHandle, boolean is_ellipsis);
+
+    native void torchIndexAppendSlice(
+            long torchIndexHandle, long min, long max, long step, int null_slice_bin);
+
+    native void torchIndexAppendFixed(long torchIndexHandle, long idx);
+
+    native void torchIndexAppendArray(long torchIndexHandle, long arrayHandle);
 }
