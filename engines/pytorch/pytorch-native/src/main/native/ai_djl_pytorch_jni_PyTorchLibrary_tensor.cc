@@ -120,31 +120,6 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndex(JNIEnv
   API_END_RETURN()
 }
 
-JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAdv(JNIEnv* env, jobject jthis, jlong jhandle, jobject index) {
-  API_BEGIN()
-  std::cout << "Reached here!" << std::endl;
-  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  using namespace std;
-
-  jclass java_util_ArrayList = static_cast<jclass>(env->FindClass("java/util/ArrayList"));
-  cout << "temp check:" << java_util_ArrayList << endl;
-  jmethodID java_util_ArrayList_get = env->GetMethodID(java_util_ArrayList, "get", "(I)Ljava/lang/Object;");
-  jmethodID java_util_ArrayList_size = env->GetMethodID(java_util_ArrayList, "size", "()I");
-  cout << "Give me correct size() methodID:" << java_util_ArrayList_get << endl;
-  cout << "jclass: " << java_util_ArrayList << endl;
-
-  jint size = 0;
-  cout << "size:" << size << endl;
-//    size = env->CallIntMethod(java_util_ArrayList, java_util_ArrayList_size);
-  jobject index_element = env->CallObjectMethod(java_util_ArrayList, java_util_ArrayList_get, 0);
-//    cout << "size" << size << endl;
-  cout << index_element << endl;
-
-  cout << "Dev ends here!" << endl;
-  return reinterpret_cast<uintptr_t>(tensor_ptr);
-  API_END_RETURN()
-}
-
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexInit(JNIEnv* env, jobject jthis, jint jsize) {
   API_BEGIN()
   //const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);

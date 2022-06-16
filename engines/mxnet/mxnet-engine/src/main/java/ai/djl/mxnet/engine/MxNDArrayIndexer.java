@@ -93,7 +93,7 @@ public class MxNDArrayIndexer extends NDArrayIndexer {
             return get(array, fullSlice.get());
         }
         throw new UnsupportedOperationException(
-                "get() currently supports all, fixed, and slices indices in MXNet engine");
+                "get() currently supports only all, fixed, and slices indices in MXNet engine");
     }
 
     /** {@inheritDoc} */
