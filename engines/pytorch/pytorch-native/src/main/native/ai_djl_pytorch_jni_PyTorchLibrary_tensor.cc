@@ -116,23 +116,15 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndex(JNIEnv
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   auto indices = utils::CreateTensorIndex(env, jmin_indices, jmax_indices, jstep_indices);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->index(indices));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexInit(JNIEnv* env, jobject jthis, jint jsize) {
   API_BEGIN()
-  //const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  using namespace std;
-  using namespace torch::indexing;
-
   std::vector<at::indexing::TensorIndex> *index_ptr = new std::vector<at::indexing::TensorIndex>;
   index_ptr->reserve(jsize);
-
-  index_ptr->emplace_back(Slice(0, 2));
-  cout << (*index_ptr)[0] << endl;
-  //cout << tensor_ptr->index((*index_ptr)[0]) << endl;
-
   return reinterpret_cast<uintptr_t>(index_ptr);
   API_END_RETURN()
 }
@@ -141,15 +133,8 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexReturn(
     jlong jhandle, jlong jtorch_index_handle) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  using namespace std;
-  using namespace torch::indexing;
-
-  std::cout << "IndexReturn:" << jtorch_index_handle << std::endl;
   auto* index_ptr = reinterpret_cast<std::vector<at::indexing::TensorIndex> *>(jtorch_index_handle);
-  std::cout << "*index_ptr[0] " << sizeof(index_ptr->at(0)) << " " << index_ptr->at(0) << std::endl;
-  std::cout << "*index_ptr " << sizeof(*index_ptr) << " " << *index_ptr << std::endl;
-  cout << "output: " << tensor_ptr->index(index_ptr->at(0)) << endl;
-  torch::Tensor* ret_ptr = new torch::Tensor(tensor_ptr->index(index_ptr->at(0)));
+  torch::Tensor* ret_ptr = new torch::Tensor(tensor_ptr->index(*index_ptr));
   return reinterpret_cast<uintptr_t>(ret_ptr);
   API_END_RETURN()
 }
@@ -186,7 +171,11 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendFi
     jlong jtorch_index_handle, jlong jidx) {
   API_BEGIN()
   auto* index_ptr = reinterpret_cast<std::vector<at::indexing::TensorIndex> *>(jtorch_index_handle);
-  index_ptr->emplace_back((long) jidx);
+  index_ptr->emplace_back((int) jidx);
+  using namespace std;
+  cout << "DEBUG" << endl;
+  cout << index_ptr->at(0) << endl;
+  cout << index_ptr->size() << endl;
   API_END()
 }
 
