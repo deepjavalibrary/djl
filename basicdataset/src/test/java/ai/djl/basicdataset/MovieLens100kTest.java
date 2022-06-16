@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
-import ai.djl.repository.Repository;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -45,12 +44,9 @@ public class MovieLens100kTest {
 
             NDManager manager = model.getNDManager();
 
-            Repository repository = Repository.newInstance("testrepo", "src/test/resources/mlrepo");
-
             MovieLens100k movieLens100k =
                     MovieLens100k.builder()
                             .optUsage(Dataset.Usage.TEST)
-                            .optRepository(repository)
                             .addFeature("user_age")
                             .addFeature("user_gender")
                             .addFeature("user_occupation")
