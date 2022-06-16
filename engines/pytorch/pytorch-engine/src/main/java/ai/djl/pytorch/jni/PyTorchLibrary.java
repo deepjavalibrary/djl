@@ -12,12 +12,10 @@
  */
 package ai.djl.pytorch.jni;
 
-import ai.djl.ndarray.index.dim.NDIndexElement;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.Set;
 
 /** A class containing utilities to interact with the PyTorch Engine's JNI layer. */
