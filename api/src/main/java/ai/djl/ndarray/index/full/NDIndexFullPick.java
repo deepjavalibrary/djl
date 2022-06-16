@@ -53,7 +53,7 @@ public final class NDIndexFullPick {
                 axis++;
             } else if (el instanceof NDIndexPick) {
                 if (fullPick == null) {
-                    fullPick = new NDIndexFullPick(((NDIndexPick) el).getIndices(), axis);
+                    fullPick = new NDIndexFullPick(((NDIndexPick) el).getIndex(), axis);
                 } else {
                     // Don't support multiple picks
                     throw new UnsupportedOperationException(
