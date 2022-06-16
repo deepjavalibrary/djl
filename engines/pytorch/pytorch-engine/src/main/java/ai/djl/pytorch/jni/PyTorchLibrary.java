@@ -188,8 +188,6 @@ final class PyTorchLibrary {
 
     native long torchIndex(long handle, long[] minIndices, long[] maxIndices, long[] stepIndices);
 
-    native long torchIndexAdv(long handle, List<NDIndexElement> indices);
-
     native void torchIndexPut(
             long handle,
             long valueHandle,
