@@ -9,7 +9,7 @@
   "website": "https://grouplens.org/datasets/movielens/100k/",
   "licenses": {
     "license": {
-      "name": "N/A",
+      "name": "MovieLens License",
       "url": "https://files.grouplens.org/datasets/movielens/ml-100k-README.txt"
     }
   },
