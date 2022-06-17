@@ -172,10 +172,6 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendFi
   API_BEGIN()
   auto* index_ptr = reinterpret_cast<std::vector<at::indexing::TensorIndex> *>(jtorch_index_handle);
   index_ptr->emplace_back((int) jidx);
-  using namespace std;
-  cout << "DEBUG" << endl;
-  cout << index_ptr->at(0) << endl;
-  cout << index_ptr->size() << endl;
   API_END()
 }
 

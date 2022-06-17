@@ -53,6 +53,12 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
     /** {@inheritDoc} */
     @Override
     public NDArray get(NDArray array, NDIndex index) {
+        if (index.getRank() == 0) {
+            if (array.getShape().isScalar()) {
+                return array.duplicate();
+            }
+            index.addAllDim();
+        }
         return JniUtils.indexAdv(manager.from(array), index);
     }
 

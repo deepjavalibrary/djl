@@ -13,7 +13,13 @@
 package ai.djl.ndarray.index;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.index.dim.*;
+import ai.djl.ndarray.index.dim.NDIndexAll;
+import ai.djl.ndarray.index.dim.NDIndexBooleans;
+import ai.djl.ndarray.index.dim.NDIndexElement;
+import ai.djl.ndarray.index.dim.NDIndexFixed;
+import ai.djl.ndarray.index.dim.NDIndexNone;
+import ai.djl.ndarray.index.dim.NDIndexPick;
+import ai.djl.ndarray.index.dim.NDIndexSlice;
 import ai.djl.ndarray.types.DataType;
 
 import java.util.ArrayList;
@@ -185,7 +191,6 @@ public class NDIndex {
      * @param indices the indices to add similar to {@link #NDIndex(String, Object...)}
      * @param args arguments to replace the variable "{}" in the indices string. Can be an integer,
      *     long, boolean {@link NDArray}, or integer {@link NDArray}.
-     * @return the updated {@link NDIndex}
      * @see #NDIndex(String, Object...)
      */
     public final void addIndices(String indices, Object... args) {
@@ -330,7 +335,7 @@ public class NDIndex {
             throw new IllegalArgumentException("Invalid argument index: " + indexItem);
         }
         // None
-        if (indexItem.equals("None")) {
+        if ("None".equals(indexItem)) {
             indices.add(new NDIndexNone());
             return argIndex;
         }

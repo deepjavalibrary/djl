@@ -81,53 +81,50 @@ public class NDIndexTest {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             Assert.assertEquals(original.get(new NDIndex()), original);
 
-            System.out.println("Engine is: " + manager.getEngine());
+            NDArray getAt = original.get(0);
+            NDArray expected = manager.create(new float[] {1f, 2f});
+            Assert.assertEquals(getAt, expected);
 
-            //            NDArray getAt = original.get(0);
-            //            NDArray expected = manager.create(new float[] {1f, 2f});
-            //            Assert.assertEquals(getAt, expected);
+            Assert.assertEquals(original.get("0,:"), expected);
+            Assert.assertEquals(original.get("0,*"), expected);
 
-            //            Assert.assertEquals(original.get("0,:"), expected);
-            //            Assert.assertEquals(original.get("0,*"), expected);
-            //
-            //            NDArray getSlice = original.get("1:");
-            //            expected = manager.create(new float[] {3f, 4f}, new Shape(1, 2));
-            //            Assert.assertEquals(getSlice, expected);
-            //
-            //            NDArray getStepSlice = original.get("1::2");
-            //            Assert.assertEquals(getStepSlice, expected);
-            //
-            //            original = manager.arange(120).reshape(2, 3, 4, 5);
-            //            NDArray getEllipsis = original.get("0,2, ...  ");
-            //            expected = manager.arange(40, 60).reshape(4, 5);
-            //            Assert.assertEquals(getEllipsis, expected);
-            //
-            //            getEllipsis = original.get("...,0:2,2");
-            //            expected =
-            //                    manager.create(new int[] {2, 7, 22, 27, 42, 47, 62, 67, 82, 87,
-            // 102, 107})
-            //                            .reshape(2, 3, 2);
-            //            Assert.assertEquals(getEllipsis, expected);
-            //
-            //            getEllipsis = original.get("1,...,2,3:5:2");
-            //            expected = manager.create(new int[] {73, 93, 113}).reshape(3, 1);
-            //            Assert.assertEquals(getEllipsis, expected);
-            //
-            //            getEllipsis = original.get("...");
-            //            Assert.assertEquals(getEllipsis, original);
-            //
-            //            // get from boolean array
-            //            original = manager.arange(10).reshape(2, 5);
-            //            NDArray bool = manager.create(new boolean[] {true, false});
-            //            expected = manager.arange(5).reshape(1, 5);
-            //            Assert.assertEquals(original.get(bool), expected);
-            //
-            //            // get from int array
-            //            original = manager.arange(1, 7f).reshape(-1, 3);
-            //            NDArray index = manager.create(new long[] {0, 4, 1, 2}, new Shape(2, 2));
-            //            NDArray actual = original.get(index);
-            //            expected = manager.create(new float[] {1, 5, 2, 3}, new Shape(2, 2));
-            //            Assert.assertEquals(actual, expected);
+            NDArray getSlice = original.get("1:");
+            expected = manager.create(new float[] {3f, 4f}, new Shape(1, 2));
+            Assert.assertEquals(getSlice, expected);
+
+            NDArray getStepSlice = original.get("1::2");
+            Assert.assertEquals(getStepSlice, expected);
+
+            original = manager.arange(120).reshape(2, 3, 4, 5);
+            NDArray getEllipsis = original.get("0,2, ...  ");
+            expected = manager.arange(40, 60).reshape(4, 5);
+            Assert.assertEquals(getEllipsis, expected);
+
+            getEllipsis = original.get("...,0:2,2");
+            expected =
+                    manager.create(new int[] {2, 7, 22, 27, 42, 47, 62, 67, 82, 87, 102, 107})
+                            .reshape(2, 3, 2);
+            Assert.assertEquals(getEllipsis, expected);
+
+            getEllipsis = original.get("1,...,2,3:5:2");
+            expected = manager.create(new int[] {73, 93, 113}).reshape(3, 1);
+            Assert.assertEquals(getEllipsis, expected);
+
+            getEllipsis = original.get("...");
+            Assert.assertEquals(getEllipsis, original);
+
+            // get from boolean array
+            original = manager.arange(10).reshape(2, 5);
+            NDArray bool = manager.create(new boolean[] {true, false});
+            expected = manager.arange(5).reshape(1, 5);
+            Assert.assertEquals(original.get(bool), expected);
+
+            // get from int array
+            original = manager.arange(1, 7f).reshape(-1, 3);
+            NDArray index = manager.create(new long[] {0, 4, 1, 2}, new Shape(2, 2));
+            NDArray actual = original.get(index);
+            expected = manager.create(new float[] {1, 5, 2, 3}, new Shape(2, 2));
+            Assert.assertEquals(actual, expected);
         }
     }
 
