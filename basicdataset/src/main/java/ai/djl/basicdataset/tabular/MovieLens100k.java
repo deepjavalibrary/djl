@@ -332,7 +332,7 @@ public final class MovieLens100k extends CsvDataset {
                 featureArray.forEach(feature -> addFeature(feature));
             }
             if (labels.isEmpty()) {
-                addNumericLabel("rating");
+                addCategoricalLabel("rating", true);
             }
             return new MovieLens100k(this);
         }

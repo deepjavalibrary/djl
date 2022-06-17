@@ -66,12 +66,13 @@ public class MovieLens100kTest {
             Assert.assertEquals(
                     data.head().toFloatArray(),
                     new float[] {
-                        23.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                        23.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
                         0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-                        0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                        0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
                         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
                     });
-            Assert.assertEquals(labels.head().toFloatArray(), new float[] {5.0f});
+            Assert.assertEquals(
+                    labels.head().toFloatArray(), new float[] {0.0f, 0.0f, 0.0f, 0.0f, 1.0f});
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Batch batch = trainer.iterateDataset(movieLens100k).iterator().next();
