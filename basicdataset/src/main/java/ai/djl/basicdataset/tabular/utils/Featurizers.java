@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** A utility class provides helper functions to create {@link Featurizer}. */
@@ -170,7 +171,8 @@ public final class Featurizers {
         @Override
         public void prepare(List<String> inputs) {
             map = new ConcurrentHashMap<>();
-            for (String input : inputs) {
+            TreeSet<String> uniqueInputs = new TreeSet<>(inputs);
+            for (String input : uniqueInputs) {
                 if (!map.containsKey(input)) {
                     map.put(input, map.size());
                 }
