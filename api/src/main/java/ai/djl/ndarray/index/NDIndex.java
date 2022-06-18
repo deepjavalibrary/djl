@@ -191,9 +191,10 @@ public class NDIndex {
      * @param indices the indices to add similar to {@link #NDIndex(String, Object...)}
      * @param args arguments to replace the variable "{}" in the indices string. Can be an integer,
      *     long, boolean {@link NDArray}, or integer {@link NDArray}.
+     * @return the updated {@link NDIndex}
      * @see #NDIndex(String, Object...)
      */
-    public final void addIndices(String indices, Object... args) {
+    public final NDIndex addIndices(String indices, Object... args) {
         String[] indexItems = indices.split(",");
         rank += indexItems.length;
         int argIndex = 0;
@@ -215,6 +216,7 @@ public class NDIndex {
         if (argIndex != args.length) {
             throw new IllegalArgumentException("Incorrect number of index arguments");
         }
+        return this;
     }
 
     /**

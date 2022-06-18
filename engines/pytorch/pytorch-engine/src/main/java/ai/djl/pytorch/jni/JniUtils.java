@@ -15,7 +15,13 @@ package ai.djl.pytorch.jni;
 import ai.djl.Device;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.index.NDIndex;
-import ai.djl.ndarray.index.dim.*;
+import ai.djl.ndarray.index.dim.NDIndexAll;
+import ai.djl.ndarray.index.dim.NDIndexBooleans;
+import ai.djl.ndarray.index.dim.NDIndexElement;
+import ai.djl.ndarray.index.dim.NDIndexFixed;
+import ai.djl.ndarray.index.dim.NDIndexNone;
+import ai.djl.ndarray.index.dim.NDIndexPick;
+import ai.djl.ndarray.index.dim.NDIndexSlice;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -37,6 +43,8 @@ import java.nio.ByteOrder;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 /**
