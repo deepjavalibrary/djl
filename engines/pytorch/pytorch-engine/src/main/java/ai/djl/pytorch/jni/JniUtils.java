@@ -22,6 +22,8 @@ import ai.djl.ndarray.index.dim.NDIndexFixed;
 import ai.djl.ndarray.index.dim.NDIndexNone;
 import ai.djl.ndarray.index.dim.NDIndexPick;
 import ai.djl.ndarray.index.dim.NDIndexSlice;
+import ai.djl.ndarray.index.dim.NDIndexTake;
+import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -381,9 +383,20 @@ public final class JniUtils {
             } else if (elem instanceof NDIndexBooleans) {
                 PtNDArray index_arr = (PtNDArray) ((NDIndexBooleans) elem).getIndex();
                 PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, index_arr.getHandle());
-            } else if (elem instanceof NDIndexPick) {
-                PtNDArray index_arr = (PtNDArray) ((NDIndexPick) elem).getIndex();
+            } else if (elem instanceof NDIndexTake) {
+                PtNDArray index_arr = (PtNDArray) ((NDIndexTake) elem).getIndex();
+                if (index_arr.getDataType() != DataType.INT64) {
+                    index_arr = index_arr.toType(DataType.INT64, true);
+                }
                 PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, index_arr.getHandle());
+            } else if (elem instanceof NDIndexPick) {
+                //noinspection OptionalGetWithoutIsPresent
+                NDIndexFullPick fullPick =
+                        NDIndexFullPick.fromIndex(index, ndArray.getShape()).get();
+                return pick(
+                        ndArray,
+                        ndArray.getManager().from(fullPick.getIndices()),
+                        fullPick.getAxis());
             }
         }
         if (indices.size() == index.getEllipsisIndex()) {
