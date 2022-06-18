@@ -608,7 +608,7 @@ final class PyTorchLibrary {
     native void torchIndexAppendNoneEllipsis(long torchIndexHandle, boolean is_ellipsis);
 
     native void torchIndexAppendSlice(
-            long torchIndexHandle, long min, long max, long step, int null_slice_bin);
+            long torchIndexHandle, long min, long max, long step, int null_slice_binary);
 
     native void torchIndexAppendFixed(long torchIndexHandle, long idx);
 
