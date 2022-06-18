@@ -152,16 +152,16 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendNo
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendSlice(JNIEnv* env, jobject jthis,
-    jlong jtorch_index_handle, jlong jmin, jlong jmax, jlong jstep, jint jnull_slice_bin) {
+    jlong jtorch_index_handle, jlong jmin, jlong jmax, jlong jstep, jint jnull_slice_binary) {
   API_BEGIN()
   auto* index_ptr = reinterpret_cast<std::vector<at::indexing::TensorIndex> *>(jtorch_index_handle);
-  if (jnull_slice_bin == 0) {
+  if (jnull_slice_binary == 0) {
       index_ptr->emplace_back(torch::indexing::Slice(jmin, jmax, jstep));
-  } else if (jnull_slice_bin == 1) {
+  } else if (jnull_slice_binary == 1) {
       index_ptr->emplace_back(torch::indexing::Slice(jmin, torch::indexing::None, jstep));
-  } else if (jnull_slice_bin == 2) {
+  } else if (jnull_slice_binary == 2) {
       index_ptr->emplace_back(torch::indexing::Slice(torch::indexing::None, jmax, jstep));
-  } else if (jnull_slice_bin == 3) {
+  } else if (jnull_slice_binary == 3) {
       index_ptr->emplace_back(torch::indexing::Slice(torch::indexing::None, torch::indexing::None, jstep));
   }
   API_END()
