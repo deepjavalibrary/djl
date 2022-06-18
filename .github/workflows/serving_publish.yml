@@ -58,9 +58,17 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - name: Publish deb
+      - name: Publish snapshot deb
+        if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
         run: |
-          cd serving
-          ./gradlew createDeb -P${{ github.event.inputs.mode }}
-          aws s3 cp build/distributions/*.deb s3://djl-ai/publish/djl-serving/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/*"
+          ./gradlew :serving:createDeb -Psnapshot
+          DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
+          aws s3 cp serving/build/distributions/*.deb s3://djl-ai/publish/djl-serving/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/djl-serving_${DJL_VERSION}~SNAPSHOT*"
+      - name: Publish release deb
+        if: ${{ github.event.inputs.mode == 'staging' }}
+        run: |
+          ./gradlew :serving:createDeb -Pstaging
+          DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
+          aws s3 cp serving/build/distributions/*.deb s3://djl-ai/publish/djl-serving/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/djl-serving_${DJL_VERSION}*"
