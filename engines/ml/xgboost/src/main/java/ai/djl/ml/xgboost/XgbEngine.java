@@ -19,10 +19,12 @@ import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
+
+import ml.dmlc.xgboost4j.java.JniUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import ml.dmlc.xgboost4j.java.JniUtils;
 
 /**
  * The {@code XgbEngine} is an implementation of the {@link Engine} based on the <a

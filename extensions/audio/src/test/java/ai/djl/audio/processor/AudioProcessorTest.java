@@ -21,12 +21,14 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
+
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class AudioProcessorTest {
 

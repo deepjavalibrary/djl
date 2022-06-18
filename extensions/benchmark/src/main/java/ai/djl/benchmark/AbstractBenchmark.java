@@ -29,15 +29,17 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
-import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.time.Duration;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.FloatBuffer;
+import java.time.Duration;
 
 /** Abstract benchmark class. */
 public abstract class AbstractBenchmark {

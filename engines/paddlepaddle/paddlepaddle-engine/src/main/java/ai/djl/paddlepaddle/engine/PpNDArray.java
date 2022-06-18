@@ -18,7 +18,9 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.paddlepaddle.jni.JniUtils;
+
 import com.sun.jna.Pointer;
+
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicReference;
 

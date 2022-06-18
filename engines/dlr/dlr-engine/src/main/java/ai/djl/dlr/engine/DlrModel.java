@@ -19,6 +19,7 @@ import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.Translator;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;

@@ -26,6 +26,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.util.Preconditions;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -325,7 +326,8 @@ class MxNDArrayEx implements NDArrayEx {
             float normType, Shape kernelShape, Shape stride, Shape padding, boolean ceilMode) {
         if (((int) normType) != normType) {
             throw new IllegalArgumentException(
-                    "float type of normType is not supported in MXNet engine, please use integer instead");
+                    "float type of normType is not supported in MXNet engine, please use integer"
+                            + " instead");
         }
         MxOpParams params = new MxOpParams();
         params.addParam("p_value", (int) normType);
@@ -343,7 +345,8 @@ class MxNDArrayEx implements NDArrayEx {
     public NDArray globalLpPool(float normType) {
         if (((int) normType) != normType) {
             throw new IllegalArgumentException(
-                    "float type of normType is not supported in MXNet engine, please use integer instead");
+                    "float type of normType is not supported in MXNet engine, please use integer"
+                            + " instead");
         }
         MxOpParams params = new MxOpParams();
         params.add("pool_type", "lp");
@@ -686,7 +689,8 @@ class MxNDArrayEx implements NDArrayEx {
 
         if (training != JnaUtils.autogradIsTraining()) {
             throw new IllegalArgumentException(
-                    "the mode of batchNorm in MXNet should align with the mode of GradientCollector");
+                    "the mode of batchNorm in MXNet should align with the mode of"
+                            + " GradientCollector");
         }
 
         return getManager()

@@ -351,8 +351,9 @@ public final class Tensor {
 
             throw new IllegalArgumentException(
                     String.format(
-                            "Cannot convert between a TensorFlowLite tensor with type %s and a Java "
-                                    + "object of type %s (which is compatible with the TensorFlowLite type %s).",
+                            "Cannot convert between a TensorFlowLite tensor with type %s and a Java"
+                                + " object of type %s (which is compatible with the TensorFlowLite"
+                                + " type %s).",
                             dtype, o.getClass().getName(), oType));
         }
     }
@@ -381,8 +382,8 @@ public final class Tensor {
         if (!Arrays.equals(srcShape, shapeCopy)) {
             throw new IllegalArgumentException(
                     String.format(
-                            "Cannot copy to a TensorFlowLite tensor (%s) with shape %s from a Java object "
-                                    + "with shape %s.",
+                            "Cannot copy to a TensorFlowLite tensor (%s) with shape %s from a Java"
+                                    + " object with shape %s.",
                             name(), Arrays.toString(shapeCopy), Arrays.toString(srcShape)));
         }
     }
@@ -411,8 +412,8 @@ public final class Tensor {
         if (!Arrays.equals(dstShape, shapeCopy)) {
             throw new IllegalArgumentException(
                     String.format(
-                            "Cannot copy from a TensorFlowLite tensor (%s) with shape %s to a Java object "
-                                    + "with shape %s.",
+                            "Cannot copy from a TensorFlowLite tensor (%s) with shape %s to a Java"
+                                    + " object with shape %s.",
                             name(), Arrays.toString(shapeCopy), Arrays.toString(dstShape)));
         }
     }

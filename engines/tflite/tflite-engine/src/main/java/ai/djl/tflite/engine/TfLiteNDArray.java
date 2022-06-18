@@ -17,10 +17,12 @@ import ai.djl.ndarray.NDArrayAdapter;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+
+import org.tensorflow.lite.Tensor;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.UUID;
-import org.tensorflow.lite.Tensor;
 
 /** {@code TfLiteNDArray} is the TFLite implementation of {@link NDArray}. */
 public class TfLiteNDArray extends NDArrayAdapter {

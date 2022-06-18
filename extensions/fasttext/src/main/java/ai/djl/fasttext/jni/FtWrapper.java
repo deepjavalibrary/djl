@@ -14,6 +14,7 @@ package ai.djl.fasttext.jni;
 
 import ai.djl.modality.Classifications;
 import ai.djl.util.NativeResource;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -270,7 +270,6 @@
         <module name="ImportControl">
             <property name="file" value="${checkstyle.importcontrol.file}"/>
         </module>
-        -->
         <module name="ImportOrder">
             <property name="option" value="under"/>
             <property name="groups" value=""/>
@@ -278,6 +277,7 @@
             <property name="separated" value="true"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
         </module>
+        -->
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
 

@@ -15,6 +15,10 @@ package ai.djl.repository;
 import ai.djl.Application;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,8 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@code SimpleUrlRepository} is a {@link Repository} contains an archive file from a HTTP URL.

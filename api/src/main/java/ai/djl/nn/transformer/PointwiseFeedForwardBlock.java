@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
+
 import java.util.List;
 import java.util.function.Function;
 

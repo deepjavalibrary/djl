@@ -17,9 +17,11 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import java.nio.charset.StandardCharsets;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.nio.charset.StandardCharsets;
 
 public class InputOutputTest {
 

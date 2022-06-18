@@ -25,6 +25,10 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.testing.TestRequirements;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -34,8 +38,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class OpenCVImageFactoryTest {
 

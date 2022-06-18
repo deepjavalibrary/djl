@@ -26,14 +26,16 @@ import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class TfSsdTest {
 
@@ -70,8 +72,7 @@ public class TfSsdTest {
 
             DetectedObjects result = predictor.predict(img);
             List<String> classes =
-                    result.items()
-                            .stream()
+                    result.items().stream()
                             .map(Classifications.Classification::getClassName)
                             .collect(Collectors.toList());
             Assert.assertTrue(classes.contains("Dog"));

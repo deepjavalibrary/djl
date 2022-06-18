@@ -14,6 +14,7 @@ package ai.djl.modality.nlp.bert;
 
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
+
 import java.util.ArrayList;
 import java.util.List;
 

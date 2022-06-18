@@ -17,6 +17,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
 import ai.djl.translate.ArgumentsUtil;
+
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +37,7 @@ public class ResnetBlockFactory implements BlockFactory {
         Shape shape =
                 new Shape(
                         ((List<Double>) arguments.get("imageShape"))
-                                .stream()
-                                .mapToLong(Double::longValue)
-                                .toArray());
+                                .stream().mapToLong(Double::longValue).toArray());
         ResNetV1.Builder blockBuilder =
                 ResNetV1.builder().setNumLayers(numLayers).setOutSize(outSize).setImageShape(shape);
         if (arguments.containsKey("batchNormMomentum")) {

@@ -25,13 +25,15 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
+
+import org.testng.Assert;
+import org.testng.SkipException;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.testng.Assert;
-import org.testng.SkipException;
-import org.testng.annotations.Test;
 
 public class OrtTest {
 

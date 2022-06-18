@@ -32,6 +32,7 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.Batchifier;
 import ai.djl.util.PairList;
+
 import org.testng.annotations.Test;
 
 public class SqueezenetTest {

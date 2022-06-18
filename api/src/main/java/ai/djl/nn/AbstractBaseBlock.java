@@ -21,6 +21,7 @@ import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -147,9 +148,7 @@ public abstract class AbstractBaseBlock implements Block {
     @Override
     public void setInitializer(Initializer initializer, String paramName) {
         Parameter parameter =
-                getDirectParameters()
-                        .values()
-                        .stream()
+                getDirectParameters().values().stream()
                         .filter(p -> p.getName().equals(paramName))
                         .findFirst()
                         .orElseThrow(

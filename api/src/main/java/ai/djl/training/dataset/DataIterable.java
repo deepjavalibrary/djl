@@ -17,6 +17,10 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -28,8 +32,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * DataIterable is a data loader that combines {@link Dataset}, {@link Batchifier}, {@link

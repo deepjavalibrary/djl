@@ -18,6 +18,7 @@ import ai.djl.ndarray.index.dim.NDIndexBooleans;
 import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
+
 import java.util.List;
 import java.util.Optional;
 

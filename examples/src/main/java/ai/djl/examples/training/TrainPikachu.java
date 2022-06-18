@@ -46,6 +46,7 @@ import ai.djl.training.loss.SingleShotDetectionLoss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

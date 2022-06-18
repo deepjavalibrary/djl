@@ -21,9 +21,11 @@ import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.training.dataset.SequenceSampler;
 import ai.djl.translate.TranslateException;
-import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class RandomAccessDatasetTest {
 

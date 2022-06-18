@@ -13,13 +13,15 @@
 package ai.djl.mxnet.jnarator;
 
 import ai.djl.mxnet.jnarator.parser.CParser;
+
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class DataType {
 

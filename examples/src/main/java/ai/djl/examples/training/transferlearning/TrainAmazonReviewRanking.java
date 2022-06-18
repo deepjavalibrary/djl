@@ -50,11 +50,13 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.PaddingStackBatchifier;
 import ai.djl.translate.TranslateException;
+
+import org.apache.commons.csv.CSVFormat;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
-import org.apache.commons.csv.CSVFormat;
 
 public final class TrainAmazonReviewRanking {
 

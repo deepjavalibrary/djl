@@ -22,6 +22,10 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Pair;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -41,10 +45,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** A {@link TranslatorFactory} that creates an generic {@link Translator}. */
 public class ServingTranslatorFactory implements TranslatorFactory {

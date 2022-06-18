@@ -29,6 +29,11 @@ import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.cuda.CudaUtils;
+
+import org.testng.Assert;
+import org.testng.SkipException;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
@@ -36,9 +41,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.testng.Assert;
-import org.testng.SkipException;
-import org.testng.annotations.Test;
 
 public class TrtTest {
 

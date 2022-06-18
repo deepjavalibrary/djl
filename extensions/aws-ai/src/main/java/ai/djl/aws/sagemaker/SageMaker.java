@@ -15,25 +15,16 @@ package ai.djl.aws.sagemaker;
 import ai.djl.Model;
 import ai.djl.util.RandomUtils;
 import ai.djl.util.Utils;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Objects;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
@@ -77,6 +68,19 @@ import software.amazon.awssdk.services.sagemakerruntime.SageMakerRuntimeClient;
 import software.amazon.awssdk.services.sagemakerruntime.model.InvokeEndpointRequest;
 import software.amazon.awssdk.services.sagemakerruntime.model.InvokeEndpointResponse;
 import software.amazon.awssdk.services.sts.StsClient;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
 
 /** A utility class that help deploy model to SageMaker. */
 public final class SageMaker {

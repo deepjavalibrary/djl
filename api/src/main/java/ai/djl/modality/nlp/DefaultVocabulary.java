@@ -13,6 +13,7 @@
 package ai.djl.modality.nlp;
 
 import ai.djl.util.Utils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -121,8 +122,7 @@ public class DefaultVocabulary implements Vocabulary {
 
         // Prune number of tokens to maxSize
         if (maxSize > 0 && tokens.size() > maxSize) {
-            tokens.entrySet()
-                    .stream()
+            tokens.entrySet().stream()
                     .sorted(
                             Map.Entry.comparingByValue(
                                     Comparator.comparingInt(
@@ -155,8 +155,7 @@ public class DefaultVocabulary implements Vocabulary {
      */
     private void initializeIndexToTokenReplacingIndices() {
         indexToToken =
-                tokens.entrySet()
-                        .stream()
+                tokens.entrySet().stream()
                         .sorted(Comparator.comparingLong(token -> token.getValue().index))
                         .map(Entry::getKey)
                         .collect(Collectors.toList());
@@ -192,7 +191,8 @@ public class DefaultVocabulary implements Vocabulary {
         }
 
         throw new IllegalStateException(
-                "Unexpected token in getIndex. Define an unknownToken for the vocabulary to enable support for unknown tokens.");
+                "Unexpected token in getIndex. Define an unknownToken for the vocabulary to enable"
+                        + " support for unknown tokens.");
     }
 
     /** {@inheritDoc} */
@@ -355,7 +355,8 @@ public class DefaultVocabulary implements Vocabulary {
         public DefaultVocabulary build() {
             if (maxTokens > 0 && maxTokens < reservedTokens.size()) {
                 throw new IllegalArgumentException(
-                        "The vocabulary maxTokens can not be smaller than the number of reserved tokens");
+                        "The vocabulary maxTokens can not be smaller than the number of reserved"
+                                + " tokens");
             }
             return new DefaultVocabulary(this);
         }

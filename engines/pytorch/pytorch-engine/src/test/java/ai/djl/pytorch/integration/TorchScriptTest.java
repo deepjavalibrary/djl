@@ -26,14 +26,16 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /** The file is for integration test for special TorchScript input. */
 public class TorchScriptTest {

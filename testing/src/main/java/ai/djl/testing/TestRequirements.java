@@ -13,9 +13,11 @@
 package ai.djl.testing;
 
 import ai.djl.engine.Engine;
+
+import org.testng.SkipException;
+
 import java.util.Arrays;
 import java.util.Calendar;
-import org.testng.SkipException;
 
 /**
  * This utility class is used to define test requirements.

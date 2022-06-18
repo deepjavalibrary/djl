@@ -13,6 +13,7 @@
 package ai.djl.ndarray;
 
 import ai.djl.ndarray.types.Shape;
+
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -57,7 +58,8 @@ public final class NDUtils {
         for (int i = 1; i < arrays.length; i++) {
             if (arrays[i].getShape().dimension() != dimension) {
                 throw new IllegalArgumentException(
-                        "all the input arrays must have same number of dimensions, but the array at index 0 has "
+                        "all the input arrays must have same number of dimensions, but the array at"
+                                + " index 0 has "
                                 + dimension
                                 + " dimension(s) and the array at index "
                                 + i

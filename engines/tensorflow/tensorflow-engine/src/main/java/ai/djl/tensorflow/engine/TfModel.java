@@ -19,7 +19,12 @@ import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Block;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
+
 import com.google.protobuf.InvalidProtocolBufferException;
+
+import org.tensorflow.proto.framework.ConfigProto;
+import org.tensorflow.proto.framework.RunOptions;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import org.tensorflow.proto.framework.ConfigProto;
-import org.tensorflow.proto.framework.RunOptions;
 
 /** {@code TfModel} is the TensorFlow implementation of {@link Model}. */
 public class TfModel extends BaseModel {

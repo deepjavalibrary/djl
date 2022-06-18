@@ -17,6 +17,7 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;

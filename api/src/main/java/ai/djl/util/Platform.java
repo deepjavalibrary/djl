@@ -13,6 +13,7 @@
 package ai.djl.util;
 
 import ai.djl.util.cuda.CudaUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

@@ -18,6 +18,10 @@ import ai.djl.metric.Metrics;
 import ai.djl.metric.Unit;
 import ai.djl.training.Trainer;
 import ai.djl.util.cuda.CudaUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,8 +37,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@link TrainingListener} that collects the memory usage information.

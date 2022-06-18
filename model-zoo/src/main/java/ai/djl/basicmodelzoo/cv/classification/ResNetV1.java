@@ -23,6 +23,7 @@ import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.pooling.Pool;
+
 import java.util.Arrays;
 
 /**

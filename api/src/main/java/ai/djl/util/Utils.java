@@ -14,6 +14,9 @@ package ai.djl.util;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.nn.Parameter;
+
+import org.slf4j.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,7 +36,6 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
 
 /** A class containing utility methods. */
 public final class Utils {

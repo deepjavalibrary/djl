@@ -24,8 +24,10 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.util.NativeResource;
+
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;

@@ -30,11 +30,13 @@ import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /** The file is for testing PyTorch Profiler functionalities. */
 public class ProfilerTest {

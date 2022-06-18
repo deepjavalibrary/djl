@@ -14,6 +14,7 @@ package ai.djl.testing;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+
 import org.testng.Assert;
 
 public final class Assertions {

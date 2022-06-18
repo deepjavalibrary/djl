@@ -13,6 +13,11 @@
 package ai.djl.basicdataset.tabular;
 
 import ai.djl.util.Progress;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,9 +30,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 
 /** {@code CsvDataset} represents the dataset that stored in a .csv file. */
 public class CsvDataset extends TabularDataset {

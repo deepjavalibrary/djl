@@ -25,10 +25,12 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.initializer.NormalInitializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
-import java.io.IOException;
-import java.util.Iterator;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Iterator;
 
 public class PikachuTest {
 

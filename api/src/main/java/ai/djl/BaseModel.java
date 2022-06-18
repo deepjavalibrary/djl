@@ -27,6 +27,10 @@ import ai.djl.translate.Translator;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -46,8 +50,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** {@code BaseModel} is the basic implementation of {@link Model}. */
 public abstract class BaseModel implements Model {

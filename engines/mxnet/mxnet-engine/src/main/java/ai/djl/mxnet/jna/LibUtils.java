@@ -15,8 +15,13 @@ package ai.djl.mxnet.jna;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
+
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +37,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for finding the MXNet Engine binary on the System.

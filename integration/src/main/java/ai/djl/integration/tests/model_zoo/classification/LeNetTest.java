@@ -33,10 +33,12 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.Batchifier;
 import ai.djl.util.PairList;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class LeNetTest {
 

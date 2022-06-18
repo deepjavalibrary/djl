@@ -37,7 +37,14 @@ import ai.djl.translate.Translator;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
+
 import com.google.gson.reflect.TypeToken;
+
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,10 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class CustomTranslatorTest {
 

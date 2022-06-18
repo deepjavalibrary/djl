@@ -21,12 +21,14 @@ import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.testing.TestRequirements;
 import ai.djl.util.Utils;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.List;
+
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class ModelZooTest {
 

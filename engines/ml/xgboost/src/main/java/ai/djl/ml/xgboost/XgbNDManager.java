@@ -21,14 +21,17 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.util.JsonUtils;
+
 import com.google.gson.JsonArray;
+
+import ml.dmlc.xgboost4j.java.ColumnBatch;
+import ml.dmlc.xgboost4j.java.JniUtils;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
-import ml.dmlc.xgboost4j.java.ColumnBatch;
-import ml.dmlc.xgboost4j.java.JniUtils;
 
 /** {@code XgbNDManager} is the XGBoost implementation of {@link NDManager}. */
 public class XgbNDManager extends BaseNDManager {

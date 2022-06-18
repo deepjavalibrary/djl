@@ -21,13 +21,9 @@ import ai.djl.tensorflow.engine.SavedModelBundle;
 import ai.djl.tensorflow.engine.TfDataType;
 import ai.djl.util.Pair;
 import ai.djl.util.cuda.CudaUtils;
+
 import com.google.protobuf.InvalidProtocolBufferException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.Loader;
 import org.bytedeco.javacpp.Pointer;
@@ -55,6 +51,13 @@ import org.tensorflow.proto.framework.ConfigProto;
 import org.tensorflow.proto.framework.GPUOptions;
 import org.tensorflow.proto.framework.MetaGraphDef;
 import org.tensorflow.proto.framework.RunOptions;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** A class containing utilities to interact with the TensorFlow Engine's Javacpp layer. */
 public final class JavacppUtils {

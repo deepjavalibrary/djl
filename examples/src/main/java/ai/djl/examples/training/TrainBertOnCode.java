@@ -36,6 +36,7 @@ import ai.djl.training.tracker.Tracker;
 import ai.djl.training.tracker.WarmUpTracker;
 import ai.djl.training.tracker.WarmUpTracker.Mode;
 import ai.djl.translate.TranslateException;
+
 import java.io.IOException;
 
 /** Simple example that performs Bert pretraining on the java source files in this repo. */

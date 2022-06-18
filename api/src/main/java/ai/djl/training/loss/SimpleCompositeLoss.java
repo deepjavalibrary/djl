@@ -14,6 +14,7 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDList;
 import ai.djl.util.Pair;
+
 import java.util.ArrayList;
 
 /**

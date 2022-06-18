@@ -13,14 +13,16 @@
 package ai.djl.modality.cv;
 
 import ai.djl.ndarray.NDArray;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@code ImageFactory} contains image creation mechanism on top of different platforms like PC and

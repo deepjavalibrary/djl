@@ -19,6 +19,7 @@ import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
+
 import org.testng.Assert;
 
 public final class TestUtils {

@@ -17,6 +17,7 @@ import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
+
 import java.util.Locale;
 import java.util.Map;
 

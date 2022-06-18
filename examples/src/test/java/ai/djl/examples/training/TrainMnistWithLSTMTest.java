@@ -15,9 +15,11 @@ package ai.djl.examples.training;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
-import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class TrainMnistWithLSTMTest {
 

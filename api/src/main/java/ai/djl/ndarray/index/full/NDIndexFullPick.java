@@ -18,6 +18,7 @@ import ai.djl.ndarray.index.dim.NDIndexAll;
 import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.dim.NDIndexPick;
 import ai.djl.ndarray.types.Shape;
+
 import java.util.Optional;
 
 /** A simplified representation of a pick-based {@link NDIndex}. */

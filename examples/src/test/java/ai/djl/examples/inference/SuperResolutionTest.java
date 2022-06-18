@@ -18,12 +18,14 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class SuperResolutionTest {
 

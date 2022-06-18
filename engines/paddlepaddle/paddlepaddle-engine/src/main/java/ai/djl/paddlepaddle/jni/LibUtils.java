@@ -15,6 +15,10 @@ package ai.djl.paddlepaddle.jni;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for finding the Paddle Engine binary on the System.

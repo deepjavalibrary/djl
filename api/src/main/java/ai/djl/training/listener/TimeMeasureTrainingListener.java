@@ -15,6 +15,10 @@ package ai.djl.training.listener;
 import ai.djl.metric.Metric;
 import ai.djl.metric.Metrics;
 import ai.djl.training.Trainer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,8 +26,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@link TrainingListener} that outputs the training time metrics after training is done.

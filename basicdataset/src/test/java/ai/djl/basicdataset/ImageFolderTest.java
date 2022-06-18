@@ -30,13 +30,15 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class ImageFolderTest {
 

@@ -19,16 +19,18 @@ import ai.djl.audio.processor.LinearSpecgram;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.LocalRepository;
-import java.nio.Buffer;
-import java.nio.ShortBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.Buffer;
+import java.nio.ShortBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * {@link AudioData} is a utility for managing audio data within a {@link

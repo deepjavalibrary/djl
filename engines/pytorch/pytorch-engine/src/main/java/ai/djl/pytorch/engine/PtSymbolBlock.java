@@ -26,14 +26,16 @@ import ai.djl.pytorch.jni.IValueUtils;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@code PtSymbolBlock} is the PyTorch implementation of {@link SymbolBlock}.

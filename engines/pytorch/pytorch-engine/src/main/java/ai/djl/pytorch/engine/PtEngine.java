@@ -22,12 +22,14 @@ import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
 import ai.djl.training.GradientCollector;
 import ai.djl.util.RandomUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@code PtEngine} is an implementation of the {@link Engine} based on the <a

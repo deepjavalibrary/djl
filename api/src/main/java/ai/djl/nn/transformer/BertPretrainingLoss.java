@@ -15,6 +15,7 @@ package ai.djl.nn.transformer;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.loss.AbstractCompositeLoss;
 import ai.djl.util.Pair;
+
 import java.util.Arrays;
 
 /** Loss that combines the next sentence and masked language losses of bert pretraining. */

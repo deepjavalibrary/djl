@@ -19,10 +19,12 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+
+import org.tensorflow.lite.Tensor;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import org.tensorflow.lite.Tensor;
 
 /** {@code TfLiteNDManager} is the TFLite implementation of {@link NDManager}. */
 public class TfLiteNDManager extends BaseNDManager {

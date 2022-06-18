@@ -18,6 +18,7 @@ import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.dim.NDIndexFixed;
 import ai.djl.ndarray.index.dim.NDIndexSlice;
 import ai.djl.ndarray.types.Shape;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

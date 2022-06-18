@@ -28,9 +28,11 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
+
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.util.List;
-import org.testng.annotations.Test;
 
 public class OCRTest {
 

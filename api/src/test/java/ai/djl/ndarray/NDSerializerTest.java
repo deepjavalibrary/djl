@@ -15,13 +15,15 @@ package ai.djl.ndarray;
 import ai.djl.Device;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.util.Float16Utils;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class NDSerializerTest {
 

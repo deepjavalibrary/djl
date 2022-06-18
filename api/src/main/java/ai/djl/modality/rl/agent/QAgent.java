@@ -21,6 +21,7 @@ import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.listener.TrainingListener.BatchData;
 import ai.djl.translate.Batchifier;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

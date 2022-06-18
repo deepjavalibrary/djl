@@ -20,6 +20,10 @@ import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,8 +35,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A dataset for loading image files stored in a folder structure.

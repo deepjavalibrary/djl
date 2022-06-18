@@ -12,9 +12,10 @@
  */
 package ai.djl.modality.nlp.preprocess;
 
-import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.List;
 
 // We need to test specific unicode char changes - however some editors tend
 // to perform unicode normalization while saving, copy-pasting etc.

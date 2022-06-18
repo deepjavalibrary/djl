@@ -23,9 +23,11 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.training.ParameterStore;
-import java.util.Arrays;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.Arrays;
 
 public class SimpleTextEncoderTest {
 

@@ -16,6 +16,7 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.TranslatorContext;
+
 import java.util.List;
 import java.util.Map;
 

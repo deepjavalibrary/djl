@@ -16,9 +16,11 @@ package ai.djl.pytorch.integration;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import java.util.Arrays;
+
 import org.testng.SkipException;
 import org.testng.annotations.Test;
+
+import java.util.Arrays;
 
 /** The file is for testing PyTorch MKLDNN functionalities. */
 public class MkldnnTest {

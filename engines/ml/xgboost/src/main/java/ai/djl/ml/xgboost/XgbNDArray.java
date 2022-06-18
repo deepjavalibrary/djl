@@ -18,10 +18,12 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+
+import ml.dmlc.xgboost4j.java.JniUtils;
+
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
-import ml.dmlc.xgboost4j.java.JniUtils;
 
 /** {@code XgbNDArray} is the XGBoost implementation of {@link NDArray}. */
 public class XgbNDArray extends NDArrayAdapter {

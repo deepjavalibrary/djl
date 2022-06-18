@@ -19,9 +19,11 @@ import ai.djl.examples.training.transferlearning.TrainResnetWithCifar10;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
-import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class TrainResNetTest {
     private static final int SEED = 1234;

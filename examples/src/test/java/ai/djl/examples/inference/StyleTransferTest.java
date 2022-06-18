@@ -18,10 +18,12 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
-import java.io.IOException;
-import java.nio.file.Paths;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.nio.file.Paths;
 
 public class StyleTransferTest {
 

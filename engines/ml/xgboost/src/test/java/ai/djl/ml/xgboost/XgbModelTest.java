@@ -27,14 +27,16 @@ import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
+
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class XgbModelTest {
 

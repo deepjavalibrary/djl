@@ -19,6 +19,7 @@ import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.jni.JniUtils;
+
 import java.util.Stack;
 
 /** The {@link NDArrayIndexer} used by the {@link PtNDArray}. */

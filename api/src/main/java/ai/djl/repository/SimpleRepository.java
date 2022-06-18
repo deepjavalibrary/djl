@@ -16,6 +16,10 @@ import ai.djl.Application;
 import ai.djl.repository.Artifact.Item;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +31,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@code SimpleRepository} is a {@link Repository} containing only a single artifact without

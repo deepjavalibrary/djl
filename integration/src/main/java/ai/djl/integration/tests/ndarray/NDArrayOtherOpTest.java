@@ -24,9 +24,11 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
 import ai.djl.training.GradientCollector;
 import ai.djl.util.Hex;
-import java.nio.FloatBuffer;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.nio.FloatBuffer;
 
 public class NDArrayOtherOpTest {
 

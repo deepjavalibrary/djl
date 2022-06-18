@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Utils;
+
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Locale;
@@ -29,9 +30,7 @@ public abstract class NDFormat {
     private static final String LF = System.getProperty("line.separator");
     private static final Pattern PATTERN = Pattern.compile("\\s*\\d\\.(\\d*?)0*e[+-](\\d+)");
     private static final boolean DEBUG =
-            ManagementFactory.getRuntimeMXBean()
-                    .getInputArguments()
-                    .stream()
+            ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
                     .anyMatch(arg -> arg.startsWith("-agentlib:jdwp"));
 
     /**

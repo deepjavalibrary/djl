@@ -24,6 +24,7 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.pooling.Pool;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

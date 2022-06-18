@@ -19,6 +19,10 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Float16Utils;
 import ai.djl.util.PairList;
 import ai.djl.util.RandomUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -31,8 +35,6 @@ import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** {@code BaseNDManager} is the default implementation of {@link NDManager}. */
 public abstract class BaseNDManager implements NDManager {
@@ -411,7 +413,8 @@ public abstract class BaseNDManager implements NDManager {
         }
         if (remaining > expectedSize) {
             logger.warn(
-                    "Input buffer size is greater than the NDArray size, please set limit explicitly.");
+                    "Input buffer size is greater than the NDArray size, please set limit"
+                            + " explicitly.");
             buffer.limit(expectedSize);
         }
     }

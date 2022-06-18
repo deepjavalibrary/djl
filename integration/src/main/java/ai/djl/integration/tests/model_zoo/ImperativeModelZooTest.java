@@ -28,9 +28,11 @@ import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
-import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class ImperativeModelZooTest {
 

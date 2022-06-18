@@ -17,13 +17,7 @@ import ai.djl.engine.Engine;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
@@ -31,6 +25,14 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** A class represents parsed command line arguments. */
 public class Arguments {
@@ -222,7 +224,8 @@ public class Arguments {
                         .hasArg()
                         .argName("NEURON-CORES")
                         .desc(
-                                "Number of neuron cores to run multithreading inference, See https://awsdocs-neuron.readthedocs-hosted.com.")
+                                "Number of neuron cores to run multithreading inference, See"
+                                        + " https://awsdocs-neuron.readthedocs-hosted.com.")
                         .build());
         options.addOptionGroup(deviceGroup);
         options.addOption(

@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
+
 import java.util.Arrays;
 import java.util.List;
 

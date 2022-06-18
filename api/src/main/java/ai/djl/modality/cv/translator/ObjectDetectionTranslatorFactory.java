@@ -18,6 +18,7 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
+
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;

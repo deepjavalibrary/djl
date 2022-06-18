@@ -20,6 +20,7 @@ import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+
 import java.util.Collections;
 
 /** Block to perform the Bert next-sentence-prediction task. */

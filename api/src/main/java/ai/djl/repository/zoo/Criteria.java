@@ -21,6 +21,10 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -29,8 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@code Criteria} class contains search criteria to look up a {@link ZooModel}.

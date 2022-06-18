@@ -13,6 +13,7 @@
 package ai.djl.training.util;
 
 import ai.djl.util.Progress;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

@@ -14,6 +14,7 @@ package ai.djl.modality.rl;
 
 import ai.djl.ndarray.NDList;
 import ai.djl.util.RandomUtils;
+
 import java.util.ArrayList;
 
 /** Contains the available actions that can be taken in an {@link ai.djl.modality.rl.env.RlEnv}. */

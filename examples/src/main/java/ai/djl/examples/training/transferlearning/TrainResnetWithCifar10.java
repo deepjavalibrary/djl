@@ -50,12 +50,14 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An example of training an image classification (ResNet for Cifar10) model.

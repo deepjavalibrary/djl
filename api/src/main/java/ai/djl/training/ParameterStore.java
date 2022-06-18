@@ -17,6 +17,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Parameter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

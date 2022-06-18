@@ -15,6 +15,10 @@ package ai.djl.repository;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.util.ClassLoaderUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -29,8 +33,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class RepositoryFactoryImpl implements RepositoryFactory {
 

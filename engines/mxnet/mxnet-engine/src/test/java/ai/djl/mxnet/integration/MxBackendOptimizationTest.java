@@ -16,6 +16,7 @@ import ai.djl.mxnet.engine.MxNDManager;
 import ai.djl.mxnet.engine.Symbol;
 import ai.djl.ndarray.NDManager;
 import ai.djl.testing.TestRequirements;
+
 import org.testng.annotations.Test;
 
 public class MxBackendOptimizationTest {

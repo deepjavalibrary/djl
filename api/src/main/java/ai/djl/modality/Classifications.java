@@ -16,10 +16,12 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.util.JsonSerializable;
 import ai.djl.util.JsonUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;

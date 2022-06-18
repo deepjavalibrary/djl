@@ -29,6 +29,10 @@ import ai.djl.training.listener.EvaluatorTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +40,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@code Trainer} interface provides a session for model training.
@@ -324,10 +326,7 @@ public class Trainer implements AutoCloseable {
      */
     private void checkGradients() {
         List<NDArray> grads = new ArrayList<>();
-        model.getBlock()
-                .getParameters()
-                .values()
-                .stream()
+        model.getBlock().getParameters().values().stream()
                 .filter(Parameter::requiresGradient)
                 .forEach(
                         param ->

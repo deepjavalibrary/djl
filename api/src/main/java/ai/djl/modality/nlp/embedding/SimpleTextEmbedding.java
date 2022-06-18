@@ -15,6 +15,7 @@ package ai.djl.modality.nlp.embedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
+
 import java.util.ArrayList;
 import java.util.List;
 

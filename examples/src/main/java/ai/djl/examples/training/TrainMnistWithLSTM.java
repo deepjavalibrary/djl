@@ -36,6 +36,7 @@ import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+
 import java.io.IOException;
 
 public final class TrainMnistWithLSTM {

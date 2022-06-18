@@ -25,6 +25,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

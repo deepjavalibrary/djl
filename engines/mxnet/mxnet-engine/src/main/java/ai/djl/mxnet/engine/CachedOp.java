@@ -22,11 +22,14 @@ import ai.djl.training.ParameterStore;
 import ai.djl.util.NativeResource;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
+
 import com.sun.jna.Pointer;
-import java.util.List;
-import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * The {@code CachedOp} is an internal helper that provides the core functionality to execute a

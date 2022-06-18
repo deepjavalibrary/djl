@@ -23,6 +23,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

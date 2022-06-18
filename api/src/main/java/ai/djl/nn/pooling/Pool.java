@@ -17,6 +17,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.util.Preconditions;
+
 import java.util.Objects;
 
 /**

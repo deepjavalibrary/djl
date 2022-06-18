@@ -13,10 +13,11 @@
 
 package ai.djl.tensorflow.engine;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.tensorflow.internal.c_api.TF_Graph;
 import org.tensorflow.internal.c_api.TF_Session;
 import org.tensorflow.proto.framework.MetaGraphDef;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /** The wrapper class for native resources required for SavedModelBundle. */
 public class SavedModelBundle implements AutoCloseable {

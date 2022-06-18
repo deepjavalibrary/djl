@@ -27,9 +27,11 @@ import ai.djl.training.dataset.Record;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
-import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 /*
  * 80 features

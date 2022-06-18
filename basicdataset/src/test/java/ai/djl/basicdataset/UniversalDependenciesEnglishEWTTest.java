@@ -21,11 +21,13 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class UniversalDependenciesEnglishEWTTest {
 

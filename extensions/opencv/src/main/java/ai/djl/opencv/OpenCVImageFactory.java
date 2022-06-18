@@ -19,15 +19,18 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Utils;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
+
 import nu.pattern.OpenCV;
+
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 
 /** {@code OpenCVImageFactory} is a high performance implementation of {@link ImageFactory}. */
 public class OpenCVImageFactory extends ImageFactory {

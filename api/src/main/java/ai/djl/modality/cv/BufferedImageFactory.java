@@ -25,6 +25,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.RandomUtils;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -39,6 +40,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.IntStream;
+
 import javax.imageio.ImageIO;
 
 /** {@code BufferedImageFactory} is the default implementation of {@link ImageFactory}. */

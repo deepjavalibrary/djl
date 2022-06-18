@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+
 import org.jtransforms.fft.FloatFFT_1D;
 
 /** Calculate linear spectrogram by short-time fourier transform. */

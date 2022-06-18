@@ -13,6 +13,7 @@
 package ai.djl.basicdataset.cv;
 
 import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 /** A metadata class to represent the structure of annotations in Coco. */

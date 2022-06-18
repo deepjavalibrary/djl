@@ -26,11 +26,13 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class DlrTest {
 

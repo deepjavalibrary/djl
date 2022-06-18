@@ -21,6 +21,11 @@ import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.training.dataset.Record;
 import ai.djl.util.Progress;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,9 +35,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 
 /**
  * GoEmotions is a corpus of 58k carefully curated comments extracted from Reddit, with human

@@ -14,10 +14,12 @@ package ai.djl.tensorrt.jni;
 
 import ai.djl.Device;
 import ai.djl.ndarray.types.DataType;
-import java.nio.ByteBuffer;
-import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
  * A class containing utilities to interact with the PyTorch Engine's Java Native Interface (JNI)

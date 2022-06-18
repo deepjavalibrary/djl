@@ -24,6 +24,7 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.norm.Dropout;
 import ai.djl.nn.pooling.Pool;
+
 import java.util.Arrays;
 
 /**

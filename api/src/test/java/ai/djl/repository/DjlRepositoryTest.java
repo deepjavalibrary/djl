@@ -18,9 +18,11 @@ import ai.djl.modality.cv.Image;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class DjlRepositoryTest {
 

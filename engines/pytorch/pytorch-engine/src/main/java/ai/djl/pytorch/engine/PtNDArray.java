@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.util.NativeResource;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -1216,7 +1217,8 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         int otherDim = other.getShape().dimension();
         if (selfDim != otherDim || selfDim > 2) {
             throw new UnsupportedOperationException(
-                    "Dimension mismatch or high dimensional dot operation is not supported. Please use .matMul instead.");
+                    "Dimension mismatch or high dimensional dot operation is not supported. Please"
+                            + " use .matMul instead.");
         }
         return JniUtils.dot(this, manager.from(other));
     }

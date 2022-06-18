@@ -31,7 +31,12 @@ import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
+
 import com.google.gson.annotations.SerializedName;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,8 +51,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An example of inference of object detection using saved model from TensorFlow 2 Detection Model

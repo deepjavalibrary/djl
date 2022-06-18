@@ -21,6 +21,13 @@ import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -31,11 +38,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@code HdfsRepository} is a {@link Repository} located on a Hadoop HDFS.

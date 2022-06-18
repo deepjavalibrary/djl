@@ -20,11 +20,13 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.training.ParameterStore;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class SingleShotDetectionTest {
 
