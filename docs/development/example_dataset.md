@@ -62,10 +62,12 @@ public class CSVDataset extends RandomAccessDataset {
                     new CSVParser(
                         reader,
                         CSVFormat.DEFAULT
-                            .withHeader("url", "isMalicious")
-                            .withFirstRecordAsHeader()
-                            .withIgnoreHeaderCase()
-                            .withTrim())) {
+                            .builder()
+                            .setHeader("url", "isMalicious")
+                            .setSkipHeaderRecord(true)
+                            .setIgnoreHeaderCase(true)
+                            .setTrim(true)
+                            .build())) {
                  csvRecords = csvParser.getRecords();
             }
             return new CSVDataset(this);
