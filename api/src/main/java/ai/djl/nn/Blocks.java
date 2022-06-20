@@ -58,7 +58,7 @@ public final class Blocks {
      *     batchFlatten} method
      */
     public static Block batchFlattenBlock() {
-        return LambdaBlock.singleton(Blocks::batchFlatten);
+        return LambdaBlock.singleton(Blocks::batchFlatten, "batchFlatten");
     }
 
     /**
@@ -70,7 +70,7 @@ public final class Blocks {
      *     batchFlatten} method
      */
     public static Block batchFlattenBlock(long size) {
-        return LambdaBlock.singleton(array -> batchFlatten(array, size));
+        return LambdaBlock.singleton(array -> batchFlatten(array, size), "batchFlatten");
     }
 
     /**
@@ -79,6 +79,6 @@ public final class Blocks {
      * @return an identity {@link Block}
      */
     public static Block identityBlock() {
-        return new LambdaBlock(x -> x);
+        return new LambdaBlock(x -> x, "identity");
     }
 }

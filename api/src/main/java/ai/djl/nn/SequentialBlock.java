@@ -93,6 +93,18 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     /**
+     * Adds a {@link LambdaBlock} that applies the given function to the sequence of blocks.
+     *
+     * @param f the function forms the {@link LambdaBlock}
+     * @param name the function name
+     * @return this block
+     */
+    public SequentialBlock add(Function<NDList, NDList> f, String name) {
+        add(new LambdaBlock(f, name));
+        return this;
+    }
+
+    /**
      * Adds a {@link LambdaBlock#singleton(Function)} that applies the given function to the
      * sequence of blocks.
      *
@@ -102,6 +114,20 @@ public class SequentialBlock extends AbstractBlock {
      */
     public SequentialBlock addSingleton(Function<NDArray, NDArray> f) {
         add(LambdaBlock.singleton(f));
+        return this;
+    }
+
+    /**
+     * Adds a {@link LambdaBlock#singleton(Function)} that applies the given function to the
+     * sequence of blocks.
+     *
+     * @param f the function forms the {@link LambdaBlock}
+     * @param name the function name
+     * @return this block
+     * @see LambdaBlock#singleton(Function)
+     */
+    public SequentialBlock addSingleton(Function<NDArray, NDArray> f, String name) {
+        add(LambdaBlock.singleton(f, name));
         return this;
     }
 

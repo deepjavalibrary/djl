@@ -37,6 +37,7 @@ public class LambdaBlock extends AbstractBlock {
     private static final byte VERSION = 2;
 
     private Function<NDList, NDList> lambda;
+    private String name;
 
     /**
      * Creates a LambdaBlock that can apply the specified function.
@@ -44,19 +45,53 @@ public class LambdaBlock extends AbstractBlock {
      * @param lambda the function to apply
      */
     public LambdaBlock(Function<NDList, NDList> lambda) {
+        this(lambda, "anonymous");
+    }
+
+    /**
+     * Creates a LambdaBlock that can apply the specified function.
+     *
+     * @param lambda the function to apply
+     * @param name the function name
+     */
+    public LambdaBlock(Function<NDList, NDList> lambda, String name) {
         super(VERSION);
         this.lambda = lambda;
+        this.name = name;
+    }
+
+    /**
+     * Returns the lambda function name.
+     *
+     * @return the lambda function name
+     */
+    public String getName() {
+        return name;
     }
 
     /**
      * Creates a {@link LambdaBlock} for a singleton function.
      *
-     * @param lambda a function accepting a singleton {@link NDList} and returning another sinleton
+     * @param lambda a function accepting a singleton {@link NDList} and returning another singleton
      *     {@link NDList}
      * @return a new {@link LambdaBlock} for the function
      */
     public static LambdaBlock singleton(Function<NDArray, NDArray> lambda) {
-        return new LambdaBlock(arrays -> new NDList(lambda.apply(arrays.singletonOrThrow())));
+        return new LambdaBlock(
+                arrays -> new NDList(lambda.apply(arrays.singletonOrThrow())),
+                lambda.getClass().getSimpleName());
+    }
+
+    /**
+     * Creates a {@link LambdaBlock} for a singleton function.
+     *
+     * @param lambda a function accepting a singleton {@link NDList} and returning another singleton
+     *     {@link NDList}
+     * @param name the function name
+     * @return a new {@link LambdaBlock} for the function
+     */
+    public static LambdaBlock singleton(Function<NDArray, NDArray> lambda, String name) {
+        return new LambdaBlock(arrays -> new NDList(lambda.apply(arrays.singletonOrThrow())), name);
     }
 
     /** {@inheritDoc} */
@@ -101,6 +136,6 @@ public class LambdaBlock extends AbstractBlock {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return "Lambda()";
+        return "Lambda::" + name + "()";
     }
 }
