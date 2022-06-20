@@ -61,7 +61,7 @@ public final class TfEngine extends Engine implements AutoCloseable {
             TensorFlow.version();
             return new TfEngine();
         } catch (Throwable t) {
-            if (t.getMessage().contains("libstdc++")) {
+            if (t.getMessage() != null && t.getMessage().contains("libstdc++")) {
                 // Does not mention .so to work with osx .dylib
                 String msg =
                         "There was an issue with your libstdc++ file required for the Tensorflow native library.\n"
