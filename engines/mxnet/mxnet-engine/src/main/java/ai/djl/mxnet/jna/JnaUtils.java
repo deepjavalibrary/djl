@@ -1887,8 +1887,18 @@ public final class JnaUtils {
         PointerByReference ref = REFS.acquire();
 
         // static_alloc and static_shape are enabled by default
+        String staticAlloc = "1";
+        String staticShape = "1";
+        if (!Boolean.parseBoolean(System.getProperty("ai.djl.mxnet.static_alloc", "true"))) {
+            staticAlloc = "0";
+        }
+        if (!Boolean.parseBoolean(System.getProperty("ai.djl.mxnet.static_shape", "true"))) {
+            staticShape = "0";
+        }
         String[] keys = {"data_indices", "param_indices", "static_alloc", "static_shape"};
-        String[] values = {dataIndices.values().toString(), paramIndices.toString(), "1", "1"};
+        String[] values = {
+            dataIndices.values().toString(), paramIndices.toString(), staticAlloc, staticShape
+        };
 
         checkCall(LIB.MXCreateCachedOpEx(symbolHandle, keys.length, keys, values, ref));
         Pointer pointer = ref.getValue();
