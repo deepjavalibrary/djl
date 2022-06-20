@@ -22,6 +22,10 @@ import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.Utils;
 import ai.djl.util.cuda.CudaUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,8 +34,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@code Engine} interface is the base of the provided implementation for DJL.
@@ -127,7 +129,9 @@ public abstract class Engine {
             throw new EngineException(
                     "No deep learning engine found."
                             + System.lineSeparator()
-                            + "Please refer to https://github.com/deepjavalibrary/djl/blob/master/docs/development/troubleshooting.md for more details.");
+                            + "Please refer to"
+                            + " https://github.com/deepjavalibrary/djl/blob/master/docs/development/troubleshooting.md"
+                            + " for more details.");
         }
         return getEngine(getDefaultEngineName());
     }

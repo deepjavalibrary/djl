@@ -20,6 +20,7 @@ import ai.djl.paddlepaddle.engine.PaddlePredictor;
 import ai.djl.paddlepaddle.engine.PpDataType;
 import ai.djl.paddlepaddle.engine.PpNDArray;
 import ai.djl.paddlepaddle.engine.PpNDManager;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;

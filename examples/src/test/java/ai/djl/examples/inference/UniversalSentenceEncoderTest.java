@@ -15,11 +15,13 @@ package ai.djl.examples.inference;
 import ai.djl.ModelException;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class UniversalSentenceEncoderTest {
 

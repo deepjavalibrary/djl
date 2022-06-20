@@ -20,6 +20,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import ai.djl.util.Preconditions;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -119,8 +120,7 @@ public class ParallelBlock extends AbstractBlock {
             boolean training,
             PairList<String, Object> params) {
         return function.apply(
-                children.values()
-                        .stream()
+                children.values().stream()
                         .map(block -> block.forward(parameterStore, inputs, training, params))
                         .collect(Collectors.toList()));
     }
@@ -133,8 +133,7 @@ public class ParallelBlock extends AbstractBlock {
             NDList labels,
             PairList<String, Object> params) {
         return function.apply(
-                children.values()
-                        .stream()
+                children.values().stream()
                         .map(block -> block.forward(parameterStore, data, labels, params))
                         .collect(Collectors.toList()));
     }

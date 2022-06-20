@@ -24,7 +24,9 @@ import ai.djl.repository.MRL;
 import ai.djl.training.dataset.Record;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
+
 import com.google.gson.reflect.TypeToken;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;

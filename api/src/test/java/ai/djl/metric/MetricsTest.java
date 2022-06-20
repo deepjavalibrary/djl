@@ -12,10 +12,11 @@
  */
 package ai.djl.metric;
 
-import java.util.List;
-import java.util.Set;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.List;
+import java.util.Set;
 
 public class MetricsTest {
 

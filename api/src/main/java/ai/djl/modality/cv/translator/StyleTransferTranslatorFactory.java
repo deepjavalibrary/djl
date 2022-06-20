@@ -18,6 +18,7 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
+
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;

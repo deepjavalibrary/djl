@@ -13,6 +13,7 @@
 package ai.djl.modality.nlp.bert;
 
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;

@@ -14,6 +14,7 @@ package ai.djl.training.loss;
 
 import ai.djl.ndarray.NDList;
 import ai.djl.training.evaluator.Evaluator;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

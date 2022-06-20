@@ -14,6 +14,7 @@ package ai.djl.ndarray;
 
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Preconditions;
+
 import java.util.Arrays;
 
 /** This class contains various methods for manipulating NDArrays. */

@@ -13,6 +13,7 @@
 package ai.djl.util;
 
 import com.sun.jna.Pointer;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 /**

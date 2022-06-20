@@ -14,6 +14,7 @@ package ai.djl.nn;
 
 import ai.djl.Model;
 import ai.djl.repository.zoo.ModelZoo;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;

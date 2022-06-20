@@ -53,6 +53,10 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
 import ai.djl.util.PairList;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -60,8 +64,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.stream.IntStream;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class BlockCoreTest {
 

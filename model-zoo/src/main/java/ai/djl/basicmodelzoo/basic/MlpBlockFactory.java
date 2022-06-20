@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
 import ai.djl.translate.ArgumentsUtil;
+
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +36,7 @@ public class MlpBlockFactory implements BlockFactory {
         int input = width * height;
         int[] hidden =
                 ((List<Double>) arguments.get("hidden"))
-                        .stream()
-                        .mapToInt(Double::intValue)
-                        .toArray();
+                        .stream().mapToInt(Double::intValue).toArray();
 
         return new Mlp(input, output, hidden);
     }

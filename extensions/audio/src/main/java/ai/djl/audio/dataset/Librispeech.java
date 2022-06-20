@@ -22,6 +22,7 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;

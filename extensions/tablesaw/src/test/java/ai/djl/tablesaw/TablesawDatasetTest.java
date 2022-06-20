@@ -18,12 +18,15 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
-import java.io.IOException;
-import java.net.URL;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
 import tech.tablesaw.api.ColumnType;
 import tech.tablesaw.io.csv.CsvReadOptions;
+
+import java.io.IOException;
+import java.net.URL;
 
 public class TablesawDatasetTest {
 

@@ -28,8 +28,8 @@ public final class RequireZoo {
     public static void basic() {
         if (!ModelZoo.hasModelZoo("ai.djl.zoo")) {
             throw new IllegalStateException(
-                    "The basic model zoo is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/model-zoo/index.html#installation");
+                    "The basic model zoo is required, but not found.Please install it by following"
+                            + " http://docs.djl.ai/model-zoo/index.html#installation");
         }
     }
 
@@ -37,13 +37,13 @@ public final class RequireZoo {
     public static void mxnet() {
         if (!ModelZoo.hasModelZoo("ai.djl.mxnet")) {
             throw new IllegalStateException(
-                    "The MXNet model zoo is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/engines/mxnet/mxnet-model-zoo/index.html#installation");
+                    "The MXNet model zoo is required, but not found.Please install it by following"
+                        + " http://docs.djl.ai/engines/mxnet/mxnet-model-zoo/index.html#installation");
         }
         if (!Engine.hasEngine("MXNet")) {
             throw new IllegalStateException(
-                    "The MXNet engine is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/engines/mxnet/mxnet-engine/index.html#installation");
+                    "The MXNet engine is required, but not found.Please install it by following"
+                        + " http://docs.djl.ai/engines/mxnet/mxnet-engine/index.html#installation");
         }
     }
 
@@ -51,13 +51,14 @@ public final class RequireZoo {
     public static void pytorch() {
         if (!ModelZoo.hasModelZoo("ai.djl.pytorch")) {
             throw new IllegalStateException(
-                    "The PyTorch model zoo is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/pytorch/pytorch-model-zoo/index.html#installation");
+                    "The PyTorch model zoo is required, but not found.Please install it by"
+                        + " following"
+                        + " http://docs.djl.ai/pytorch/pytorch-model-zoo/index.html#installation");
         }
         if (!Engine.hasEngine("PyTorch")) {
             throw new IllegalStateException(
-                    "The PyTorch engine is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/pytorch/pytorch-engine/index.html#installation");
+                    "The PyTorch engine is required, but not found.Please install it by following"
+                            + " http://docs.djl.ai/pytorch/pytorch-engine/index.html#installation");
         }
     }
 
@@ -65,13 +66,15 @@ public final class RequireZoo {
     public static void tensorflow() {
         if (!ModelZoo.hasModelZoo("ai.djl.tensorflow")) {
             throw new IllegalStateException(
-                    "The TensorFlow model zoo is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/engines/tensorflow/tensorflow-model-zoo/index.html#installation");
+                    "The TensorFlow model zoo is required, but not found.Please install it by"
+                        + " following"
+                        + " http://docs.djl.ai/engines/tensorflow/tensorflow-model-zoo/index.html#installation");
         }
         if (!Engine.hasEngine("TensorFlow")) {
             throw new IllegalStateException(
-                    "The TensorFlow engine is required, but not found."
-                            + "Please install it by following http://docs.djl.ai/engines/tensorflow/tensorflow-engine/index.html#installation");
+                    "The TensorFlow engine is required, but not found.Please install it by"
+                        + " following"
+                        + " http://docs.djl.ai/engines/tensorflow/tensorflow-engine/index.html#installation");
         }
     }
 }

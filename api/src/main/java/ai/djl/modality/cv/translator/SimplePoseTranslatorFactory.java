@@ -20,6 +20,7 @@ import ai.djl.modality.cv.output.Joints;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
+
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Map;

@@ -19,11 +19,13 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.zero.Performance;
 import ai.djl.zero.cv.ImageClassification.Classes;
+
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
-import org.testng.annotations.Test;
 
 public class ImageClassificationTest {
 

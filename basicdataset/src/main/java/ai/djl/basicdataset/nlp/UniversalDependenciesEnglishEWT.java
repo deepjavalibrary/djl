@@ -23,6 +23,7 @@ import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.training.dataset.Record;
 import ai.djl.util.Progress;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -144,9 +145,7 @@ public class UniversalDependenciesEnglishEWT extends TextDataset {
         NDList labels =
                 new NDList(
                         manager.create(
-                                        universalPosTags
-                                                .get(Math.toIntExact(index))
-                                                .stream()
+                                        universalPosTags.get(Math.toIntExact(index)).stream()
                                                 .mapToInt(Integer::intValue)
                                                 .toArray())
                                 .toType(DataType.INT32, false));

@@ -14,6 +14,7 @@ package ai.djl.repository;
 
 import ai.djl.Application;
 import ai.djl.repository.zoo.DefaultModelZoo;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;

@@ -19,6 +19,7 @@ import ai.djl.training.loss.ElasticNetWeightDecay;
 import ai.djl.training.loss.L1WeightDecay;
 import ai.djl.training.loss.L2WeightDecay;
 import ai.djl.training.loss.Loss;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

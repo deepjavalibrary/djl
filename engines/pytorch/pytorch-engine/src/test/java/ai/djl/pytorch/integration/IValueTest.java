@@ -24,12 +24,14 @@ import ai.djl.pytorch.jni.IValue;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class IValueTest {
 

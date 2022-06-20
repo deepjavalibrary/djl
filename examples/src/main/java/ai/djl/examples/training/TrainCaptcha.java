@@ -39,6 +39,7 @@ import ai.djl.training.loss.SimpleCompositeLoss;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+
 import java.io.IOException;
 
 /**

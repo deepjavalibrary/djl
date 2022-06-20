@@ -18,9 +18,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import ai.djl.util.Preconditions;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.Pointer;
@@ -31,6 +29,10 @@ import org.tensorflow.internal.c_api.TFE_Op;
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
 import org.tensorflow.internal.c_api.TF_Status;
 import org.tensorflow.internal.c_api.global.tensorflow;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /** An {@code TfOpExecutor} for executing TensorFlow operation eagerly. */
 final class TfOpExecutor implements AutoCloseable {

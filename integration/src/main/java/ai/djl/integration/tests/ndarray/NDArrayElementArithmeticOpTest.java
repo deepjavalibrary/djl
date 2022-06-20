@@ -25,10 +25,12 @@ import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class NDArrayElementArithmeticOpTest {
 

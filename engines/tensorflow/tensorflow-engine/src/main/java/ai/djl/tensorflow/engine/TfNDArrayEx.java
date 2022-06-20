@@ -23,8 +23,10 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
-import java.util.List;
+
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
+
+import java.util.List;
 
 public class TfNDArrayEx implements NDArrayEx {
 

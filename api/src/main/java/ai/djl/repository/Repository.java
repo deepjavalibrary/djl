@@ -14,6 +14,7 @@ package ai.djl.repository;
 
 import ai.djl.Application;
 import ai.djl.util.Progress;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;

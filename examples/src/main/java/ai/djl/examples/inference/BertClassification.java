@@ -29,6 +29,10 @@ import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.TranslatorContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -36,8 +40,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The example is targeted to specific use case for BERT classification. TODO make it generic enough
@@ -129,8 +131,7 @@ public final class BertClassification {
         private NDArray stackInputs(List<NDList> tokenizedInputs, int index, String inputName) {
             NDArray stacked =
                     NDArrays.stack(
-                            tokenizedInputs
-                                    .stream()
+                            tokenizedInputs.stream()
                                     .map(list -> list.get(index).expandDims(0))
                                     .collect(Collectors.toCollection(NDList::new)));
             stacked.setName(inputName);

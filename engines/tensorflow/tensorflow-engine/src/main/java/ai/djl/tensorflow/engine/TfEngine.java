@@ -23,14 +23,16 @@ import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import ai.djl.tensorflow.engine.javacpp.LibUtils;
 import ai.djl.training.GradientCollector;
 import ai.djl.util.RandomUtils;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
+
 import org.bytedeco.javacpp.PointerScope;
 import org.tensorflow.TensorFlow;
 import org.tensorflow.internal.c_api.TFE_Context;
 import org.tensorflow.internal.c_api.TF_DeviceList;
 import org.tensorflow.internal.c_api.TF_Status;
 import org.tensorflow.internal.c_api.global.tensorflow;
+
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The {@code TfEngine} is an implementation of the {@link Engine} based on the <a
@@ -64,8 +66,11 @@ public final class TfEngine extends Engine implements AutoCloseable {
             if (t.getMessage().contains("libstdc++")) {
                 // Does not mention .so to work with osx .dylib
                 String msg =
-                        "There was an issue with your libstdc++ file required for the Tensorflow native library.\n"
-                                + "It can be installed or upgraded through gcc by following the instructions on the TensorFlow install page: https://docs.djl.ai/engines/tensorflow/index.html#note";
+                        "There was an issue with your libstdc++ file required for the Tensorflow"
+                                + " native library.\n"
+                                + "It can be installed or upgraded through gcc by following the"
+                                + " instructions on the TensorFlow install page:"
+                                + " https://docs.djl.ai/engines/tensorflow/index.html#note";
                 throw new EngineException(msg, t);
             }
 

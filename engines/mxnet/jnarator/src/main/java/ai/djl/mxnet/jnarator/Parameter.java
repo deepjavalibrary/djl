@@ -13,9 +13,11 @@
 package ai.djl.mxnet.jnarator;
 
 import ai.djl.mxnet.jnarator.parser.CParser;
+
+import org.antlr.v4.runtime.tree.ParseTree;
+
 import java.util.List;
 import java.util.Objects;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Parameter {
 

@@ -23,6 +23,7 @@ import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;

@@ -20,6 +20,7 @@ import ai.djl.ndarray.index.dim.NDIndexFixed;
 import ai.djl.ndarray.index.dim.NDIndexPick;
 import ai.djl.ndarray.index.dim.NDIndexSlice;
 import ai.djl.ndarray.types.DataType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;

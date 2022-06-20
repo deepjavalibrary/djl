@@ -15,12 +15,14 @@ package ai.djl.repository.zoo;
 import ai.djl.engine.Engine;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** A {@link ModelZoo} that contains models in specified locations. */
 public class DefaultModelZoo extends ModelZoo {

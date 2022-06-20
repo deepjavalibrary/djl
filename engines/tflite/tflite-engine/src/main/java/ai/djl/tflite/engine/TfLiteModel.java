@@ -18,6 +18,9 @@ import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.util.Utils;
+
+import org.tensorflow.lite.Interpreter;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +28,6 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import org.tensorflow.lite.Interpreter;
 
 /**
  * {@code TfLiteModel} is the TFLite implementation of {@link Model}.

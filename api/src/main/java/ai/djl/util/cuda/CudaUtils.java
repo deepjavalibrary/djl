@@ -14,12 +14,15 @@ package ai.djl.util.cuda;
 
 import ai.djl.Device;
 import ai.djl.engine.EngineException;
+
 import com.sun.jna.Native;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.lang.management.MemoryUsage;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** A class containing CUDA utility methods. */
 public final class CudaUtils {

@@ -17,9 +17,11 @@ import ai.djl.engine.Engine;
 import ai.djl.examples.training.transferlearning.TrainAmazonReviewRanking;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
+
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
-import org.testng.annotations.Test;
 
 public class TrainAmazonReviewTest {
 

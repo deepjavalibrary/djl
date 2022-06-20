@@ -21,9 +21,11 @@ import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+
+import ml.dmlc.xgboost4j.java.JniUtils;
+
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicReference;
-import ml.dmlc.xgboost4j.java.JniUtils;
 
 /** {@code XgbSymbolBlock} is the XGBoost implementation of {@link SymbolBlock}. */
 public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable {

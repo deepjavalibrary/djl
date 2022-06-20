@@ -21,6 +21,7 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
+
 import java.util.List;
 
 /** A {@link WordEmbedding} using a {@link ZooModel}. */

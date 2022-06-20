@@ -15,6 +15,7 @@ package ai.djl.mxnet.jna;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;

@@ -14,11 +14,13 @@ package ai.djl.training.listener;
 
 import ai.djl.Model;
 import ai.djl.training.Trainer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** A {@link TrainingListener} that saves a model and can save checkpoints. */
 public class SaveModelTrainingListener extends TrainingListenerAdapter {

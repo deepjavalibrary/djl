@@ -16,6 +16,7 @@ package ai.djl.training.evaluator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.util.Pair;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -14,6 +14,7 @@ package ai.djl.ndarray;
 
 import ai.djl.Device;
 import ai.djl.ndarray.types.Shape;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;

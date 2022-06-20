@@ -25,8 +25,8 @@ public class DivergenceCheckTrainingListener extends TrainingListenerAdapter {
         Loss trainingLoss = trainer.getLoss();
         if (Float.isNaN(trainingLoss.getAccumulator(EvaluatorTrainingListener.TRAIN_ALL))) {
             throw new TrainingDivergedException(
-                    "The Loss became NaN, try reduce learning rate,"
-                            + "add clipGradient option to your optimizer, check input data and loss calculation.");
+                    "The Loss became NaN, try reduce learning rate,add clipGradient option to your"
+                            + " optimizer, check input data and loss calculation.");
         }
     }
 }

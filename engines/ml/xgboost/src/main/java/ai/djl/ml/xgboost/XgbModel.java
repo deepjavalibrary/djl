@@ -16,13 +16,15 @@ import ai.djl.BaseModel;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+
+import ml.dmlc.xgboost4j.java.JniUtils;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Map;
-import ml.dmlc.xgboost4j.java.JniUtils;
 
 /** {@code XgbModel} is the XGBoost implementation of {@link Model}. */
 public class XgbModel extends BaseModel {

@@ -14,6 +14,7 @@ package ai.djl.fasttext;
 
 import ai.djl.basicdataset.RawDataset;
 import ai.djl.fasttext.zoo.nlp.textclassification.FtTextClassification;
+
 import java.io.IOException;
 import java.nio.file.Path;
 

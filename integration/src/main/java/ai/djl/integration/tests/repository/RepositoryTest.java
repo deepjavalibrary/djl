@@ -20,6 +20,12 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
+
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -27,10 +33,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class RepositoryTest {
 

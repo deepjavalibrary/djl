@@ -19,6 +19,7 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.training.listener.TrainingListener.BatchData;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Preconditions;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +85,8 @@ public final class EasyTrain {
     public static void trainBatch(Trainer trainer, Batch batch) {
         if (trainer.getManager().getEngine() != batch.getManager().getEngine()) {
             throw new IllegalArgumentException(
-                    "The data must be on the same engine as the trainer. You may need to change one of your NDManagers.");
+                    "The data must be on the same engine as the trainer. You may need to change one"
+                            + " of your NDManagers.");
         }
         Batch[] splits = batch.split(trainer.getDevices(), false);
         BatchData batchData =
@@ -142,7 +144,8 @@ public final class EasyTrain {
     public static void validateBatch(Trainer trainer, Batch batch) {
         Preconditions.checkArgument(
                 trainer.getManager().getEngine() == batch.getManager().getEngine(),
-                "The data must be on the same engine as the trainer. You may need to change one of your NDManagers.");
+                "The data must be on the same engine as the trainer. You may need to change one of"
+                        + " your NDManagers.");
         Batch[] splits = batch.split(trainer.getDevices(), false);
         BatchData batchData =
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());

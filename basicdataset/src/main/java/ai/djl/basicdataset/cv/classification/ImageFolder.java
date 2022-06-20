@@ -15,6 +15,7 @@ package ai.djl.basicdataset.cv.classification;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.translate.Pipeline;
 import ai.djl.util.Progress;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;

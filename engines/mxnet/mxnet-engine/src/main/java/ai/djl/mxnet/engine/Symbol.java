@@ -18,7 +18,9 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.util.NativeResource;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
+
 import com.sun.jna.Pointer;
+
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;

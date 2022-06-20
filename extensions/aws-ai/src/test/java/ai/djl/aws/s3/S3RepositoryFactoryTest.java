@@ -13,9 +13,11 @@
 package ai.djl.aws.s3;
 
 import ai.djl.repository.Repository;
-import java.net.URI;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.net.URI;
 
 public class S3RepositoryFactoryTest {
 

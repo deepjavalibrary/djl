@@ -21,13 +21,15 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import ai.djl.util.Pair;
+
+import org.tensorflow.internal.c_api.TFE_Context;
+import org.tensorflow.internal.c_api.TFE_TensorHandle;
+import org.tensorflow.internal.c_api.TF_Tensor;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import org.tensorflow.internal.c_api.TFE_Context;
-import org.tensorflow.internal.c_api.TFE_TensorHandle;
-import org.tensorflow.internal.c_api.TF_Tensor;
 
 @SuppressWarnings("PMD.UseTryWithResources")
 public class TfNDManager extends BaseNDManager {

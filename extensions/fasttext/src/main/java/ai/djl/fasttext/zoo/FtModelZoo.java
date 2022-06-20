@@ -17,6 +17,7 @@ import ai.djl.fasttext.zoo.nlp.textclassification.TextClassificationModelLoader;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

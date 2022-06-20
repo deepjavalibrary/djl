@@ -21,6 +21,7 @@ import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Activation;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+
 import java.util.Arrays;
 
 /** Creates a block that performs all bert pretraining tasks (next sentence and masked language). */

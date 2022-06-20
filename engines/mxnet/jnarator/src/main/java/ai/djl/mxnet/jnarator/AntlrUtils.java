@@ -13,10 +13,12 @@
 package ai.djl.mxnet.jnarator;
 
 import ai.djl.mxnet.jnarator.parser.CParser;
-import java.util.ArrayList;
-import java.util.List;
+
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class AntlrUtils {
 

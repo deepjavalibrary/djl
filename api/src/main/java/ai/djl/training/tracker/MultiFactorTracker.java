@@ -101,9 +101,9 @@ public class MultiFactorTracker implements Tracker {
         public Builder setSteps(int[] steps) {
             if (steps.length <= 1) {
                 throw new IllegalArgumentException(
-                        "Steps should be an array of integers indicating when the "
-                                + "value should be changed, usually in an uneven interval of steps"
-                                + "use FactorTracker if you want the value to be changed at a constant interval of steps");
+                        "Steps should be an array of integers indicating when the value should be"
+                            + " changed, usually in an uneven interval of stepsuse FactorTracker if"
+                            + " you want the value to be changed at a constant interval of steps");
             }
             for (int i = 0; i < steps.length; i++) {
                 if (i > 0 && steps[i] <= steps[i - 1]) {

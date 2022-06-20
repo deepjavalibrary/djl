@@ -14,12 +14,14 @@ package ai.djl.repository;
 
 import ai.djl.Application;
 import ai.djl.util.Progress;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@code MRL} (Machine learning Resource Locator) is a pointer to a {@link Metadata} "resource"

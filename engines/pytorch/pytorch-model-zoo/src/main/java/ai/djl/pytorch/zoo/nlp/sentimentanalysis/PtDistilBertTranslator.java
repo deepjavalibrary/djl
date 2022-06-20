@@ -22,6 +22,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;

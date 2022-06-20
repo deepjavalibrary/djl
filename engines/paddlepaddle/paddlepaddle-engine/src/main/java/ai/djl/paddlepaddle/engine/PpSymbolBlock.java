@@ -22,6 +22,7 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+
 import java.util.Arrays;
 
 /** {@code PpSymbolBlock} is the PaddlePaddle implementation of {@link SymbolBlock}. */

@@ -16,9 +16,11 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.TestRequirements;
-import java.nio.ByteBuffer;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.nio.ByteBuffer;
 
 public class DlrNDManagerTest {
 

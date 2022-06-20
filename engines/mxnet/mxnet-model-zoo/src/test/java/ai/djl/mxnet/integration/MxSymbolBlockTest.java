@@ -41,13 +41,15 @@ import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class MxSymbolBlockTest {
 
@@ -229,8 +231,7 @@ public class MxSymbolBlockTest {
             gradCol.backward(loss);
         }
         List<NDArray> grads =
-                block.getParameters()
-                        .stream()
+                block.getParameters().stream()
                         .map(
                                 stringParameterPair ->
                                         stringParameterPair.getValue().getArray().getGradient())

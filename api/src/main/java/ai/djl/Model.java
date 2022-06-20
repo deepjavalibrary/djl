@@ -22,6 +22,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
 import ai.djl.util.PairList;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

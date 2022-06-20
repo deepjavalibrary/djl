@@ -119,8 +119,8 @@ public final class Interpreter implements InterpreterApi {
         }
         if (methodName == null) {
             throw new IllegalArgumentException(
-                    "Input error: SignatureDef methodName should not be null. null is only allowed if the"
-                            + " model has a single Signature. Available Signatures: "
+                    "Input error: SignatureDef methodName should not be null. null is only allowed"
+                            + " if the model has a single Signature. Available Signatures: "
                             + Arrays.toString(signatureNameList));
         }
         wrapper.runSignature(inputs, outputs, methodName);
@@ -174,8 +174,8 @@ public final class Interpreter implements InterpreterApi {
         }
         if (methodName == null) {
             throw new IllegalArgumentException(
-                    "Input error: SignatureDef methodName should not be null. null is only allowed if the"
-                            + " model has a single Signature. Available Signatures: "
+                    "Input error: SignatureDef methodName should not be null. null is only allowed"
+                            + " if the model has a single Signature. Available Signatures: "
                             + Arrays.toString(signatureNameList));
         }
         return wrapper.getInputTensor(inputName, methodName);
@@ -221,8 +221,8 @@ public final class Interpreter implements InterpreterApi {
         }
         if (methodName == null) {
             throw new IllegalArgumentException(
-                    "Input error: SignatureDef methodName should not be null. null is only allowed if the"
-                            + " model has a single Signature. Available Signatures: "
+                    "Input error: SignatureDef methodName should not be null. null is only allowed"
+                            + " if the model has a single Signature. Available Signatures: "
                             + Arrays.toString(signatureNameList));
         }
         return wrapper.getOutputTensor(outputName, methodName);

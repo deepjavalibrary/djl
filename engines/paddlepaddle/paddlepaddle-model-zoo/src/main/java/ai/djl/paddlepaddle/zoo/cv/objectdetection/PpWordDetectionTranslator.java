@@ -27,6 +27,7 @@ import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,8 +64,7 @@ public class PpWordDetectionTranslator implements NoBatchifyTranslator<Image, De
             result = result.squeeze(0).toType(DataType.UINT8, true);
             Image image = factory.fromNDArray(result);
             boxes =
-                    image.findBoundingBoxes()
-                            .parallelStream()
+                    image.findBoundingBoxes().parallelStream()
                             .filter(
                                     box -> {
                                         Rectangle rect = (Rectangle) box;

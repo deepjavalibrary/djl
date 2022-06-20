@@ -15,12 +15,14 @@ package ai.djl.huggingface.tokenizers;
 
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.djl.testing.TestRequirements;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class HuggingFaceTokenizerTest {
 

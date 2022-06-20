@@ -15,9 +15,11 @@ package ai.djl.examples.training;
 import ai.djl.engine.Engine;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
-import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class TrainTicTacToeTest {
 

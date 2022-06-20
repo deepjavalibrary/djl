@@ -15,6 +15,8 @@ limitations under the License.
 
 package org.tensorflow.lite;
 
+import org.tensorflow.lite.nnapi.NnApiDelegate;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
@@ -23,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.tensorflow.lite.nnapi.NnApiDelegate;
 
 final class NativeInterpreterWrapper implements AutoCloseable {
 
@@ -48,8 +49,9 @@ final class NativeInterpreterWrapper implements AutoCloseable {
                 || (!(buffer instanceof MappedByteBuffer)
                         && (!buffer.isDirect() || buffer.order() != ByteOrder.nativeOrder()))) {
             throw new IllegalArgumentException(
-                    "Model ByteBuffer should be either a MappedByteBuffer of the model file, or a direct "
-                            + "ByteBuffer using ByteOrder.nativeOrder() which contains bytes of model content.");
+                    "Model ByteBuffer should be either a MappedByteBuffer of the model file, or a"
+                        + " direct ByteBuffer using ByteOrder.nativeOrder() which contains bytes of"
+                        + " model content.");
         }
         this.modelByteBuffer = buffer;
         long errorHandle = createErrorReporter(ERROR_BUFFER_SIZE);
@@ -272,8 +274,8 @@ final class NativeInterpreterWrapper implements AutoCloseable {
         } else {
             throw new IllegalArgumentException(
                     String.format(
-                            "Input error: '%s' is not a valid name for any input. Names of inputs and their "
-                                    + "indexes are %s",
+                            "Input error: '%s' is not a valid name for any input. Names of inputs"
+                                    + " and their indexes are %s",
                             name, inputsIndexes));
         }
     }
@@ -311,8 +313,8 @@ final class NativeInterpreterWrapper implements AutoCloseable {
         } else {
             throw new IllegalArgumentException(
                     String.format(
-                            "Input error: '%s' is not a valid name for any output. Names of outputs and their "
-                                    + "indexes are %s",
+                            "Input error: '%s' is not a valid name for any output. Names of outputs"
+                                    + " and their indexes are %s",
                             name, outputsIndexes));
         }
     }
@@ -416,7 +418,8 @@ final class NativeInterpreterWrapper implements AutoCloseable {
     void setCancelled(boolean value) {
         if (cancellationFlagHandle == 0) {
             throw new IllegalStateException(
-                    "Cannot cancel the inference. Have you called Interpreter.Options.setCancellable?");
+                    "Cannot cancel the inference. Have you called"
+                            + " Interpreter.Options.setCancellable?");
         }
         setCancelled(interpreterHandle, cancellationFlagHandle, value);
     }

@@ -21,10 +21,12 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.testing.Assertions;
-import java.io.IOException;
-import java.nio.file.Paths;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.nio.file.Paths;
 
 public class ModelTest {
 

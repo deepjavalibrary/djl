@@ -20,6 +20,7 @@ import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.PairList;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;

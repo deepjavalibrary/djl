@@ -13,6 +13,7 @@
 package ai.djl.translate;
 
 import ai.djl.ndarray.NDList;
+
 import java.util.Arrays;
 import java.util.stream.IntStream;
 

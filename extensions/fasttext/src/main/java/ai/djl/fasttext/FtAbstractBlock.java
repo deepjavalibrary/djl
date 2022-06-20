@@ -15,6 +15,7 @@ package ai.djl.fasttext;
 import ai.djl.fasttext.jni.FtWrapper;
 import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.ParameterList;
+
 import java.nio.file.Path;
 
 /**

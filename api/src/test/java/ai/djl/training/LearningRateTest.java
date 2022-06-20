@@ -18,6 +18,7 @@ import ai.djl.training.tracker.CyclicalTracker;
 import ai.djl.training.tracker.FactorTracker;
 import ai.djl.training.tracker.MultiFactorTracker;
 import ai.djl.training.tracker.Tracker;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

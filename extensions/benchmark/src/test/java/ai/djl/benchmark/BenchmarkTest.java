@@ -13,15 +13,17 @@
 package ai.djl.benchmark;
 
 import ai.djl.ndarray.types.DataType;
-import java.net.MalformedURLException;
-import java.nio.file.Paths;
-import java.util.Map;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.net.MalformedURLException;
+import java.nio.file.Paths;
+import java.util.Map;
 
 public class BenchmarkTest {
 

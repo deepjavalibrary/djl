@@ -44,6 +44,7 @@ import ai.djl.training.loss.MaskedSoftmaxCrossEntropyLoss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.PaddingStackBatchifier;
 import ai.djl.translate.TranslateException;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;

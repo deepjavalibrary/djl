@@ -15,9 +15,11 @@ package ai.djl.nn.convolutional;
 
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Pair;
-import java.util.stream.IntStream;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.stream.IntStream;
 
 public class Conv2dTransposeTest extends OutputShapeTest {
 

@@ -16,13 +16,15 @@ import ai.djl.engine.EngineException;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** Utilities for finding the Huggingface tokenizer native binary on the System. */
 @SuppressWarnings("MissingJavadocMethod")

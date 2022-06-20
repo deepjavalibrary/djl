@@ -21,6 +21,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.Activation;
 import ai.djl.nn.recurrent.RNN;
+
 import java.util.List;
 
 /** An internal interface that encapsulates engine specific operations. */

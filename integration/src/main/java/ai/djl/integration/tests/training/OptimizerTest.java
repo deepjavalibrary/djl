@@ -34,6 +34,7 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.tracker.Tracker;
 import ai.djl.translate.Batchifier;
+
 import org.testng.annotations.Test;
 
 public class OptimizerTest {
@@ -314,8 +315,7 @@ public class OptimizerTest {
         trainer.step();
         return NDArrays.stack(
                 new NDList(
-                        block.getParameters()
-                                .stream()
+                        block.getParameters().stream()
                                 .map(paramPair -> paramPair.getValue().getArray().mean())
                                 .toArray(NDArray[]::new)));
     }

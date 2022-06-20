@@ -20,10 +20,13 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.training.Trainer;
 import ai.djl.util.PairList;
+
 import com.sun.jna.Pointer;
-import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /** A FunctionInfo represents an operator (ie function) within the MXNet Engine. */
 public class FunctionInfo {
@@ -116,7 +119,8 @@ public class FunctionInfo {
             for (int i = 1; i < src.length; ++i) {
                 if (!device.equals(src[i].getDevice())) {
                     logger.warn(
-                            "Please make sure all the NDArrays are in the same device. You can call toDevice() to move the NDArray to the desired Device.");
+                            "Please make sure all the NDArrays are in the same device. You can call"
+                                    + " toDevice() to move the NDArray to the desired Device.");
                 }
             }
         }

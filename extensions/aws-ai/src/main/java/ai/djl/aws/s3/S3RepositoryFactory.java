@@ -14,10 +14,12 @@ package ai.djl.aws.s3;
 
 import ai.djl.repository.Repository;
 import ai.djl.repository.RepositoryFactory;
+
+import software.amazon.awssdk.services.s3.S3Client;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
-import software.amazon.awssdk.services.s3.S3Client;
 
 /** A class responsible to create {@link S3Repository} instances. */
 public class S3RepositoryFactory implements RepositoryFactory {

@@ -14,11 +14,13 @@ package ai.djl.tablesaw;
 
 import ai.djl.basicdataset.tabular.TabularDataset;
 import ai.djl.util.Progress;
-import java.util.Collections;
-import java.util.List;
+
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.ReadOptions;
+
+import java.util.Collections;
+import java.util.List;
 
 /** {@code TablesawDataset} represents the dataset that stored in a .csv file. */
 public class TablesawDataset extends TabularDataset {

@@ -13,6 +13,7 @@
 package ai.djl.metric;
 
 import com.google.gson.annotations.SerializedName;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.regex.Matcher;

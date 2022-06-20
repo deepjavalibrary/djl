@@ -17,6 +17,7 @@ import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.core.Embedding;
+
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;

@@ -25,6 +25,10 @@ import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import ai.djl.util.NativeResource;
 import ai.djl.util.Preconditions;
+
+import org.tensorflow.internal.c_api.TFE_TensorHandle;
+import org.tensorflow.internal.c_api.TF_Tensor;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -33,8 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
-import org.tensorflow.internal.c_api.TFE_TensorHandle;
-import org.tensorflow.internal.c_api.TF_Tensor;
 
 /** {@code TfNDArray} is the TensorFlow implementation of {@link NDArray}. */
 @SuppressWarnings("PMD.UseTryWithResources")

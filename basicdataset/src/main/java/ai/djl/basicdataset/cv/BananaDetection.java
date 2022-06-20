@@ -28,7 +28,9 @@ import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.PairList;
 import ai.djl.util.Progress;
+
 import com.google.gson.reflect.TypeToken;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;

@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory;
 import ai.djl.ndarray.NDList;
 import ai.djl.util.Pair;
+
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Map;

@@ -13,8 +13,10 @@
 package ai.djl.hadoop.hdfs;
 
 import ai.djl.repository.Repository;
-import java.net.URI;
+
 import org.testng.annotations.Test;
+
+import java.net.URI;
 
 public class HdfsRepositoryFactoryTest {
 

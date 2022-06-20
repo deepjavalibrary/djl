@@ -43,10 +43,12 @@ import ai.djl.translate.Batchifier;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.PairList;
+
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import org.testng.annotations.Test;
 
 public class ResnetTest {
 

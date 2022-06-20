@@ -20,9 +20,11 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
 import ai.djl.training.dataset.Batch;
 import ai.djl.translate.Batchifier;
-import java.util.Locale;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.Locale;
 
 public class DatasetUtilsTest {
 

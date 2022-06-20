@@ -27,6 +27,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

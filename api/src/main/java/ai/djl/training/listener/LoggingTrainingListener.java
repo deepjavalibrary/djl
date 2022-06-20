@@ -19,10 +19,12 @@ import ai.djl.training.Trainer;
 import ai.djl.training.evaluator.Evaluator;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
-import java.util.ArrayList;
-import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link TrainingListener} that outputs the progress of training each batch and epoch into logs.

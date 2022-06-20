@@ -21,7 +21,9 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.NativeResource;
+
 import com.sun.jna.Pointer;
+
 import java.util.Arrays;
 
 /** {@code MxParameterServer} is the MXNet implementation of {@link ParameterServer}. */

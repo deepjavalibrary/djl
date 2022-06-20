@@ -26,6 +26,7 @@ import ai.djl.modality.nlp.preprocess.TextProcessor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.AbstractBlock;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

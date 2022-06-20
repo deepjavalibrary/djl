@@ -19,7 +19,17 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
+
 import com.google.gson.reflect.TypeToken;
+
+import org.testng.Assert;
+import org.testng.SkipException;
+import org.testng.annotations.Test;
+
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.core.exception.SdkException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -28,12 +38,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import org.testng.Assert;
-import org.testng.SkipException;
-import org.testng.annotations.Test;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.core.exception.SdkException;
 
 public class SageMakerTest {
 

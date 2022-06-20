@@ -23,6 +23,7 @@ import ai.djl.nn.core.Linear;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+
 import java.util.Arrays;
 import java.util.function.Function;
 

@@ -23,6 +23,7 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -138,8 +139,7 @@ public class BertCodeDataset implements Dataset {
             }
             // Create masked instances for training
             maskedInstances =
-                    sentencePairs
-                            .stream()
+                    sentencePairs.stream()
                             .limit(epochLimit)
                             .map(
                                     sentencePair ->
@@ -226,14 +226,12 @@ public class BertCodeDataset implements Dataset {
 
         private static ParsedFile parse(Path file) {
             List<String> normalizedLines =
-                    fileToLines(file)
-                            .stream()
+                    fileToLines(file).stream()
                             .map(ParsedFile::normalizeLine)
                             .filter(line -> !line.isEmpty())
                             .collect(Collectors.toList());
             List<List<String>> tokens =
-                    normalizedLines
-                            .stream()
+                    normalizedLines.stream()
                             .map(ParsedFile::tokenizeLine)
                             .collect(Collectors.toList());
             return new ParsedFile(file, normalizedLines, tokens);
@@ -309,8 +307,7 @@ public class BertCodeDataset implements Dataset {
             return sourceFile
                     + "\n"
                     + "=======================\n"
-                    + tokenizedLines
-                            .stream()
+                    + tokenizedLines.stream()
                             .map(tokens -> String.join("|", tokens))
                             .collect(Collectors.joining("\n"));
         }

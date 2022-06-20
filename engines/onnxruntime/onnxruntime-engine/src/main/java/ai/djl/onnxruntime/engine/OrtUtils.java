@@ -19,6 +19,7 @@ import ai.onnxruntime.OnnxJavaType;
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -55,7 +56,8 @@ final class OrtUtils {
                     return OnnxTensor.createTensor(env, (ByteBuffer) data, sh, OnnxJavaType.UINT8);
                 case STRING:
                     throw new UnsupportedOperationException(
-                            "Use toTensor(OrtEnvironment env, String[] inputs, Shape shape) instead.");
+                            "Use toTensor(OrtEnvironment env, String[] inputs, Shape shape)"
+                                    + " instead.");
                 case BOOLEAN:
                 case FLOAT16:
                 default:

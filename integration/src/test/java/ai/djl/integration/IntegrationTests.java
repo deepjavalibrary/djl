@@ -13,6 +13,7 @@
 package ai.djl.integration;
 
 import ai.djl.util.cuda.CudaUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;

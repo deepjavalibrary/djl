@@ -18,6 +18,7 @@ import ai.djl.translate.Pipeline;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

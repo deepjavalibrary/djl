@@ -17,10 +17,12 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.TestRequirements;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 public class TfNDManagerTest {
 

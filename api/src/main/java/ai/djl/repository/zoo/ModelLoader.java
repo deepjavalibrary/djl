@@ -15,6 +15,7 @@ package ai.djl.repository.zoo;
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.repository.Artifact;
+
 import java.io.IOException;
 import java.util.List;
 

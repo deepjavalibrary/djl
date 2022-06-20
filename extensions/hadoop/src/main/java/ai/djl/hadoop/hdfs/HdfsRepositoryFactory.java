@@ -14,10 +14,12 @@ package ai.djl.hadoop.hdfs;
 
 import ai.djl.repository.Repository;
 import ai.djl.repository.RepositoryFactory;
+
+import org.apache.hadoop.conf.Configuration;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
-import org.apache.hadoop.conf.Configuration;
 
 /** A class responsible to create {@link HdfsRepository} instances. */
 public class HdfsRepositoryFactory implements RepositoryFactory {

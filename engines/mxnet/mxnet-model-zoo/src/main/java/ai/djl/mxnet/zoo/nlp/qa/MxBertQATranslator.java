@@ -28,7 +28,9 @@ import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
+
 import com.google.gson.annotations.SerializedName;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;

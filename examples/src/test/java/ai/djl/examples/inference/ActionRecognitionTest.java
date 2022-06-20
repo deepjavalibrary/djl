@@ -16,9 +16,11 @@ import ai.djl.ModelException;
 import ai.djl.modality.Classifications;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
-import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class ActionRecognitionTest {
 

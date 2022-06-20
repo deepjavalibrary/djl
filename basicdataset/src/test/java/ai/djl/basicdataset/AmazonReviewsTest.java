@@ -16,9 +16,11 @@ import ai.djl.basicdataset.nlp.AmazonReview;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.TranslateException;
-import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class AmazonReviewsTest {
 

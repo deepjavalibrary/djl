@@ -24,10 +24,12 @@ import ai.djl.testing.Assertions;
 import ai.djl.testing.TestRequirements;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
-import java.nio.FloatBuffer;
-import java.util.stream.IntStream;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.nio.FloatBuffer;
+import java.util.stream.IntStream;
 
 public class NDArrayCreationOpTest {
 

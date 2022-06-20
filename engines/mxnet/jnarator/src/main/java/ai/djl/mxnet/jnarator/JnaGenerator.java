@@ -287,7 +287,8 @@ public class JnaGenerator {
             writer.append("            getPointer().setLong(0, value.longValue());\n");
             writer.append("        } else {\n");
             writer.append(
-                    "            throw new IllegalArgumentException(\"size_t has to be either 4 or 8 bytes.\");\n");
+                    "            throw new IllegalArgumentException(\"size_t has to be either 4 or"
+                            + " 8 bytes.\");\n");
             writer.append("        }\n");
             writer.append("    }\n\n");
             writer.append("    public NativeSize getValue() {\n");
@@ -297,7 +298,8 @@ public class JnaGenerator {
             writer.append("            return new NativeSize(getPointer().getLong(0));\n");
             writer.append("        } else {\n");
             writer.append(
-                    "            throw new IllegalArgumentException(\"size_t has to be either 4 or 8 bytes.\");\n");
+                    "            throw new IllegalArgumentException(\"size_t has to be either 4 or"
+                            + " 8 bytes.\");\n");
             writer.append("        }\n");
             writer.append("    }\n");
             writer.append("}\n");

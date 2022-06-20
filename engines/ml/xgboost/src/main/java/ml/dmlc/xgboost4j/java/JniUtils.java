@@ -17,8 +17,10 @@ import ai.djl.ml.xgboost.XgbNDArray;
 import ai.djl.ml.xgboost.XgbNDManager;
 import ai.djl.ml.xgboost.XgbSymbolBlock;
 import ai.djl.ndarray.types.Shape;
+
 import com.sun.jna.Native;
 import com.sun.jna.PointerProxy;
+
 import java.nio.Buffer;
 
 /** DJL class that has access to XGBoost JNI. */

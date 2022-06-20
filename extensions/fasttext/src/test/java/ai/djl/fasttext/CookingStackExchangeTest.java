@@ -32,6 +32,12 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -42,10 +48,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class CookingStackExchangeTest {
 
@@ -143,7 +145,8 @@ public class CookingStackExchangeTest {
         try (FtModel model = new FtModel("text_classification")) {
             model.load(modelFile);
             String text =
-                    "Convair was an american aircraft manufacturing company which later expanded into rockets and spacecraft .";
+                    "Convair was an american aircraft manufacturing company which later expanded"
+                            + " into rockets and spacecraft .";
             Classifications result = ((FtTextClassification) model.getBlock()).classify(text, 5);
 
             logger.info("{}", result);

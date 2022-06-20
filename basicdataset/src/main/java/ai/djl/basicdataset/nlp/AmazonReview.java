@@ -19,12 +19,14 @@ import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.util.Progress;
+
+import org.apache.commons.csv.CSVFormat;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.csv.CSVFormat;
 
 /**
  * The {@link AmazonReview} dataset contains a {@link ai.djl.Application.NLP#SENTIMENT_ANALYSIS} set

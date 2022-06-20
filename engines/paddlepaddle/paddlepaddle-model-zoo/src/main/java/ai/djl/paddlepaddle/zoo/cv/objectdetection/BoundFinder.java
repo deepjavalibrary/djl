@@ -15,6 +15,7 @@ package ai.djl.paddlepaddle.zoo.cv.objectdetection;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.Point;
 import ai.djl.modality.cv.output.Rectangle;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,8 +66,7 @@ public class BoundFinder {
      * @return the region defined by boxes
      */
     public List<BoundingBox> getBoxes() {
-        return pointsCollection
-                .stream()
+        return pointsCollection.stream()
                 .parallel()
                 .map(
                         points -> {

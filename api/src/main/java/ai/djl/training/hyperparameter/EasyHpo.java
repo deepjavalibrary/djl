@@ -26,9 +26,11 @@ import ai.djl.training.hyperparameter.optimizer.HpOptimizer;
 import ai.djl.training.hyperparameter.param.HpSet;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
-import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /** Helper for easy training with hyperparameters. */
 public abstract class EasyHpo {

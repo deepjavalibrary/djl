@@ -22,9 +22,11 @@ import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset.Usage;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
-import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class ImageNetTest {
 

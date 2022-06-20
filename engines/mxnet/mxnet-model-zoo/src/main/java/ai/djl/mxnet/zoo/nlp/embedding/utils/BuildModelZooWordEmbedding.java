@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.modality.nlp.embedding.TrainableWordEmbedding;
 import ai.djl.ndarray.NDArray;
 import ai.djl.util.Utils;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;

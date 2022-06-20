@@ -17,6 +17,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.translate.ArgumentsUtil;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,23 +38,19 @@ public class SsdBlockFactory implements BlockFactory {
         boolean globalPool = ArgumentsUtil.booleanValue(arguments, "globalPool");
         int[] numFilters =
                 ((List<Double>) arguments.get("numFilters"))
-                        .stream()
-                        .mapToInt(Double::intValue)
-                        .toArray();
+                        .stream().mapToInt(Double::intValue).toArray();
         List<Float> ratio =
                 ((List<Double>) arguments.get("ratios"))
-                        .stream()
-                        .map(Double::floatValue)
-                        .collect(Collectors.toList());
+                        .stream().map(Double::floatValue).collect(Collectors.toList());
         List<List<Float>> sizes =
                 ((List<List<Double>>) arguments.get("sizes"))
                         .stream()
-                        .map(
-                                size ->
-                                        size.stream()
-                                                .map(Double::floatValue)
-                                                .collect(Collectors.toList()))
-                        .collect(Collectors.toList());
+                                .map(
+                                        size ->
+                                                size.stream()
+                                                        .map(Double::floatValue)
+                                                        .collect(Collectors.toList()))
+                                .collect(Collectors.toList());
         List<List<Float>> ratios = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             ratios.add(ratio);

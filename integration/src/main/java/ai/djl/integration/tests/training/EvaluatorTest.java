@@ -20,6 +20,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.training.evaluator.AbstractAccuracy;
 import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.evaluator.TopKAccuracy;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

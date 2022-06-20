@@ -25,6 +25,7 @@ import ai.djl.training.GradientCollector;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.initializer.NormalInitializer;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

@@ -14,6 +14,7 @@ package ai.djl.translate;
 
 import ai.djl.Model;
 import ai.djl.util.Pair;
+
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;

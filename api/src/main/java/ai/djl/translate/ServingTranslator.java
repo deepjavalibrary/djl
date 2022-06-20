@@ -14,6 +14,7 @@ package ai.djl.translate;
 
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+
 import java.util.Map;
 
 /** A {@link Translator} that can handle generic {@link Input} and {@link Output}. */

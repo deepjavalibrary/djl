@@ -20,9 +20,11 @@ import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
+
+import org.tensorflow.lite.Interpreter;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.tensorflow.lite.Interpreter;
 
 /**
  * {@code TfLiteSymbolBlock} is the TFLite implementation of {@link SymbolBlock}.

@@ -21,10 +21,12 @@ import ai.djl.nn.AbstractBlock;
 import ai.djl.tensorrt.jni.JniUtils;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /** {@code TrtSession} represents the TensorRT's execution context. */
 public class TrtSession extends AbstractBlock implements AutoCloseable {
