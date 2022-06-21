@@ -58,7 +58,7 @@ For macOS, you can use the following library:
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-native-mkl</artifactId>
     <classifier>osx-x86_64</classifier>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -73,18 +73,30 @@ installed on your GPU machine, you can use one of the following library:
 **Important:** Since cuda 11.0, you must install CUDNN and NCCL matches the CUDA version manually.
 Apache MXNet no longer statically link CUDNN and NCCL in it.
 
-Apache MXNet 1.8.0 cu110 package supports SM 5.0, 6.0, 7.0 and 8.0 cuda architectures.
-Apache MXNet 1.8.0 cu102 package supports SM 3.0, 5.0, 6.0, 7.0 and 7.5 cuda architectures.
+Apache MXNet 1.9.0 cu112 package supports SM 5.0, 6.0, 7.0 and 8.0 cuda architectures.
+Apache MXNet 1.9.0 cu110 package supports SM 5.0, 6.0, 7.0 and 8.0 cuda architectures.
+Apache MXNet 1.9.0 cu102 package supports SM 3.0, 5.0, 6.0, 7.0 and 7.5 cuda architectures.
 
-- ai.djl.mxnet:mxnet-native-cu102mkl:1.8.0:linux-x86_64 - CUDA 11.0
-- ai.djl.mxnet:mxnet-native-cu101mkl:1.8.0:linux-x86_64 - CUDA 10.2
+- ai.djl.mxnet:mxnet-native-cu112mkl:1.9.0:linux-x86_64 - CUDA 11.2
+- ai.djl.mxnet:mxnet-native-cu102mkl:1.9.0:linux-x86_64 - CUDA 11.0
+- ai.djl.mxnet:mxnet-native-cu101mkl:1.9.0:linux-x86_64 - CUDA 10.2
+
+```xml
+<dependency>
+    <groupId>ai.djl.mxnet</groupId>
+    <artifactId>mxnet-native-cu112mkl</artifactId>
+    <classifier>linux-x86_64</classifier>
+    <version>1.9.0</version>
+    <scope>runtime</scope>
+</dependency>
+```
 
 ```xml
 <dependency>
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-native-cu110mkl</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -94,14 +106,14 @@ Apache MXNet 1.8.0 cu102 package supports SM 3.0, 5.0, 6.0, 7.0 and 7.5 cuda arc
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-native-cu102mkl</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
 #### Linux CPU
 
-- ai.djl.mxnet:mxnet-native-mkl:1.8.0:linux-x86_64
+- ai.djl.mxnet:mxnet-native-mkl:1.9.0:linux-x86_64
 
 ```xml
 <dependency>
@@ -109,7 +121,7 @@ Apache MXNet 1.8.0 cu102 package supports SM 3.0, 5.0, 6.0, 7.0 and 7.5 cuda arc
     <artifactId>mxnet-native-mkl</artifactId>
     <classifier>linux-x86_64</classifier>
     <scope>runtime</scope>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
 </dependency>
 ```
 
@@ -130,7 +142,7 @@ This package supports CUDA 11.0 and CUDA 10.2 for Windows.
 
 ### Windows CPU
 
-- ai.djl.mxnet:mxnet-native-mkl:1.8.0:win-x86_64
+- ai.djl.mxnet:mxnet-native-mkl:1.9.0:win-x86_64
 
 ```xml
 <dependency>
@@ -138,6 +150,6 @@ This package supports CUDA 11.0 and CUDA 10.2 for Windows.
     <artifactId>mxnet-native-mkl</artifactId>
     <classifier>win-x86_64</classifier>
     <scope>runtime</scope>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
 </dependency>
 ```
