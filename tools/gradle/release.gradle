@@ -59,7 +59,6 @@ task increaseFinalVersion {
         collection += fileTree(".").filter {
             it.name.endsWith(".md") || it.name.endsWith("overview.html")
         }
-        collection += file("extensions/benchmark/snapcraft/snapcraft.yaml")
 
         collection.each { File file ->
             file.text = file.text.replaceAll("/${previousVersion}/", "/${djl_version}/")
