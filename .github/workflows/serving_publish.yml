@@ -64,7 +64,7 @@ jobs:
           ./gradlew :serving:createDeb -Psnapshot
           DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
           aws s3 cp serving/build/distributions/*.deb s3://djl-ai/publish/djl-serving/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/djl-serving_${DJL_VERSION}~SNAPSHOT*"
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/djl-serving_${DJL_VERSION}*"
       - name: Publish release deb
         if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
