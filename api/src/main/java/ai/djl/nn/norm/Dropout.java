@@ -91,12 +91,6 @@ public class Dropout extends AbstractBlock {
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return "Dropout()";
-    }
-
     /**
      * Applies Dropout to the input.
      *

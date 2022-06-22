@@ -373,7 +373,8 @@ public final class Utils {
         Shape[] inputShapes = block.isInitialized() ? block.getInputShapes() : null;
         Shape[] outputShapes = inputShapes != null ? block.getOutputShapes(inputShapes) : null;
         StringBuilder sb = new StringBuilder(200);
-        if (block instanceof LambdaBlock && !"anonymous".equals(((LambdaBlock) block).getName())) {
+        if (block instanceof LambdaBlock
+                && !LambdaBlock.DEFAULT_NAME.equals(((LambdaBlock) block).getName())) {
             sb.append(((LambdaBlock) block).getName());
         } else if (blockName != null) {
             sb.append(blockName);

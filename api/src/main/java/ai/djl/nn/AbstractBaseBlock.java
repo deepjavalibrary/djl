@@ -360,43 +360,6 @@ public abstract class AbstractBaseBlock implements Block {
         return Utils.describe(this, null, 0);
     }
 
-    private void appendShape(StringBuilder sb, Shape[] shapes) {
-        boolean first = true;
-        for (Shape shape : shapes) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(", ");
-            }
-            long[] sh = shape.getShape();
-            int length = sh.length;
-            if (length == 0) {
-                sb.append("()");
-            } else {
-                int index = 0;
-                if (sh[0] == -1) {
-                    --length;
-                    index = 1;
-                }
-
-                if (length == 0) {
-                    sb.append("()");
-                } else if (length == 1) {
-                    sb.append(sh[index]);
-                } else {
-                    sb.append('(');
-                    for (int i = index; i < sh.length; ++i) {
-                        if (i > index) {
-                            sb.append(", ");
-                        }
-                        sb.append(sh[i]);
-                    }
-                    sb.append(')');
-                }
-            }
-        }
-    }
-
     /** {@inheritDoc} */
     @Override
     public Shape[] getInputShapes() {

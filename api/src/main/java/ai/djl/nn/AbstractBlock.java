@@ -101,7 +101,7 @@ public abstract class AbstractBlock extends AbstractBaseBlock {
      * @return the block given as a parameter - that way the block can be created and reassigned to
      *     a member variable more easily.
      */
-    public final <B extends Block> B addChildBlock(String name, B block) {
+    protected final <B extends Block> B addChildBlock(String name, B block) {
         int childNumber = children.size() + 1;
         children.add(String.format(Locale.ROOT, "%02d%s", childNumber, name), block);
         return block;
@@ -114,8 +114,8 @@ public abstract class AbstractBlock extends AbstractBaseBlock {
      * @param f the function forms the {@link LambdaBlock}
      * @return the child block
      */
-    public LambdaBlock addChildBlock(String name, Function<NDList, NDList> f) {
-        return addChildBlock(name, new LambdaBlock(f));
+    protected LambdaBlock addChildBlock(String name, Function<NDList, NDList> f) {
+        return addChildBlock(name, new LambdaBlock(f, name));
     }
 
     /**
@@ -126,8 +126,8 @@ public abstract class AbstractBlock extends AbstractBaseBlock {
      * @return the child block
      * @see LambdaBlock#singleton(Function)
      */
-    public final LambdaBlock addChildBlockSingleton(String name, Function<NDArray, NDArray> f) {
-        return addChildBlock(name, LambdaBlock.singleton(f));
+    protected final LambdaBlock addChildBlockSingleton(String name, Function<NDArray, NDArray> f) {
+        return addChildBlock(name, LambdaBlock.singleton(f, name));
     }
 
     /**

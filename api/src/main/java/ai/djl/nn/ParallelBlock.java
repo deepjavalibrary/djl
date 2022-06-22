@@ -180,17 +180,4 @@ public class ParallelBlock extends AbstractBlock {
             throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("Parallel(\n");
-        for (Block block : children.values()) {
-            String blockString = block.toString().replaceAll("(?m)^", "\t");
-            sb.append(blockString).append('\n');
-        }
-        sb.append(')');
-        return sb.toString();
-    }
 }
