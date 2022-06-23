@@ -106,6 +106,8 @@ public class NDIndex {
      *
      *     // Uses ellipsis to select all the dimensions except for last axis where we only get a subsection.
      *     assertEquals(a.get(new NDIndex("..., 2")).getShape(), new Shape(5, 4));
+     *
+     *     // TODO: Add doc for the new indexings
      * </pre>
      *
      * @param indices a comma separated list of indices corresponding to either subsections,
@@ -336,7 +338,7 @@ public class NDIndex {
         if (!m.matches()) {
             throw new IllegalArgumentException("Invalid argument index: " + indexItem);
         }
-        // None
+        // "None" case
         if ("None".equals(indexItem)) {
             indices.add(new NDIndexNone());
             return argIndex;

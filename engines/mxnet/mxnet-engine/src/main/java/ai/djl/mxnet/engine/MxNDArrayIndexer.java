@@ -15,15 +15,10 @@ package ai.djl.mxnet.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.index.NDArrayIndexer;
-import ai.djl.ndarray.index.NDIndex;
-import ai.djl.ndarray.index.dim.NDIndexBooleans;
-import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import ai.djl.ndarray.types.Shape;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Stack;
 
 /** The {@link NDArrayIndexer} used by the {@link MxNDArray}. */
@@ -64,36 +59,6 @@ public class MxNDArrayIndexer extends NDArrayIndexer {
             oldResult.close();
         }
         return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray get(NDArray array, NDIndex index) {
-        if (index.getRank() == 0 && array.getShape().isScalar()) {
-            return array.duplicate();
-        }
-
-        // use booleanMask for NDIndexBooleans case
-        List<NDIndexElement> indices = index.getIndices();
-        if (!indices.isEmpty() && indices.get(0) instanceof NDIndexBooleans) {
-            if (indices.size() != 1) {
-                throw new IllegalArgumentException(
-                        "get() currently doesn't support more that one boolean NDArray");
-            }
-            return array.booleanMask(((NDIndexBooleans) indices.get(0)).getIndex());
-        }
-
-        Optional<NDIndexFullPick> fullPick = NDIndexFullPick.fromIndex(index, array.getShape());
-        if (fullPick.isPresent()) {
-            return get(array, fullPick.get());
-        }
-
-        Optional<NDIndexFullSlice> fullSlice = NDIndexFullSlice.fromIndex(index, array.getShape());
-        if (fullSlice.isPresent()) {
-            return get(array, fullSlice.get());
-        }
-        throw new UnsupportedOperationException(
-                "get() currently supports only all, fixed, and slices indices in MXNet engine");
     }
 
     /** {@inheritDoc} */
