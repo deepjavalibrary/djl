@@ -436,7 +436,6 @@ public final class JniUtils {
         if (index.getDataType() != DataType.INT64) {
             index = index.toType(DataType.INT64, true);
         }
-        System.out.println(PyTorchLibrary.LIB.torchTake(ndArray.getHandle(), index.getHandle()));
         return new PtNDArray(
                 ndArray.getManager(),
                 PyTorchLibrary.LIB.torchTake(ndArray.getHandle(), index.getHandle()));
