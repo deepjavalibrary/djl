@@ -14,6 +14,11 @@ package ai.djl.nn;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.util.Pair;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** Utility class that provides some useful blocks. */
 public final class Blocks {
@@ -80,5 +85,52 @@ public final class Blocks {
      */
     public static Block identityBlock() {
         return new LambdaBlock(x -> x, "identity");
+    }
+
+    /**
+     * Returns a string representation of the passed {@link Block} describing the input axes, output
+     * axes, and the block's children.
+     *
+     * @param block the block to describe
+     * @param blockName the name to be used for the passed block, or <code>null</code> if its class
+     *     name is to be used
+     * @param beginAxis skips all axes before this axis; use <code>0</code> to print all axes and
+     *     <code>1</code> to skip the batch axis.
+     * @return the string representation
+     */
+    public static String describe(Block block, String blockName, int beginAxis) {
+        Shape[] inputShapes = block.isInitialized() ? block.getInputShapes() : null;
+        Shape[] outputShapes = inputShapes != null ? block.getOutputShapes(inputShapes) : null;
+        StringBuilder sb = new StringBuilder(200);
+        if (block instanceof LambdaBlock
+                && !LambdaBlock.DEFAULT_NAME.equals(((LambdaBlock) block).getName())) {
+            sb.append(((LambdaBlock) block).getName());
+        } else if (blockName != null) {
+            sb.append(blockName);
+        } else {
+            sb.append(block.getClass().getSimpleName());
+        }
+        if (inputShapes != null) {
+            sb.append(
+                    Stream.of(inputShapes)
+                            .map(shape -> shape.slice(beginAxis).toString())
+                            .collect(Collectors.joining("+")));
+        }
+        if (!block.getChildren().isEmpty()) {
+            sb.append(" {\n");
+            for (Pair<String, Block> pair : block.getChildren()) {
+                String child = describe(pair.getValue(), pair.getKey().substring(2), beginAxis);
+                sb.append(child.replaceAll("(?m)^", "\t")).append('\n');
+            }
+            sb.append('}');
+        }
+        if (outputShapes != null) {
+            sb.append(" -> ");
+            sb.append(
+                    Stream.of(outputShapes)
+                            .map(shape -> shape.slice(beginAxis).toString())
+                            .collect(Collectors.joining("+")));
+        }
+        return sb.toString();
     }
 }

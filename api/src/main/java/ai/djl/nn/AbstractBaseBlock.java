@@ -21,7 +21,6 @@ import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
-import ai.djl.util.Utils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -357,7 +356,7 @@ public abstract class AbstractBaseBlock implements Block {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return Utils.describe(this, null, 0);
+        return Blocks.describe(this, null, 0);
     }
 
     /** {@inheritDoc} */
