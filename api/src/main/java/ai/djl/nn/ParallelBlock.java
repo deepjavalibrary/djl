@@ -13,6 +13,7 @@
 package ai.djl.nn;
 
 import ai.djl.MalformedModelException;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -112,6 +113,43 @@ public class ParallelBlock extends AbstractBlock {
         return add(new LambdaBlock(f));
     }
 
+    /**
+     * Adds a {@link LambdaBlock}, that applies the given function, to the list of parallel
+     * branches.
+     *
+     * @param f the function forms the {@link LambdaBlock}
+     * @param name the function name
+     * @return this block
+     */
+    public ParallelBlock add(Function<NDList, NDList> f, String name) {
+        return add(new LambdaBlock(f, name));
+    }
+
+    /**
+     * Adds a {@link LambdaBlock#singleton(Function)}, that applies the given function, to the list
+     * of parallel branches.
+     *
+     * @param f the function forms the {@link LambdaBlock}
+     * @return this block
+     * @see LambdaBlock#singleton(Function)
+     */
+    public ParallelBlock addSingleton(Function<NDArray, NDArray> f) {
+        return add(LambdaBlock.singleton(f));
+    }
+
+    /**
+     * Adds a {@link LambdaBlock#singleton(Function)}, that applies the given function, to the list
+     * of parallel branches.
+     *
+     * @param f the function forms the {@link LambdaBlock}
+     * @param name the function name
+     * @return this block
+     * @see LambdaBlock#singleton(Function)
+     */
+    public ParallelBlock addSingleton(Function<NDArray, NDArray> f, String name) {
+        return add(LambdaBlock.singleton(f, name));
+    }
+
     /** {@inheritDoc} */
     @Override
     protected NDList forwardInternal(
@@ -179,18 +217,5 @@ public class ParallelBlock extends AbstractBlock {
         } else if (loadVersion != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("Parallel(\n");
-        for (Block block : children.values()) {
-            String blockString = block.toString().replaceAll("(?m)^", "\t");
-            sb.append(blockString).append('\n');
-        }
-        sb.append(')');
-        return sb.toString();
     }
 }

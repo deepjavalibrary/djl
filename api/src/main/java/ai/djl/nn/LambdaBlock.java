@@ -34,6 +34,8 @@ import java.util.function.Function;
  */
 public class LambdaBlock extends AbstractBlock {
 
+    public static final String DEFAULT_NAME = "anonymous";
+
     private static final byte VERSION = 2;
 
     private Function<NDList, NDList> lambda;
@@ -45,7 +47,7 @@ public class LambdaBlock extends AbstractBlock {
      * @param lambda the function to apply
      */
     public LambdaBlock(Function<NDList, NDList> lambda) {
-        this(lambda, "anonymous");
+        this(lambda, DEFAULT_NAME);
     }
 
     /**
@@ -131,11 +133,5 @@ public class LambdaBlock extends AbstractBlock {
         } else if (version != 1) {
             throw new MalformedModelException("Unsupported encoding version: " + version);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return "Lambda::" + name + "()";
     }
 }
