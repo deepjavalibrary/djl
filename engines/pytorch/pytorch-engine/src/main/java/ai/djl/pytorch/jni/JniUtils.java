@@ -445,6 +445,15 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchTake(ndArray.getHandle(), index.getHandle()));
     }
 
+    public static PtNDArray put(PtNDArray ndArray, PtNDArray index, PtNDArray data) {
+        if (index.getDataType() != DataType.INT64) {
+            index = index.toType(DataType.INT64, true);
+        }
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchPut(ndArray.getHandle(), index.getHandle(), data.getHandle()));
+    }
+
     public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {
         Shape indexShape = index.getShape();
         Shape ndShape = ndArray.getShape();

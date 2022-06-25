@@ -581,13 +581,29 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray gather(NDArray index, int axis);
 
     /**
-     * Returns a partial {@code NDArray} pointed by the indexed array according to linear indexing,
-     * and the of output is of the same shape as index.
+     * Returns a partial {@code NDArray} pointed by {@param index} according to linear indexing, and
+     * the of output is of the same shape as {@param index}.
      *
-     * @param index picks the elements of an NDArray to the same position as index
+     * @param index picks the elements of an NDArray and output to the same entry as in {@param
+     *     index}
      * @return the partial {@code NDArray} of the same shape as index
      */
     NDArray take(NDArray index);
+
+    /**
+     * Set the entries of {@code NDArray} pointed by {@param index} according to linear indexing, to
+     * be the numbers in {@param data}, which is of the same shape as {@param index}.
+     *
+     * @param index select the entries of an {@code NDArray}
+     * @param data  numbers to assign to the indexed entries.
+     * @return
+     */
+    default NDArray put(NDArray index, NDArray data) {
+        if (!Arrays.equals(index.getShape().getShape(), data.getShape().getShape())){
+            throw new IllegalArgumentException("The shapes of index and data don't match");
+        }
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
 
     /**
      * Returns a scalar {@code NDArray} corresponding to a single element.

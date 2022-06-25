@@ -249,6 +249,17 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTake(
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchPut(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong jindex_handle, jlong jdata_handle) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const auto* index_ptr = reinterpret_cast<torch::Tensor*>(jindex_handle);
+  const auto* data_ptr = reinterpret_cast<torch::Tensor*>(jdata_handle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->put(*index_ptr, *data_ptr));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMaskedSelect(
     JNIEnv* env, jobject jthis, jlong jhandle, jlong jmasked_handle) {
   API_BEGIN()

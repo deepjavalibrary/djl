@@ -172,22 +172,13 @@ public class NDIndexTest {
     }
 
     @Test
-    public void testSetNumber() {
+    public void testPut() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
-            NDArray expected = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2));
-            original.set(new NDIndex(0), 9);
-            Assert.assertEquals(original, expected);
-
-            original = manager.arange(4f).reshape(2, 2);
-            expected = manager.ones(new Shape(2, 2));
-            original.set(new NDIndex("..."), 1);
-            Assert.assertEquals(original, expected);
-
-            original = manager.arange(4f).reshape(2, 2);
-            expected = manager.create(new float[] {1, 1, 1, 3}).reshape(2, 2);
-            original.set(new NDIndex("..., 0"), 1);
-            Assert.assertEquals(original, expected);
+            NDArray expected = manager.create(new float[] {1, 8, 666, 77}, new Shape(2, 2));
+            NDArray idx = manager.create(new long[] {2, 3, 1}, new Shape(3));
+            NDArray data = manager.create(new float[] {666, 77, 8}, new Shape(3));
+            Assert.assertEquals(original.put(idx, data), expected);
         }
     }
 
@@ -225,6 +216,25 @@ public class NDIndexTest {
             NDArray original = manager.ones(new Shape(1, 5));
             original.set(new NDIndex(":, 0::2"), array -> array.mul(-1).add(1));
             NDArray expected = manager.create(new float[][] {{0, 1, 0, 1, 0}});
+            Assert.assertEquals(original, expected);
+        }
+    }
+
+    public void testSetNumber() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+            NDArray expected = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2));
+            original.set(new NDIndex(0), 9);
+            Assert.assertEquals(original, expected);
+
+            original = manager.arange(4f).reshape(2, 2);
+            expected = manager.ones(new Shape(2, 2));
+            original.set(new NDIndex("..."), 1);
+            Assert.assertEquals(original, expected);
+
+            original = manager.arange(4f).reshape(2, 2);
+            expected = manager.create(new float[] {1, 1, 1, 3}).reshape(2, 2);
+            original.set(new NDIndex("..., 0"), 1);
             Assert.assertEquals(original, expected);
         }
     }
