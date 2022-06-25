@@ -349,7 +349,11 @@ public final class JniUtils {
                         ndArray.getHandle(), minIndices, maxIndices, stepIndices));
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static PtNDArray indexAdv(PtNDArray ndArray, NDIndex index) {
+        if (ndArray == null) {
+            return ndArray;
+        }
         List<NDIndexElement> indices = index.getIndices();
         long torchIndexHandle = PyTorchLibrary.LIB.torchIndexInit(indices.size());
         ListIterator<NDIndexElement> it = indices.listIterator();
@@ -365,8 +369,8 @@ public final class JniUtils {
                 Long min = ((NDIndexSlice) elem).getMin();
                 Long max = ((NDIndexSlice) elem).getMax();
                 Long step = ((NDIndexSlice) elem).getStep();
-                int null_slice_bin = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
-                // null_slice_bin encodes whether (min, max) is null:
+                int nullSliceBin = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
+                // nullSliceBin encodes whether the slice (min, max) is null:
                 // is_null == 1, ! is_null == 0;
                 // 0b11 == 3, 0b10 = 2, ...
                 PyTorchLibrary.LIB.torchIndexAppendSlice(
@@ -374,23 +378,23 @@ public final class JniUtils {
                         min == null ? 0 : min,
                         max == null ? 0 : max,
                         step == null ? 1 : step,
-                        null_slice_bin);
+                        nullSliceBin);
             } else if (elem instanceof NDIndexAll) {
                 PyTorchLibrary.LIB.torchIndexAppendSlice(torchIndexHandle, 0, 0, 1, 3);
             } else if (elem instanceof NDIndexFixed) {
                 PyTorchLibrary.LIB.torchIndexAppendFixed(
                         torchIndexHandle, ((NDIndexFixed) elem).getIndex());
             } else if (elem instanceof NDIndexBooleans) {
-                PtNDArray index_arr = (PtNDArray) ((NDIndexBooleans) elem).getIndex();
-                PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, index_arr.getHandle());
+                PtNDArray indexArr = (PtNDArray) ((NDIndexBooleans) elem).getIndex();
+                PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, indexArr.getHandle());
             } else if (elem instanceof NDIndexTake) {
-                PtNDArray index_arr = (PtNDArray) ((NDIndexTake) elem).getIndex();
-                if (index_arr.getDataType() != DataType.INT64) {
-                    index_arr = index_arr.toType(DataType.INT64, true);
+                PtNDArray indexArr = (PtNDArray) ((NDIndexTake) elem).getIndex();
+                if (indexArr.getDataType() != DataType.INT64) {
+                    indexArr = indexArr.toType(DataType.INT64, true);
                 }
-                PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, index_arr.getHandle());
+                PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, indexArr.getHandle());
             } else if (elem instanceof NDIndexPick) {
-                //noinspection OptionalGetWithoutIsPresent
+                // Backward compatible
                 NDIndexFullPick fullPick =
                         NDIndexFullPick.fromIndex(index, ndArray.getShape()).get();
                 return pick(

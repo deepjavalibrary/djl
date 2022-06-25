@@ -10,6 +10,7 @@ dependencies {
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
     testImplementation(project(":testing"))
     testRuntimeOnly project(":engines:pytorch:pytorch-engine")
+    testRuntimeOnly project(":engines:pytorch:pytorch-jni")
 }
 
 task syncS3(type: Exec) {

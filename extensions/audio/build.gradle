@@ -31,6 +31,7 @@ dependencies {
     testImplementation project(":testing")
     testRuntimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
     testRuntimeOnly project(":engines:pytorch:pytorch-engine")
+    testRuntimeOnly project(":engines:pytorch:pytorch-jni")
 }
 
 publishing {

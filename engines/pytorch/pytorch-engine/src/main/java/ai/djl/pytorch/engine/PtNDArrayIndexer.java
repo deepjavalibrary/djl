@@ -55,11 +55,20 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
     public NDArray get(NDArray array, NDIndex index) {
         if (index.getRank() == 0) {
             if (array.getShape().isScalar()) {
-                return array.duplicate();
+                return array.getManager() == manager
+                        ? array.duplicate()
+                        : manager.create(
+                                array.toByteBuffer(), array.getShape(), array.getDataType());
             }
             index.addAllDim();
         }
-        return JniUtils.indexAdv(manager.from(array), index);
+        if (array == null || array instanceof PtNDArray && array.getManager() == manager) {
+            return JniUtils.indexAdv((PtNDArray) array, index);
+        } else {
+            PtNDArray arrayNew =
+                    manager.create(array.toByteBuffer(), array.getShape(), array.getDataType());
+            return JniUtils.indexAdv(arrayNew, index);
+        }
     }
 
     /** {@inheritDoc} */

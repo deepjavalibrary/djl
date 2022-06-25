@@ -605,10 +605,10 @@ final class PyTorchLibrary {
 
     native long torchIndexReturn(long handle, long torchIndexHandle);
 
-    native void torchIndexAppendNoneEllipsis(long torchIndexHandle, boolean is_ellipsis);
+    native void torchIndexAppendNoneEllipsis(long torchIndexHandle, boolean isEllipsis);
 
     native void torchIndexAppendSlice(
-            long torchIndexHandle, long min, long max, long step, int null_slice_binary);
+            long torchIndexHandle, long min, long max, long step, int nullSliceBinary);
 
     native void torchIndexAppendFixed(long torchIndexHandle, long idx);
 
