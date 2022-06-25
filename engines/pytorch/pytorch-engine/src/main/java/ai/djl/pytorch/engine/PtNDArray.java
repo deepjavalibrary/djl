@@ -268,9 +268,6 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         if (!(index instanceof PtNDArray) || !(data instanceof PtNDArray)) {
             throw new IllegalArgumentException("Only PtNDArray is supported.");
         }
-        if (!Arrays.equals(index.getShape().getShape(), data.getShape().getShape())){
-            throw new IllegalArgumentException("The shapes of index and data don't match");
-        }
         return JniUtils.put(this, (PtNDArray) index, (PtNDArray) data);
     }
 

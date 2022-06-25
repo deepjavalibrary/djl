@@ -599,9 +599,6 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return
      */
     default NDArray put(NDArray index, NDArray data) {
-        if (!Arrays.equals(index.getShape().getShape(), data.getShape().getShape())){
-            throw new IllegalArgumentException("The shapes of index and data don't match");
-        }
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
