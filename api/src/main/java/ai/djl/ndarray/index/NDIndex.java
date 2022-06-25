@@ -17,9 +17,10 @@ import ai.djl.ndarray.index.dim.NDIndexAll;
 import ai.djl.ndarray.index.dim.NDIndexBooleans;
 import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.dim.NDIndexFixed;
-import ai.djl.ndarray.index.dim.NDIndexNone;
+import ai.djl.ndarray.index.dim.NDIndexNull;
 import ai.djl.ndarray.index.dim.NDIndexPick;
 import ai.djl.ndarray.index.dim.NDIndexSlice;
+import ai.djl.ndarray.index.dim.NDIndexTake;
 import ai.djl.ndarray.types.DataType;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class NDIndex {
     /* Android regex requires escape } char as well */
     private static final Pattern ITEM_PATTERN =
             Pattern.compile(
-                    "(\\*)|((-?\\d+|\\{\\})?:(-?\\d+|\\{\\})?(:(-?\\d+|\\{\\}))?)|(-?\\d+|\\{\\})|None");
+                    "(\\*)|((-?\\d+|\\{\\})?:(-?\\d+|\\{\\})?(:(-?\\d+|\\{\\}))?)|(-?\\d+|\\{\\})|null");
 
     private int rank;
     private List<NDIndexElement> indices;
@@ -107,7 +108,9 @@ public class NDIndex {
      *     // Uses ellipsis to select all the dimensions except for last axis where we only get a subsection.
      *     assertEquals(a.get(new NDIndex("..., 2")).getShape(), new Shape(5, 4));
      *
-     *     // TODO: Add doc for the new indexings
+     *     // Uses null to add an extra axis to the output array
+     *     assertEquals(a.get(new NDIndex(":2, null, 0, :2")).getShape(), new Shape(2, 1, 2));
+     *
      * </pre>
      *
      * @param indices a comma separated list of indices corresponding to either subsections,
@@ -338,9 +341,9 @@ public class NDIndex {
         if (!m.matches()) {
             throw new IllegalArgumentException("Invalid argument index: " + indexItem);
         }
-        // "None" case
-        if ("None".equals(indexItem)) {
-            indices.add(new NDIndexNone());
+        // "null" case
+        if ("null".equals(indexItem)) {
+            indices.add(new NDIndexNull());
             return argIndex;
         }
         // "*" case
@@ -366,9 +369,12 @@ public class NDIndex {
                         indices.add(new NDIndexBooleans(array));
                         return argIndex + 1;
                     } else if (array.getDataType().isInteger()) {
-                        indices.add(new NDIndexPick(array));
+                        indices.add(new NDIndexTake(array));
                         return argIndex + 1;
                     }
+                } else if (arg == null) {
+                    indices.add(new NDIndexNull());
+                    return argIndex + 1;
                 }
                 throw new IllegalArgumentException("Unknown argument: " + arg);
             } else {

@@ -19,7 +19,7 @@ import ai.djl.ndarray.index.dim.NDIndexAll;
 import ai.djl.ndarray.index.dim.NDIndexBooleans;
 import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.dim.NDIndexFixed;
-import ai.djl.ndarray.index.dim.NDIndexNone;
+import ai.djl.ndarray.index.dim.NDIndexNull;
 import ai.djl.ndarray.index.dim.NDIndexPick;
 import ai.djl.ndarray.index.dim.NDIndexSlice;
 import ai.djl.ndarray.index.dim.NDIndexTake;
@@ -363,7 +363,7 @@ public final class JniUtils {
             }
 
             NDIndexElement elem = it.next();
-            if (elem instanceof NDIndexNone) {
+            if (elem instanceof NDIndexNull) {
                 PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, false);
             } else if (elem instanceof NDIndexSlice) {
                 Long min = ((NDIndexSlice) elem).getMin();

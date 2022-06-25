@@ -13,7 +13,7 @@
 package ai.djl.ndarray.index.dim;
 
 /** An {@code NDIndexElement} to return all values in a particular dimension. */
-public class NDIndexNone implements NDIndexElement {
+public class NDIndexNull implements NDIndexElement {
 
     /** {@inheritDoc} */
     @Override

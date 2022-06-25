@@ -62,6 +62,7 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
             }
             index.addAllDim();
         }
+
         if (array == null || array instanceof PtNDArray && array.getManager() == manager) {
             return JniUtils.indexAdv((PtNDArray) array, index);
         } else {
