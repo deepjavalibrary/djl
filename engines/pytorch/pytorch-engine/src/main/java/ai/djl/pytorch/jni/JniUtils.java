@@ -451,7 +451,8 @@ public final class JniUtils {
         }
         return new PtNDArray(
                 ndArray.getManager(),
-                PyTorchLibrary.LIB.torchPut(ndArray.getHandle(), index.getHandle(), data.getHandle()));
+                PyTorchLibrary.LIB.torchPut(
+                        ndArray.getHandle(), index.getHandle(), data.getHandle()));
     }
 
     public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {
