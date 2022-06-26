@@ -17,6 +17,8 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 
+import java.util.List;
+
 /**
  * A {@code Batch} is used to hold multiple items (data and label pairs) from a {@link Dataset}.
  *
@@ -47,6 +49,7 @@ public class Batch implements AutoCloseable {
     private int size;
     private long progress;
     private long progressTotal;
+    private List<?> indices;
 
     /**
      * Creates a new instance of {@code Batch} with the given manager, data and labels.
@@ -81,6 +84,44 @@ public class Batch implements AutoCloseable {
         this.labelBatchifier = labelBatchifier;
         this.progress = progress;
         this.progressTotal = progressTotal;
+    }
+
+    /**
+     * Creates a new instance of {@code Batch} with the given manager, data and labels.
+     *
+     * @param manager the manager for the {@code Batch}
+     * @param data the {@link NDList} containing the data
+     * @param labels the {@link NDList} containing the labels
+     * @param size (batchSize) the number of {@link Record}s in the batch
+     * @param dataBatchifier the {@link Batchifier} that is used to split data
+     * @param labelBatchifier the {@link Batchifier} that is used for split labels
+     * @param progress the progress of the batch if it is part of some kind of iteration like a
+     *     dataset iteration. Returns 0 if there is no iteration.
+     * @param progressTotal the total or end value for the progress of the batch if it is part of
+     * @param indices the indices used to extract the data and labels
+     */
+    public Batch(
+            NDManager manager,
+            NDList data,
+            NDList labels,
+            int size,
+            Batchifier dataBatchifier,
+            Batchifier labelBatchifier,
+            long progress,
+            long progressTotal,
+            List<?> indices) {
+        this.manager = manager;
+        this.manager.setName("batch");
+        data.attach(manager);
+        labels.attach(manager);
+        this.data = data;
+        this.labels = labels;
+        this.size = size;
+        this.dataBatchifier = dataBatchifier;
+        this.labelBatchifier = labelBatchifier;
+        this.progress = progress;
+        this.progressTotal = progressTotal;
+        this.indices = indices;
     }
 
     /**
@@ -174,7 +215,8 @@ public class Batch implements AutoCloseable {
                             dataBatchifier,
                             labelBatchifier,
                             progress,
-                            progressTotal)
+                            progressTotal,
+                            indices)
                 };
             } else {
                 NDList d = data.toDevice(devices[0], true);
@@ -188,7 +230,8 @@ public class Batch implements AutoCloseable {
                             dataBatchifier,
                             labelBatchifier,
                             progress,
-                            progressTotal)
+                            progressTotal,
+                            indices)
                 };
             }
         }
@@ -212,7 +255,8 @@ public class Batch implements AutoCloseable {
                             dataBatchifier,
                             labelBatchifier,
                             progress,
-                            progressTotal);
+                            progressTotal,
+                            indices);
         }
         return splitted;
     }
@@ -223,5 +267,15 @@ public class Batch implements AutoCloseable {
                     "Split can only be called on a batch containing a batchifier");
         }
         return batchifier.split(list, numOfSlices, evenSplit);
+    }
+
+    /**
+     * Returns the indices used to extract the data and labels from the {@link Dataset}.
+     *
+     * @return a list of {@link Long} if the {@link Dataset} is a {@link RandomAccessDataset},
+     *     otherwise may return <code>null</code>.
+     */
+    public List<?> getIndices() {
+        return indices;
     }
 }

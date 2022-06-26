@@ -199,7 +199,8 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
                 dataBatchifier,
                 labelBatchifier,
                 progress,
-                dataset.size());
+                dataset.size(),
+                indices);
     }
 
     private void preFetch() {
