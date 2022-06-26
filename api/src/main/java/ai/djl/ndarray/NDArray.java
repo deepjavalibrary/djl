@@ -581,22 +581,21 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray gather(NDArray index, int axis);
 
     /**
-     * Returns a partial {@code NDArray} pointed by {@param index} according to linear indexing, and
-     * the of output is of the same shape as {@param index}.
+     * Returns a partial {@code NDArray} pointed by index according to linear indexing, and
+     * the of output is of the same shape as index.
      *
-     * @param index picks the elements of an NDArray and output to the same entry as in {@param
-     *     index}
+     * @param index picks the elements of an NDArray and output to the same entry as in index
      * @return the partial {@code NDArray} of the same shape as index
      */
     NDArray take(NDArray index);
 
     /**
-     * Set the entries of {@code NDArray} pointed by {@param index} according to linear indexing, to
-     * be the numbers in {@param data}, which is of the same shape as {@param index}.
+     * Set the entries of {@code NDArray} pointed by index according to linear indexing, to
+     * be the numbers in data, which is of the same shape as index.
      *
      * @param index select the entries of an {@code NDArray}
-     * @param data  numbers to assign to the indexed entries.
-     * @return
+     * @param data  numbers to assign to the indexed entries
+     * @return The NDArray with updated values
      */
     default NDArray put(NDArray index, NDArray data) {
         throw new UnsupportedOperationException("Not implemented yet.");
