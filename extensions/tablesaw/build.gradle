@@ -15,6 +15,7 @@ dependencies {
 //    testRuntimeOnly "tech.tablesaw:tablesaw-html:${tablesaw_version}"
 //    testRuntimeOnly "tech.tablesaw:tablesaw-json:${tablesaw_version}"
     testRuntimeOnly project(":engines:pytorch:pytorch-engine")
+    testRuntimeOnly project(":engines:pytorch:pytorch-jni")
 }
 
 publishing {

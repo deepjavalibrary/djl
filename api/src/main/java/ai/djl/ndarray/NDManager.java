@@ -165,7 +165,7 @@ public interface NDManager extends AutoCloseable {
     ByteBuffer allocateDirect(int capacity);
 
     /**
-     * Creates a new {@code NDArray} if the input {@link NDArray} is from external engine.
+     * Creates a new {@code NDArray} if the input {@link NDArray} is from an external engine.
      *
      * @param array the input {@code NDArray}
      * @return a new {@code NDArray} if the input {@code NDArray} is from external engine

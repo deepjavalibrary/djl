@@ -14,6 +14,7 @@ package ai.djl.pytorch.engine;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.index.NDArrayIndexer;
+import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.dim.NDIndexBooleans;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
@@ -46,6 +47,28 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
         long[] step = fullSlice.getStep();
         try (PtNDArray res = JniUtils.index(manager.from(array), min, max, step, manager)) {
             return res.squeeze(fullSlice.getToSqueeze());
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray get(NDArray array, NDIndex index) {
+        if (index.getRank() == 0) {
+            if (array.getShape().isScalar()) {
+                return array.getManager() == manager
+                        ? array.duplicate()
+                        : manager.create(
+                                array.toByteBuffer(), array.getShape(), array.getDataType());
+            }
+            index.addAllDim();
+        }
+
+        if (array == null || array instanceof PtNDArray && array.getManager() == manager) {
+            return JniUtils.indexAdv((PtNDArray) array, index);
+        } else {
+            PtNDArray arrayNew =
+                    manager.create(array.toByteBuffer(), array.getShape(), array.getDataType());
+            return JniUtils.indexAdv(arrayNew, index);
         }
     }
 

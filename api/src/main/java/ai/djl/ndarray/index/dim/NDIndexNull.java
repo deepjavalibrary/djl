@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -12,34 +12,12 @@
  */
 package ai.djl.ndarray.index.dim;
 
-import ai.djl.ndarray.NDArray;
-
-/** An {@link NDIndexElement} that gets elements by index in the specified axis. */
-public class NDIndexPick implements NDIndexElement {
-
-    private NDArray index;
-
-    /**
-     * Constructs a pick.
-     *
-     * @param index the index to pick
-     */
-    public NDIndexPick(NDArray index) {
-        this.index = index;
-    }
+/** An {@code NDIndexElement} to return all values in a particular dimension. */
+public class NDIndexNull implements NDIndexElement {
 
     /** {@inheritDoc} */
     @Override
     public int getRank() {
         return 1;
-    }
-
-    /**
-     * Returns the index to pick.
-     *
-     * @return the index to pick
-     */
-    public NDArray getIndex() {
-        return index;
     }
 }

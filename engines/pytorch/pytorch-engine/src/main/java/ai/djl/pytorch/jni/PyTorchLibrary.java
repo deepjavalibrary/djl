@@ -600,4 +600,17 @@ final class PyTorchLibrary {
     native long torchNorm(long handle, int ord, long[] axis, boolean keepDims);
 
     native long torchNonZeros(long handle);
+
+    native long torchIndexInit(int size);
+
+    native long torchIndexReturn(long handle, long torchIndexHandle);
+
+    native void torchIndexAppendNoneEllipsis(long torchIndexHandle, boolean isEllipsis);
+
+    native void torchIndexAppendSlice(
+            long torchIndexHandle, long min, long max, long step, int nullSliceBinary);
+
+    native void torchIndexAppendFixed(long torchIndexHandle, long idx);
+
+    native void torchIndexAppendArray(long torchIndexHandle, long arrayHandle);
 }
