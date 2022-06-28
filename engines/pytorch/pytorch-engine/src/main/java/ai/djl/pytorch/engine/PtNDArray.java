@@ -258,9 +258,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         return JniUtils.take(this, (PtNDArray) index);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public NDArray put(NDArray index, NDArray data) {
         if (!(index instanceof PtNDArray) || !(data instanceof PtNDArray)) {
