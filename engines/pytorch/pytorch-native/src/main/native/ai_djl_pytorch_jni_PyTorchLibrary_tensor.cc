@@ -123,30 +123,30 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndex(JNIEnv
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexInit(JNIEnv* env, jobject jthis, jint jsize) {
   API_BEGIN()
-  std::vector<torch::indexing::TensorIndex> *index_ptr = new std::vector<torch::indexing::TensorIndex>;
+  std::vector<torch::indexing::TensorIndex>* index_ptr = new std::vector<torch::indexing::TensorIndex>;
   index_ptr->reserve(jsize);
   return reinterpret_cast<uintptr_t>(index_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexReturn(JNIEnv* env, jobject jthis,
-    jlong jhandle, jlong jtorch_index_handle) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexReturn(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong jtorch_index_handle) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex> *>(jtorch_index_handle);
+  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex>*>(jtorch_index_handle);
   torch::Tensor* ret_ptr = new torch::Tensor(tensor_ptr->index(*index_ptr));
   return reinterpret_cast<uintptr_t>(ret_ptr);
   API_END_RETURN()
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendNoneEllipsis(JNIEnv* env, jobject jthis,
-    jlong jtorch_index_handle, jboolean jis_ellipsis) {
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendNoneEllipsis(
+    JNIEnv* env, jobject jthis, jlong jtorch_index_handle, jboolean jis_ellipsis) {
   API_BEGIN()
-  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex> *>(jtorch_index_handle);
+  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex>*>(jtorch_index_handle);
   if (jis_ellipsis) {
-      index_ptr->emplace_back(torch::indexing::Ellipsis);
+    index_ptr->emplace_back(torch::indexing::Ellipsis);
   } else {
-      index_ptr->emplace_back(torch::indexing::None);
+    index_ptr->emplace_back(torch::indexing::None);
   }
   API_END()
 }
@@ -154,34 +154,34 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendNo
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendSlice(JNIEnv* env, jobject jthis,
     jlong jtorch_index_handle, jlong jmin, jlong jmax, jlong jstep, jint jnull_slice_binary) {
   API_BEGIN()
-  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex> *>(jtorch_index_handle);
+  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex>*>(jtorch_index_handle);
   if (jnull_slice_binary == 0) {
-      index_ptr->emplace_back(torch::indexing::Slice(jmin, jmax, jstep));
+    index_ptr->emplace_back(torch::indexing::Slice(jmin, jmax, jstep));
   } else if (jnull_slice_binary == 1) {
-      index_ptr->emplace_back(torch::indexing::Slice(jmin, torch::indexing::None, jstep));
+    index_ptr->emplace_back(torch::indexing::Slice(jmin, torch::indexing::None, jstep));
   } else if (jnull_slice_binary == 2) {
-      index_ptr->emplace_back(torch::indexing::Slice(torch::indexing::None, jmax, jstep));
+    index_ptr->emplace_back(torch::indexing::Slice(torch::indexing::None, jmax, jstep));
   } else if (jnull_slice_binary == 3) {
-      index_ptr->emplace_back(torch::indexing::Slice(torch::indexing::None, torch::indexing::None, jstep));
+    index_ptr->emplace_back(torch::indexing::Slice(torch::indexing::None, torch::indexing::None, jstep));
   }
   API_END()
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendFixed(JNIEnv* env, jobject jthis,
-    jlong jtorch_index_handle, jlong jidx) {
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendFixed(
+    JNIEnv* env, jobject jthis, jlong jtorch_index_handle, jlong jidx) {
   API_BEGIN()
-  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex> *>(jtorch_index_handle);
+  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex>*>(jtorch_index_handle);
   index_ptr->emplace_back((int) jidx);
   API_END()
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendArray(JNIEnv* env, jobject jthis,
-    jlong jtorch_index_handle, jlong jarray) {
-API_BEGIN()
-  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex> *>(jtorch_index_handle);
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAppendArray(
+    JNIEnv* env, jobject jthis, jlong jtorch_index_handle, jlong jarray) {
+  API_BEGIN()
+  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex>*>(jtorch_index_handle);
   auto* array_ptr = reinterpret_cast<torch::Tensor*>(jarray);
   index_ptr->emplace_back(*array_ptr);
-API_END()
+  API_END()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexPut(JNIEnv* env, jobject jthis, jlong jhandle,

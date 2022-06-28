@@ -260,8 +260,6 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /**
      * {@inheritDoc}
-     *
-     * @return
      */
     @Override
     public NDArray put(NDArray index, NDArray data) {
