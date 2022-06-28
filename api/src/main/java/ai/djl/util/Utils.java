@@ -353,4 +353,28 @@ public final class Utils {
         }
         return Paths.get(cacheDir);
     }
+
+    /**
+     * Returns nested model directory if the directory contains only one subdirectory.
+     *
+     * @param modelDir the model directory
+     * @return subdirectory if the model directory only contains one subdirectory
+     */
+    public static Path getNestedModelDir(Path modelDir) {
+        if (Files.isDirectory(modelDir)) {
+            try {
+                // handle actual model directory is subdirectory case
+                List<Path> files =
+                        Files.list(modelDir)
+                                .filter(p -> !p.getFileName().toString().startsWith("."))
+                                .collect(Collectors.toList());
+                if (files.size() == 1 && Files.isDirectory(files.get(0))) {
+                    return files.get(0);
+                }
+            } catch (IOException e) {
+                throw new AssertionError("Failed to list files: " + modelDir, e);
+            }
+        }
+        return modelDir.toAbsolutePath();
+    }
 }
