@@ -65,15 +65,6 @@ RUN v="${TRT_VERSION%.*}-1+cuda${CUDA_VERSION%.*}" &&\
         python3-libnvinfer=${v}; \
     apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-# Install PyPI packages
-RUN pip3 install --upgrade pip
-RUN pip3 install setuptools>=41.0.0
-COPY requirements.txt /tmp/requirements.txt
-RUN pip3 install -r /tmp/requirements.txt
-RUN pip3 install jupyter jupyterlab
-# Workaround to remove numpy installed with tensorflow
-RUN pip3 install --upgrade numpy
-
 # Install Cmake
 RUN cd /tmp && \
     wget https://github.com/Kitware/CMake/releases/download/v3.14.4/cmake-3.14.4-Linux-x86_64.sh && \
