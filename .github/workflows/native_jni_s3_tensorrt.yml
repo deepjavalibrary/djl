@@ -6,7 +6,7 @@ on:
 jobs:
   build-tensorrt-jni-linux:
     runs-on: ubuntu-latest
-    container: deepjavalibrary/ubuntu18.04:tensorrt-cuda113
+    container: deepjavalibrary/ubuntu18.04:tensorrt-cuda116
     steps:
       - name: Install Environment
         run: pip3 install awscli --upgrade
