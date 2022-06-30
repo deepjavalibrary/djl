@@ -228,4 +228,15 @@ public class NDIndexTest {
             Assert.assertEquals(original, expected);
         }
     }
+
+    @Test
+    public void testPut() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
+            NDArray expected = manager.create(new float[] {1, 8, 666, 77}, new Shape(2, 2));
+            NDArray idx = manager.create(new long[] {2, 3, 1}, new Shape(3));
+            NDArray data = manager.create(new float[] {666, 77, 8}, new Shape(3));
+            Assert.assertEquals(original.put(idx, data), expected);
+        }
+    }
 }

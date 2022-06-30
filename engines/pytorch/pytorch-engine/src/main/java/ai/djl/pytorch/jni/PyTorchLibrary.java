@@ -200,6 +200,8 @@ final class PyTorchLibrary {
 
     native long torchTake(long handle, long index);
 
+    native long torchPut(long handle, long index, long data);
+
     native long torchMaskedSelect(long handle, long maskHandle);
 
     native void torchMaskedPut(long handle, long valueHandle, long maskHandle);

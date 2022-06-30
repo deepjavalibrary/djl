@@ -116,14 +116,15 @@ JNIEXPORT jint JNICALL Java_ai_djl_fasttext_jni_FastTextLibrary_predictProba(
   fasttext_ptr->predictLine(in, predictions, top_k, 0.0);
 
   int size = predictions.size();
-   jclass java_lang_Float = static_cast<jclass>(env->NewGlobalRef(env->FindClass("java/lang/Float")));
-   jmethodID java_lang_Float_ = env->GetMethodID(java_lang_Float, "<init>", "(F)V");
+  jclass java_lang_Float = static_cast<jclass>(env->NewGlobalRef(env->FindClass("java/lang/Float")));
+  jmethodID java_lang_Float_ = env->GetMethodID(java_lang_Float, "<init>", "(F)V");
   jclass java_util_ArrayList = static_cast<jclass>(env->NewGlobalRef(env->FindClass("java/util/ArrayList")));
   jmethodID java_util_ArrayList_add = env->GetMethodID(java_util_ArrayList, "add", "(Ljava/lang/Object;)Z");
   for (int i = 0; i < size; ++i) {
     std::pair<real, std::string> pair = predictions[i];
-     env->CallBooleanMethod(jclasses, java_util_ArrayList_add, env->NewStringUTF(pair.second.c_str()));
-     env->CallBooleanMethod(jprob, java_util_ArrayList_add, env->NewObject(java_lang_Float, java_lang_Float_, pair.first));
+    env->CallBooleanMethod(jclasses, java_util_ArrayList_add, env->NewStringUTF(pair.second.c_str()));
+    env->CallBooleanMethod(
+        jprob, java_util_ArrayList_add, env->NewObject(java_lang_Float, java_lang_Float_, pair.first));
   }
 
   return size;
