@@ -597,9 +597,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @param data numbers to assign to the indexed entries
      * @return The NDArray with updated values
      */
-    default NDArray put(NDArray index, NDArray data) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
+    NDArray put(NDArray index, NDArray data);
 
     /**
      * Returns a scalar {@code NDArray} corresponding to a single element.
