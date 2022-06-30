@@ -76,6 +76,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             if (factory != null
                     && !(factory instanceof ServingTranslatorFactory)
                     && factory.isSupported(input, output)) {
+                logger.info("Using TranslatorFactory: {}", factory.getClass().getName());
                 return factory.newInstance(input, output, model, arguments);
             }
         }
@@ -92,6 +93,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         ServingTranslator translator = findTranslator(libPath, className);
         if (translator != null) {
             translator.setArguments(arguments);
+            logger.info("Using translator: {}", translator.getClass().getName());
             return translator;
         }
         return loadDefaultTranslator(arguments);
@@ -122,6 +124,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             ClassLoader parentCl = ClassLoaderUtils.getContextClassLoader();
             ClassLoader cl = new URLClassLoader(urls.toArray(new URL[0]), parentCl);
             if (className != null && !className.isEmpty()) {
+                logger.info("Trying to loading specified Translator: {}", className);
                 return initTranslator(cl, className);
             }
 
@@ -160,6 +163,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             className = className.replace(File.separatorChar, '.');
             ServingTranslator translator = initTranslator(cl, className);
             if (translator != null) {
+                logger.info("Found translator in model directory: {}", className);
                 return translator;
             }
         }
@@ -177,6 +181,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
                     fileName = fileName.replace('/', '.');
                     ServingTranslator translator = initTranslator(cl, fileName);
                     if (translator != null) {
+                        logger.info("Found translator {} in jar {}", fileName, path);
                         return translator;
                     }
                 }
