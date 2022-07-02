@@ -40,16 +40,16 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
     private int rescaledWidth;
     private int rescaledHeight;
 
-    private final int channel = 3;
-    private final int classnum = 21;
-    private final int bike = 2;
-    private final int car = 7;
-    private final int dog = 8;
-    private final int cat = 12;
-    private final int person = 15;
+    private static final int channel = 3;
+    private static final int classnum = 21;
+    private static final int bike = 2;
+    private static final int car = 7;
+    private static final int dog = 8;
+    private static final int cat = 12;
+    private static final int person = 15;
 
     // sheep is also identified with id 13 as well, this is taken into account when coloring pixels
-    private final int sheep = 17; // 13
+    private static final int sheep = 17; // 13
 
     /**
      * Creates the Semantic Segmentation translator from the given builder.
