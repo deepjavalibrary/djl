@@ -123,6 +123,18 @@ public class IValueTest {
                 Assert.assertEquals(list.get("data1"), array1);
             }
 
+            // (Dict(str, Tensor[])
+            Map<String, IValue> iValueMap = new ConcurrentHashMap<>();
+            try (IValue v1 = IValue.listFrom(array1);
+                    IValue v2 = IValue.listFrom(array2)) {
+                iValueMap.put("data1", v1);
+                iValueMap.put("data2", v2);
+                try (IValue ivalue = IValue.stringIValueMapFrom(iValueMap)) {
+                    Assert.assertTrue(ivalue.isMap());
+                    Assert.assertEquals(ivalue.getType(), "Dict(str, Tensor[])");
+                }
+            }
+
             try (IValue iv1 = IValue.from(1);
                     IValue iv2 = IValue.from(2);
                     IValue ivalue = IValue.listFrom(iv1, iv2)) {

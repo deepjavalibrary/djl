@@ -522,6 +522,8 @@ final class PyTorchLibrary {
 
     native long iValueFromStringMap(String[] keys, long[] tensorHandles);
 
+    native long iValueFromStringIValueMap(String[] keys, long[] tensorHandles);
+
     native long iValueToTensor(long iValueHandle);
 
     native boolean iValueToBool(long iValueHandle);

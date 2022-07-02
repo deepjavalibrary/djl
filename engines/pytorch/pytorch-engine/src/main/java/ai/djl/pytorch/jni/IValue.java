@@ -288,6 +288,24 @@ public class IValue extends NativeResource<Long> {
     }
 
     /**
+     * Creates a new {@code IValue} of type {@code Map[String, IValue]}.
+     *
+     * @param map the Map[String, IValue] value
+     * @return a new {@code IValue} of type {@code Map[String, IValue]}
+     */
+    public static IValue stringIValueMapFrom(Map<String, IValue> map) {
+        String[] keys = new String[map.size()];
+        long[] handles = new long[map.size()];
+        int i = 0;
+        for (Map.Entry<String, IValue> entry : map.entrySet()) {
+            keys[i] = entry.getKey();
+            handles[i] = entry.getValue().getHandle();
+            ++i;
+        }
+        return new IValue(PyTorchLibrary.LIB.iValueFromStringIValueMap(keys, handles));
+    }
+
+    /**
      * Returns the {@code boolean} value of this IValue.
      *
      * @return the boolean value of this IValue
