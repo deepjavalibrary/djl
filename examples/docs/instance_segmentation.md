@@ -38,6 +38,6 @@ This should produce the following output
 ```
 
 
-With the previous command, an output image with bounding box around all objects will be saved at: build/output/instances.jpg:
+With the previous command, an output image with bounding box around all objects will be saved at: build/output/instances.png:
 
 ![detected-instances](img/detected_instances.png)
