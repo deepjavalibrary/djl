@@ -40,16 +40,16 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
     private int rescaledWidth;
     private int rescaledHeight;
 
-    private static final int channel = 3;
-    private static final int classnum = 21;
-    private static final int bike = 2;
-    private static final int car = 7;
-    private static final int dog = 8;
-    private static final int cat = 12;
-    private static final int person = 15;
+    private static final int CHANNEL = 3;
+    private static final int CLASSNUM = 21;
+    private static final int BIKE = 2;
+    private static final int CAR = 7;
+    private static final int DOG = 8;
+    private static final int CAT = 12;
+    private static final int PERSON = 15;
 
     // sheep is also identified with id 13 as well, this is taken into account when coloring pixels
-    private static final int sheep = 17; // 13
+    private static final int SHEEP = 17; // 13
 
     /**
      * Creates the Semantic Segmentation translator from the given builder.
@@ -84,15 +84,15 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
 
         // build image array
         NDManager manager = NDManager.newBaseManager();
-        ByteBuffer bb = manager.allocateDirect(channel * height * width);
-        NDArray intRet = manager.create(bb, new Shape(channel, height, width), DataType.UINT8);
+        ByteBuffer bb = manager.allocateDirect(CHANNEL * height * width);
+        NDArray intRet = manager.create(bb, new Shape(CHANNEL, height, width), DataType.UINT8);
 
         // change color of pixels in image array where objects have been detected
         for (int j = 0; j < height; j++) {
             for (int k = 0; k < width; k++) {
                 int maxi = 0;
                 double maxnum = -Double.MAX_VALUE;
-                for (int i = 0; i < classnum; i++) {
+                for (int i = 0; i < CLASSNUM; i++) {
 
                     // get score for each i at the k,j pixel of the image
                     float score = scores[i * (width * height) + j * width + k];
@@ -103,13 +103,13 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
                 }
 
                 // color pixel if object was found, otherwise leave as is (black)
-                if (maxi == person || maxi == bike) {
+                if (maxi == PERSON || maxi == BIKE) {
                     NDIndex index = new NDIndex(0, j, k);
                     intRet.set(index, 0xFF00FF);
-                } else if (maxi == cat || maxi == sheep || maxi == 13) {
+                } else if (maxi == CAT || maxi == SHEEP || maxi == 13) {
                     NDIndex index = new NDIndex(1, j, k);
                     intRet.set(index, 0xFF00FF);
-                } else if (maxi == car || maxi == dog) {
+                } else if (maxi == CAR || maxi == DOG) {
                     NDIndex index = new NDIndex(2, j, k);
                     intRet.set(index, 0xFF00FF);
                 }
