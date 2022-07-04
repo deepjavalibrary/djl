@@ -2,7 +2,7 @@
 
 ## Install the Java Development Kit
 
-The Deep Java Library (DJL)  project requires JDK 8 (or later). We recommend using JDK8, since there are some known issues with JDK 11+.
+The Deep Java Library (DJL)  project requires JDK 11 (or later). 
 
 Verify that Java is available in your $PATH environment variable by using the following commands. If you have multiple versions of Java installed,
 you can use the $JAVA_HOME environment variable to control which version of Java to use.
@@ -10,13 +10,13 @@ you can use the $JAVA_HOME environment variable to control which version of Java
 For ubuntu:
 
 ```bash
-sudo apt-get install openjdk-8-jdk-headless
+sudo apt-get install openjdk-11-jdk
 ```
 
 For centos
 
 ```bash
-sudo yum install java-1.8.0-openjdk
+sudo yum install java-11-openjdk
 ```
 
 For Mac:
@@ -24,7 +24,7 @@ For Mac:
 ```bash
 brew tap homebrew/cask-versions
 brew update
-brew install --cask temurin8
+brew install --cask temurin11
 ```
 
 You can also download and install [Oracle JDK](https://www.oracle.com/technetwork/java/javase/overview/index.html)
