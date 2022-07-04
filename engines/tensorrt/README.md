@@ -38,3 +38,8 @@ You can pull the TensorRT engine from the central Maven repository by including 
     <scope>runtime</scope>
 </dependency>
 ```
+
+## Development
+We provide a [docker file](https://github.com/deepjavalibrary/djl/blob/master/docker/tensorrt/Dockerfile) to make 
+development of tensorrt with djl easier. Follow the instructions in the 
+[docker readme](https://github.com/deepjavalibrary/djl/blob/master/docker/README.md) to build and run the container.

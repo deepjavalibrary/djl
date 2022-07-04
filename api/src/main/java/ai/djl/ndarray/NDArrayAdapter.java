@@ -191,6 +191,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray put(NDArray index, NDArray data) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void set(Buffer data) {
         NDArray array = manager.create(data, getShape(), getDataType());
         intern(array);

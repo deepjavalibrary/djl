@@ -116,13 +116,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public SparseFormat getSparseFormat() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isSparse() {
-        throw new UnsupportedOperationException("Not implemented");
+        return SparseFormat.DENSE;
     }
 
     /** {@inheritDoc} */
@@ -217,6 +211,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public NDArray take(NDArray index) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray put(NDArray index, NDArray data) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
