@@ -1044,6 +1044,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray inverse() {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray norm(boolean keepDims) {
         return getAlternativeArray().norm(keepDims);
     }
