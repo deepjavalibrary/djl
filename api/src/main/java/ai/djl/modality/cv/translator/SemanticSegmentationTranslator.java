@@ -37,9 +37,6 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
     private final int shortEdge;
     private final int maxEdge;
 
-    private int rescaledWidth;
-    private int rescaledHeight;
-
     private static final int CHANNEL = 3;
     private static final int CLASSNUM = 21;
     private static final int BIKE = 2;
@@ -79,43 +76,44 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
         float[] scores = list.get(1).toFloatArray();
 
         // get dimensions of image
-        final int width = (int) ctx.getAttachment("originalWidth");
-        final int height = (int) ctx.getAttachment("originalHeight");
+        int width = (int) ctx.getAttachment("originalWidth");
+        int height = (int) ctx.getAttachment("originalHeight");
 
         // build image array
-        NDManager manager = NDManager.newBaseManager();
-        ByteBuffer bb = manager.allocateDirect(CHANNEL * height * width);
-        NDArray intRet = manager.create(bb, new Shape(CHANNEL, height, width), DataType.UINT8);
+        try (NDManager manager = NDManager.newBaseManager()) {
+            ByteBuffer bb = manager.allocateDirect(CHANNEL * height * width);
+            NDArray intRet = manager.create(bb, new Shape(CHANNEL, height, width), DataType.UINT8);
 
-        // change color of pixels in image array where objects have been detected
-        for (int j = 0; j < height; j++) {
-            for (int k = 0; k < width; k++) {
-                int maxi = 0;
-                double maxnum = -Double.MAX_VALUE;
-                for (int i = 0; i < CLASSNUM; i++) {
+            // change color of pixels in image array where objects have been detected
+            for (int j = 0; j < height; j++) {
+                for (int k = 0; k < width; k++) {
+                    int maxi = 0;
+                    double maxnum = -Double.MAX_VALUE;
+                    for (int i = 0; i < CLASSNUM; i++) {
 
-                    // get score for each i at the k,j pixel of the image
-                    float score = scores[i * (width * height) + j * width + k];
-                    if (score > maxnum) {
-                        maxnum = score;
-                        maxi = i;
+                        // get score for each i at the k,j pixel of the image
+                        float score = scores[i * (width * height) + j * width + k];
+                        if (score > maxnum) {
+                            maxnum = score;
+                            maxi = i;
+                        }
+                    }
+
+                    // color pixel if object was found, otherwise leave as is (black)
+                    if (maxi == PERSON || maxi == BIKE) {
+                        NDIndex index = new NDIndex(0, j, k);
+                        intRet.set(index, 0xFF00FF);
+                    } else if (maxi == CAT || maxi == SHEEP || maxi == 13) {
+                        NDIndex index = new NDIndex(1, j, k);
+                        intRet.set(index, 0xFF00FF);
+                    } else if (maxi == CAR || maxi == DOG) {
+                        NDIndex index = new NDIndex(2, j, k);
+                        intRet.set(index, 0xFF00FF);
                     }
                 }
-
-                // color pixel if object was found, otherwise leave as is (black)
-                if (maxi == PERSON || maxi == BIKE) {
-                    NDIndex index = new NDIndex(0, j, k);
-                    intRet.set(index, 0xFF00FF);
-                } else if (maxi == CAT || maxi == SHEEP || maxi == 13) {
-                    NDIndex index = new NDIndex(1, j, k);
-                    intRet.set(index, 0xFF00FF);
-                } else if (maxi == CAR || maxi == DOG) {
-                    NDIndex index = new NDIndex(2, j, k);
-                    intRet.set(index, 0xFF00FF);
-                }
             }
+            return BufferedImageFactory.getInstance().fromNDArray(intRet);
         }
-        return BufferedImageFactory.getInstance().fromNDArray(intRet);
     }
 
     /**
@@ -156,8 +154,8 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
             if (Math.round(scale * max) > maxEdge) {
                 scale = maxEdge / (float) max;
             }
-            rescaledHeight = Math.round(height * scale);
-            rescaledWidth = Math.round(width * scale);
+            int rescaledHeight = Math.round(height * scale);
+            int rescaledWidth = Math.round(width * scale);
 
             return NDImageUtils.resize(array, rescaledWidth, rescaledHeight);
         }

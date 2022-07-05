@@ -36,7 +36,7 @@ This should produce the following output
 
 With the previous command, an output image with bounding box around all objects will be saved at: build/output/semantic_instances.png:
 
-![detected-instances](img/semantic_instance_bikes.png)
+![detected-instances](https://resources.djl.ai/images/semantic_segmentation/semantic_instance_bikes.png)
 
 ## Run another semantic segmentation example
 
@@ -69,4 +69,4 @@ This should produce the following output
 
 With the previous command, an output image with bounding box around all objects will be saved at: build/output/semantic_instances.png:
 
-![detected-instances](img/semantic_instance_dog_bike_car.png)
+![detected-instances](https://resources.djl.ai/images/semantic_segmentation/semantic_instance_dog_bike_car.png)

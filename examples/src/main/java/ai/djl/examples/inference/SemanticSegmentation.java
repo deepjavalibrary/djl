@@ -12,28 +12,25 @@
  */
 package ai.djl.examples.inference;
 
-import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.transform.Normalize;
-import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.SemanticSegmentationTranslator;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An example of inference using a semantic segmentation model.
@@ -44,7 +41,8 @@ import java.nio.file.Paths;
  */
 public final class SemanticSegmentation {
 
-    private static final Logger logger = LoggerFactory.getLogger(SemanticSegmentationTranslator.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(SemanticSegmentationTranslator.class);
 
     private SemanticSegmentation() {}
 
@@ -56,25 +54,19 @@ public final class SemanticSegmentation {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
-        URL url = new URL("https://djl-misc.s3.amazonaws.com/tmp/semantic_segmentation/ai/djl/pytorch/deeplab/deeplabv3_scripted.pt");
-        try (InputStream in = url.openStream()) {
-            Files.copy(in, Paths.get("src/test/resources/deeplabv3_scripted.pt"));
-        }
-
-        // get image dimensions
-        final int height = img.getHeight();
-        final int width = img.getWidth();
-
-        // rgb coloring means and standard deviations for improved detection performance
-        final float[] MEAN = {0.485f, 0.456f, 0.406f};
-        final float[] STD = {0.229f, 0.224f, 0.225f};
+        String url =
+                "https://mlrepo.djl.ai/model/cv/semantic_segmentation/ai/djl/pytorch/deeplabv3/0.0.1/deeplabv3.zip";
+        Map<String, String> arguments = new ConcurrentHashMap<>();
+        arguments.put("toTensor", "true");
+        arguments.put("normalize", "true");
+        SemanticSegmentationTranslator translator =
+                SemanticSegmentationTranslator.builder(arguments).build();
 
         Criteria<Image, Image> criteria =
                 Criteria.builder()
-                        .optApplication(Application.CV.SEMANTIC_SEGMENTATION)
                         .setTypes(Image.class, Image.class)
-                        .optModelPath(Paths.get("src/test/resources/deeplabv3_scripted.pt"))
-                        .optTranslator(SemanticSegmentationTranslator.builder().addTransform(new Resize(width, height)).addTransform(new ToTensor()).addTransform(new Normalize(MEAN, STD)).optSynsetUrl("https://mlrepo.djl.ai/model/cv/instance_segmentation/ai/djl/mxnet/mask_rcnn/classes.txt").build())
+                        .optModelUrls(url)
+                        .optTranslator(translator)
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
                         .build();
