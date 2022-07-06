@@ -73,45 +73,45 @@ public class NDIndex {
      * <pre>
      *     NDArray a = manager.ones(new Shape(5, 4, 3));
      *
-     *     // Get a subsection of the NDArray in the first axis.
+     *     // Gets a subsection of the NDArray in the first axis.
      *     assertEquals(a.get(new NDIndex("2")).getShape(), new Shape(4, 3));
      *
-     *     // Get a subsection of the NDArray indexing from the end (-i == length - i).
+     *     // Gets a subsection of the NDArray indexing from the end (-i == length - i).
      *     assertEquals(a.get(new NDIndex("-1")).getShape(), new Shape(4, 3));
      *
-     *     // Get everything in the first axis and a subsection in the second axis.
+     *     // Gets everything in the first axis and a subsection in the second axis.
      *     // You can use either : or * to represent everything
      *     assertEquals(a.get(new NDIndex(":, 2")).getShape(), new Shape(5, 3));
      *     assertEquals(a.get(new NDIndex("*, 2")).getShape(), new Shape(5, 3));
      *
-     *     // Get a range of values along the second axis that is inclusive on the bottom and exclusive on the top.
+     *     // Gets a range of values along the second axis that is inclusive on the bottom and exclusive on the top.
      *     assertEquals(a.get(new NDIndex(":, 1:3")).getShape(), new Shape(5, 2, 3));
      *
-     *     // Exclude either the min or the max of the range to go all the way to the beginning or end.
+     *     // Excludes either the min or the max of the range to go all the way to the beginning or end.
      *     assertEquals(a.get(new NDIndex(":, :3")).getShape(), new Shape(5, 3, 3));
      *     assertEquals(a.get(new NDIndex(":, 1:")).getShape(), new Shape(5, 4, 3));
      *
-     *     // Use the value after the second colon in a slicing range, the step, to get every other result.
+     *     // Uses the value after the second colon in a slicing range, the step, to get every other result.
      *     assertEquals(a.get(new NDIndex(":, 1::2")).getShape(), new Shape(5, 2, 3));
      *
-     *     // Use a negative step to reverse along the dimension.
+     *     // Uses a negative step to reverse along the dimension.
      *     assertEquals(a.get(new NDIndex("-1")).getShape(), new Shape(5, 4, 3));
      *
-     *     // Use a variable argument to the index
+     *     // Uses a variable argument to the index
      *     // It can replace any number in any of these formats with {} and then the value of {}
      *     // is specified in an argument following the indices string.
      *     assertEquals(a.get(new NDIndex("{}, {}:{}", 0, 1, 3)).getShape(), new Shape(2, 3));
      *
-     *     // Use ellipsis to insert many full slices
+     *     // Uses ellipsis to insert many full slices
      *     assertEquals(a.get(new NDIndex("...")).getShape(), new Shape(5, 4, 3));
      *
-     *     // Use ellipsis to select all the dimensions except for last axis where we only get a subsection.
+     *     // Uses ellipsis to select all the dimensions except for last axis where we only get a subsection.
      *     assertEquals(a.get(new NDIndex("..., 2")).getShape(), new Shape(5, 4));
      *
-     *     // Use null to add an extra axis to the output array
+     *     // Uses null to add an extra axis to the output array
      *     assertEquals(a.get(new NDIndex(":2, null, 0, :2")).getShape(), new Shape(2, 1, 2));
      *
-     *     // Get entries of an NDArray with mixed index
+     *     // Gets entries of an NDArray with mixed index
      *     index1 = manager.create(new long[] {0, 1, 1}, new Shape(2));
      *     bool1 = manager.create(new boolean[] {true, false, true});
      *     assertEquals(a.get(new NDIndex(":{}, {}, {}, {}" 2, index1, bool1, null).getShape(), new Shape(2, 2, 1));
