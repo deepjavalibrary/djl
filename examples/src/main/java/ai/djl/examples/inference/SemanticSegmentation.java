@@ -54,11 +54,17 @@ public final class SemanticSegmentation {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
+        int height = img.getHeight();
+        int width = img.getWidth();
+
         String url =
                 "https://mlrepo.djl.ai/model/cv/semantic_segmentation/ai/djl/pytorch/deeplabv3/0.0.1/deeplabv3.zip";
         Map<String, String> arguments = new ConcurrentHashMap<>();
         arguments.put("toTensor", "true");
         arguments.put("normalize", "true");
+        arguments.put("resize", "true");
+        arguments.put("width", String.valueOf(width));
+        arguments.put("height", String.valueOf(height));
         SemanticSegmentationTranslator translator =
                 SemanticSegmentationTranslator.builder(arguments).build();
 
