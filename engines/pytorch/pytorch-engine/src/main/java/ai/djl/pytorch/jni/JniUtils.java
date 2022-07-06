@@ -1166,6 +1166,11 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.torchErfinv(ndArray.getHandle()));
     }
 
+    public static PtNDArray inverse(PtNDArray ndArray) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchInverse(ndArray.getHandle()));
+    }
+
     public static PtNDArray interpolate(
             PtNDArray ndArray, long[] size, int mode, boolean alignCorners) {
         return new PtNDArray(

@@ -1227,6 +1227,12 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray inverse() {
+        return manager.invoke("inverse", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray isNaN() {
         return manager.invoke("_npi_isnan", this, null);
     }

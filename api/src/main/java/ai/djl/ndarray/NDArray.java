@@ -3645,6 +3645,13 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray isInfinite();
 
     /**
+     * Computes the inverse of square {@code NDArray} if it exists.
+     *
+     * @return the inverse of square {@code NDArray}.
+     */
+    NDArray inverse();
+
+    /**
      * Returns the boolean {@code NDArray} with value {@code true} where this {@code NDArray}'s
      * entries are NaN, or {@code false} where they are not NaN.
      *

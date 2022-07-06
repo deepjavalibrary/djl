@@ -1339,6 +1339,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDArray inverse() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray isNaN() {
         return manager.opExecutor("IsNan").addInput(this).buildSingletonOrThrow();
     }
