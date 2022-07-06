@@ -111,6 +111,11 @@ public class NDIndex {
      *     // Uses null to add an extra axis to the output array
      *     assertEquals(a.get(new NDIndex(":2, null, 0, :2")).getShape(), new Shape(2, 1, 2));
      *
+     *     // Gets entries of an NDArray with mixed index
+     *     index1 = manager.create(new long[] {0, 1, 1}, new Shape(2));
+     *     bool1 = manager.create(new boolean[] {true, false, true});
+     *     assertEquals(a.get(new NDIndex(":{}, {}, {}, {}" 2, index1, bool1, null).getShape(), new Shape(2, 2, 1));
+     *
      * </pre>
      *
      * @param indices a comma separated list of indices corresponding to either subsections,

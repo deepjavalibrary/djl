@@ -74,6 +74,25 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
 
     /** {@inheritDoc} */
     @Override
+    public void set(NDArray array, NDIndex index, Object data) {
+        PtNDArray ptArray =
+                array instanceof PtNDArray
+                        ? (PtNDArray) array
+                        : manager.create(
+                                array.toByteBuffer(), array.getShape(), array.getDataType());
+
+        if (data instanceof Number) {
+            JniUtils.indexAdvPut(ptArray, index, (PtNDArray) manager.create((Number) data));
+        } else if (data instanceof NDArray) {
+            JniUtils.indexAdvPut(ptArray, index, (PtNDArray) data);
+        } else {
+            throw new IllegalArgumentException(
+                    "The type of value to assign cannot be other than NDArray and Number.");
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void set(NDArray array, NDIndexFullSlice fullSlice, NDArray value) {
         Stack<NDArray> prepareValue = new Stack<>();
         prepareValue.add(value);
