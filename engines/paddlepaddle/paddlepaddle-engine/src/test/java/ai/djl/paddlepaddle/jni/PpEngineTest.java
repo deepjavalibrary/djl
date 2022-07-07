@@ -13,13 +13,17 @@
 package ai.djl.paddlepaddle.jni;
 
 import ai.djl.paddlepaddle.engine.PpEngine;
+import ai.djl.testing.TestRequirements;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PpEngineTest {
+
     @Test
     public void testGetVersion() {
+        TestRequirements.notArm();
+
         String version = PpEngine.getInstance().getVersion();
         Assert.assertEquals(version.split("\\.").length, 3);
     }
