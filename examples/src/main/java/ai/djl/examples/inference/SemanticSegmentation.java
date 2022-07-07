@@ -62,9 +62,6 @@ public final class SemanticSegmentation {
         Map<String, String> arguments = new ConcurrentHashMap<>();
         arguments.put("toTensor", "true");
         arguments.put("normalize", "true");
-        arguments.put("resize", "true");
-        arguments.put("width", String.valueOf(width));
-        arguments.put("height", String.valueOf(height));
         SemanticSegmentationTranslator translator =
                 SemanticSegmentationTranslator.builder(arguments).build();
 
@@ -79,17 +76,20 @@ public final class SemanticSegmentation {
         try (ZooModel<Image, Image> model = criteria.loadModel()) {
             try (Predictor<Image, Image> predictor = model.newPredictor()) {
                 Image semanticImage = predictor.predict(img);
-                saveSemanticImage(semanticImage);
+                saveSemanticImage(semanticImage, width, height);
             }
         }
     }
 
-    private static void saveSemanticImage(Image img) throws IOException {
+    private static void saveSemanticImage(Image img, int width, int height) throws IOException {
         Path outputDir = Paths.get("build/output");
         Files.createDirectories(outputDir);
 
         Path imagePath = outputDir.resolve("semantic_instances.png");
-        img.save(Files.newOutputStream(imagePath), "png");
+
+        // reduce image down to original size
+        Image resized = img.getSubImage(0, 0, width, height);
+        resized.save(Files.newOutputStream(imagePath), "png");
         logger.info("Segmentation result image has been saved in: {}", imagePath);
     }
 }

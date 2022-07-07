@@ -74,10 +74,9 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
     public Image processOutput(TranslatorContext ctx, NDList list) {
         // scores contains the probabilities of each pixel being a certain object
         float[] scores = list.get(1).toFloatArray();
-
-        // get dimensions of image
-        int width = (int) ctx.getAttachment("originalWidth");
-        int height = (int) ctx.getAttachment("originalHeight");
+        Shape shape = list.get(1).getShape();
+        int width = (int) shape.get(2);
+        int height = (int) shape.get(1);
 
         // build image array
         try (NDManager manager = NDManager.newBaseManager()) {
