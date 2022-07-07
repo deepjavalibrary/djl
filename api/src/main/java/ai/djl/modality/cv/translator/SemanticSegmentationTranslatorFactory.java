@@ -21,14 +21,24 @@ import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
+import ai.djl.util.Pair;
 
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /** A {@link TranslatorFactory} that creates a {@link SemanticSegmentationTranslator} instance. */
-public class SemanticSegmentationTranslatorFactory extends ObjectDetectionTranslatorFactory {
+public class SemanticSegmentationTranslatorFactory implements TranslatorFactory {
+
+    private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();
+
+    static {
+        SUPPORTED_TYPES.add(new Pair<>(Image.class, Image.class));
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -48,5 +58,11 @@ public class SemanticSegmentationTranslatorFactory extends ObjectDetectionTransl
                     SemanticSegmentationTranslator.builder(arguments).build());
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Set<Pair<Type, Type>> getSupportedTypes() {
+        return SUPPORTED_TYPES;
     }
 }

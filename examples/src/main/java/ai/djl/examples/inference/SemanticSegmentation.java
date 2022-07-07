@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.inference;
 
+import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
@@ -29,8 +30,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An example of inference using a semantic segmentation model.
@@ -54,25 +53,13 @@ public final class SemanticSegmentation {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
-        int height = img.getHeight();
-        int width = img.getWidth();
-
-        String url =
-                "https://mlrepo.djl.ai/model/cv/semantic_segmentation/ai/djl/pytorch/deeplabv3/0.0.1/deeplabv3.zip";
-        Map<String, String> arguments = new ConcurrentHashMap<>();
-        arguments.put("toTensor", "true");
-        arguments.put("normalize", "true");
-        arguments.put("resize", "true");
-        arguments.put("width", String.valueOf(width));
-        arguments.put("height", String.valueOf(height));
-        SemanticSegmentationTranslator translator =
-                SemanticSegmentationTranslator.builder(arguments).build();
-
         Criteria<Image, Image> criteria =
                 Criteria.builder()
+                        .optApplication(Application.CV.SEMANTIC_SEGMENTATION)
                         .setTypes(Image.class, Image.class)
-                        .optModelUrls(url)
-                        .optTranslator(translator)
+                        .optFilter("backbone", "resnet50")
+                        .optFilter("flavor", "v1b")
+                        .optFilter("dataset", "coco")
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
                         .build();
