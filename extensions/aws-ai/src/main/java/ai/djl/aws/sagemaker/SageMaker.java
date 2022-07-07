@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.regions.Region;
@@ -152,34 +153,64 @@ public final class SageMaker {
         logger.info("SageMaker endpoint {} created: {}", endpointName, endpointArn);
     }
 
-    /** Deletes the Amazon SageMaker endpoint. */
-    public void deleteEndpoint() {
-        logger.info("Deleting SageMaker endpoint {} ...", endpointName);
-        DeleteEndpointRequest req =
-                DeleteEndpointRequest.builder().endpointName(endpointName).build();
-        sageMaker.deleteEndpoint(req);
-        SageMakerWaiter waiter = sageMaker.waiter();
-        DescribeEndpointRequest waitReq =
-                DescribeEndpointRequest.builder().endpointName(endpointConfigName).build();
-        waiter.waitUntilEndpointDeleted(waitReq);
-        logger.info("SageMaker endpoint {} deleted.", endpointName);
+    /**
+     * Deletes the Amazon SageMaker endpoint.
+     *
+     * @param quietly true to suppress error
+     */
+    public void deleteEndpoint(boolean quietly) {
+        try {
+            logger.info("Deleting SageMaker endpoint {} ...", endpointName);
+            DeleteEndpointRequest req =
+                    DeleteEndpointRequest.builder().endpointName(endpointName).build();
+            sageMaker.deleteEndpoint(req);
+            SageMakerWaiter waiter = sageMaker.waiter();
+            DescribeEndpointRequest waitReq =
+                    DescribeEndpointRequest.builder().endpointName(endpointConfigName).build();
+            waiter.waitUntilEndpointDeleted(waitReq);
+            logger.info("SageMaker endpoint {} deleted.", endpointName);
+        } catch (SdkException e) {
+            if (!quietly) {
+                throw e;
+            }
+        }
     }
 
-    /** Deletes the endpoint configuration. */
-    public void deleteEndpointConfig() {
-        DeleteEndpointConfigRequest req =
-                DeleteEndpointConfigRequest.builder()
-                        .endpointConfigName(endpointConfigName)
-                        .build();
-        sageMaker.deleteEndpointConfig(req);
-        logger.info("SageMaker endpoint config {} deleted.", endpointConfigName);
+    /**
+     * Deletes the endpoint configuration.
+     *
+     * @param quietly true to suppress error
+     */
+    public void deleteEndpointConfig(boolean quietly) {
+        try {
+            DeleteEndpointConfigRequest req =
+                    DeleteEndpointConfigRequest.builder()
+                            .endpointConfigName(endpointConfigName)
+                            .build();
+            sageMaker.deleteEndpointConfig(req);
+            logger.info("SageMaker endpoint config {} deleted.", endpointConfigName);
+        } catch (SdkException e) {
+            if (!quietly) {
+                throw e;
+            }
+        }
     }
 
-    /** Deletes the SageMaker model configuration. */
-    public void deleteSageMakerModel() {
-        DeleteModelRequest req = DeleteModelRequest.builder().modelName(modelName).build();
-        sageMaker.deleteModel(req);
-        logger.info("SageMaker model {} deleted.", modelName);
+    /**
+     * Deletes the SageMaker model configuration.
+     *
+     * @param quietly true to suppress error
+     */
+    public void deleteSageMakerModel(boolean quietly) {
+        try {
+            DeleteModelRequest req = DeleteModelRequest.builder().modelName(modelName).build();
+            sageMaker.deleteModel(req);
+            logger.info("SageMaker model {} deleted.", modelName);
+        } catch (SdkException e) {
+            if (!quietly) {
+                throw e;
+            }
+        }
     }
 
     /**
@@ -298,7 +329,7 @@ public final class SageMaker {
                 BufferedOutputStream bos = new BufferedOutputStream(os);
                 GzipCompressorOutputStream zos = new GzipCompressorOutputStream(bos);
                 TarArchiveOutputStream tos = new TarArchiveOutputStream(zos)) {
-
+            tos.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
             addToTar(dir, dir, tos);
             tos.finish();
         }
