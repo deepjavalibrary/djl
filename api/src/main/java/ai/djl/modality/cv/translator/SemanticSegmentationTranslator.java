@@ -12,8 +12,8 @@
  */
 package ai.djl.modality.cv.translator;
 
-import ai.djl.modality.cv.BufferedImageFactory;
 import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
@@ -111,7 +111,8 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
                     }
                 }
             }
-            return BufferedImageFactory.getInstance().fromNDArray(intRet);
+
+            return ImageFactory.getInstance().fromNDArray(intRet);
         }
     }
 

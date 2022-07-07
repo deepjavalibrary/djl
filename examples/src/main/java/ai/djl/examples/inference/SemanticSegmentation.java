@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An example of inference using a semantic segmentation model.
@@ -53,13 +55,20 @@ public final class SemanticSegmentation {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
+        String url =
+                "https://mlrepo.djl.ai/model/cv/semantic_segmentation/ai/djl/pytorch/deeplabv3/0.0.1/deeplabv3.zip";
+        Map<String, String> arguments = new ConcurrentHashMap<>();
+        arguments.put("toTensor", "true");
+        arguments.put("normalize", "true");
+        SemanticSegmentationTranslator translator =
+                SemanticSegmentationTranslator.builder(arguments).build();
+
         Criteria<Image, Image> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.SEMANTIC_SEGMENTATION)
                         .setTypes(Image.class, Image.class)
-                        .optFilter("backbone", "resnet50")
-                        .optFilter("flavor", "v1b")
-                        .optFilter("dataset", "coco")
+                        .optModelUrls(url)
+                        .optTranslator(translator)
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
                         .build();
