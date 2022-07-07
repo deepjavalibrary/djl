@@ -143,7 +143,10 @@ public class BaseModelLoader implements ModelLoader {
 
             String modelName = criteria.getModelName();
             if (modelName == null) {
-                modelName = artifact.getName();
+                modelName = options.get("modelName");
+                if (modelName == null) {
+                    modelName = artifact.getName();
+                }
             }
 
             Model model =
