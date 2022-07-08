@@ -19,7 +19,6 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.ArgumentsUtil;
@@ -28,6 +27,7 @@ import ai.djl.translate.TranslatorContext;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * A {@link BaseImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects}
@@ -39,14 +39,6 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
 
     private static final int CHANNEL = 3;
     private static final int CLASSNUM = 21;
-    private static final int BIKE = 2;
-    private static final int CAR = 7;
-    private static final int DOG = 8;
-    private static final int CAT = 12;
-    private static final int PERSON = 15;
-
-    // sheep is also identified with id 13 as well, this is taken into account when coloring pixels
-    private static final int SHEEP = 17; // 13
 
     /**
      * Creates the Semantic Segmentation translator from the given builder.
@@ -80,8 +72,21 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
 
         // build image array
         try (NDManager manager = NDManager.newBaseManager()) {
-            ByteBuffer bb = manager.allocateDirect(CHANNEL * height * width);
-            NDArray intRet = manager.create(bb, new Shape(CHANNEL, height, width), DataType.UINT8);
+            int imageSize = width * height;
+            ByteBuffer bb = manager.allocateDirect(CHANNEL * imageSize);
+            int r = 0; // adjustment for red pixel
+            int g = 1; // adjustment for green pixel
+            int b = 2; // adjustment for blue pixel
+            int[][] colors = new int[21][3];
+            for (int i = 0; i < 21; i++) {
+                Random random = new Random();
+                byte red = (byte) random.nextInt(256);
+                byte green = (byte) random.nextInt(256);
+                byte blue = (byte) random.nextInt(256);
+                colors[i][r] = red;
+                colors[i][g] = green;
+                colors[i][b] = blue;
+            }
 
             // change color of pixels in image array where objects have been detected
             for (int j = 0; j < height; j++) {
@@ -89,30 +94,26 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
                     int maxi = 0;
                     double maxnum = -Double.MAX_VALUE;
                     for (int i = 0; i < CLASSNUM; i++) {
-
                         // get score for each i at the k,j pixel of the image
-                        float score = scores[i * (width * height) + j * width + k];
+                        float score = scores[i * (imageSize) + j * width + k];
                         if (score > maxnum) {
                             maxnum = score;
                             maxi = i;
                         }
                     }
-
-                    // color pixel if object was found, otherwise leave as is (black)
-                    if (maxi == PERSON || maxi == BIKE) {
-                        NDIndex index = new NDIndex(0, j, k);
-                        intRet.set(index, 0xFF00FF);
-                    } else if (maxi == CAT || maxi == SHEEP || maxi == 13) {
-                        NDIndex index = new NDIndex(1, j, k);
-                        intRet.set(index, 0xFF00FF);
-                    } else if (maxi == CAR || maxi == DOG) {
-                        NDIndex index = new NDIndex(2, j, k);
-                        intRet.set(index, 0xFF00FF);
+                    if (maxi > 0) {
+                        bb.put(r * imageSize + j * width + k, (byte) colors[maxi][r]);
+                        bb.put(g * imageSize + j * width + k, (byte) colors[maxi][g]);
+                        bb.put(b * imageSize + j * width + k, (byte) colors[maxi][b]);
                     }
                 }
             }
+            int originW = (int) ctx.getAttachment("originalWidth");
+            int originH = (int) ctx.getAttachment("originalHeight");
+            NDArray intRet = manager.create(bb, new Shape(height, width, CHANNEL), DataType.UINT8);
+            NDArray resized = NDImageUtils.resize(intRet, originW, originH);
 
-            return ImageFactory.getInstance().fromNDArray(intRet);
+            return ImageFactory.getInstance().fromNDArray(resized);
         }
     }
 
