@@ -24,16 +24,17 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Transform;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.RandomUtils;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * A {@link BaseImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects}
  * with boundaries at the detailed pixel level.
  */
 public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
+
     private final int shortEdge;
     private final int maxEdge;
 
@@ -77,34 +78,33 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
             int r = 0; // adjustment for red pixel
             int g = 1; // adjustment for green pixel
             int b = 2; // adjustment for blue pixel
-            int[][] colors = new int[21][3];
-            for (int i = 0; i < 21; i++) {
-                Random random = new Random();
-                byte red = (byte) random.nextInt(256);
-                byte green = (byte) random.nextInt(256);
-                byte blue = (byte) random.nextInt(256);
+            byte[][] colors = new byte[CLASSNUM][3];
+            for (int i = 0; i < CLASSNUM; i++) {
+                byte red = (byte) RandomUtils.nextInt(256);
+                byte green = (byte) RandomUtils.nextInt(256);
+                byte blue = (byte) RandomUtils.nextInt(256);
                 colors[i][r] = red;
                 colors[i][g] = green;
                 colors[i][b] = blue;
             }
 
             // change color of pixels in image array where objects have been detected
-            for (int j = 0; j < height; j++) {
-                for (int k = 0; k < width; k++) {
+            for (int h = 0; h < height; h++) {
+                for (int w = 0; w < width; w++) {
                     int maxi = 0;
                     double maxnum = -Double.MAX_VALUE;
                     for (int i = 0; i < CLASSNUM; i++) {
-                        // get score for each i at the k,j pixel of the image
-                        float score = scores[i * (imageSize) + j * width + k];
+                        // get score for each i at the h,w pixel of the image
+                        float score = scores[i * (imageSize) + h * width + w];
                         if (score > maxnum) {
                             maxnum = score;
                             maxi = i;
                         }
                     }
                     if (maxi > 0) {
-                        bb.put(r * imageSize + j * width + k, (byte) colors[maxi][r]);
-                        bb.put(g * imageSize + j * width + k, (byte) colors[maxi][g]);
-                        bb.put(b * imageSize + j * width + k, (byte) colors[maxi][b]);
+                        bb.put(h * width + w, colors[maxi][r]);
+                        bb.put(g * imageSize + h * width + w, colors[maxi][g]);
+                        bb.put(b * imageSize + h * width + w, colors[maxi][b]);
                     }
                 }
             }
