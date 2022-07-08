@@ -57,6 +57,9 @@ public class PtModelZoo extends ModelZoo {
 
         MRL cyclegan = REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "cyclegan", "0.0.1");
         MODEL_LOADERS.add(new BaseModelLoader(cyclegan));
+
+        MRL deeplabv3 = REPOSITORY.model(CV.SEMANTIC_SEGMENTATION, GROUP_ID, "deeplabv3", "0.0.1");
+        MODEL_LOADERS.add(new BaseModelLoader(deeplabv3));
     }
 
     /** {@inheritDoc} */

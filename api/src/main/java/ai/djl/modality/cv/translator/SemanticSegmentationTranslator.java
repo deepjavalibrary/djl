@@ -12,8 +12,8 @@
  */
 package ai.djl.modality.cv.translator;
 
-import ai.djl.modality.cv.BufferedImageFactory;
 import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
@@ -74,10 +74,9 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
     public Image processOutput(TranslatorContext ctx, NDList list) {
         // scores contains the probabilities of each pixel being a certain object
         float[] scores = list.get(1).toFloatArray();
-
-        // get dimensions of image
-        int width = (int) ctx.getAttachment("originalWidth");
-        int height = (int) ctx.getAttachment("originalHeight");
+        Shape shape = list.get(1).getShape();
+        int width = (int) shape.get(2);
+        int height = (int) shape.get(1);
 
         // build image array
         try (NDManager manager = NDManager.newBaseManager()) {
@@ -112,7 +111,8 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
                     }
                 }
             }
-            return BufferedImageFactory.getInstance().fromNDArray(intRet);
+
+            return ImageFactory.getInstance().fromNDArray(intRet);
         }
     }
 
