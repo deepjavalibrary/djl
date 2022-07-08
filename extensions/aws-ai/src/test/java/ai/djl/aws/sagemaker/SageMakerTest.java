@@ -28,7 +28,6 @@ import org.testng.annotations.Test;
 
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.core.exception.SdkException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,36 +49,40 @@ public class SageMakerTest {
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
-                        .optModelUrls("https://resources.djl.ai/test-models/mlp.tar.gz")
+                        .optModelUrls(
+                                "https://resources.djl.ai/test-models/pytorch/resnet18_jit.tar.gz")
                         .build();
         try (ZooModel<NDList, NDList> model = criteria.loadModel()) {
             SageMaker sageMaker =
                     SageMaker.builder()
                             .setModel(model)
                             .optBucketName("djl-sm-test")
-                            .optModelName("resnet")
-                            .optContainerImage("125045733377.dkr.ecr.us-east-1.amazonaws.com/djl")
+                            .optModelName("resnet18-jit")
+                            .optContainerImage(
+                                    "125045733377.dkr.ecr.us-east-1.amazonaws.com/djl-serving")
                             .optExecutionRole(
                                     "arn:aws:iam::125045733377:role/service-role/DJLSageMaker-ExecutionRole-20210213T1027050")
                             .build();
 
-            sageMaker.deploy();
+            try {
+                sageMaker.deploy();
 
-            byte[] image;
-            Path imagePath = Paths.get("../../examples/src/test/resources/0.png");
-            try (InputStream is = Files.newInputStream(imagePath)) {
-                image = Utils.toByteArray(is);
+                byte[] image;
+                Path imagePath = Paths.get("../../examples/src/test/resources/kitten.jpg");
+                try (InputStream is = Files.newInputStream(imagePath)) {
+                    image = Utils.toByteArray(is);
+                }
+                String ret = new String(sageMaker.invoke(image), StandardCharsets.UTF_8);
+                Type type = new TypeToken<List<Classifications.Classification>>() {}.getType();
+                List<Classifications.Classification> list = JsonUtils.GSON.fromJson(ret, type);
+                String className = list.get(0).getClassName();
+                Assert.assertEquals(className, "n02123159 tiger cat");
+            } finally {
+                sageMaker.deleteEndpoint(true);
+                sageMaker.deleteEndpointConfig(true);
+                sageMaker.deleteSageMakerModel(true);
             }
-            String ret = new String(sageMaker.invoke(image), StandardCharsets.UTF_8);
-            Type type = new TypeToken<List<Classifications.Classification>>() {}.getType();
-            List<Classifications.Classification> list = JsonUtils.GSON.fromJson(ret, type);
-            String className = list.get(0).getClassName();
-            Assert.assertEquals(className, "0");
-
-            sageMaker.deleteEndpoint();
-            sageMaker.deleteEndpointConfig();
-            sageMaker.deleteSageMakerModel();
-        } catch (SdkException e) {
+        } catch (SdkClientException e) {
             throw new SkipException("Skip tests that requires permission.", e);
         }
     }
