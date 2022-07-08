@@ -192,6 +192,8 @@ final class PyTorchLibrary {
             long[] maxIndices,
             long[] stepIndices);
 
+    native void torchIndexAdvPut(long handle, long torchIndexHandle, long data);
+
     native void torchSet(long handle, ByteBuffer data);
 
     native long torchSlice(long handle, long dim, long start, long end, long step);
@@ -361,6 +363,8 @@ final class PyTorchLibrary {
 
     native long torchErfinv(long handle);
 
+    native long torchInverse(long self);
+
     native long torchNNInterpolate(long handle, long[] size, int mode, boolean alignCorners);
 
     native long torchNNLinear(long handle, long weightHandle, long biasHandle);
@@ -524,6 +528,8 @@ final class PyTorchLibrary {
 
     native long iValueFromStringMap(String[] keys, long[] tensorHandles);
 
+    native long iValueFromStringIValueMap(String[] keys, long[] tensorHandles);
+
     native long iValueToTensor(long iValueHandle);
 
     native boolean iValueToBool(long iValueHandle);
@@ -605,7 +611,7 @@ final class PyTorchLibrary {
 
     native long torchIndexInit(int size);
 
-    native long torchIndexReturn(long handle, long torchIndexHandle);
+    native long torchIndexAdvGet(long handle, long torchIndexHandle);
 
     native void torchIndexAppendNoneEllipsis(long torchIndexHandle, boolean isEllipsis);
 

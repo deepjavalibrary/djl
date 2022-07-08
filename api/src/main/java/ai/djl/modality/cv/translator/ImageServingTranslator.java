@@ -25,6 +25,7 @@ import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonSerializable;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /** A {@link Translator} that can handle generic CV {@link Input} and {@link Output}. */
@@ -56,10 +57,18 @@ public class ImageServingTranslator implements Translator<Input, Output> {
         Object obj = translator.processOutput(ctx, list);
         if (obj instanceof JsonSerializable) {
             output.add((JsonSerializable) obj);
+            output.addProperty("Content-Type", "application/json");
+        } else if (obj instanceof Image) {
+            Image img = (Image) obj;
+            try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                img.save(bos, "png");
+                output.add(bos.toByteArray());
+            }
+            output.addProperty("Content-Type", "image/png");
         } else {
             output.add(BytesSupplier.wrapAsJson(obj));
+            output.addProperty("Content-Type", "application/json");
         }
-        output.addProperty("Content-Type", "application/json");
         return output;
     }
 

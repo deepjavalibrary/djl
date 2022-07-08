@@ -387,5 +387,5 @@ flavorNames.each { flavor ->
 
 clean.doFirst {
     delete "${project.projectDir}/jnilib"
-    delete "${project.projectDir.getParent()}/pytorch-engine/jnilib"
+    delete "${project.projectDir.getParent()}/pytorch-jni/jnilib"
 }

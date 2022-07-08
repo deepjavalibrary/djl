@@ -129,7 +129,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexInit(JN
   API_END_RETURN()
 }
 
-JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexReturn(
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAdvGet(
     JNIEnv* env, jobject jthis, jlong jhandle, jlong jtorch_index_handle) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
@@ -191,6 +191,16 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexPut(JNIE
   const auto* value_ptr = reinterpret_cast<torch::Tensor*>(jvalue_handle);
   auto indices = utils::CreateTensorIndex(env, jmin_indices, jmax_indices, jstep_indices);
   tensor_ptr->index_put_(indices, *value_ptr);
+  API_END()
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAdvPut(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong jtorch_index_handle, jlong jdata_handle) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const auto* data_ptr = reinterpret_cast<torch::Tensor*>(jdata_handle);
+  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex>*>(jtorch_index_handle);
+  ((torch::Tensor) *tensor_ptr).index_put_(*index_ptr, *data_ptr);
   API_END()
 }
 

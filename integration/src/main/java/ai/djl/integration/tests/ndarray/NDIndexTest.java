@@ -157,6 +157,15 @@ public class NDIndexTest {
             expected = manager.create(new int[] {0, 1, 9, 10, 4, 5, 11, 12}, new Shape(2, 4));
             original.set(new NDIndex(":, 2:"), manager.arange(9, 13).reshape(2, 2));
             Assert.assertEquals(original, expected);
+
+            // set by index array
+            original = manager.arange(1, 10).reshape(3, 3);
+            NDArray index = manager.create(new long[] {0, 1}, new Shape(2));
+            value = manager.create(new int[] {666, 777, 888, 999}, new Shape(2, 2));
+            original.set(new NDIndex("{}, :{}", index, 2), value);
+            expected =
+                    manager.create(new int[] {666, 777, 3, 888, 999, 6, 7, 8, 9}, new Shape(3, 3));
+            Assert.assertEquals(original, expected);
         }
     }
 
@@ -187,6 +196,14 @@ public class NDIndexTest {
             original = manager.arange(4f).reshape(2, 2);
             expected = manager.create(new float[] {1, 1, 1, 3}).reshape(2, 2);
             original.set(new NDIndex("..., 0"), 1);
+            Assert.assertEquals(original, expected);
+
+            // set by index array
+            original = manager.arange(1, 10).reshape(3, 3);
+            NDArray index = manager.create(new long[] {0, 1}, new Shape(2));
+            original.set(new NDIndex("{}, :{}", index, 2), 666);
+            expected =
+                    manager.create(new int[] {666, 666, 3, 666, 666, 6, 7, 8, 9}, new Shape(3, 3));
             Assert.assertEquals(original, expected);
         }
     }

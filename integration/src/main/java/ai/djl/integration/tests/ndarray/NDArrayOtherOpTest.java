@@ -870,6 +870,26 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
+    public void testInverse() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array =
+                    manager.create(
+                                    new float[] {
+                                        1.0f, -4.0f, 2.0f, -2.0f, 1.0f, 3.0f, 2.0f, 6.0f, 8.0f
+                                    })
+                            .reshape(3, 3);
+            NDArray expected =
+                    manager.create(
+                                    new float[] {
+                                        0.0794f, -0.3492f, 0.1111f, -0.1746f, -0.0317f, 0.0556f,
+                                        0.1111f, 0.1111f, 0.0556f
+                                    })
+                            .reshape(3, 3);
+            Assertions.assertAlmostEquals(array.inverse(), expected);
+        }
+    }
+
+    @Test
     public void testNorm() {
         try (NDManager manager = NDManager.newBaseManager()) {
             // test 1-D

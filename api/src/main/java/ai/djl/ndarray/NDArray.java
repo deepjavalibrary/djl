@@ -595,7 +595,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      *
      * @param index select the entries of an {@code NDArray}
      * @param data numbers to assign to the indexed entries
-     * @return The NDArray with updated values
+     * @return the NDArray with updated values
      */
     NDArray put(NDArray index, NDArray data);
 
@@ -3643,6 +3643,13 @@ public interface NDArray extends NDResource, BytesSupplier {
      *     are infinite
      */
     NDArray isInfinite();
+
+    /**
+     * Computes the inverse of square {@code NDArray} if it exists.
+     *
+     * @return the inverse of square {@code NDArray}.
+     */
+    NDArray inverse();
 
     /**
      * Returns the boolean {@code NDArray} with value {@code true} where this {@code NDArray}'s

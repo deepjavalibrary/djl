@@ -179,6 +179,11 @@ public class OrtModel extends BaseModel {
             ortSession.setCPUArenaAllocator(true);
         }
 
+        String customOpLibrary = (String) options.get("customOpLibrary");
+        if (customOpLibrary != null) {
+            ortSession.registerCustomOpLibrary(customOpLibrary);
+        }
+
         Device device = manager.getDevice();
         if (options.containsKey("ortDevice")) {
             String ortDevice = (String) options.get("ortDevice");
