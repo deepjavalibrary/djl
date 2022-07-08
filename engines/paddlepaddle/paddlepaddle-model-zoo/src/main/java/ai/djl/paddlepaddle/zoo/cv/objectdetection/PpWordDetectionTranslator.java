@@ -22,13 +22,11 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.opencv.OpenCVImageFactory;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,13 +52,12 @@ public class PpWordDetectionTranslator implements NoBatchifyTranslator<Image, De
 
     /** {@inheritDoc} */
     @Override
-    public DetectedObjects processOutput(TranslatorContext ctx, NDList list)
-            throws FileNotFoundException {
+    public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         NDArray result = list.singletonOrThrow();
         ImageFactory factory = ImageFactory.getInstance();
         List<BoundingBox> boxes;
         // faster mechanism
-        if (factory instanceof OpenCVImageFactory) {
+        if ("ai.djl.opencv.OpenCVImageFactory".equals(factory.getClass().getName())) {
             result = result.squeeze(0).toType(DataType.UINT8, true);
             Image image = factory.fromNDArray(result);
             boxes =
