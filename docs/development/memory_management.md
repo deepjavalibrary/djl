@@ -37,7 +37,7 @@ The intermediate NDArrays involving in training case are usually
 
 In general, all the parameters in the model should be associated with Model level NDManager.
 All of the input and output NDArrays should be associated with one NDManager which is one level down to the model NDManager.
-Please check if you call [batch.close()](https://javadoc.io/static/ai.djl/api/0.17.0/ai/djl/training/dataset/Batch.html#close--)
+Please check if you call [batch.close()](https://javadoc.io/static/ai.djl/api/0.18.0/ai/djl/training/dataset/Batch.html#close--)
 to release one batch of the dataset at the end of each batch.
 If you still see the memory grows as the training process goes, it is most likely that intermediate NDArrays are attached to the Model(Block) parameter level.
 As a result, those NDArrays would not closed until the training is finished.
