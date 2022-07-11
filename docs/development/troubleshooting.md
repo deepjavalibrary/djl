@@ -20,39 +20,7 @@ You can install this package and reboot again to see if the issue persist. You c
 
 CN: Windows 10 加载失败常常是因为缺少 Windows Visual C++ 相关扩展包而导致的。您可以通过下面Windows的步骤来修复系统缺失依赖项。
 
-### 1.1 Engine dependency is missing
-DJL currently supports four engines: MXNet, PyTorch, TensorFlow and FastText.
-Please include at least one of those engines and their native library as dependencies.
-For example, adding MXNet engine dependencies:
-
-Gradle:
-
-```
-implementation "ai.djl.mxnet:mxnet-engine:0.18.0"
-// See https://github.com/deepjavalibrary/djl/blob/master/engines/mxnet/mxnet-engine/README.md for more MXNet library selection options
-runtimeOnly "ai.djl.mxnet:mxnet-native-auto:1.8.0"
-```
-
-Maven:
-
-```
-<dependency>
-    <groupId>ai.djl.mxnet</groupId>
-    <artifactId>mxnet-engine</artifactId>
-    <version>{version}</version>
-</dependency>
-<dependency>
-    <!--
-        See https://github.com/deepjavalibrary/djl/blob/master/engines/mxnet/mxnet-engine/README.md for more MXNet library selection options
-    -->
-    <groupId>ai.djl.mxnet</groupId>
-    <artifactId>mxnet-native-auto</artifactId>
-    <version>{mxnet.version}</version>
-    <scope>runtime</scope>
-</dependency>
-```
-
-### 1.2 Intellij Issue
+### 1.1 Intellij Issue
 The error may appear after running the `./gradlew clean` command:
 This issue is caused by a mismatch between IntelliJ and the Gradle runner.
 To fix this, navigate to: `Preferences-> Build Execution Deployment -> Build Tools -> Gradle`. Then, change the `Build and running using:` option to `Gradle`.
@@ -83,8 +51,8 @@ libtorch.dylib:
 	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 400.9.0)
 ```
 
-It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`. If one of them is missing, it throws an `UnsatisfiedLinkError` exception.
-If you are using `ai.djl.{engine}:{engine}-native-auto`, please create an issue at `https://github.com/deepjavalibrary/djl`.
+It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`.
+If one of them is missing, it throws an `UnsatisfiedLinkError` exception, please create an issue at `https://github.com/deepjavalibrary/djl`.
 
 **Windows**
 
@@ -208,10 +176,10 @@ If that happens, the following can help: Go to `File > Settings > Build, Executi
   
 ## 7. Running an integration test hangs for a long time
 Often, the test itself does not actually hang. To run the integration tests, the `integration` subproject 
-has a `-SNAPSHOT` dependency on the mxnet native binaries, `ai.djl.mxnet:mxnet-native-auto`. As it 
-is a snapshot depency, it is updated by the build system regularly. If your integration tests hang, 
+has a `-SNAPSHOT` dependency on the PyTorch native binaries. As it 
+is a snapshot dependency, it is updated by the build system regularly. If your integration tests hang, 
 it is most likely just the automatic binary dependency being updated. As the total size is roughly
-1.7GB the download may take a while. Once this download is over, all further tests will run instantly.
+1.7GB (on GPU machine) the download may take a while. Once this download is over, all further tests will run instantly.
 
 ## 8. `UnsatisfiedLinkError` when running with old version of libstdc++.so
 If you encountered the following error:
