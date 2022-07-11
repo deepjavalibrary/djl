@@ -96,13 +96,13 @@ If you have another project and want to use a custom version of DJL in it, you c
 
 ```groovy
 dependencies {
-    implementation platform("ai.djl:bom:0.17.0-SNAPSHOT")
+    implementation platform("ai.djl:bom:<THE NEXT TO-PUBLISH VERSION>-SNAPSHOT")
 }
 ```
 
 This snapshot version is the same as the custom DJL repository. 
 
-You also need to change directory to `djl/bom`. Then build and publish it to maven local same as was done in `djl`.
+You also need to change directory to `djl/bom`. Then build and publish it to maven local same as what was done in `djl`.
 
 From there, you may have to update the Maven or Gradle build of the project importing DJL to also look at the local maven repository cache for your locally published versions of DJL. For Maven, no changes are necessary. If you are using Gradle, you will have to add the maven local repository such as this [example](https://github.com/deepjavalibrary/djl-demo/blob/135c969d66d98d1672852e53a37e52ca1da3e325/pneumonia-detection/build.gradle#L11):
 

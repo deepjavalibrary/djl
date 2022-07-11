@@ -484,11 +484,11 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Sets the {@code NDArray} by boolean mask.
      *
-     * @param index the boolean {@code NDArray} that indicates what to get
+     * @param index the boolean or integer {@code NDArray} that indicates what to get
      * @param value the value to replace with
      */
     default void set(NDArray index, Number value) {
-        set(new NDIndex().addBooleanIndex(index), value);
+        set(new NDIndex("{}", index), value);
     }
 
     /**
@@ -526,7 +526,7 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Returns a partial {@code NDArray}.
      *
-     * @param index the boolean or int {@code NDArray} that indicates what to get
+     * @param index the boolean or integer {@code NDArray} that indicates what to get
      * @return the partial {@code NDArray}
      */
     default NDArray get(NDArray index) {
