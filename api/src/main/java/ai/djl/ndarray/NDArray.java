@@ -482,7 +482,7 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
-     * Sets the {@code NDArray} by boolean mask.
+     * Sets the {@code NDArray} by boolean mask or integer index.
      *
      * @param index the boolean or integer {@code NDArray} that indicates what to get
      * @param value the value to replace with
