@@ -96,7 +96,7 @@ If you have another project and want to use a custom version of DJL in it, you c
 
 ```groovy
 dependencies {
-    implementation platform("ai.djl:bom:<UPCOMING VERSION>-SNAPSHOT")
+    implementation platform("ai.djl:bom:0.19.0-SNAPSHOT")
 }
 ```
 
