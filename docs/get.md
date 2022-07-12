@@ -96,10 +96,10 @@ If you have another project and want to use a custom version of DJL in it, you c
 
 ```groovy
 dependencies {
-    implementation platform("ai.djl:bom:0.19.0-SNAPSHOT")
+    implementation platform("ai.djl:bom:<UPCOMING VERSION>-SNAPSHOT")
 }
 ```
-
+Currently, the `<UPCOMING VERSION> = 0.19.0`.
 This snapshot version is the same as the custom DJL repository. 
 
 You also need to change directory to `djl/bom`. Then build and publish it to maven local same as what was done in `djl`.
