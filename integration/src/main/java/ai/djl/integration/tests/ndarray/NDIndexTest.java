@@ -205,6 +205,13 @@ public class NDIndexTest {
             expected =
                     manager.create(new int[] {666, 666, 3, 666, 666, 6, 7, 8, 9}, new Shape(3, 3));
             Assert.assertEquals(original, expected);
+
+            original = manager.arange(1, 10).reshape(3, 3);
+            original.set(index, 666);
+            expected =
+                    manager.create(
+                            new int[] {666, 666, 666, 666, 666, 666, 7, 8, 9}, new Shape(3, 3));
+            Assert.assertEquals(original, expected);
         }
     }
 
