@@ -57,7 +57,7 @@ public class NDIndexTest {
     public void testGather() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.arange(20f).reshape(-1, 4);
-            NDArray index = manager.create(new long[] {0, 0, 2, 1, 1, 2}, new Shape(3, 2));
+            NDArray index = manager.create(new float[] {0, 0, 2, 1, 1, 2}, new Shape(3, 2));
             NDArray actual = original.gather(index, 1);
             NDArray expected = manager.create(new float[] {0, 0, 6, 5, 9, 10}, new Shape(3, 2));
             Assert.assertEquals(actual, expected);
@@ -68,7 +68,7 @@ public class NDIndexTest {
     public void testTake() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.arange(1, 7f).reshape(-1, 3);
-            NDArray index = manager.create(new long[] {0, 4, 1, 2}, new Shape(2, 2));
+            NDArray index = manager.create(new float[] {0, 4, 1, 2}, new Shape(2, 2));
             NDArray actual = original.take(index);
             NDArray expected = manager.create(new float[] {1, 5, 2, 3}, new Shape(2, 2));
             Assert.assertEquals(actual, expected);
@@ -119,25 +119,28 @@ public class NDIndexTest {
             expected = manager.arange(5).reshape(1, 5);
             Assert.assertEquals(original.get(bool), expected);
 
-            // get from int array
+            // get from integer array (higher rank included) or float array
             original = manager.arange(1, 7f).reshape(-1, 2);
             NDArray index = manager.create(new long[] {0, 0, 1, 2}, new Shape(2, 2));
+            NDArray indexFloat = manager.create(new float[] {0, 0, 1, 2}, new Shape(2, 2));
             NDArray actual = original.get(index);
+            NDArray actual2 = original.get(indexFloat);
             expected = manager.create(new float[] {1, 2, 1, 2, 3, 4, 5, 6}, new Shape(2, 2, 2));
             Assert.assertEquals(actual, expected);
+            Assert.assertEquals(actual2, expected);
 
-            // indexing with boolean, broadcast int array and slice
+            // indexing with boolean, slice, and integer array (higher rank included) or float array
             original = manager.arange(3 * 3 * 3 * 3).reshape(3, 3, 3, 3);
             NDArray bool1 = manager.create(new boolean[] {true, false, true});
             NDArray index1 = manager.create(new long[] {2, 2}, new Shape(1, 2));
-            NDArray index2 = manager.create(new long[] {0, 1}, new Shape(1, 2));
+            NDArray index2 = manager.create(new float[] {0, 1}, new Shape(1, 2));
             actual = original.get(":{}, {}, {}, {}", 2, index1, bool1, index2);
             expected = manager.create(new int[] {18, 25, 45, 52}, new Shape(2, 1, 2));
             Assert.assertEquals(actual, expected);
 
-            // indexing with null, broadcast int array and slice
+            // indexing with null, slice and integer array (higher rank included) or float array
             original = manager.arange(3 * 3 * 3).reshape(3, 3, 3);
-            index1 = manager.create(new long[] {0, 1}, new Shape(2));
+            index1 = manager.create(new float[] {0, 1}, new Shape(2));
             index2 = manager.create(new long[] {0, 0, 2, 1}, new Shape(2, 2));
             actual = original.get(":{}, {}, {}, {}", 2, index1, index2, null);
             expected = manager.create(new int[] {0, 3, 2, 4, 9, 12, 11, 13}, new Shape(2, 2, 2, 1));
@@ -160,7 +163,7 @@ public class NDIndexTest {
 
             // set by index array
             original = manager.arange(1, 10).reshape(3, 3);
-            NDArray index = manager.create(new long[] {0, 1}, new Shape(2));
+            NDArray index = manager.create(new float[] {0, 1}, new Shape(2));
             value = manager.create(new int[] {666, 777, 888, 999}, new Shape(2, 2));
             original.set(new NDIndex("{}, :{}", index, 2), value);
             expected =
@@ -258,7 +261,7 @@ public class NDIndexTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             NDArray expected = manager.create(new float[] {1, 8, 666, 77}, new Shape(2, 2));
-            NDArray idx = manager.create(new long[] {2, 3, 1}, new Shape(3));
+            NDArray idx = manager.create(new float[] {2, 3, 1}, new Shape(3));
             NDArray data = manager.create(new float[] {666, 77, 8}, new Shape(3));
             Assert.assertEquals(original.put(idx, data), expected);
         }
