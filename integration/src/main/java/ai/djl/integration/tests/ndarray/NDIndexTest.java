@@ -126,7 +126,7 @@ public class NDIndexTest {
             expected = manager.create(new float[] {1, 2, 1, 2, 3, 4, 5, 6}, new Shape(2, 2, 2));
             Assert.assertEquals(actual, expected);
 
-            // indexing with boolean, broadcast int array and slice
+            // indexing with boolean, slice, and integer array (higher rank included)
             original = manager.arange(3 * 3 * 3 * 3).reshape(3, 3, 3, 3);
             NDArray bool1 = manager.create(new boolean[] {true, false, true});
             NDArray index1 = manager.create(new long[] {2, 2}, new Shape(1, 2));
@@ -135,7 +135,7 @@ public class NDIndexTest {
             expected = manager.create(new int[] {18, 25, 45, 52}, new Shape(2, 1, 2));
             Assert.assertEquals(actual, expected);
 
-            // indexing with null, broadcast int array and slice
+            // indexing with null, slice and int array (higher rank included)
             original = manager.arange(3 * 3 * 3).reshape(3, 3, 3);
             index1 = manager.create(new long[] {0, 1}, new Shape(2));
             index2 = manager.create(new long[] {0, 0, 2, 1}, new Shape(2, 2));
