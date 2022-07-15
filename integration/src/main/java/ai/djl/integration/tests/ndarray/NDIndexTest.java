@@ -119,7 +119,7 @@ public class NDIndexTest {
             expected = manager.arange(5).reshape(1, 5);
             Assert.assertEquals(original.get(bool), expected);
 
-            // get from integer array or float array
+            // get from integer array (higher rank included) or float array
             original = manager.arange(1, 7f).reshape(-1, 2);
             NDArray index = manager.create(new long[] {0, 0, 1, 2}, new Shape(2, 2));
             NDArray indexFloat = manager.create(new float[] {0, 0, 1, 2}, new Shape(2, 2));
