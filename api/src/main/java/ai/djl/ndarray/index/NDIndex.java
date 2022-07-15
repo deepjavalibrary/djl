@@ -372,7 +372,8 @@ public class NDIndex {
                     if (array.getDataType().isBoolean()) {
                         indices.add(new NDIndexBooleans(array));
                         return argIndex + 1;
-                    } else if (array.getDataType().isInteger() || array.getDataType().isFloating()) {
+                    } else if (array.getDataType().isInteger()
+                            || array.getDataType().isFloating()) {
                         indices.add(new NDIndexTake(array));
                         return argIndex + 1;
                     }
