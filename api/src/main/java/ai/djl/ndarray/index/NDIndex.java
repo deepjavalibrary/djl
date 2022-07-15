@@ -373,7 +373,7 @@ public class NDIndex {
                     if (array.getDataType() == DataType.BOOLEAN) {
                         indices.add(new NDIndexBooleans(array));
                         return argIndex + 1;
-                    } else if (array.getDataType().isInteger()) {
+                    } else {
                         indices.add(new NDIndexTake(array));
                         return argIndex + 1;
                     }
