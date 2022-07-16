@@ -58,7 +58,7 @@ public final class NDIndexFullPick {
                             el instanceof NDIndexPick
                                     ? ((NDIndexPick) el).getIndex()
                                     : ((NDIndexTake) el).getIndex();
-                    if (!indexElem.getShape().isRankOne()) {
+                    if (el instanceof NDIndexTake && !indexElem.getShape().isRankOne()) {
                         throw new UnsupportedOperationException(
                                 "Only rank-1 indexing array is supported for pick");
                     }
