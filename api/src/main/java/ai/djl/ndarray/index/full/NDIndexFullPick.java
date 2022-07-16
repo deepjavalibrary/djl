@@ -60,7 +60,7 @@ public final class NDIndexFullPick {
                                     : ((NDIndexTake) el).getIndex();
                     if (!indexElem.getShape().isRankOne()) {
                         throw new UnsupportedOperationException(
-                                "Only one pick per get is currently supported");
+                                "Only rank-1 indexing array is supported for pick");
                     }
                     fullPick = new NDIndexFullPick(indexElem, axis);
                 } else {
