@@ -487,7 +487,8 @@ public class Shape {
      * @return if the array is rank-1
      */
     public boolean isRankOne() {
-        int max = 1, ans = 1;
+        int max = 1;
+        int ans = 1;
         for (long s : shape) {
             int size =  Math.toIntExact(s);
             max = Math.max(max, size);
