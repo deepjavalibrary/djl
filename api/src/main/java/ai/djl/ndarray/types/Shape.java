@@ -492,7 +492,7 @@ public class Shape {
         for (long s : shape) {
             int size =  Math.toIntExact(s);
             max = Math.max(max, size);
-            ans *= s;
+            ans *= size;
             if (ans < 0) {
                 return false;
             }
