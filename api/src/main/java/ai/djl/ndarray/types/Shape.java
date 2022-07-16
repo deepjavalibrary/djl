@@ -489,8 +489,9 @@ public class Shape {
     public boolean isRankOne() {
         int max = 1;
         int ans = 1;
-        for (long size : shape) {
-            max = (int) Math.max(max, size);
+        for (long s : shape) {
+            int size = Math.toIntExact(s);
+            max = Math.max(max, size);
             ans *= size;
             if (ans < 0) {
                 return false;
