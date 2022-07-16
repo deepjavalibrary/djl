@@ -58,6 +58,10 @@ public final class NDIndexFullPick {
                             el instanceof NDIndexPick
                                     ? ((NDIndexPick) el).getIndex()
                                     : ((NDIndexTake) el).getIndex();
+                    if (!indexElem.getShape().isRankOne()) {
+                        throw new UnsupportedOperationException(
+                                "Only one pick per get is currently supported");
+                    }
                     fullPick = new NDIndexFullPick(indexElem, axis);
                 } else {
                     // Don't support multiple picks
