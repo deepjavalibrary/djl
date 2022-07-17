@@ -52,22 +52,26 @@ public final class NDIndexFullPick {
         for (NDIndexElement el : index.getIndices()) {
             if (el instanceof NDIndexAll) {
                 axis++;
-            } else if (el instanceof NDIndexPick || el instanceof NDIndexTake) {
-                if (fullPick == null) {
-                    NDArray indexElem =
-                            el instanceof NDIndexPick
-                                    ? ((NDIndexPick) el).getIndex()
-                                    : ((NDIndexTake) el).getIndex();
-                    if (el instanceof NDIndexTake && !indexElem.getShape().isRankOne()) {
-                        throw new UnsupportedOperationException(
-                                "Only rank-1 indexing array is supported for pick");
-                    }
-                    fullPick = new NDIndexFullPick(indexElem, axis);
-                } else {
+            } else if (el instanceof NDIndexPick) {
+                if (fullPick != null) {
                     // Don't support multiple picks
                     throw new UnsupportedOperationException(
                             "Only one pick per get is currently supported");
                 }
+                NDArray indexElem = ((NDIndexPick) el).getIndex();
+                fullPick = new NDIndexFullPick(indexElem, axis);
+            } else if (el instanceof NDIndexTake) {
+                if (fullPick != null) {
+                    // Don't support multiple picks
+                    throw new UnsupportedOperationException(
+                            "Only one pick per get is currently supported");
+                }
+                NDArray indexElem = ((NDIndexTake) el).getIndex();
+                if (!indexElem.getShape().isRankOne()) {
+                    throw new UnsupportedOperationException(
+                            "Only rank-1 indexing array is supported for pick");
+                }
+                fullPick = new NDIndexFullPick(indexElem, axis);
             } else {
                 // Invalid dim for fullPick
                 return Optional.empty();
