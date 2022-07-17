@@ -91,6 +91,15 @@ public enum DataType {
     }
 
     /**
+     * Checks whether it is a boolean data type.
+     *
+     * @return whether it is a boolean data type
+     */
+    public boolean isBoolean() {
+        return format == Format.BOOLEAN;
+    }
+
+    /**
      * Returns the data type to use for a data buffer.
      *
      * @param data the buffer to analyze
