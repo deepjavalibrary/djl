@@ -45,6 +45,7 @@ The following table illustrates which pytorch version that DJL supports:
 
 | PyTorch engine version | PyTorch native library version             |
 |------------------------|--------------------------------------------|
+| pytorch-engine:0.18.0  | 1.9.1, 1.10.0, 1.11.0                      |
 | pytorch-engine:0.17.0  | 1.9.1, 1.10.0, 1.11.0                      |
 | pytorch-engine:0.16.0  | 1.8.1, 1.9.1, 1.10.0                       |
 | pytorch-engine:0.15.0  | pytorch-native-auto: 1.8.1, 1.9.1, 1.10.0  |
@@ -64,6 +65,13 @@ We strongly recommend you to use [Bill of Materials (BOM)](../../../bom/README.m
 
 By default, DJL will download the PyTorch native libraries into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
+
+If you are running on an older operating system (like CentOS 7), you have to use
+[precxx11 build](#for-pre-cxx11-build) or set system property to auto select for precxx11 binary:
+
+```
+System.setProperty("PYTORCH_PRECXX11", "true");
+```
 
 You can choose a native library based on your platform if you don't have network access at runtime.
 
