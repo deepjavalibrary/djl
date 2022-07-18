@@ -364,10 +364,11 @@ public final class LibUtils {
         String flavor = platform.getFlavor();
         String classifier = platform.getClassifier();
         String precxx11;
-        if (Boolean.getBoolean("PYTORCH_PRECXX11")
-                || Boolean.parseBoolean(System.getenv("PYTORCH_PRECXX11"))
-                || ("aarch64".equals(platform.getOsArch())
-                        && "linux".equals(platform.getOsPrefix()))) {
+        if (System.getProperty("os.name").startsWith("Linux")
+                && (Boolean.getBoolean("PYTORCH_PRECXX11")
+                        || Boolean.parseBoolean(System.getenv("PYTORCH_PRECXX11"))
+                        || ("aarch64".equals(platform.getOsArch())
+                                && "linux".equals(platform.getOsPrefix())))) {
             precxx11 = "-precxx11";
         } else {
             precxx11 = "";
