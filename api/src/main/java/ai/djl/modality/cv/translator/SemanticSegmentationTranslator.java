@@ -110,10 +110,12 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
             }
             int originW = (int) ctx.getAttachment("originalWidth");
             int originH = (int) ctx.getAttachment("originalHeight");
-            NDArray intRet = manager.create(bb, new Shape(height, width, CHANNEL), DataType.UINT8);
-            NDArray resized = NDImageUtils.resize(intRet, originW, originH);
+            NDArray fullImage =
+                    manager.create(bb, new Shape(height, width, CHANNEL), DataType.UINT8);
+            NDArray resized = NDImageUtils.resize(fullImage, originW, originH);
+            NDArray ret = resized.toType(DataType.UINT8, true);
 
-            return ImageFactory.getInstance().fromNDArray(resized);
+            return ImageFactory.getInstance().fromNDArray(ret);
         }
     }
 
