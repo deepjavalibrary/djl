@@ -98,7 +98,7 @@ public class BitmapImageFactory extends ImageFactory {
                 array = array.transpose(2, 0, 1);
                 shape = array.getShape();
             } else {
-                throw new IllegalArgumentException("First and last dimension should be number of channel with value 1 or 3");
+                throw new IllegalArgumentException("First or last dimension should be number of channel with value 1 or 3");
             }
         }
         int height = (int) shape.get(1);
