@@ -21,7 +21,6 @@ import ai.djl.ndarray.index.dim.NDIndexNull;
 import ai.djl.ndarray.index.dim.NDIndexPick;
 import ai.djl.ndarray.index.dim.NDIndexSlice;
 import ai.djl.ndarray.index.dim.NDIndexTake;
-import ai.djl.ndarray.types.DataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -370,10 +369,11 @@ public class NDIndex {
                     return argIndex + 1;
                 } else if (arg instanceof NDArray) {
                     NDArray array = (NDArray) arg;
-                    if (array.getDataType() == DataType.BOOLEAN) {
+                    if (array.getDataType().isBoolean()) {
                         indices.add(new NDIndexBooleans(array));
                         return argIndex + 1;
-                    } else if (array.getDataType().isInteger()) {
+                    } else if (array.getDataType().isInteger()
+                            || array.getDataType().isFloating()) {
                         indices.add(new NDIndexTake(array));
                         return argIndex + 1;
                     }

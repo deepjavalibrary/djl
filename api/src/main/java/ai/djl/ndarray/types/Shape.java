@@ -477,4 +477,26 @@ public class Shape {
         }
         return new Shape(shapeValue, new String(layout));
     }
+
+    /**
+     * Returns if the array is rank-1 which is inferred from the shape.
+     *
+     * <p>For example, an array with shape [1, 10, 1] returns true. Array with indeterminate size -1
+     * returns false.
+     *
+     * @return if the array is rank-1
+     */
+    public boolean isRankOne() {
+        int max = 1;
+        int ans = 1;
+        for (long s : shape) {
+            int size = Math.toIntExact(s);
+            max = Math.max(max, size);
+            ans *= size;
+            if (ans < 0) {
+                return false;
+            }
+        }
+        return max == ans;
+    }
 }
