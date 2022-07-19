@@ -582,7 +582,8 @@ public class PtNDArrayEx implements NDArrayEx {
                                     new long[] {height, width},
                                     getInterpolationMode(interpolation),
                                     false)
-                            .transpose(0, 2, 3, 1);
+                            .transpose(0, 2, 3, 1)
+                            .toType(array.getDataType(), false);
             if (dim == 3) {
                 result = result.squeeze(0);
             }
