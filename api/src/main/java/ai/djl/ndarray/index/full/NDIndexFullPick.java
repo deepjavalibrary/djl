@@ -17,6 +17,7 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.dim.NDIndexAll;
 import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.dim.NDIndexPick;
+import ai.djl.ndarray.index.dim.NDIndexTake;
 import ai.djl.ndarray.types.Shape;
 
 import java.util.Optional;
@@ -52,13 +53,25 @@ public final class NDIndexFullPick {
             if (el instanceof NDIndexAll) {
                 axis++;
             } else if (el instanceof NDIndexPick) {
-                if (fullPick == null) {
-                    fullPick = new NDIndexFullPick(((NDIndexPick) el).getIndex(), axis);
-                } else {
+                if (fullPick != null) {
                     // Don't support multiple picks
                     throw new UnsupportedOperationException(
                             "Only one pick per get is currently supported");
                 }
+                NDArray indexElem = ((NDIndexPick) el).getIndex();
+                fullPick = new NDIndexFullPick(indexElem, axis);
+            } else if (el instanceof NDIndexTake) {
+                if (fullPick != null) {
+                    // Don't support multiple picks
+                    throw new UnsupportedOperationException(
+                            "Only one pick per get is currently supported");
+                }
+                NDArray indexElem = ((NDIndexTake) el).getIndex();
+                if (!indexElem.getShape().isRankOne()) {
+                    throw new UnsupportedOperationException(
+                            "Only rank-1 indexing array is supported for pick");
+                }
+                fullPick = new NDIndexFullPick(indexElem, axis);
             } else {
                 // Invalid dim for fullPick
                 return Optional.empty();
