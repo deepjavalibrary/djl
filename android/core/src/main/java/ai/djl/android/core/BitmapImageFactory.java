@@ -85,6 +85,8 @@ public class BitmapImageFactory extends ImageFactory {
     @Override
     public Image fromNDArray(NDArray array) {
         Shape shape = array.getShape();
+        int height = (int) shape.get(1);
+        int width = (int) shape.get(2);
         if (shape.dimension() != 3) {
             throw new IllegalArgumentException("Shape should only have three dimension follow CHW");
         }
@@ -95,20 +97,20 @@ public class BitmapImageFactory extends ImageFactory {
             throw new UnsupportedOperationException("Grayscale image is not supported");
         } else if (shape.get(0) != 3) {
             if (shape.get(2) == 3) {
-                array = array.transpose(2, 0, 1);
-                shape = array.getShape();
+                height = (int) shape.get(0);
+                width = (int) shape.get(1);
             } else {
                 throw new IllegalArgumentException("First or last dimension should be number of channel with value 1 or 3");
             }
         }
-        int height = (int) shape.get(1);
-        int width = (int) shape.get(2);
-        int imageArea = width * height;
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        int finalWidth = width;
+        int finalHeight = height;
+        int imageArea = finalWidth * finalHeight;
+        Bitmap bitmap = Bitmap.createBitmap(finalWidth, finalHeight, Bitmap.Config.ARGB_8888);
         int[] raw = array.toUint8Array();
         IntStream.range(0, imageArea).parallel().forEach(ele -> {
-            int x = ele % width;
-            int y = ele / width;
+            int x = ele % finalWidth;
+            int y = ele / finalWidth;
             int red = raw[ele] & 0xFF;
             int green = raw[ele + imageArea] & 0xFF;
             int blue = raw[ele + imageArea * 2] & 0xFF;
