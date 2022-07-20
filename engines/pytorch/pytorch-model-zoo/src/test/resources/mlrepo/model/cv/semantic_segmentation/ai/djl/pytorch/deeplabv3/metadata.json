@@ -1,0 +1,41 @@
+{
+  "metadataVersion": "0.1",
+  "resourceType": "model",
+  "application": "cv/semantic_segmentation",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "deeplabv3",
+  "name": "Semantic segmentation",
+  "description": "Semantic segmentation",
+  "website": "http://www.djl.ai/pytorch/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "Berkeley Software Distribution (BSD) Zero Clause License",
+      "url": "https://opensource.org/licenses/0BSD"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "deeplabv3",
+      "properties": {
+        "backbone": "resnet50",
+        "flavor": "v1b",
+        "dataset": "coco"
+      },
+      "arguments": {
+        "toTensor": true,
+        "normalize": true,
+        "translatorFactory": "ai.djl.modality.cv.translator.SemanticSegmentationTranslatorFactory"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/deeplabv3.zip",
+          "sha1Hash": "06b8471f40d41d5f4fce7736cdd24081b9fa2e8e",
+          "name": "",
+          "size": 155844147
+        }
+      }
+    }
+  ]
+}
