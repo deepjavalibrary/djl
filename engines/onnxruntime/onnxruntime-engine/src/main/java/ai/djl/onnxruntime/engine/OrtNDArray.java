@@ -25,11 +25,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 /** {@code OrtNDArray} is the ONNX Runtime implementation of {@link NDArray}. */
 public class OrtNDArray extends NDArrayAdapter {
 
-    private OnnxTensor tensor;
+    private AtomicReference<OnnxTensor> tensor;
 
     /**
      * Constructs an ONNX Runtime NDArray from a {@link OnnxTensor} (internal. Use {@link NDManager}
@@ -41,19 +42,24 @@ public class OrtNDArray extends NDArrayAdapter {
      */
     OrtNDArray(OrtNDManager manager, NDManager alternativeManager, OnnxTensor tensor) {
         super(manager, alternativeManager, null, null, UUID.randomUUID().toString());
-        this.tensor = tensor;
+        this.tensor = new AtomicReference<>(tensor);
         manager.attachInternal(uid, this);
     }
 
-    OnnxTensor getTensor() {
-        return tensor;
+    /**
+     * Returns the {@code OnnxTensor} representation of this OrtNDArray.
+     *
+     * @return the {@code OnnxTensor} representation of this OrtNDArray
+     */
+    public OnnxTensor getTensor() {
+        return tensor.get();
     }
 
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
         if (dataType == null) {
-            dataType = OrtUtils.toDataType(tensor.getInfo().type);
+            dataType = OrtUtils.toDataType(tensor.get().getInfo().type);
         }
         return dataType;
     }
@@ -62,7 +68,7 @@ public class OrtNDArray extends NDArrayAdapter {
     @Override
     public Shape getShape() {
         if (shape == null) {
-            shape = new Shape(tensor.getInfo().getShape());
+            shape = new Shape(tensor.get().getInfo().getShape());
         }
         return shape;
     }
@@ -70,8 +76,7 @@ public class OrtNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public void intern(NDArray replaced) {
-        tensor.close();
-        tensor = ((OrtNDArray) replaced).tensor;
+        tensor.getAndSet(((OrtNDArray) replaced).getTensor()).close();
     }
 
     /** {@inheritDoc} */
@@ -85,7 +90,7 @@ public class OrtNDArray extends NDArrayAdapter {
     @Override
     public String[] toStringArray(Charset charset) {
         try {
-            Object obj = tensor.getValue();
+            Object obj = tensor.get().getValue();
             if (obj instanceof String) {
                 // Scalar type;
                 return new String[] {(String) obj};
@@ -102,15 +107,16 @@ public class OrtNDArray extends NDArrayAdapter {
         if (getDataType() == DataType.STRING) {
             throw new IllegalArgumentException("Please use toStringArray() for String NDArray.");
         }
-        return tensor.getByteBuffer().order(ByteOrder.nativeOrder());
+        return tensor.get().getByteBuffer().order(ByteOrder.nativeOrder());
     }
 
     /** {@inheritDoc} */
     @Override
     public void close() {
-        if (!isClosed) {
-            tensor.close();
-            super.close();
+        super.close();
+        OnnxTensor ortTensor = tensor.getAndSet(null);
+        if (ortTensor != null) {
+            ortTensor.close();
         }
     }
 }

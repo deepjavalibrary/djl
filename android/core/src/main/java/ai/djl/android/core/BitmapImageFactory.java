@@ -93,8 +93,13 @@ public class BitmapImageFactory extends ImageFactory {
         }
         if (shape.get(0) == 1) {
             throw new UnsupportedOperationException("Grayscale image is not supported");
-        } else if (shape.get(0) != 3){
-            throw new IllegalArgumentException("First dimension should be number of channel with value 1 or 3");
+        } else if (shape.get(0) != 3) {
+            if (shape.get(2) == 3) {
+                array = array.transpose(2, 0, 1);
+                shape = array.getShape();
+            } else {
+                throw new IllegalArgumentException("First or last dimension should be number of channel with value 1 or 3");
+            }
         }
         int height = (int) shape.get(1);
         int width = (int) shape.get(2);

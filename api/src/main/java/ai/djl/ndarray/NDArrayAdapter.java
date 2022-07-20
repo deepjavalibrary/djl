@@ -74,6 +74,7 @@ public abstract class NDArrayAdapter implements NDArray {
         manager.attachInternal(getUid(), this);
         alternativeManager = ((BaseNDManager) manager).getAlternativeManager();
         if (alternativeManager == null) {
+            // to prevent hybrid engine memory leak
             alternativeManager = manager;
         }
     }
@@ -193,6 +194,12 @@ public abstract class NDArrayAdapter implements NDArray {
     @Override
     public NDArray put(NDArray index, NDArray data) {
         throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray get(NDIndex index) {
+        return get(alternativeManager, index);
     }
 
     /** {@inheritDoc} */
@@ -1075,7 +1082,11 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArrayEx getNDArrayInternal() {
-        return getAlternativeArray().getNDArrayInternal();
+        NDArray array = getAlternativeArray();
+        if (array instanceof NDArrayAdapter) {
+            throw new UnsupportedOperationException("Operation not supported.");
+        }
+        return array.getNDArrayInternal();
     }
 
     /** {@inheritDoc} */
@@ -1083,11 +1094,11 @@ public abstract class NDArrayAdapter implements NDArray {
     public void close() {
         if (!isClosed) {
             manager.detachInternal(getUid());
+            isClosed = true;
             if (alternativeArray != null) {
                 alternativeArray.close();
                 alternativeArray = null;
             }
-            isClosed = true;
         }
     }
 
