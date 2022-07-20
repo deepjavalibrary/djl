@@ -90,8 +90,6 @@ public class BufferedImageFactory extends ImageFactory {
             throw new UnsupportedOperationException("Batch is not supported");
         } else if (shape.get(0) == 1 || shape.get(2) == 1) {
             throw new UnsupportedOperationException("Grayscale image is not supported");
-        } else if (array.getDataType() != DataType.UINT8 && array.getDataType() != DataType.INT8) {
-            throw new IllegalArgumentException("Datatype should be INT8 or UINT8");
         }
         int height = (int) shape.get(0);
         int width = (int) shape.get(1);
@@ -101,7 +99,7 @@ public class BufferedImageFactory extends ImageFactory {
         }
         int imageArea = width * height;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        int[] raw = array.toUint8Array();
+        int[] raw = array.toType(DataType.UINT8, false).toUint8Array();
         int finalWidth = width;
         IntStream.range(0, imageArea)
                 .forEach(

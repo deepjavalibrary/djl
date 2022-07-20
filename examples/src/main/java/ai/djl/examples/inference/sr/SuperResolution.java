@@ -95,7 +95,6 @@ public final class SuperResolution {
             }
 
             return stitches.stream()
-                    .map(array -> array.toType(DataType.UINT8, false))
                     .map(array -> ImageFactory.getInstance().fromNDArray(array))
                     .collect(Collectors.toList());
         }

@@ -113,9 +113,8 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
             NDArray fullImage =
                     manager.create(bb, new Shape(height, width, CHANNEL), DataType.UINT8);
             NDArray resized = NDImageUtils.resize(fullImage, originW, originH);
-            NDArray ret = resized.toType(DataType.UINT8, false);
 
-            return ImageFactory.getInstance().fromNDArray(ret);
+            return ImageFactory.getInstance().fromNDArray(resized);
         }
     }
 

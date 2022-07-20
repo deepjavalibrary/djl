@@ -34,7 +34,7 @@ public class StyleTransferTranslator implements NoBatchifyTranslator<Image, Imag
     /** {@inheritDoc} */
     @Override
     public Image processOutput(TranslatorContext ctx, NDList list) {
-        NDArray output = list.get(0).addi(1).muli(128).toType(DataType.UINT8, false);
+        NDArray output = list.get(0).addi(1).muli(128);
         return ImageFactory.getInstance().fromNDArray(output.squeeze());
     }
 
