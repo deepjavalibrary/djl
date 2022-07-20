@@ -14,6 +14,7 @@ package ai.djl.integration.tests.ndarray;
 
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
+import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -967,6 +968,29 @@ public class NDArrayOtherOpTest {
                 NDArray grad = x.getGradient();
                 Assert.assertEquals(1f, grad.getFloat(0));
             }
+        }
+    }
+
+    @Test
+    public void testResize() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // test on HWC
+            NDArray fullImage = manager.create(new Shape(600, 800, 3), DataType.UINT8);
+            Assert.assertEquals(fullImage.getDataType(), DataType.UINT8);
+            NDArray resized = NDImageUtils.resize(fullImage, 500, 700);
+            Assert.assertEquals(resized.getDataType(), DataType.UINT8);
+
+            // test on CHW
+            fullImage = manager.create(new Shape(3, 600, 800), DataType.UINT8);
+            Assert.assertEquals(fullImage.getDataType(), DataType.UINT8);
+            resized = NDImageUtils.resize(fullImage, 500, 700);
+            Assert.assertEquals(resized.getDataType(), DataType.UINT8);
+
+            // test type that is converted to in PtNDArrayEx.java
+            fullImage = manager.create(new Shape(600, 800, 3), DataType.FLOAT32);
+            Assert.assertEquals(fullImage.getDataType(), DataType.FLOAT32);
+            resized = NDImageUtils.resize(fullImage, 500, 700);
+            Assert.assertEquals(resized.getDataType(), DataType.FLOAT32);
         }
     }
 }
