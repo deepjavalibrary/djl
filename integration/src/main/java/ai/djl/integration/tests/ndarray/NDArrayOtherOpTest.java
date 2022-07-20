@@ -975,21 +975,21 @@ public class NDArrayOtherOpTest {
     public void testResize() {
         try (NDManager manager = NDManager.newBaseManager()) {
             // test on HWC
-            NDArray fullImage = manager.create(new Shape(600, 800, 3), DataType.UINT8);
+            NDArray fullImage = manager.create(new Shape(28, 28, 3), DataType.UINT8);
             Assert.assertEquals(fullImage.getDataType(), DataType.UINT8);
-            NDArray resized = NDImageUtils.resize(fullImage, 500, 700);
+            NDArray resized = NDImageUtils.resize(fullImage, 32, 32);
             Assert.assertEquals(resized.getDataType(), DataType.UINT8);
 
             // test on CHW
-            fullImage = manager.create(new Shape(3, 600, 800), DataType.UINT8);
+            fullImage = manager.create(new Shape(3, 28, 28), DataType.UINT8);
             Assert.assertEquals(fullImage.getDataType(), DataType.UINT8);
-            resized = NDImageUtils.resize(fullImage, 500, 700);
+            resized = NDImageUtils.resize(fullImage, 32, 32);
             Assert.assertEquals(resized.getDataType(), DataType.UINT8);
 
             // test type that is converted to in PtNDArrayEx.java
-            fullImage = manager.create(new Shape(600, 800, 3), DataType.FLOAT32);
+            fullImage = manager.create(new Shape(28, 28, 3), DataType.FLOAT32);
             Assert.assertEquals(fullImage.getDataType(), DataType.FLOAT32);
-            resized = NDImageUtils.resize(fullImage, 500, 700);
+            resized = NDImageUtils.resize(fullImage, 32, 32);
             Assert.assertEquals(resized.getDataType(), DataType.FLOAT32);
         }
     }

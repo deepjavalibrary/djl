@@ -517,11 +517,15 @@ public class TfNDArrayEx implements NDArrayEx {
                                     .addInput(temp)
                                     .addInput(size)
                                     .buildSingletonOrThrow()) {
-                return image.squeeze();
+                return image.squeeze().toType(array.getDataType(), false);
             }
         }
         try (NDArray size = manager.create(new int[] {height, width})) {
-            return manager.opExecutor(op).addInput(array).addInput(size).buildSingletonOrThrow();
+            return manager.opExecutor(op)
+                    .addInput(array)
+                    .addInput(size)
+                    .buildSingletonOrThrow()
+                    .toType(array.getDataType(), false);
         }
     }
 
