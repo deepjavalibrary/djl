@@ -33,7 +33,7 @@ public class SuperResolutionTranslator implements Translator<Image, Image> {
     /** {@inheritDoc} */
     @Override
     public Image processOutput(TranslatorContext ctx, NDList list) {
-        NDArray output = list.get(0).clip(0, 255).toType(DataType.UINT8, false);
+        NDArray output = list.get(0).clip(0, 255);
         return ImageFactory.getInstance().fromNDArray(output.squeeze());
     }
 }

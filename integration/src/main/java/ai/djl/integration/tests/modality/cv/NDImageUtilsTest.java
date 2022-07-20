@@ -17,6 +17,7 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
 import ai.djl.testing.TestRequirements;
@@ -108,7 +109,7 @@ public class NDImageUtilsTest {
                     continue;
                 }
                 // test 3D H, W, C
-                NDArray image = manager.ones(new Shape(100, 50, 3));
+                NDArray image = manager.ones(new Shape(100, 50, 3), DataType.UINT8);
                 NDArray result = NDImageUtils.resize(image, 50, 50);
                 NDArray expected = manager.ones(new Shape(50, 50, 3));
                 Assertions.assertAlmostEquals(result, expected);
@@ -122,6 +123,7 @@ public class NDImageUtilsTest {
                 expected = manager.ones(new Shape(5, 20, 20, 3));
                 Assertions.assertAlmostEquals(result, expected);
                 result = NDImageUtils.resize(batchImages, 25, 50, interpolation);
+                Assert.assertEquals(result.getDataType(), DataType.FLOAT32);
                 expected = manager.ones(new Shape(5, 50, 25, 3));
                 Assertions.assertAlmostEquals(result, expected);
 
