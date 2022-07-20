@@ -18,6 +18,7 @@ import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.ImageClassificationDataset;
 import ai.djl.basicdataset.cv.classification.ImageNet;
 import ai.djl.basicdataset.cv.classification.Mnist;
+import ai.djl.basicmodelzoo.cv.classification.MobileNetV1;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
@@ -129,12 +130,21 @@ public final class ImageClassification {
         // Determine the layers based on performance
         int numLayers = performance.switchPerformance(18, 50, 152);
 
-        Block block =
-                ResNetV1.builder()
-                        .setImageShape(imageShape)
-                        .setNumLayers(numLayers)
-                        .setOutSize(classes.size())
-                        .build();
+        Block block;
+
+        if (performance.equals(Performance.FAST)) {
+            // for small and fast cases, build a MobileNet
+            block = MobileNetV1.builder().setOutSize(classes.size()).build();
+        } else {
+            // for large cases, build a ResNet
+            block =
+                    ResNetV1.builder()
+                            .setImageShape(imageShape)
+                            .setNumLayers(numLayers)
+                            .setOutSize(classes.size())
+                            .build();
+        }
+
         Model model = Model.newInstance("ImageClassification");
         model.setBlock(block);
 
