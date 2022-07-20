@@ -77,9 +77,8 @@ public class OpenCVImageFactory extends ImageFactory {
         Shape shape = array.getShape();
         if (shape.dimension() == 4) {
             throw new UnsupportedOperationException("Batch is not supported");
-        } else if (array.getDataType() != DataType.UINT8 && array.getDataType() != DataType.INT8) {
-            throw new IllegalArgumentException("Datatype should be INT8 or UINT8");
         }
+        array = array.toType(DataType.UINT8, false);
         boolean grayScale = shape.get(0) == 1 || shape.get(2) == 1;
         if (grayScale) {
             // expected CHW

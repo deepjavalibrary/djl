@@ -58,7 +58,7 @@ public class PpWordDetectionTranslator implements NoBatchifyTranslator<Image, De
         List<BoundingBox> boxes;
         // faster mechanism
         if ("ai.djl.opencv.OpenCVImageFactory".equals(factory.getClass().getName())) {
-            result = result.squeeze(0).toType(DataType.UINT8, true);
+            result = result.squeeze(0);
             Image image = factory.fromNDArray(result);
             boxes =
                     image.findBoundingBoxes().parallelStream()

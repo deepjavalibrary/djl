@@ -35,6 +35,7 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Mask;
 import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -89,9 +90,6 @@ public class BitmapImageFactory extends ImageFactory {
         int width = (int) shape.get(2);
         if (shape.dimension() != 3) {
             throw new IllegalArgumentException("Shape should only have three dimension follow CHW");
-        }
-        if (array.getDataType() != DataType.UINT8 && array.getDataType() != DataType.INT8) {
-            throw new IllegalArgumentException("Datatype should be INT8");
         }
         if (shape.get(0) == 1) {
             throw new UnsupportedOperationException("Grayscale image is not supported");

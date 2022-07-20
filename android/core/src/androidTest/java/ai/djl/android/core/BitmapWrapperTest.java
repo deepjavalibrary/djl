@@ -85,7 +85,7 @@ public class BitmapWrapperTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.arange(0.0f, 12.0f).reshape(3, 2, 2);
             ImageFactory factory = ImageFactory.getInstance();
-            Image image = factory.fromNDArray(array.toType(DataType.INT8, true));
+            Image image = factory.fromNDArray(array);
             NDArray converted = image.toNDArray(manager)
                     .transpose(2, 0, 1)
                     .toType(DataType.FLOAT32, true);
