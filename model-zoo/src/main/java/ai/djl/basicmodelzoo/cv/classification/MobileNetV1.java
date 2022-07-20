@@ -30,10 +30,25 @@ import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
+/**
+ * {@code MobileNetV1} contains a generic implementation of Mobilenetw adapted from
+ * https://github.com/weiaicunzai/pytorch-cifar100/blob/master/models/mobilenet.py (Original author weiaicunzai)
+ *
+ * see https://arxiv.org/pdf/1704.04861.pdf for more information about MobileNet
+ */
 public final class MobileNetV1 {
     private MobileNetV1(){}
 
+    /**
+     * Builds a {@link Block} that represent a depthWise-pointWise Unit used in the implementation of
+     * the MobileNet Model
+     *
+     * @param inputChannels number of inputChannels, used for depthWise Kernel
+     * @param outputChannels number of outputChannels, used for pointWise kernel
+     * @param stride control the stride of depthWise Kernel
+     * @param builder add the builder to obtain batchNormMomentum
+     * @return a {@link Block} that represent a depthWise-pointWise Unit
+     */
     public static Block DepthSeparableConv2d(int inputChannels,int outputChannels,int stride,Builder builder){
         //depthWise does not include bias
         SequentialBlock depthWise = new SequentialBlock();
@@ -69,6 +84,12 @@ public final class MobileNetV1 {
         return depthWise.add(pointWise);    //two blocks are merged together
     }
 
+    /**
+     * Create a new {@link Block} of {@link MobileNetV1} with the arguments from the given {@link
+     * Builder}.
+     * @param builder the {@link Builder} with the necessary arguments
+     * @return a {@link Block} that represents the required MobileNet model
+     */
     public static Block mobilenet(Builder builder){
         //no bias in MobileNet
         SequentialBlock mobileNet = new SequentialBlock();
@@ -133,36 +154,65 @@ public final class MobileNetV1 {
 
         return mobileNet;
     }
-
+    /**
+     * Creates a builder to build a {@link MobileNetV1}.
+     *
+     * @return a new builder
+     */
     public static Builder builder(){
         return new MobileNetV1.Builder();
     }
 
+    /**
+     * The Builder to construct a {@link MobileNetV1} object.
+     */
     public static final class Builder{
         float batchNormMomentum = 0.9f;
         float alpha = 1f;   //width multiplier defined in the paper
 
-        long outSize = 10;  //10 as default for cifar10 or mnist
+        long outSize = 10;  //10 as default for basic datasets like cifar10 or mnist
 
         private final int[] filters = new int[]{32,64,128,128,256,256,512,512,1024,1024};
 
         Builder(){}
 
+        /**
+         * Set the widthMultiplier of MobileNet
+         * @param widthMultiplier the widthMultiplier of MobileNet
+         * @return this {@code Builder}
+         */
         public Builder setWidthMultiplier(float widthMultiplier){
             this.alpha = widthMultiplier;
             return this;
         }
 
+        /**
+         * Sets the momentum of batchNorm layer.
+         *
+         * @param batchNormMomentum the momentum
+         * @return this {@code Builder}
+         */
         public Builder setBatchNormMomentum(float batchNormMomentum){
             this.batchNormMomentum = batchNormMomentum;
             return this;
         }
 
+        /**
+         * Sets the size of the output.
+         *
+         * @param outSize the output size
+         * @return this {@code Builder}
+         */
         public Builder setOutputSize(long outSize){
             this.outSize = outSize;
             return this;
         }
 
+        /**
+         * Builds a {@link MobileNetV1} block.
+         *
+         * @return the {@link MobileNetV1} block
+         */
         public Block build(){
             return mobilenet(this);
         }
