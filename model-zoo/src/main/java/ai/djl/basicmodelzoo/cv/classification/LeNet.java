@@ -67,7 +67,7 @@ public final class LeNet {
                 .add(Activation::sigmoid)
                 .add(Linear.builder().setUnits(builder.numChannels[3]).build())
                 .add(Activation::sigmoid)
-                .add(Linear.builder().setUnits(10).build());
+                .add(Linear.builder().setUnits(builder.outSize).build());
     }
 
     /**

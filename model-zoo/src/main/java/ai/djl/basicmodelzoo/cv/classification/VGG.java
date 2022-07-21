@@ -57,7 +57,7 @@ public final class VGG {
                 .add(Linear.builder().setUnits(4096).build())
                 .add(Activation::relu)
                 .add(Dropout.builder().optRate(0.5f).build())
-                .add(Linear.builder().setUnits(10).build());
+                .add(Linear.builder().setUnits(builder.outSize).build());
 
         return block;
     }

@@ -159,7 +159,7 @@ public final class AlexNet {
          * @param outSize the output size
          * @return this {@code Builder}
          */
-        public AlexNet.Builder setOutSize(long outSize){
+        public AlexNet.Builder setOutSize(long outSize) {
             this.outSize = outSize;
             return this;
         }

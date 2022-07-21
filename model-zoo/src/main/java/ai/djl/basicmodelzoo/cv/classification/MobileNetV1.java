@@ -30,9 +30,9 @@ import ai.djl.nn.pooling.Pool;
  * <p>see https://arxiv.org/pdf/1704.04861.pdf for more information about MobileNet
  */
 public final class MobileNetV1 {
-    private MobileNetV1() {}
+    static final int[] FILTERS = {32, 64, 128, 128, 256, 256, 512, 512, 1024, 1024};
 
-    static int[] filters = {32, 64, 128, 128, 256, 256, 512, 512, 1024, 1024};
+    private MobileNetV1() {}
 
     /**
      * Builds a {@link Block} that represent a depthWise-pointWise Unit used in the implementation
@@ -107,7 +107,9 @@ public final class MobileNetV1 {
                                                 .optStride(new Shape(2, 2))
                                                 .optPadding(new Shape(1, 1)) // padding = 'same'
                                                 .setFilters(
-                                                        (int) (filters[0] * builder.widthMultiplier))
+                                                        (int)
+                                                                (FILTERS[0]
+                                                                        * builder.widthMultiplier))
                                                 .build())
                                 .add(
                                         BatchNorm.builder()
@@ -118,88 +120,88 @@ public final class MobileNetV1 {
                 // separable conv1
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[0] * builder.widthMultiplier),
-                                (int) (filters[1] * builder.widthMultiplier),
+                                (int) (FILTERS[0] * builder.widthMultiplier),
+                                (int) (FILTERS[1] * builder.widthMultiplier),
                                 1,
                                 builder))
                 // separable conv2
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[1] * builder.widthMultiplier),
-                                (int) (filters[2] * builder.widthMultiplier),
+                                (int) (FILTERS[1] * builder.widthMultiplier),
+                                (int) (FILTERS[2] * builder.widthMultiplier),
                                 2,
                                 builder))
                 // separable conv3
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[2] * builder.widthMultiplier),
-                                (int) (filters[3] * builder.widthMultiplier),
+                                (int) (FILTERS[2] * builder.widthMultiplier),
+                                (int) (FILTERS[3] * builder.widthMultiplier),
                                 1,
                                 builder))
                 // separable conv4
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[3] * builder.widthMultiplier),
-                                (int) (filters[4] * builder.widthMultiplier),
+                                (int) (FILTERS[3] * builder.widthMultiplier),
+                                (int) (FILTERS[4] * builder.widthMultiplier),
                                 2,
                                 builder))
                 // separable conv5
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[4] * builder.widthMultiplier),
-                                (int) (filters[5] * builder.widthMultiplier),
+                                (int) (FILTERS[4] * builder.widthMultiplier),
+                                (int) (FILTERS[5] * builder.widthMultiplier),
                                 1,
                                 builder))
                 // separable conv6
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[5] * builder.widthMultiplier),
-                                (int) (filters[6] * builder.widthMultiplier),
+                                (int) (FILTERS[5] * builder.widthMultiplier),
+                                (int) (FILTERS[6] * builder.widthMultiplier),
                                 2,
                                 builder))
                 // separable conv7*5
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[6] * builder.widthMultiplier),
-                                (int) (filters[7] * builder.widthMultiplier),
+                                (int) (FILTERS[6] * builder.widthMultiplier),
+                                (int) (FILTERS[7] * builder.widthMultiplier),
                                 1,
                                 builder))
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[6] * builder.widthMultiplier),
-                                (int) (filters[7] * builder.widthMultiplier),
+                                (int) (FILTERS[6] * builder.widthMultiplier),
+                                (int) (FILTERS[7] * builder.widthMultiplier),
                                 1,
                                 builder))
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[6] * builder.widthMultiplier),
-                                (int) (filters[7] * builder.widthMultiplier),
+                                (int) (FILTERS[6] * builder.widthMultiplier),
+                                (int) (FILTERS[7] * builder.widthMultiplier),
                                 1,
                                 builder))
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[6] * builder.widthMultiplier),
-                                (int) (filters[7] * builder.widthMultiplier),
+                                (int) (FILTERS[6] * builder.widthMultiplier),
+                                (int) (FILTERS[7] * builder.widthMultiplier),
                                 1,
                                 builder))
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[6] * builder.widthMultiplier),
-                                (int) (filters[7] * builder.widthMultiplier),
+                                (int) (FILTERS[6] * builder.widthMultiplier),
+                                (int) (FILTERS[7] * builder.widthMultiplier),
                                 1,
                                 builder))
                 // separable conv8
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[7] * builder.widthMultiplier),
-                                (int) (filters[8] * builder.widthMultiplier),
+                                (int) (FILTERS[7] * builder.widthMultiplier),
+                                (int) (FILTERS[8] * builder.widthMultiplier),
                                 2,
                                 builder))
                 // separable conv9
                 .add(
                         depthSeparableConv2d(
-                                (int) (filters[8] * builder.widthMultiplier),
-                                (int) (filters[9] * builder.widthMultiplier),
+                                (int) (FILTERS[8] * builder.widthMultiplier),
+                                (int) (FILTERS[9] * builder.widthMultiplier),
                                 1,
                                 builder)) // maybe the paper goes wrong here
                 // AveragePool
