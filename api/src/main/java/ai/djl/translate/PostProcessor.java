@@ -26,7 +26,7 @@ public interface PostProcessor<O> {
      *
      * @param ctx the toolkit used for post-processing
      * @param list the output NDList after inference, usually immutable in some engines, e.g.
-     *     PyTorch. See: <a href="https://github.com/deepjavalibrary/djl/issues/1774">...</a>
+     *     PyTorch. @see <a href="https://github.com/deepjavalibrary/djl/issues/1774">Issue 1774</a>
      * @return the output object of expected type
      * @throws Exception if an error occurs during processing output
      */
