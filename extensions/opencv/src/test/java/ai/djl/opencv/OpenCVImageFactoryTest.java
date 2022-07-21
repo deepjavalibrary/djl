@@ -23,7 +23,6 @@ import ai.djl.modality.cv.output.Mask;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.testing.TestRequirements;
 
 import org.testng.Assert;
@@ -144,7 +143,7 @@ public class OpenCVImageFactoryTest {
                         {1, 1, 0, 0, 0},
                         {1, 0, 0, 0, 1}
                     };
-            NDArray array = manager.create(arr).muli(255).toType(DataType.INT8, true).expandDims(0);
+            NDArray array = manager.create(arr).muli(255).expandDims(0);
             OpenCVImage image = (OpenCVImage) factory.fromNDArray(array);
             List<BoundingBox> rectangles = image.findBoundingBoxes();
             List<Rectangle> expected =

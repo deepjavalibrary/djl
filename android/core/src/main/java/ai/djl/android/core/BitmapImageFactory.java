@@ -35,6 +35,7 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Mask;
 import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -88,24 +89,18 @@ public class BitmapImageFactory extends ImageFactory {
         if (shape.dimension() != 3) {
             throw new IllegalArgumentException("Shape should only have three dimension follow CHW");
         }
-        if (array.getDataType() != DataType.UINT8 && array.getDataType() != DataType.INT8) {
-            throw new IllegalArgumentException("Datatype should be INT8");
-        }
         if (shape.get(0) == 1) {
             throw new UnsupportedOperationException("Grayscale image is not supported");
-        } else if (shape.get(0) != 3) {
-            if (shape.get(2) == 3) {
-                array = array.transpose(2, 0, 1);
-                shape = array.getShape();
-            } else {
-                throw new IllegalArgumentException("First or last dimension should be number of channel with value 1 or 3");
-            }
+        }
+        if (NDImageUtils.isCHW(shape)) {
+            array = array.transpose(2, 0, 1);
+            shape = array.getShape();
         }
         int height = (int) shape.get(1);
         int width = (int) shape.get(2);
         int imageArea = width * height;
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        int[] raw = array.toUint8Array();
+        int[] raw = array.toType(DataType.UINT8, false).toUint8Array();
         IntStream.range(0, imageArea).parallel().forEach(ele -> {
             int x = ele % width;
             int y = ele / width;

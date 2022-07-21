@@ -17,7 +17,6 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
@@ -41,7 +40,7 @@ public final class BigGANTranslator implements NoBatchifyTranslator<int[], Image
     /** {@inheritDoc} */
     @Override
     public Image[] processOutput(TranslatorContext ctx, NDList list) {
-        NDArray output = list.get(0).addi(1).muli(128).clip(0, 255).toType(DataType.UINT8, false);
+        NDArray output = list.get(0).addi(1).muli(128).clip(0, 255);
 
         int sampleSize = (int) output.getShape().get(0);
         Image[] images = new Image[sampleSize];
