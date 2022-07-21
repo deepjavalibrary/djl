@@ -32,6 +32,8 @@ import ai.djl.nn.pooling.Pool;
 public final class MobileNetV1 {
     private MobileNetV1() {}
 
+    static int[] filters = {32, 64, 128, 128, 256, 256, 512, 512, 1024, 1024};
+
     /**
      * Builds a {@link Block} that represent a depthWise-pointWise Unit used in the implementation
      * of the MobileNet Model.
@@ -105,7 +107,7 @@ public final class MobileNetV1 {
                                                 .optStride(new Shape(2, 2))
                                                 .optPadding(new Shape(1, 1)) // padding = 'same'
                                                 .setFilters(
-                                                        (int) (builder.filters[0] * builder.alpha))
+                                                        (int) (filters[0] * builder.widthMultiplier))
                                                 .build())
                                 .add(
                                         BatchNorm.builder()
@@ -116,88 +118,88 @@ public final class MobileNetV1 {
                 // separable conv1
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[0] * builder.alpha),
-                                (int) (builder.filters[1] * builder.alpha),
+                                (int) (filters[0] * builder.widthMultiplier),
+                                (int) (filters[1] * builder.widthMultiplier),
                                 1,
                                 builder))
                 // separable conv2
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[1] * builder.alpha),
-                                (int) (builder.filters[2] * builder.alpha),
+                                (int) (filters[1] * builder.widthMultiplier),
+                                (int) (filters[2] * builder.widthMultiplier),
                                 2,
                                 builder))
                 // separable conv3
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[2] * builder.alpha),
-                                (int) (builder.filters[3] * builder.alpha),
+                                (int) (filters[2] * builder.widthMultiplier),
+                                (int) (filters[3] * builder.widthMultiplier),
                                 1,
                                 builder))
                 // separable conv4
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[3] * builder.alpha),
-                                (int) (builder.filters[4] * builder.alpha),
+                                (int) (filters[3] * builder.widthMultiplier),
+                                (int) (filters[4] * builder.widthMultiplier),
                                 2,
                                 builder))
                 // separable conv5
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[4] * builder.alpha),
-                                (int) (builder.filters[5] * builder.alpha),
+                                (int) (filters[4] * builder.widthMultiplier),
+                                (int) (filters[5] * builder.widthMultiplier),
                                 1,
                                 builder))
                 // separable conv6
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[5] * builder.alpha),
-                                (int) (builder.filters[6] * builder.alpha),
+                                (int) (filters[5] * builder.widthMultiplier),
+                                (int) (filters[6] * builder.widthMultiplier),
                                 2,
                                 builder))
                 // separable conv7*5
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[6] * builder.alpha),
-                                (int) (builder.filters[7] * builder.alpha),
+                                (int) (filters[6] * builder.widthMultiplier),
+                                (int) (filters[7] * builder.widthMultiplier),
                                 1,
                                 builder))
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[6] * builder.alpha),
-                                (int) (builder.filters[7] * builder.alpha),
+                                (int) (filters[6] * builder.widthMultiplier),
+                                (int) (filters[7] * builder.widthMultiplier),
                                 1,
                                 builder))
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[6] * builder.alpha),
-                                (int) (builder.filters[7] * builder.alpha),
+                                (int) (filters[6] * builder.widthMultiplier),
+                                (int) (filters[7] * builder.widthMultiplier),
                                 1,
                                 builder))
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[6] * builder.alpha),
-                                (int) (builder.filters[7] * builder.alpha),
+                                (int) (filters[6] * builder.widthMultiplier),
+                                (int) (filters[7] * builder.widthMultiplier),
                                 1,
                                 builder))
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[6] * builder.alpha),
-                                (int) (builder.filters[7] * builder.alpha),
+                                (int) (filters[6] * builder.widthMultiplier),
+                                (int) (filters[7] * builder.widthMultiplier),
                                 1,
                                 builder))
                 // separable conv8
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[7] * builder.alpha),
-                                (int) (builder.filters[8] * builder.alpha),
+                                (int) (filters[7] * builder.widthMultiplier),
+                                (int) (filters[8] * builder.widthMultiplier),
                                 2,
                                 builder))
                 // separable conv9
                 .add(
                         depthSeparableConv2d(
-                                (int) (builder.filters[8] * builder.alpha),
-                                (int) (builder.filters[9] * builder.alpha),
+                                (int) (filters[8] * builder.widthMultiplier),
+                                (int) (filters[9] * builder.widthMultiplier),
                                 1,
                                 builder)) // maybe the paper goes wrong here
                 // AveragePool
@@ -219,12 +221,10 @@ public final class MobileNetV1 {
 
     /** The Builder to construct a {@link MobileNetV1} object. */
     public static final class Builder {
+
         float batchNormMomentum = 0.9f;
-        float alpha = 1f; // width multiplier defined in the paper
-
-        long outSize = 10; // 10 as default for basic datasets like cifar10 or mnist
-
-        int[] filters = {32, 64, 128, 128, 256, 256, 512, 512, 1024, 1024};
+        float widthMultiplier = 1f; // width multiplier(also named alpha) defined in the paper
+        long outSize = 10; // 10 as default for basic datasets like cifar-10 or mnist
 
         Builder() {}
 
@@ -235,7 +235,7 @@ public final class MobileNetV1 {
          * @return this {@code Builder}
          */
         public Builder optWidthMultiplier(float widthMultiplier) {
-            this.alpha = widthMultiplier;
+            this.widthMultiplier = widthMultiplier;
             return this;
         }
 

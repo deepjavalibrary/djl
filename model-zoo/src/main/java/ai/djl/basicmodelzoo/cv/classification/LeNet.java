@@ -84,6 +84,7 @@ public final class LeNet {
 
         int numLayers = 4;
         int[] numChannels = {6, 16, 120, 84};
+        long outSize = 10;
 
         Builder() {}
 
@@ -101,6 +102,17 @@ public final class LeNet {
             }
 
             this.numChannels = numChannels;
+            return this;
+        }
+
+        /**
+         * Sets the size of the output.
+         *
+         * @param outSize the output size
+         * @return this {@code Builder}
+         */
+        public Builder setOutSize(long outSize) {
+            this.outSize = outSize;
             return this;
         }
 

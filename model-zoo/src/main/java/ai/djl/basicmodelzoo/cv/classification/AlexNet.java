@@ -101,8 +101,8 @@ public final class AlexNet {
                 .add(Activation::relu)
                 .add(Dropout.builder().optRate(builder.dropOutRate).build())
                 // Output layer. The number of
-                // classes is 10, instead of 1000 as in the paper
-                .add(Linear.builder().setUnits(10).build());
+                // classes is 10 as default, instead of 1000 as in the paper
+                .add(Linear.builder().setUnits(builder.outSize).build());
     }
 
     /**
@@ -120,6 +120,8 @@ public final class AlexNet {
         float dropOutRate = 0.5f;
         int numLayers = 7;
         int[] numChannels = {96, 256, 384, 384, 256, 4096, 4096};
+
+        long outSize = 10;
 
         Builder() {}
 
@@ -148,6 +150,17 @@ public final class AlexNet {
             }
 
             this.numChannels = numChannels;
+            return this;
+        }
+
+        /**
+         * Sets the size of the output.
+         *
+         * @param outSize the output size
+         * @return this {@code Builder}
+         */
+        public AlexNet.Builder setOutSize(long outSize){
+            this.outSize = outSize;
             return this;
         }
 
