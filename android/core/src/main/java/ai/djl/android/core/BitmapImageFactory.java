@@ -91,7 +91,10 @@ public class BitmapImageFactory extends ImageFactory {
         if (shape.dimension() != 3) {
             throw new IllegalArgumentException("Shape should only have three dimension follow CHW");
         }
-        if (shape.get(0) == 1) {
+        if (array.getDataType() != DataType.UINT8 && array.getDataType() != DataType.INT8) {
+            throw new IllegalArgumentException("Datatype should be INT8");
+        }
+        if (shape.get(0) == 1 || shape.get(2) == 1) {
             throw new UnsupportedOperationException("Grayscale image is not supported");
         } else if (shape.get(0) != 3) {
             if (shape.get(2) == 3) {
@@ -101,11 +104,11 @@ public class BitmapImageFactory extends ImageFactory {
                 throw new IllegalArgumentException("First or last dimension should be number of channel with value 1 or 3");
             }
         }
-        int finalWidth = width;
-        int finalHeight = height;
-        int imageArea = finalWidth * finalHeight;
-        Bitmap bitmap = Bitmap.createBitmap(finalWidth, finalHeight, Bitmap.Config.ARGB_8888);
+
+        int imageArea = width * height;
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         int[] raw = array.toUint8Array();
+        int finalWidth = width;
         IntStream.range(0, imageArea).parallel().forEach(ele -> {
             int x = ele % finalWidth;
             int y = ele / finalWidth;
