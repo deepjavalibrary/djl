@@ -108,7 +108,7 @@ public final class GoogLeNet {
                         block3,
                         block4,
                         block5,
-                        Linear.builder().setUnits(10).build());
+                        Linear.builder().setUnits(builder.outSize).build());
     }
 
     // c1 - c4 are the number of output channels for each layer in the path
@@ -205,7 +205,20 @@ public final class GoogLeNet {
     /** The Builder to construct a {@link GoogLeNet} object. */
     public static final class Builder {
 
+        long outSize = 10;
+
         Builder() {}
+
+        /**
+         * Sets the size of the output.
+         *
+         * @param outSize the output size
+         * @return this {@code Builder}
+         */
+        public Builder setOutSize(long outSize) {
+            this.outSize = outSize;
+            return this;
+        }
 
         /**
          * Builds a {@link GoogLeNet} block.

@@ -57,7 +57,7 @@ public final class VGG {
                 .add(Linear.builder().setUnits(4096).build())
                 .add(Activation::relu)
                 .add(Dropout.builder().optRate(0.5f).build())
-                .add(Linear.builder().setUnits(10).build());
+                .add(Linear.builder().setUnits(builder.outSize).build());
 
         return block;
     }
@@ -101,6 +101,7 @@ public final class VGG {
 
         int numLayers = 11;
         int[][] convArch = {{1, 64}, {1, 128}, {2, 256}, {2, 512}, {2, 512}};
+        long outSize = 10;
 
         /**
          * Sets the number of layers. It is equal to total sum of numConvs in convArch + 3.
@@ -134,6 +135,17 @@ public final class VGG {
             }
 
             this.convArch = convArch;
+            return this;
+        }
+
+        /**
+         * Sets the size of the output.
+         *
+         * @param outSize the output size
+         * @return this {@code Builder}
+         */
+        public Builder setOutSize(long outSize) {
+            this.outSize = outSize;
             return this;
         }
 
