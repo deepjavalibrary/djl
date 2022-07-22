@@ -91,23 +91,27 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
             // change color of pixels in image array where objects have been detected
             for (int h = 0; h < height; h++) {
                 for (int w = 0; w < width; w++) {
+                    int index = h * width + w;
                     int maxi = 0;
                     double maxnum = -Double.MAX_VALUE;
                     for (int i = 0; i < CLASSNUM; i++) {
                         // get score for each i at the h,w pixel of the image
-                        float score = scores[i * (imageSize) + h * width + w];
+                        float score = scores[i * (imageSize) + index];
                         if (score > maxnum) {
                             maxnum = score;
                             maxi = i;
                         }
                     }
                     if (maxi > 0) {
-                        bb.put(h * width + w, colors[maxi][r]);
-                        bb.put(g * imageSize + h * width + w, colors[maxi][g]);
-                        bb.put(b * imageSize + h * width + w, colors[maxi][b]);
+                        bb.put(colors[maxi][r]);
+                        bb.put(colors[maxi][g]);
+                        bb.put(colors[maxi][b]);
+                    } else {
+                        bb.position(bb.position() + 3);
                     }
                 }
             }
+            bb.rewind();
             int originW = (int) ctx.getAttachment("originalWidth");
             int originH = (int) ctx.getAttachment("originalHeight");
             NDArray fullImage =

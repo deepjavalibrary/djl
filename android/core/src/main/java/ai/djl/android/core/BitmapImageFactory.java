@@ -26,7 +26,6 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -88,27 +87,27 @@ public class BitmapImageFactory extends ImageFactory {
         Shape shape = array.getShape();
         if (shape.dimension() != 3) {
             throw new IllegalArgumentException("Shape should only have three dimension follow CHW");
-        }
-        if (shape.get(0) == 1) {
+        } else if (shape.get(0) == 1 || shape.get(2) == 1) {
             throw new UnsupportedOperationException("Grayscale image is not supported");
         }
         if (NDImageUtils.isCHW(shape)) {
-            array = array.transpose(2, 0, 1);
+            array = array.transpose(1, 2, 0);
             shape = array.getShape();
         }
-        int height = (int) shape.get(1);
-        int width = (int) shape.get(2);
-        int imageArea = width * height;
+
+        int height = (int) shape.get(0);
+        int width = (int) shape.get(1);
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         int[] raw = array.toType(DataType.UINT8, false).toUint8Array();
-        IntStream.range(0, imageArea).parallel().forEach(ele -> {
-            int x = ele % width;
-            int y = ele / width;
-            int red = raw[ele] & 0xFF;
-            int green = raw[ele + imageArea] & 0xFF;
-            int blue = raw[ele + imageArea * 2] & 0xFF;
-            bitmap.setPixel(x, y, Color.argb(255, red, green, blue));
-        });
+        for (int h = 0; h < height; ++h) {
+            for (int w = 0; w < width; ++w) {
+                int pos = (h * width + w) * 3;
+                int red = raw[pos];
+                int green = raw[pos + 1];
+                int blue = raw[pos + 2];
+                bitmap.setPixel(w, h, Color.argb(255, red, green, blue));
+            }
+        }
         return new BitMapWrapper(bitmap);
     }
 
