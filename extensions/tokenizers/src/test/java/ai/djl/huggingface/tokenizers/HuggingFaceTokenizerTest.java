@@ -15,10 +15,14 @@ package ai.djl.huggingface.tokenizers;
 
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.djl.testing.TestRequirements;
+import ai.djl.training.util.DownloadUtils;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HuggingFaceTokenizerTest {
 
     @Test
-    public void testTokenizer() {
+    public void testTokenizer() throws IOException {
         TestRequirements.notArm();
 
         String input = "Hello, y'all! How are you 😁 ?";
@@ -74,9 +78,8 @@ public class HuggingFaceTokenizerTest {
             CharSpan[] charSpansResult = encoding.getCharTokenSpans();
 
             Assert.assertEquals(expectedLength, charSpansResult.length);
-            Assert.assertEquals(charSpansExpected[0], charSpansResult[0]);
-            Assert.assertEquals(
-                    charSpansExpected[expectedLength - 1], charSpansResult[expectedLength - 1]);
+            Assert.assertNull(charSpansResult[0]);
+            Assert.assertNull(charSpansResult[expectedLength - 1]);
 
             for (int i = 1; i < expectedLength - 1; i++) {
                 Assert.assertEquals(charSpansExpected[i].getStart(), charSpansResult[i].getStart());
@@ -95,6 +98,16 @@ public class HuggingFaceTokenizerTest {
 
             Encoding encoding = tokenizer.encode(Arrays.asList(inputs));
             Assert.assertEquals(encoding.getTokens(), exp);
+        }
+
+        DownloadUtils.download(
+                "https://huggingface.co/bert-base-cased/raw/main/tokenizer.json",
+                "build/tokenizer/tokenizer.json");
+        Path path = Paths.get("build/tokenizer");
+        try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance(path)) {
+            long[] ids = {101, 8667, 102, 1731, 1132, 1128, 102};
+            Encoding encoding = tokenizer.encode("Hello", "How are you");
+            Assert.assertEquals(encoding.getIds(), ids);
         }
     }
 }

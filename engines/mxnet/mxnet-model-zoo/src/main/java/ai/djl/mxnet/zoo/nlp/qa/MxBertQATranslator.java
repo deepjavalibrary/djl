@@ -113,7 +113,7 @@ public class MxBertQATranslator extends QATranslator {
         NDArray endLogits = output.get(1).reshape(new Shape(1, -1));
         int startIdx = (int) startLogits.argMax(1).getLong();
         int endIdx = (int) endLogits.argMax(1).getLong();
-        return tokenizer.tokenToString(tokens.subList(startIdx, endIdx + 1));
+        return tokenizer.buildSentence(tokens.subList(startIdx, endIdx + 1));
     }
 
     /**
