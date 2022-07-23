@@ -1534,6 +1534,8 @@ public final class JniUtils {
             String[] extraFileKeys,
             String[] extraFileValues) {
         Device device = manager.getDevice();
+        logger.debug("mapLocation: {}", mapLocation);
+        logger.debug("extraFileKeys: {}", Arrays.toString(extraFileKeys));
         long handle =
                 PyTorchLibrary.LIB.moduleLoad(
                         path.toString(),
