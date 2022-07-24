@@ -93,7 +93,7 @@ public class PtBertQATranslator extends QATranslator {
         if (startIdx >= endIdx) {
             return "";
         }
-        return tokenizer.tokenToString(tokens.subList(startIdx, endIdx + 1));
+        return tokenizer.buildSentence(tokens.subList(startIdx, endIdx + 1));
     }
 
     /**

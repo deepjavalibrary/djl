@@ -26,7 +26,10 @@ public final class TokenizersLibrary {
 
     public native void deleteTokenizer(long handle);
 
-    public native long encode(long tokenizer, String input, boolean addSpecialTokens);
+    public native long encode(long tokenizer, String text, boolean addSpecialTokens);
+
+    public native long encodeDual(
+            long tokenizer, String text, String textPair, boolean addSpecialTokens);
 
     public native long encodeList(long tokenizer, String[] inputs, boolean addSpecialTokens);
 

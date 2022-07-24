@@ -35,9 +35,12 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
 
     private boolean addSpecialTokens;
 
-    private HuggingFaceTokenizer(long handle, boolean addSpecialTokens) {
+    private HuggingFaceTokenizer(long handle, Map<String, String> options) {
         super(handle);
-        this.addSpecialTokens = addSpecialTokens;
+        this.addSpecialTokens =
+                options == null
+                        || !options.containsKey("addSpecialTokens")
+                        || Boolean.parseBoolean(options.get("addSpecialTokens"));
     }
 
     /**
@@ -61,11 +64,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         LibUtils.checkStatus();
 
         long handle = TokenizersLibrary.LIB.createTokenizer(identifier);
-        boolean addSpecialTokens =
-                options == null
-                        || !options.containsKey("addSpecialTokens")
-                        || Boolean.parseBoolean(options.get("addSpecialTokens"));
-        return new HuggingFaceTokenizer(handle, addSpecialTokens);
+        return new HuggingFaceTokenizer(handle, options);
     }
 
     /**
@@ -89,6 +88,9 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      */
     public static HuggingFaceTokenizer newInstance(Path modelPath, Map<String, String> options)
             throws IOException {
+        if (Files.isDirectory(modelPath)) {
+            modelPath = modelPath.resolve("tokenizer.json");
+        }
         try (InputStream is = Files.newInputStream(modelPath)) {
             return newInstance(is, options);
         }
@@ -108,9 +110,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         String json = Utils.toString(is);
 
         long handle = TokenizersLibrary.LIB.createTokenizerFromString(json);
-        boolean addSpecialTokens =
-                options != null && Boolean.parseBoolean(options.get("addSpecialTokens"));
-        return new HuggingFaceTokenizer(handle, addSpecialTokens);
+        return new HuggingFaceTokenizer(handle, options);
     }
 
     /** {@inheritDoc} */
@@ -124,7 +124,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     @Override
     public String buildSentence(List<String> tokens) {
         // TODO:
-        return String.join(" ", tokens);
+        return String.join(" ", tokens).replace(" ##", "").trim();
     }
 
     /** {@inheritDoc} */
@@ -139,11 +139,24 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     /**
      * Returns the {@code Encoding} of the input sentence.
      *
-     * @param input the input sentence
+     * @param text the input sentence
      * @return the {@code Encoding} of the input sentence
      */
-    public Encoding encode(String input) {
-        long encoding = TokenizersLibrary.LIB.encode(getHandle(), input, addSpecialTokens);
+    public Encoding encode(String text) {
+        long encoding = TokenizersLibrary.LIB.encode(getHandle(), text, addSpecialTokens);
+        return toEncoding(encoding);
+    }
+
+    /**
+     * Returns the {@code Encoding} of the input sentence.
+     *
+     * @param text the input sentence
+     * @param textPair the second input sentence
+     * @return the {@code Encoding} of the input sentence
+     */
+    public Encoding encode(String text, String textPair) {
+        long encoding =
+                TokenizersLibrary.LIB.encodeDual(getHandle(), text, textPair, addSpecialTokens);
         return toEncoding(encoding);
     }
 

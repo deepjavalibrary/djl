@@ -76,7 +76,7 @@ public class BertFullTokenizer extends BertTokenizer {
 
     /** {@inheritDoc} */
     @Override
-    public String tokenToString(List<String> tokens) {
+    public String buildSentence(List<String> tokens) {
         return String.join(" ", tokens).replace(" ##", "").trim();
     }
 

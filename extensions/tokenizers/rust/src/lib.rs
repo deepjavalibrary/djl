@@ -106,6 +106,39 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 }
 
 #[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_encodeDual(
+    env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+    text: JString,
+    text_pair: JString,
+    add_special_tokens: jboolean,
+) -> jlong {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    let sequence1: String = env
+        .get_string(text)
+        .expect("Couldn't get text string!")
+        .into();
+    let sequence2: String = env
+        .get_string(text_pair)
+        .expect("Couldn't get text_pair string!")
+        .into();
+
+    let input_sequence1 = tk::InputSequence::from(sequence1);
+    let input_sequence2 = tk::InputSequence::from(sequence2);
+    let encoded_input = EncodeInput::Dual(input_sequence1, input_sequence2);
+    let encoding = tokenizer.encode(encoded_input, add_special_tokens == JNI_TRUE);
+
+    match encoding {
+        Ok(output) => to_handle(output),
+        Err(err) => {
+            env.throw(err.to_string()).unwrap();
+            0
+        }
+    }
+}
+
+#[no_mangle]
 pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_encodeList(
     env: JNIEnv,
     _: JObject,
