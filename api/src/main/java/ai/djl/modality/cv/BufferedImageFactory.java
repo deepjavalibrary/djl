@@ -39,7 +39,6 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import javax.imageio.ImageIO;
 
@@ -91,27 +90,26 @@ public class BufferedImageFactory extends ImageFactory {
         } else if (shape.get(0) == 1 || shape.get(2) == 1) {
             throw new UnsupportedOperationException("Grayscale image is not supported");
         }
+        if (NDImageUtils.isCHW(shape)) {
+            array = array.transpose(1, 2, 0);
+            shape = array.getShape();
+        }
         int height = (int) shape.get(0);
         int width = (int) shape.get(1);
-        if (NDImageUtils.isCHW(shape)) {
-            height = (int) shape.get(1);
-            width = (int) shape.get(2);
-        }
-        int imageArea = width * height;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         int[] raw = array.toType(DataType.UINT8, false).toUint8Array();
-        int finalWidth = width;
-        IntStream.range(0, imageArea)
-                .forEach(
-                        ele -> {
-                            int x = ele % finalWidth;
-                            int y = ele / finalWidth;
-                            int red = raw[ele] & 0xFF;
-                            int green = raw[ele + imageArea] & 0xFF;
-                            int blue = raw[ele + imageArea * 2] & 0xFF;
-                            int rgb = (red << 16) | (green << 8) | blue;
-                            image.setRGB(x, y, rgb);
-                        });
+        int[] pixels = new int[width * height];
+        for (int h = 0; h < height; ++h) {
+            for (int w = 0; w < width; ++w) {
+                int index = h * width + w;
+                int pos = index * 3;
+                int red = raw[pos];
+                int green = raw[pos + 1];
+                int blue = raw[pos + 2];
+                pixels[index] = (red << 16) | (green << 8) | blue;
+            }
+        }
+        image.setRGB(0, 0, width, height, pixels, 0, width);
         return new BufferedImageWrapper(image);
     }
 
