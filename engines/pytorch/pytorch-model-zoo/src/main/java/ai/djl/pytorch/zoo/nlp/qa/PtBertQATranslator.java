@@ -91,7 +91,9 @@ public class PtBertQATranslator extends QATranslator {
         int startIdx = (int) startLogits.argMax().getLong();
         int endIdx = (int) endLogits.argMax().getLong();
         if (startIdx >= endIdx) {
-            return "";
+            int tmp = startIdx;
+            startIdx = endIdx;
+            endIdx = tmp;
         }
         return tokenizer.tokenToString(tokens.subList(startIdx, endIdx + 1));
     }
