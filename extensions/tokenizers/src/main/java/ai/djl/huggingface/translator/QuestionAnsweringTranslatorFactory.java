@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/** A {@link TranslatorFactory} that creates a {@link QuestionAnsweringTranslator} instance. */
 public class QuestionAnsweringTranslatorFactory implements TranslatorFactory {
 
     private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();

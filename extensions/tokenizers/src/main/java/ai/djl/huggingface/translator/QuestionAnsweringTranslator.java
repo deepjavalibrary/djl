@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** The translator for Huggingface question answering model. */
 public class QuestionAnsweringTranslator implements Translator<QAInput, String> {
 
     private HuggingFaceTokenizer tokenizer;
@@ -180,10 +181,17 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
             optTokenizerName(ArgumentsUtil.stringValue(arguments, "tokenizer"));
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
             optAddSpecialTokens(ArgumentsUtil.booleanValue(arguments, "addSpecialTokens", true));
-            String batchifier = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
-            optBatchifer(Batchifier.fromString(batchifier));
+            optBatchifer(
+                    Batchifier.fromString(
+                            ArgumentsUtil.stringValue(arguments, "batchifier", "stack")));
         }
 
+        /**
+         * Builds the translator.
+         *
+         * @return the new translator
+         * @throws IOException if I/O error occurs
+         */
         public QuestionAnsweringTranslator build() throws IOException {
             HuggingFaceTokenizer tokenizer;
             Map<String, String> options = new ConcurrentHashMap<>();
