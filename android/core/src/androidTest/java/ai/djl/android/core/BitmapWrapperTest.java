@@ -90,6 +90,12 @@ public class BitmapWrapperTest {
                     .transpose(2, 0, 1)
                     .toType(DataType.FLOAT32, true);
             assertEquals(array, converted);
+
+            array = manager.arange(0, 12, 1, DataType.UINT8).reshape(3, 2, 2);
+            array = array.transpose(1, 2, 0);
+            image = factory.fromNDArray(array);
+            converted = image.toNDArray(manager);
+            assertEquals(array, converted);
         }
     }
 }
