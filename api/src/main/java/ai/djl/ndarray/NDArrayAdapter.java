@@ -133,19 +133,26 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray toDevice(Device device, boolean copy) {
-        if (device.equals(getDevice()) && !copy) {
+        if (device.equals(getDevice())) {
+            if (copy) {
+                return duplicate();
+            }
             return this;
         }
-        return duplicate();
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray toType(DataType dataType, boolean copy) {
-        if (dataType.equals(getDataType()) && !copy) {
+        if (dataType.equals(getDataType())) {
+            if (copy) {
+                return duplicate();
+            }
             return this;
         }
-        return duplicate();
+        // TODO: each engine should override this method
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
