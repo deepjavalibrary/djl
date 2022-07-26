@@ -90,20 +90,19 @@ public class BufferedImageFactory extends ImageFactory {
         } else if (shape.get(0) == 1 || shape.get(2) == 1) {
             throw new UnsupportedOperationException("Grayscale image is not supported");
         }
+        int[] raw = array.toType(DataType.UINT8, false).toUint8Array();
         if (NDImageUtils.isCHW(shape)) {
             int height = (int) shape.get(1);
             int width = (int) shape.get(2);
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            int[] raw = array.toType(DataType.UINT8, false).toUint8Array();
             int[] pixels = new int[width * height];
             int imageArea = height * width;
             for (int h = 0; h < height; ++h) {
                 for (int w = 0; w < width; ++w) {
                     int index = h * width + w;
-                    int pos = index;
-                    int red = raw[pos];
-                    int green = raw[imageArea + pos];
-                    int blue = raw[imageArea * 2 + pos];
+                    int red = raw[index];
+                    int green = raw[imageArea + index];
+                    int blue = raw[imageArea * 2 + index];
                     pixels[index] = (red << 16) | (green << 8) | blue;
                 }
             }
@@ -113,7 +112,6 @@ public class BufferedImageFactory extends ImageFactory {
         int height = (int) shape.get(0);
         int width = (int) shape.get(1);
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        int[] raw = array.toType(DataType.UINT8, false).toUint8Array();
         int[] pixels = new int[width * height];
         for (int h = 0; h < height; ++h) {
             for (int w = 0; w < width; ++w) {
