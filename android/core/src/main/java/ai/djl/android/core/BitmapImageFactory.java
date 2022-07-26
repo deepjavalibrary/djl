@@ -110,7 +110,6 @@ public class BitmapImageFactory extends ImageFactory {
         int height = (int) shape.get(0);
         int width = (int) shape.get(1);
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        int imageArea = height * width;
         for (int h = 0; h < height; ++h) {
             for (int w = 0; w < width; ++w) {
                 int pos = (h * width + w) * 3;

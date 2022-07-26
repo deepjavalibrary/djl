@@ -48,10 +48,9 @@ public class BufferedImageFactoryTest {
                     image.toNDArray(manager).transpose(2, 0, 1).toType(DataType.FLOAT32, true);
             Assertions.assertAlmostEquals(array, converted);
 
-            array = manager.arange(0, 12, 1, DataType.UINT8).reshape(3, 2, 2);
             array = array.transpose(1, 2, 0);
             image = factory.fromNDArray(array);
-            converted = image.toNDArray(manager);
+            converted = image.toNDArray(manager).toType(DataType.FLOAT32, false);
             Assertions.assertAlmostEquals(array, converted);
         }
     }
