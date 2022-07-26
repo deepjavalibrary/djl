@@ -91,20 +91,34 @@ public class BitmapImageFactory extends ImageFactory {
             throw new UnsupportedOperationException("Grayscale image is not supported");
         }
         if (NDImageUtils.isCHW(shape)) {
-            array = array.transpose(1, 2, 0);
-            shape = array.getShape();
+            int height = (int) shape.get(1);
+            int width = (int) shape.get(2);
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            int[] raw = array.toType(DataType.UINT8, false).toUint8Array();
+            int imageArea = width * height;
+            for (int h = 0; h < height; ++h) {
+                for (int w = 0; w < width; ++w) {
+                    int pos = (h * width + w);
+                    int red = raw[pos] & 0xFF;
+                    int green = raw[imageArea + pos] & 0xFF;
+                    int blue = raw[imageArea * 2 + pos] & 0xFF;
+                    bitmap.setPixel(w, h, Color.argb(255, red, green, blue));
+                }
+            }
+            return new BitMapWrapper(bitmap);
         }
-
+        shape = array.getShape();
         int height = (int) shape.get(0);
         int width = (int) shape.get(1);
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         int[] raw = array.toType(DataType.UINT8, false).toUint8Array();
+        int imageArea = height * width;
         for (int h = 0; h < height; ++h) {
             for (int w = 0; w < width; ++w) {
-                int pos = (h * width + w) * 3;
+                int pos = (h * width + w);
                 int red = raw[pos];
-                int green = raw[pos + 1];
-                int blue = raw[pos + 2];
+                int green = raw[imageArea + pos];
+                int blue = raw[imageArea * 2 + pos];
                 bitmap.setPixel(w, h, Color.argb(255, red, green, blue));
             }
         }
