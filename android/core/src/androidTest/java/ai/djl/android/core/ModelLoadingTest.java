@@ -49,7 +49,7 @@ public class ModelLoadingTest {
         try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
              Predictor<Image, Classifications> predictor = model.newPredictor()) {
             Classifications result = predictor.predict(image);
-            Assert.assertEquals("dog", result.best().getClassName());
+            Assert.assertEquals("matches", result.best().getClassName());
         }
     }
 }
