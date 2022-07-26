@@ -234,28 +234,11 @@ For the Windows platform, you can choose between CPU and GPU.
 
 - ai.djl.pytorch:pytorch-jni:1.11.0-0.18.0
 - ai.djl.pytorch:pytorch-native-cu113:1.11.0:win-x86_64
-- ai.djl.pytorch:pytorch-native-cu102:1.11.0:win-x86_64
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cu113</artifactId>
-    <classifier>win-x86_64</classifier>
-    <version>1.11.0</version>
-    <scope>runtime</scope>
-</dependency>
-<dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-jni</artifactId>
-    <version>1.11.0-0.18.0</version>
-    <scope>runtime</scope>
-</dependency>
-```
-
-```xml
-<dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-cu102</artifactId>
     <classifier>win-x86_64</classifier>
     <version>1.11.0</version>
     <scope>runtime</scope>
