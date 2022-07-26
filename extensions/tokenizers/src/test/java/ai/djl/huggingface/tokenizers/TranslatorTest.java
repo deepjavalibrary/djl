@@ -12,7 +12,6 @@
  */
 package ai.djl.huggingface.tokenizers;
 
-import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.huggingface.translator.QuestionAnsweringTranslatorFactory;
 import ai.djl.inference.Predictor;
@@ -20,8 +19,6 @@ import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.repository.zoo.Criteria;
@@ -72,12 +69,6 @@ public class TranslatorTest {
                         "model");
         Path modelDir = Paths.get("build/model");
         Files.createDirectories(modelDir);
-        Model testModel = Model.newInstance("model");
-        testModel.setBlock(block);
-        block.initialize(testModel.getNDManager(), DataType.FLOAT32, new Shape(1));
-        testModel.save(modelDir, "model");
-        testModel.close();
-
         Criteria<QAInput, String> criteria =
                 Criteria.builder()
                         .setTypes(QAInput.class, String.class)
@@ -85,6 +76,7 @@ public class TranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-cased")
+                        .optOption("hasParameter", "false")
                         .optTranslatorFactory(new QuestionAnsweringTranslatorFactory())
                         .build();
 

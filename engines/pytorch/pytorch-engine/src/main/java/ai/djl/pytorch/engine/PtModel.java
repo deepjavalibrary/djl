@@ -97,15 +97,24 @@ public class PtModel extends BaseModel {
                 properties.put(extraFileKeys[i], extraFileValues[i]);
             }
         } else {
-            Path paramFile = paramPathResolver(prefix, options);
-            if (paramFile == null) {
-                throw new IOException(
-                        "Parameter file not found in: "
-                                + modelDir
-                                + ". If you only specified model path, make sure path name match"
-                                + "your saved model file name.");
+            boolean hasParameter = true;
+            if (options != null) {
+                String paramOption = (String) options.get("hasParameter");
+                if (paramOption != null) {
+                    hasParameter = Boolean.parseBoolean(paramOption);
+                }
             }
-            readParameters(paramFile, options);
+            if (hasParameter) {
+                Path paramFile = paramPathResolver(prefix, options);
+                if (paramFile == null) {
+                    throw new IOException(
+                            "Parameter file not found in: "
+                                    + modelDir
+                                    + ". If you only specified model path, make sure path name"
+                                    + " matchyour saved model file name.");
+                }
+                readParameters(paramFile, options);
+            }
         }
     }
 
