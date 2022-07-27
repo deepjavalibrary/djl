@@ -85,6 +85,14 @@ task compileJNI {
     }
 }
 
+task formatPython {
+    doFirst {
+        exec {
+            commandLine "bash", "-c", "find . -name '*.py' -print0 | xargs -0 yapf --in-place"
+        }
+    }
+}
+
 clean.doFirst {
     delete System.getProperty("user.home") + "/.djl.ai/tokenizers"
     delete "rust/target"
