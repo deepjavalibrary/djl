@@ -76,7 +76,7 @@ public class NDIndex {
      *     assertEquals(a.get(new NDIndex("2")).getShape(), new Shape(4, 3));
      *
      *     // Gets a subsection of the NDArray indexing from the end (-i == length - i).
-     *     assertEquals(a.get(new NDIndex("-1")).getShape(), new Shape(4, 3));
+     *     assertEquals(a.get(new NDIndex("-2")).getShape(), new Shape(4, 3));
      *
      *     // Gets everything in the first axis and a subsection in the second axis.
      *     // You can use either : or * to represent everything
