@@ -45,7 +45,7 @@ public class JarRepositoryTest {
         URL[] url = {jarFile.toUri().toURL()};
         try {
             Thread.currentThread().setContextClassLoader(new URLClassLoader(url));
-            Repository repo = Repository.newInstance("test", "jar:///test.zip");
+            Repository repo = Repository.newInstance("test", "jar:///test.zip?hash=1");
             Assert.assertEquals("test", repo.getName());
             Assert.assertTrue(repo.isRemote());
 
