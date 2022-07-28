@@ -137,6 +137,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         @Override
         public Repository newInstance(String name, URI uri) {
             String p = uri.getPath();
+            String queryString = uri.getRawQuery();
             if (p.startsWith("/")) {
                 p = p.substring(1);
             }
@@ -157,7 +158,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             }
 
             fileName = FilenameUtils.getNamePart(fileName);
-            return new JarRepository(name, uri, fileName);
+            return new JarRepository(name, uri, fileName, queryString);
         }
 
         /** {@inheritDoc} */
