@@ -1,1 +1,1 @@
-../gradlew.bat
+call ..\gradlew.bat
