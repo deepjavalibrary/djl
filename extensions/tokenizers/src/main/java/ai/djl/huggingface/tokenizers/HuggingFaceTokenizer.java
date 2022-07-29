@@ -208,6 +208,16 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         return ret;
     }
 
+    /**
+     * Returns the decoded String from the input ids.
+     *
+     * @param ids the input ids
+     * @return the decoded String from the input ids
+     */
+    public String decode(long[] ids) {
+        return TokenizersLibrary.LIB.decode(getHandle(), ids, addSpecialTokens);
+    }
+
     private Encoding toEncoding(long encoding) {
         long[] ids = TokenizersLibrary.LIB.getTokenIds(encoding);
         long[] typeIds = TokenizersLibrary.LIB.getTypeIds(encoding);

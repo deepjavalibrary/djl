@@ -19,9 +19,9 @@ use tk::tokenizer::{EncodeInput, Encoding};
 use tk::Tokenizer;
 use tk::{FromPretrainedParameters, Offsets};
 
-use jni::objects::{JClass, JMethodID, JObject, JString, JValue};
+use jni::objects::{JClass, JMethodID, JObject, JString, JValue, ReleaseMode};
 use jni::sys::{
-    jboolean, jint, jlong, jlongArray, jobjectArray, jsize, JNI_TRUE,
+    jboolean, jint, jlong, jlongArray, jobjectArray, jsize, jstring, JNI_TRUE,
 };
 use jni::JNIEnv;
 
@@ -375,6 +375,34 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
         }
     }
     array
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_decode(
+    env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+    ids: jlongArray,
+    add_special_tokens: jboolean,
+) -> jstring {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    let long_ids = env.get_long_array_elements(ids, ReleaseMode::NoCopyBack).unwrap();
+    let long_ids_ptr = long_ids.as_ptr();
+    let len = long_ids.size().unwrap() as usize;
+    let mut decode_ids: Vec<u32> = Vec::new();
+    for i in 0..len {
+        unsafe {
+            let val = long_ids_ptr.add(i);
+            decode_ids.push(*val as u32);
+        }
+    }
+    let decoding: String = tokenizer.decode(decode_ids, add_special_tokens == JNI_TRUE).unwrap();
+    let ret = env
+        .new_string(decoding)
+        .expect("Couldn't create java string!")
+        .into_inner();
+
+    ret
 }
 
 fn to_handle<T: 'static>(val: T) -> jlong {

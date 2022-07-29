@@ -50,4 +50,6 @@ public final class TokenizersLibrary {
     public native long[] getSpecialTokenMask(long encoding);
 
     public native CharSpan[] getTokenCharSpans(long encoding);
+
+    public native String decode(long tokenizer, long[] ids, boolean addSpecialTokens);
 }
