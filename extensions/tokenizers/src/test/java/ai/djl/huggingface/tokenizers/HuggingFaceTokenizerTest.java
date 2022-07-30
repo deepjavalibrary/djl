@@ -110,4 +110,26 @@ public class HuggingFaceTokenizerTest {
             Assert.assertEquals(encoding.getIds(), ids);
         }
     }
+
+    @Test
+    public void testTokenizerDecoding() {
+        List<long[]> testIds =
+                Arrays.asList(
+                        new long[] {
+                            101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 1128, 100, 136, 102
+                        },
+                        new long[] {
+                            101, 3570, 1110, 170, 21162, 1285, 119, 2750, 4250, 146, 112, 173, 1474,
+                            102
+                        });
+        List<String> expectedDecodings =
+                Arrays.asList(
+                        "Hello, y ' all! How are you?",
+                        "Today is a sunny day. Good weather I ' d say");
+        try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
+            for (int i = 0; i < testIds.size(); ++i) {
+                Assert.assertEquals(tokenizer.decode(testIds.get(i)), expectedDecodings.get(i));
+            }
+        }
+    }
 }
