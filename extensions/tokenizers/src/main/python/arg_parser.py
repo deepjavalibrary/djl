@@ -23,7 +23,7 @@ def converter_args():
                         default=1,
                         help="Max amount of models to convert")
     parser.add_argument("-o", "--output-dir", help="Model output directory")
-    parser.add_argument("-t",
+    parser.add_argument("-c",
                         "--categories",
                         nargs="*",
                         help="Model categories to convert")

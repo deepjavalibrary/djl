@@ -21,7 +21,7 @@ import shutil
 from shasum import sha1_sum
 
 import json
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, ModelSearchArguments
 from huggingface_hub import hf_hub_download
 from transformers import pipeline
 import torch
@@ -84,6 +84,7 @@ class HuggingfaceConverter:
                 self.processed_models = json.load(f)
 
     def convert_huggingface_models(self, category: str):
+        languages = ModelSearchArguments().language
         api = HfApi()
         models = api.list_models(filter=f"{category},pytorch",
                                  sort="downloads",
@@ -93,6 +94,15 @@ class HuggingfaceConverter:
         temp_dir = f"{self.output_dir}/tmp"
 
         for model_info in models:
+            is_english = True
+            for tag in model_info.tags:
+                if tag in languages and tag != 'en':
+                    is_english = False
+                    break
+
+            if not is_english:
+                continue
+
             if self.processed_models.get(model_info.modelId):
                 logging.info(f"Skip converted mode: {model_info.modelId}.")
                 continue
