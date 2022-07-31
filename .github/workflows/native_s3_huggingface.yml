@@ -64,7 +64,7 @@ jobs:
       - name: Release JNI prep
         run: |
           ./gradlew :extensions:tokenizers:compileJNI
-          ./gradlew -Pjni :extensions:tokenizers:test
+          PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
