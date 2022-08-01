@@ -90,7 +90,7 @@ public final class LibUtils {
                     "Paddle MKL/GPU requires user to set LD_LIBRARY_PATH="
                             + libDir
                             + ", the current one is set to: "
-                            + System.getenv("LD_LIBRARY_PATH"));
+                            + Utils.getenv("LD_LIBRARY_PATH"));
             List<String> names = Arrays.asList("libdnnl.so.2", "libiomp5.so", "libmklml_intel.so");
             names.forEach(
                     name -> {
@@ -123,7 +123,7 @@ public final class LibUtils {
     }
 
     private static String findOverrideLibrary() {
-        String libPath = System.getenv("PADDLE_LIBRARY_PATH");
+        String libPath = Utils.getenv("PADDLE_LIBRARY_PATH");
         if (libPath != null) {
             String libName = findLibraryInPath(libPath);
             if (libName != null) {

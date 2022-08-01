@@ -22,6 +22,7 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.tensorrt.jni.JniUtils;
 import ai.djl.tensorrt.jni.LibUtils;
 import ai.djl.training.GradientCollector;
+import ai.djl.util.Utils;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
@@ -49,7 +50,7 @@ public final class TrtEngine extends Engine {
         try {
             LibUtils.loadLibrary();
             JniUtils.initPlugins("");
-            String paths = System.getenv("TENSORRT_EXTRA_LIBRARY_PATH");
+            String paths = Utils.getenv("TENSORRT_EXTRA_LIBRARY_PATH");
             if (paths == null) {
                 paths = System.getProperty("TENSORRT_EXTRA_LIBRARY_PATH");
             }

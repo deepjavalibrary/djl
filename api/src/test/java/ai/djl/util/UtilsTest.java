@@ -78,4 +78,11 @@ public class UtilsTest {
         float[] array = Utils.toFloatArray(list);
         Assert.assertEquals(array, new float[] {1f, 2f});
     }
+
+    @Test
+    public void testGetenv() {
+        if (!Utils.getenv().containsKey("TEST")) {
+            Assert.assertNull(Utils.getenv("TEST"));
+        }
+    }
 }
