@@ -30,8 +30,14 @@ SUPPORTED_TASK = {
     "fill-mask": {
         "translator":
         "ai.djl.huggingface.translator.FillMaskTranslatorFactory",
-        "application": "nlp/fill_mask",
-        "inputs": "Hello I'm a [MASK] model."
+        "application":
+        "nlp/fill_mask",
+        "inputs":
+        "Hello I'm a [MASK] model.",
+        "output": [
+            "fashion", "role", 'new', 'super', 'fine', 'male', 'female', 'big',
+            'top', 'modeling', 'virtual'
+        ]
     },
     "question-answering": {
         "translator":
@@ -94,6 +100,7 @@ class HuggingfaceConverter:
         temp_dir = f"{self.output_dir}/tmp"
 
         for model_info in models:
+            model_id = model_info.modelId
             is_english = True
             for tag in model_info.tags:
                 if tag in languages and tag != 'en':
@@ -103,13 +110,12 @@ class HuggingfaceConverter:
             if not is_english:
                 continue
 
-            if self.processed_models.get(model_info.modelId):
-                logging.info(f"Skip converted mode: {model_info.modelId}.")
+            if self.processed_models.get(model_id):
+                logging.info(f"Skip converted mode: {model_id}.")
                 continue
 
-            result, reason, size = self.save_model(model_info.modelId)
-            self.save_progress(model_info.modelId, model_info.sha, result,
-                               reason, size)
+            result, reason, size = self.save_model(model_id)
+            self.save_progress(model_id, model_info.sha, result, reason, size)
             shutil.rmtree(temp_dir)
 
     def save_model(self, model_id: str):
@@ -223,11 +229,11 @@ class HuggingfaceConverter:
 
         # test traced model
         out = traced_model(input_ids, attention_mask)
+        tokenizer = hf_pipeline.tokenizer
 
         if task == "question-answering":
             answer_start = torch.argmax(out["start_logits"])
             answer_end = torch.argmax(out["end_logits"]) + 1
-            tokenizer = hf_pipeline.tokenizer
 
             out_ids = input_ids[0].tolist()[answer_start:answer_end]
             tokens = tokenizer.convert_ids_to_tokens(out_ids)
@@ -242,8 +248,29 @@ class HuggingfaceConverter:
                     logging.warning(
                         f"pipeline output differs from expected: {pipeline_output}"
                     )
+        elif task == "fill-mask":
+            masked_token_id = tokenizer.mask_token_id
+            masked_index = torch.nonzero(
+                input_ids.squeeze(0) == masked_token_id,
+                as_tuple=False).squeeze(0)
+            logits = out['logits'][0, masked_index]
+            answer = torch.argmax(logits)
+            prediction = tokenizer.decode(answer).strip()
+
+            if prediction not in expected_output:
+                inputs = SUPPORTED_TASK[task]["inputs"]
+                if tokenizer.mask_token != "[MASK]":
+                    inputs = inputs.replace("[MASK]", tokenizer.mask_token)
+                pipeline_output = hf_pipeline(inputs)
+
+                if prediction not in [o["token_str"] for o in pipeline_output]:
+                    return False, f"Unexpected inference result: {prediction}"
+                else:
+                    logging.warning(
+                        f"pipeline output differs from expected: {pipeline_output}"
+                    )
         else:
-            if hasattr(out, "last_hidden_layer"):
+            if not hasattr(out, "last_hidden_layer"):
                 return False, f"Unexpected inference result: {out}"
 
         return True
@@ -270,6 +297,9 @@ class HuggingfaceConverter:
         else:
             text = inputs
             text_pair = None
+
+        if task == "fill-mask" and tokenizer.mask_token != "[MASK]":
+            text = text.replace("[MASK]", tokenizer.mask_token)
 
         encoding = tokenizer.encode_plus(text,
                                          text_pair=text_pair,
