@@ -83,6 +83,7 @@ public class UtilsTest {
     public void testGetenv() {
         if (!Utils.getenv().containsKey("TEST")) {
             Assert.assertNull(Utils.getenv("TEST"));
+            Assert.assertEquals(Utils.getenv("TEST", "test"), "test");
         }
     }
 }

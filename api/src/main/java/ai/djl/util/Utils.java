@@ -31,7 +31,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -387,21 +386,35 @@ public final class Utils {
      * Gets the value of the specified environment variable.
      *
      * @param name the name of the environment variable
+     * @param def a default value
+     * @return the string value of the variable, or {@code def} if the variable is not defined in
+     *     the system environment or security manager doesn't allow access to the environment
+     *     variable
+     */
+    public static String getenv(String name, String def) {
+        try {
+            String val = System.getenv(name);
+            return val == null ? def : val;
+        } catch (SecurityException e) {
+            logger.warn("Security manager doesn't allow access to the environment variable");
+        }
+        return def;
+    }
+
+    /**
+     * Gets the value of the specified environment variable.
+     *
+     * @param name the name of the environment variable
      * @return the string value of the variable, or {@code null} if the variable is not defined in
      *     the system environment or security manager doesn't allow access to the environment
      *     variable
      */
     public static String getenv(String name) {
-        try {
-            return System.getenv(name);
-        } catch (SecurityException e) {
-            logger.error("Security manager doesn't allow access to the environment variable");
-        }
-        return null;
+        return getenv(name, null);
     }
 
     /**
-     * Returns a map of the current system environment.
+     * Returns an unmodifiable string map view of the current system environment.
      *
      * @return the environment as a map of variable names to values
      */
@@ -409,8 +422,8 @@ public final class Utils {
         try {
             return System.getenv();
         } catch (SecurityException e) {
-            logger.error("Security manager doesn't allow access to the environment variable");
+            logger.warn("Security manager doesn't allow access to the environment variable");
         }
-        return Collections.unmodifiableMap(new HashMap<>());
+        return Collections.emptyMap();
     }
 }
