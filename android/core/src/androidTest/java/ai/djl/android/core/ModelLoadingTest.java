@@ -50,7 +50,7 @@ public class ModelLoadingTest {
                 .addTransform(new ToTensor())
                 .optApplySoftmax(true).build())
             .build();
-        Image image = ImageFactory.getInstance().fromUrl("https://raw.githubusercontent.com/awslabs/djl/master/examples/src/test/resources/kitten.jpg");
+        Image image = ImageFactory.getInstance().fromUrl("https://resources.djl.ai/images/kitten.jpg");
         try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
              Predictor<Image, Classifications> predictor = model.newPredictor()) {
             Classifications result = predictor.predict(image);
