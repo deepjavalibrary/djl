@@ -52,4 +52,14 @@ public final class TokenizersLibrary {
     public native CharSpan[] getTokenCharSpans(long encoding);
 
     public native String decode(long tokenizer, long[] ids, boolean addSpecialTokens);
+
+    public native void disablePadding(long tokenizer);
+
+    public native void setPadding(
+            long tokenizer, long maxLength, String paddingStrategy, long padToMultipleOf);
+
+    public native void disableTruncation(long tokenizer);
+
+    public native void setTruncation(
+            long tokenizer, long maxLength, String truncationStrategy, long stride);
 }

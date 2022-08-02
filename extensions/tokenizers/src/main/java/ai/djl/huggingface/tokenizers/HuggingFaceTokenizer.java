@@ -302,6 +302,90 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         return decode(ids, !addSpecialTokens);
     }
 
+    /**
+     * Sets the truncation and padding behavior for the tokenizer.
+     *
+     * @param truncationStrategy the {@code TruncationStrategy} to use
+     * @param paddingStrategy the {@code PaddingStrategy} to use
+     * @param maxLength the maximum length to pad/truncate sequences to
+     */
+    public void setTruncationAndPadding(
+            TruncationStrategy truncationStrategy,
+            PaddingStrategy paddingStrategy,
+            long maxLength) {
+        setTruncationAndPadding(truncationStrategy, paddingStrategy, maxLength, 0, 0);
+    }
+
+    /**
+     * Sets the truncation and padding behavior for the tokenizer.
+     *
+     * @param truncationStrategy the {@code TruncationStrategy} to use
+     * @param paddingStrategy the {@code PaddingStrategy} to use
+     * @param maxLength the maximum length to pad/truncate sequences to
+     * @param stride value to use when handling overflow
+     */
+    public void setTruncationAndPadding(
+            TruncationStrategy truncationStrategy,
+            PaddingStrategy paddingStrategy,
+            long maxLength,
+            long stride) {
+        setTruncationAndPadding(truncationStrategy, paddingStrategy, maxLength, stride, 0);
+    }
+
+    /**
+     * Sets the truncation and padding behavior for the tokenizer.
+     *
+     * @param truncationStrategy the {@code TruncationStrategy} to use
+     * @param paddingStrategy the {@code PaddingStrategy} to use
+     * @param maxLength the maximum length to pad/truncate sequences to
+     * @param stride value to use when handling overflow
+     * @param padToMultipleOf pad sequence length to multiple of value
+     */
+    public void setTruncationAndPadding(
+            TruncationStrategy truncationStrategy,
+            PaddingStrategy paddingStrategy,
+            long maxLength,
+            long stride,
+            long padToMultipleOf) {
+        setTruncation(truncationStrategy, maxLength, stride);
+        setPadding(paddingStrategy, maxLength, padToMultipleOf);
+    }
+
+    /**
+     * Sets the truncation behavior for the tokenizer.
+     *
+     * @param truncationStrategy the {@code TruncationStrategy} to use
+     * @param maxLength the maximum length to truncate sequences to
+     * @param stride value to use when handling overflow
+     */
+    public void setTruncation(TruncationStrategy truncationStrategy, long maxLength, long stride) {
+        if (truncationStrategy == TruncationStrategy.DO_NOT_TRUNCATE) {
+            TokenizersLibrary.LIB.disableTruncation(getHandle());
+        } else {
+            TokenizersLibrary.LIB.setTruncation(
+                    getHandle(), maxLength, truncationStrategy.toString().toLowerCase(), stride);
+        }
+    }
+
+    /**
+     * Sets the padding behavior for the tokenizer.
+     *
+     * @param paddingStrategy the {@code PaddingStrategy} to use
+     * @param maxLength the maximum length to pad sequences to
+     * @param padToMultipleOf pad sequence length to multiple of value
+     */
+    public void setPadding(PaddingStrategy paddingStrategy, long maxLength, long padToMultipleOf) {
+        if (paddingStrategy == PaddingStrategy.DO_NOT_PAD) {
+            TokenizersLibrary.LIB.disablePadding(getHandle());
+        } else {
+            TokenizersLibrary.LIB.setPadding(
+                    getHandle(),
+                    maxLength,
+                    paddingStrategy.toString().toLowerCase(),
+                    padToMultipleOf);
+        }
+    }
+
     private Encoding toEncoding(long encoding) {
         long[] ids = TokenizersLibrary.LIB.getTokenIds(encoding);
         long[] typeIds = TokenizersLibrary.LIB.getTypeIds(encoding);
@@ -314,5 +398,18 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         TokenizersLibrary.LIB.deleteEncoding(encoding);
         return new Encoding(
                 ids, typeIds, tokens, wordIds, attentionMask, specialTokenMask, charSpans);
+    }
+
+    enum TruncationStrategy {
+        DO_NOT_TRUNCATE,
+        LONGEST_FIRST,
+        ONLY_FIRST,
+        ONLY_SECOND
+    }
+
+    enum PaddingStrategy {
+        DO_NOT_PAD,
+        BATCH_LONGEST,
+        FIXED
     }
 }

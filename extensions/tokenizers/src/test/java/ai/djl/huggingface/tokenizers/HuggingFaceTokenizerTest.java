@@ -155,4 +155,77 @@ public class HuggingFaceTokenizerTest {
             }
         }
     }
+
+    @Test
+    public void testTruncationAndPadding() {
+        TestRequirements.notArm();
+
+        try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
+            List<String> inputs =
+                    Arrays.asList(
+                            "Hello, y'all! How are you?",
+                            "Today is a sunny day. Good weather I'd say",
+                            "I am happy");
+            tokenizer.setTruncationAndPadding(
+                    HuggingFaceTokenizer.TruncationStrategy.LONGEST_FIRST,
+                    HuggingFaceTokenizer.PaddingStrategy.BATCH_LONGEST,
+                    10);
+            List<long[]> expectedIds =
+                    Arrays.asList(
+                            new long[] {101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 102},
+                            new long[] {101, 3570, 1110, 170, 21162, 1285, 119, 2750, 4250, 102},
+                            new long[] {101, 146, 1821, 2816, 102, 0, 0, 0, 0, 0});
+            List<long[]> expectedAttentionMasks =
+                    Arrays.asList(
+                            new long[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                            new long[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                            new long[] {1, 1, 1, 1, 1, 0, 0, 0, 0, 0});
+            Encoding[] encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(encodings[i].getIds(), expectedIds.get(i));
+                Assert.assertEquals(encodings[i].getAttentionMask(), expectedAttentionMasks.get(i));
+            }
+
+            tokenizer.setTruncationAndPadding(
+                    HuggingFaceTokenizer.TruncationStrategy.LONGEST_FIRST,
+                    HuggingFaceTokenizer.PaddingStrategy.FIXED,
+                    12);
+            expectedIds =
+                    Arrays.asList(
+                            new long[] {
+                                101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 1128, 136, 102
+                            },
+                            new long[] {
+                                101, 3570, 1110, 170, 21162, 1285, 119, 2750, 4250, 146, 112, 102
+                            },
+                            new long[] {101, 146, 1821, 2816, 102, 0, 0, 0, 0, 0, 0, 0});
+            expectedAttentionMasks =
+                    Arrays.asList(
+                            new long[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                            new long[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                            new long[] {1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0});
+            encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(encodings[i].getIds(), expectedIds.get(i));
+                Assert.assertEquals(encodings[i].getAttentionMask(), expectedAttentionMasks.get(i));
+            }
+
+            tokenizer.setTruncationAndPadding(
+                    HuggingFaceTokenizer.TruncationStrategy.ONLY_FIRST,
+                    HuggingFaceTokenizer.PaddingStrategy.BATCH_LONGEST,
+                    8);
+            Encoding encoding = tokenizer.encode("Hello there my friend", "How are you");
+            long[] expectedId = new long[] {101, 8667, 1175, 102, 1731, 1132, 1128, 102};
+            Assert.assertEquals(encoding.getIds(), expectedId);
+
+            tokenizer.setTruncationAndPadding(
+                    HuggingFaceTokenizer.TruncationStrategy.ONLY_SECOND,
+                    HuggingFaceTokenizer.PaddingStrategy.DO_NOT_PAD,
+                    8);
+
+            encoding = tokenizer.encode("Hello there my friend", "How are you");
+            expectedId = new long[] {101, 8667, 1175, 1139, 1910, 102, 1731, 102};
+            Assert.assertEquals(encoding.getIds(), expectedId);
+        }
+    }
 }
