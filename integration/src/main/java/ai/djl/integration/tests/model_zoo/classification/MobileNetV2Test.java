@@ -17,16 +17,20 @@ import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.classification.MobileNetV2;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
+import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
+import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.translate.Batchifier;
 import ai.djl.util.PairList;
 
 import org.testng.annotations.Test;
@@ -46,7 +50,21 @@ public class MobileNetV2Test {
                 Shape inputShape = new Shape(batchSize, 3, 224, 224);
                 trainer.initialize(inputShape);
                 NDManager manager = trainer.getManager();
+                NDArray input = manager.randomUniform(0, 1, inputShape);
+                NDArray label = manager.ones(new Shape(batchSize, 1));
+                Batch batch =
+                        new Batch(
+                                manager.newSubManager(),
+                                new NDList(input),
+                                new NDList(label),
+                                batchSize,
+                                Batchifier.STACK,
+                                Batchifier.STACK,
+                                0,
+                                0);
                 PairList<String, Parameter> parameters = mobilenet.getParameters();
+                EasyTrain.trainBatch(trainer, batch);
+                trainer.step();
 
                 NDArray expectedAtIndex0 =
                         manager.ones(new Shape(32, 3, 1, 1)); // 32*3*1*1 for first layer
