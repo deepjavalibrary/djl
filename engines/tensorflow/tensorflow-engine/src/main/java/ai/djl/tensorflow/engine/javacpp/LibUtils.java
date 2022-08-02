@@ -65,7 +65,7 @@ public final class LibUtils {
     }
 
     private static String findOverrideLibrary() {
-        String libPath = System.getenv("TENSORFLOW_LIBRARY_PATH");
+        String libPath = Utils.getenv("TENSORFLOW_LIBRARY_PATH");
         if (libPath != null) {
             String libName = findLibraryInPath(libPath);
             if (libName != null) {

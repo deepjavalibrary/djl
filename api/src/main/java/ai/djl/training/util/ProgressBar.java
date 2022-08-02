@@ -13,6 +13,7 @@
 package ai.djl.training.util;
 
 import ai.djl.util.Progress;
+import ai.djl.util.Utils;
 
 /**
  * {@code ProgressBar} is an implementation of {@link Progress}. It can be used to display the
@@ -142,7 +143,7 @@ public final class ProgressBar implements Progress {
         if (System.getProperty("os.name").startsWith("Win")) {
             return '=';
         } else if (System.getProperty("os.name").startsWith("Linux")) {
-            String lang = System.getenv("LANG");
+            String lang = Utils.getenv("LANG");
             if (lang == null || !lang.contains("UTF-8")) {
                 return '=';
             }

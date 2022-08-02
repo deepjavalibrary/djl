@@ -71,7 +71,7 @@ public abstract class Engine {
             return null;
         }
 
-        String defaultEngine = System.getenv("DJL_DEFAULT_ENGINE");
+        String defaultEngine = Utils.getenv("DJL_DEFAULT_ENGINE");
         defaultEngine = System.getProperty("ai.djl.default_engine", defaultEngine);
         if (defaultEngine == null || defaultEngine.isEmpty()) {
             int rank = Integer.MAX_VALUE;
@@ -340,7 +340,7 @@ public abstract class Engine {
 
         System.out.println();
         System.out.println("--------- Environment Variables ---------");
-        System.getenv().forEach((k, v) -> System.out.println(k + ": " + v));
+        Utils.getenv().forEach((k, v) -> System.out.println(k + ": " + v));
 
         System.out.println();
         System.out.println("-------------- Directories --------------");

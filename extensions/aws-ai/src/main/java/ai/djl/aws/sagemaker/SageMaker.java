@@ -455,7 +455,7 @@ public final class SageMaker {
     }
 
     private String getContainerImageName() {
-        String metadataFile = System.getenv("ECS_CONTAINER_METADATA_FILE");
+        String metadataFile = Utils.getenv("ECS_CONTAINER_METADATA_FILE");
         if (metadataFile == null) {
             throw new AssertionError("Not in a ECS container.");
         }
