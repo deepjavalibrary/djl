@@ -200,6 +200,9 @@ public class BaseModelLoader implements ModelLoader {
         if (block != null) {
             model.setBlock(block);
         }
+        for (Map.Entry<String, Object> entry : arguments.entrySet()) {
+            model.setProperty(entry.getKey(), entry.getValue().toString());
+        }
         return model;
     }
 
