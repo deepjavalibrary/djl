@@ -140,10 +140,37 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * Returns the {@code Encoding} of the input sentence.
      *
      * @param text the input sentence
+     * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
+     *     model
+     * @return the {@code Encoding} of the input sentence
+     */
+    public Encoding encode(String text, boolean addSpecialTokens) {
+        long encoding = TokenizersLibrary.LIB.encode(getHandle(), text, addSpecialTokens);
+        return toEncoding(encoding);
+    }
+
+    /**
+     * Returns the {@code Encoding} of the input sentence.
+     *
+     * @param text the input sentence
      * @return the {@code Encoding} of the input sentence
      */
     public Encoding encode(String text) {
-        long encoding = TokenizersLibrary.LIB.encode(getHandle(), text, addSpecialTokens);
+        return encode(text, addSpecialTokens);
+    }
+
+    /**
+     * Returns the {@code Encoding} of the input sentence.
+     *
+     * @param text the input sentence
+     * @param textPair the second input sentence
+     * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
+     *     model
+     * @return the {@code Encoding} of the input sentence
+     */
+    public Encoding encode(String text, String textPair, boolean addSpecialTokens) {
+        long encoding =
+                TokenizersLibrary.LIB.encodeDual(getHandle(), text, textPair, addSpecialTokens);
         return toEncoding(encoding);
     }
 
@@ -155,9 +182,20 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentence
      */
     public Encoding encode(String text, String textPair) {
-        long encoding =
-                TokenizersLibrary.LIB.encodeDual(getHandle(), text, textPair, addSpecialTokens);
-        return toEncoding(encoding);
+        return encode(text, textPair, addSpecialTokens);
+    }
+
+    /**
+     * Returns the {@code Encoding} of the input sentences.
+     *
+     * @param inputs the input sentences
+     * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
+     *     model
+     * @return the {@code Encoding} of the input sentences
+     */
+    public Encoding encode(List<String> inputs, boolean addSpecialTokens) {
+        String[] array = inputs.toArray(new String[0]);
+        return encode(array, addSpecialTokens);
     }
 
     /**
@@ -167,8 +205,20 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentences
      */
     public Encoding encode(List<String> inputs) {
-        String[] array = inputs.toArray(new String[0]);
-        return encode(array);
+        return encode(inputs, addSpecialTokens);
+    }
+
+    /**
+     * Returns the {@code Encoding} of the input sentences.
+     *
+     * @param inputs the input sentences
+     * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
+     *     model
+     * @return the {@code Encoding} of the input sentences
+     */
+    public Encoding encode(String[] inputs, boolean addSpecialTokens) {
+        long encoding = TokenizersLibrary.LIB.encodeList(getHandle(), inputs, addSpecialTokens);
+        return toEncoding(encoding);
     }
 
     /**
@@ -178,8 +228,20 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentences
      */
     public Encoding encode(String[] inputs) {
-        long encoding = TokenizersLibrary.LIB.encodeList(getHandle(), inputs, addSpecialTokens);
-        return toEncoding(encoding);
+        return encode(inputs, addSpecialTokens);
+    }
+
+    /**
+     * Returns the {@code Encoding} of the input sentence in batch.
+     *
+     * @param inputs the batch of input sentence
+     * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
+     *     model
+     * @return the {@code Encoding} of the input sentence in batch
+     */
+    public Encoding[] batchEncode(List<String> inputs, boolean addSpecialTokens) {
+        String[] array = inputs.toArray(new String[0]);
+        return batchEncode(array, addSpecialTokens);
     }
 
     /**
@@ -189,17 +251,18 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentence in batch
      */
     public Encoding[] batchEncode(List<String> inputs) {
-        String[] array = inputs.toArray(new String[0]);
-        return batchEncode(array);
+        return batchEncode(inputs, addSpecialTokens);
     }
 
     /**
      * Returns the {@code Encoding} of the input sentence in batch.
      *
      * @param inputs the batch of input sentence
+     * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
+     *     model
      * @return the {@code Encoding} of the input sentence in batch
      */
-    public Encoding[] batchEncode(String[] inputs) {
+    public Encoding[] batchEncode(String[] inputs, boolean addSpecialTokens) {
         long[] encodings = TokenizersLibrary.LIB.batchEncode(getHandle(), inputs, addSpecialTokens);
         Encoding[] ret = new Encoding[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
@@ -209,13 +272,34 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     /**
+     * Returns the {@code Encoding} of the input sentence in batch.
+     *
+     * @param inputs the batch of input sentence
+     * @return the {@code Encoding} of the input sentence in batch
+     */
+    public Encoding[] batchEncode(String[] inputs) {
+        return batchEncode(inputs, addSpecialTokens);
+    }
+
+    /**
+     * Returns the decoded String from the input ids.
+     *
+     * @param ids the input ids
+     * @param skipSpecialTokens whether to remove special tokens in the decoding
+     * @return the decoded String from the input ids
+     */
+    public String decode(long[] ids, boolean skipSpecialTokens) {
+        return TokenizersLibrary.LIB.decode(getHandle(), ids, skipSpecialTokens);
+    }
+
+    /**
      * Returns the decoded String from the input ids.
      *
      * @param ids the input ids
      * @return the decoded String from the input ids
      */
     public String decode(long[] ids) {
-        return TokenizersLibrary.LIB.decode(getHandle(), ids, addSpecialTokens);
+        return decode(ids, !addSpecialTokens);
     }
 
     private Encoding toEncoding(long encoding) {
