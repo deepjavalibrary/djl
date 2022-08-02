@@ -9,6 +9,7 @@ on:
       - "**.html"
       - "**.js"
       - "**.css"
+      - "android/**"
 
 jobs:
   build:
