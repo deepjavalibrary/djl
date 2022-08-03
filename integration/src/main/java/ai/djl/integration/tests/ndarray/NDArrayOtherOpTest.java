@@ -269,7 +269,7 @@ public class NDArrayOtherOpTest {
             float[] data = {-1};
             array.set(FloatBuffer.wrap(data));
             NDArray expected = manager.create(-1f);
-            Assert.assertEquals(array, expected);
+            Assertions.assertAlmostEquals(array, expected);
             array = manager.zeros(new Shape(2, 3));
             data = new float[] {0, 1, 2, 3, 4, 5};
             array.set(FloatBuffer.wrap(data));
