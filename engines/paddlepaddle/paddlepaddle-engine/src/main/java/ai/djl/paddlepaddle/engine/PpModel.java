@@ -19,6 +19,7 @@ import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.paddlepaddle.jni.JniUtils;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Translator;
 
 import java.io.FileNotFoundException;
@@ -86,10 +87,12 @@ public class PpModel extends BaseModel {
                 JniUtils.disableGLog(config);
             }
             if (options.containsKey("CMLNumThreads")) {
-                JniUtils.cpuMathLibraryNumThreads(config, (Integer) options.get("CMLNumThreads"));
+                JniUtils.cpuMathLibraryNumThreads(
+                        config, ArgumentsUtil.intValue(options, "CMLNumThreads"));
             }
             if (options.containsKey("SwitchIrOptim")) {
-                JniUtils.switchIrOptim(config, (Boolean) options.get("SwitchIrOptim"));
+                JniUtils.switchIrOptim(
+                        config, ArgumentsUtil.booleanValue(options, "SwitchIrOptim"));
             }
         }
         paddlePredictor = new PaddlePredictor(JniUtils.createPredictor(config));

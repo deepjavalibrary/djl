@@ -383,7 +383,7 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     _: JObject,
     handle: jlong,
     ids: jlongArray,
-    add_special_tokens: jboolean,
+    skip_special_tokens: jboolean,
 ) -> jstring {
     let tokenizer = cast_handle::<Tokenizer>(handle);
     let long_ids = env.get_long_array_elements(ids, ReleaseMode::NoCopyBack).unwrap();
@@ -396,7 +396,7 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
             decode_ids.push(*val as u32);
         }
     }
-    let decoding: String = tokenizer.decode(decode_ids, add_special_tokens == JNI_TRUE).unwrap();
+    let decoding: String = tokenizer.decode(decode_ids, skip_special_tokens == JNI_TRUE).unwrap();
     let ret = env
         .new_string(decoding)
         .expect("Couldn't create java string!")

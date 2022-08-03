@@ -22,6 +22,7 @@ import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
 import ai.djl.training.GradientCollector;
 import ai.djl.util.RandomUtils;
+import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public final class PtEngine extends Engine {
             logger.info("Number of inter-op threads is " + JniUtils.getNumInteropThreads());
             logger.info("Number of intra-op threads is " + JniUtils.getNumThreads());
 
-            String paths = System.getenv("PYTORCH_EXTRA_LIBRARY_PATH");
+            String paths = Utils.getenv("PYTORCH_EXTRA_LIBRARY_PATH");
             if (paths == null) {
                 paths = System.getProperty("PYTORCH_EXTRA_LIBRARY_PATH");
             }

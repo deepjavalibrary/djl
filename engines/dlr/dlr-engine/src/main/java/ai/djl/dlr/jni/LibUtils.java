@@ -139,7 +139,7 @@ public final class LibUtils {
     }
 
     private static String findNativeOverrideLibrary() {
-        String libPath = System.getenv("DLR_LIBRARY_PATH");
+        String libPath = Utils.getenv("DLR_LIBRARY_PATH");
         if (libPath != null) {
             String libName = findLibraryInPath(libPath);
             if (libName != null) {

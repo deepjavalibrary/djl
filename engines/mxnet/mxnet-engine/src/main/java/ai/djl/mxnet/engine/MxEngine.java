@@ -25,6 +25,7 @@ import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.RandomUtils;
+import ai.djl.util.Utils;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
@@ -58,11 +59,9 @@ public final class MxEngine extends Engine {
             Runtime.getRuntime().addShutdownHook(new Thread(JnaUtils::waitAll)); // NOPMD
 
             // load extra MXNet library
-            String paths = System.getenv("MXNET_EXTRA_LIBRARY_PATH");
-            boolean extraLibVerbose = false;
-            if (System.getenv().containsKey(MXNET_EXTRA_LIBRARY_VERBOSE)) {
-                extraLibVerbose = Boolean.parseBoolean(System.getenv(MXNET_EXTRA_LIBRARY_VERBOSE));
-            }
+            String paths = Utils.getenv("MXNET_EXTRA_LIBRARY_PATH");
+            boolean extraLibVerbose =
+                    Boolean.parseBoolean(Utils.getenv(MXNET_EXTRA_LIBRARY_VERBOSE));
             if (paths != null) {
                 String[] files = paths.split(",");
                 for (String file : files) {

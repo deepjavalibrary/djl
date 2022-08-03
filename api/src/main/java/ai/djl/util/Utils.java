@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.nn.Parameter;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -39,6 +41,8 @@ import java.util.stream.Collectors;
 
 /** A class containing utility methods. */
 public final class Utils {
+
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
     private Utils() {}
 
@@ -326,7 +330,7 @@ public final class Utils {
     public static Path getEngineCacheDir() {
         String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
         if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = System.getenv("ENGINE_CACHE_DIR");
+            cacheDir = Utils.getenv("ENGINE_CACHE_DIR");
             if (cacheDir == null || cacheDir.isEmpty()) {
                 return getCacheDir();
             }
@@ -342,7 +346,7 @@ public final class Utils {
     public static Path getCacheDir() {
         String cacheDir = System.getProperty("DJL_CACHE_DIR");
         if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = System.getenv("DJL_CACHE_DIR");
+            cacheDir = Utils.getenv("DJL_CACHE_DIR");
             if (cacheDir == null || cacheDir.isEmpty()) {
                 Path dir = Paths.get(System.getProperty("user.home"));
                 if (!Files.isWritable(dir)) {
@@ -376,5 +380,50 @@ public final class Utils {
             }
         }
         return modelDir.toAbsolutePath();
+    }
+
+    /**
+     * Gets the value of the specified environment variable.
+     *
+     * @param name the name of the environment variable
+     * @param def a default value
+     * @return the string value of the variable, or {@code def} if the variable is not defined in
+     *     the system environment or security manager doesn't allow access to the environment
+     *     variable
+     */
+    public static String getenv(String name, String def) {
+        try {
+            String val = System.getenv(name);
+            return val == null ? def : val;
+        } catch (SecurityException e) {
+            logger.warn("Security manager doesn't allow access to the environment variable");
+        }
+        return def;
+    }
+
+    /**
+     * Gets the value of the specified environment variable.
+     *
+     * @param name the name of the environment variable
+     * @return the string value of the variable, or {@code null} if the variable is not defined in
+     *     the system environment or security manager doesn't allow access to the environment
+     *     variable
+     */
+    public static String getenv(String name) {
+        return getenv(name, null);
+    }
+
+    /**
+     * Returns an unmodifiable string map view of the current system environment.
+     *
+     * @return the environment as a map of variable names to values
+     */
+    public static Map<String, String> getenv() {
+        try {
+            return System.getenv();
+        } catch (SecurityException e) {
+            logger.warn("Security manager doesn't allow access to the environment variable");
+        }
+        return Collections.emptyMap();
     }
 }

@@ -86,7 +86,7 @@ public final class LibUtils {
     }
 
     private static String findOverrideLibrary() {
-        String libPath = System.getenv("MXNET_LIBRARY_PATH");
+        String libPath = Utils.getenv("MXNET_LIBRARY_PATH");
         if (libPath != null) {
             String libName = findLibraryInPath(libPath);
             if (libName != null) {
@@ -102,7 +102,7 @@ public final class LibUtils {
     }
 
     private static synchronized String findLibraryInClasspath() {
-        String overrideVersion = System.getenv("MXNET_VERSION");
+        String overrideVersion = Utils.getenv("MXNET_VERSION");
         if (overrideVersion == null) {
             overrideVersion = System.getProperty("MXNET_VERSION");
         }

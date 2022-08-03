@@ -24,7 +24,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.onnxruntime.zoo.tabular.softmax_regression.IrisFlower;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import ai.onnxruntime.OrtException;
 
@@ -42,8 +41,6 @@ public class OrtTest {
 
     @Test
     public void testOrt() throws TranslateException, ModelException, IOException {
-        TestRequirements.notArm();
-
         try {
             Criteria<IrisFlower, Classifications> criteria =
                     Criteria.builder()
@@ -92,8 +89,6 @@ public class OrtTest {
 
     @Test
     public void testNDArray() throws OrtException {
-        TestRequirements.notArm();
-
         try (NDManager manager = OrtNDManager.getSystemManager().newSubManager()) {
             NDArray zeros = manager.zeros(new Shape(1, 2));
             float[] data = zeros.toFloatArray();
@@ -122,8 +117,6 @@ public class OrtTest {
 
     @Test
     public void testStringTensor() throws ModelException, IOException, TranslateException {
-        TestRequirements.notArm();
-
         setAlternativeEngineDisabled(true);
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
@@ -148,8 +141,6 @@ public class OrtTest {
 
     @Test
     public void testAlternativeArray() {
-        TestRequirements.notArm();
-
         try (NDManager manager = OrtNDManager.getSystemManager().newSubManager()) {
             NDArray array = manager.zeros(new Shape(1, 2));
             Assert.assertEquals(array.get(0).toFloatArray(), new float[] {0, 0});
