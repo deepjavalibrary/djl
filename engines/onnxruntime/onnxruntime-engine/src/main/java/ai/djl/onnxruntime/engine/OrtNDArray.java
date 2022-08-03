@@ -76,7 +76,12 @@ public class OrtNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public void intern(NDArray replaced) {
-        tensor.getAndSet(((OrtNDArray) replaced).getTensor()).close();
+        OrtNDArray arr = (OrtNDArray) replaced;
+        OnnxTensor oldHandle = tensor.getAndSet(arr.tensor.getAndSet(null));
+        if (oldHandle != null) {
+            oldHandle.close();
+        }
+        replaced.close();
     }
 
     /** {@inheritDoc} */
@@ -113,10 +118,10 @@ public class OrtNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        super.close();
         OnnxTensor ortTensor = tensor.getAndSet(null);
         if (ortTensor != null) {
             ortTensor.close();
         }
+        super.close();
     }
 }
