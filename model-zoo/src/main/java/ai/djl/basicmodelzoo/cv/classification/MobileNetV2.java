@@ -19,14 +19,15 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
-import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.pooling.Pool;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * {@code MobileNetV2} contains a generic implementation of MobilenetV2 adapted from
@@ -88,17 +89,13 @@ public final class MobileNetV2 {
 
         // if dimMatch,then add x
         if (stride == 1 && inputChannels == outputChannels) {
-            block =
-                    new SequentialBlock()
-                            .add(
-                                    new ParallelBlock(
-                                            list ->
-                                                    new NDList(
-                                                            NDArrays.add(
-                                                                    list.get(0).singletonOrThrow(),
-                                                                    list.get(1)
-                                                                            .singletonOrThrow())),
-                                            Arrays.asList(block, Blocks.identityBlock())));
+            return new ParallelBlock(
+                    list ->
+                            new NDList(
+                                    NDArrays.add(
+                                            list.get(0).singletonOrThrow(),
+                                            list.get(1).singletonOrThrow())),
+                    Arrays.asList(block, Blocks.identityBlock()));
         }
         return block; // No reluBlock here
     }
@@ -123,9 +120,8 @@ public final class MobileNetV2 {
             float batchNormMomentum) {
         SequentialBlock layers = new SequentialBlock();
         layers.add(linearBottleNeck(inputChannels, outputChannels, stride, t, batchNormMomentum));
-        while (repeat - 1 > 0) {
+        for (int i = 0; i < repeat - 1; i++) {
             layers.add(linearBottleNeck(outputChannels, outputChannels, 1, t, batchNormMomentum));
-            repeat--;
         }
         return layers;
     }
@@ -156,62 +152,17 @@ public final class MobileNetV2 {
                     .add(Activation.reluBlock());
         }
 
-        Block bottleNeck1 =
-                makeStage(
-                        builder.repeatTimes[1],
-                        builder.filters[0],
-                        builder.filters[1],
-                        builder.strides[1],
-                        builder.multiTimes[0],
-                        builder.batchNormMomentum);
-        Block bottleNeck2 =
-                makeStage(
-                        builder.repeatTimes[2],
-                        builder.filters[1],
-                        builder.filters[2],
-                        builder.strides[2],
-                        builder.multiTimes[1],
-                        builder.batchNormMomentum);
-        Block bottleNeck3 =
-                makeStage(
-                        builder.repeatTimes[3],
-                        builder.filters[2],
-                        builder.filters[3],
-                        builder.strides[3],
-                        builder.multiTimes[2],
-                        builder.batchNormMomentum);
-        Block bottleNeck4 =
-                makeStage(
-                        builder.repeatTimes[4],
-                        builder.filters[3],
-                        builder.filters[4],
-                        builder.strides[4],
-                        builder.multiTimes[3],
-                        builder.batchNormMomentum);
-        Block bottleNeck5 =
-                makeStage(
-                        builder.repeatTimes[5],
-                        builder.filters[4],
-                        builder.filters[5],
-                        builder.strides[5],
-                        builder.multiTimes[4],
-                        builder.batchNormMomentum);
-        Block bottleNeck6 =
-                makeStage(
-                        builder.repeatTimes[6],
-                        builder.filters[5],
-                        builder.filters[6],
-                        builder.strides[6],
-                        builder.multiTimes[5],
-                        builder.batchNormMomentum);
-        Block bottleNeck7 =
-                makeStage(
-                        builder.repeatTimes[7],
-                        builder.filters[6],
-                        builder.filters[7],
-                        builder.strides[7],
-                        builder.multiTimes[6],
-                        builder.batchNormMomentum);
+        List<Block> bottleNecks = new ArrayList<>();
+        for (int i = 0; i < MULTILENGTH; i++) {
+            bottleNecks.add(
+                    makeStage(
+                            builder.repeatTimes[i + 1],
+                            builder.filters[i],
+                            builder.filters[i + 1],
+                            builder.strides[i + 1],
+                            builder.multiTimes[i],
+                            builder.batchNormMomentum));
+        }
 
         SequentialBlock conv1 = new SequentialBlock();
         for (int i = 0; i < builder.repeatTimes[8]; i++) {
@@ -236,43 +187,18 @@ public final class MobileNetV2 {
                         .setFilters((int) builder.outSize)
                         .optBias(false)
                         .build();
+
         return mobileNet
                 .add(pre)
-                .add(bottleNeck1)
-                .add(bottleNeck2)
-                .add(bottleNeck3)
-                .add(bottleNeck4)
-                .add(bottleNeck5)
-                .add(bottleNeck6)
-                .add(bottleNeck7)
+                .addAll(bottleNecks)
                 .add(conv1)
                 .add(Pool.globalAvgPool2dBlock())
-                .add(
-                        new LambdaBlock(
-                                list ->
-                                        new NDList(
-                                                list.get(0)
-                                                        .reshape(
-                                                                new Shape(
-                                                                        list.get(0)
-                                                                                .getShape()
-                                                                                .get(0),
-                                                                        builder.filters[8],
-                                                                        1,
-                                                                        1))))) // reshape for
-                // conv1*1
+                .addSingleton(
+                        array -> array.reshape(array.getShape().get(0), builder.filters[8], 1, 1))
+                // reshape for conv1*1
                 .add(conv2)
-                .add(
-                        new LambdaBlock(
-                                list ->
-                                        new NDList(
-                                                list.get(0)
-                                                        .reshape(
-                                                                new Shape(
-                                                                        list.get(0)
-                                                                                .getShape()
-                                                                                .get(0),
-                                                                        builder.outSize))))); // reshape for output
+                // reshape for output
+                .addSingleton(array -> array.reshape(array.getShape().get(0), builder.outSize));
     }
 
     /**
