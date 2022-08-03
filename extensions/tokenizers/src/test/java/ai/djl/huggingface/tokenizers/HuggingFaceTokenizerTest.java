@@ -113,6 +113,7 @@ public class HuggingFaceTokenizerTest {
 
     @Test
     public void testTokenizerDecoding() {
+        TestRequirements.notArm();
         List<long[]> testIds =
                 Arrays.asList(
                         new long[] {
