@@ -136,7 +136,13 @@ public final class Platform {
         return platform;
     }
 
-    private static Platform fromSystem(String engine) {
+    /**
+     * Returns the system platform.
+     *
+     * @param engine the name of the engine
+     * @return the platform representing the system (without an "engine".properties file)
+     */
+    public static Platform fromSystem(String engine) {
         String engineProp = engine + "-engine.properties";
         String versionKey = engine + "_version";
         Platform platform = fromSystem();

@@ -3,6 +3,7 @@ configure([
         project(':basicdataset'),
         project(':engines:dlr:dlr-engine'),
         project(':engines:ml:xgboost'),
+        project(':engines:ml:lightgbm'),
         project(':engines:mxnet:mxnet-engine'),
         project(':engines:mxnet:mxnet-model-zoo'),
         project(':engines:onnxruntime:onnxruntime-android'),
