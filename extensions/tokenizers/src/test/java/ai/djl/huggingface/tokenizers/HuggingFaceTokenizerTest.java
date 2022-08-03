@@ -122,13 +122,35 @@ public class HuggingFaceTokenizerTest {
                             101, 3570, 1110, 170, 21162, 1285, 119, 2750, 4250, 146, 112, 173, 1474,
                             102
                         });
-        List<String> expectedDecodings =
+        List<String> expectedDecodingsNoSpecialTokens =
                 Arrays.asList(
                         "Hello, y ' all! How are you?",
                         "Today is a sunny day. Good weather I ' d say");
+        List<String> expectedDecodingsWithSpecialTokens =
+                Arrays.asList(
+                        "[CLS] Hello, y ' all! How are you [UNK]? [SEP]",
+                        "[CLS] Today is a sunny day. Good weather I ' d say [SEP]");
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
             for (int i = 0; i < testIds.size(); ++i) {
-                Assert.assertEquals(tokenizer.decode(testIds.get(i)), expectedDecodings.get(i));
+                Assert.assertEquals(
+                        tokenizer.decode(testIds.get(i)),
+                        expectedDecodingsWithSpecialTokens.get(i));
+                Assert.assertEquals(
+                        tokenizer.decode(testIds.get(i), true),
+                        expectedDecodingsNoSpecialTokens.get(i));
+            }
+        }
+
+        Map<String, String> options = new ConcurrentHashMap<>();
+        options.put("addSpecialTokens", "false");
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.newInstance("bert-base-cased", options)) {
+            for (int i = 0; i < testIds.size(); ++i) {
+                Assert.assertEquals(
+                        tokenizer.decode(testIds.get(i)), expectedDecodingsNoSpecialTokens.get(i));
+                Assert.assertEquals(
+                        tokenizer.decode(testIds.get(i), false),
+                        expectedDecodingsWithSpecialTokens.get(i));
             }
         }
     }
