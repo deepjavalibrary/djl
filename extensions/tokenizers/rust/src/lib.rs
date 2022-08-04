@@ -18,6 +18,8 @@ use std::str::FromStr;
 use tk::tokenizer::{EncodeInput, Encoding};
 use tk::Tokenizer;
 use tk::{FromPretrainedParameters, Offsets};
+use tk::utils::truncation::{TruncationParams, TruncationStrategy};
+use tk::utils::padding::{PaddingParams, PaddingStrategy};
 
 use jni::objects::{JClass, JMethodID, JObject, JString, JValue, ReleaseMode};
 use jni::sys::{
@@ -403,6 +405,81 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
         .into_inner();
 
     ret
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_setPadding(
+    env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+    max_length: jlong,
+    padding_strategy: JString,
+    pad_to_multiple_of: jlong,
+) {
+    let strategy: String = env
+        .get_string(padding_strategy)
+        .expect("Couldn't get java string!")
+        .into();
+    let len = max_length as usize;
+    let res_strategy = match strategy.as_ref() {
+        "batch_longest" => Ok(PaddingStrategy::BatchLongest),
+        "fixed" => Ok(PaddingStrategy::Fixed(len)),
+        _ => Err("strategy must be one of [batch_longest, fixed]"),
+    };
+
+    let mut params = PaddingParams::default();
+    params.strategy = res_strategy.unwrap();
+    params.pad_to_multiple_of = Some(pad_to_multiple_of as usize);
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    tokenizer.with_padding(Some(params));
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_disablePadding(
+    _env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    tokenizer.with_padding(None);
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_setTruncation(
+    env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+    truncation_max_length: jlong,
+    truncation_strategy: JString,
+    truncation_stride: jlong,
+) {
+    let strategy: String = env
+        .get_string(truncation_strategy)
+        .expect("Couldn't get java string!")
+        .into();
+    let res_strategy = match strategy.as_ref() {
+       "longest_first" => Ok(TruncationStrategy::LongestFirst),
+       "only_first" => Ok(TruncationStrategy::OnlyFirst),
+       "only_second" => Ok(TruncationStrategy::OnlySecond),
+       _ => Err("strategy must be one of [longest_first, only_first, only_second]"),
+    };
+    let mut params = TruncationParams::default();
+    params.max_length = truncation_max_length as usize;
+    params.strategy = res_strategy.unwrap();
+    params.stride = truncation_stride as usize;
+
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    tokenizer.with_truncation(Some(params));
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_disableTruncation(
+    _env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    tokenizer.with_truncation(None);
 }
 
 fn to_handle<T: 'static>(val: T) -> jlong {
