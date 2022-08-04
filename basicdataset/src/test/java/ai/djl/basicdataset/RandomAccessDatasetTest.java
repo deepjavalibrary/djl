@@ -26,6 +26,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 public class RandomAccessDatasetTest {
 
@@ -53,6 +57,18 @@ public class RandomAccessDatasetTest {
             Assert.assertEquals(15, subset.size());
             Record record = subset.get(manager, 0);
             Assert.assertEquals(record.getData().head().getLong(), 10);
+
+            List<Long> indices =
+                    LongStream.range(10, 25).mapToObj(n -> n).collect(Collectors.toList());
+            subset = dataset.subDataset(indices);
+            Assert.assertEquals(15, subset.size());
+            record = subset.get(manager, 0);
+            Assert.assertEquals(record.getData().head().getLong(), 10);
+
+            Collections.reverse(indices);
+            subset = dataset.subDataset(indices);
+            record = subset.get(manager, 0);
+            Assert.assertEquals(record.getData().head().getLong(), 24);
         }
     }
 }

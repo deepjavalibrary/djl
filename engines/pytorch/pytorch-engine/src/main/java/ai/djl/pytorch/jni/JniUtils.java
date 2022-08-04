@@ -358,7 +358,7 @@ public final class JniUtils {
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
-    public static PtNDArray indexAdv(PtNDArray ndArray, NDIndex index) {
+    public static PtNDArray indexAdv(PtNDArray ndArray, NDIndex index, PtNDManager manager) {
         if (ndArray == null) {
             return ndArray;
         }
@@ -405,10 +405,7 @@ public final class JniUtils {
                 // Backward compatible
                 NDIndexFullPick fullPick =
                         NDIndexFullPick.fromIndex(index, ndArray.getShape()).get();
-                return pick(
-                        ndArray,
-                        ndArray.getManager().from(fullPick.getIndices()),
-                        fullPick.getAxis());
+                return pick(ndArray, manager.from(fullPick.getIndices()), fullPick.getAxis());
             }
         }
         if (indices.size() == index.getEllipsisIndex()) {
@@ -416,7 +413,7 @@ public final class JniUtils {
         }
 
         return new PtNDArray(
-                ndArray.getManager(),
+                manager,
                 PyTorchLibrary.LIB.torchIndexAdvGet(ndArray.getHandle(), torchIndexHandle));
     }
 

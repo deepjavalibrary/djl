@@ -44,14 +44,14 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
 
     private static final Logger logger = LoggerFactory.getLogger(DataIterable.class);
 
-    private RandomAccessDataset dataset;
-    private NDManager manager;
-    private Batchifier dataBatchifier;
-    private Batchifier labelBatchifier;
-    private Pipeline pipeline;
-    private Pipeline targetPipeline;
+    protected RandomAccessDataset dataset;
+    protected NDManager manager;
+    protected Batchifier dataBatchifier;
+    protected Batchifier labelBatchifier;
+    protected Pipeline pipeline;
+    protected Pipeline targetPipeline;
     private ExecutorService executor;
-    private Device device;
+    protected Device device;
 
     private Iterator<List<Long>> sample;
     // for multithreading
@@ -160,7 +160,7 @@ public class DataIterable implements Iterable<Batch>, Iterator<Batch> {
         }
     }
 
-    private Batch fetch(List<Long> indices, int progress) throws IOException {
+    protected Batch fetch(List<Long> indices, int progress) throws IOException {
         NDManager subManager = manager.newSubManager();
         subManager.setName("dataIter fetch");
         int batchSize = indices.size();

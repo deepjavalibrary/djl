@@ -27,6 +27,7 @@ import ai.djl.util.RandomUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -84,36 +85,14 @@ public abstract class RandomAccessDataset implements Dataset {
     /** {@inheritDoc} */
     @Override
     public Iterable<Batch> getData(NDManager manager) throws IOException, TranslateException {
-        prepare();
-        return new DataIterable(
-                this,
-                manager,
-                sampler,
-                dataBatchifier,
-                labelBatchifier,
-                pipeline,
-                targetPipeline,
-                null,
-                prefetchNumber,
-                device);
+        return getData(manager, sampler, null);
     }
 
     /** {@inheritDoc} */
     @Override
     public Iterable<Batch> getData(NDManager manager, ExecutorService executorService)
             throws IOException, TranslateException {
-        prepare();
-        return new DataIterable(
-                this,
-                manager,
-                sampler,
-                dataBatchifier,
-                labelBatchifier,
-                pipeline,
-                targetPipeline,
-                executorService,
-                prefetchNumber,
-                device);
+        return getData(manager, sampler, executorService);
     }
 
     /**
@@ -127,18 +106,7 @@ public abstract class RandomAccessDataset implements Dataset {
      */
     public Iterable<Batch> getData(NDManager manager, Sampler sampler)
             throws IOException, TranslateException {
-        prepare();
-        return new DataIterable(
-                this,
-                manager,
-                sampler,
-                dataBatchifier,
-                labelBatchifier,
-                pipeline,
-                targetPipeline,
-                null,
-                prefetchNumber,
-                device);
+        return getData(manager, sampler, null);
     }
 
     /**
@@ -209,10 +177,10 @@ public abstract class RandomAccessDataset implements Dataset {
         int from = 0;
         for (int i = 0; i < ratio.length - 1; ++i) {
             int to = from + (int) (ratio[i] / sum * size);
-            ret[i] = new SubDataset(this, indices, from, to);
+            ret[i] = newSubDataset(indices, from, to);
             from = to;
         }
-        ret[ratio.length - 1] = new SubDataset(this, indices, from, size);
+        ret[ratio.length - 1] = newSubDataset(indices, from, size);
         return ret;
     }
 
@@ -227,7 +195,32 @@ public abstract class RandomAccessDataset implements Dataset {
     public RandomAccessDataset subDataset(int fromIndex, int toIndex) {
         int size = Math.toIntExact(size());
         int[] indices = IntStream.range(0, size).toArray();
-        return new SubDataset(this, indices, fromIndex, toIndex);
+        return newSubDataset(indices, fromIndex, toIndex);
+    }
+
+    /**
+     * Returns a view of the portion of this data for the specified {@code subIndices}.
+     *
+     * @param subIndices sub-set of indices of this dataset
+     * @return a view of the specified indices within this dataset
+     */
+    public RandomAccessDataset subDataset(List<Long> subIndices) {
+        if (BulkDataIterable.isRange(subIndices)) {
+            int size = Math.toIntExact(size());
+            int[] indices = IntStream.range(0, size).toArray();
+            long fromIndex = subIndices.get(0);
+            long toIndex = subIndices.get(0) + subIndices.size();
+            return newSubDataset(indices, Math.toIntExact(fromIndex), Math.toIntExact(toIndex));
+        }
+        return newSubDataset(subIndices);
+    }
+
+    protected RandomAccessDataset newSubDataset(int[] indices, int from, int to) {
+        return new SubDataset(this, indices, from, to);
+    }
+
+    protected RandomAccessDataset newSubDataset(List<Long> subIndices) {
+        return new SubDatasetByIndices(this, subIndices);
     }
 
     /**
@@ -492,6 +485,42 @@ public abstract class RandomAccessDataset implements Dataset {
         @Override
         protected long availableSize() {
             return to - from;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void prepare(Progress progress) {}
+    }
+
+    private static final class SubDatasetByIndices extends RandomAccessDataset {
+
+        private RandomAccessDataset dataset;
+        private List<Long> subIndices;
+
+        public SubDatasetByIndices(RandomAccessDataset dataset, List<Long> subIndices) {
+            this.dataset = dataset;
+            this.subIndices = subIndices;
+            this.sampler = dataset.sampler;
+            this.dataBatchifier = dataset.dataBatchifier;
+            this.labelBatchifier = dataset.labelBatchifier;
+            this.pipeline = dataset.pipeline;
+            this.targetPipeline = dataset.targetPipeline;
+            this.prefetchNumber = dataset.prefetchNumber;
+            this.device = dataset.device;
+
+            limit = Long.MAX_VALUE;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Record get(NDManager manager, long index) throws IOException {
+            return dataset.get(manager, subIndices.get(Math.toIntExact(index)));
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected long availableSize() {
+            return subIndices.size();
         }
 
         /** {@inheritDoc} */
