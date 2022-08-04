@@ -115,6 +115,9 @@ class HuggingfaceConverter:
                 continue
 
             result, reason, size = self.save_model(model_id)
+            if not result:
+                logging.error(reason)
+
             self.save_progress(model_id, model_info.sha, result, reason, size)
             shutil.rmtree(temp_dir)
 
@@ -139,8 +142,9 @@ class HuggingfaceConverter:
         if not model_file:
             return False, "Failed to trace model", -1
 
-        if not self.verify_jit_model(hf_pipeline, task, model_file):
-            return False, "Failed verify jit model", -1
+        result, reason = self.verify_jit_model(hf_pipeline, task, model_file)
+        if not result:
+            return False, reason, -1
 
         size = self.save_model_zoo(task, model_id, temp_dir)
 
@@ -232,12 +236,16 @@ class HuggingfaceConverter:
         tokenizer = hf_pipeline.tokenizer
 
         if task == "question-answering":
-            answer_start = torch.argmax(out["start_logits"])
-            answer_end = torch.argmax(out["end_logits"]) + 1
+            start_ = out["start_logits"]
+            end_ = out["end_logits"]
+            start_[0, 0] = 0
+            end_[0, 0] = 0
+            answer_start = torch.argmax(start_)
+            answer_end = torch.argmax(end_) + 1
 
             out_ids = input_ids[0].tolist()[answer_start:answer_end]
             tokens = tokenizer.convert_ids_to_tokens(out_ids)
-            prediction = tokenizer.convert_tokens_to_string(tokens)
+            prediction = tokenizer.convert_tokens_to_string(tokens).strip()
 
             if prediction.lower() != expected_output:
                 inputs = SUPPORTED_TASK[task]["inputs"]
@@ -273,7 +281,7 @@ class HuggingfaceConverter:
             if not hasattr(out, "last_hidden_layer"):
                 return False, f"Unexpected inference result: {out}"
 
-        return True
+        return True, None
 
     @staticmethod
     def load_model(task: str, model_id: str):
