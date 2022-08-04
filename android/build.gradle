@@ -23,6 +23,8 @@ allprojects {
             url "https://oss.sonatype.org/content/repositories/snapshots/"
         }
     }
+
+    apply from: file("${rootProject.projectDir}/../tools/gradle/android-formatter.gradle")
 }
 
 task clean(type: Delete) {

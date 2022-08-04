@@ -12,11 +12,6 @@
  */
 package ai.djl.android.core;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.io.IOException;
-
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -30,6 +25,11 @@ import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
+
 /* Integration test to check if model and inference runs fine */
 public class ModelLoadingTest {
 
@@ -38,21 +38,25 @@ public class ModelLoadingTest {
 
         String modelUrl = "https://resources.djl.ai/demo/pytorch/traced_resnet18.zip";
         ImageClassificationTranslator.builder()
-            .addTransform(new Resize(224, 224))
-            .addTransform(new ToTensor())
-            .optApplySoftmax(true)
-            .build();
-        Criteria<Image, Classifications> criteria = Criteria.builder()
-            .setTypes(Image.class, Classifications.class)
-            .optModelUrls(modelUrl)
-            .optTranslator(ImageClassificationTranslator.builder()
                 .addTransform(new Resize(224, 224))
                 .addTransform(new ToTensor())
-                .optApplySoftmax(true).build())
-            .build();
-        Image image = ImageFactory.getInstance().fromUrl("https://resources.djl.ai/images/kitten.jpg");
+                .optApplySoftmax(true)
+                .build();
+        Criteria<Image, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, Classifications.class)
+                        .optModelUrls(modelUrl)
+                        .optTranslator(
+                                ImageClassificationTranslator.builder()
+                                        .addTransform(new Resize(224, 224))
+                                        .addTransform(new ToTensor())
+                                        .optApplySoftmax(true)
+                                        .build())
+                        .build();
+        Image image =
+                ImageFactory.getInstance().fromUrl("https://resources.djl.ai/images/kitten.jpg");
         try (ZooModel<Image, Classifications> model = ModelZoo.loadModel(criteria);
-             Predictor<Image, Classifications> predictor = model.newPredictor()) {
+                Predictor<Image, Classifications> predictor = model.newPredictor()) {
             Classifications result = predictor.predict(image);
             Assert.assertEquals("n02124075 Egyptian cat", result.best().getClassName());
         }

@@ -1,0 +1,40 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'com.google.googlejavaformat:google-java-format:1.15.0'
+    }
+}
+
+apply plugin: JavaFormatterPlugin
+
+import com.google.googlejavaformat.java.Formatter
+import com.google.googlejavaformat.java.ImportOrderer
+import com.google.googlejavaformat.java.JavaFormatterOptions
+import com.google.googlejavaformat.java.Main
+import com.google.googlejavaformat.java.RemoveUnusedImports
+
+class JavaFormatterPlugin implements Plugin<Project> {
+    void apply(Project project) {
+        project.task('formatJava') {
+            doLast {
+                if (project.getRootProject() == project) {
+                    return
+                }
+                Main formatter = new Main(new PrintWriter(System.out, true), new PrintWriter(System.err, true), System.in)
+                FileTree dirs = project.fileTree("${project.getProjectDir()}/src").matching {
+                    include "**/*.java"
+                }
+                for (file in dirs) {
+                    if (formatter.format("-a", "-i", file.getAbsolutePath()) != 0) {
+                        throw new GradleException("Format java failed: " + file.getAbsolutePath())
+                    }
+                }
+            }
+        }
+    }
+}
