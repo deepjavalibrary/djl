@@ -49,7 +49,7 @@ import java.util.stream.Stream;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-/** A {@link TranslatorFactory} that creates an generic {@link Translator}. */
+/** A {@link TranslatorFactory} that creates a generic {@link Translator}. */
 public class ServingTranslatorFactory implements TranslatorFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(ServingTranslatorFactory.class);
