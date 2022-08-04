@@ -44,6 +44,10 @@ jobs:
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
       - name: Compile PaddlePaddle JNI
         run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
+      - name: Test ONNX Runtime
+        run: |
+          ./gradlew -Dai.djl.default_engine=OnnxRuntime :integration:test
+          ./gradlew :integration:clean
       - name: Build with Gradle
         run: ./gradlew build jRR jRV
       - name: Upload test results
@@ -89,3 +93,4 @@ jobs:
         run: |
           ./gradlew -Pjni "-Dai.djl.default_engine=PyTorch" test -x examples:test
           ./gradlew -Pjni --rerun-tasks "-Dai.djl.default_engine=TensorFlow" test -x examples:test
+          ./gradlew --rerun-tasks "-Dai.djl.default_engine=OnnxRuntime" :integration:test

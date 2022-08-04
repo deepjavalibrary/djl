@@ -103,10 +103,8 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                if (System.getProperty("ai.djl.default_engine") == "PyTorch") {
-                    minimum = 0.4
-                } else if (System.getProperty("ai.djl.default_engine") == "TensorFlow") {
-                    minimum = 0.29
+                if (System.getProperty("ai.djl.default_engine") != null) {
+                    minimum = 0.2
                 } else {
                     // TODO: improve coverage by running integration tests with 3 engines
                     minimum = 0.4
