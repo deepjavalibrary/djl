@@ -19,14 +19,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.file.Path;
-import java.util.List;
-
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.BoundingBox;
@@ -41,9 +33,15 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.RandomUtils;
 
-/**
- * {@code BitmapImageFactory} is the Android implementation of {@link ImageFactory}.
- */
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.file.Path;
+import java.util.List;
+
+/** {@code BitmapImageFactory} is the Android implementation of {@link ImageFactory}. */
 public class BitmapImageFactory extends ImageFactory {
 
     /** {@inheritDoc} */
@@ -59,7 +57,7 @@ public class BitmapImageFactory extends ImageFactory {
     /** {@inheritDoc} */
     @Override
     public Image fromUrl(URL url) throws IOException {
-            return fromInputStream(url.openStream());
+        return fromInputStream(url.openStream());
     }
 
     /** {@inheritDoc} */
@@ -121,7 +119,6 @@ public class BitmapImageFactory extends ImageFactory {
         }
         return new BitMapWrapper(bitmap);
     }
-
 
     static class BitMapWrapper implements Image {
         private Bitmap bitmap;
@@ -195,7 +192,7 @@ public class BitmapImageFactory extends ImageFactory {
         @Override
         public void save(OutputStream os, String type) throws IOException {
             if (!bitmap.compress(Bitmap.CompressFormat.valueOf(type.toUpperCase()), 100, os)) {
-                throw new IOException("Cannot save image file to output stream File type " +  type);
+                throw new IOException("Cannot save image file to output stream File type " + type);
             }
         }
 
@@ -210,7 +207,7 @@ public class BitmapImageFactory extends ImageFactory {
         @Override
         public void drawBoundingBoxes(DetectedObjects detections) {
             Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-            Canvas canvas =  new Canvas(mutableBitmap);
+            Canvas canvas = new Canvas(mutableBitmap);
             // set the paint configure
             int stroke = 2;
             Paint paint = new Paint();
@@ -235,7 +232,8 @@ public class BitmapImageFactory extends ImageFactory {
                         x,
                         y,
                         x + (int) (rectangle.getWidth() * imageWidth),
-                        y + (int) (rectangle.getHeight() * imageHeight), paint);
+                        y + (int) (rectangle.getHeight() * imageHeight),
+                        paint);
                 drawText(canvas, color, className, x, y, stroke, 4);
                 // If we have a mask instead of a plain rectangle, draw tha mask
                 if (box instanceof Mask) {
@@ -252,7 +250,7 @@ public class BitmapImageFactory extends ImageFactory {
         @Override
         public void drawJoints(Joints joints) {
             Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-            Canvas canvas =  new Canvas(mutableBitmap);
+            Canvas canvas = new Canvas(mutableBitmap);
             // set the paint configure
             Paint paint = new Paint();
             paint.setStrokeWidth(2);
@@ -274,7 +272,8 @@ public class BitmapImageFactory extends ImageFactory {
         }
 
         private int randomColor() {
-            return Color.rgb(RandomUtils.nextInt(255), RandomUtils.nextInt(255), RandomUtils.nextInt(255));
+            return Color.rgb(
+                    RandomUtils.nextInt(255), RandomUtils.nextInt(255), RandomUtils.nextInt(255));
         }
 
         private int darker(int color) {
@@ -282,13 +281,11 @@ public class BitmapImageFactory extends ImageFactory {
             int r = Math.round(Color.red(color) * 0.8f);
             int g = Math.round(Color.green(color) * 0.8f);
             int b = Math.round(Color.blue(color) * 0.8f);
-            return Color.argb(a,
-                    Math.min(r, 255),
-                    Math.min(g, 255),
-                    Math.min(b, 255));
+            return Color.argb(a, Math.min(r, 255), Math.min(g, 255), Math.min(b, 255));
         }
 
-        private void drawText(Canvas canvas, int color, String text, int x, int y, int stroke, int padding) {
+        private void drawText(
+                Canvas canvas, int color, String text, int x, int y, int stroke, int padding) {
             Paint paint = new Paint();
             Paint.FontMetrics metrics = paint.getFontMetrics();
             paint.setStyle(Paint.Style.FILL);
@@ -326,7 +323,9 @@ public class BitmapImageFactory extends ImageFactory {
                 y = 0;
             }
 
-            Bitmap maskedImage = Bitmap.createBitmap(probDist.length, probDist[0].length, Bitmap.Config.ARGB_8888);
+            Bitmap maskedImage =
+                    Bitmap.createBitmap(
+                            probDist.length, probDist[0].length, Bitmap.Config.ARGB_8888);
             for (int xCor = 0; xCor < probDist.length; xCor++) {
                 for (int yCor = 0; yCor < probDist[xCor].length; yCor++) {
                     float opacity = probDist[xCor][yCor];
@@ -339,8 +338,8 @@ public class BitmapImageFactory extends ImageFactory {
                     maskedImage.setPixel(xCor, yCor, darker(Color.argb(opacity, r, g, b)));
                 }
             }
-            Canvas canvas =  new Canvas(image);
-            canvas.drawBitmap(maskedImage, x, y,null);
+            Canvas canvas = new Canvas(image);
+            canvas.drawBitmap(maskedImage, x, y, null);
         }
     }
 }
