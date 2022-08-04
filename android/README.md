@@ -5,8 +5,7 @@ It has the following two modules:
 
 - Core package: contains some Image processing toolkit for Android user using DJL
 - PyTorch Native: contains DJL PyTorch Android native package
-- ONNXRuntime Native: contains DJL ONNXRuntime Android native package
-
+- ONNXRuntime: contains DJL ONNXRuntime Android package
 
 ## Installation
 You need to have Android SDK and Android NDK installed on your machine.
@@ -17,10 +16,10 @@ In gradle, you can include the snapshot repository and add the 4 modules in your
 
 ```
 dependencies {
-    implementation "ai.djl:api:0.18.0-SNAPSHOT"
-    implementation "ai.djl.android:core:0.18.0-SNAPSHOT"
-    androidRuntimeOnly "ai.djl.pytorch:pytorch-engine:0.18.0-SNAPSHOT"
-    androidRuntimeOnly "ai.djl.android:pytorch-native:0.18.0-SNAPSHOT"
-    androidRuntimeOnly "ai.djl.android:onnxruntime-native:0.18.0-SNAPSHOT"
+    implementation "ai.djl:api:0.19.0-SNAPSHOT"
+    implementation "ai.djl.android:core:0.19.0-SNAPSHOT"
+    androidRuntimeOnly "ai.djl.pytorch:pytorch-engine:0.19.0-SNAPSHOT"
+    androidRuntimeOnly "ai.djl.android:pytorch-native:0.19.0-SNAPSHOT"
+    androidRuntimeOnly "ai.djl.android:onnxruntime:0.19.0-SNAPSHOT"
 }
 ```

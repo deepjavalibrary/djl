@@ -1,4 +1,3 @@
 rootProject.name='android'
-include ':pytorch-native'
 include ':core'
-include ':onnxruntime-native'
+include ':pytorch-native'

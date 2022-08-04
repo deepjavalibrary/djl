@@ -97,19 +97,12 @@ afterEvaluate {
     }
 }
 
-repositories {
-    maven {
-        name = "local"
-        url = "../onnxruntime-native/build/repo"
-    }
-}
-
 dependencies {
     implementation "ai.djl:api:${version}"
     testImplementation 'junit:junit:4.13.2'
     androidTestRuntimeOnly "ai.djl.pytorch:pytorch-engine:${version}"
     androidTestRuntimeOnly "ai.djl.android:pytorch-native:${version}"
-    androidTestRuntimeOnly "ai.djl.android:onnxruntime-native:${version}"
+    androidTestImplementation "ai.djl.android:onnxruntime:${version}"
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
