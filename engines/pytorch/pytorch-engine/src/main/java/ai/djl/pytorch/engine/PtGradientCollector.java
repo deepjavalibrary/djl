@@ -20,6 +20,14 @@ import ai.djl.training.GradientCollector;
 /** {@code PtGradientCollector} is the PyTorch implementation of {@link GradientCollector}. */
 public class PtGradientCollector implements GradientCollector {
 
+    private boolean gradModel;
+
+    /** Constructs a new {@code PtGradientCollector} instance. */
+    public PtGradientCollector() {
+        gradModel = JniUtils.isGradMode();
+        JniUtils.setGradMode(true);
+    }
+
     /** {@inheritDoc} */
     @Override
     public void backward(NDArray target) {
@@ -49,6 +57,9 @@ public class PtGradientCollector implements GradientCollector {
     /** {@inheritDoc} */
     @Override
     public void close() {
+        if (!gradModel) {
+            JniUtils.setGradMode(false);
+        }
         // TODO: do some clean up if necessary
     }
 }
