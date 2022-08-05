@@ -51,6 +51,7 @@ public final class PtEngine extends Engine {
     static Engine newInstance() {
         try {
             LibUtils.loadLibrary();
+            JniUtils.setGradMode(false);
             if (Integer.getInteger("ai.djl.pytorch.num_interop_threads") != null) {
                 JniUtils.setNumInteropThreads(
                         Integer.getInteger("ai.djl.pytorch.num_interop_threads"));

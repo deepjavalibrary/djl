@@ -24,6 +24,10 @@ final class PyTorchLibrary {
 
     private PyTorchLibrary() {}
 
+    native boolean torchIsGradMode();
+
+    native void torchSetGradMode(boolean enable);
+
     native int torchGetNumInteropThreads();
 
     native int torchGetNumThreads();

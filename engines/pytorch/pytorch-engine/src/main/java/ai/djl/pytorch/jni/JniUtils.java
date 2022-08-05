@@ -82,6 +82,14 @@ public final class JniUtils {
         }
     }
 
+    public static boolean isGradMode() {
+        return PyTorchLibrary.LIB.torchIsGradMode();
+    }
+
+    public static void setGradMode(boolean enable) {
+        PyTorchLibrary.LIB.torchSetGradMode(enable);
+    }
+
     public static int getNumInteropThreads() {
         return PyTorchLibrary.LIB.torchGetNumInteropThreads();
     }

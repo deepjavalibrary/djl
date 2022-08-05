@@ -39,6 +39,19 @@ using namespace torch::autograd::profiler;
 
 // The file is the implementation for PyTorch system-wide operations
 
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIsGradMode(JNIEnv* env, jobject jthis) {
+  API_BEGIN()
+  return c10::GradMode::is_enabled();
+  API_END_RETURN()
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetGradMode(
+    JNIEnv* env, jobject jthis, jboolean enable) {
+  API_BEGIN()
+  c10::GradMode::set_enabled(enable);
+  API_END()
+}
+
 JNIEXPORT jint JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchGetNumInteropThreads(JNIEnv* env, jobject jthis) {
   API_BEGIN()
   return torch::get_num_interop_threads();
