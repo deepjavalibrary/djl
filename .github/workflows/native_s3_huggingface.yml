@@ -39,13 +39,15 @@ jobs:
 
   build-tokenizers-jni-linux:
     runs-on: ubuntu-latest
-    container: amazonlinux:2
+    container: centos:centos7
     steps:
       - name: Install Environment
         run: |
           yum -y update
-          yum -y groupinstall "Development Tools"
-          yum -y install python3-pip perl-IPC-Cmd
+          yum -y install centos-release-scl-rh epel-release
+          yum -y install devtoolset-7 git patch cmake3 libstdc++-static
+          ln -s /usr/bin/cmake3 /usr/bin/cmake
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
           pip3 install awscli --upgrade
       - uses: actions-rs/toolchain@v1
         with:
@@ -63,6 +65,8 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
+          source "$HOME/.cargo/env"
+          export PATH=$PATH:/opt/rh/devtoolset-7/root/usr/bin
           ./gradlew :extensions:tokenizers:compileJNI
           PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
       - name: Configure AWS Credentials
