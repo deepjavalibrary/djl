@@ -116,9 +116,13 @@ public class BulkDataIterable extends DataIterable {
      * Checks whether the given indices actually represents a range.
      *
      * @param indices the indices to examine
-     * @return whether the given indices are sorted in ascending order with no gap
+     * @return whether the given indices are sorted in ascending order with no gap and has at least
+     *     one element
      */
     public static boolean isRange(List<Long> indices) {
+        if (indices.isEmpty()) {
+            return false;
+        }
         long from = indices.get(0);
         for (long index : indices) {
             if (index != from++) {
