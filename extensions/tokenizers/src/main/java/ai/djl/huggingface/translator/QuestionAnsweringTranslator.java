@@ -18,6 +18,7 @@ import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.index.NDIndex;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
@@ -25,8 +26,6 @@ import ai.djl.translate.TranslatorContext;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -55,8 +54,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
     public NDList processInput(TranslatorContext ctx, QAInput input) {
         NDManager manager = ctx.getNDManager();
         Encoding encoding = tokenizer.encode(input.getQuestion(), input.getParagraph());
-        String[] tokens = encoding.getTokens();
-        ctx.setAttachment("tokens", Arrays.asList(tokens));
+        ctx.setAttachment("encoding", encoding);
         long[] indices = encoding.getIds();
         long[] attentionMask = encoding.getAttentionMask();
         NDList ndList = new NDList(3);
@@ -71,10 +69,11 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
     public String processOutput(TranslatorContext ctx, NDList list) {
-        NDArray startLogits = list.get(0);
-        NDArray endLogits = list.get(1);
+        NDArray startLogits = list.get(0).duplicate();
+        NDArray endLogits = list.get(1).duplicate();
+        startLogits.set(new NDIndex(0), 0);
+        endLogits.set(new NDIndex(0), 0);
         int startIdx = (int) startLogits.argMax().getLong();
         int endIdx = (int) endLogits.argMax().getLong();
         if (startIdx > endIdx) {
@@ -82,8 +81,12 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
             startIdx = endIdx;
             endIdx = tmp;
         }
-        List<String> tokens = (List<String>) ctx.getAttachment("tokens");
-        return tokenizer.buildSentence(tokens.subList(startIdx, endIdx + 1));
+        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
+        long[] indices = encoding.getIds();
+        int len = endIdx - startIdx + 1;
+        long[] ids = new long[len];
+        System.arraycopy(indices, startIdx, ids, 0, len);
+        return tokenizer.decode(ids).trim();
     }
 
     /**

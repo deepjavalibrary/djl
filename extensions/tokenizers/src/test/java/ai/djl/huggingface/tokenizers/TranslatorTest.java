@@ -60,7 +60,9 @@ public class TranslatorTest {
                             NDManager manager = a.getManager();
                             long[][] start = new long[1][36];
                             long[][] end = new long[1][36];
+                            start[0][0] = 2;
                             start[0][20] = 1;
+                            end[0][0] = 2;
                             end[0][21] = 1;
                             NDArray arr1 = manager.create(start);
                             NDArray arr2 = manager.create(end);
