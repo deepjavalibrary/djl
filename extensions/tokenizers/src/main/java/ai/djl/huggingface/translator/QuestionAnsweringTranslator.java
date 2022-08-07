@@ -70,8 +70,11 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
     /** {@inheritDoc} */
     @Override
     public String processOutput(TranslatorContext ctx, NDList list) {
+        // PyTorch InferenceMode tensor is read only, must clone it
         NDArray startLogits = list.get(0).duplicate();
         NDArray endLogits = list.get(1).duplicate();
+
+        // exclude <CLS>, TODO: exclude impossible ids properly and handle max answer length
         startLogits.set(new NDIndex(0), 0);
         endLogits.set(new NDIndex(0), 0);
         int startIdx = (int) startLogits.argMax().getLong();
