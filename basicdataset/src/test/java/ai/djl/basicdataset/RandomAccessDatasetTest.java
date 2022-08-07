@@ -58,6 +58,7 @@ public class RandomAccessDatasetTest {
             Record record = subset.get(manager, 0);
             Assert.assertEquals(record.getData().head().getLong(), 10);
 
+            /** Tests {@link #ArrayDataset.getByRange()} */
             List<Long> indices =
                     LongStream.range(10, 25).mapToObj(n -> n).collect(Collectors.toList());
             subset = dataset.subDataset(indices);
@@ -65,8 +66,18 @@ public class RandomAccessDatasetTest {
             record = subset.get(manager, 0);
             Assert.assertEquals(record.getData().head().getLong(), 10);
 
+            /** Tests {@link #ArrayDataset.getByIndices()} */
             Collections.reverse(indices);
             subset = dataset.subDataset(indices);
+            record = subset.get(manager, 0);
+            Assert.assertEquals(record.getData().head().getLong(), 24);
+
+            /** Tests {@link #RandomAccessDataset.subDataset(recordKeys, subRecordKeys)} */
+            List<String> subRecordKeys =
+                    indices.stream().map(k -> "key" + k).collect(Collectors.toList());
+            List<String> recordKeys =
+                    LongStream.range(0, 100).mapToObj(k -> "key" + k).collect(Collectors.toList());
+            subset = dataset.subDataset(recordKeys, subRecordKeys);
             record = subset.get(manager, 0);
             Assert.assertEquals(record.getData().head().getLong(), 24);
         }

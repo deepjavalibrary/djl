@@ -26,9 +26,12 @@ import ai.djl.util.Progress;
 import ai.djl.util.RandomUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -213,6 +216,68 @@ public abstract class RandomAccessDataset implements Dataset {
             return newSubDataset(indices, Math.toIntExact(fromIndex), Math.toIntExact(toIndex));
         }
         return newSubDataset(subIndices);
+    }
+
+    /**
+     * Returns a view of the portion of this data for the specified record keys. Assuming that the
+     * records of this database are represented by the keys in <code>recordKeys</code>, then <code>
+     * subRecordKeys</code> defines the view on the corresponding records of the database.
+     *
+     * @param recordKeys unique keys for all records of this dataset.
+     * @param subRecordKeys keys to define the view on the dataset. All keys in <code>subRecordKeys
+     *     </code> must be contained in <code>recordKeys</code> but may occur more than once.
+     * @param <K> the record key type.
+     * @return a view of the specified records within this dataset
+     */
+    public <K> RandomAccessDataset subDataset(List<K> recordKeys, List<K> subRecordKeys) {
+        if (this.size() != recordKeys.size()) {
+            throw new IllegalArgumentException(
+                    "Requires as many record keys as there are records in the dataset.");
+        }
+        Map<K, Long> indicesOfRecordKeys = new ConcurrentHashMap<>(recordKeys.size());
+        for (int index = 0; index < recordKeys.size(); index++) {
+            Long prevIndex = indicesOfRecordKeys.put(recordKeys.get(index), (long) index);
+            if (prevIndex != null) {
+                throw new IllegalArgumentException(
+                        "At least two keys at position "
+                                + prevIndex
+                                + " and "
+                                + index
+                                + " are equal!");
+            }
+        }
+        return subDataset(indicesOfRecordKeys, subRecordKeys);
+    }
+
+    /**
+     * Returns a view of the portion of this data for the specified record keys. Assuming that the
+     * records of this database are represented by the keys in <code>indicesOfRecordKeys</code>,
+     * then <code>
+     * subRecordKeys</code> defines the view on the corresponding records of the database.
+     *
+     * @param indicesOfRecordKeys Map for keys of the records in this dataset to their index
+     *     position within this dataset. While this map typically maps all records, technically it
+     *     just needs to map the ones occuring in <code>subRecordKeys</code>.
+     * @param subRecordKeys Keys to define the view on the dataset. All keys in <code>subRecordKeys
+     *     </code> must be contained in <code>indicesOfRecordKeys</code> but may occur more than
+     *     once.
+     * @param <K> the record key type.
+     * @return a view of the records identified by the specified keys of this dataset
+     */
+    public <K> RandomAccessDataset subDataset(
+            Map<K, Long> indicesOfRecordKeys, List<K> subRecordKeys) {
+        List<Long> subIndices = new ArrayList<>(subRecordKeys.size());
+        for (K recordKey : subRecordKeys) {
+            Long index = indicesOfRecordKeys.get(recordKey);
+            if (index == null) {
+                throw new IllegalArgumentException(
+                        "The key of subRecordKeys at position "
+                                + subRecordKeys.indexOf(recordKey)
+                                + " is not contained in recordKeys!");
+            }
+            subIndices.add(index);
+        }
+        return subDataset(subIndices);
     }
 
     protected RandomAccessDataset newSubDataset(int[] indices, int from, int to) {
