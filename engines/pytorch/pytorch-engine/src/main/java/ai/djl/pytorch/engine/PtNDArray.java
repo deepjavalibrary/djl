@@ -1055,10 +1055,13 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray argSort(int axis, boolean ascending) {
-        if (!ascending) {
-            throw new UnsupportedOperationException("Only support ascending!");
+        PtNDArray arr = JniUtils.argSort(this, axis, false);
+        if (ascending) {
+            return arr;
         }
-        return JniUtils.argSort(this, axis, false);
+        PtNDArray flip = JniUtils.flip(arr, new long[] {axis});
+        arr.close();
+        return flip;
     }
 
     /** {@inheritDoc} */
