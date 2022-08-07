@@ -1,1 +1,3 @@
 __pycache__
+model/
+processed_models.json

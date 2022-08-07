@@ -13,8 +13,10 @@
 package ai.djl.huggingface.tokenizers;
 
 import ai.djl.ModelException;
+import ai.djl.huggingface.translator.FillMaskTranslatorFactory;
 import ai.djl.huggingface.translator.QuestionAnsweringTranslatorFactory;
 import ai.djl.inference.Predictor;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -86,6 +88,47 @@ public class TranslatorTest {
                 Predictor<QAInput, String> predictor = model.newPredictor()) {
             String res = predictor.predict(input);
             Assert.assertEquals(res, "December 2004");
+        }
+    }
+
+    @Test
+    public void testFillMaskTranslator() throws ModelException, IOException, TranslateException {
+        TestRequirements.notArm();
+
+        String input = "Hello I'm a [MASK] model.";
+
+        Block block =
+                new LambdaBlock(
+                        a -> {
+                            NDManager manager = a.getManager();
+                            float[][] logits = new float[10][4828];
+                            logits[6][4827] = 5;
+                            logits[6][2535] = 4;
+                            logits[6][2047] = 3;
+                            logits[6][3565] = 2;
+                            logits[6][2986] = 1;
+                            NDArray arr = manager.create(logits);
+                            arr = arr.expandDims(0);
+                            return new NDList(arr);
+                        },
+                        "model");
+        Path modelDir = Paths.get("build/model");
+        Files.createDirectories(modelDir);
+        Criteria<String, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(String.class, Classifications.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new FillMaskTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String, Classifications> model = criteria.loadModel();
+                Predictor<String, Classifications> predictor = model.newPredictor()) {
+            Classifications res = predictor.predict(input);
+            Assert.assertEquals(res.best().getClassName(), "fashion");
         }
     }
 }

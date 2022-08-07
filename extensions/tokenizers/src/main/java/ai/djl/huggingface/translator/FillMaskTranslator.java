@@ -14,33 +14,41 @@ package ai.djl.huggingface.translator;
 
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
-import ai.djl.modality.nlp.qa.QAInput;
+import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.index.NDIndex;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
+import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** The translator for Huggingface question answering model. */
-public class QuestionAnsweringTranslator implements Translator<QAInput, String> {
+public class FillMaskTranslator implements Translator<String, Classifications> {
 
     private HuggingFaceTokenizer tokenizer;
-    private boolean includeTokenTypes;
+    private String maskToken;
+    private long maskTokenId;
+    private int topK;
     private Batchifier batchifier;
 
-    QuestionAnsweringTranslator(
-            HuggingFaceTokenizer tokenizer, boolean includeTokenTypes, Batchifier batchifier) {
+    FillMaskTranslator(
+            HuggingFaceTokenizer tokenizer, String maskToken, int topK, Batchifier batchifier) {
         this.tokenizer = tokenizer;
-        this.includeTokenTypes = includeTokenTypes;
+        this.maskToken = maskToken;
+        this.topK = topK;
         this.batchifier = batchifier;
+        Encoding encoding = tokenizer.encode(maskToken, false);
+        maskTokenId = encoding.getIds()[0];
     }
 
     /** {@inheritDoc} */
@@ -51,45 +59,44 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
 
     /** {@inheritDoc} */
     @Override
-    public NDList processInput(TranslatorContext ctx, QAInput input) {
+    public NDList processInput(TranslatorContext ctx, String input) throws TranslateException {
         NDManager manager = ctx.getNDManager();
-        Encoding encoding = tokenizer.encode(input.getQuestion(), input.getParagraph());
-        ctx.setAttachment("encoding", encoding);
+        Encoding encoding = tokenizer.encode(input);
         long[] indices = encoding.getIds();
+        int maskIndex = -1;
+        for (int i = 0; i < indices.length; ++i) {
+            if (indices[i] == maskTokenId) {
+                if (maskIndex != -1) {
+                    throw new TranslateException("Only one mask supported.");
+                }
+                maskIndex = i;
+            }
+        }
+        if (maskIndex == -1) {
+            throw new TranslateException("Mask token " + maskToken + " not found.");
+        }
+        ctx.setAttachment("maskIndex", maskIndex);
         long[] attentionMask = encoding.getAttentionMask();
-        NDList ndList = new NDList(3);
+        NDList ndList = new NDList(2);
         ndList.add(manager.create(indices));
         ndList.add(manager.create(attentionMask));
-        if (includeTokenTypes) {
-            long[] typeIds = encoding.getTypeIds();
-            ndList.add(manager.create(typeIds));
-        }
         return ndList;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String processOutput(TranslatorContext ctx, NDList list) {
-        // PyTorch InferenceMode tensor is read only, must clone it
-        NDArray startLogits = list.get(0).duplicate();
-        NDArray endLogits = list.get(1).duplicate();
-
-        // exclude <CLS>, TODO: exclude impossible ids properly and handle max answer length
-        startLogits.set(new NDIndex(0), 0);
-        endLogits.set(new NDIndex(0), 0);
-        int startIdx = (int) startLogits.argMax().getLong();
-        int endIdx = (int) endLogits.argMax().getLong();
-        if (startIdx > endIdx) {
-            int tmp = startIdx;
-            startIdx = endIdx;
-            endIdx = tmp;
+    public Classifications processOutput(TranslatorContext ctx, NDList list) {
+        int maskIndex = (int) ctx.getAttachment("maskIndex");
+        NDArray prob = list.get(0).get(maskIndex).softmax(0);
+        NDArray array = prob.argSort(0, false);
+        long[] classIds = new long[topK];
+        List<Double> probabilities = new ArrayList<>(topK);
+        for (int i = 0; i < topK; ++i) {
+            classIds[i] = array.getLong(i);
+            probabilities.add((double) prob.getFloat(classIds[i]));
         }
-        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
-        long[] indices = encoding.getIds();
-        int len = endIdx - startIdx + 1;
-        long[] ids = new long[len];
-        System.arraycopy(indices, startIdx, ids, 0, len);
-        return tokenizer.decode(ids).trim();
+        String[] classes = tokenizer.decode(classIds).trim().split(" ");
+        return new Classifications(Arrays.asList(classes), probabilities);
     }
 
     /**
@@ -117,11 +124,34 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
     /** The builder for question answering translator. */
     public static final class Builder {
 
+        private String maskedToken = "[MASK]";
+        private int topK = 5;
         private String tokenizerName;
         private Path tokenizerPath;
-        private boolean includeTokenTypes;
         private boolean addSpecialTokens = true;
         private Batchifier batchifier = Batchifier.STACK;
+
+        /**
+         * Sets the id of the mask {@link Translator}.
+         *
+         * @param maskedToken the id of the mask
+         * @return this builder
+         */
+        public Builder optMaskToken(String maskedToken) {
+            this.maskedToken = maskedToken;
+            return this;
+        }
+
+        /**
+         * Set the topK number of classes to be displayed.
+         *
+         * @param topK the number of top classes to return
+         * @return this builder
+         */
+        public Builder optTopK(int topK) {
+            this.topK = topK;
+            return this;
+        }
 
         /**
          * Sets the name of the tokenizer for the {@link Translator}.
@@ -157,17 +187,6 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
         }
 
         /**
-         * Sets if include token types for the {@link Translator}.
-         *
-         * @param includeTokenTypes true to include token types
-         * @return this builder
-         */
-        public Builder optIncludeTokenTypes(boolean includeTokenTypes) {
-            this.includeTokenTypes = includeTokenTypes;
-            return this;
-        }
-
-        /**
          * Sets the {@link Batchifier} for the {@link Translator}.
          *
          * @param batchifier true to include token types
@@ -184,8 +203,9 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
          * @param arguments the model arguments
          */
         public void configure(Map<String, ?> arguments) {
+            optMaskToken(ArgumentsUtil.stringValue(arguments, "maskToken", "[MASK]"));
+            optTopK(ArgumentsUtil.intValue(arguments, "topK", 5));
             optTokenizerName(ArgumentsUtil.stringValue(arguments, "tokenizer"));
-            optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
             optAddSpecialTokens(ArgumentsUtil.booleanValue(arguments, "addSpecialTokens", true));
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
             optBatchifier(Batchifier.fromString(batchifierStr));
@@ -197,7 +217,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
          * @return the new translator
          * @throws IOException if I/O error occurs
          */
-        public QuestionAnsweringTranslator build() throws IOException {
+        public FillMaskTranslator build() throws IOException {
             HuggingFaceTokenizer tokenizer;
             Map<String, String> options = new ConcurrentHashMap<>();
             options.put("addSpecialTokens", String.valueOf(addSpecialTokens));
@@ -206,7 +226,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
             } else {
                 tokenizer = HuggingFaceTokenizer.newInstance(tokenizerPath, options);
             }
-            return new QuestionAnsweringTranslator(tokenizer, includeTokenTypes, batchifier);
+            return new FillMaskTranslator(tokenizer, maskedToken, topK, batchifier);
         }
     }
 }

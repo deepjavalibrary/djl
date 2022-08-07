@@ -146,7 +146,8 @@ class HuggingfaceConverter:
         if not result:
             return False, reason, -1
 
-        size = self.save_model_zoo(task, model_id, temp_dir)
+        size = self.save_model_zoo(task, model_id, temp_dir,
+                                   hf_pipeline.tokenizer.mask_token)
 
         return True, None, size
 
@@ -183,7 +184,8 @@ class HuggingfaceConverter:
         script_module.save(model_file)
         return model_file
 
-    def save_model_zoo(self, task: str, model_id: str, temp_dir: str):
+    def save_model_zoo(self, task: str, model_id: str, temp_dir: str,
+                       mask_token: str):
         artifact_ids = model_id.split("/")
         model_name = artifact_ids[-1]
 
@@ -197,9 +199,11 @@ class HuggingfaceConverter:
         # Save serving.properties
         serving_file = os.path.join(temp_dir, "serving.properties")
         with open(serving_file, 'w') as f:
-            f.write(
-                f"engine=PyTorch\noption.modelName={model_name}\noption.mapLocation=true\n"
-                f"translatorFactory={translator}")
+            f.write(f"engine=PyTorch\n"
+                    f"option.modelName={model_name}\n"
+                    f"option.mapLocation=true\n"
+                    f"maskToken={mask_token}\n"
+                    f"translatorFactory={translator}")
 
         # Save model as .zip file
         zip_file = os.path.join(model_dir, f"{model_name}.zip")
@@ -257,11 +261,10 @@ class HuggingfaceConverter:
                         f"pipeline output differs from expected: {pipeline_output}"
                     )
         elif task == "fill-mask":
-            masked_token_id = tokenizer.mask_token_id
-            masked_index = torch.nonzero(
-                input_ids.squeeze(0) == masked_token_id,
-                as_tuple=False).squeeze(0)
-            logits = out['logits'][0, masked_index]
+            mask_token_id = tokenizer.mask_token_id
+            mask_index = torch.nonzero(input_ids.squeeze(0) == mask_token_id,
+                                       as_tuple=False).squeeze(0)
+            logits = out['logits'][0, mask_index]
             answer = torch.argmax(logits)
             prediction = tokenizer.decode(answer).strip()
 
