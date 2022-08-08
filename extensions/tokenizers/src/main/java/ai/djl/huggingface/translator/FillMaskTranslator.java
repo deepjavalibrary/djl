@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** The translator for Huggingface question answering model. */
+/** The translator for Huggingface fill mask model. */
 public class FillMaskTranslator implements Translator<String, Classifications> {
 
     private HuggingFaceTokenizer tokenizer;
@@ -100,7 +100,7 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
     }
 
     /**
-     * Creates a builder to build a {@code QuestionAnsweringTranslator}.
+     * Creates a builder to build a {@code FillMaskTranslator}.
      *
      * @return a new builder
      */
@@ -109,7 +109,7 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
     }
 
     /**
-     * Creates a builder to build a {@code QuestionAnsweringTranslator}.
+     * Creates a builder to build a {@code FillMaskTranslator}.
      *
      * @param arguments the models' arguments
      * @return a new builder
@@ -121,7 +121,7 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
         return builder;
     }
 
-    /** The builder for question answering translator. */
+    /** The builder for fill mask translator. */
     public static final class Builder {
 
         private String maskedToken = "[MASK]";

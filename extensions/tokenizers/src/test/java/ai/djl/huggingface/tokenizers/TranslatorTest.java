@@ -12,11 +12,14 @@
  */
 package ai.djl.huggingface.tokenizers;
 
+import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.huggingface.translator.FillMaskTranslatorFactory;
 import ai.djl.huggingface.translator.QuestionAnsweringTranslatorFactory;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -37,6 +40,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TranslatorTest {
 
@@ -54,7 +59,6 @@ public class TranslatorTest {
                 "BBC Japan was a general entertainment Channel. "
                         + "Which operated between December 2004 and April 2006. "
                         + "It ceased operations after its Japanese distributor folded.";
-        QAInput input = new QAInput(question, paragraph);
 
         Block block =
                 new LambdaBlock(
@@ -63,9 +67,9 @@ public class TranslatorTest {
                             long[][] start = new long[1][36];
                             long[][] end = new long[1][36];
                             start[0][0] = 2;
-                            start[0][20] = 1;
+                            start[0][21] = 1;
                             end[0][0] = 2;
-                            end[0][21] = 1;
+                            end[0][20] = 1;
                             NDArray arr1 = manager.create(start);
                             NDArray arr2 = manager.create(end);
                             return new NDList(arr1, arr2);
@@ -73,6 +77,7 @@ public class TranslatorTest {
                         "model");
         Path modelDir = Paths.get("build/model");
         Files.createDirectories(modelDir);
+
         Criteria<QAInput, String> criteria =
                 Criteria.builder()
                         .setTypes(QAInput.class, String.class)
@@ -86,8 +91,49 @@ public class TranslatorTest {
 
         try (ZooModel<QAInput, String> model = criteria.loadModel();
                 Predictor<QAInput, String> predictor = model.newPredictor()) {
+            QAInput input = new QAInput(question, paragraph);
             String res = predictor.predict(input);
             Assert.assertEquals(res, "December 2004");
+        }
+
+        Criteria<Input, Output> criteria2 =
+                Criteria.builder()
+                        .setTypes(Input.class, Output.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-cased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new QuestionAnsweringTranslatorFactory())
+                        .build();
+
+        try (ZooModel<Input, Output> model = criteria2.loadModel();
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            Input input = new Input();
+            input.add("question", question);
+            input.add("paragraph", paragraph);
+            Output res = predictor.predict(input);
+            Assert.assertEquals(res.getAsString(0), "December 2004");
+        }
+
+        try (Model model = Model.newInstance("test")) {
+            model.setBlock(block);
+            Map<String, String> options = new HashMap<>();
+            options.put("hasParameter", "false");
+            model.load(modelDir, "test", options);
+
+            QuestionAnsweringTranslatorFactory factory = new QuestionAnsweringTranslatorFactory();
+            Map<String, String> arguments = new HashMap<>();
+
+            Assert.assertThrows(
+                    TranslateException.class,
+                    () -> factory.newInstance(String.class, Integer.class, model, arguments));
+
+            arguments.put("tokenizer", "bert-base-cased");
+
+            Assert.assertThrows(
+                    IllegalArgumentException.class,
+                    () -> factory.newInstance(String.class, Integer.class, model, arguments));
         }
     }
 
@@ -95,7 +141,7 @@ public class TranslatorTest {
     public void testFillMaskTranslator() throws ModelException, IOException, TranslateException {
         TestRequirements.notArm();
 
-        String input = "Hello I'm a [MASK] model.";
+        String text = "Hello I'm a [MASK] model.";
 
         Block block =
                 new LambdaBlock(
@@ -114,6 +160,7 @@ public class TranslatorTest {
                         "model");
         Path modelDir = Paths.get("build/model");
         Files.createDirectories(modelDir);
+
         Criteria<String, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(String.class, Classifications.class)
@@ -127,8 +174,54 @@ public class TranslatorTest {
 
         try (ZooModel<String, Classifications> model = criteria.loadModel();
                 Predictor<String, Classifications> predictor = model.newPredictor()) {
-            Classifications res = predictor.predict(input);
+            Classifications res = predictor.predict(text);
             Assert.assertEquals(res.best().getClassName(), "fashion");
+            Assert.assertThrows(
+                    TranslateException.class,
+                    () -> predictor.predict("Hello I'm a invalid model."));
+            Assert.assertThrows(
+                    TranslateException.class,
+                    () -> predictor.predict("I'm a [MASK] [MASK] model."));
+        }
+
+        Criteria<Input, Output> criteria2 =
+                Criteria.builder()
+                        .setTypes(Input.class, Output.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new FillMaskTranslatorFactory())
+                        .build();
+
+        try (ZooModel<Input, Output> model = criteria2.loadModel();
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            Input input = new Input();
+            input.add(text);
+            Output out = predictor.predict(input);
+            Classifications res = (Classifications) out.getData();
+            Assert.assertEquals(res.best().getClassName(), "fashion");
+        }
+
+        try (Model model = Model.newInstance("test")) {
+            model.setBlock(block);
+            Map<String, String> options = new HashMap<>();
+            options.put("hasParameter", "false");
+            model.load(modelDir, "test", options);
+
+            FillMaskTranslatorFactory factory = new FillMaskTranslatorFactory();
+            Map<String, String> arguments = new HashMap<>();
+
+            Assert.assertThrows(
+                    TranslateException.class,
+                    () -> factory.newInstance(String.class, Integer.class, model, arguments));
+
+            arguments.put("tokenizer", "bert-base-cased");
+
+            Assert.assertThrows(
+                    IllegalArgumentException.class,
+                    () -> factory.newInstance(String.class, Integer.class, model, arguments));
         }
     }
 }
