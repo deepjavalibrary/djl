@@ -126,7 +126,8 @@ public class HdfsRepositoryTest {
 
     private void setFilePermission(Configuration config) {
         try {
-            Process process = Runtime.getRuntime().exec("/bin/sh -c umask");
+            String[] cmd = {"/bin/sh", "-c", "umask"};
+            Process process = Runtime.getRuntime().exec(cmd);
             int rc = process.waitFor();
             if (rc != 0) {
                 return;
