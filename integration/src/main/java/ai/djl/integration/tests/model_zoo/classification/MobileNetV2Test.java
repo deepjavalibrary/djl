@@ -35,6 +35,8 @@ import ai.djl.util.PairList;
 
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
+
 public class MobileNetV2Test {
     @Test
     public void testTrain() {
@@ -68,11 +70,11 @@ public class MobileNetV2Test {
 
                 NDArray expectedAtIndex0 =
                         manager.ones(new Shape(32, 3, 1, 1)); // 32*3*1*1 for first layer
-                NDArray expectedAtIndex5 =
+                NDArray expectedAtIndex6 =
                         manager.ones(new Shape(32, 32, 1, 1)); // 32*32*1*1 for pointWiseLayer1
-                NDArray expectedAtIndex10 =
+                NDArray expectedAtIndex12 =
                         manager.ones(new Shape(32, 1, 3, 3)); // 32*1*3*3 for depthWiseLayer1
-                NDArray expectedAtIndex260 =
+                NDArray expectedAtIndex312 =
                         manager.ones(
                                 new Shape(
                                         1280, 320, 1,
@@ -81,12 +83,61 @@ public class MobileNetV2Test {
                 Assertions.assertAlmostEquals(
                         parameters.get(0).getValue().getArray(), expectedAtIndex0);
                 Assertions.assertAlmostEquals(
-                        parameters.get(5).getValue().getArray(), expectedAtIndex5);
+                        parameters.get(6).getValue().getArray(), expectedAtIndex6);
                 Assertions.assertAlmostEquals(
-                        parameters.get(10).getValue().getArray(), expectedAtIndex10);
+                        parameters.get(12).getValue().getArray(), expectedAtIndex12);
                 Assertions.assertAlmostEquals(
-                        parameters.get(260).getValue().getArray(), expectedAtIndex260);
+                        parameters.get(312).getValue().getArray(), expectedAtIndex312);
             }
+        }
+    }
+
+    public static void main(String[] args) {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Engine.getInstance().getDevices(2)) //use a simple gpu
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+        Block mobilenet = MobileNetV2.builder().setOutSize(10).build();
+
+        try(Model model = Model.newInstance("mobilenet")){
+            model.setBlock(mobilenet);
+            try (Trainer trainer = model.newTrainer(config)) {
+                int batchSize = 1;
+                Shape inputShape = new Shape(batchSize, 3, 224, 224);
+                trainer.initialize(inputShape);
+
+                NDManager manager = trainer.getManager();
+
+                NDArray input = manager.ones(inputShape);
+                NDArray label = manager.ones(new Shape(batchSize, 1));
+                Batch batch =
+                        new Batch(
+                                manager.newSubManager(),
+                                new NDList(input),
+                                new NDList(label),
+                                batchSize,
+                                Batchifier.STACK,
+                                Batchifier.STACK,
+                                0,
+                                0);
+                PairList<String, Parameter> parameters = mobilenet.getParameters();
+                EasyTrain.trainBatch(trainer, batch);
+                trainer.step();
+                for(int i = 0;i<parameters.size();i+=5){
+                    System.out.println(parameters.get(i).getValue().getArray().getShape());
+                }
+            }
+        }
+        System.out.println("---------------------------------------------------");
+        getOutputShapes(mobilenet,new Shape[]{new Shape(1,3,224,224)});
+    }
+
+    private static void getOutputShapes(Block mobilenet,Shape[] inputs){
+        Shape[] current = inputs;
+        System.out.println(Arrays.toString(current));
+        for(Block block:mobilenet.getChildren().values()){
+            current = block.getOutputShapes(current);
+            System.out.println(Arrays.toString(current));
         }
     }
 }

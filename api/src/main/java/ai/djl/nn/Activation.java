@@ -13,6 +13,7 @@
 package ai.djl.nn;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.nn.core.Prelu;
 
@@ -55,6 +56,19 @@ public final class Activation {
      */
     public static NDList relu(NDList arrays) {
         return new NDList(arrays.singletonOrThrow().getNDArrayInternal().relu());
+    }
+
+    /**
+     * Applies ReLU6 activation on the input singleton {@link NDList}.
+     *
+     * <p>ReLU is defined by: \( y = min(6,max(0, x)) \)
+     *
+     * @param arrays the input singleton {@link NDList}
+     * @return the singleton {@link NDList} after applying ReLU6 activation
+     */
+    public static NDList relu6(NDList arrays) {
+        return new NDList(
+                NDArrays.minimum(6, arrays.singletonOrThrow().getNDArrayInternal().relu()));
     }
 
     /**
@@ -314,6 +328,17 @@ public final class Activation {
      */
     public static Block reluBlock() {
         return new LambdaBlock(Activation::relu, "ReLU");
+    }
+
+    /**
+     * Creates a {@link LambdaBlock} that applies the {@link #relu6(NDList) ReLU6} activation
+     * function in its forward function.
+     *
+     * @return the {@link LambdaBlock} that applies the {@link #relu6(NDList) ReLU} activation
+     *     function
+     */
+    public static Block relu6Block() {
+        return new LambdaBlock(Activation::relu6, "ReLU6");
     }
 
     /**
