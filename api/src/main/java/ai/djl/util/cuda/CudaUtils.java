@@ -187,6 +187,10 @@ public final class CudaUtils {
             logger.debug("cudart library not found.");
             logger.trace("", e);
             return null;
+        } catch (SecurityException e) {
+            logger.warn("Access denied during loading cudart library.");
+            logger.trace("", e);
+            return null;
         }
     }
 
