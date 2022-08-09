@@ -73,7 +73,7 @@ Maven:
 <dependency>
     <groupId>com.microsoft.onnxruntime</groupId>
     <artifactId>onnxruntime_gpu</artifactId>
-    <version>1.12.0</version>
+    <version>1.12.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -83,7 +83,7 @@ Gradle:
     implementation("ai.djl.onnxruntime:onnxruntime-engine:0.18.0") {
         exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
     }
-    implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.12.0"
+    implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.12.1"
 ```
 
 #### Enable TensorRT execution
