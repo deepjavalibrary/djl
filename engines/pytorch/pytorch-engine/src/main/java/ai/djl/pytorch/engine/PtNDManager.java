@@ -184,6 +184,10 @@ public class PtNDManager extends BaseNDManager {
 
         /** {@inheritDoc} */
         @Override
+        void attachUncappedInternal(String resourceId, AutoCloseable resource) {}
+
+        /** {@inheritDoc} */
+        @Override
         public void detachInternal(String resourceId) {}
 
         /** {@inheritDoc} */
