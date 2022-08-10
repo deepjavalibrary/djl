@@ -397,12 +397,16 @@ public class MxNDManager extends BaseNDManager {
 
         /** {@inheritDoc} */
         @Override
-        public void tempAttachInternal(
-                NDManager originalManager, String resourceId, NDResource resource) {}
+        public void detachInternal(String resourceId) {}
 
         /** {@inheritDoc} */
         @Override
-        public void detachInternal(String resourceId) {}
+        public void attachUncappedInternal(String resourceId, AutoCloseable resource) {}
+
+        /** {@inheritDoc} */
+        @Override
+        public void tempAttachInternal(
+                NDManager originalManager, String resourceId, NDResource resource) {}
 
         /** {@inheritDoc} */
         @Override
