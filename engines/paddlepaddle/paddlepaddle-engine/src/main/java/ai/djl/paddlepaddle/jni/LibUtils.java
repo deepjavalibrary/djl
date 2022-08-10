@@ -123,7 +123,7 @@ public final class LibUtils {
     }
 
     private static String findOverrideLibrary() {
-        String libPath = Utils.getenv("PADDLE_LIBRARY_PATH");
+        String libPath = Utils.getEnvOrSystemProperty("PADDLE_LIBRARY_PATH");
         if (libPath != null) {
             String libName = findLibraryInPath(libPath);
             if (libName != null) {

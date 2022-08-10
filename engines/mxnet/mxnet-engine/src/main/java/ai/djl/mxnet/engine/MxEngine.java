@@ -59,9 +59,9 @@ public final class MxEngine extends Engine {
             Runtime.getRuntime().addShutdownHook(new Thread(JnaUtils::waitAll)); // NOPMD
 
             // load extra MXNet library
-            String paths = Utils.getenv("MXNET_EXTRA_LIBRARY_PATH");
+            String paths = Utils.getEnvOrSystemProperty("MXNET_EXTRA_LIBRARY_PATH");
             boolean extraLibVerbose =
-                    Boolean.parseBoolean(Utils.getenv(MXNET_EXTRA_LIBRARY_VERBOSE));
+                    Boolean.parseBoolean(Utils.getEnvOrSystemProperty(MXNET_EXTRA_LIBRARY_VERBOSE));
             if (paths != null) {
                 String[] files = paths.split(",");
                 for (String file : files) {

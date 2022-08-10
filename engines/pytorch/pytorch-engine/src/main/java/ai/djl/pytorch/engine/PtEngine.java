@@ -66,10 +66,7 @@ public final class PtEngine extends Engine {
             logger.info("Number of inter-op threads is " + JniUtils.getNumInteropThreads());
             logger.info("Number of intra-op threads is " + JniUtils.getNumThreads());
 
-            String paths = Utils.getenv("PYTORCH_EXTRA_LIBRARY_PATH");
-            if (paths == null) {
-                paths = System.getProperty("PYTORCH_EXTRA_LIBRARY_PATH");
-            }
+            String paths = Utils.getEnvOrSystemProperty("PYTORCH_EXTRA_LIBRARY_PATH");
             if (paths != null) {
                 String[] files = paths.split(",");
                 for (String file : files) {

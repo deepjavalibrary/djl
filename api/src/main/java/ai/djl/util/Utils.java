@@ -328,12 +328,9 @@ public final class Utils {
      * @return DJL engine cache directory
      */
     public static Path getEngineCacheDir() {
-        String cacheDir = System.getProperty("ENGINE_CACHE_DIR");
+        String cacheDir = getEnvOrSystemProperty("ENGINE_CACHE_DIR");
         if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = Utils.getenv("ENGINE_CACHE_DIR");
-            if (cacheDir == null || cacheDir.isEmpty()) {
-                return getCacheDir();
-            }
+            return getCacheDir();
         }
         return Paths.get(cacheDir);
     }
@@ -344,16 +341,13 @@ public final class Utils {
      * @return DJL cache directory
      */
     public static Path getCacheDir() {
-        String cacheDir = System.getProperty("DJL_CACHE_DIR");
+        String cacheDir = getEnvOrSystemProperty("DJL_CACHE_DIR");
         if (cacheDir == null || cacheDir.isEmpty()) {
-            cacheDir = Utils.getenv("DJL_CACHE_DIR");
-            if (cacheDir == null || cacheDir.isEmpty()) {
-                Path dir = Paths.get(System.getProperty("user.home"));
-                if (!Files.isWritable(dir)) {
-                    dir = Paths.get(System.getProperty("java.io.tmpdir"));
-                }
-                return dir.resolve(".djl.ai");
+            Path dir = Paths.get(System.getProperty("user.home"));
+            if (!Files.isWritable(dir)) {
+                dir = Paths.get(System.getProperty("java.io.tmpdir"));
             }
+            return dir.resolve(".djl.ai");
         }
         return Paths.get(cacheDir);
     }
@@ -380,6 +374,16 @@ public final class Utils {
             }
         }
         return modelDir.toAbsolutePath();
+    }
+
+    /**
+     * Gets the value of the specified environment variable or system property.
+     *
+     * @param name the name of the environment variable
+     * @return the string value of the variable or system property
+     */
+    public static String getEnvOrSystemProperty(String name) {
+        return getenv(name, System.getProperty(name));
     }
 
     /**

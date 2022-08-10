@@ -169,7 +169,7 @@ public final class LibUtils {
     }
 
     private static LibTorch findOverrideLibrary() {
-        String libPath = Utils.getenv("PYTORCH_LIBRARY_PATH");
+        String libPath = Utils.getEnvOrSystemProperty("PYTORCH_LIBRARY_PATH");
         if (libPath != null) {
             LibTorch lib = findLibraryInPath(libPath);
             if (lib != null) {
@@ -268,10 +268,7 @@ public final class LibUtils {
 
     private static LibTorch findNativeLibrary() {
         Platform platform = Platform.detectPlatform("pytorch");
-        String overrideVersion = Utils.getenv("PYTORCH_VERSION");
-        if (overrideVersion == null) {
-            overrideVersion = System.getProperty("PYTORCH_VERSION");
-        }
+        String overrideVersion = Utils.getEnvOrSystemProperty("PYTORCH_VERSION");
         if (overrideVersion != null
                 && !overrideVersion.isEmpty()
                 && !platform.getVersion().startsWith(overrideVersion)) {
@@ -366,7 +363,7 @@ public final class LibUtils {
         String precxx11;
         if (System.getProperty("os.name").startsWith("Linux")
                 && (Boolean.getBoolean("PYTORCH_PRECXX11")
-                        || Boolean.parseBoolean(Utils.getenv("PYTORCH_PRECXX11"))
+                        || Boolean.parseBoolean(Utils.getEnvOrSystemProperty("PYTORCH_PRECXX11"))
                         || ("aarch64".equals(platform.getOsArch())
                                 && "linux".equals(platform.getOsPrefix())))) {
             precxx11 = "-precxx11";
@@ -509,22 +506,16 @@ public final class LibUtils {
             this.dir = dir;
             this.apiVersion = platform.getApiVersion();
             this.classifier = platform.getClassifier();
-            version = Utils.getenv("PYTORCH_VERSION");
+            version = Utils.getEnvOrSystemProperty("PYTORCH_VERSION");
             if (version == null) {
-                version = System.getProperty("PYTORCH_VERSION");
-                if (version == null) {
-                    version = platform.getVersion();
-                }
+                version = platform.getVersion();
             }
-            flavor = Utils.getenv("PYTORCH_FLAVOR");
+            flavor = Utils.getEnvOrSystemProperty("PYTORCH_FLAVOR");
             if (flavor == null) {
-                flavor = System.getProperty("PYTORCH_FLAVOR");
-                if (flavor == null) {
-                    if (CudaUtils.getGpuCount() > 0) {
-                        flavor = "cu" + CudaUtils.getCudaVersionString() + "-precxx11";
-                    } else {
-                        flavor = "cpu-precxx11";
-                    }
+                if (CudaUtils.getGpuCount() > 0) {
+                    flavor = "cu" + CudaUtils.getCudaVersionString() + "-precxx11";
+                } else {
+                    flavor = "cpu-precxx11";
                 }
             }
         }
