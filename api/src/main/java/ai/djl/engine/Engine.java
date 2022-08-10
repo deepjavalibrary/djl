@@ -71,8 +71,8 @@ public abstract class Engine {
             return null;
         }
 
-        String defaultEngine = Utils.getenv("DJL_DEFAULT_ENGINE");
-        defaultEngine = System.getProperty("ai.djl.default_engine", defaultEngine);
+        String def = System.getProperty("ai.djl.default_engine");
+        String defaultEngine = Utils.getenv("DJL_DEFAULT_ENGINE", def);
         if (defaultEngine == null || defaultEngine.isEmpty()) {
             int rank = Integer.MAX_VALUE;
             for (EngineProvider provider : ALL_ENGINES.values()) {

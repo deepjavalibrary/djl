@@ -50,10 +50,7 @@ public final class TrtEngine extends Engine {
         try {
             LibUtils.loadLibrary();
             JniUtils.initPlugins("");
-            String paths = Utils.getenv("TENSORRT_EXTRA_LIBRARY_PATH");
-            if (paths == null) {
-                paths = System.getProperty("TENSORRT_EXTRA_LIBRARY_PATH");
-            }
+            String paths = Utils.getEnvOrSystemProperty("TENSORRT_EXTRA_LIBRARY_PATH");
             if (paths != null) {
                 String[] files = paths.split(",");
                 for (String file : files) {
