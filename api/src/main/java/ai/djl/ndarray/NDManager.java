@@ -1634,4 +1634,11 @@ public interface NDManager extends AutoCloseable {
     /** {@inheritDoc} */
     @Override
     void close();
+
+    /**
+     * A {@link SystemNDManager} is a marker class for a base NDManager.
+     *
+     * <p>Unlike a typical {@link NDManager}, they can not be closed and don't track memory.
+     */
+    interface SystemNDManager {}
 }
