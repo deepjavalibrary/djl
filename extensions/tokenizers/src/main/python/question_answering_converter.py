@@ -52,10 +52,8 @@ class QuestionAnsweringConverter(HuggingfaceConverter):
             pipeline_output = hf_pipeline(self.inputs)
             if pipeline_output != prediction:
                 return False, f"Unexpected inference result: {prediction}"
-            else:
-                logging.warning(
-                    f"pipeline output differs from expected: {pipeline_output}"
-                )
+            logging.warning(
+                f"pipeline output differs from expected: {pipeline_output}")
 
         return True, None
 

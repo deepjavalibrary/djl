@@ -23,13 +23,15 @@ def converter_args():
                         default=1,
                         help="Max amount of models to convert")
     parser.add_argument("-o", "--output-dir", help="Model output directory")
-    parser.add_argument("-c",
-                        "--categories",
-                        nargs="*",
-                        help="Model categories to convert")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "-c",
+        "--category",
+        help="Model category to convert",
+    )
+    group.add_argument("-m", "--model-name", help="Model name to convert")
+
     args = parser.parse_args()
-    if not args.categories:
-        args.categories = ["question-answering"]
     if args.output_dir is None:
         args.output_dir = "."
 

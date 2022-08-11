@@ -48,10 +48,8 @@ class FillMaskConverter(HuggingfaceConverter):
 
             if prediction not in [o["token_str"] for o in pipeline_output]:
                 return False, f"Unexpected inference result: {prediction}"
-            else:
-                logging.warning(
-                    f"pipeline output differs from expected: {pipeline_output}"
-                )
+            logging.warning(
+                f"pipeline output differs from expected: {pipeline_output}")
 
         return True, None
 

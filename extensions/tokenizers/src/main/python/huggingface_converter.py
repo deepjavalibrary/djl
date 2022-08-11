@@ -164,7 +164,7 @@ class HuggingfaceConverter:
         return True, None
 
     def load_model(self, model_id: str):
-        logging.info(f"Loading model: {model_id}.")
+        logging.info(f"Loading model: {model_id} ...")
         kwargs = {
             "tokenizer": model_id,
             "device": -1  # always use CPU to trace the model
