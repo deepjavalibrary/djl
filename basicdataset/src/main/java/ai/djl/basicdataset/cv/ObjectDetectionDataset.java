@@ -20,13 +20,13 @@ import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * A helper to create {@link ai.djl.training.dataset.Dataset}s for {@link
  * ai.djl.Application.CV#OBJECT_DETECTION}.
  */
 public abstract class ObjectDetectionDataset extends ImageDataset {
-
     /**
      * Creates a new instance of {@link ObjectDetectionDataset} with the given necessary
      * configurations.
@@ -68,4 +68,11 @@ public abstract class ObjectDetectionDataset extends ImageDataset {
      * @throws IOException if the data could not be loaded
      */
     public abstract PairList<Long, Rectangle> getObjects(long index) throws IOException;
+
+    /**
+     * Returns the classes that detected objects in the dataset can be classified into.
+     *
+     * @return the classes that detected objects in the dataset can be classified into.
+     */
+    public abstract List<String> getClasses();
 }

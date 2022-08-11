@@ -129,6 +129,12 @@ public class PikachuDetection extends ObjectDetectionDataset {
 
     /** {@inheritDoc} */
     @Override
+    public List<String> getClasses() {
+        return Collections.singletonList("pikachu");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     protected long availableSize() {
         return imagePaths.size();
     }

@@ -45,14 +45,14 @@ import java.util.Optional;
  * <p>Each image might have different {@link ai.djl.ndarray.types.Shape}s.
  */
 public class CocoDetection extends ObjectDetectionDataset {
-
+    // TODO: Add synset logic for coco dataset
     private static final String ARTIFACT_ID = "coco";
     private static final String VERSION = "1.0";
 
     private Usage usage;
     private List<Path> imagePaths;
     private List<PairList<Long, Rectangle>> labels;
-
+    private List<String> synset;
     private MRL mrl;
     private boolean prepared;
 
@@ -62,6 +62,7 @@ public class CocoDetection extends ObjectDetectionDataset {
         mrl = builder.getMrl();
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
+        synset = new ArrayList<>();
     }
 
     /**
@@ -77,6 +78,12 @@ public class CocoDetection extends ObjectDetectionDataset {
     @Override
     public PairList<Long, Rectangle> getObjects(long index) {
         return labels.get(Math.toIntExact(index));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<String> getClasses() {
+        return synset;
     }
 
     /** {@inheritDoc} */
