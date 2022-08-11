@@ -34,24 +34,22 @@ def main():
     huggingface_models = HuggingfaceModels(args.output_dir)
     temp_dir = f"{args.output_dir}/tmp"
 
-    for category in args.categories:
-        models = huggingface_models.list_models(category, args.limit)
+    models = huggingface_models.list_models(args)
 
-        for model in models:
-            task = model["task"]
-            model_info = model["model_info"]
-            model_id = model_info.modelId
-            converter = SUPPORTED_TASK[task]
+    for model in models:
+        task = model["task"]
+        model_info = model["model_info"]
+        model_id = model_info.modelId
+        converter = SUPPORTED_TASK[task]
 
-            result, reason, size = converter.save_model(
-                model_id, args.output_dir, temp_dir)
-            if not result:
-                logging.error(reason)
+        result, reason, size = converter.save_model(model_id, args.output_dir,
+                                                    temp_dir)
+        if not result:
+            logging.error(reason)
 
-            huggingface_models.update_progress(model_info,
-                                               converter.application, result,
-                                               reason, size)
-            shutil.rmtree(temp_dir)
+        huggingface_models.update_progress(model_info, converter.application,
+                                           result, reason, size)
+        shutil.rmtree(temp_dir)
 
     logging.info("finished.")
 

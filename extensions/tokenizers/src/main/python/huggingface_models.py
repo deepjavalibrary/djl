@@ -18,6 +18,7 @@ from typing import List
 from huggingface_hub import HfApi, ModelSearchArguments
 from huggingface_hub import hf_hub_download
 from huggingface_hub.hf_api import ModelInfo
+from argparse import Namespace
 
 ARCHITECTURES_2_TASK = {
     "ForQuestionAnswering": "question-answering",
@@ -41,24 +42,38 @@ class HuggingfaceModels:
 
         self.temp_dir = f"{self.output_dir}/tmp"
 
-    def list_models(self, category: str, limit: int) -> List[dict]:
+    def list_models(self, args: Namespace) -> List[dict]:
         languages = ModelSearchArguments().language
         api = HfApi()
-        models = api.list_models(filter=f"{category},pytorch",
-                                 sort="downloads",
-                                 direction=-1,
-                                 limit=limit)
+        if args.model_name:
+            models = api.list_models(filter="pytorch",
+                                     search=args.model_name,
+                                     sort="downloads",
+                                     direction=-1,
+                                     limit=args.limit)
+            if not models:
+                logging.warning(f"no model found: {args.model_name}.")
+        else:
+            models = api.list_models(filter=f"{args.category},pytorch",
+                                     sort="downloads",
+                                     direction=-1,
+                                     limit=args.limit)
+            if not models:
+                logging.warning(f"no model matches category: {args.category}.")
 
         ret = []
         for model_info in models:
             model_id = model_info.modelId
-            is_english = True
-            for tag in model_info.tags:
-                if tag in languages and tag != 'en':
-                    is_english = False
-                    break
+            is_english = "en" in model_info.tags
+            if not is_english:
+                is_english = True
+                for tag in model_info.tags:
+                    if tag in languages and tag != 'en':
+                        is_english = False
+                        break
 
             if not is_english:
+                logging.warning(f"Skip non-English model: {model_id}.")
                 continue
 
             if self.processed_models.get(model_id):
