@@ -1,0 +1,36 @@
+group 'ai.dj.gluonTS'
+
+dependencies {
+    api project(":api")
+    api project(":basicdataset")
+    api "tech.tablesaw:tablesaw-core:${tablesaw_version}"
+    api "tech.tablesaw:tablesaw-jsplot:${tablesaw_version}"
+
+    implementation "commons-cli:commons-cli:${commons_cli_version}"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+    testImplementation project(":testing")
+
+//    runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
+//    runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
+    runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
+
+    testRuntimeOnly project(":engines:mxnet:mxnet-engine")
+    testRuntimeOnly project(":engines:mxnet:jnarator")
+}
+
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            pom {
+//                name = "GluonTS for DJL"
+//                description = "GluonTS for DJL"
+//                url = "http://www.djl.ai/extensions/${project.name}"
+//            }
+//        }
+//    }
+//}
