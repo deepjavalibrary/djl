@@ -37,7 +37,7 @@ public class IntegrationTests {
             } else if ("aarch64".equals(System.getProperty("os.arch"))) {
                 engines = new String[] {"PyTorch"};
             } else {
-                engines = new String[] {"MXNet", "PyTorch", "TensorFlow", "XGBoost"};
+                engines = new String[] {"MXNet", "PyTorch", "TensorFlow", "XGBoost", "LightGBM"};
             }
         } else {
             engines = new String[] {defaultEngine};

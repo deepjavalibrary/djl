@@ -18,6 +18,7 @@ dependencies {
     runtimeOnly project(":engines:pytorch:pytorch-jni")
     runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
     runtimeOnly project(":engines:ml:xgboost")
+    runtimeOnly project(":engines:ml:lightgbm")
 
     if (System.getProperty("ai.djl.default_engine") == "OnnxRuntime") {
         // onnxruntime requires user install libgomp.so.1 manually, exclude from default dependency
