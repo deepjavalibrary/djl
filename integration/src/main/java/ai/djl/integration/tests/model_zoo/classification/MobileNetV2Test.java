@@ -35,8 +35,6 @@ import ai.djl.util.PairList;
 
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-
 public class MobileNetV2Test {
     @Test
     public void testTrain() {
