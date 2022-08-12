@@ -31,7 +31,7 @@ public class LgbmDataset extends NDArrayAdapter {
 
     private AtomicReference<SWIGTYPE_p_p_void> handle;
 
-    // Track Datset source for inference calls
+    // Track Dataset source for inference calls
     private SrcType srcType;
     private Path srcFile;
     private NDArray srcArray;

@@ -13,17 +13,17 @@
 
 package ai.djl.ml.lightgbm;
 
-import ai.djl.MalformedModelException;
-import ai.djl.Model;
+import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
-import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
@@ -36,16 +36,22 @@ import java.nio.file.Paths;
 public class LgbmModelTest {
 
     @Test
-    public void testLoad() throws MalformedModelException, IOException, TranslateException {
+    public void testLoad() throws ModelException, IOException, TranslateException {
         TestRequirements.notArm();
         Path modelDir = Paths.get("build/model");
         DownloadUtils.download(
                 "https://resources.djl.ai/test-models/lightgbm/quadratic.txt",
                 modelDir.resolve("quadratic.txt").toString());
 
-        try (Model model = Model.newInstance("model")) {
-            model.load(modelDir, "quadratic");
-            Predictor<NDList, NDList> predictor = model.newPredictor(new NoopTranslator());
+        Criteria<NDList, NDList> criteria =
+                Criteria.builder()
+                        .setTypes(NDList.class, NDList.class)
+                        .optModelPath(modelDir)
+                        .optModelName("quadratic")
+                        .build();
+
+        try (ZooModel<NDList, NDList> model = criteria.loadModel();
+                Predictor<NDList, NDList> predictor = model.newPredictor()) {
             try (NDManager manager = NDManager.newBaseManager()) {
                 NDArray array = manager.ones(new Shape(10, 4));
                 NDList output = predictor.predict(new NDList(array));

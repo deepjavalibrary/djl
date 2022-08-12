@@ -2,7 +2,6 @@ group "ai.djl.ml.lightgbm"
 
 dependencies {
     api project(":api")
-    api "commons-logging:commons-logging:${commons_logging_version}"
     api "com.microsoft.ml.lightgbm:lightgbmlib:${lightgbm_version}"
 
     testImplementation(project(":testing"))
