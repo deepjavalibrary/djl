@@ -202,7 +202,7 @@ task downloadMxnetNativeLib() {
             from("${BINARY_ROOT}/mkl/linux/native/lib") {
                 exclude '**/libmxnet.so'
             }
-            into("${BINARY_ROOT}/cu110mkl/linux/native/lib")
+            into("${BINARY_ROOT}/cu112mkl/linux/native/lib")
         }
     }
 }
