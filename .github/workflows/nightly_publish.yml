@@ -88,10 +88,119 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=TensorFlow"
 
+  test-aarch64:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: [ self-hosted, aarch64 ]
+    container: amazonlinux:2
+    timeout-minutes: 30
+    needs: create-runners
+    steps:
+      - name: Setup Environment
+        run: |
+          yum -y update
+          yum install -y tar gzip
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: corretto
+          architecture: aarch64
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Test with Gradle
+        run: |
+          ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
+          ./gradlew :integration:clean
+          ./gradlew :integration:test "-Dai.djl.default_engine=OnnxRuntime"
+          ./gradlew :integration:clean
+
+  test-cuda-102:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: [ self-hosted, gpu ]
+    container:
+      image: nvidia/cuda:10.2-cudnn8-runtime-ubuntu18.04
+      options: --gpus all --runtime=nvidia
+      env:
+        DJL_CACHE_DIR: /root/.djl.ai
+    timeout-minutes: 30
+    needs: create-runners
+    steps:
+      - name: Setup Environment
+        run: |
+          apt-get update
+          apt-get install -y software-properties-common wget locales libgomp1
+          locale-gen en_US.UTF-8
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: corretto
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Test with Gradle
+        run: |
+          ./gradlew :integration:test
+          ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=PyTorch
+          ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=OnnxRuntime
+          ./gradlew :engines:mxnet:mxnet-model-zoo:test
+          ./gradlew :engines:pytorch:pytorch-model-zoo:test
+          ./gradlew :engines:onnxruntime:onnxruntime-engine:test
+          mkdir -p /root/.djl.ai/paddle/2.2.2-cu102-linux-x86_64
+          LD_LIBRARY_PATH=/root/.djl.ai/paddle/2.2.2-cu102-linux-x86_64:/usr/local/cuda/lib64 \
+          ./gradlew :engines:paddlepaddle:paddlepaddle-model-zoo:test
+
+  test-cuda-113:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: [ self-hosted, gpu ]
+    container:
+      image: nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu18.04
+      options: --gpus all --runtime=nvidia
+    timeout-minutes: 30
+    needs: create-runners
+    steps:
+      - name: Setup Environment
+        run: |
+          apt-get update
+          apt-get install -y software-properties-common wget locales libfontconfig1
+          locale-gen en_US.UTF-8
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: corretto
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Test with Gradle
+        run: |
+          ./gradlew :integration:test
+          ./gradlew :engines:tensorflow:tensorflow-model-zoo:test
+          ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=PyTorch
+          ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=TensorFlow
+          ./gradlew :engines:mxnet:mxnet-model-zoo:test
+          ./gradlew :engines:pytorch:pytorch-model-zoo:test
+          ./gradlew :engines:tensorflow:tensorflow-model-zoo:test
+          ./gradlew :engines:tensorrt:test
+          ./gradlew :engines:onnxruntime:onnxruntime-engine:test
+
   publish:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-18.04
-    needs: [ build, test-pytorch, test-tensorflow ]
+    needs: [ build, test-pytorch, test-tensorflow, test-aarch64, test-cuda-102, test-cuda-113 ]
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -137,3 +246,56 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
+
+  create-runners:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: [ self-hosted, scheduler ]
+    steps:
+      - name: Create new Graviton instance
+        id: create_aarch64
+        run: |
+          cd /home/ubuntu/djl_benchmark_script/scripts
+          token=$( curl -X POST -H "Authorization: token ${{ secrets.ACTION_RUNNER_PERSONAL_TOKEN }}" \
+          https://api.github.com/repos/deepjavalibrary/djl/actions/runners/registration-token \
+          --fail \
+          | jq '.token' | tr -d '"' )
+          ./start_instance.sh action_graviton $token djl
+      - name: Create new GPU instance 1
+        id: create_gpu_1
+        run: |
+          cd /home/ubuntu/djl_benchmark_script/scripts
+          token=$( curl -X POST -H "Authorization: token ${{ secrets.ACTION_RUNNER_PERSONAL_TOKEN }}" \
+          https://api.github.com/repos/deepjavalibrary/djl/actions/runners/registration-token \
+          --fail \
+          | jq '.token' | tr -d '"' )
+          ./start_instance.sh action_gpu $token djl
+      - name: Create new GPU instance 2
+        id: create_gpu_2
+        run: |
+          cd /home/ubuntu/djl_benchmark_script/scripts
+          token=$( curl -X POST -H "Authorization: token ${{ secrets.ACTION_RUNNER_PERSONAL_TOKEN }}" \
+          https://api.github.com/repos/deepjavalibrary/djl/actions/runners/registration-token \
+          --fail \
+          | jq '.token' | tr -d '"' )
+          ./start_instance.sh action_gpu $token djl
+    outputs:
+      aarch64_instance_id: ${{ steps.create_aarch64.outputs.action_graviton_instance_id }}
+      gpu_1_instance_id: ${{ steps.create_gpu_1.outputs.action_gpu_instance_id }}
+      gpu_2_instance_id: ${{ steps.create_gpu_2.outputs.action_gpu_instance_id }}
+
+  stop-runners:
+    if: always()
+    runs-on: [ self-hosted, scheduler ]
+    needs: [ create-runners, test-aarch64, test-cuda-102, test-cuda-113 ]
+    steps:
+      - name: Stop all instances
+        run: |
+          cd /home/ubuntu/djl_benchmark_script/scripts
+          instance_id=${{ needs.create-runners.outputs.aarch64_instance_id }}
+          ./stop_instance.sh $instance_id
+          cd /home/ubuntu/djl_benchmark_script/scripts
+          instance_id=${{ needs.create-runners.outputs.gpu_1_instance_id }}
+          ./stop_instance.sh $instance_id
+          cd /home/ubuntu/djl_benchmark_script/scripts
+          instance_id=${{ needs.create-runners.outputs.gpu_2_instance_id }}
+          ./stop_instance.sh $instance_id
