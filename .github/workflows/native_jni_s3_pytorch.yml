@@ -161,17 +161,16 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Install CUDA 11.3
+      - name: Install CUDA 11.6
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
-          curl.exe -L https://developer.download.nvidia.com/compute/cuda/11.3.1/local_installers/cuda_11.3.1_465.89_win10.exe -o cuda.exe
-          curl.exe -L https://developer.download.nvidia.com/compute/redist/cudnn/v8.2.1/cudnn-11.3-windows-x64-v8.2.1.32.zip -o cudnn.zip
+          curl.exe -L https://developer.download.nvidia.com/compute/cuda/11.6.1/local_installers/cuda_11.6.1_511.65_windows.exe -o cuda.exe
+          curl.exe -L https://developer.download.nvidia.com/compute/redist/cudnn/v8.4.1/local_installers/11.6/cudnn-windows-x86_64-8.4.1.50_cuda11.6-archive.zip -o cudnn.zip
           cuda.exe -s
-          mkdir cuda
           unzip.exe cudnn.zip
-          cp.exe -a cuda/include cuda/lib cuda/bin "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.3/"
-          rm.exe -Rf cuda.exe cuda.exe cudnn.zip cuda
+          cp.exe -a cudnn*/include cudnn*/lib cudnn*/bin "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/"
+          rm.exe -Rf cuda.exe cuda.exe cudnn.zip cudnn*
       - name: Release CPU JNI
         shell: cmd
         run: |
@@ -181,7 +180,7 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
-          set "CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.3"
+          set "CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.6"
           set "PATH=%CUDA_PATH%\bin;%CUDA_PATH%\libnvvp;%PATH%"
           gradlew :engines:pytorch:pytorch-native:cleanJNI :engines:pytorch:pytorch-native:compileJNI -Pcu11 -Ppt_version=${{ github.event.inputs.pt_version }}
       - name: Configure AWS Credentials
@@ -229,7 +228,9 @@ jobs:
           pip3 install awscli --upgrade
       - name: Release JNI prep
         run: |
-          rm -rf djl && git clone https://github.com/deepjavalibrary/djl && cd djl
+          BRANCH=$(sed -e s:refs/heads/::g -e s:/:-:g <<< ${{ github.event.ref }})
+          echo $BRANCH
+          rm -rf djl && git clone https://github.com/deepjavalibrary/djl -b $BRANCH && cd djl
           export JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto.aarch64
           export PATH=$PATH:$JAVA_HOME
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}

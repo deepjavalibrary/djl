@@ -14,6 +14,8 @@ if "%2" == "cpu" (
       set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu111/libtorch-win-shared-with-deps-%VERSION%%%2Bcu111.zip"
 ) else if "%2" == "cu113" (
       set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu113/libtorch-win-shared-with-deps-%VERSION%%%2Bcu113.zip"
+) else if "%2" == "cu116" (
+      set DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu116/libtorch-win-shared-with-deps-%VERSION%%%2Bcu116.zip"
 )
 
 
@@ -28,6 +30,9 @@ if exist %FILEPATH% (
     echo Finished downloading libtorch
 )
 
+if "%VERSION%" == "1.12.1" (
+    copy /y src\main\patch\cuda.cmake libtorch\share\cmake\Caffe2\public\
+)
 if "%VERSION%" == "1.11.0" (
     copy /y src\main\patch\cuda.cmake libtorch\share\cmake\Caffe2\public\
 )
