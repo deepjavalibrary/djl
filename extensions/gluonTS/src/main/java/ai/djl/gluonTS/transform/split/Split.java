@@ -11,10 +11,11 @@
  * and limitations under the License.
  */
 
-package ai.djl.gluonTS.transform;
+package ai.djl.gluonTS.transform.split;
 
 import ai.djl.gluonTS.GluonTSData;
 import ai.djl.gluonTS.dataset.FieldName;
+import ai.djl.gluonTS.transform.InstanceSampler;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
