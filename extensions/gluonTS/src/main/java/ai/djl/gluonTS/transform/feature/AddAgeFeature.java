@@ -24,6 +24,7 @@ public class AddAgeFeature implements GluonTSTransform {
         this.logScale = logScale;
     }
 
+    /** {@inheritDoc} */
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
         return Feature.addAgeFeature(

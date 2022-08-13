@@ -15,6 +15,7 @@ public class RemoveFields implements GluonTSTransform {
         this.fieldNames = fieldNames;
     }
 
+    /** {@inheritDoc} */
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
         return Field.removeFields(manager, fieldNames, data);

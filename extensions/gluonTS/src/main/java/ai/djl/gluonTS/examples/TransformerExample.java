@@ -13,7 +13,6 @@
 package ai.djl.gluonTS.examples;
 
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.gluonTS.ForeCast;
 import ai.djl.gluonTS.GluonTSData;
 import ai.djl.gluonTS.dataset.FieldName;
@@ -33,7 +32,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** The example is targeted to specific use case for Transformer time series forecast. */
 public final class TransformerExample {
@@ -43,13 +43,14 @@ public final class TransformerExample {
     private TransformerExample() {}
 
     public static void main(String[] args) throws IOException, TranslateException, ModelException {
-        logger.info(Engine.getInstance().getVersion());
+        logger.info("model: Transformer");
         float[] results = TransformerExample.predict(args);
+        logger.info("Prediction result: {}", Arrays.toString(results));
     }
 
     public static float[] predict(String[] args)
             throws IOException, TranslateException, ModelException {
-        HashMap<String, Object> arguments = new HashMap<>();
+        Map<String, Object> arguments = new ConcurrentHashMap<>();
         arguments.put("prediction_length", 28);
         TransformerTranslator.Builder builder = TransformerTranslator.builder(arguments);
         TransformerTranslator translator = builder.build();
@@ -72,13 +73,8 @@ public final class TransformerExample {
                                 .div(1857f);
                 input.setField(FieldName.TARGET, target);
                 ForeCast foreCast = predictor.predict(input);
-                NDArray median = foreCast.mean();
-                float[] floats = median.toFloatArray();
 
-                // [681. 491. 600. 353. 300. 412. 419. 158.  92.  97.  75.  34.  52.  69.
-                //  37.  15.   7.  10.   7.   9.  12.  20.   6.   9.   7.   3.   3.  11.]
-                logger.info(Arrays.toString(floats));
-                return floats;
+                return foreCast.mean().toFloatArray();
             }
         }
     }

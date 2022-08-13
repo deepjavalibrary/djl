@@ -15,6 +15,7 @@ public class AddObservedValuesIndicator implements GluonTSTransform {
         this.outputField = outputField;
     }
 
+    /** {@inheritDoc} */
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
         return Feature.addObservedValuesIndicator(manager, targetField, outputField, data);

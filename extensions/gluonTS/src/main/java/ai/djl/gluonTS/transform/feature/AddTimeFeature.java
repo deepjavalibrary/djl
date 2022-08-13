@@ -34,6 +34,7 @@ public class AddTimeFeature implements GluonTSTransform {
         this.freq = freq;
     }
 
+    /** {@inheritDoc} */
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
         return Feature.addTimeFeature(

@@ -29,6 +29,7 @@ public class VstackFeatures implements GluonTSTransform {
         this(outputField, inputFields, true, false);
     }
 
+    /** {@inheritDoc} */
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
         return Convert.vstackFeatures(manager, outputField, inputFields, dropInputs, hStack, data);

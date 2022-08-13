@@ -16,6 +16,7 @@ public class SetField implements GluonTSTransform {
         this.value = value;
     }
 
+    /** {@inheritDoc} */
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
         NDArray _value = manager.create(value.getShape());
