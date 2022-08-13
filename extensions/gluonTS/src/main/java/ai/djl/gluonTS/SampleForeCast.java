@@ -102,7 +102,7 @@ public class SampleForeCast extends ForeCast {
     @Override
     public NDArray mean() {
         if (mean == null) {
-            mean = samples.mean(new int[]{0});
+            mean = samples.mean(new int[] {0});
         }
         return super.mean();
     }

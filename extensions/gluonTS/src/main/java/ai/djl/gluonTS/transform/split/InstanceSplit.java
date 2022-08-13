@@ -22,7 +22,18 @@ public class InstanceSplit implements GluonTSTransform {
     private List<FieldName> timeSeriesFields;
     private float dummyValue;
 
-    public InstanceSplit(FieldName targetField, FieldName isPadField, FieldName startField, FieldName forecastStartField, InstanceSampler instanceSampler, int pastLength, int futureLength, int leadTime, boolean outputNTC, List<FieldName> timeSeriesFields, float dummyValue) {
+    public InstanceSplit(
+            FieldName targetField,
+            FieldName isPadField,
+            FieldName startField,
+            FieldName forecastStartField,
+            InstanceSampler instanceSampler,
+            int pastLength,
+            int futureLength,
+            int leadTime,
+            boolean outputNTC,
+            List<FieldName> timeSeriesFields,
+            float dummyValue) {
         this.targetField = targetField;
         this.isPadField = isPadField;
         this.startField = startField;
@@ -36,27 +47,45 @@ public class InstanceSplit implements GluonTSTransform {
         this.dummyValue = dummyValue;
     }
 
-    public InstanceSplit(FieldName targetField, FieldName isPadField, FieldName startField, FieldName forecastStartField, InstanceSampler instanceSampler, int pastLength, int futureLength, List<FieldName> timeSeriesFields, float dummyValue) {
-        this(targetField, isPadField, startField, forecastStartField, instanceSampler, pastLength, futureLength,
-            0, true, timeSeriesFields, dummyValue);
+    public InstanceSplit(
+            FieldName targetField,
+            FieldName isPadField,
+            FieldName startField,
+            FieldName forecastStartField,
+            InstanceSampler instanceSampler,
+            int pastLength,
+            int futureLength,
+            List<FieldName> timeSeriesFields,
+            float dummyValue) {
+        this(
+                targetField,
+                isPadField,
+                startField,
+                forecastStartField,
+                instanceSampler,
+                pastLength,
+                futureLength,
+                0,
+                true,
+                timeSeriesFields,
+                dummyValue);
     }
 
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
         return Split.instanceSplit(
-            manager,
-            targetField,
-            isPadField,
-            startField,
-            forecastStartField,
-            instanceSampler,
-            pastLength,
-            futureLength,
-            leadTime,
-            outputNTC,
-            timeSeriesFields,
-            dummyValue,
-            data
-        );
+                manager,
+                targetField,
+                isPadField,
+                startField,
+                forecastStartField,
+                instanceSampler,
+                pastLength,
+                futureLength,
+                leadTime,
+                outputNTC,
+                timeSeriesFields,
+                dummyValue,
+                data);
     }
 }

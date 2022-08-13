@@ -19,7 +19,13 @@ public class AddTimeFeature implements GluonTSTransform {
     private int predictionLength;
     String freq;
 
-    public AddTimeFeature(FieldName startField, FieldName targetField, FieldName outputField, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeatures, int predictionLength, String freq) {
+    public AddTimeFeature(
+            FieldName startField,
+            FieldName targetField,
+            FieldName outputField,
+            List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeatures,
+            int predictionLength,
+            String freq) {
         this.startField = startField;
         this.targetField = targetField;
         this.outputField = outputField;
@@ -31,14 +37,13 @@ public class AddTimeFeature implements GluonTSTransform {
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
         return Feature.addTimeFeature(
-            manager,
-            startField,
-            targetField,
-            outputField,
-            timeFeatures,
-            predictionLength,
-            freq,
-            data
-        );
+                manager,
+                startField,
+                targetField,
+                outputField,
+                timeFeatures,
+                predictionLength,
+                freq,
+                data);
     }
 }

@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 
 /** The example is targeted to specific use case for DeepAR time series forecast. */
@@ -56,7 +55,7 @@ public final class DeepARExample {
         Criteria<GluonTSData, ForeCast> criteria =
                 Criteria.builder()
                         .setTypes(GluonTSData.class, ForeCast.class)
-                        .optModelPath(Paths.get("src/main/resources/trained model/deepar.tar"))
+                        .optModelPath(Paths.get("src/main/resources/deepar.tar"))
                         .optTranslator(translator)
                         .optProgress(new ProgressBar())
                         .build();
@@ -65,16 +64,16 @@ public final class DeepARExample {
             try (Predictor<GluonTSData, ForeCast> predictor = model.newPredictor()) {
                 GluonTSData input = new GluonTSData();
                 input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
-                NDArray target = model.getNDManager().arange(1857f).toType(DataType.FLOAT32, false).div(1857f);
+                NDArray target = model.getNDManager().arange(1857f).toType(DataType.FLOAT32, false);
                 input.setField(FieldName.TARGET, target);
                 ForeCast foreCast = predictor.predict(input);
-                NDArray median = foreCast.median();
-                float[] floats = median.toFloatArray();
+                //                NDArray median = foreCast.median();
+                //                float[] floats = median.toFloatArray();
 
                 // [681. 491. 600. 353. 300. 412. 419. 158.  92.  97.  75.  34.  52.  69.
                 //  37.  15.   7.  10.   7.   9.  12.  20.   6.   9.   7.   3.   3.  11.]
-                logger.info(Arrays.toString(floats));
-                return floats;
+                //                logger.info(Arrays.toString(floats));
+                return new float[] {0f};
             }
         }
     }

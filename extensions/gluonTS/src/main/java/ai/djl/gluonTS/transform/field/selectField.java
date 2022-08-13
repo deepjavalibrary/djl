@@ -16,10 +16,6 @@ public class selectField implements GluonTSTransform {
 
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
-        return Field.selectField(
-            manager,
-            inputFields,
-            data
-        );
+        return Field.selectField(manager, inputFields, data);
     }
 }

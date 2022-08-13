@@ -14,7 +14,11 @@ public class VstackFeatures implements GluonTSTransform {
     private boolean dropInputs;
     private boolean hStack;
 
-    public VstackFeatures(FieldName outputField, List<FieldName> inputFields, boolean dropInputs, boolean hStack) {
+    public VstackFeatures(
+            FieldName outputField,
+            List<FieldName> inputFields,
+            boolean dropInputs,
+            boolean hStack) {
         this.outputField = outputField;
         this.inputFields = inputFields;
         this.dropInputs = dropInputs;
@@ -27,13 +31,6 @@ public class VstackFeatures implements GluonTSTransform {
 
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
-        return Convert.vstackFeatures(
-            manager,
-            outputField,
-            inputFields,
-            dropInputs,
-            hStack,
-            data
-        );
+        return Convert.vstackFeatures(manager, outputField, inputFields, dropInputs, hStack, data);
     }
 }

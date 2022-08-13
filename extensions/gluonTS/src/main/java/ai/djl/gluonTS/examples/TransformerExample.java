@@ -65,7 +65,11 @@ public final class TransformerExample {
             try (Predictor<GluonTSData, ForeCast> predictor = model.newPredictor()) {
                 GluonTSData input = new GluonTSData();
                 input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
-                NDArray target = model.getNDManager().arange(1857f).toType(DataType.FLOAT32, false).div(1857f);
+                NDArray target =
+                        model.getNDManager()
+                                .arange(1857f)
+                                .toType(DataType.FLOAT32, false)
+                                .div(1857f);
                 input.setField(FieldName.TARGET, target);
                 ForeCast foreCast = predictor.predict(input);
                 NDArray median = foreCast.mean();

@@ -16,7 +16,8 @@ public class AddAgeFeature implements GluonTSTransform {
         this(targetField, outputField, predictionLength, true);
     }
 
-    public AddAgeFeature(FieldName targetField, FieldName outputField, int predictionLength, boolean logScale) {
+    public AddAgeFeature(
+            FieldName targetField, FieldName outputField, int predictionLength, boolean logScale) {
         this.targetField = targetField;
         this.outputField = outputField;
         this.predictionLength = predictionLength;
@@ -26,12 +27,6 @@ public class AddAgeFeature implements GluonTSTransform {
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
         return Feature.addAgeFeature(
-            manager,
-            targetField,
-            outputField,
-            predictionLength,
-            logScale,
-            data
-        );
+                manager, targetField, outputField, predictionLength, logScale, data);
     }
 }
