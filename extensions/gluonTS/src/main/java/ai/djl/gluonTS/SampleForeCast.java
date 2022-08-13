@@ -98,4 +98,12 @@ public class SampleForeCast extends ForeCast {
 
         return new SampleForeCast(samples, startDate, item_id, freq);
     }
+
+    @Override
+    public NDArray mean() {
+        if (mean == null) {
+            mean = samples.mean(new int[]{0});
+        }
+        return super.mean();
+    }
 }

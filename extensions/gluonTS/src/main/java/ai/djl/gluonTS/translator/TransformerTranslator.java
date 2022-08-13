@@ -2,6 +2,7 @@ package ai.djl.gluonTS.translator;
 
 import ai.djl.gluonTS.ForeCast;
 import ai.djl.gluonTS.GluonTSData;
+import ai.djl.gluonTS.SampleForeCast;
 import ai.djl.gluonTS.dataset.FieldName;
 import ai.djl.gluonTS.timeFeature.Lag;
 import ai.djl.gluonTS.timeFeature.TimeFeature;
@@ -30,7 +31,6 @@ public class TransformerTranslator extends BaseGluonTSTranslator {
             new ArrayList<String>() {
                 {
                     add(FieldName.FEAT_STATIC_CAT.name());
-                    add(FieldName.FEAT_STATIC_REAL.name());
                     add("PAST_" + FieldName.FEAT_TIME.name());
                     add("PAST_" + FieldName.TARGET.name());
                     add("PAST_" + FieldName.OBSERVED_VALUES.name());
@@ -41,7 +41,6 @@ public class TransformerTranslator extends BaseGluonTSTranslator {
             new ArrayList<String>() {
                 {
                     add(FieldName.FEAT_STATIC_CAT.name());
-                    add(FieldName.FEAT_STATIC_REAL.name());
                     add("PAST_" + FieldName.FEAT_TIME.name());
                     add("PAST_" + FieldName.TARGET.name());
                     add("PAST_" + FieldName.OBSERVED_VALUES.name());
@@ -78,7 +77,7 @@ public class TransformerTranslator extends BaseGluonTSTranslator {
     @Override
     public ForeCast processOutput(TranslatorContext ctx, NDList list) throws Exception {
         NDArray outputs = list.singletonOrThrow();
-        return null;
+        return new SampleForeCast(outputs, LocalDateTime.parse("2011-01-29T00:00"), "0", "D");
     }
 
     /** {@inheritDoc} */
