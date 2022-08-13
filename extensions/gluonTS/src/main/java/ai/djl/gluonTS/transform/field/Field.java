@@ -21,13 +21,13 @@ import ai.djl.ndarray.NDManager;
 import java.util.ArrayList;
 import java.util.List;
 
-/** this is a class use to operate field name in {@link GluonTSData} */
+/** this is a class use to operate field name in {@link GluonTSData}. */
 public final class Field {
 
-    public Field() {}
+    private Field() {}
 
     /**
-     * Remove fields names if present
+     * Remove fields names if present.
      *
      * @param manager default {@link NDManager}
      * @param fieldNames List of names of the fields that will be removed

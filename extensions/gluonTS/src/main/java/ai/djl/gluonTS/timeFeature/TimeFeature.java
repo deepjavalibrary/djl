@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /** this is a class to generate time feature by frequency. */
-public class TimeFeature {
+public final class TimeFeature {
 
     private static final PairList<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>>
             FEATURES_BY_OFFSETS =
@@ -71,8 +71,15 @@ public class TimeFeature {
                         }
                     };
 
-    public TimeFeature() {}
+    private TimeFeature() {}
 
+    /**
+     * Computes feature by seconds.
+     *
+     * @param manager default {@link NDManager}.
+     * @param index time data.
+     * @return the result feature.
+     */
     public static NDArray secondOfMinute(NDManager manager, List<LocalDateTime> index) {
         return manager.create(index.stream().mapToInt(LocalDateTime::getSecond).toArray())
                 .toType(DataType.FLOAT32, false)
@@ -80,6 +87,13 @@ public class TimeFeature {
                 .subi(0.5);
     }
 
+    /**
+     * Computes feature by minutes.
+     *
+     * @param manager default {@link NDManager}.
+     * @param index time data.
+     * @return the result feature.
+     */
     public static NDArray minuteOfHour(NDManager manager, List<LocalDateTime> index) {
         return manager.create(index.stream().mapToInt(LocalDateTime::getMinute).toArray())
                 .toType(DataType.FLOAT32, false)
@@ -87,6 +101,13 @@ public class TimeFeature {
                 .subi(0.5);
     }
 
+    /**
+     * Computes feature by hours.
+     *
+     * @param manager default {@link NDManager}.
+     * @param index time data.
+     * @return the result feature.
+     */
     public static NDArray hourOfDay(NDManager manager, List<LocalDateTime> index) {
         return manager.create(index.stream().mapToInt(LocalDateTime::getHour).toArray())
                 .toType(DataType.FLOAT32, false)
@@ -94,6 +115,13 @@ public class TimeFeature {
                 .subi(0.5);
     }
 
+    /**
+     * Computes feature by days of the week.
+     *
+     * @param manager default {@link NDManager}.
+     * @param index time data.
+     * @return the result feature.
+     */
     public static NDArray dayOfWeek(NDManager manager, List<LocalDateTime> index) {
         return manager.create(index.stream().mapToInt(a -> a.getDayOfWeek().ordinal()).toArray())
                 .toType(DataType.FLOAT32, false)
@@ -101,6 +129,13 @@ public class TimeFeature {
                 .subi(0.5);
     }
 
+    /**
+     * Computes feature by days fo the month.
+     *
+     * @param manager default {@link NDManager}.
+     * @param index time data.
+     * @return the result feature.
+     */
     public static NDArray dayOfMonth(NDManager manager, List<LocalDateTime> index) {
         return manager.create(index.stream().mapToInt(LocalDateTime::getDayOfMonth).toArray())
                 .toType(DataType.FLOAT32, false)
@@ -109,6 +144,13 @@ public class TimeFeature {
                 .subi(0.5f);
     }
 
+    /**
+     * Computes feature by days of the year.
+     *
+     * @param manager default {@link NDManager}.
+     * @param index time data.
+     * @return the result feature.
+     */
     public static NDArray dayOfYear(NDManager manager, List<LocalDateTime> index) {
         return manager.create(index.stream().mapToInt(LocalDateTime::getDayOfYear).toArray())
                 .toType(DataType.FLOAT32, false)
@@ -117,6 +159,13 @@ public class TimeFeature {
                 .subi(0.5f);
     }
 
+    /**
+     * Computes feature by months of the year.
+     *
+     * @param manager default {@link NDManager}.
+     * @param index time data.
+     * @return the result feature.
+     */
     public static NDArray monthOfYear(NDManager manager, List<LocalDateTime> index) {
         return manager.create(index.stream().mapToInt(LocalDateTime::getMonthValue).toArray())
                 .toType(DataType.FLOAT32, false)
@@ -125,6 +174,13 @@ public class TimeFeature {
                 .subi(0.5);
     }
 
+    /**
+     * Computes feature by weeks of the year.
+     *
+     * @param manager default {@link NDManager}.
+     * @param index time data.
+     * @return the result feature.
+     */
     public static NDArray weekOfYear(NDManager manager, List<LocalDateTime> index) {
         throw new UnsupportedOperationException("weekOfYear is not supported yet");
     }

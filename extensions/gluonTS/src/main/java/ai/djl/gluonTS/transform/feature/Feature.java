@@ -29,14 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
-/** this is a class use to add feature in {@link GluonTSData} */
-public class Feature {
+/** this is a class use to add feature in {@link GluonTSData}. */
+public final class Feature {
 
-    public Feature() {}
+    private Feature() {}
 
     /**
      * Replaces missing values in a {@link NDArray} (NaNs) with a dummy value and adds an
-     * "observed"-indicator that is "1" when values are observed and "0" when values are missing
+     * "observed"-indicator that is "1" when values are observed and "0" when values are missing.
      *
      * @param manager default {@link NDManager}
      * @param targetField Field for which missing values will be replaced
@@ -119,7 +119,7 @@ public class Feature {
     }
 
     /**
-     * Adds on 'age' feature to the {@link GluonTSData}
+     * Adds on 'age' feature to the {@link GluonTSData}.
      *
      * <p>The age feature starts with a small value at the start of the time series and grows over
      * time.

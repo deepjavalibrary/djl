@@ -11,7 +11,6 @@
  * and limitations under the License.
  */
 
-package ai.djl.gluonTS.transform;
+package ai.djl.gluonTS.timeFeature;
 
-/** This is a class for utils. */
-public class Utils {}
+public class TimeFeatureTest {}

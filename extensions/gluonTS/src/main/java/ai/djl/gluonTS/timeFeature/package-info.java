@@ -11,7 +11,5 @@
  * and limitations under the License.
  */
 
-package ai.djl.gluonTS.transform;
-
-/** This is a class for utils. */
-public class Utils {}
+/** Contains utils to get time feature from prediction frequency. */
+package ai.djl.gluonTS.timeFeature;

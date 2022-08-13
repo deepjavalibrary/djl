@@ -10,33 +10,31 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.gluonTS.transform.feature;
+package ai.djl.gluonTS.transform.field;
 
 import ai.djl.gluonTS.GluonTSData;
-import ai.djl.gluonTS.dataset.FieldName;
 import ai.djl.gluonTS.transform.GluonTSTransform;
 import ai.djl.ndarray.NDManager;
 
-/** Add observed value for the target data. */
-public class AddObservedValuesIndicator implements GluonTSTransform {
+import java.util.List;
 
-    private FieldName targetField;
-    private FieldName outputField;
+/** Select preset field names. */
+public class SelectField implements GluonTSTransform {
+
+    private final List<String> inputFields;
 
     /**
-     * Constructs a {@link AddObservedValuesIndicator}.
+     * Constructs a {@link SelectField}.
      *
-     * @param targetField target field name to be observed
-     * @param outputField output field name
+     * @param inputFields field names to select from.
      */
-    public AddObservedValuesIndicator(FieldName targetField, FieldName outputField) {
-        this.targetField = targetField;
-        this.outputField = outputField;
+    public SelectField(List<String> inputFields) {
+        this.inputFields = inputFields;
     }
 
     /** {@inheritDoc} */
     @Override
     public GluonTSData transform(NDManager manager, GluonTSData data) {
-        return Feature.addObservedValuesIndicator(manager, targetField, outputField, data);
+        return Field.selectField(manager, inputFields, data);
     }
 }

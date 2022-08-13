@@ -11,7 +11,5 @@
  * and limitations under the License.
  */
 
-package ai.djl.gluonTS.transform;
-
-/** This is a class for utils. */
-public class Utils {}
+/** Contains transform for {@link ai.djl.gluonTS.GluonTSData} to CRUD name field. */
+package ai.djl.gluonTS.transform.field;

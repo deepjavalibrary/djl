@@ -18,9 +18,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Lag {
+/** This class contains static method for get lags from frequency. */
+public final class Lag {
 
-    public Lag() {}
+    private Lag() {}
 
     /**
      * Generates a list of lags that are appropriate for the given frequency string.
@@ -35,9 +36,9 @@ public class Lag {
      */
     public static List<Integer> getLagsForFreq(String freqStr, int lagUb) {
         List<List<Integer>> lags;
-        if (freqStr.equals("D")) {
-            lags = _make_lags_for_day(1);
-            lags.addAll(_make_lags_for_week(1f / 7f));
+        if ("D".equals(freqStr)) {
+            lags = makeLagsForDay(1);
+            lags.addAll(makeLagsForWeek(1f / 7f));
         } else {
             throw new IllegalArgumentException("invalid frequency: freq now must be D");
         }
@@ -67,25 +68,32 @@ public class Lag {
         return ret;
     }
 
+    /**
+     * Generates a list of lags that are appropriate for the given frequency string. Set the lagUb
+     * to default value 1200.
+     *
+     * @param freqStr Frequency string of the form [multiple][granularity] such as "12H", "1D" etc.
+     * @return a list of lags
+     */
     public static List<Integer> getLagsForFreq(String freqStr) {
         return getLagsForFreq(freqStr, 1200);
     }
 
-    private static List<List<Integer>> _make_lags_for_day(float multiple) {
+    private static List<List<Integer>> makeLagsForDay(float multiple) {
         int numCycles = 4;
         List<List<Integer>> ret = new ArrayList<>();
         for (int i = 1; i < numCycles + 1; i++) {
-            ret.add(_make_lags((int) (i * 7 / multiple), 1));
+            ret.add(makeLags((int) (i * 7 / multiple), 1));
         }
-        ret.add(_make_lags((int) (30 / multiple), 1));
+        ret.add(makeLags((int) (30 / multiple), 1));
         return ret;
     }
 
-    private static List<List<Integer>> _make_lags_for_week(float multiple) {
+    private static List<List<Integer>> makeLagsForWeek(float multiple) {
         int numCycles = 3;
         List<List<Integer>> ret = new ArrayList<>();
         for (int i = 1; i < numCycles + 1; i++) {
-            ret.add(_make_lags((int) (i * 52 / multiple), 1));
+            ret.add(makeLags((int) (i * 52 / multiple), 1));
         }
         ret.add(
                 new ArrayList<Integer>() {
@@ -105,7 +113,7 @@ public class Lag {
      * @param delta +/- delta.
      * @return a range between [middle - delta, middle + delta]
      */
-    private static List<Integer> _make_lags(int middle, int delta) {
+    private static List<Integer> makeLags(int middle, int delta) {
         List<Integer> ret = new ArrayList<>();
         for (int i = middle - delta; i < middle + delta + 1; i++) {
             ret.add(i);

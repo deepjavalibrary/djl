@@ -11,7 +11,8 @@
  * and limitations under the License.
  */
 
-package ai.djl.gluonTS.transform;
-
-/** This is a class for utils. */
-public class Utils {}
+/**
+ * Contains transform for {@link ai.djl.gluonTS.GluonTSData} to convert {@link
+ * ai.djl.ndarray.NDArray}.
+ */
+package ai.djl.gluonTS.transform.convert;

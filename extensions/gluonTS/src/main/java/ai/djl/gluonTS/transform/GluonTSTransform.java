@@ -20,6 +20,7 @@ public interface GluonTSTransform {
 
     /**
      * Transform process on GluonTSData.
+     *
      * @param manager The default manager for data process.
      * @param data The data to be operated on.
      * @return The result {@link GluonTSData}.

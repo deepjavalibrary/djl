@@ -34,22 +34,46 @@ public class GluonTSData extends PairList<String, NDArray> {
     private LocalDateTime startTime;
     private LocalDateTime foreCastStartTime;
 
+    /** Constructs an empty {@code GluonTSData}. */
     public GluonTSData() {
         super();
     }
 
+    /**
+     * Constructs an empty {@code GluonTSData} with the specified initial capacity.
+     *
+     * @param initialCapacity the initial capacity of the list
+     * @throws IllegalArgumentException if the specified initial capacity is negative
+     */
     public GluonTSData(int initialCapacity) {
         super(initialCapacity);
     }
 
+    /**
+     * Constructs a {@code GluonTSData} containing the elements of the specified keys and values.
+     *
+     * @param keys the key list containing elements to be placed into this PairList
+     * @param values the value list containing elements to be placed into this PairList
+     * @throws IllegalArgumentException if the keys and values size are different
+     */
     public GluonTSData(List<String> keys, List<NDArray> values) {
         super(keys, values);
     }
 
+    /**
+     * Constructs a {@code GluonTSData} containing the elements of the specified list of Pairs.
+     *
+     * @param list the list containing elements to be placed into this PairList
+     */
     public GluonTSData(List<Pair<String, NDArray>> list) {
         super(list);
     }
 
+    /**
+     * Constructs a {@code GluonTSData} containing the elements of the specified map.
+     *
+     * @param map the map contains keys and values
+     */
     public GluonTSData(Map<String, NDArray> map) {
         super(map);
     }
@@ -70,7 +94,7 @@ public class GluonTSData extends PairList<String, NDArray> {
     /**
      * Get the time series start time.
      *
-     * @return a {@link LocalDateTime} representing start time;
+     * @return a {@link LocalDateTime} representing start time.
      */
     public LocalDateTime getStartTime() {
         return startTime;
@@ -96,7 +120,7 @@ public class GluonTSData extends PairList<String, NDArray> {
     }
 
     /**
-     * Returns the value for the fieldName
+     * Returns the value for the fieldName.
      *
      * @param fieldName the {@link FieldName} of the element to get.
      * @return the {@link NDArray} value for the {@link FieldName}.
@@ -145,7 +169,7 @@ public class GluonTSData extends PairList<String, NDArray> {
     }
 
     /**
-     * Remove the key-value pair for the {@link FieldName}
+     * Remove the key-value pair for the {@link FieldName}.
      *
      * @param fieldName the {@link FieldName} to be removed.
      */

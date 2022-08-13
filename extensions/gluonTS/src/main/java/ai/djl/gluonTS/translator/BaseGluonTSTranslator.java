@@ -1,3 +1,15 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 package ai.djl.gluonTS.translator;
 
 import ai.djl.gluonTS.ForeCast;
@@ -6,15 +18,17 @@ import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /** Built-in {@code Translator} that provides default GluonTSTranslator config process. */
 public abstract class BaseGluonTSTranslator implements Translator<GluonTSData, ForeCast> {
 
     protected int predictionLength;
-    protected int context_length;
+    protected int contextLength;
 
     protected String freq;
+    protected LocalDateTime startTime;
 
     private Batchifier batchifier;
 
@@ -28,7 +42,7 @@ public abstract class BaseGluonTSTranslator implements Translator<GluonTSData, F
         this.freq = builder.freq;
         this.predictionLength = builder.predictionLength;
         // TODO: for inferring
-        this.context_length = builder.predictionLength;
+        this.contextLength = builder.predictionLength;
     }
 
     /** {@inheritDoc} */

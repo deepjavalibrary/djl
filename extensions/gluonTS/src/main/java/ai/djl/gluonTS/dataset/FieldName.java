@@ -39,6 +39,11 @@ public enum FieldName {
 
     TARGET_DIM_INDICATOR;
 
+    /**
+     * Converts the name to lower case.
+     *
+     * @return the String converted to lower case.
+     */
     public String lowerCase() {
         return this.toString().toLowerCase();
     }

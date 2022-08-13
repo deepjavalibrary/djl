@@ -21,7 +21,7 @@ public abstract class ForeCast {
 
     protected LocalDateTime startDate;
     protected int predictionLength;
-    protected NDArray mean = null;
+    protected NDArray mean;
     protected String freq;
 
     /**
@@ -35,6 +35,7 @@ public abstract class ForeCast {
         this.startDate = startDate;
         this.predictionLength = predictionLength;
         this.freq = freq;
+        this.mean = null;
     }
 
     /**
@@ -55,10 +56,20 @@ public abstract class ForeCast {
         return this.quantile(Float.parseFloat(q));
     }
 
+    /**
+     * Computes the median of forecast.
+     *
+     * @return value of the median.
+     */
     public NDArray median() {
         return this.quantile(0.5f);
     }
 
+    /**
+     * Get the prediction frequency like "D", "H"...
+     *
+     * @return the prediction frequency.
+     */
     public String freq() {
         return this.freq;
     }
@@ -66,21 +77,22 @@ public abstract class ForeCast {
     /**
      * Returns the time length of forecast.
      *
-     * @return
+     * @return the prediction length
      */
     public int predictionLength() {
         return predictionLength;
     }
 
     /**
-     * Returns forecast mean
+     * Computes and return the forecast mean.
      *
-     * @return
+     * @return forecast mean
      */
     public NDArray mean() {
         return mean;
     }
 
+    /** Plots the prediction result with {@code Tablesaw}. */
     public void plot() {
         throw new UnsupportedOperationException("plot is not supported yet");
     }

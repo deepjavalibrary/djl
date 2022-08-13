@@ -24,9 +24,10 @@ import ai.djl.ndarray.types.Shape;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Split {
+/** this is a class use to split the time series data of {@link GluonTSData}. */
+public final class Split {
 
-    public Split() {}
+    private Split() {}
 
     /**
      * Selects training instances, by slicing the target and other time series like arrays at random
@@ -102,17 +103,17 @@ public class Split {
                 } else {
                     pastPiece = tsData.get("..., :{}", i);
                 }
-                data.setField(_past(tsField), pastPiece);
+                data.setField(past(tsField), pastPiece);
                 NDArray futureData;
                 if (i + leadTime >= (int) tsData.getShape().tail()) {
-                    // Only for the inference. if create the NDArray by slice the tsData, an unknown error occur
+                    // Only for the inference. if create the NDArray by slice the tsData, an unknown
+                    // error occur
                     futureData = manager.create(new Shape(0));
                 } else {
-                    futureData = tsData.get("..., {}:{}", i + leadTime, i + leadTime + futureLength);
+                    futureData =
+                            tsData.get("..., {}:{}", i + leadTime, i + leadTime + futureLength);
                 }
-                data.setField(
-                        _future(tsField),
-                        futureData);
+                data.setField(future(tsField), futureData);
                 data.remove(tsField);
             }
 
@@ -123,14 +124,14 @@ public class Split {
 
             if (outputNTC) {
                 for (FieldName tsField : sliceCols) {
-                    NDArray past = data.get(_past(tsField));
-                    data.setField(_past(tsField), past.transpose());
-                    NDArray future = data.get(_future(tsField));
-                    data.setField(_future(tsField), future.transpose());
+                    NDArray past = data.get(past(tsField));
+                    data.setField(past(tsField), past.transpose());
+                    NDArray future = data.get(future(tsField));
+                    data.setField(future(tsField), future.transpose());
                 }
             }
 
-            data.setField(_past(isPadField), padIndicator);
+            data.setField(past(isPadField), padIndicator);
 
             // only for freq "D" now
             data.setForeCastStartTime(data.getStartTime().plusDays(i + leadTime));
@@ -199,11 +200,11 @@ public class Split {
                 data);
     }
 
-    private static String _past(FieldName name) {
+    private static String past(FieldName name) {
         return String.format("PAST_%s", name.name());
     }
 
-    private static String _future(FieldName name) {
+    private static String future(FieldName name) {
         return String.format("FUTURE_%s", name.name());
     }
 }

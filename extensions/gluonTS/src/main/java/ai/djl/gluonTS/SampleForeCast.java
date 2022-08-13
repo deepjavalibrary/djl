@@ -25,10 +25,10 @@ public class SampleForeCast extends ForeCast {
     protected static NDManager samplesManger = NDManager.newBaseManager();
 
     private NDArray samples;
-    private String item_id;
+    private String itemId;
     private int numSamples;
 
-    private NDArray sortedSamples = null;
+    private NDArray sortedSamples;
 
     /**
      * Constructs a {@link SampleForeCast}.
@@ -36,15 +36,14 @@ public class SampleForeCast extends ForeCast {
      * @param samples {@link NDArray} array of size (num_samples, prediction_length) (1D case),
      *     (num_samples, prediction_length, target_dim) (multivariate case)
      * @param startDate start of the forecast
-     * @param itemId id
      * @param freq frequency of the forecast.
      */
-    public SampleForeCast(NDArray samples, LocalDateTime startDate, String itemId, String freq) {
+    public SampleForeCast(NDArray samples, LocalDateTime startDate, String freq) {
         super(startDate, (int) samples.getShape().get(1), freq);
         this.samples = samplesManger.create(samples.getShape());
         samples.copyTo(this.samples);
-        this.item_id = itemId;
         this.numSamples = (int) samples.getShape().head();
+        this.sortedSamples = null;
     }
 
     /**
@@ -82,7 +81,7 @@ public class SampleForeCast extends ForeCast {
      * @return a new {@link SampleForeCast}.
      */
     public SampleForeCast copyDIm(int dim) {
-        NDArray samples;
+        NDArray copySamples = null;
         if (this.samples.getShape().dimension() == 2) {
             samples = this.samples;
         } else {
@@ -96,13 +95,14 @@ public class SampleForeCast extends ForeCast {
             samples = this.samples.get(":, :, {}", dim);
         }
 
-        return new SampleForeCast(samples, startDate, item_id, freq);
+        return new SampleForeCast(samples, startDate, freq);
     }
 
+    /** {@inheritDoc}. */
     @Override
     public NDArray mean() {
         if (mean == null) {
-            mean = samples.mean(new int[]{0});
+            mean = samples.mean(new int[] {0});
         }
         return super.mean();
     }

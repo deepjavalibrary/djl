@@ -11,7 +11,5 @@
  * and limitations under the License.
  */
 
-package ai.djl.gluonTS.transform;
-
-/** This is a class for utils. */
-public class Utils {}
+/** Contains transform for {@link ai.djl.gluonTS.GluonTSData} to generate time feature. */
+package ai.djl.gluonTS.transform.feature;

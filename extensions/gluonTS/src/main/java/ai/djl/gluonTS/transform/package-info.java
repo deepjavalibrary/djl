@@ -11,7 +11,5 @@
  * and limitations under the License.
  */
 
+/** Contains transform classes. */
 package ai.djl.gluonTS.transform;
-
-/** This is a class for utils. */
-public class Utils {}

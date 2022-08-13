@@ -11,7 +11,5 @@
  * and limitations under the License.
  */
 
-package ai.djl.gluonTS.transform;
-
-/** This is a class for utils. */
-public class Utils {}
+/** Contains examples of inference with pretrained GluonTS models. */
+package ai.djl.gluonTS.examples;

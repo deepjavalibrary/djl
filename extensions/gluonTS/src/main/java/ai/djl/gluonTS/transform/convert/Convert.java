@@ -22,10 +22,10 @@ import ai.djl.ndarray.NDManager;
 
 import java.util.List;
 
-/** this is a class use to convert the shape of {@link NDArray} in {@link GluonTSData} */
-public class Convert {
+/** this is a class use to convert the shape of {@link NDArray} in {@link GluonTSData}. */
+public final class Convert {
 
-    public Convert() {}
+    private Convert() {}
 
     /**
      * Stack fields together using {@link NDArrays#concat(NDList)}. when hStack = false, axis = 0

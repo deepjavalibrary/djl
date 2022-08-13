@@ -31,7 +31,7 @@ public abstract class InstanceSampler {
     protected int minFuture;
 
     /**
-     * Constructor for {@link InstanceSampler}
+     * Constructor for {@link InstanceSampler}.
      *
      * @param axis the axis of the time series length
      * @param minPast minimal pastime length
@@ -44,7 +44,7 @@ public abstract class InstanceSampler {
     }
 
     /**
-     * get the sampled indices bounds
+     * get the sampled indices bounds.
      *
      * @param ts the time series
      * @return the indices bounds
@@ -57,7 +57,7 @@ public abstract class InstanceSampler {
     }
 
     /**
-     * call the sample process
+     * Call the sample process.
      *
      * @param ts the time series
      * @return list of indices

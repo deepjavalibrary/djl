@@ -1,3 +1,16 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
 package ai.djl.gluonTS.translator;
 
 import ai.djl.gluonTS.ForeCast;
@@ -6,7 +19,8 @@ import ai.djl.gluonTS.SampleForeCast;
 import ai.djl.gluonTS.dataset.FieldName;
 import ai.djl.gluonTS.timeFeature.Lag;
 import ai.djl.gluonTS.timeFeature.TimeFeature;
-import ai.djl.gluonTS.transform.*;
+import ai.djl.gluonTS.transform.InstanceSampler;
+import ai.djl.gluonTS.transform.PredictionSplitSampler;
 import ai.djl.gluonTS.transform.convert.Convert;
 import ai.djl.gluonTS.transform.feature.Feature;
 import ai.djl.gluonTS.transform.field.Field;
@@ -19,7 +33,9 @@ import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.TranslatorContext;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 /** The {@link ai.djl.translate.Translator} for Transformer time series forecasting tasks. */
@@ -64,6 +80,11 @@ public class TransformerTranslator extends BaseGluonTSTranslator {
 
     private final InstanceSampler instanceSampler;
 
+    /**
+     * Constructs a {@link TransformerTranslator} with {@link Builder}.
+     *
+     * @param builder the data to build with
+     */
     public TransformerTranslator(Builder builder) {
         super(builder);
         this.useFeatDynamicReal = builder.useFeatDynamicReal;
@@ -73,7 +94,7 @@ public class TransformerTranslator extends BaseGluonTSTranslator {
 
         this.lagsSeq = Lag.getLagsForFreq(freq);
         this.timeFeatures = TimeFeature.timeFeaturesFromFreqStr(freq);
-        this.historyLength = context_length + lagsSeq.get(lagsSeq.size() - 1);
+        this.historyLength = contextLength + lagsSeq.get(lagsSeq.size() - 1);
         this.instanceSampler = PredictionSplitSampler.newTestSplitSampler();
     }
 
@@ -81,13 +102,14 @@ public class TransformerTranslator extends BaseGluonTSTranslator {
     @Override
     public ForeCast processOutput(TranslatorContext ctx, NDList list) throws Exception {
         NDArray outputs = list.singletonOrThrow();
-        return new SampleForeCast(outputs, LocalDateTime.parse("2011-01-29T00:00"), "0", "D");
+        return new SampleForeCast(outputs, this.startTime, this.freq);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, GluonTSData input) throws Exception {
         NDManager manager = ctx.getNDManager();
+        this.startTime = input.getStartTime();
 
         List<FieldName> removeFieldNames = new ArrayList<>();
         removeFieldNames.add(FieldName.FEAT_DYNAMIC_CAT);
@@ -151,7 +173,7 @@ public class TransformerTranslator extends BaseGluonTSTranslator {
     }
 
     /**
-     * Creates a builder to build a {@code DeepARTranslator}.
+     * Creates a builder to build a {@code TransformerTranslator}.
      *
      * @return a new builder
      */
@@ -160,7 +182,7 @@ public class TransformerTranslator extends BaseGluonTSTranslator {
     }
 
     /**
-     * Creates a builder to build a {@code DeepARTranslator}.
+     * Creates a builder to build a {@code TransformerTranslator}.
      *
      * @param arguments the models' arguments
      * @return a new builder
