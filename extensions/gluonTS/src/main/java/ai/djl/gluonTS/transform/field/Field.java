@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.gluonTS.transform;
+package ai.djl.gluonTS.transform.field;
 
 import ai.djl.gluonTS.GluonTSData;
 import ai.djl.gluonTS.dataset.FieldName;
