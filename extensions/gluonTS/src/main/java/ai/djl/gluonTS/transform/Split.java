@@ -102,9 +102,16 @@ public class Split {
                     pastPiece = tsData.get("..., :{}", i);
                 }
                 data.setField(_past(tsField), pastPiece);
+                NDArray futureData;
+                if (i + leadTime >= (int) tsData.getShape().tail()) {
+                    // Only for the inference. if create the NDArray by slice the tsData, an unknown error occur
+                    futureData = manager.create(new Shape(0));
+                } else {
+                    futureData = tsData.get("..., {}:{}", i + leadTime, i + leadTime + futureLength);
+                }
                 data.setField(
                         _future(tsField),
-                        tsData.get("..., {}:{}", i + leadTime, i + leadTime + futureLength));
+                        futureData);
                 data.remove(tsField);
             }
 
