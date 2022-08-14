@@ -68,11 +68,11 @@ public class MobileNetV2Test {
 
                 NDArray expectedAtIndex0 =
                         manager.ones(new Shape(32, 3, 1, 1)); // 32*3*1*1 for first layer
-                NDArray expectedAtIndex6 =
+                NDArray expectedAtIndex5 =
                         manager.ones(new Shape(32, 32, 1, 1)); // 32*32*1*1 for pointWiseLayer1
-                NDArray expectedAtIndex12 =
+                NDArray expectedAtIndex10 =
                         manager.ones(new Shape(32, 1, 3, 3)); // 32*1*3*3 for depthWiseLayer1
-                NDArray expectedAtIndex312 =
+                NDArray expectedAtIndex260 =
                         manager.ones(
                                 new Shape(
                                         1280, 320, 1,
@@ -81,11 +81,11 @@ public class MobileNetV2Test {
                 Assertions.assertAlmostEquals(
                         parameters.get(0).getValue().getArray(), expectedAtIndex0);
                 Assertions.assertAlmostEquals(
-                        parameters.get(6).getValue().getArray(), expectedAtIndex6);
+                        parameters.get(5).getValue().getArray(), expectedAtIndex5);
                 Assertions.assertAlmostEquals(
-                        parameters.get(12).getValue().getArray(), expectedAtIndex12);
+                        parameters.get(10).getValue().getArray(), expectedAtIndex10);
                 Assertions.assertAlmostEquals(
-                        parameters.get(312).getValue().getArray(), expectedAtIndex312);
+                        parameters.get(260).getValue().getArray(), expectedAtIndex260);
             }
         }
     }
