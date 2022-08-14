@@ -67,7 +67,7 @@ public final class MobileNetV2 {
                 // add a batchNorm
                 .add(BatchNorm.builder().optEpsilon(2E-5f).optMomentum(batchNormMomentum).build())
                 // add a relu
-                .add(Activation.reluBlock())
+                .add(Activation.relu6Block())
                 .add(
                         Conv2d.builder() // DepthWise
                                 .setKernelShape(new Shape(3, 3))
@@ -78,7 +78,7 @@ public final class MobileNetV2 {
                                 .optBias(false)
                                 .build())
                 .add(BatchNorm.builder().optEpsilon(2E-5f).optMomentum(batchNormMomentum).build())
-                .add(Activation.reluBlock())
+                .add(Activation.relu6Block())
                 .add(
                         Conv2d.builder() // PointWise
                                 .setFilters(outputChannels)
@@ -97,7 +97,7 @@ public final class MobileNetV2 {
                                             list.get(1).singletonOrThrow())),
                     Arrays.asList(block, Blocks.identityBlock()));
         }
-        return block; // No reluBlock here
+        return block; // No relu6Block here
     }
 
     /**
@@ -149,7 +149,7 @@ public final class MobileNetV2 {
                                     .optEpsilon(2E-5f)
                                     .optMomentum(builder.batchNormMomentum)
                                     .build())
-                    .add(Activation.reluBlock());
+                    .add(Activation.relu6Block());
         }
 
         List<Block> bottleNecks = new ArrayList<>();
@@ -178,14 +178,13 @@ public final class MobileNetV2 {
                                     .optEpsilon(2E-5f)
                                     .optMomentum(builder.batchNormMomentum)
                                     .build())
-                    .add(Activation.reluBlock());
+                    .add(Activation.relu6Block());
         }
 
         Block conv2 =
                 Conv2d.builder()
                         .setKernelShape(new Shape(1, 1))
                         .setFilters((int) builder.outSize)
-                        .optBias(false)
                         .build();
 
         return mobileNet

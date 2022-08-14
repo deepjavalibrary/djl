@@ -18,7 +18,7 @@ import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.ImageClassificationDataset;
 import ai.djl.basicdataset.cv.classification.ImageNet;
 import ai.djl.basicdataset.cv.classification.Mnist;
-import ai.djl.basicmodelzoo.cv.classification.MobileNetV1;
+import ai.djl.basicmodelzoo.cv.classification.MobileNetV2;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
@@ -133,8 +133,8 @@ public final class ImageClassification {
         Block block;
 
         if (performance.equals(Performance.FAST)) {
-            // for small and fast cases, build a MobileNet
-            block = MobileNetV1.builder().setOutSize(classes.size()).build();
+            // for small and fast cases, build a MobileNetV2
+            block = MobileNetV2.builder().setOutSize(classes.size()).build();
         } else {
             // for large cases, build a ResNet
             block =
