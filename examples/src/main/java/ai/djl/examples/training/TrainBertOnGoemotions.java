@@ -39,6 +39,7 @@ import ai.djl.training.tracker.Tracker;
 import ai.djl.training.tracker.WarmUpTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+
 import java.io.IOException;
 
 /** Example that performs Bert pretraining on the GoEmotions dataset. */
