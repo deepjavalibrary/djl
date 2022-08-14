@@ -2,19 +2,23 @@ package ai.djl.gluonTS.translator;
 
 import ai.djl.gluonTS.ForeCast;
 import ai.djl.gluonTS.GluonTSData;
+import ai.djl.ndarray.NDList;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorContext;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /** Built-in {@code Translator} that provides default GluonTSTranslator config process. */
 public abstract class BaseGluonTSTranslator implements Translator<GluonTSData, ForeCast> {
 
     protected int predictionLength;
-    protected int context_length;
+    protected int contextLength;
 
     protected String freq;
+    protected LocalDateTime startTime;
 
     private Batchifier batchifier;
 
@@ -28,7 +32,7 @@ public abstract class BaseGluonTSTranslator implements Translator<GluonTSData, F
         this.freq = builder.freq;
         this.predictionLength = builder.predictionLength;
         // TODO: for inferring
-        this.context_length = builder.predictionLength;
+        this.contextLength = builder.predictionLength;
     }
 
     /** {@inheritDoc} */

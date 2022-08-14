@@ -80,7 +80,7 @@ public class DeepARTranslator extends BaseGluonTSTranslator {
 
         this.lagsSeq = Lag.getLagsForFreq(freq);
         this.timeFeatures = TimeFeature.timeFeaturesFromFreqStr(freq);
-        this.historyLength = context_length + lagsSeq.get(lagsSeq.size() - 1);
+        this.historyLength = contextLength + lagsSeq.get(lagsSeq.size() - 1);
         this.instanceSampler = PredictionSplitSampler.newTestSplitSampler();
     }
 
@@ -88,13 +88,14 @@ public class DeepARTranslator extends BaseGluonTSTranslator {
     @Override
     public ForeCast processOutput(TranslatorContext ctx, NDList list) throws Exception {
         NDArray outputs = list.singletonOrThrow();
-        return new SampleForeCast(outputs, LocalDateTime.parse("2011-01-29T00:00"), "0", "D");
+        return new SampleForeCast(outputs, this.startTime, this.freq);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, GluonTSData input) throws Exception {
         NDManager manager = ctx.getNDManager();
+        this.startTime = input.getStartTime();
 
         List<FieldName> removeFieldNames = new ArrayList<>();
         removeFieldNames.add(FieldName.FEAT_DYNAMIC_CAT);
@@ -164,10 +165,6 @@ public class DeepARTranslator extends BaseGluonTSTranslator {
 
         input = Field.selectField(manager, PRED_INPUT_FIELDS, input);
 
-        NDList ndList = input.toNDList();
-        for (NDArray array : ndList) {
-            System.out.println(Arrays.toString(array.toFloatArray()));
-        }
         return input.toNDList();
     }
 
