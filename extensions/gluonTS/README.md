@@ -33,3 +33,5 @@ You can build the latest javadocs locally using the following command:
 ```
 
 The javadocs output is built in the `build/doc/javadoc` folder.
+
+Some of our comments refer to gluonts, please check the [GluonTS documentation](https://ts.gluon.ai/stable/) for more information.
