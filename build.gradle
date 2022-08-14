@@ -10,9 +10,6 @@ allprojects {
     version = "${djl_version}" + (isRelease ? "" : "-SNAPSHOT")
 
     repositories {
-//        maven {
-//            url "https://mlrepo.djl.ai/maven/"
-//        }
         mavenCentral()
         maven {
             url 'https://oss.sonatype.org/content/repositories/snapshots/'
@@ -104,7 +101,7 @@ configure(javaProjects()) {
     }
 
     compileTestJava {
-        options.compilerArgs << "-proc:none" << "-Xlint:all,-options,-static" << "-Werror"
+        options.compilerArgs << "-proc:none" << "-Xlint:all,-options,-static,-removal" << "-Werror"
     }
 
     jar {
