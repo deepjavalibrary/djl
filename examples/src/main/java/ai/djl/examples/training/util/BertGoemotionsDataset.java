@@ -22,6 +22,7 @@ import ai.djl.training.dataset.Dataset;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,8 +98,7 @@ public class BertGoemotionsDataset implements Dataset {
             }
             // Create masked instances for training
             maskedInstances =
-                    sentencePairs
-                            .stream()
+                    sentencePairs.stream()
                             .limit(epochLimit)
                             .map(
                                     sentencePair ->
@@ -186,8 +186,7 @@ public class BertGoemotionsDataset implements Dataset {
                 normalizedLines.add(goEmotions.getRawText(i, true));
             }
             List<List<String>> tokens =
-                    normalizedLines
-                            .stream()
+                    normalizedLines.stream()
                             .map(ParsedFile::tokenizeLine)
                             .collect(Collectors.toList());
             return new ParsedFile(normalizedLines, tokens);
