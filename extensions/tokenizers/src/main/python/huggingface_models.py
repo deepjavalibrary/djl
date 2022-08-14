@@ -64,6 +64,12 @@ class HuggingfaceModels:
         ret = []
         for model_info in models:
             model_id = model_info.modelId
+
+            # flair model is not supported yet
+            if "flair" in model_info.tags:
+                logging.info(f"Skip flair model: {model_id}.")
+                continue
+
             is_english = "en" in model_info.tags
             if not is_english:
                 is_english = True
