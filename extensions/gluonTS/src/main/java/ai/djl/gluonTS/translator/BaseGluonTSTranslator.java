@@ -2,11 +2,9 @@ package ai.djl.gluonTS.translator;
 
 import ai.djl.gluonTS.ForeCast;
 import ai.djl.gluonTS.GluonTSData;
-import ai.djl.ndarray.NDList;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
-import ai.djl.translate.TranslatorContext;
 
 import java.time.LocalDateTime;
 import java.util.Map;

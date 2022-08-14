@@ -20,6 +20,7 @@ import ai.djl.gluonTS.translator.TransformerTranslator;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
@@ -68,9 +69,8 @@ public final class TransformerExample {
                 input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
                 NDArray target =
                         model.getNDManager()
-                                .arange(1857f)
-                                .toType(DataType.FLOAT32, false)
-                                .div(1857f);
+                                .randomUniform(0f, 50f, new Shape(1857))
+                                .toType(DataType.FLOAT32, false);
                 input.setField(FieldName.TARGET, target);
                 ForeCast foreCast = predictor.predict(input);
 
