@@ -57,7 +57,7 @@ public final class DeepARExample {
         Criteria<GluonTSData, ForeCast> criteria =
                 Criteria.builder()
                         .setTypes(GluonTSData.class, ForeCast.class)
-                        .optModelPath(Paths.get("src/main/resources/deepar.tar"))
+                        .optModelPath(Paths.get("src/main/resources/trained model/deepar.tar"))
                         .optTranslator(translator)
                         .optProgress(new ProgressBar())
                         .build();
