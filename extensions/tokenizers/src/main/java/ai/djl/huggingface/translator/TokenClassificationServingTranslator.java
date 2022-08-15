@@ -21,7 +21,8 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
 /**
- * A {@link Translator} that can handle generic token classification {@link Input} and {@link Output}.
+ * A {@link Translator} that can handle generic token classification {@link Input} and {@link
+ * Output}.
  */
 public class TokenClassificationServingTranslator implements Translator<Input, Output> {
 
