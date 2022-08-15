@@ -23,7 +23,7 @@ ARCH=$4
 
 if [[ ! -d "libtorch" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
-    if [[ ! "$FLAVOR" =~ ^(cpu|cu102|cu111|cu113)$ ]]; then
+    if [[ ! "$FLAVOR" =~ ^(cpu|cu102|cu111|cu113|cu116)$ ]]; then
       echo "$FLAVOR is not supported."
       exit 1
     fi
@@ -35,7 +35,11 @@ if [[ ! -d "libtorch" ]]; then
     fi
 
   elif [[ $PLATFORM == 'darwin' ]]; then
-    curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip | jar xv
+    if [[ $ARCH == 'aarch64' ]]; then
+      curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-macos-${VERSION}-aarch64.zip | jar xv
+    else
+      curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip | jar xv
+    fi
   else
     echo "$PLATFORM is not supported."
     exit 1

@@ -20,8 +20,10 @@ if (project.hasProperty("cu10")) {
 } else if (project.hasProperty("cu11")) {
     if (VERSION.startsWith("1.8.") || VERSION.startsWith("1.9.")) {
         FLAVOR = "cu111"
-    } else {
+    } else if (VERSION.startsWith("1.10.") || VERSION.startsWith("1.11.")) {
         FLAVOR = "cu113"
+    } else {
+        FLAVOR = "cu116"
     }
 }
 String BINARY_ROOT = "${project.buildDir}/download"
@@ -85,8 +87,10 @@ def prepareNativeLib(String binaryRoot, String ver) {
     String cu11
     if (ver.startsWith("1.8.") || ver.startsWith("1.9.")) {
         cu11 = "cu111"
-    } else {
+    } else if (ver.startsWith("1.10.") || ver.startsWith("1.11.")) {
         cu11 = "cu113"
+    } else {
+        cu11 = "cu116"
     }
 
     def files = [
@@ -101,12 +105,12 @@ def prepareNativeLib(String binaryRoot, String ver) {
     ]
 
     def aarch64Files = [
-            "${ver}/libtorch-shared-with-deps-${ver}-aarch64.zip": "cpu-precxx11/linux-aarch64"
+            "${ver}/libtorch-shared-with-deps-${ver}-aarch64.zip": "cpu-precxx11/linux-aarch64",
+            "${ver}/libtorch-macos-${ver}-aarch64.zip"           : "cpu/osx-aarch64"
     ]
 
     copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
     copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
-
 
     exec {
         commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-x86_64/native/lib/libtorch_cpu.dylib"
@@ -141,9 +145,15 @@ def copyNativeLibToOutputDir(Map<String, String> fileStoreMap, String binaryRoot
             }
             into("${outputDir}/native/lib")
         }
-        if (entry.value.contains("-precxx11") && !entry.value.contains("aarch64")) {
+        if (entry.value.contains("-precxx11")) {
             def libstd = new File("${outputDir}/native/lib/libstdc++.so.6")
-            new URL("https://publish.djl.ai/extra/libstdc%2B%2B.so.6").withInputStream {
+            String stdcUrl;
+            if (entry.value.contains("aarch64")) {
+                stdcUrl = "https://publish.djl.ai/extra/aarch64/libstdc%2B%2B.so.6"
+            } else {
+                stdcUrl = "https://publish.djl.ai/extra/libstdc%2B%2B.so.6"
+            }
+            new URL(stdcUrl).withInputStream {
                 i -> libstd.withOutputStream { it << i }
             }
         }
@@ -260,14 +270,15 @@ task uploadS3 {
         def f = new File("${BINARY_ROOT}/files.txt")
         def uploadDirs = [
                 "${BINARY_ROOT}/cpu/linux-x86_64/native/lib/",
+                "${BINARY_ROOT}/cpu/osx-aarch64/native/lib/",
                 "${BINARY_ROOT}/cpu/osx-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu/win-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-aarch64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu102/linux/native/lib/",
-                "${BINARY_ROOT}/cu113/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu113/win-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu113-precxx11/linux-x86_64/native/lib/"
+                "${BINARY_ROOT}/cu102/linux-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu116/linux-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu116/win-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu116-precxx11/linux-x86_64/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
@@ -389,3 +400,4 @@ clean.doFirst {
     delete "${project.projectDir}/jnilib"
     delete "${project.projectDir.getParent()}/pytorch-jni/jnilib"
 }
+
