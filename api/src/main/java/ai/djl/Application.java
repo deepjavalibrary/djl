@@ -82,6 +82,8 @@ public class Application {
                 return NLP.MACHINE_TRANSLATION;
             case "nlp/multiple_choice":
                 return NLP.MULTIPLE_CHOICE;
+            case "nlp/text_embedding":
+                return NLP.TEXT_EMBEDDING;
             case "tabular":
                 return Tabular.ANY;
             case "tabular/linear_regression":
