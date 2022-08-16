@@ -90,10 +90,14 @@ class HuggingfaceModels:
             with open(config) as f:
                 config = json.load(f)
 
-            task, architecture = self.to_supported_task(config)
-            if not task:
-                logging.info(f"Unsupported model architecture: {architecture}")
-                continue
+            if "sentence-similarity" in model_info.tags:
+                task = "sentence-similarity"
+            else:
+                task, architecture = self.to_supported_task(config)
+                if not task:
+                    logging.info(
+                        f"Unsupported model architecture: {architecture}")
+                    continue
 
             model = {
                 "model_info": model_info,
