@@ -29,3 +29,5 @@ jobs:
         working-directory: engines/pytorch/pytorch-native
         run: |
           ./gradlew uploadS3
+          PYTORCH_VERSION=$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/*"
