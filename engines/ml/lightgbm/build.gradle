@@ -15,7 +15,6 @@ dependencies {
 publishing {
     publications {
         maven(MavenPublication) {
-            artifactId "lightgbm-engine"
             pom {
                 name = "DJL Engine Adapter for LightGBM"
                 description = "Deep Java Library (DJL) Engine Adapter for LightGBM"
