@@ -43,6 +43,7 @@ public class XgbModelTest {
     @BeforeClass
     public void downloadXGBoostModel() throws IOException {
         TestRequirements.notArm();
+        TestRequirements.notWindows();
 
         Path modelDir = Paths.get("build/model");
         DownloadUtils.download(
@@ -76,23 +77,24 @@ public class XgbModelTest {
 
     @Test
     public void testLoad() throws MalformedModelException, IOException, TranslateException {
-        // TODO: skip for Windows since it is not supported by XGBoost
-        if (!System.getProperty("os.name").startsWith("Win")) {
-            try (Model model = Model.newInstance("XGBoost")) {
-                model.load(Paths.get("build/model"), "regression");
-                Predictor<NDList, NDList> predictor = model.newPredictor(new NoopTranslator());
-                try (NDManager manager = NDManager.newBaseManager()) {
-                    NDArray array = manager.ones(new Shape(10, 13));
-                    NDList output = predictor.predict(new NDList(array));
-                    Assert.assertEquals(output.singletonOrThrow().getDataType(), DataType.FLOAT32);
-                    Assert.assertEquals(output.singletonOrThrow().toFloatArray().length, 10);
-                }
+        TestRequirements.notArm();
+        TestRequirements.notWindows();
+
+        try (Model model = Model.newInstance("XGBoost")) {
+            model.load(Paths.get("build/model"), "regression");
+            Predictor<NDList, NDList> predictor = model.newPredictor(new NoopTranslator());
+            try (NDManager manager = NDManager.newBaseManager()) {
+                NDArray array = manager.ones(new Shape(10, 13));
+                NDList output = predictor.predict(new NDList(array));
+                Assert.assertEquals(output.singletonOrThrow().getDataType(), DataType.FLOAT32);
+                Assert.assertEquals(output.singletonOrThrow().toFloatArray().length, 10);
             }
         }
     }
 
     @Test
     public void testNDArray() {
+        TestRequirements.notArm();
         TestRequirements.notWindows();
 
         try (XgbNDManager manager =
