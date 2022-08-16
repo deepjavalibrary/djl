@@ -74,7 +74,3 @@ class TokenClassificationConverter(HuggingfaceConverter):
             f"pipeline output differs from expected: {pipeline_output}")
 
         return True, None
-
-    def encode_inputs(self, tokenizer):
-        text = self.inputs
-        return tokenizer.encode_plus(text, return_tensors='pt')
