@@ -118,10 +118,4 @@ public final class TfLiteEngine extends Engine {
     public void setRandomSeed(int seed) {
         throw new UnsupportedOperationException("Not supported for TFLite");
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return getEngineName() + ':' + getVersion();
-    }
 }

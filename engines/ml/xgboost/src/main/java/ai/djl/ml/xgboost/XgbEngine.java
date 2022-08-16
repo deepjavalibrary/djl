@@ -140,6 +140,12 @@ public final class XgbEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return getEngineName() + ':' + getVersion();
+        StringBuilder sb = new StringBuilder(200);
+        sb.append(getEngineName()).append(':').append(getVersion()).append(", ");
+        sb.append(getEngineName()).append(':').append(getVersion()).append(", capabilities: [\n");
+        if (hasCapability(StandardCapabilities.CUDA)) {
+            sb.append("\t").append(StandardCapabilities.CUDA).append(",\n"); // NOPMD
+        }
+        return sb.toString();
     }
 }
