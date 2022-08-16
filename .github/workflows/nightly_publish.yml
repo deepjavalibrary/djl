@@ -219,6 +219,7 @@ jobs:
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.10.0 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.11.0 -Psnapshot
+          ./gradlew clean engines:ml:xgboost:publish -Pgpu -Psnapshot 
           ./gradlew clean publish -Psnapshot
           cd bom
           ./gradlew publish -Psnapshot
@@ -232,6 +233,7 @@ jobs:
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.10.0 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.11.0 -P${{ github.event.inputs.mode }}
+          ./gradlew clean engines:ml:xgboost:publish -Pgpu -P${{ github.event.inputs.mode }} 
           ./gradlew clean publish -P${{ github.event.inputs.mode }}
           cd bom
           ./gradlew publish -P${{ github.event.inputs.mode }}
