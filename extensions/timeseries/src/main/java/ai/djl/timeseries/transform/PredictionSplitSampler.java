@@ -44,6 +44,8 @@ public class PredictionSplitSampler extends InstanceSampler {
         List<Integer> ret = new ArrayList<>();
         if (bound[0] < bound[1]) {
             ret.add(bound[1]);
+        } else if (!allowEmptyInterval) {
+            throw new IllegalArgumentException("The start >= end while allowEmptyInterval = False");
         }
         return ret;
     }

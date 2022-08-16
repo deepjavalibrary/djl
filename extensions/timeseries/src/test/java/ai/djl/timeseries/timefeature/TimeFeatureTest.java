@@ -11,5 +11,6 @@
  * and limitations under the License.
  */
 
-/** Contains utils to get time feature from prediction frequency. */
-package ai.djl.timeseries.timeFeature;
+package ai.djl.timeseries.timefeature;
+
+public class TimeFeatureTest {}

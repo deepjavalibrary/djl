@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.timeseries.timeFeature;
+package ai.djl.timeseries.timefeature;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -28,48 +28,35 @@ public final class TimeFeature {
 
     private static final PairList<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>>
             FEATURES_BY_OFFSETS =
-                    new PairList<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>>(
-                            12) {
-                        {
-                            add("Y", Collections.emptyList());
-                            add("Q", Arrays.asList(TimeFeature::monthOfYear));
-                            add("M", Arrays.asList(TimeFeature::monthOfYear));
-                            add(
-                                    "W",
-                                    Arrays.asList(
-                                            TimeFeature::dayOfMonth, TimeFeature::weekOfYear));
-                            add(
-                                    "D",
+                    new PairList<>(
+                            Arrays.asList("Y", "Q", "M", "W", "D", "H", "T", "S"),
+                            Arrays.asList(
+                                    Collections.emptyList(),
+                                    Arrays.asList(TimeFeature::monthOfYear),
+                                    Arrays.asList(TimeFeature::monthOfYear),
+                                    Arrays.asList(TimeFeature::dayOfMonth, TimeFeature::weekOfYear),
                                     Arrays.asList(
                                             TimeFeature::dayOfWeek,
                                             TimeFeature::dayOfMonth,
-                                            TimeFeature::dayOfYear));
-                            add(
-                                    "H",
+                                            TimeFeature::dayOfYear),
                                     Arrays.asList(
                                             TimeFeature::hourOfDay,
                                             TimeFeature::dayOfWeek,
                                             TimeFeature::dayOfMonth,
-                                            TimeFeature::dayOfYear));
-                            add(
-                                    "T",
+                                            TimeFeature::dayOfYear),
                                     Arrays.asList(
                                             TimeFeature::minuteOfHour,
                                             TimeFeature::hourOfDay,
                                             TimeFeature::dayOfWeek,
                                             TimeFeature::dayOfMonth,
-                                            TimeFeature::dayOfYear));
-                            add(
-                                    "T",
+                                            TimeFeature::dayOfYear),
                                     Arrays.asList(
                                             TimeFeature::secondOfMinute,
                                             TimeFeature::minuteOfHour,
                                             TimeFeature::hourOfDay,
                                             TimeFeature::dayOfWeek,
                                             TimeFeature::dayOfMonth,
-                                            TimeFeature::dayOfYear));
-                        }
-                    };
+                                            TimeFeature::dayOfYear)));
 
     private TimeFeature() {}
 

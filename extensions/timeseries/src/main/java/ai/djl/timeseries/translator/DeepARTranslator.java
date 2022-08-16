@@ -20,8 +20,8 @@ import ai.djl.timeseries.ForeCast;
 import ai.djl.timeseries.SampleForeCast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
-import ai.djl.timeseries.timeFeature.Lag;
-import ai.djl.timeseries.timeFeature.TimeFeature;
+import ai.djl.timeseries.timefeature.Lag;
+import ai.djl.timeseries.timefeature.TimeFeature;
 import ai.djl.timeseries.transform.InstanceSampler;
 import ai.djl.timeseries.transform.PredictionSplitSampler;
 import ai.djl.timeseries.transform.convert.Convert;
@@ -33,6 +33,7 @@ import ai.djl.translate.TranslatorContext;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -45,42 +46,19 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
     private final boolean useFeatStaticCat;
 
     private int historyLength;
-    private int numSamples;
 
     private static final List<String> PRED_INPUT_FIELDS =
-            new ArrayList<String>() {
-                {
-                    add(FieldName.FEAT_STATIC_CAT.name());
-                    add(FieldName.FEAT_STATIC_REAL.name());
-                    add("PAST_" + FieldName.FEAT_TIME.name());
-                    add("PAST_" + FieldName.TARGET.name());
-                    add("PAST_" + FieldName.OBSERVED_VALUES.name());
-                    add("FUTURE_" + FieldName.FEAT_TIME.name());
-                    add("PAST_" + FieldName.IS_PAD.name());
-                }
-            };
-    private static final List<String> TRAIN_INPUT_FIELDS =
-            new ArrayList<String>() {
-                {
-                    add(FieldName.FEAT_STATIC_CAT.name());
-                    add(FieldName.FEAT_STATIC_REAL.name());
-                    add("PAST_" + FieldName.FEAT_TIME.name());
-                    add("PAST_" + FieldName.TARGET.name());
-                    add("PAST_" + FieldName.OBSERVED_VALUES.name());
-                    add("PAST_" + FieldName.IS_PAD.name());
-                    add("FUTURE" + FieldName.FEAT_TIME.name());
-                    add("FUTURE" + FieldName.TARGET.name());
-                    add("FUTURE_" + FieldName.OBSERVED_VALUES.name());
-                }
-            };
+            new ArrayList<>(
+                    Arrays.asList(
+                            FieldName.FEAT_STATIC_CAT.name(),
+                            FieldName.FEAT_STATIC_REAL.name(),
+                            "PAST_" + FieldName.FEAT_TIME.name(),
+                            "PAST_" + FieldName.TARGET.name(),
+                            "PAST_" + FieldName.OBSERVED_VALUES.name(),
+                            "FUTURE_" + FieldName.FEAT_TIME.name(),
+                            "PAST_" + FieldName.IS_PAD.name()));
     private static final List<FieldName> TIME_SERIES_FIELDS =
-            new ArrayList<FieldName>() {
-                {
-                    add(FieldName.FEAT_TIME);
-                    add(FieldName.OBSERVED_VALUES);
-                }
-            };
-    private final List<Integer> lagsSeq;
+            new ArrayList<>(Arrays.asList(FieldName.FEAT_TIME, FieldName.OBSERVED_VALUES));
     private final List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeatures;
 
     private final InstanceSampler instanceSampler;
@@ -96,9 +74,7 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         this.useFeatStaticReal = builder.useFeatStaticReal;
         this.useFeatStaticCat = builder.useFeatStaticCat;
 
-        this.numSamples = builder.numSamples;
-
-        this.lagsSeq = Lag.getLagsForFreq(freq);
+        List<Integer> lagsSeq = Lag.getLagsForFreq(freq);
         this.timeFeatures = TimeFeature.timeFeaturesFromFreqStr(freq);
         this.historyLength = contextLength + lagsSeq.get(lagsSeq.size() - 1);
         this.instanceSampler = PredictionSplitSampler.newTestSplitSampler();
@@ -221,7 +197,6 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         private boolean useFeatStaticCat;
 
         // postProcess args
-        private int numSamples;
 
         Builder() {}
 
@@ -249,13 +224,6 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
                             arguments,
                             "use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(),
                             false);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        protected void configPostProcess(Map<String, ?> arguments) {
-            super.configPostProcess(arguments);
-            this.numSamples = ArgumentsUtil.intValue(arguments, "num_samples", 100);
         }
 
         /**

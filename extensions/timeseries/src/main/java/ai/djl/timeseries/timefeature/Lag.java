@@ -11,9 +11,10 @@
  * and limitations under the License.
  */
 
-package ai.djl.timeseries.timeFeature;
+package ai.djl.timeseries.timefeature;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,29 +43,21 @@ public final class Lag {
         } else {
             throw new IllegalArgumentException("invalid frequency: freq now must be D");
         }
-        List<Integer> ret =
-                new ArrayList<Integer>() {
-                    {
-                        for (List<Integer> subList : lags) {
-                            for (Integer lag : subList) {
-                                if (lag > 7 && lag <= lagUb) {
-                                    add(lag);
-                                }
-                            }
-                        }
-                    }
-                };
+        List<Integer> ret = new ArrayList<>();
+        for (List<Integer> subList : lags) {
+            for (Integer lag : subList) {
+                if (lag > 7 && lag <= lagUb) {
+                    ret.add(lag);
+                }
+            }
+        }
         ret = ret.stream().distinct().collect(Collectors.toList());
         ret.sort(Comparator.naturalOrder());
-        ret.addAll(
-                0,
-                new ArrayList<Integer>() {
-                    {
-                        for (int i = 1; i < 8; i++) {
-                            add(i);
-                        }
-                    }
-                });
+        List<Integer> list = new ArrayList<>();
+        for (int i = 1; i < 8; i++) {
+            list.add(i);
+        }
+        ret.addAll(0, list);
         return ret;
     }
 
@@ -96,13 +89,11 @@ public final class Lag {
             ret.add(makeLags((int) (i * 52 / multiple), 1));
         }
         ret.add(
-                new ArrayList<Integer>() {
-                    {
-                        add((int) (4f / multiple));
-                        add((int) (8f / multiple));
-                        add((int) (12f / multiple));
-                    }
-                });
+                new ArrayList<>(
+                        Arrays.asList(
+                                (int) (4f / multiple),
+                                (int) (8f / multiple),
+                                (int) (12f / multiple))));
         return ret;
     }
 

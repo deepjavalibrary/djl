@@ -40,7 +40,7 @@ public final class Split {
      * <p>If the target array is one-dimensional, the resulting instance has shape (len_target). In
      * the multi-dimensional case, the instance has shape (dim, len_target).
      *
-     * <p>target -> past_target and future_target
+     * <p>target -&gt; past_target and future_target
      *
      * <p>The transformation also adds a field 'past_is_pad' that indicates whether values where
      * padded or not. Convention: time axis is always the last axis.
@@ -150,7 +150,7 @@ public final class Split {
      * <p>If the target array is one-dimensional, the resulting instance has shape (len_target). In
      * the multi-dimensional case, the instance has shape (dim, len_target).
      *
-     * <p>target -> past_target and future_target
+     * <p>target -&gt; past_target and future_target
      *
      * <p>The transformation also adds a field 'past_is_pad' that indicates whether values where
      * padded or not. Convention: time axis is always the last axis.

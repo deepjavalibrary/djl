@@ -22,10 +22,7 @@ import java.time.LocalDateTime;
  */
 public class SampleForeCast extends ForeCast {
 
-    protected static NDManager samplesManger = NDManager.newBaseManager();
-
     private NDArray samples;
-    private String itemId;
     private int numSamples;
 
     private NDArray sortedSamples;
@@ -40,6 +37,7 @@ public class SampleForeCast extends ForeCast {
      */
     public SampleForeCast(NDArray samples, LocalDateTime startDate, String freq) {
         super(startDate, (int) samples.getShape().get(1), freq);
+        NDManager samplesManger = NDManager.newBaseManager();
         this.samples = samplesManger.create(samples.getShape());
         samples.copyTo(this.samples);
         this.numSamples = (int) samples.getShape().head();
@@ -81,20 +79,20 @@ public class SampleForeCast extends ForeCast {
      */
     public SampleForeCast copyDim(int dim) {
         NDArray copySamples;
-        if (this.samples.getShape().dimension() == 2) {
-            samples = this.samples;
+        if (samples.getShape().dimension() == 2) {
+            copySamples = samples;
         } else {
-            int targetDim = (int) this.samples.getShape().get(2);
+            int targetDim = (int) samples.getShape().get(2);
             if (dim >= targetDim) {
                 throw new IllegalArgumentException(
                         String.format(
                                 "must set 0 <= dim < target_dim, but got dim=%d, target_dim=%d",
                                 dim, targetDim));
             }
-            samples = this.samples.get(":, :, {}", dim);
+            copySamples = samples.get(":, :, {}", dim);
         }
 
-        return new SampleForeCast(samples, startDate, freq);
+        return new SampleForeCast(copySamples, startDate, freq);
     }
 
     /** {@inheritDoc}. */

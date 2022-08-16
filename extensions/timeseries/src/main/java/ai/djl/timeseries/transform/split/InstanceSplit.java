@@ -116,6 +116,7 @@ public class InstanceSplit implements TimeSeriesTransform {
     }
 
     /** {@inheritDoc}. */
+    @Override
     public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
         return Split.instanceSplit(
                 manager,

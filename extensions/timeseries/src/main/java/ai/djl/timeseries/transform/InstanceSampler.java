@@ -21,7 +21,7 @@ import java.util.List;
  * An InstanceSampler is called with the time series ``ts``, and returns a set of indices at which
  * training instances will be generated.
  *
- * <p>The sampled indices ``i`` satisfy ``a <= i <= b``, where ``a = min_past`` and ``b =
+ * <p>The sampled indices ``i`` satisfy ``a &lt;= i &lt;= b``, where ``a = min_past`` and ``b =
  * ts.shape[axis] - min_future``.
  */
 public abstract class InstanceSampler {

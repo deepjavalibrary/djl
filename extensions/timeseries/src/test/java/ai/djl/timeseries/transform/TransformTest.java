@@ -21,7 +21,7 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
-import ai.djl.timeseries.timeFeature.TimeFeature;
+import ai.djl.timeseries.timefeature.TimeFeature;
 import ai.djl.timeseries.transform.convert.Convert;
 import ai.djl.timeseries.transform.feature.Feature;
 import ai.djl.timeseries.transform.field.Field;

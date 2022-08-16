@@ -12,4 +12,4 @@
  */
 
 /** Contains tests for the timeFeature module. */
-package ai.djl.timeseries.timeFeature;
+package ai.djl.timeseries.timefeature;

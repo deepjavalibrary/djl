@@ -75,18 +75,20 @@ public final class Feature {
             int predictionLength,
             String freq,
             TimeSeriesData data) {
-        if (timeFeatures.size() == 0) {
+        if (timeFeatures.isEmpty()) {
             data.setField(outputField, null);
         }
 
         LocalDateTime start = data.getStartTime();
         int length = targetTransformationLength(data.get(targetField), predictionLength, false);
 
-        String formattedFreq = freq;
+        StringBuilder sb = new StringBuilder();
+        sb.append(freq);
         if (!freq.matches("\\d+.*")) {
-            formattedFreq = "1" + formattedFreq;
+            sb.insert(0, 1);
         }
-        formattedFreq = "P" + formattedFreq;
+        sb.insert(0, "P");
+        String formattedFreq = sb.toString();
 
         TemporalAmount timeFreq;
         if (freq.endsWith("H") || freq.endsWith("T") || freq.endsWith("S")) {
@@ -95,25 +97,18 @@ public final class Feature {
             timeFreq = Period.parse(formattedFreq);
         }
 
-        List<LocalDateTime> index =
-                new ArrayList<LocalDateTime>() {
-                    {
-                        LocalDateTime temp = start;
-                        for (int i = 0; i < length; i++) {
-                            add(temp);
-                            temp = temp.plus(timeFreq);
-                        }
-                    }
-                };
+        List<LocalDateTime> index = new ArrayList<>();
+        LocalDateTime temp = start;
+        for (int i = 0; i < length; i++) {
+            index.add(temp);
+            temp = temp.plus(timeFreq);
+        }
 
-        NDList outputs =
-                new NDList(timeFeatures.size()) {
-                    {
-                        for (BiFunction<NDManager, List<LocalDateTime>, NDArray> f : timeFeatures) {
-                            add(f.apply(manager, index));
-                        }
-                    }
-                };
+        NDList outputs = new NDList(timeFeatures.size());
+        for (BiFunction<NDManager, List<LocalDateTime>, NDArray> f : timeFeatures) {
+            outputs.add(f.apply(manager, index));
+        }
+
         data.setField(outputField, NDArrays.stack(outputs));
         return data;
     }

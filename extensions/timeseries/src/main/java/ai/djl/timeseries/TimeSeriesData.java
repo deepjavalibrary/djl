@@ -80,10 +80,12 @@ public class TimeSeriesData extends PairList<String, NDArray> {
      */
     public NDList toNDList() {
         List<NDArray> arrays = this.values();
-        for (int i = 0; i < arrays.size(); i++) {
-            arrays.get(i).setName("data" + i);
+        int index = 0;
+        for (NDArray array : arrays) {
+            array.setName("data" + index);
+            index++;
         }
-        return new NDList(this.values());
+        return new NDList(arrays);
     }
 
     /**
