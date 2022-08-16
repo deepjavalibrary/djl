@@ -30,8 +30,8 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
     def __init__(self):
         super().__init__()
         self.task = "sentence-similarity"
-        self.application = "nlp/sentence-_similarity"
-        self.translator = "ai.djl.huggingface.translator.SentenceSimilarityTranslatorFactory"
+        self.application = "nlp/text_embedding"
+        self.translator = "ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory"
         self.inputs = "This is an example sentence"
         self.outputs = 0
 
