@@ -124,10 +124,4 @@ public final class LgbmEngine extends Engine {
     public void setRandomSeed(int seed) {
         throw new UnsupportedOperationException("Not supported for LightGBM");
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return getEngineName() + ':' + getVersion();
-    }
 }

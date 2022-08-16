@@ -127,10 +127,4 @@ public final class PpEngine extends Engine {
     public void setRandomSeed(int seed) {
         throw new UnsupportedOperationException("Not supported for PaddlePaddle");
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return getEngineName() + ':' + getVersion();
-    }
 }
