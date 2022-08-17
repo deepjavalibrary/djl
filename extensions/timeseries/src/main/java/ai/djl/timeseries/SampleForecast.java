@@ -17,9 +17,9 @@ import ai.djl.ndarray.NDArray;
 import java.time.LocalDateTime;
 
 /**
- * A {@link ForeCast} object, where the predicted distribution is represented internally as samples.
+ * A {@link Forecast} object, where the predicted distribution is represented internally as samples.
  */
-public class SampleForeCast extends ForeCast {
+public class SampleForecast extends Forecast {
 
     private NDArray samples;
     private int numSamples;
@@ -34,7 +34,7 @@ public class SampleForeCast extends ForeCast {
      * @param startDate start of the forecast
      * @param freq frequency of the forecast
      */
-    public SampleForeCast(NDArray samples, LocalDateTime startDate, String freq) {
+    public SampleForecast(NDArray samples, LocalDateTime startDate, String freq) {
         super(startDate, (int) samples.getShape().get(1), freq);
         this.samples = samples.duplicate();
         this.numSamples = (int) samples.getShape().head();
@@ -72,9 +72,9 @@ public class SampleForeCast extends ForeCast {
      * Returns a new Forecast object with only the selected sub-dimension.
      *
      * @param dim the selected dim
-     * @return a new {@link SampleForeCast}.
+     * @return a new {@link SampleForecast}.
      */
-    public SampleForeCast copyDim(int dim) {
+    public SampleForecast copyDim(int dim) {
         NDArray copySamples;
         if (samples.getShape().dimension() == 2) {
             copySamples = samples;
@@ -89,7 +89,7 @@ public class SampleForeCast extends ForeCast {
             copySamples = samples.get(":, :, {}", dim);
         }
 
-        return new SampleForeCast(copySamples, startDate, freq);
+        return new SampleForecast(copySamples, startDate, freq);
     }
 
     /** {@inheritDoc}. */

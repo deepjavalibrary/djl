@@ -19,7 +19,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.timeseries.ForeCast;
+import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.timeseries.translator.TransformerTranslator;
@@ -54,16 +54,16 @@ public final class TransformerTimeSeries {
         arguments.put("prediction_length", 28);
         TransformerTranslator.Builder builder = TransformerTranslator.builder(arguments);
         TransformerTranslator translator = builder.build();
-        Criteria<TimeSeriesData, ForeCast> criteria =
+        Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
-                        .setTypes(TimeSeriesData.class, ForeCast.class)
+                        .setTypes(TimeSeriesData.class, Forecast.class)
                         .optModelUrls(modelUrl)
                         .optTranslator(translator)
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<TimeSeriesData, ForeCast> model = criteria.loadModel();
-                Predictor<TimeSeriesData, ForeCast> predictor = model.newPredictor()) {
+        try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
+                Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
             TimeSeriesData input = new TimeSeriesData(1);
             input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
             NDArray target =
@@ -71,7 +71,7 @@ public final class TransformerTimeSeries {
                             .randomUniform(0f, 50f, new Shape(1857))
                             .toType(DataType.FLOAT32, false);
             input.setField(FieldName.TARGET, target);
-            ForeCast foreCast = predictor.predict(input);
+            Forecast foreCast = predictor.predict(input);
 
             return foreCast.mean().toFloatArray();
         }

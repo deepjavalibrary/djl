@@ -16,8 +16,8 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.timeseries.ForeCast;
-import ai.djl.timeseries.SampleForeCast;
+import ai.djl.timeseries.Forecast;
+import ai.djl.timeseries.SampleForecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.timeseries.timefeature.Lag;
@@ -79,9 +79,9 @@ public class TransformerTranslator extends BaseTimeSeriesTranslator {
 
     /** {@inheritDoc} */
     @Override
-    public ForeCast processOutput(TranslatorContext ctx, NDList list) {
+    public Forecast processOutput(TranslatorContext ctx, NDList list) {
         NDArray outputs = list.singletonOrThrow();
-        return new SampleForeCast(outputs, this.startTime, this.freq);
+        return new SampleForecast(outputs, this.startTime, this.freq);
     }
 
     /** {@inheritDoc} */

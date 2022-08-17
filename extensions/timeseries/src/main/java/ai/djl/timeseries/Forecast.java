@@ -17,7 +17,7 @@ import ai.djl.ndarray.NDArray;
 import java.time.LocalDateTime;
 
 /** An abstract class representing the forecast results for the time series data. */
-public abstract class ForeCast {
+public abstract class Forecast {
 
     protected LocalDateTime startDate;
     protected int predictionLength;
@@ -31,7 +31,7 @@ public abstract class ForeCast {
      * @param predictionLength the time length of prediction
      * @param freq the prediction frequency
      */
-    public ForeCast(LocalDateTime startDate, int predictionLength, String freq) {
+    public Forecast(LocalDateTime startDate, int predictionLength, String freq) {
         this.startDate = startDate;
         this.predictionLength = predictionLength;
         this.freq = freq;

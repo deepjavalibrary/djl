@@ -12,7 +12,7 @@
  */
 package ai.djl.timeseries.translator;
 
-import ai.djl.timeseries.ForeCast;
+import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 /** Built-in {@code Translator} that provides default TimeSeriesTranslator config process. */
-public abstract class BaseTimeSeriesTranslator implements Translator<TimeSeriesData, ForeCast> {
+public abstract class BaseTimeSeriesTranslator implements Translator<TimeSeriesData, Forecast> {
 
     protected int predictionLength;
     protected int contextLength;

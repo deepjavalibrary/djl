@@ -13,7 +13,7 @@
 package ai.djl.timeseries.translator;
 
 import ai.djl.Model;
-import ai.djl.timeseries.ForeCast;
+import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
@@ -31,7 +31,7 @@ public class TransformerTranslatorFactory implements TranslatorFactory {
     /** {@inheritDoc} */
     @Override
     public Set<Pair<Type, Type>> getSupportedTypes() {
-        return Collections.singleton(new Pair<>(TimeSeriesData.class, ForeCast.class));
+        return Collections.singleton(new Pair<>(TimeSeriesData.class, Forecast.class));
     }
 
     /** {@inheritDoc} */
