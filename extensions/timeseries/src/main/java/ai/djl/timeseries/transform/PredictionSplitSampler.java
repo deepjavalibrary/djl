@@ -24,7 +24,7 @@ public class PredictionSplitSampler extends InstanceSampler {
     private boolean allowEmptyInterval;
 
     /**
-     * Constructor for {@link PredictionSplitSampler}.
+     * Constructs a new instance of {@code PredictionSplitSampler}.
      *
      * @param axis the axis of the time series length
      * @param minPast minimal pastime length
@@ -51,16 +51,16 @@ public class PredictionSplitSampler extends InstanceSampler {
     }
 
     /**
-     * Constructs a SplitSampler for test.
+     * Creates a new instance {@code PredictionSplitSampler} for test.
      *
-     * @return a {@link PredictionSplitSampler}
+     * @return a {@code PredictionSplitSampler}
      */
     public static PredictionSplitSampler newTestSplitSampler() {
         return new PredictionSplitSampler(-1, 0, 0, false);
     }
 
     /**
-     * Constructs a SplitSampler for valid.
+     * Creates a new instance {@code PredictionSplitSampler} for validation.
      *
      * @return a {@link PredictionSplitSampler}
      */

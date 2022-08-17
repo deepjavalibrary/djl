@@ -33,11 +33,11 @@ public abstract class BaseTimeSeriesTranslator implements Translator<TimeSeriesD
     private Batchifier batchifier;
 
     /**
-     * Consturcts an TimeSeriesTranslator with the provied builder.
+     * Constructs a new {@code TimeSeriesTranslator} instance with the provided builder.
      *
      * @param builder the data to build with
      */
-    public BaseTimeSeriesTranslator(BaseBuilder<?> builder) {
+    protected BaseTimeSeriesTranslator(BaseBuilder<?> builder) {
         this.batchifier = builder.batchifier;
         this.freq = builder.freq;
         this.predictionLength = builder.predictionLength;

@@ -38,8 +38,8 @@ public class SetField implements TimeSeriesTransform {
     /** {@inheritDoc} */
     @Override
     public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
-        NDArray copyValue = manager.create(value.getShape());
-        value.copyTo(copyValue);
-        return Field.setField(manager, outputField, copyValue, data);
+        NDArray copyValue = value.duplicate();
+        Field.setField(outputField, copyValue, data);
+        return data;
     }
 }

@@ -60,6 +60,7 @@ public class VstackFeatures implements TimeSeriesTransform {
     /** {@inheritDoc} */
     @Override
     public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
-        return Convert.vstackFeatures(manager, outputField, inputFields, dropInputs, hStack, data);
+        Convert.vstackFeatures(outputField, inputFields, dropInputs, hStack, data);
+        return data;
     }
 }

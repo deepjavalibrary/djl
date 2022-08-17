@@ -29,6 +29,7 @@ import ai.djl.timeseries.transform.feature.Feature;
 import ai.djl.timeseries.transform.field.Field;
 import ai.djl.timeseries.transform.split.Split;
 import ai.djl.translate.ArgumentsUtil;
+import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
 import java.time.LocalDateTime;
@@ -38,13 +39,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-/** The {@link ai.djl.translate.Translator} for DeepAR time series forecasting tasks. */
+/** The {@link Translator} for DeepAR time series forecasting tasks. */
 public class DeepARTranslator extends BaseTimeSeriesTranslator {
 
-    private final boolean useFeatDynamicReal;
-    private final boolean useFeatStaticReal;
-    private final boolean useFeatStaticCat;
-
+    private boolean useFeatDynamicReal;
+    private boolean useFeatStaticReal;
+    private boolean useFeatStaticCat;
     private int historyLength;
 
     private static final List<String> PRED_INPUT_FIELDS =
@@ -64,7 +64,7 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
     private final InstanceSampler instanceSampler;
 
     /**
-     * Constructs a {@link DeepARTranslator} with {@link Builder}.
+     * Constructs a new {@code DeepARTranslator} instance.
      *
      * @param builder the data to build with
      */
@@ -82,14 +82,14 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
 
     /** {@inheritDoc} */
     @Override
-    public ForeCast processOutput(TranslatorContext ctx, NDList list) throws Exception {
+    public ForeCast processOutput(TranslatorContext ctx, NDList list) {
         NDArray outputs = list.singletonOrThrow();
         return new SampleForeCast(outputs, this.startTime, this.freq);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList processInput(TranslatorContext ctx, TimeSeriesData input) throws Exception {
+    public NDList processInput(TranslatorContext ctx, TimeSeriesData input) {
         NDManager manager = ctx.getNDManager();
         this.startTime = input.getStartTime();
 
@@ -101,41 +101,31 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         if (!useFeatDynamicReal) {
             removeFieldNames.add(FieldName.FEAT_DYNAMIC_REAL);
         }
-        input = Field.removeFields(manager, removeFieldNames, input);
+        Field.removeFields(removeFieldNames, input);
 
         if (!useFeatStaticCat) {
-            input =
-                    Field.setField(
-                            manager, FieldName.FEAT_STATIC_CAT, manager.zeros(new Shape(1)), input);
+            Field.setField(FieldName.FEAT_STATIC_CAT, manager.zeros(new Shape(1)), input);
         }
 
         if (!useFeatStaticReal) {
-            input =
-                    Field.setField(
-                            manager,
-                            FieldName.FEAT_STATIC_REAL,
-                            manager.zeros(new Shape(1)),
-                            input);
+            Field.setField(FieldName.FEAT_STATIC_REAL, manager.zeros(new Shape(1)), input);
         }
 
-        input =
-                Feature.addObservedValuesIndicator(
-                        manager, FieldName.TARGET, FieldName.OBSERVED_VALUES, input);
+        Feature.addObservedValuesIndicator(
+                manager, FieldName.TARGET, FieldName.OBSERVED_VALUES, input);
 
-        input =
-                Feature.addTimeFeature(
-                        manager,
-                        FieldName.START,
-                        FieldName.TARGET,
-                        FieldName.FEAT_TIME,
-                        timeFeatures,
-                        predictionLength,
-                        freq,
-                        input);
+        Feature.addTimeFeature(
+                manager,
+                FieldName.START,
+                FieldName.TARGET,
+                FieldName.FEAT_TIME,
+                timeFeatures,
+                predictionLength,
+                freq,
+                input);
 
-        input =
-                Feature.addAgeFeature(
-                        manager, FieldName.TARGET, FieldName.FEAT_AGE, predictionLength, input);
+        Feature.addAgeFeature(
+                manager, FieldName.TARGET, FieldName.FEAT_AGE, predictionLength, input);
 
         List<FieldName> inputFields = new ArrayList<>();
         inputFields.add(FieldName.FEAT_TIME);
@@ -143,23 +133,22 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         if (useFeatDynamicReal) {
             inputFields.add(FieldName.FEAT_DYNAMIC_REAL);
         }
-        input = Convert.vstackFeatures(manager, FieldName.FEAT_TIME, inputFields, input);
+        Convert.vstackFeatures(FieldName.FEAT_TIME, inputFields, input);
 
-        input =
-                Split.instanceSplit(
-                        manager,
-                        FieldName.TARGET,
-                        FieldName.IS_PAD,
-                        FieldName.START,
-                        FieldName.FORECAST_START,
-                        instanceSampler,
-                        historyLength,
-                        predictionLength,
-                        TIME_SERIES_FIELDS,
-                        0,
-                        input);
+        Split.instanceSplit(
+                manager,
+                FieldName.TARGET,
+                FieldName.IS_PAD,
+                FieldName.START,
+                FieldName.FORECAST_START,
+                instanceSampler,
+                historyLength,
+                predictionLength,
+                TIME_SERIES_FIELDS,
+                0,
+                input);
 
-        input = Field.selectField(manager, PRED_INPUT_FIELDS, input);
+        input = Field.selectField(PRED_INPUT_FIELDS, input);
 
         return input.toNDList();
     }
@@ -196,8 +185,6 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         private boolean useFeatStaticReal;
         private boolean useFeatStaticCat;
 
-        // postProcess args
-
         Builder() {}
 
         @Override
@@ -209,17 +196,17 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         @Override
         protected void configPreProcess(Map<String, ?> arguments) {
             super.configPreProcess(arguments);
-            this.useFeatDynamicReal =
+            useFeatDynamicReal =
                     ArgumentsUtil.booleanValue(
                             arguments,
                             "use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(),
                             false);
-            this.useFeatStaticCat =
+            useFeatStaticCat =
                     ArgumentsUtil.booleanValue(
                             arguments,
                             "use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(),
                             false);
-            this.useFeatStaticReal =
+            useFeatStaticReal =
                     ArgumentsUtil.booleanValue(
                             arguments,
                             "use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(),

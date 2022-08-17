@@ -13,12 +13,11 @@
 package ai.djl.timeseries;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDManager;
 
 import java.time.LocalDateTime;
 
 /**
- * A {@code Forecast} object, where the predicted distribution is represented internally as samples.
+ * A {@link ForeCast} object, where the predicted distribution is represented internally as samples.
  */
 public class SampleForeCast extends ForeCast {
 
@@ -28,7 +27,7 @@ public class SampleForeCast extends ForeCast {
     private NDArray sortedSamples;
 
     /**
-     * Constructs a {@link SampleForeCast}.
+     * Constructs a {@code SampleForeCast}.
      *
      * @param samples {@link NDArray} array of size (num_samples, prediction_length) (1D case),
      *     (num_samples, prediction_length, target_dim) (multivariate case)
@@ -37,9 +36,7 @@ public class SampleForeCast extends ForeCast {
      */
     public SampleForeCast(NDArray samples, LocalDateTime startDate, String freq) {
         super(startDate, (int) samples.getShape().get(1), freq);
-        NDManager samplesManger = NDManager.newBaseManager();
-        this.samples = samplesManger.create(samples.getShape());
-        samples.copyTo(this.samples);
+        this.samples = samples.duplicate();
         this.numSamples = (int) samples.getShape().head();
     }
 

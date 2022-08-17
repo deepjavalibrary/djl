@@ -65,7 +65,7 @@ public final class Lag {
      * Generates a list of lags that are appropriate for the given frequency string. Set the lagUb
      * to default value 1200.
      *
-     * @param freqStr Frequency string of the form [multiple][granularity] such as "12H", "1D" etc.
+     * @param freqStr Frequency string of the form [multiple][granularity] such as "12H", "1D" etc
      * @return a list of lags
      */
     public static List<Integer> getLagsForFreq(String freqStr) {
@@ -98,10 +98,10 @@ public final class Lag {
     }
 
     /**
-     * Create a set of lags around a middle point including +/- delta.
+     * Creates a set of lags around a middle point including +/- delta.
      *
-     * @param middle middle point
-     * @param delta +/- delta.
+     * @param middle the middle point
+     * @param delta the delta
      * @return a range between [middle - delta, middle + delta]
      */
     private static List<Integer> makeLags(int middle, int delta) {

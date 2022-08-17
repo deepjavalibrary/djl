@@ -25,7 +25,7 @@ public abstract class ForeCast {
     protected String freq;
 
     /**
-     * Constructs a Forecast, during the post-processing.
+     * Constructs a {@code Forecast} instance.
      *
      * @param startDate the time series start date
      * @param predictionLength the time length of prediction

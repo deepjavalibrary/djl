@@ -37,6 +37,7 @@ public class AddObservedValuesIndicator implements TimeSeriesTransform {
     /** {@inheritDoc} */
     @Override
     public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
-        return Feature.addObservedValuesIndicator(manager, targetField, outputField, data);
+        Feature.addObservedValuesIndicator(manager, targetField, outputField, data);
+        return data;
     }
 }

@@ -16,7 +16,6 @@ package ai.djl.timeseries.transform.convert;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 
@@ -31,16 +30,13 @@ public final class Convert {
      * Stack fields together using {@link NDArrays#concat(NDList)}. when hStack = false, axis = 0
      * Otherwise axis = 1.
      *
-     * @param manager default {@link NDManager}
      * @param outputField Field names to use for the output
      * @param inputFields Fields to stack together
      * @param dropInputs If set to true the input fields will be dropped
      * @param hStack To stack horizontally instead of vertically
      * @param data the {@link TimeSeriesData} to operate on
-     * @return the result {@link TimeSeriesData}
      */
-    public static TimeSeriesData vstackFeatures(
-            NDManager manager,
+    public static void vstackFeatures(
             FieldName outputField,
             List<FieldName> inputFields,
             boolean dropInputs,
@@ -63,24 +59,19 @@ public final class Convert {
                 }
             }
         }
-        return data;
     }
 
     /**
-     * Stack fields together using {@link NDArrays#concat(NDList)}. set hStack = false, dropInputs =
-     * true
+     * Stack fields together using {@link NDArrays#concat(NDList)}.
      *
-     * @param manager default {@link NDManager}
+     * <p>set hStack = false, dropInputs = true
+     *
      * @param outputField Field names to use for the output
      * @param inputFields Fields to stack together
      * @param data the {@link TimeSeriesData} to operate on
-     * @return the result {@link TimeSeriesData}
      */
-    public static TimeSeriesData vstackFeatures(
-            NDManager manager,
-            FieldName outputField,
-            List<FieldName> inputFields,
-            TimeSeriesData data) {
-        return vstackFeatures(manager, outputField, inputFields, true, false, data);
+    public static void vstackFeatures(
+            FieldName outputField, List<FieldName> inputFields, TimeSeriesData data) {
+        vstackFeatures(outputField, inputFields, true, false, data);
     }
 }

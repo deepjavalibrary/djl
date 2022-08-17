@@ -31,7 +31,7 @@ public abstract class InstanceSampler {
     protected int minFuture;
 
     /**
-     * Constructor for {@link InstanceSampler}.
+     * Constructs a new instance of {@code InstanceSampler}.
      *
      * @param axis the axis of the time series length
      * @param minPast minimal pastime length
@@ -44,10 +44,10 @@ public abstract class InstanceSampler {
     }
 
     /**
-     * get the sampled indices bounds.
+     * Returns the sampled indices bounds.
      *
      * @param ts the time series
-     * @return the indices bounds
+     * @return the indices bound
      */
     public int[] getBounds(NDArray ts) {
         int start = this.minPast;

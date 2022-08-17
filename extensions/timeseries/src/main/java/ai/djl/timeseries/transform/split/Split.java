@@ -62,9 +62,8 @@ public final class Split {
      *     as the target (default None)
      * @param dummyValue Value to use for padding (default 0.0)
      * @param data the {@link TimeSeriesData} to operate on
-     * @return the result {@link TimeSeriesData}
      */
-    public static TimeSeriesData instanceSplit(
+    public static void instanceSplit(
             NDManager manager,
             FieldName targetField,
             FieldName isPadField,
@@ -136,7 +135,6 @@ public final class Split {
             // only for freq "D" now
             data.setForeCastStartTime(data.getStartTime().plusDays(i + leadTime));
         }
-        return data;
     }
 
     /**
@@ -170,9 +168,8 @@ public final class Split {
      *     as the target (default None)
      * @param dummyValue Value to use for padding (default 0.0)
      * @param data the {@link TimeSeriesData} to operate on
-     * @return the result {@link TimeSeriesData}
      */
-    public static TimeSeriesData instanceSplit(
+    public static void instanceSplit(
             NDManager manager,
             FieldName targetField,
             FieldName isPadField,
@@ -184,7 +181,7 @@ public final class Split {
             List<FieldName> timeSeriesFields,
             float dummyValue,
             TimeSeriesData data) {
-        return instanceSplit(
+        instanceSplit(
                 manager,
                 targetField,
                 isPadField,

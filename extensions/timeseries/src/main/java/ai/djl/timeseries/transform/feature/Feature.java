@@ -42,15 +42,13 @@ public final class Feature {
      * @param targetField Field for which missing values will be replaced
      * @param outputField Field name to use for the indicator
      * @param data the {@link TimeSeriesData} to operate on
-     * @return the result {@link TimeSeriesData}
      */
-    public static TimeSeriesData addObservedValuesIndicator(
+    public static void addObservedValuesIndicator(
             NDManager manager, FieldName targetField, FieldName outputField, TimeSeriesData data) {
         NDArray value = data.get(targetField);
         data.setField(targetField, dummyValueImputation(manager, value, 0f));
         NDArray nanEntries = value.isNaN();
         data.setField(outputField, nanEntries.logicalNot().toType(value.getDataType(), false));
-        return data;
     }
 
     /**
@@ -64,9 +62,8 @@ public final class Feature {
      * @param predictionLength Prediction length
      * @param freq Prediction time frequency
      * @param data the {@link TimeSeriesData} to operate on
-     * @return the result {@link TimeSeriesData}
      */
-    public static TimeSeriesData addTimeFeature(
+    public static void addTimeFeature(
             NDManager manager,
             FieldName startField,
             FieldName targetField,
@@ -110,7 +107,6 @@ public final class Feature {
         }
 
         data.setField(outputField, NDArrays.stack(outputs));
-        return data;
     }
 
     /**
@@ -160,15 +156,14 @@ public final class Feature {
      * @param outputField Field name to use for the output
      * @param predictionLength Prediction length
      * @param data the {@link TimeSeriesData} to operate on
-     * @return the result {@link TimeSeriesData}
      */
-    public static TimeSeriesData addAgeFeature(
+    public static void addAgeFeature(
             NDManager manager,
             FieldName targetField,
             FieldName outputField,
             int predictionLength,
             TimeSeriesData data) {
-        return addAgeFeature(manager, targetField, outputField, predictionLength, true, data);
+        addAgeFeature(manager, targetField, outputField, predictionLength, true, data);
     }
 
     private static int targetTransformationLength(

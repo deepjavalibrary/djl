@@ -24,7 +24,7 @@ public class SelectField implements TimeSeriesTransform {
     private final List<String> inputFields;
 
     /**
-     * Constructs a {@link SelectField}.
+     * Constructs a {@code SelectField} instance.
      *
      * @param inputFields field names to select from
      */
@@ -35,6 +35,6 @@ public class SelectField implements TimeSeriesTransform {
     /** {@inheritDoc} */
     @Override
     public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
-        return Field.selectField(manager, inputFields, data);
+        return Field.selectField(inputFields, data);
     }
 }

@@ -60,7 +60,7 @@ public class AddTimeFeature implements TimeSeriesTransform {
     /** {@inheritDoc} */
     @Override
     public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
-        return Feature.addTimeFeature(
+        Feature.addTimeFeature(
                 manager,
                 startField,
                 targetField,
@@ -69,5 +69,6 @@ public class AddTimeFeature implements TimeSeriesTransform {
                 predictionLength,
                 freq,
                 data);
+        return data;
     }
 }

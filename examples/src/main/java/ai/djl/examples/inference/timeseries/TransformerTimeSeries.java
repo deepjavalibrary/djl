@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.timeseries;
 
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Map;
@@ -45,12 +44,12 @@ public final class TransformerTimeSeries {
 
     public static void main(String[] args) throws IOException, TranslateException, ModelException {
         logger.info("model: Transformer");
-        float[] results = TransformerTimeSeries.predict(args);
+        float[] results = TransformerTimeSeries.predict();
         logger.info("Prediction result: {}", Arrays.toString(results));
     }
 
-    public static float[] predict(String[] args)
-            throws IOException, TranslateException, ModelException {
+    public static float[] predict() throws IOException, TranslateException, ModelException {
+        String modelUrl = "https://resources.djl.ai/test-models/mxnet/timeseries/transformer.zip";
         Map<String, Object> arguments = new ConcurrentHashMap<>();
         arguments.put("prediction_length", 28);
         TransformerTranslator.Builder builder = TransformerTranslator.builder(arguments);
@@ -58,24 +57,23 @@ public final class TransformerTimeSeries {
         Criteria<TimeSeriesData, ForeCast> criteria =
                 Criteria.builder()
                         .setTypes(TimeSeriesData.class, ForeCast.class)
-                        .optModelPath(Paths.get("src/test/resources/trained model/transformer.tar"))
+                        .optModelUrls(modelUrl)
                         .optTranslator(translator)
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<TimeSeriesData, ForeCast> model = criteria.loadModel()) {
-            try (Predictor<TimeSeriesData, ForeCast> predictor = model.newPredictor()) {
-                TimeSeriesData input = new TimeSeriesData(1);
-                input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
-                NDArray target =
-                        model.getNDManager()
-                                .randomUniform(0f, 50f, new Shape(1857))
-                                .toType(DataType.FLOAT32, false);
-                input.setField(FieldName.TARGET, target);
-                ForeCast foreCast = predictor.predict(input);
+        try (ZooModel<TimeSeriesData, ForeCast> model = criteria.loadModel();
+                Predictor<TimeSeriesData, ForeCast> predictor = model.newPredictor()) {
+            TimeSeriesData input = new TimeSeriesData(1);
+            input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
+            NDArray target =
+                    model.getNDManager()
+                            .randomUniform(0f, 50f, new Shape(1857))
+                            .toType(DataType.FLOAT32, false);
+            input.setField(FieldName.TARGET, target);
+            ForeCast foreCast = predictor.predict(input);
 
-                return foreCast.mean().toFloatArray();
-            }
+            return foreCast.mean().toFloatArray();
         }
     }
 }

@@ -14,7 +14,6 @@ package ai.djl.timeseries.timefeature;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.util.PairList;
 
 import java.time.LocalDateTime;
@@ -22,41 +21,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /** this is a class to generate time feature by frequency. */
 public final class TimeFeature {
 
     private static final PairList<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>>
-            FEATURES_BY_OFFSETS =
-                    new PairList<>(
-                            Arrays.asList("Y", "Q", "M", "W", "D", "H", "T", "S"),
-                            Arrays.asList(
-                                    Collections.emptyList(),
-                                    Arrays.asList(TimeFeature::monthOfYear),
-                                    Arrays.asList(TimeFeature::monthOfYear),
-                                    Arrays.asList(TimeFeature::dayOfMonth, TimeFeature::weekOfYear),
-                                    Arrays.asList(
-                                            TimeFeature::dayOfWeek,
-                                            TimeFeature::dayOfMonth,
-                                            TimeFeature::dayOfYear),
-                                    Arrays.asList(
-                                            TimeFeature::hourOfDay,
-                                            TimeFeature::dayOfWeek,
-                                            TimeFeature::dayOfMonth,
-                                            TimeFeature::dayOfYear),
-                                    Arrays.asList(
-                                            TimeFeature::minuteOfHour,
-                                            TimeFeature::hourOfDay,
-                                            TimeFeature::dayOfWeek,
-                                            TimeFeature::dayOfMonth,
-                                            TimeFeature::dayOfYear),
-                                    Arrays.asList(
-                                            TimeFeature::secondOfMinute,
-                                            TimeFeature::minuteOfHour,
-                                            TimeFeature::hourOfDay,
-                                            TimeFeature::dayOfWeek,
-                                            TimeFeature::dayOfMonth,
-                                            TimeFeature::dayOfYear)));
+            FEATURES_BY_OFFSETS = init();
 
     private TimeFeature() {}
 
@@ -68,10 +39,8 @@ public final class TimeFeature {
      * @return the result feature
      */
     public static NDArray secondOfMinute(NDManager manager, List<LocalDateTime> index) {
-        return manager.create(index.stream().mapToInt(LocalDateTime::getSecond).toArray())
-                .toType(DataType.FLOAT32, false)
-                .divi(59f)
-                .subi(0.5);
+        float[] data = getFeature(index, LocalDateTime::getSecond);
+        return manager.create(data).divi(59f).subi(0.5);
     }
 
     /**
@@ -82,10 +51,8 @@ public final class TimeFeature {
      * @return the result feature
      */
     public static NDArray minuteOfHour(NDManager manager, List<LocalDateTime> index) {
-        return manager.create(index.stream().mapToInt(LocalDateTime::getMinute).toArray())
-                .toType(DataType.FLOAT32, false)
-                .divi(59f)
-                .subi(0.5);
+        float[] data = getFeature(index, LocalDateTime::getMinute);
+        return manager.create(data).divi(59f).subi(0.5);
     }
 
     /**
@@ -96,10 +63,8 @@ public final class TimeFeature {
      * @return the result feature
      */
     public static NDArray hourOfDay(NDManager manager, List<LocalDateTime> index) {
-        return manager.create(index.stream().mapToInt(LocalDateTime::getHour).toArray())
-                .toType(DataType.FLOAT32, false)
-                .divi(23f)
-                .subi(0.5);
+        float[] data = getFeature(index, LocalDateTime::getHour);
+        return manager.create(data).divi(23f).subi(0.5);
     }
 
     /**
@@ -110,10 +75,8 @@ public final class TimeFeature {
      * @return the result feature
      */
     public static NDArray dayOfWeek(NDManager manager, List<LocalDateTime> index) {
-        return manager.create(index.stream().mapToInt(a -> a.getDayOfWeek().ordinal()).toArray())
-                .toType(DataType.FLOAT32, false)
-                .divi(6f)
-                .subi(0.5);
+        float[] data = getFeature(index, a -> a.getDayOfWeek().ordinal());
+        return manager.create(data).divi(6f).subi(0.5);
     }
 
     /**
@@ -124,11 +87,8 @@ public final class TimeFeature {
      * @return the result feature
      */
     public static NDArray dayOfMonth(NDManager manager, List<LocalDateTime> index) {
-        return manager.create(index.stream().mapToInt(LocalDateTime::getDayOfMonth).toArray())
-                .toType(DataType.FLOAT32, false)
-                .subi(1f)
-                .divi(30f)
-                .subi(0.5f);
+        float[] data = getFeature(index, LocalDateTime::getDayOfMonth);
+        return manager.create(data).subi(1f).divi(30f).subi(0.5f);
     }
 
     /**
@@ -139,11 +99,8 @@ public final class TimeFeature {
      * @return the result feature
      */
     public static NDArray dayOfYear(NDManager manager, List<LocalDateTime> index) {
-        return manager.create(index.stream().mapToInt(LocalDateTime::getDayOfYear).toArray())
-                .toType(DataType.FLOAT32, false)
-                .subi(1f)
-                .divi(365f)
-                .subi(0.5f);
+        float[] data = getFeature(index, LocalDateTime::getDayOfYear);
+        return manager.create(data).subi(1f).divi(365f).subi(0.5f);
     }
 
     /**
@@ -154,11 +111,8 @@ public final class TimeFeature {
      * @return the result feature
      */
     public static NDArray monthOfYear(NDManager manager, List<LocalDateTime> index) {
-        return manager.create(index.stream().mapToInt(LocalDateTime::getMonthValue).toArray())
-                .toType(DataType.FLOAT32, false)
-                .subi(1f)
-                .divi(11f)
-                .subi(0.5);
+        float[] data = getFeature(index, LocalDateTime::getMonthValue);
+        return manager.create(data).subi(1f).divi(11f).subi(0.5);
     }
 
     /**
@@ -172,6 +126,16 @@ public final class TimeFeature {
         throw new UnsupportedOperationException("weekOfYear is not supported yet");
     }
 
+    private static float[] getFeature(
+            List<LocalDateTime> index, Function<LocalDateTime, Number> function) {
+        float[] data = new float[index.size()];
+        int i = 0;
+        for (LocalDateTime time : index) {
+            data[i++] = function.apply(time).floatValue();
+        }
+        return data;
+    }
+
     /**
      * Returns a list of time features that will be appropriate for the given frequency string.
      *
@@ -181,5 +145,39 @@ public final class TimeFeature {
     public static List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeaturesFromFreqStr(
             String freqStr) {
         return FEATURES_BY_OFFSETS.get(freqStr);
+    }
+
+    private static PairList<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>>
+            init() {
+        List<String> keys = Arrays.asList("Y", "Q", "M", "W", "D", "H", "T", "S");
+        List<List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>> values =
+                Arrays.asList(
+                        Collections.emptyList(),
+                        Collections.singletonList(TimeFeature::monthOfYear),
+                        Collections.singletonList(TimeFeature::monthOfYear),
+                        Arrays.asList(TimeFeature::dayOfMonth, TimeFeature::weekOfYear),
+                        Arrays.asList(
+                                TimeFeature::dayOfWeek,
+                                TimeFeature::dayOfMonth,
+                                TimeFeature::dayOfYear),
+                        Arrays.asList(
+                                TimeFeature::hourOfDay,
+                                TimeFeature::dayOfWeek,
+                                TimeFeature::dayOfMonth,
+                                TimeFeature::dayOfYear),
+                        Arrays.asList(
+                                TimeFeature::minuteOfHour,
+                                TimeFeature::hourOfDay,
+                                TimeFeature::dayOfWeek,
+                                TimeFeature::dayOfMonth,
+                                TimeFeature::dayOfYear),
+                        Arrays.asList(
+                                TimeFeature::secondOfMinute,
+                                TimeFeature::minuteOfHour,
+                                TimeFeature::hourOfDay,
+                                TimeFeature::dayOfWeek,
+                                TimeFeature::dayOfMonth,
+                                TimeFeature::dayOfYear));
+        return new PairList<>(keys, values);
     }
 }

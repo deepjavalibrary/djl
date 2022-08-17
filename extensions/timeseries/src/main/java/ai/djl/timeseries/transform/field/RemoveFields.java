@@ -25,7 +25,7 @@ public class RemoveFields implements TimeSeriesTransform {
     private final List<FieldName> fieldNames;
 
     /**
-     * Constructs a {@link RemoveFields}.
+     * Constructs a {@code RemoveFields} instance.
      *
      * @param fieldNames field name to be removed
      */
@@ -36,6 +36,7 @@ public class RemoveFields implements TimeSeriesTransform {
     /** {@inheritDoc} */
     @Override
     public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
-        return Field.removeFields(manager, fieldNames, data);
+        Field.removeFields(fieldNames, data);
+        return data;
     }
 }
