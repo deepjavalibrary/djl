@@ -26,8 +26,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Copy files to S3
-        working-directory: engines/pytorch/pytorch-native
         run: |
-          ./gradlew uploadS3
+          ./gradlew :engines:pytorch:pytorch-native:uploadS3
           PYTORCH_VERSION=$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/*"
