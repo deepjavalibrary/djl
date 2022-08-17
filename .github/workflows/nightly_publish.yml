@@ -286,7 +286,7 @@ jobs:
       gpu_2_instance_id: ${{ steps.create_gpu_2.outputs.action_gpu_instance_id }}
 
   stop-runners:
-    if: always()
+    if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: [ self-hosted, scheduler ]
     needs: [ create-runners, test-aarch64, test-cuda-102, test-cuda-113 ]
     steps:

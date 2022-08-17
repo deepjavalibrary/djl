@@ -253,7 +253,7 @@ jobs:
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
 
   stop-runners:
-    if: always()
+    if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: [ self-hosted, scheduler ]
     needs: [ create-aarch64-runner, build-pytorch-jni-aarch64 ]
     steps:
