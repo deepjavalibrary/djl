@@ -1292,6 +1292,12 @@ public final class JniUtils {
                         eps));
     }
 
+    public static PtNDArray normalize(PtNDArray ndArray, double p, long dim, double eps) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchNNNormalize(ndArray.getHandle(), p, dim, eps));
+    }
+
     public static PtNDArray dropout(PtNDArray ndArray, double prob, boolean training) {
         return new PtNDArray(
                 ndArray.getManager(),

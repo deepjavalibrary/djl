@@ -1021,6 +1021,12 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray normalize(double p, long dim, double eps) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray rotate90(int times, int[] axes) {
         if (axes.length != 2) {
             throw new IllegalArgumentException("Axes must be 2");

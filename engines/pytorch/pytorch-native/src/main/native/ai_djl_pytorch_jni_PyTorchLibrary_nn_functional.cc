@@ -168,6 +168,24 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLayerNorm(
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNNormalize(
+    JNIEnv* env, jobject jthis, jlong jinput, jdouble jp, jlong jdim, jdouble jeps) {
+  API_BEGIN()
+#if defined(__ANDROID__)
+  env->ThrowNew(ENGINE_EXCEPTION_CLASS, "Normalize is not supported on Android.");
+  return 0;
+#else
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jinput);
+  auto options = torch::nn::functional::NormalizeFuncOptions();
+  options.p(jp);
+  options.dim(jdim);
+  options.eps(jeps);
+  const auto* result_ptr = new torch::Tensor(torch::nn::functional::normalize(*tensor_ptr, options));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+#endif
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNDropout(
     JNIEnv* env, jobject jthis, jlong jinput, jdouble probability, jboolean jtraining) {
   API_BEGIN()

@@ -1036,6 +1036,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDArray normalize(double p, long dim, double eps) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray rotate90(int times, int[] axes) {
         throw new UnsupportedOperationException("Not implemented");
     }

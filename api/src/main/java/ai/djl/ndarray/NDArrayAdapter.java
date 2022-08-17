@@ -770,6 +770,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray normalize(double p, long dim, double eps) {
+        return getAlternativeArray().normalize(p, dim, eps);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray rotate90(int times, int[] axes) {
         return getAlternativeArray().rotate90(times, axes);
     }
