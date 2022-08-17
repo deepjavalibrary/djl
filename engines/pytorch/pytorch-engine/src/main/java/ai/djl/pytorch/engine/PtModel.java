@@ -111,7 +111,7 @@ public class PtModel extends BaseModel {
                             "Parameter file not found in: "
                                     + modelDir
                                     + ". If you only specified model path, make sure path name"
-                                    + " matchyour saved model file name.");
+                                    + " match your saved model file name.");
                 }
                 readParameters(paramFile, options);
             }
