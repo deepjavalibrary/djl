@@ -81,14 +81,15 @@ public class TransformerTranslator extends BaseTimeSeriesTranslator {
     @Override
     public Forecast processOutput(TranslatorContext ctx, NDList list) {
         NDArray outputs = list.singletonOrThrow();
-        return new SampleForecast(outputs, this.startTime, this.freq);
+        return new SampleForecast(
+                outputs, ((TimeSeriesData) ctx.getAttachment("input")).getStartTime(), this.freq);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, TimeSeriesData input) {
         NDManager manager = ctx.getNDManager();
-        this.startTime = input.getStartTime();
+        ctx.setAttachment("input", input);
 
         List<FieldName> removeFieldNames = new ArrayList<>();
         removeFieldNames.add(FieldName.FEAT_DYNAMIC_CAT);

@@ -18,7 +18,6 @@ import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 /** Built-in {@code Translator} that provides default TimeSeriesTranslator config process. */
@@ -28,7 +27,6 @@ public abstract class BaseTimeSeriesTranslator implements Translator<TimeSeriesD
     protected int contextLength;
 
     protected String freq;
-    protected LocalDateTime startTime;
 
     private Batchifier batchifier;
 
