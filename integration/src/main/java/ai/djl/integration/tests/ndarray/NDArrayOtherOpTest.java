@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.ndarray.LazyNDArray;
@@ -943,6 +944,21 @@ public class NDArrayOtherOpTest {
                                     })
                             .reshape(new Shape(3, 2, 3));
             Assert.assertEquals(array.oneHot(3), expected);
+        }
+    }
+
+    @Test
+    public void testNormalize() {
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu(), "PyTorch")) {
+            float[][] buf = {
+                {0.2673f, 0.5345f, 0.8018f},
+                {0.4558f, 0.5698f, 0.6838f}
+            };
+            float[] data = {1, 2, 3, 4, 5, 6};
+            NDArray x = manager.create(data, new Shape(2, 3));
+            NDArray expected = manager.create(buf);
+            NDArray ret = x.normalize();
+            Assertions.assertAlmostEquals(ret, expected);
         }
     }
 

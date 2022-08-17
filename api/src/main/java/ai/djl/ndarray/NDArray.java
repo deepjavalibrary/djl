@@ -2718,6 +2718,84 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray mean(int[] axes, boolean keepDims);
 
     /**
+     * Performs Lp normalization of the array over specified dimension.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1, 2, 3, 4, 5, 6}, new Shape(2, 3));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu() float32
+     * [[1., 2., 3.],
+     *  [4., 5., 6.],
+     * ]
+     * jshell&gt; array.normalize();
+     * ND: (2, 3) cpu() float32
+     * [[0.2673, 0.5345, 0.8018],
+     *  [0.4558, 0.5698, 0.6838],
+     * ]
+     * </pre>
+     *
+     * @return the normalized {@code NDArray}
+     */
+    default NDArray normalize() {
+        return normalize(2, 1, 1e-12);
+    }
+
+    /**
+     * Performs Lp normalization of the array over specified dimension.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1, 2, 3, 4, 5, 6}, new Shape(2, 3));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu() float32
+     * [[1., 2., 3.],
+     *  [4., 5., 6.],
+     * ]
+     * jshell&gt; array.normalize(2, 1);
+     * ND: (2, 3) cpu() float32
+     * [[0.2673, 0.5345, 0.8018],
+     *  [0.4558, 0.5698, 0.6838],
+     * ]
+     * </pre>
+     *
+     * @param exponent the exponent value in the norm formulation
+     * @param dim the dimension to reduce
+     * @return the normalized {@code NDArray}
+     */
+    default NDArray normalize(double exponent, long dim) {
+        return normalize(exponent, dim, 1e-12);
+    }
+
+    /**
+     * Performs Lp normalization of the array over specified dimension.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {1, 2, 3, 4, 5, 6}, new Shape(2, 3));
+     * jshell&gt; array;
+     * ND: (2, 2) cpu() float32
+     * [[1., 2., 3.],
+     *  [4., 5., 6.],
+     * ]
+     * jshell&gt; array.normalize(2, 1, 1e-12);
+     * ND: (2, 3) cpu() float32
+     * [[0.2673, 0.5345, 0.8018],
+     *  [0.4558, 0.5698, 0.6838],
+     * ]
+     * </pre>
+     *
+     * @param exponent the exponent value in the norm formulation
+     * @param dim the dimension to reduce
+     * @param eps the small value to avoid division by zero
+     * @return the normalized {@code NDArray}
+     */
+    NDArray normalize(double exponent, long dim, double eps);
+
+    /**
      * Rotates an array by 90 degrees in the plane specified by axes.
      *
      * <p>Rotation direction is from the first towards the second axis.

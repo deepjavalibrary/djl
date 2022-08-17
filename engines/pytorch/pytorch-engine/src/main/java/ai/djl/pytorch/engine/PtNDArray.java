@@ -934,6 +934,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public PtNDArray normalize(double p, long dim, double eps) {
+        return JniUtils.normalize(this, p, dim, eps);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray rotate90(int times, int[] axes) {
         if (axes.length != 2) {
             throw new IllegalArgumentException("Axes must be 2");
