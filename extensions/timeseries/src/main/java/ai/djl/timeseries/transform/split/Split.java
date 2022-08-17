@@ -107,7 +107,9 @@ public final class Split {
                 if (i + leadTime >= (int) tsData.getShape().tail()) {
                     // Only for the inference. if create the NDArray by slice the tsData, an unknown
                     // error occur
-                    futureData = manager.create(new Shape(0));
+                    Shape shape = tsData.getShape();
+                    shape = shape.slice(0, shape.dimension() - 1).add(0);
+                    futureData = manager.create(shape);
                 } else {
                     futureData =
                             tsData.get("..., {}:{}", i + leadTime, i + leadTime + futureLength);
