@@ -56,7 +56,11 @@ public class XgbNDArray extends NDArrayAdapter {
         manager.attachInternal(uid, this);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Returns the native XGBoost Booster pointer.
+     *
+     * @return the pointer
+     */
     public long getHandle() {
         if (handle == null) {
             throw new UnsupportedOperationException(
