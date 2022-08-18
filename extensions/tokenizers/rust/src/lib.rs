@@ -422,9 +422,9 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
         .into();
     let len = max_length as usize;
     let res_strategy = match strategy.as_ref() {
-        "batch_longest" => Ok(PaddingStrategy::BatchLongest),
-        "fixed" => Ok(PaddingStrategy::Fixed(len)),
-        _ => Err("strategy must be one of [batch_longest, fixed]"),
+        "longest" => Ok(PaddingStrategy::BatchLongest),
+        "max_length" => Ok(PaddingStrategy::Fixed(len)),
+        _ => Err("strategy must be one of [longest, max_length]"),
     };
 
     let mut params = PaddingParams::default();
