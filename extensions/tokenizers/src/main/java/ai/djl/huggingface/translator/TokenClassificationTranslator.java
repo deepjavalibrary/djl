@@ -15,6 +15,7 @@ package ai.djl.huggingface.translator;
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
+import ai.djl.modality.nlp.translator.NamedEntity;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
