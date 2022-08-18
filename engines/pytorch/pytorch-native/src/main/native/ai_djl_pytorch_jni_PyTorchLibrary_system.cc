@@ -41,14 +41,20 @@ using namespace torch::autograd::profiler;
 
 JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIsGradMode(JNIEnv* env, jobject jthis) {
   API_BEGIN()
-  return c10::GradMode::is_enabled();
+  #if defined(__ANDROID__)
+      return false;
+  #else
+      return c10::GradMode::is_enabled();
+  #endif
   API_END_RETURN()
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetGradMode(
     JNIEnv* env, jobject jthis, jboolean enable) {
   API_BEGIN()
-  c10::GradMode::set_enabled(enable);
+  #if !defined(__ANDROID__)
+      c10::GradMode::set_enabled(enable);
+  #endif
   API_END()
 }
 

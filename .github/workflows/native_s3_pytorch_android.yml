@@ -33,14 +33,12 @@ jobs:
           export ANDROID_ABI=${{ matrix.format }}
           cd android_pytorch_tmp
           BUILD_LITE_INTERPRETER=0 ./scripts/build_android.sh
+          # PyTorch 1.12.1 padding.h include ATen/native/PadNd.h,
+          # but ATen/native/*.h files are excluded for mobile build.
+          # TODO: Remove it once PyTorch fix this problem.
           cp aten/src/ATen/native/PadNd.h build_android/install/include/ATen/native
           cd build_android
           zip -r ${{ matrix.format }}_native.zip install/include lib
-      - name: Upload pytorch src
-        uses: actions/upload-artifact@v3
-        with:
-          name: pytorch-src-${{ matrix.format }}
-          path: android_pytorch_tmp
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -51,3 +49,8 @@ jobs:
         run: |
           aws s3 cp android_pytorch_tmp/build_android/${{ matrix.format }}_native.zip s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/android_native/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/android_native*"
+      - name: Upload pytorch src
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytorch-src-${{ matrix.format }}
+          path: android_pytorch_tmp
