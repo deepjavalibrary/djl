@@ -15,6 +15,8 @@ package ai.djl.huggingface.translator;
 import ai.djl.Model;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.modality.nlp.translator.NamedEntity;
+import ai.djl.modality.nlp.translator.TokenClassificationServingTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
