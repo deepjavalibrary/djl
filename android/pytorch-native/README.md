@@ -80,7 +80,7 @@ See: [https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/nativ
 
 ```
 # cd into whatever directory holds your djl directory
-export PYTORCH_VERSION=1.11.0
+export PYTORCH_VERSION=1.12.1
 export ANDROID_NDK=${ANDROID_HOME}/ndk/${NDK_VERSION}
 
 # clone PyTorch to local machine
@@ -124,7 +124,7 @@ cd ..
 ./gradlew compileAndroidJNI -Ppt_version=${PYTORCH_VERSION}
 ```
 
-`jnilib/0.18.0/android` folder will be created after build, and shared library will be uploaded to S3 in CI build
+`jnilib/0.19.0/android` folder will be created after build, and shared library will be uploaded to S3 in CI build
 
 ## Build PyTorch android library (.aar) and publish to Sonatype snapshot repo
 
@@ -138,7 +138,7 @@ cd ../../../android
 
 # To avoid download jni from S3, manually copy them
 mkdir -p pytorch-native/jnilib
-cp -r ../engines/pytorch/pytorch-native/jnilib/0.18.0/android/* pytorch-native/jnilib
+cp -r ../engines/pytorch/pytorch-native/jnilib/0.19.0/android/* pytorch-native/jnilib
 
 ./gradlew :pytorch-native:assemble
 # publish to local maven repo (~/.m2 folder)

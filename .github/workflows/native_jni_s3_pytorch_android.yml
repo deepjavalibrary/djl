@@ -7,7 +7,7 @@ jobs:
   build-pytorch-jni-android:
     runs-on: ubuntu-18.04
     env:
-      PYTORCH_VERSION: "1.11.0"
+      PYTORCH_VERSION: "1.12.1"
       NDK_VERSION: "21.1.6352462"
 
     steps:

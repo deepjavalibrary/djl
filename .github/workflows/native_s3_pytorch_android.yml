@@ -10,7 +10,7 @@ jobs:
       matrix:
         format: ["armeabi-v7a", "arm64-v8a", "x86" ,"x86_64"]
     env:
-      PYTORCH_VERSION: "1.11.0"
+      PYTORCH_VERSION: "1.12.1"
       NDK_VERSION: "21.1.6352462"
     steps:
       - uses: actions/checkout@v2
@@ -33,8 +33,14 @@ jobs:
           export ANDROID_ABI=${{ matrix.format }}
           cd android_pytorch_tmp
           BUILD_LITE_INTERPRETER=0 ./scripts/build_android.sh
+          cp aten/src/ATen/native/PadNd.h build_android/install/include/ATen/native
           cd build_android
           zip -r ${{ matrix.format }}_native.zip install/include lib
+      - name: Upload pytorch src
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytorch-src-${{ matrix.format }}
+          path: android_pytorch_tmp
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
