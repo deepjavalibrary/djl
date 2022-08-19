@@ -45,6 +45,7 @@ jar {
                         "ml/dmlc/xgboost4j/java/DMatrix*",
                         "ml/dmlc/xgboost4j/java/NativeLibLoader*",
                         "ml/dmlc/xgboost4j/java/XGBoost*",
+                        "ml/dmlc/xgboost4j/java/Column*",
                         "ml/dmlc/xgboost4j/java/util/*",
                         "ml/dmlc/xgboost4j/gpu/java/*",
                         "ml/dmlc/xgboost4j/LabeledPoint.*",
