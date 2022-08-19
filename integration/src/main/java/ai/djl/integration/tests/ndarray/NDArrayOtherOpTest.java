@@ -12,7 +12,6 @@
  */
 package ai.djl.integration.tests.ndarray;
 
-import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.ndarray.LazyNDArray;
@@ -949,7 +948,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testNormalize() {
-        try (NDManager manager = NDManager.newBaseManager(Device.cpu(), "PyTorch")) {
+        try (NDManager manager = NDManager.newBaseManager()) {
             float[][] buf = {
                 {0.2673f, 0.5345f, 0.8018f},
                 {0.4558f, 0.5698f, 0.6838f}
