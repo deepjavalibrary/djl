@@ -11,6 +11,7 @@ fi
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 
 VERSION=python-v$1
+ARCH=$2
 
 pushd $WORK_DIR
 if [ ! -d "tokenizers" ]; then
@@ -30,9 +31,9 @@ cargo build --manifest-path $RUST_MANIFEST --release
 
 # for nightly ci
 if [[ $PLATFORM == 'darwin' ]]; then
-  mkdir -p build/jnilib/osx-x86_64
-  cp -f rust/target/release/libdjl.dylib build/jnilib/osx-x86_64/libtokenizers.dylib
+  mkdir -p build/jnilib/osx-$ARCH
+  cp -f rust/target/release/libdjl.dylib build/jnilib/osx-$ARCH/libtokenizers.dylib
 elif [[ $PLATFORM == 'linux' ]]; then
-  mkdir -p build/jnilib/linux-x86_64
-  cp -f rust/target/release/libdjl.so build/jnilib/linux-x86_64/libtokenizers.so
+  mkdir -p build/jnilib/linux-$ARCH
+  cp -f rust/target/release/libdjl.so build/jnilib/linux-$ARCH/libtokenizers.so
 fi
