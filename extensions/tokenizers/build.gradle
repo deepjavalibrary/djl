@@ -18,12 +18,14 @@ processResources {
     doLast {
         def url = "https://publish.djl.ai/tokenizers"
         def files = [
-                "win-x86_64/libwinpthread-1.dll": "extra",
-                "win-x86_64/libgcc_s_seh-1.dll" : "extra",
-                "win-x86_64/libstdc%2B%2B-6.dll": "extra",
-                "win-x86_64/tokenizers.dll"     : "${tokenizers_version}/jnilib/${djl_version}",
-                "linux-x86_64/libtokenizers.so" : "${tokenizers_version}/jnilib/${djl_version}",
-                "osx-x86_64/libtokenizers.dylib": "${tokenizers_version}/jnilib/${djl_version}"
+                "win-x86_64/libwinpthread-1.dll" : "extra",
+                "win-x86_64/libgcc_s_seh-1.dll"  : "extra",
+                "win-x86_64/libstdc%2B%2B-6.dll" : "extra",
+                "win-x86_64/tokenizers.dll"      : "${tokenizers_version}/jnilib/${djl_version}",
+                "linux-x86_64/libtokenizers.so"  : "${tokenizers_version}/jnilib/${djl_version}",
+                "linux-aarch64/libtokenizers.so" : "${tokenizers_version}/jnilib/${djl_version}",
+                "osx-x86_64/libtokenizers.dylib" : "${tokenizers_version}/jnilib/${djl_version}",
+                "osx-aarch64/libtokenizers.dylib": "${tokenizers_version}/jnilib/${djl_version}",
         ]
         def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
@@ -66,8 +68,9 @@ task compileJNI {
     doFirst {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
                 || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            def arch = System.properties["os.arch"] == "amd64" ? "x86_64" : System.properties["os.arch"]
             exec {
-                commandLine "bash", "build.sh", "${tokenizers_version}"
+                commandLine "bash", "build.sh", "${tokenizers_version}", arch
             }
         } else {
             exec {
