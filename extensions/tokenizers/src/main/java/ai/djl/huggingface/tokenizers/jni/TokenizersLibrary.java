@@ -53,13 +53,23 @@ public final class TokenizersLibrary {
 
     public native String decode(long tokenizer, long[] ids, boolean addSpecialTokens);
 
+    public native String getTruncationStrategy(long tokenizer);
+
+    public native String getPaddingStrategy(long tokenizer);
+
+    public native int getMaxLength(long tokenizer);
+
+    public native int getStride(long tokenizer);
+
+    public native int getPadToMultipleOf(long tokenizer);
+
     public native void disablePadding(long tokenizer);
 
     public native void setPadding(
-            long tokenizer, long length, String paddingStrategy, long padToMultipleOf);
+            long tokenizer, int maxLength, String paddingStrategy, int padToMultipleOf);
 
     public native void disableTruncation(long tokenizer);
 
     public native void setTruncation(
-            long tokenizer, long maxLength, String truncationStrategy, long stride);
+            long tokenizer, int maxLength, String truncationStrategy, int stride);
 }

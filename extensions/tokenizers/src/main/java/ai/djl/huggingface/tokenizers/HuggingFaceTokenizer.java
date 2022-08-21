@@ -16,6 +16,7 @@ import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.djl.huggingface.tokenizers.jni.LibUtils;
 import ai.djl.huggingface.tokenizers.jni.TokenizersLibrary;
 import ai.djl.modality.nlp.preprocess.Tokenizer;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.util.NativeResource;
 import ai.djl.util.Utils;
 
@@ -37,56 +38,48 @@ import java.util.Map;
 public final class HuggingFaceTokenizer extends NativeResource<Long> implements Tokenizer {
 
     private static final Logger logger = LoggerFactory.getLogger(HuggingFaceTokenizer.class);
-    private static final long DEFAULT_TRUNCATION_LENGTH = 512L;
-    private static final long DEFAULT_PADDING_LENGTH = 0L;
-    private static final long DEFAULT_STRIDE = 0L;
-    private static final long DEFAULT_PAD_TO_MULTIPLE_OF = 0L;
 
     private boolean addSpecialTokens;
-    private TruncationStrategy truncationStrategy;
-    private PaddingStrategy paddingStrategy;
-    private long truncationLength;
-    private long paddingLength;
-    private long stride;
-    private long padToMultipleOf;
+    private TruncationStrategy truncation;
+    private PaddingStrategy padding;
+    private int maxLength;
+    private int stride;
+    private int padToMultipleOf;
+    private int modelMaxLength;
 
     private HuggingFaceTokenizer(long handle, Map<String, String> options) {
         super(handle);
-        this.addSpecialTokens =
-                options == null
-                        || !options.containsKey("addSpecialTokens")
-                        || Boolean.parseBoolean(options.get("addSpecialTokens"));
+        String val = TokenizersLibrary.LIB.getTruncationStrategy(handle);
+        truncation = TruncationStrategy.fromValue(val);
+        val = TokenizersLibrary.LIB.getPaddingStrategy(handle);
+        padding = PaddingStrategy.fromValue(val);
+        maxLength = TokenizersLibrary.LIB.getMaxLength(handle);
+        stride = TokenizersLibrary.LIB.getStride(handle);
+        padToMultipleOf = TokenizersLibrary.LIB.getPadToMultipleOf(handle);
+
         if (options != null) {
-            this.truncationStrategy =
-                    TruncationStrategy.fromValue(
-                            options.getOrDefault("truncationStrategy", "do_not_truncate"));
-            this.paddingStrategy =
-                    PaddingStrategy.fromValue(
-                            options.getOrDefault("paddingStrategy", "do_not_pad"));
-            this.truncationLength =
-                    options.containsKey("maxLength")
-                            ? Long.parseLong(options.get("maxLength"))
-                            : DEFAULT_TRUNCATION_LENGTH;
-            this.paddingLength =
-                    options.containsKey("length")
-                            ? Long.parseLong(options.get("length"))
-                            : DEFAULT_PADDING_LENGTH;
-            this.stride =
-                    options.containsKey("stride")
-                            ? Long.parseLong(options.get("stride"))
-                            : DEFAULT_STRIDE;
-            this.padToMultipleOf =
-                    options.containsKey("padToMultipleOf")
-                            ? Long.parseLong(options.get("padToMultipleOf"))
-                            : DEFAULT_PAD_TO_MULTIPLE_OF;
-            resolvePotentialTruncationAndPaddingConflicts();
-            setTruncation();
-            setPadding();
+            val = options.getOrDefault("addSpecialTokens", "true");
+            addSpecialTokens = Boolean.parseBoolean(val);
+            modelMaxLength = ArgumentsUtil.intValue(options, "modelMaxLength", 512);
+            if (options.containsKey("truncation")) {
+                truncation = TruncationStrategy.fromValue(options.get("truncation"));
+            }
+            if (options.containsKey("padding")) {
+                padding = PaddingStrategy.fromValue(options.get("padding"));
+            }
+            maxLength = ArgumentsUtil.intValue(options, "maxLength", maxLength);
+            stride = ArgumentsUtil.intValue(options, "stride", stride);
+            padToMultipleOf = ArgumentsUtil.intValue(options, "padToMultipleOf", padToMultipleOf);
+        } else {
+            addSpecialTokens = true;
+            modelMaxLength = 512;
         }
+
+        updateTruncationAndPadding();
     }
 
     /**
-     * Create a pre-trained {@code HuggingFaceTokenizer} instance from huggingface hub.
+     * Creates a pre-trained {@code HuggingFaceTokenizer} instance from huggingface hub.
      *
      * @param name the name of the huggingface tokenizer
      * @return a {@code HuggingFaceTokenizer} instance
@@ -347,145 +340,117 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     /**
      * Enables or Disables default truncation behavior for the tokenizer.
      *
-     * @param enableTruncation whether to enable default truncation behavior
+     * @param enabled whether to enable default truncation behavior
      */
-    public void enableTruncation(boolean enableTruncation) {
+    public void setTruncation(boolean enabled) {
         TruncationStrategy strategy =
-                enableTruncation
-                        ? TruncationStrategy.LONGEST_FIRST
-                        : TruncationStrategy.NO_TRUNCATION;
-        enableTruncation(strategy, DEFAULT_TRUNCATION_LENGTH, DEFAULT_STRIDE);
+                enabled ? TruncationStrategy.LONGEST_FIRST : TruncationStrategy.DO_NOT_TRUNCATE;
+        if (strategy != truncation) {
+            truncation = strategy;
+            updateTruncationAndPadding();
+        }
     }
 
     /**
-     * Enables specific truncation behavior for the tokenizer.
+     * Enables truncation to specified length for the tokenizer.
      *
-     * @param truncationStrategy the {@link TruncationStrategy} to use
-     * @param maxLength the maximum length sequences should be truncated to
-     * @param stride the length of the previous first sequence to include in the overflowing
-     *     sequence
+     * @param maxLength truncate to specified length
      */
-    public void enableTruncation(
-            TruncationStrategy truncationStrategy, long maxLength, long stride) {
-        if (this.truncationStrategy == truncationStrategy
-                && this.truncationLength == maxLength
-                && this.stride == stride) {
-            return;
+    public void setTruncation(int maxLength) {
+        truncation = TruncationStrategy.LONGEST_FIRST;
+        this.maxLength = maxLength;
+        updateTruncationAndPadding();
+    }
+
+    /** Enables truncation to only truncate the first item. */
+    public void setTruncateFirstOnly() {
+        if (truncation != TruncationStrategy.ONLY_FIRST) {
+            truncation = TruncationStrategy.ONLY_FIRST;
+            updateTruncationAndPadding();
         }
-        updateTruncationAndPaddingSettings(
-                truncationStrategy,
-                maxLength,
-                stride,
-                this.paddingStrategy,
-                this.paddingLength,
-                this.padToMultipleOf);
-        resolvePotentialTruncationAndPaddingConflicts();
-        setTruncation();
+    }
+
+    /** Enables truncation to only truncate the second item. */
+    public void setTruncateSecondOnly() {
+        if (truncation != TruncationStrategy.ONLY_SECOND) {
+            truncation = TruncationStrategy.ONLY_SECOND;
+            updateTruncationAndPadding();
+        }
     }
 
     /**
      * Enables or Disables default padding behavior for the tokenizer.
      *
-     * @param enablePadding whether to enable default padding behavior
+     * @param enabled whether to enable default padding behavior
      */
-    public void enablePadding(boolean enablePadding) {
-        PaddingStrategy strategy =
-                enablePadding ? PaddingStrategy.LONGEST : PaddingStrategy.NO_PADDING;
-        enablePadding(strategy, DEFAULT_PADDING_LENGTH, DEFAULT_PAD_TO_MULTIPLE_OF);
+    public void setPadding(boolean enabled) {
+        PaddingStrategy p = enabled ? PaddingStrategy.LONGEST : PaddingStrategy.DO_NOT_PAD;
+        if (padding != p) {
+            padding = p;
+            updateTruncationAndPadding();
+        }
     }
 
     /**
-     * Enables specific padding behavior for the tokenizer.
+     * Enables padding to pad to specified length.
      *
-     * @param paddingStrategy the {@link PaddingStrategy} to use
-     * @param length if PaddingStrategy.MAX_LENGTH is used, determines the length sequences are
-     *     padded to
-     * @param padToMultipleOf if non-zero, pads sequences to a multiple of the value
+     * @param maxLength truncate to specified length
+     * @param padToMultipleOf pad the sequence to a multiple of the provided value
      */
-    public void enablePadding(PaddingStrategy paddingStrategy, long length, long padToMultipleOf) {
-        if (this.paddingStrategy == paddingStrategy
-                && this.paddingLength == length
-                && this.padToMultipleOf == padToMultipleOf) {
-            return;
-        }
-        updateTruncationAndPaddingSettings(
-                this.truncationStrategy,
-                this.truncationLength,
-                this.stride,
-                paddingStrategy,
-                length,
-                padToMultipleOf);
-        resolvePotentialTruncationAndPaddingConflicts();
-        setPadding();
+    public void setPadding(int maxLength, int padToMultipleOf) {
+        this.maxLength = maxLength;
+        this.padToMultipleOf = padToMultipleOf;
+        updateTruncationAndPadding();
     }
 
-    private void resolvePotentialTruncationAndPaddingConflicts() {
-        if (this.truncationStrategy == TruncationStrategy.NO_TRUNCATION
-                && this.paddingStrategy == PaddingStrategy.NO_PADDING) {
-            return;
-        }
-        if (TruncationStrategy.NO_TRUNCATION != this.truncationStrategy
-                && this.truncationLength < this.stride) {
-            throw new IllegalArgumentException("maxLength cannot be less than stride");
-        }
-        if (TruncationStrategy.NO_TRUNCATION != this.truncationStrategy
-                && this.padToMultipleOf > 0
-                && this.truncationLength % this.padToMultipleOf != 0) {
-            throw new IllegalArgumentException(
-                    "maxLength and padToMultipleOf are both specified but maxLength is not a"
-                            + " multiple of padToMultipleOf");
-        }
-        if (PaddingStrategy.LONGEST == this.paddingStrategy && this.paddingLength != 0) {
-            logger.warn(
-                    "padding length has no effect when padding strategy \"longest\" is used. Use"
-                            + " padding strategy \"max_length\" to pad to a specific length");
-            this.paddingLength = 0;
-        }
-        if (PaddingStrategy.MAX_LENGTH == this.paddingStrategy && this.paddingLength == 0) {
-            logger.warn(
-                    "padding strategy of \"max_length\" requested with length of 0."
-                            + " Defaulting to padding strategy \"longest\"");
-            this.paddingStrategy = PaddingStrategy.LONGEST;
-        }
-    }
+    /*
+     * See: https://huggingface.co/docs/transformers/pad_truncation
+     */
+    private void updateTruncationAndPadding() {
+        boolean isTruncate = truncation != TruncationStrategy.DO_NOT_TRUNCATE;
+        if (padding == PaddingStrategy.MAX_LENGTH || isTruncate) {
+            if (maxLength == -1) {
+                logger.warn(
+                        "maxLength is not explicitly specified, use modelMaxLength: "
+                                + modelMaxLength);
+                maxLength = modelMaxLength;
+            } else if (maxLength > modelMaxLength) {
+                logger.warn(
+                        "maxLength is greater then modelMaxLength, change to: " + modelMaxLength);
+                maxLength = modelMaxLength;
+            }
 
-    private void setTruncation() {
-        if (TruncationStrategy.NO_TRUNCATION == this.truncationStrategy) {
-            TokenizersLibrary.LIB.disableTruncation(getHandle());
+            if (padding == PaddingStrategy.MAX_LENGTH && isTruncate && padToMultipleOf != 0) {
+                int remainder = maxLength % padToMultipleOf;
+                if (remainder != 0) {
+                    int newMaxLength = maxLength + padToMultipleOf - maxLength % padToMultipleOf;
+                    if (newMaxLength > modelMaxLength) {
+                        newMaxLength -= padToMultipleOf;
+                    }
+                    logger.warn(
+                            "maxLength ("
+                                    + maxLength
+                                    + ") is not a multiple of padToMultipleOf ("
+                                    + padToMultipleOf
+                                    + "), change to: "
+                                    + newMaxLength);
+                    maxLength = newMaxLength;
+                }
+            }
+        }
+
+        if (isTruncate) {
+            TokenizersLibrary.LIB.setTruncation(getHandle(), maxLength, truncation.name(), stride);
         } else {
-            TokenizersLibrary.LIB.setTruncation(
-                    getHandle(),
-                    this.truncationLength,
-                    this.truncationStrategy.getValue(),
-                    this.stride);
+            TokenizersLibrary.LIB.disableTruncation(getHandle());
         }
-    }
 
-    private void setPadding() {
-        if (PaddingStrategy.NO_PADDING == this.paddingStrategy) {
+        if (padding == PaddingStrategy.DO_NOT_PAD) {
             TokenizersLibrary.LIB.disablePadding(getHandle());
         } else {
             TokenizersLibrary.LIB.setPadding(
-                    getHandle(),
-                    this.paddingLength,
-                    this.paddingStrategy.getValue(),
-                    this.padToMultipleOf);
+                    getHandle(), maxLength, padding.name(), padToMultipleOf);
         }
-    }
-
-    private void updateTruncationAndPaddingSettings(
-            TruncationStrategy truncationStrategy,
-            long maxLength,
-            long stride,
-            PaddingStrategy paddingStrategy,
-            long length,
-            long padToMultipleOf) {
-        this.truncationStrategy = truncationStrategy;
-        this.truncationLength = maxLength;
-        this.stride = stride;
-        this.paddingStrategy = paddingStrategy;
-        this.paddingLength = length;
-        this.padToMultipleOf = padToMultipleOf;
     }
 
     private Encoding toEncoding(long encoding) {
@@ -503,65 +468,39 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     /** An enum to represent the different available truncation strategies. */
-    public enum TruncationStrategy {
-        LONGEST_FIRST("longest_first"),
-        ONLY_FIRST("only_first"),
-        ONLY_SECOND("only_second"),
-        NO_TRUNCATION("do_not_truncate");
-
-        private String value;
-
-        TruncationStrategy(String value) {
-            this.value = value;
-        }
-
-        /**
-         * Returns the String representation of the TruncationStrategy type.
-         *
-         * @return the String representation of the TruncationStrategy type
-         */
-        public String getValue() {
-            return this.value;
-        }
+    enum TruncationStrategy {
+        LONGEST_FIRST,
+        ONLY_FIRST,
+        ONLY_SECOND,
+        DO_NOT_TRUNCATE;
 
         /**
          * Converts the String to the matching TruncationStrategy type.
          *
          * @param value the String to convert
-         * @return the matching TruncationStrategy type
+         * @return the matching PaddingStrategy type
          * @throws IllegalArgumentException if the value does not match any TruncationStrategy type
          */
         public static TruncationStrategy fromValue(String value) {
+            if ("true".equals(value)) {
+                return TruncationStrategy.LONGEST_FIRST;
+            } else if ("false".equals(value)) {
+                return TruncationStrategy.DO_NOT_TRUNCATE;
+            }
             for (TruncationStrategy strategy : TruncationStrategy.values()) {
-                if (strategy.getValue().equals(value)) {
+                if (strategy.name().equalsIgnoreCase(value)) {
                     return strategy;
                 }
             }
-            throw new IllegalArgumentException(
-                    String.format("The value [%s] does not match any TruncationStrategy", value));
+            throw new IllegalArgumentException("Invalid TruncationStrategy: " + value);
         }
     }
 
     /** An enum to represent the different available padding strategies. */
-    public enum PaddingStrategy {
-        LONGEST("longest"),
-        MAX_LENGTH("max_length"),
-        NO_PADDING("do_not_pad");
-
-        private String value;
-
-        PaddingStrategy(String value) {
-            this.value = value;
-        }
-
-        /**
-         * Returns the String representation of the PaddingStrategy type.
-         *
-         * @return the String representation of the PaddingStrategy type
-         */
-        public String getValue() {
-            return this.value;
-        }
+    enum PaddingStrategy {
+        LONGEST,
+        MAX_LENGTH,
+        DO_NOT_PAD;
 
         /**
          * Converts the String to the matching PaddingStrategy type.
@@ -571,13 +510,17 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
          * @throws IllegalArgumentException if the value does not match any PaddingStrategy type
          */
         public static PaddingStrategy fromValue(String value) {
+            if ("true".equals(value)) {
+                return PaddingStrategy.LONGEST;
+            } else if ("false".equals(value)) {
+                return PaddingStrategy.DO_NOT_PAD;
+            }
             for (PaddingStrategy strategy : PaddingStrategy.values()) {
-                if (strategy.getValue().equals(value)) {
+                if (strategy.name().equalsIgnoreCase(value)) {
                     return strategy;
                 }
             }
-            throw new IllegalArgumentException(
-                    String.format("The value [%s] does not match any PaddingStrategy", value));
+            throw new IllegalArgumentException("Invalid PaddingStrategy: " + value);
         }
     }
 }

@@ -16,15 +16,13 @@ extern crate tokenizers as tk;
 
 use std::str::FromStr;
 use tk::tokenizer::{EncodeInput, Encoding};
+use tk::utils::padding::{PaddingParams, PaddingStrategy};
+use tk::utils::truncation::{TruncationParams, TruncationStrategy};
 use tk::Tokenizer;
 use tk::{FromPretrainedParameters, Offsets};
-use tk::utils::truncation::{TruncationParams, TruncationStrategy};
-use tk::utils::padding::{PaddingParams, PaddingStrategy};
 
 use jni::objects::{JClass, JMethodID, JObject, JString, JValue, ReleaseMode};
-use jni::sys::{
-    jboolean, jint, jlong, jlongArray, jobjectArray, jsize, jstring, JNI_TRUE,
-};
+use jni::sys::{jboolean, jint, jlong, jlongArray, jobjectArray, jsize, jstring, JNI_TRUE};
 use jni::JNIEnv;
 
 #[no_mangle]
@@ -388,7 +386,9 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     skip_special_tokens: jboolean,
 ) -> jstring {
     let tokenizer = cast_handle::<Tokenizer>(handle);
-    let long_ids = env.get_long_array_elements(ids, ReleaseMode::NoCopyBack).unwrap();
+    let long_ids = env
+        .get_long_array_elements(ids, ReleaseMode::NoCopyBack)
+        .unwrap();
     let long_ids_ptr = long_ids.as_ptr();
     let len = long_ids.size().unwrap() as usize;
     let mut decode_ids: Vec<u32> = Vec::new();
@@ -398,7 +398,9 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
             decode_ids.push(*val as u32);
         }
     }
-    let decoding: String = tokenizer.decode(decode_ids, skip_special_tokens == JNI_TRUE).unwrap();
+    let decoding: String = tokenizer
+        .decode(decode_ids, skip_special_tokens == JNI_TRUE)
+        .unwrap();
     let ret = env
         .new_string(decoding)
         .expect("Couldn't create java string!")
@@ -408,13 +410,113 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 }
 
 #[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getTruncationStrategy(
+    env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) -> jstring {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    let truncation = tokenizer.get_truncation();
+    let strategy = match truncation {
+        Some(val) => val.strategy.as_ref(),
+        None => "DO_NOT_TRUNCATE",
+    };
+
+    let ret = env
+        .new_string(strategy.to_string())
+        .expect("Couldn't create java string!")
+        .into_inner();
+
+    ret
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getPaddingStrategy(
+    env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) -> jstring {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    let padding = tokenizer.get_padding();
+    let strategy = match padding {
+        Some(val) => match val.strategy {
+            PaddingStrategy::BatchLongest => "LONGEST",
+            _ => "MAX_LENGTH",
+        },
+        None => "DO_NOT_PAD",
+    };
+
+    let ret = env
+        .new_string(strategy)
+        .expect("Couldn't create java string!")
+        .into_inner();
+
+    ret
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getMaxLength(
+    _env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) -> jint {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    let truncation = tokenizer.get_truncation();
+    let mut max_length = match truncation {
+        Some(val) => val.max_length as jint,
+        None => -1,
+    };
+    if max_length == -1 {
+        let padding = tokenizer.get_padding();
+        max_length = match padding {
+            Some(param) => match param.strategy {
+                PaddingStrategy::Fixed(i) => i as jint,
+                _ => -1,
+            },
+            _ => -1,
+        };
+    }
+    max_length
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getStride(
+    _env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) -> jint {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    let truncation = tokenizer.get_truncation();
+    let ret = match truncation {
+        Some(val) => val.stride,
+        None => 0,
+    };
+    ret as jint
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getPadToMultipleOf(
+    _env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) -> jint {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    let padding = tokenizer.get_padding();
+    let ret = match padding {
+        Some(val) => val.pad_to_multiple_of.unwrap_or(0),
+        None => 0,
+    };
+    ret as jint
+}
+
+#[no_mangle]
 pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_setPadding(
     env: JNIEnv,
     _: JObject,
     handle: jlong,
-    max_length: jlong,
+    max_length: jint,
     padding_strategy: JString,
-    pad_to_multiple_of: jlong,
+    pad_to_multiple_of: jint,
 ) {
     let strategy: String = env
         .get_string(padding_strategy)
@@ -422,8 +524,8 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
         .into();
     let len = max_length as usize;
     let res_strategy = match strategy.as_ref() {
-        "longest" => Ok(PaddingStrategy::BatchLongest),
-        "max_length" => Ok(PaddingStrategy::Fixed(len)),
+        "LONGEST" => Ok(PaddingStrategy::BatchLongest),
+        "MAX_LENGTH" => Ok(PaddingStrategy::Fixed(len)),
         _ => Err("strategy must be one of [longest, max_length]"),
     };
 
@@ -449,19 +551,19 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     env: JNIEnv,
     _: JObject,
     handle: jlong,
-    truncation_max_length: jlong,
+    truncation_max_length: jint,
     truncation_strategy: JString,
-    truncation_stride: jlong,
+    truncation_stride: jint,
 ) {
     let strategy: String = env
         .get_string(truncation_strategy)
         .expect("Couldn't get java string!")
         .into();
     let res_strategy = match strategy.as_ref() {
-       "longest_first" => Ok(TruncationStrategy::LongestFirst),
-       "only_first" => Ok(TruncationStrategy::OnlyFirst),
-       "only_second" => Ok(TruncationStrategy::OnlySecond),
-       _ => Err("strategy must be one of [longest_first, only_first, only_second]"),
+        "LONGEST_FIRST" => Ok(TruncationStrategy::LongestFirst),
+        "ONLY_FIRST" => Ok(TruncationStrategy::OnlyFirst),
+        "ONLY_SECOND" => Ok(TruncationStrategy::OnlySecond),
+        _ => Err("strategy must be one of [longest_first, only_first, only_second]"),
     };
     let mut params = TruncationParams::default();
     params.max_length = truncation_max_length as usize;
