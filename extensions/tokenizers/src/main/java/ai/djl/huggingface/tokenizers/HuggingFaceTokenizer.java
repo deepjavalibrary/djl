@@ -351,17 +351,6 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         }
     }
 
-    /**
-     * Enables truncation to specified length for the tokenizer.
-     *
-     * @param maxLength truncate to specified length
-     */
-    public void setTruncation(int maxLength) {
-        truncation = TruncationStrategy.LONGEST_FIRST;
-        this.maxLength = maxLength;
-        updateTruncationAndPadding();
-    }
-
     /** Enables truncation to only truncate the first item. */
     public void setTruncateFirstOnly() {
         if (truncation != TruncationStrategy.ONLY_FIRST) {
@@ -392,15 +381,38 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     /**
-     * Enables padding to pad to specified length.
-     *
-     * @param maxLength truncate to specified length
-     * @param padToMultipleOf pad the sequence to a multiple of the provided value
+     * Enables padding to pad sequences to previously specified maxLength, or modelMaxLength if not
+     * specified.
      */
-    public void setPadding(int maxLength, int padToMultipleOf) {
-        this.maxLength = maxLength;
-        this.padToMultipleOf = padToMultipleOf;
-        updateTruncationAndPadding();
+    public void setPaddingMaxLength() {
+        if (padding != PaddingStrategy.MAX_LENGTH) {
+            padding = PaddingStrategy.MAX_LENGTH;
+            updateTruncationAndPadding();
+        }
+    }
+
+    /**
+     * Sets maxLength for padding and truncation.
+     *
+     * @param maxLength the length to truncate and/or pad sequences to
+     */
+    public void setMaxLength(int maxLength) {
+        if (this.maxLength != maxLength) {
+            this.maxLength = maxLength;
+            updateTruncationAndPadding();
+        }
+    }
+
+    /**
+     * Sets padToMultipleOf for padding.
+     *
+     * @param padToMultipleOf the multiple of sequences should be padded to
+     */
+    public void setPadToMultipleOf(int padToMultipleOf) {
+        if (this.padToMultipleOf != padToMultipleOf) {
+            this.padToMultipleOf = padToMultipleOf;
+            updateTruncationAndPadding();
+        }
     }
 
     /*
@@ -468,7 +480,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     /** An enum to represent the different available truncation strategies. */
-    enum TruncationStrategy {
+    private enum TruncationStrategy {
         LONGEST_FIRST,
         ONLY_FIRST,
         ONLY_SECOND,
@@ -481,7 +493,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
          * @return the matching PaddingStrategy type
          * @throws IllegalArgumentException if the value does not match any TruncationStrategy type
          */
-        public static TruncationStrategy fromValue(String value) {
+        static TruncationStrategy fromValue(String value) {
             if ("true".equals(value)) {
                 return TruncationStrategy.LONGEST_FIRST;
             } else if ("false".equals(value)) {
@@ -497,7 +509,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     /** An enum to represent the different available padding strategies. */
-    enum PaddingStrategy {
+    private enum PaddingStrategy {
         LONGEST,
         MAX_LENGTH,
         DO_NOT_PAD;
@@ -509,7 +521,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
          * @return the matching PaddingStrategy type
          * @throws IllegalArgumentException if the value does not match any PaddingStrategy type
          */
-        public static PaddingStrategy fromValue(String value) {
+        static PaddingStrategy fromValue(String value) {
             if ("true".equals(value)) {
                 return PaddingStrategy.LONGEST;
             } else if ("false".equals(value)) {

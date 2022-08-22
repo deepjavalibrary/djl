@@ -153,7 +153,7 @@ public class HuggingFaceTokenizerTest {
     }
 
     @Test
-    public void testTruncationAndPadding() {
+    public void testMaxLengthTruncationAndAllPaddings() {
         List<String> inputs =
                 Arrays.asList(
                         "Hello, y'all! How are you?",
@@ -172,21 +172,83 @@ public class HuggingFaceTokenizerTest {
                             new long[] {101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 102},
                             new long[] {101, 3570, 1110, 170, 21162, 1285, 119, 2750, 4250, 102},
                             new long[] {101, 146, 1821, 2816, 102, 0, 0, 0, 0, 0});
-            List<long[]> expectedAttentionMasksWithTruncationAndPadding =
-                    Arrays.asList(
-                            new long[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                            new long[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                            new long[] {1, 1, 1, 1, 1, 0, 0, 0, 0, 0});
-            Encoding[] encodingsWithTruncationAndPadding = tokenizer.batchEncode(inputs);
-            for (int i = 0; i < encodingsWithTruncationAndPadding.length; ++i) {
+            Encoding[] encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
                 Assert.assertEquals(
-                        encodingsWithTruncationAndPadding[i].getIds(),
-                        expectedIdsWithTruncationAndPadding.get(i));
-                Assert.assertEquals(
-                        encodingsWithTruncationAndPadding[i].getAttentionMask(),
-                        expectedAttentionMasksWithTruncationAndPadding.get(i));
+                        encodings[i].getIds(), expectedIdsWithTruncationAndPadding.get(i));
             }
 
+            List<long[]> expectedIdsWithTruncationAndPaddingToMultiple =
+                    Arrays.asList(
+                            new long[] {101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 102, 0, 0},
+                            new long[] {
+                                101, 3570, 1110, 170, 21162, 1285, 119, 2750, 4250, 102, 0, 0
+                            },
+                            new long[] {101, 146, 1821, 2816, 102, 0, 0, 0, 0, 0, 0, 0});
+            tokenizer.setPadToMultipleOf(3);
+            encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(
+                        encodings[i].getIds(),
+                        expectedIdsWithTruncationAndPaddingToMultiple.get(i));
+            }
+
+            List<long[]> expectedIdsNoPadding =
+                    Arrays.asList(
+                            new long[] {101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 102},
+                            new long[] {101, 3570, 1110, 170, 21162, 1285, 119, 2750, 4250, 102},
+                            new long[] {101, 146, 1821, 2816, 102});
+            tokenizer.setPadding(false);
+            encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(encodings[i].getIds(), expectedIdsNoPadding.get(i));
+            }
+        }
+    }
+
+    @Test
+    public void testMaxModelLengthTruncationAndAllPaddings() {
+        String repeat = "hi,";
+        int numRepeats = 513;
+        int capacity = numRepeats * 3;
+        StringBuilder stringBuilder = new StringBuilder(capacity);
+        for (int i = 0; i < numRepeats; ++i) {
+            stringBuilder.append(repeat);
+        }
+        List<String> inputs = Arrays.asList(stringBuilder.toString(), "This is a short sentence");
+        try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
+            int[] expectedNumberOfIdsNoTruncationNoPadding = new int[] {numRepeats * 2 + 2, 7};
+            Encoding[] encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(
+                        encodings[i].getIds().length, expectedNumberOfIdsNoTruncationNoPadding[i]);
+            }
+
+            tokenizer.setTruncation(true);
+            int[] expectedNumberOfIdsDefaultTruncationNoPadding = new int[] {512, 7};
+            encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(
+                        encodings[i].getIds().length,
+                        expectedNumberOfIdsDefaultTruncationNoPadding[i]);
+            }
+
+            tokenizer.setPadding(true);
+            encodings = tokenizer.batchEncode(inputs);
+            for (Encoding encoding : encodings) {
+                Assert.assertEquals(encoding.getIds().length, 512);
+            }
+        }
+    }
+
+    @Test
+    public void testNoTruncationAndAllPaddings() {
+        List<String> inputs =
+                Arrays.asList(
+                        "Hello, y'all! How are you?",
+                        "Today is a sunny day. Good weather I'd say",
+                        "I am happy");
+        try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
             List<long[]> expectedIdsNoTruncationOrPadding =
                     Arrays.asList(
                             new long[] {
@@ -197,51 +259,13 @@ public class HuggingFaceTokenizerTest {
                                 1474, 102
                             },
                             new long[] {101, 146, 1821, 2816, 102});
-            List<long[]> expectedAttentionMasksNoTruncationOrPadding =
-                    Arrays.asList(
-                            new long[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                            new long[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                            new long[] {1, 1, 1, 1, 1});
 
-            tokenizer.setTruncation(false);
-            tokenizer.setPadding(false);
-            Encoding[] encodingsNoTruncationOrPadding = tokenizer.batchEncode(inputs);
-            for (int i = 0; i < encodingsNoTruncationOrPadding.length; ++i) {
-                Assert.assertEquals(
-                        encodingsNoTruncationOrPadding[i].getIds(),
-                        expectedIdsNoTruncationOrPadding.get(i));
-                Assert.assertEquals(
-                        encodingsNoTruncationOrPadding[i].getAttentionMask(),
-                        expectedAttentionMasksNoTruncationOrPadding.get(i));
-            }
-        }
-
-        try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
-            tokenizer.setTruncateFirstOnly();
-            tokenizer.setTruncation(7);
             Encoding[] encodings = tokenizer.batchEncode(inputs);
-            List<long[]> expectedIds =
-                    Arrays.asList(
-                            new long[] {101, 8667, 117, 194, 112, 1155, 102},
-                            new long[] {101, 3570, 1110, 170, 21162, 1285, 102},
-                            new long[] {101, 146, 1821, 2816, 102});
             for (int i = 0; i < encodings.length; ++i) {
-                Assert.assertEquals(encodings[i].getIds(), expectedIds.get(i));
+                Assert.assertEquals(encodings[i].getIds(), expectedIdsNoTruncationOrPadding.get(i));
             }
-
             tokenizer.setPadding(true);
-            expectedIds =
-                    Arrays.asList(
-                            new long[] {101, 8667, 117, 194, 112, 1155, 102},
-                            new long[] {101, 3570, 1110, 170, 21162, 1285, 102},
-                            new long[] {101, 146, 1821, 2816, 102, 0, 0});
-            encodings = tokenizer.batchEncode(inputs);
-            for (int i = 0; i < encodings.length; ++i) {
-                Assert.assertEquals(encodings[i].getIds(), expectedIds.get(i));
-            }
-
-            tokenizer.setTruncation(false);
-            expectedIds =
+            List<long[]> expectedIdsNoTruncationDefaultPadding =
                     Arrays.asList(
                             new long[] {
                                 101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 1128, 136, 102, 0,
@@ -254,23 +278,77 @@ public class HuggingFaceTokenizerTest {
                             new long[] {101, 146, 1821, 2816, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0});
             encodings = tokenizer.batchEncode(inputs);
             for (int i = 0; i < encodings.length; ++i) {
-                Assert.assertEquals(encodings[i].getIds(), expectedIds.get(i));
+                Assert.assertEquals(
+                        encodings[i].getIds(), expectedIdsNoTruncationDefaultPadding.get(i));
+            }
+
+            tokenizer.setPaddingMaxLength();
+            encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(encodings[i].getIds().length, 512);
+            }
+
+            tokenizer.setMaxLength(15);
+            List<long[]> expectedIdsNoTruncationMaxLengthPadding =
+                    Arrays.asList(
+                            new long[] {
+                                101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 1128, 136, 102, 0,
+                                0, 0
+                            },
+                            new long[] {
+                                101, 3570, 1110, 170, 21162, 1285, 119, 2750, 4250, 146, 112, 173,
+                                1474, 102, 0
+                            },
+                            new long[] {101, 146, 1821, 2816, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+            encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(
+                        encodings[i].getIds(), expectedIdsNoTruncationMaxLengthPadding.get(i));
+            }
+
+            tokenizer.setPadToMultipleOf(8);
+            List<long[]> expectedIdsNoTruncationMaxLengthPadToMultiplePadding =
+                    Arrays.asList(
+                            new long[] {
+                                101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 1128, 136, 102, 0,
+                                0, 0, 0
+                            },
+                            new long[] {
+                                101, 3570, 1110, 170, 21162, 1285, 119, 2750, 4250, 146, 112, 173,
+                                1474, 102, 0, 0
+                            },
+                            new long[] {
+                                101, 146, 1821, 2816, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                            });
+            encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(
+                        encodings[i].getIds(),
+                        expectedIdsNoTruncationMaxLengthPadToMultiplePadding.get(i));
             }
         }
     }
 
     @Test
-    public void testTruncationAndPaddingForPairEncoding() {
+    public void testTruncationAndPaddingForPairInputs() {
         Map<String, String> options = new ConcurrentHashMap<>();
         options.put("truncation", "only_first");
         options.put("padding", "longest");
         options.put("maxLength", "8");
+        String text = "Hello there my friend";
+        String textPair = "How are you";
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.newInstance("bert-base-cased", options)) {
-            Encoding encoding = tokenizer.encode("Hello there my friend", "How are you");
+            Encoding encoding = tokenizer.encode(text, textPair);
             long[] expectedId = new long[] {101, 8667, 1175, 102, 1731, 1132, 1128, 102};
             Assert.assertEquals(encoding.getIds(), expectedId);
+
+            tokenizer.setPadToMultipleOf(3);
+            encoding = tokenizer.encode(text, textPair);
+            long[] expectedIdPadToMultiple =
+                    new long[] {101, 8667, 1175, 102, 1731, 1132, 1128, 102, 0};
+            Assert.assertEquals(encoding.getIds(), expectedIdPadToMultiple);
         }
 
         options.put("truncation", "only_second");
@@ -279,8 +357,23 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.newInstance("bert-base-cased", options)) {
-            Encoding encoding = tokenizer.encode("Hello there my friend", "How are you");
+            Encoding encoding = tokenizer.encode(text, textPair);
             long[] expectedId = new long[] {101, 8667, 1175, 1139, 1910, 102, 1731, 102};
+            Assert.assertEquals(encoding.getIds(), expectedId);
+
+            tokenizer.setPadToMultipleOf(3);
+            tokenizer.setPadding(true);
+            encoding = tokenizer.encode(text, textPair);
+            long[] expectedIdPadToMultiple =
+                    new long[] {101, 8667, 1175, 1139, 1910, 102, 1731, 102, 0};
+            Assert.assertEquals(encoding.getIds(), expectedIdPadToMultiple);
+        }
+
+        options.put("truncation", "longest_first");
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.newInstance("bert-base-cased", options)) {
+            Encoding encoding = tokenizer.encode(text, textPair);
+            long[] expectedId = new long[] {101, 8667, 1175, 1139, 102, 1731, 1132, 102};
             Assert.assertEquals(encoding.getIds(), expectedId);
         }
     }
