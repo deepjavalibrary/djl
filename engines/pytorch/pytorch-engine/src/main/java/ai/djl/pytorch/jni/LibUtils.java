@@ -507,11 +507,11 @@ public final class LibUtils {
             this.apiVersion = platform.getApiVersion();
             this.classifier = platform.getClassifier();
             version = Utils.getEnvOrSystemProperty("PYTORCH_VERSION");
-            if (version == null) {
+            if (version == null || version.isEmpty()) {
                 version = platform.getVersion();
             }
             flavor = Utils.getEnvOrSystemProperty("PYTORCH_FLAVOR");
-            if (flavor == null) {
+            if (flavor == null || flavor.isEmpty()) {
                 if (CudaUtils.getGpuCount() > 0) {
                     flavor = "cu" + CudaUtils.getCudaVersionString() + "-precxx11";
                 } else {
