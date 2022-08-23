@@ -55,6 +55,8 @@ public class FillMaskTranslatorFactory implements TranslatorFactory {
         try {
             HuggingFaceTokenizer tokenizer =
                     HuggingFaceTokenizer.builder(arguments).optTokenizerPath(modelPath).build();
+            // close tokenizer when model is closed
+            model.getNDManager().attachInternal(tokenizer.getUid(), tokenizer);
             FillMaskTranslator translator =
                     FillMaskTranslator.builder(tokenizer, arguments).build();
             if (input == String.class && output == Classifications.class) {

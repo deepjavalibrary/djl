@@ -424,6 +424,14 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
                 ids, typeIds, tokens, wordIds, attentionMask, specialTokenMask, charSpans);
     }
 
+    /** {@inheritDoc} */
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void finalize() throws Throwable {
+        close();
+        super.finalize();
+    }
+
     /** An enum to represent the different available truncation strategies. */
     private enum TruncationStrategy {
         LONGEST_FIRST,

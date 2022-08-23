@@ -55,6 +55,8 @@ public class QuestionAnsweringTranslatorFactory implements TranslatorFactory {
         try {
             HuggingFaceTokenizer tokenizer =
                     HuggingFaceTokenizer.builder(arguments).optTokenizerPath(modelPath).build();
+            // close tokenizer when model is closed
+            model.getNDManager().attachInternal(tokenizer.getUid(), tokenizer);
             QuestionAnsweringTranslator translator =
                     QuestionAnsweringTranslator.builder(tokenizer, arguments).build();
             if (input == QAInput.class && output == String.class) {
