@@ -25,9 +25,7 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /** The translator for Huggingface question answering model. */
 public class QuestionAnsweringTranslator implements Translator<QAInput, String> {
@@ -95,20 +93,22 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
     /**
      * Creates a builder to build a {@code QuestionAnsweringTranslator}.
      *
+     * @param tokenizer the tokenizer
      * @return a new builder
      */
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(HuggingFaceTokenizer tokenizer) {
+        return new Builder(tokenizer);
     }
 
     /**
      * Creates a builder to build a {@code QuestionAnsweringTranslator}.
      *
+     * @param tokenizer the tokenizer
      * @param arguments the models' arguments
      * @return a new builder
      */
-    public static Builder builder(Map<String, ?> arguments) {
-        Builder builder = builder();
+    public static Builder builder(HuggingFaceTokenizer tokenizer, Map<String, ?> arguments) {
+        Builder builder = builder(tokenizer);
         builder.configure(arguments);
 
         return builder;
@@ -117,43 +117,12 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
     /** The builder for question answering translator. */
     public static final class Builder {
 
-        private String tokenizerName;
-        private Path tokenizerPath;
+        private HuggingFaceTokenizer tokenizer;
         private boolean includeTokenTypes;
-        private boolean addSpecialTokens = true;
         private Batchifier batchifier = Batchifier.STACK;
 
-        /**
-         * Sets the name of the tokenizer for the {@link Translator}.
-         *
-         * @param tokenizerName the name of the tokenizer
-         * @return this builder
-         */
-        public Builder optTokenizerName(String tokenizerName) {
-            this.tokenizerName = tokenizerName;
-            return this;
-        }
-
-        /**
-         * Sets the file path of the tokenizer for the {@link Translator}.
-         *
-         * @param tokenizerPath the path of the tokenizer
-         * @return this builder
-         */
-        public Builder optTokenizerPath(Path tokenizerPath) {
-            this.tokenizerPath = tokenizerPath;
-            return this;
-        }
-
-        /**
-         * Sets if add special tokens for the {@link Translator}.
-         *
-         * @param addSpecialTokens true to add special tokens
-         * @return this builder
-         */
-        public Builder optAddSpecialTokens(boolean addSpecialTokens) {
-            this.addSpecialTokens = addSpecialTokens;
-            return this;
+        Builder(HuggingFaceTokenizer tokenizer) {
+            this.tokenizer = tokenizer;
         }
 
         /**
@@ -184,9 +153,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
          * @param arguments the model arguments
          */
         public void configure(Map<String, ?> arguments) {
-            optTokenizerName(ArgumentsUtil.stringValue(arguments, "tokenizer"));
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
-            optAddSpecialTokens(ArgumentsUtil.booleanValue(arguments, "addSpecialTokens", true));
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
             optBatchifier(Batchifier.fromString(batchifierStr));
         }
@@ -198,14 +165,6 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
          * @throws IOException if I/O error occurs
          */
         public QuestionAnsweringTranslator build() throws IOException {
-            HuggingFaceTokenizer tokenizer;
-            Map<String, String> options = new ConcurrentHashMap<>();
-            options.put("addSpecialTokens", String.valueOf(addSpecialTokens));
-            if (tokenizerName != null) {
-                tokenizer = HuggingFaceTokenizer.newInstance(tokenizerName, options);
-            } else {
-                tokenizer = HuggingFaceTokenizer.newInstance(tokenizerPath, options);
-            }
             return new QuestionAnsweringTranslator(tokenizer, includeTokenTypes, batchifier);
         }
     }

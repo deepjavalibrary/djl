@@ -32,7 +32,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /** The translator for Huggingface token classification model. */
 public class TokenClassificationTranslator implements Translator<String, NamedEntity[]> {
@@ -111,20 +110,22 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
     /**
      * Creates a builder to build a {@code TokenClassificationTranslator}.
      *
+     * @param tokenizer the tokenizer
      * @return a new builder
      */
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(HuggingFaceTokenizer tokenizer) {
+        return new Builder(tokenizer);
     }
 
     /**
      * Creates a builder to build a {@code TokenClassificationTranslator}.
      *
+     * @param tokenizer the tokenizer
      * @param arguments the models' arguments
      * @return a new builder
      */
-    public static Builder builder(Map<String, ?> arguments) {
-        Builder builder = builder();
+    public static Builder builder(HuggingFaceTokenizer tokenizer, Map<String, ?> arguments) {
+        Builder builder = builder(tokenizer);
         builder.configure(arguments);
 
         return builder;
@@ -133,42 +134,11 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
     /** The builder for token classification translator. */
     public static final class Builder {
 
-        private String tokenizerName;
-        private Path tokenizerPath;
-        private boolean addSpecialTokens = true;
+        private HuggingFaceTokenizer tokenizer;
         private Batchifier batchifier = Batchifier.STACK;
 
-        /**
-         * Sets the name of the tokenizer for the {@link Translator}.
-         *
-         * @param tokenizerName the name of the tokenizer
-         * @return this builder
-         */
-        public Builder optTokenizerName(String tokenizerName) {
-            this.tokenizerName = tokenizerName;
-            return this;
-        }
-
-        /**
-         * Sets the file path of the tokenizer for the {@link Translator}.
-         *
-         * @param tokenizerPath the path of the tokenizer
-         * @return this builder
-         */
-        public Builder optTokenizerPath(Path tokenizerPath) {
-            this.tokenizerPath = tokenizerPath;
-            return this;
-        }
-
-        /**
-         * Sets if add special tokens for the {@link Translator}.
-         *
-         * @param addSpecialTokens true to add special tokens
-         * @return this builder
-         */
-        public Builder optAddSpecialTokens(boolean addSpecialTokens) {
-            this.addSpecialTokens = addSpecialTokens;
-            return this;
+        Builder(HuggingFaceTokenizer tokenizer) {
+            this.tokenizer = tokenizer;
         }
 
         /**
@@ -188,8 +158,6 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          * @param arguments the model arguments
          */
         public void configure(Map<String, ?> arguments) {
-            optTokenizerName(ArgumentsUtil.stringValue(arguments, "tokenizer"));
-            optAddSpecialTokens(ArgumentsUtil.booleanValue(arguments, "addSpecialTokens", true));
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
             optBatchifier(Batchifier.fromString(batchifierStr));
         }
@@ -201,14 +169,6 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          * @throws IOException if I/O error occurs
          */
         public TokenClassificationTranslator build() throws IOException {
-            HuggingFaceTokenizer tokenizer;
-            Map<String, String> options = new ConcurrentHashMap<>();
-            options.put("addSpecialTokens", String.valueOf(addSpecialTokens));
-            if (tokenizerName != null) {
-                tokenizer = HuggingFaceTokenizer.newInstance(tokenizerName, options);
-            } else {
-                tokenizer = HuggingFaceTokenizer.newInstance(tokenizerPath, options);
-            }
             return new TokenClassificationTranslator(tokenizer, batchifier);
         }
     }

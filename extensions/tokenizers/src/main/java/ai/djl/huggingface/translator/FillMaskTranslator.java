@@ -25,12 +25,10 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /** The translator for Huggingface fill mask model. */
 public class FillMaskTranslator implements Translator<String, Classifications> {
@@ -102,20 +100,22 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
     /**
      * Creates a builder to build a {@code FillMaskTranslator}.
      *
+     * @param tokenizer the tokenizer
      * @return a new builder
      */
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(HuggingFaceTokenizer tokenizer) {
+        return new Builder(tokenizer);
     }
 
     /**
      * Creates a builder to build a {@code FillMaskTranslator}.
      *
+     * @param tokenizer the tokenizer
      * @param arguments the models' arguments
      * @return a new builder
      */
-    public static Builder builder(Map<String, ?> arguments) {
-        Builder builder = builder();
+    public static Builder builder(HuggingFaceTokenizer tokenizer, Map<String, ?> arguments) {
+        Builder builder = builder(tokenizer);
         builder.configure(arguments);
 
         return builder;
@@ -124,12 +124,14 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
     /** The builder for fill mask translator. */
     public static final class Builder {
 
+        private HuggingFaceTokenizer tokenizer;
         private String maskedToken = "[MASK]";
         private int topK = 5;
-        private String tokenizerName;
-        private Path tokenizerPath;
-        private boolean addSpecialTokens = true;
         private Batchifier batchifier = Batchifier.STACK;
+
+        Builder(HuggingFaceTokenizer tokenizer) {
+            this.tokenizer = tokenizer;
+        }
 
         /**
          * Sets the id of the mask {@link Translator}.
@@ -154,39 +156,6 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
         }
 
         /**
-         * Sets the name of the tokenizer for the {@link Translator}.
-         *
-         * @param tokenizerName the name of the tokenizer
-         * @return this builder
-         */
-        public Builder optTokenizerName(String tokenizerName) {
-            this.tokenizerName = tokenizerName;
-            return this;
-        }
-
-        /**
-         * Sets the file path of the tokenizer for the {@link Translator}.
-         *
-         * @param tokenizerPath the path of the tokenizer
-         * @return this builder
-         */
-        public Builder optTokenizerPath(Path tokenizerPath) {
-            this.tokenizerPath = tokenizerPath;
-            return this;
-        }
-
-        /**
-         * Sets if add special tokens for the {@link Translator}.
-         *
-         * @param addSpecialTokens true to add special tokens
-         * @return this builder
-         */
-        public Builder optAddSpecialTokens(boolean addSpecialTokens) {
-            this.addSpecialTokens = addSpecialTokens;
-            return this;
-        }
-
-        /**
          * Sets the {@link Batchifier} for the {@link Translator}.
          *
          * @param batchifier true to include token types
@@ -205,8 +174,6 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
         public void configure(Map<String, ?> arguments) {
             optMaskToken(ArgumentsUtil.stringValue(arguments, "maskToken", "[MASK]"));
             optTopK(ArgumentsUtil.intValue(arguments, "topK", 5));
-            optTokenizerName(ArgumentsUtil.stringValue(arguments, "tokenizer"));
-            optAddSpecialTokens(ArgumentsUtil.booleanValue(arguments, "addSpecialTokens", true));
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
             optBatchifier(Batchifier.fromString(batchifierStr));
         }
@@ -218,14 +185,6 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
          * @throws IOException if I/O error occurs
          */
         public FillMaskTranslator build() throws IOException {
-            HuggingFaceTokenizer tokenizer;
-            Map<String, String> options = new ConcurrentHashMap<>();
-            options.put("addSpecialTokens", String.valueOf(addSpecialTokens));
-            if (tokenizerName != null) {
-                tokenizer = HuggingFaceTokenizer.newInstance(tokenizerName, options);
-            } else {
-                tokenizer = HuggingFaceTokenizer.newInstance(tokenizerPath, options);
-            }
             return new FillMaskTranslator(tokenizer, maskedToken, topK, batchifier);
         }
     }

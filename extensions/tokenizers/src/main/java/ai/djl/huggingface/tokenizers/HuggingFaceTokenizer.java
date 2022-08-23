@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@code HuggingFaceTokenizer} is a Huggingface tokenizer implementation of the {@link Tokenizer}
@@ -338,81 +339,25 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     /**
-     * Enables or Disables default truncation behavior for the tokenizer.
+     * Creates a builder to build a {@code HuggingFaceTokenizer}.
      *
-     * @param enabled whether to enable default truncation behavior
+     * @return a new builder
      */
-    public void setTruncation(boolean enabled) {
-        TruncationStrategy strategy =
-                enabled ? TruncationStrategy.LONGEST_FIRST : TruncationStrategy.DO_NOT_TRUNCATE;
-        if (strategy != truncation) {
-            truncation = strategy;
-            updateTruncationAndPadding();
-        }
-    }
-
-    /** Enables truncation to only truncate the first item. */
-    public void setTruncateFirstOnly() {
-        if (truncation != TruncationStrategy.ONLY_FIRST) {
-            truncation = TruncationStrategy.ONLY_FIRST;
-            updateTruncationAndPadding();
-        }
-    }
-
-    /** Enables truncation to only truncate the second item. */
-    public void setTruncateSecondOnly() {
-        if (truncation != TruncationStrategy.ONLY_SECOND) {
-            truncation = TruncationStrategy.ONLY_SECOND;
-            updateTruncationAndPadding();
-        }
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Enables or Disables default padding behavior for the tokenizer.
+     * Creates a builder to build a {@code HuggingFaceTokenizer}.
      *
-     * @param enabled whether to enable default padding behavior
+     * @param arguments the models' arguments
+     * @return a new builder
      */
-    public void setPadding(boolean enabled) {
-        PaddingStrategy p = enabled ? PaddingStrategy.LONGEST : PaddingStrategy.DO_NOT_PAD;
-        if (padding != p) {
-            padding = p;
-            updateTruncationAndPadding();
-        }
-    }
+    public static Builder builder(Map<String, ?> arguments) {
+        Builder builder = builder();
+        builder.configure(arguments);
 
-    /**
-     * Enables padding to pad sequences to previously specified maxLength, or modelMaxLength if not
-     * specified.
-     */
-    public void setPaddingMaxLength() {
-        if (padding != PaddingStrategy.MAX_LENGTH) {
-            padding = PaddingStrategy.MAX_LENGTH;
-            updateTruncationAndPadding();
-        }
-    }
-
-    /**
-     * Sets maxLength for padding and truncation.
-     *
-     * @param maxLength the length to truncate and/or pad sequences to
-     */
-    public void setMaxLength(int maxLength) {
-        if (this.maxLength != maxLength) {
-            this.maxLength = maxLength;
-            updateTruncationAndPadding();
-        }
-    }
-
-    /**
-     * Sets padToMultipleOf for padding.
-     *
-     * @param padToMultipleOf the multiple of sequences should be padded to
-     */
-    public void setPadToMultipleOf(int padToMultipleOf) {
-        if (this.padToMultipleOf != padToMultipleOf) {
-            this.padToMultipleOf = padToMultipleOf;
-            updateTruncationAndPadding();
-        }
+        return builder;
     }
 
     /*
@@ -533,6 +478,154 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
                 }
             }
             throw new IllegalArgumentException("Invalid PaddingStrategy: " + value);
+        }
+    }
+
+    /** The builder for creating huggingface tokenizer. */
+    public static final class Builder {
+
+        private Path tokenizerPath;
+        private Map<String, String> options;
+
+        Builder() {
+            options = new ConcurrentHashMap<>();
+            options.put("addSpecialTokens", "true");
+        }
+
+        /**
+         * Sets the name of the tokenizer.
+         *
+         * @param tokenizerName the name of the tokenizer
+         * @return this builder
+         */
+        public Builder optTokenizerName(String tokenizerName) {
+            options.put("tokenizer", tokenizerName);
+            return this;
+        }
+
+        /**
+         * Sets the file path of the tokenizer.
+         *
+         * @param tokenizerPath the path of the tokenizer
+         * @return this builder
+         */
+        public Builder optTokenizerPath(Path tokenizerPath) {
+            this.tokenizerPath = tokenizerPath;
+            return this;
+        }
+
+        /**
+         * Sets if add special tokens.
+         *
+         * @param addSpecialTokens true to add special tokens
+         * @return this builder
+         */
+        public Builder optAddSpecialTokens(boolean addSpecialTokens) {
+            options.put("addSpecialTokens", String.valueOf(addSpecialTokens));
+            return this;
+        }
+
+        /**
+         * Enables or Disables default truncation behavior for the tokenizer.
+         *
+         * @param enabled whether to enable default truncation behavior
+         * @return this builder
+         */
+        public Builder optTruncation(boolean enabled) {
+            options.put("truncation", String.valueOf(enabled));
+            return this;
+        }
+
+        /**
+         * Enables truncation to only truncate the first item.
+         *
+         * @return this builder
+         */
+        public Builder optTruncateFirstOnly() {
+            options.put("truncation", TruncationStrategy.ONLY_FIRST.name());
+            return this;
+        }
+
+        /**
+         * Enables truncation to only truncate the second item.
+         *
+         * @return this builder
+         */
+        public Builder optTruncateSecondOnly() {
+            options.put("truncation", TruncationStrategy.ONLY_SECOND.name());
+            return this;
+        }
+
+        /**
+         * Enables or Disables default padding behavior for the tokenizer.
+         *
+         * @param enabled whether to enable default padding behavior
+         * @return this builder
+         */
+        public Builder optPadding(boolean enabled) {
+            options.put("padding", String.valueOf(enabled));
+            return this;
+        }
+
+        /**
+         * Enables padding to pad sequences to previously specified maxLength, or modelMaxLength if
+         * not specified.
+         *
+         * @return this builder
+         */
+        public Builder optPadToMaxLength() {
+            options.put("padding", PaddingStrategy.MAX_LENGTH.name());
+            return this;
+        }
+
+        /**
+         * Sets maxLength for padding and truncation.
+         *
+         * @param maxLength the length to truncate and/or pad sequences to
+         * @return this builder
+         */
+        public Builder optMaxLength(int maxLength) {
+            options.put("maxLength", String.valueOf(maxLength));
+            return this;
+        }
+
+        /**
+         * Sets padToMultipleOf for padding.
+         *
+         * @param padToMultipleOf the multiple of sequences should be padded to
+         * @return this builder
+         */
+        public Builder optPadToMultipleOf(int padToMultipleOf) {
+            options.put("padToMultipleOf", String.valueOf(padToMultipleOf));
+            return this;
+        }
+
+        /**
+         * Configures the builder with the arguments.
+         *
+         * @param arguments the arguments
+         */
+        public void configure(Map<String, ?> arguments) {
+            for (Map.Entry<String, ?> entry : arguments.entrySet()) {
+                options.put(entry.getKey(), entry.getValue().toString());
+            }
+        }
+
+        /**
+         * Builds the translator.
+         *
+         * @return the new translator
+         * @throws IOException when IO operation fails in loading a resource
+         */
+        public HuggingFaceTokenizer build() throws IOException {
+            String tokenizerName = options.get("tokenizer");
+            if (tokenizerName != null) {
+                return HuggingFaceTokenizer.newInstance(tokenizerName, options);
+            }
+            if (tokenizerPath == null) {
+                throw new IllegalArgumentException("Missing tokenizer path.");
+            }
+            return HuggingFaceTokenizer.newInstance(tokenizerPath, options);
         }
     }
 }
