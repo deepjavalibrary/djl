@@ -271,19 +271,9 @@ jobs:
           --fail \
           | jq '.token' | tr -d '"' )
           ./start_instance.sh action_gpu $token djl
-      - name: Create new GPU instance 2
-        id: create_gpu_2
-        run: |
-          cd /home/ubuntu/djl_benchmark_script/scripts
-          token=$( curl -X POST -H "Authorization: token ${{ secrets.ACTION_RUNNER_PERSONAL_TOKEN }}" \
-          https://api.github.com/repos/deepjavalibrary/djl/actions/runners/registration-token \
-          --fail \
-          | jq '.token' | tr -d '"' )
-          ./start_instance.sh action_gpu $token djl
     outputs:
       aarch64_instance_id: ${{ steps.create_aarch64.outputs.action_graviton_instance_id }}
       gpu_1_instance_id: ${{ steps.create_gpu_1.outputs.action_gpu_instance_id }}
-      gpu_2_instance_id: ${{ steps.create_gpu_2.outputs.action_gpu_instance_id }}
 
   stop-runners:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
@@ -297,7 +287,4 @@ jobs:
           ./stop_instance.sh $instance_id
           cd /home/ubuntu/djl_benchmark_script/scripts
           instance_id=${{ needs.create-runners.outputs.gpu_1_instance_id }}
-          ./stop_instance.sh $instance_id
-          cd /home/ubuntu/djl_benchmark_script/scripts
-          instance_id=${{ needs.create-runners.outputs.gpu_2_instance_id }}
           ./stop_instance.sh $instance_id

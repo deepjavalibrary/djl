@@ -1,6 +1,8 @@
 name: Continuous Android
 
 on:
+  schedule:
+    - cron: '0 8 * * *'
   pull_request:
     paths:
       - "android/**"
