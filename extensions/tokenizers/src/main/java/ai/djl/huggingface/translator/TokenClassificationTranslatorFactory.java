@@ -13,6 +13,7 @@
 package ai.djl.huggingface.translator;
 
 import ai.djl.Model;
+import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.nlp.translator.NamedEntity;
@@ -52,10 +53,10 @@ public class TokenClassificationTranslatorFactory implements TranslatorFactory {
             throws TranslateException {
         Path modelPath = model.getModelPath();
         try {
+            HuggingFaceTokenizer tokenizer =
+                    HuggingFaceTokenizer.builder(arguments).optTokenizerPath(modelPath).build();
             TokenClassificationTranslator translator =
-                    TokenClassificationTranslator.builder(arguments)
-                            .optTokenizerPath(modelPath)
-                            .build();
+                    TokenClassificationTranslator.builder(tokenizer, arguments).build();
             if (input == String.class && output == NamedEntity[].class) {
                 return translator;
             } else if (input == Input.class && output == Output.class) {

@@ -13,6 +13,7 @@
 package ai.djl.huggingface.translator;
 
 import ai.djl.Model;
+import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
@@ -52,8 +53,10 @@ public class FillMaskTranslatorFactory implements TranslatorFactory {
             throws TranslateException {
         Path modelPath = model.getModelPath();
         try {
+            HuggingFaceTokenizer tokenizer =
+                    HuggingFaceTokenizer.builder(arguments).optTokenizerPath(modelPath).build();
             FillMaskTranslator translator =
-                    FillMaskTranslator.builder(arguments).optTokenizerPath(modelPath).build();
+                    FillMaskTranslator.builder(tokenizer, arguments).build();
             if (input == String.class && output == Classifications.class) {
                 return translator;
             } else if (input == Input.class && output == Output.class) {
