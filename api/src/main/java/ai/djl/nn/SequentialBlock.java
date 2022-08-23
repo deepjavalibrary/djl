@@ -22,10 +22,14 @@ import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * {@code SequentialBlock} is a {@link Block} whose children form a chain of blocks with each child
@@ -36,7 +40,8 @@ import java.util.function.Function;
  */
 public class SequentialBlock extends AbstractBlock {
 
-    private static final byte VERSION = 2;
+    private static final byte VERSION = 3;
+    private boolean returnIntermediate;
 
     /**
      * Creates an empty sequential block. Use {@code add} and {@code addAll} to add blocks to be
@@ -148,6 +153,29 @@ public class SequentialBlock extends AbstractBlock {
         }
     }
 
+    /**
+     * Returns whether the block returns all intermediate block results or only the end of the
+     * sequential chain.
+     *
+     * @return whether the block returns all intermediate block results or only the end of the
+     *     sequential chain
+     */
+    public boolean isReturnIntermediate() {
+        return returnIntermediate;
+    }
+
+    /**
+     * Sets whether the block returns all intermediate sequence results.
+     *
+     * @param returnIntermediate true for intermediates, false for only chain result (default and
+     *     typical behavior is false)
+     * @return this {@link SequentialBlock}
+     */
+    public SequentialBlock setReturnIntermediate(boolean returnIntermediate) {
+        this.returnIntermediate = returnIntermediate;
+        return this;
+    }
+
     /** {@inheritDoc} */
     @Override
     protected NDList forwardInternal(
@@ -155,9 +183,15 @@ public class SequentialBlock extends AbstractBlock {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
+        List<NDList> past = new ArrayList<>(children.size());
         NDList current = inputs;
         for (Block block : children.values()) {
             current = block.forward(parameterStore, current, training);
+            past.add(current);
+        }
+        if (returnIntermediate) {
+            return new NDList(
+                    past.stream().flatMap(Collection::stream).collect(Collectors.toList()));
         }
         return current;
     }
@@ -169,9 +203,15 @@ public class SequentialBlock extends AbstractBlock {
             NDList data,
             NDList labels,
             PairList<String, Object> params) {
+        List<NDList> past = new ArrayList<>(children.size());
         NDList current = data;
         for (Block block : children.values()) {
             current = block.forward(parameterStore, current, labels, params);
+            past.add(current);
+        }
+        if (returnIntermediate) {
+            return new NDList(
+                    past.stream().flatMap(Collection::stream).collect(Collectors.toList()));
         }
         return current;
     }
@@ -192,11 +232,23 @@ public class SequentialBlock extends AbstractBlock {
         if (children.isEmpty()) {
             throw new IllegalArgumentException("The sequential block is empty");
         }
+        List<Shape[]> past = new ArrayList<>(children.size());
         Shape[] current = inputs;
         for (Block block : children.values()) {
             current = block.getOutputShapes(current);
+            past.add(current);
+        }
+        if (returnIntermediate) {
+            return past.stream().flatMap(Arrays::stream).toArray(Shape[]::new);
         }
         return current;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void saveMetadata(DataOutputStream os) throws IOException {
+        saveInputShapes(os);
+        os.writeBoolean(returnIntermediate);
     }
 
     /** {@inheritDoc} */
@@ -205,7 +257,10 @@ public class SequentialBlock extends AbstractBlock {
             throws IOException, MalformedModelException {
         if (loadVersion == version) {
             readInputShapes(is);
-        } else if (loadVersion != 1) {
+            returnIntermediate = is.readBoolean();
+        } else if (loadVersion == 2) {
+            readInputShapes(is);
+        } else {
             throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
     }

@@ -44,6 +44,7 @@ import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.PairList;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -98,6 +99,40 @@ public class ResnetTest {
                         parameters.get(1).getValue().getArray(), expectedAtIndex1);
                 Assertions.assertAlmostEquals(
                         parameters.get(87).getValue().getArray(), expectedAtIndex87);
+            }
+        }
+    }
+
+    @Test
+    public void testWithIntermediate() throws TranslateException {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
+                        .optDevices(Engine.getInstance().getDevices(2))
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+
+        Block resNet50 =
+                ResNetV1.builder()
+                        .setImageShape(new Shape(1, 28, 28))
+                        .setNumLayers(50)
+                        .setOutSize(10)
+                        .build()
+                        .setReturnIntermediate(true);
+
+        try (Model model = Model.newInstance("resnet")) {
+            model.setBlock(resNet50);
+            int batchSize = 1;
+            Shape inputShape = new Shape(batchSize, 1, 28, 28);
+            int resultSize = 29;
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(inputShape);
+
+                Assert.assertEquals(
+                        resNet50.getOutputShapes(new Shape[] {inputShape}).length, resultSize);
+            }
+            try (Predictor<NDList, NDList> predictor = model.newPredictor(new NoopTranslator())) {
+                NDManager manager = model.getNDManager();
+                NDList result = predictor.predict(new NDList(manager.ones(inputShape)));
+                Assert.assertEquals(result.size(), resultSize);
             }
         }
     }
