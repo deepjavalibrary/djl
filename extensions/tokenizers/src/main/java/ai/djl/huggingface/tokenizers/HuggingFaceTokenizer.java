@@ -16,6 +16,7 @@ import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.djl.huggingface.tokenizers.jni.LibUtils;
 import ai.djl.huggingface.tokenizers.jni.TokenizersLibrary;
 import ai.djl.modality.nlp.preprocess.Tokenizer;
+import ai.djl.ndarray.NDManager;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.util.NativeResource;
 import ai.djl.util.Utils;
@@ -493,11 +494,23 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     public static final class Builder {
 
         private Path tokenizerPath;
+        private NDManager manager;
         private Map<String, String> options;
 
         Builder() {
             options = new ConcurrentHashMap<>();
             options.put("addSpecialTokens", "true");
+        }
+
+        /**
+         * Sets the optional manager used to manage the lifecycle of the tokenizer.
+         *
+         * @param manager the {@link NDManager}
+         * @return this builder
+         */
+        public Builder optManager(NDManager manager) {
+            this.manager = manager;
+            return this;
         }
 
         /**
@@ -620,6 +633,19 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         }
 
         /**
+         * Utility to make a tokenizer managed by the builder manager (if one is specified).
+         *
+         * @param tokenizer the tokenizer to manage
+         * @return the updated tokenizer
+         */
+        private HuggingFaceTokenizer managed(HuggingFaceTokenizer tokenizer) {
+            if (manager != null) {
+                manager.attachInternal(tokenizer.getUid(), tokenizer);
+            }
+            return tokenizer;
+        }
+
+        /**
          * Builds the translator.
          *
          * @return the new translator
@@ -628,12 +654,12 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         public HuggingFaceTokenizer build() throws IOException {
             String tokenizerName = options.get("tokenizer");
             if (tokenizerName != null) {
-                return HuggingFaceTokenizer.newInstance(tokenizerName, options);
+                return managed(HuggingFaceTokenizer.newInstance(tokenizerName, options));
             }
             if (tokenizerPath == null) {
                 throw new IllegalArgumentException("Missing tokenizer path.");
             }
-            return HuggingFaceTokenizer.newInstance(tokenizerPath, options);
+            return managed(HuggingFaceTokenizer.newInstance(tokenizerPath, options));
         }
     }
 }
