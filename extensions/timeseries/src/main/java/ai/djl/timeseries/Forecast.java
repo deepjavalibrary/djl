@@ -21,7 +21,6 @@ public abstract class Forecast {
 
     protected LocalDateTime startDate;
     protected int predictionLength;
-    protected NDArray mean;
     protected String freq;
 
     /**
@@ -56,6 +55,13 @@ public abstract class Forecast {
     }
 
     /**
+     * Computes and returns the forecast mean.
+     *
+     * @return forecast mean
+     */
+    public abstract NDArray mean();
+
+    /**
      * Computes the median of forecast.
      *
      * @return value of the median
@@ -78,21 +84,7 @@ public abstract class Forecast {
      *
      * @return the prediction length
      */
-    public int predictionLength() {
+    public int getPredictionLength() {
         return predictionLength;
-    }
-
-    /**
-     * Computes and returns the forecast mean.
-     *
-     * @return forecast mean
-     */
-    public NDArray mean() {
-        return mean;
-    }
-
-    /** Plots the prediction result with {@code Tablesaw}. */
-    public void plot() {
-        throw new UnsupportedOperationException("plot is not supported yet");
     }
 }

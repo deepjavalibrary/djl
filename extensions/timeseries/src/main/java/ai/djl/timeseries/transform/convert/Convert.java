@@ -19,8 +19,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 
-import java.util.List;
-
 /** this is a class use to convert the shape of {@link NDArray} in {@link TimeSeriesData}. */
 public final class Convert {
 
@@ -38,7 +36,7 @@ public final class Convert {
      */
     public static void vstackFeatures(
             FieldName outputField,
-            List<FieldName> inputFields,
+            FieldName[] inputFields,
             boolean dropInputs,
             boolean hStack,
             TimeSeriesData data) {
@@ -71,7 +69,7 @@ public final class Convert {
      * @param data the {@link TimeSeriesData} to operate on
      */
     public static void vstackFeatures(
-            FieldName outputField, List<FieldName> inputFields, TimeSeriesData data) {
+            FieldName outputField, FieldName[] inputFields, TimeSeriesData data) {
         vstackFeatures(outputField, inputFields, true, false, data);
     }
 }

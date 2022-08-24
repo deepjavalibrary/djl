@@ -22,6 +22,7 @@ import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.timeseries.transform.InstanceSampler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /** this is a class use to split the time series data of {@link TimeSeriesData}. */
@@ -74,11 +75,12 @@ public final class Split {
             int futureLength,
             int leadTime,
             boolean outputNTC,
-            List<FieldName> timeSeriesFields,
+            FieldName[] timeSeriesFields,
             float dummyValue,
             TimeSeriesData data) {
 
-        List<FieldName> sliceCols = new ArrayList<>(timeSeriesFields);
+        List<FieldName> sliceCols = new ArrayList<>(timeSeriesFields.length + 1);
+        sliceCols.addAll(Arrays.asList(timeSeriesFields));
         sliceCols.add(targetField);
         NDArray target = data.get(targetField);
 
@@ -135,7 +137,7 @@ public final class Split {
             data.setField(past(isPadField), padIndicator);
 
             // only for freq "D" now
-            data.setForeCastStartTime(data.getStartTime().plusDays(i + leadTime));
+            data.setForecastStartTime(data.getStartTime().plusDays(i + leadTime));
         }
     }
 
@@ -180,7 +182,7 @@ public final class Split {
             InstanceSampler instanceSampler,
             int pastLength,
             int futureLength,
-            List<FieldName> timeSeriesFields,
+            FieldName[] timeSeriesFields,
             float dummyValue,
             TimeSeriesData data) {
         instanceSplit(
@@ -200,10 +202,10 @@ public final class Split {
     }
 
     private static String past(FieldName name) {
-        return String.format("PAST_%s", name.name());
+        return "PAST_" + name.name();
     }
 
     private static String future(FieldName name) {
-        return String.format("FUTURE_%s", name.name());
+        return "FUTURE_" + name.name();
     }
 }

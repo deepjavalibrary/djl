@@ -32,7 +32,7 @@ import java.util.Map;
 public class TimeSeriesData extends PairList<String, NDArray> {
 
     private LocalDateTime startTime;
-    private LocalDateTime foreCastStartTime;
+    private LocalDateTime forecastStartTime;
 
     /**
      * Constructs an empty {@code TimeSeriesData} with the specified initial capacity.
@@ -102,8 +102,8 @@ public class TimeSeriesData extends PairList<String, NDArray> {
      *
      * @return a {@link LocalDateTime} representing the time to forecast
      */
-    public LocalDateTime getForeCastStartTime() {
-        return foreCastStartTime;
+    public LocalDateTime getForecastStartTime() {
+        return forecastStartTime;
     }
 
     /**
@@ -113,7 +113,7 @@ public class TimeSeriesData extends PairList<String, NDArray> {
      * @param value the {@link NDArray} value
      */
     public void add(FieldName fieldName, NDArray value) {
-        add(fieldName.toString(), value);
+        add(fieldName.name(), value);
     }
 
     /**
@@ -123,7 +123,7 @@ public class TimeSeriesData extends PairList<String, NDArray> {
      * @return the {@link NDArray} value for the {@link FieldName}
      */
     public NDArray get(FieldName fieldName) {
-        return get(fieldName.toString());
+        return get(fieldName.name());
     }
 
     /**
@@ -161,8 +161,8 @@ public class TimeSeriesData extends PairList<String, NDArray> {
      *
      * @param value the {@link LocalDateTime} time to forecast
      */
-    public void setForeCastStartTime(LocalDateTime value) {
-        this.foreCastStartTime = value;
+    public void setForecastStartTime(LocalDateTime value) {
+        this.forecastStartTime = value;
     }
 
     /**
@@ -171,6 +171,6 @@ public class TimeSeriesData extends PairList<String, NDArray> {
      * @param fieldName the {@link FieldName} to be removed.
      */
     public void remove(FieldName fieldName) {
-        remove(fieldName.toString());
+        remove(fieldName.name());
     }
 }

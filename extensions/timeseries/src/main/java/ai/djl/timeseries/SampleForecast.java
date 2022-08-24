@@ -13,7 +13,6 @@
 package ai.djl.timeseries;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDManager;
 
 import java.time.LocalDateTime;
 
@@ -25,8 +24,6 @@ public class SampleForecast extends Forecast {
     private NDArray samples;
     private int numSamples;
 
-    private NDArray sortedSamples;
-
     /**
      * Constructs a {@code SampleForeCast}.
      *
@@ -37,11 +34,7 @@ public class SampleForecast extends Forecast {
      */
     public SampleForecast(NDArray samples, LocalDateTime startDate, String freq) {
         super(startDate, (int) samples.getShape().get(1), freq);
-        // Make the NDManager of samples from Predictor
-        NDManager samplesManger = samples.getManager().getParentManager();
-        this.samples = samplesManger.create(samples.getShape());
-        this.samples.setName(samples.getName());
-        samples.copyTo(this.samples);
+        this.samples = samples;
         this.numSamples = (int) samples.getShape().head();
     }
 
@@ -51,10 +44,7 @@ public class SampleForecast extends Forecast {
      * @return the sorted sample array
      */
     public NDArray getSortedSamples() {
-        if (sortedSamples == null) {
-            sortedSamples = samples.sort(0);
-        }
-        return sortedSamples;
+        return samples.sort(0);
     }
 
     /**
@@ -100,9 +90,6 @@ public class SampleForecast extends Forecast {
     /** {@inheritDoc}. */
     @Override
     public NDArray mean() {
-        if (mean == null) {
-            mean = samples.mean(new int[] {0});
-        }
-        return super.mean();
+        return samples.mean(new int[] {0});
     }
 }

@@ -18,13 +18,11 @@ import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
 
-import java.util.List;
-
-/** Use the {@link ai.djl.ndarray.NDArrays#concat(NDList)} to vstack datas. */
+/** Use the {@link ai.djl.ndarray.NDArrays#concat(NDList)} to vstack data. */
 public class VstackFeatures implements TimeSeriesTransform {
 
     private FieldName outputField;
-    private List<FieldName> inputFields;
+    private FieldName[] inputFields;
     private boolean dropInputs;
     private boolean hStack;
 
@@ -37,10 +35,7 @@ public class VstackFeatures implements TimeSeriesTransform {
      * @param hStack use hStack
      */
     public VstackFeatures(
-            FieldName outputField,
-            List<FieldName> inputFields,
-            boolean dropInputs,
-            boolean hStack) {
+            FieldName outputField, FieldName[] inputFields, boolean dropInputs, boolean hStack) {
         this.outputField = outputField;
         this.inputFields = inputFields;
         this.dropInputs = dropInputs;
@@ -53,7 +48,7 @@ public class VstackFeatures implements TimeSeriesTransform {
      * @param outputField output field name
      * @param inputFields input field names
      */
-    public VstackFeatures(FieldName outputField, List<FieldName> inputFields) {
+    public VstackFeatures(FieldName outputField, FieldName[] inputFields) {
         this(outputField, inputFields, true, false);
     }
 

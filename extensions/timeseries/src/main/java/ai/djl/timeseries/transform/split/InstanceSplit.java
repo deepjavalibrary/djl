@@ -18,8 +18,6 @@ import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.timeseries.transform.InstanceSampler;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
 
-import java.util.List;
-
 /**
  * Use the {@link ai.djl.timeseries.transform.InstanceSampler} to split the time series data into
  * past and future part.
@@ -35,7 +33,7 @@ public class InstanceSplit implements TimeSeriesTransform {
     private int futureLength;
     private int leadTime;
     private boolean outputNTC;
-    private List<FieldName> timeSeriesFields;
+    private FieldName[] timeSeriesFields;
     private float dummyValue;
 
     /**
@@ -63,7 +61,7 @@ public class InstanceSplit implements TimeSeriesTransform {
             int futureLength,
             int leadTime,
             boolean outputNTC,
-            List<FieldName> timeSeriesFields,
+            FieldName[] timeSeriesFields,
             float dummyValue) {
         this.targetField = targetField;
         this.isPadField = isPadField;
@@ -99,7 +97,7 @@ public class InstanceSplit implements TimeSeriesTransform {
             InstanceSampler instanceSampler,
             int pastLength,
             int futureLength,
-            List<FieldName> timeSeriesFields,
+            FieldName[] timeSeriesFields,
             float dummyValue) {
         this(
                 targetField,

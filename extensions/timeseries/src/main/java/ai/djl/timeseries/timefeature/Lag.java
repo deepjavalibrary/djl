@@ -89,11 +89,8 @@ public final class Lag {
             ret.add(makeLags((int) (i * 52 / multiple), 1));
         }
         ret.add(
-                new ArrayList<>(
-                        Arrays.asList(
-                                (int) (4f / multiple),
-                                (int) (8f / multiple),
-                                (int) (12f / multiple))));
+                Arrays.asList(
+                        (int) (4f / multiple), (int) (8f / multiple), (int) (12f / multiple)));
         return ret;
     }
 

@@ -14,19 +14,20 @@ package ai.djl.timeseries.timefeature;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.util.PairList;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /** this is a class to generate time feature by frequency. */
 public final class TimeFeature {
 
-    private static final PairList<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>>
+    private static final Map<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>>
             FEATURES_BY_OFFSETS = init();
 
     private TimeFeature() {}
@@ -147,37 +148,41 @@ public final class TimeFeature {
         return FEATURES_BY_OFFSETS.get(freqStr);
     }
 
-    private static PairList<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>>
-            init() {
-        List<String> keys = Arrays.asList("Y", "Q", "M", "W", "D", "H", "T", "S");
-        List<List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>> values =
+    private static Map<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>> init() {
+        Map<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>> map =
+                new ConcurrentHashMap<>();
+        map.put("Y", Collections.emptyList());
+        map.put("Q", Collections.singletonList(TimeFeature::monthOfYear));
+        map.put("M", Collections.singletonList(TimeFeature::monthOfYear));
+        map.put("W", Arrays.asList(TimeFeature::dayOfMonth, TimeFeature::weekOfYear));
+        map.put(
+                "D",
                 Arrays.asList(
-                        Collections.emptyList(),
-                        Collections.singletonList(TimeFeature::monthOfYear),
-                        Collections.singletonList(TimeFeature::monthOfYear),
-                        Arrays.asList(TimeFeature::dayOfMonth, TimeFeature::weekOfYear),
-                        Arrays.asList(
-                                TimeFeature::dayOfWeek,
-                                TimeFeature::dayOfMonth,
-                                TimeFeature::dayOfYear),
-                        Arrays.asList(
-                                TimeFeature::hourOfDay,
-                                TimeFeature::dayOfWeek,
-                                TimeFeature::dayOfMonth,
-                                TimeFeature::dayOfYear),
-                        Arrays.asList(
-                                TimeFeature::minuteOfHour,
-                                TimeFeature::hourOfDay,
-                                TimeFeature::dayOfWeek,
-                                TimeFeature::dayOfMonth,
-                                TimeFeature::dayOfYear),
-                        Arrays.asList(
-                                TimeFeature::secondOfMinute,
-                                TimeFeature::minuteOfHour,
-                                TimeFeature::hourOfDay,
-                                TimeFeature::dayOfWeek,
-                                TimeFeature::dayOfMonth,
-                                TimeFeature::dayOfYear));
-        return new PairList<>(keys, values);
+                        TimeFeature::dayOfWeek, TimeFeature::dayOfMonth, TimeFeature::dayOfYear));
+        map.put(
+                "H",
+                Arrays.asList(
+                        TimeFeature::hourOfDay,
+                        TimeFeature::dayOfWeek,
+                        TimeFeature::dayOfMonth,
+                        TimeFeature::dayOfYear));
+        map.put(
+                "T",
+                Arrays.asList(
+                        TimeFeature::minuteOfHour,
+                        TimeFeature::hourOfDay,
+                        TimeFeature::dayOfWeek,
+                        TimeFeature::dayOfMonth,
+                        TimeFeature::dayOfYear));
+        map.put(
+                "S",
+                Arrays.asList(
+                        TimeFeature::secondOfMinute,
+                        TimeFeature::minuteOfHour,
+                        TimeFeature::hourOfDay,
+                        TimeFeature::dayOfWeek,
+                        TimeFeature::dayOfMonth,
+                        TimeFeature::dayOfYear));
+        return map;
     }
 }

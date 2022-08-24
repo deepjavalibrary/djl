@@ -42,8 +42,7 @@ public class TransformTest {
             TimeSeriesData input = new TimeSeriesData(10);
             input.setField(FieldName.FEAT_STATIC_REAL, manager.create(new Shape(1, 2, 3)));
             input.setField(FieldName.FEAT_STATIC_CAT, manager.create(new Shape(2, 2, 3)));
-            List<FieldName> inputFields =
-                    Arrays.asList(FieldName.FEAT_STATIC_REAL, FieldName.FEAT_STATIC_CAT);
+            FieldName[] inputFields = {FieldName.FEAT_STATIC_REAL, FieldName.FEAT_STATIC_CAT};
             Convert.vstackFeatures(FieldName.FEAT_TIME, inputFields, input);
             Assert.assertTrue(input.contains(FieldName.FEAT_TIME.name()));
             Assert.assertEquals(input.get(FieldName.FEAT_TIME).getShape(), new Shape(3, 2, 3));
@@ -153,8 +152,7 @@ public class TransformTest {
             input.setField(FieldName.FEAT_AGE, array1);
             input.setField(FieldName.FEAT_TIME, array2);
 
-            List<String> fields =
-                    Arrays.asList(FieldName.FEAT_TIME.name(), FieldName.FEAT_AGE.name());
+            String[] fields = {FieldName.FEAT_TIME.name(), FieldName.FEAT_AGE.name()};
             input = Field.selectField(fields, input);
 
             Assert.assertEquals(input.size(), 2);
@@ -183,7 +181,7 @@ public class TransformTest {
                     PredictionSplitSampler.newTestSplitSampler(),
                     30,
                     28,
-                    Arrays.asList(FieldName.FEAT_TIME, FieldName.OBSERVED_VALUES),
+                    new FieldName[] {FieldName.FEAT_TIME, FieldName.OBSERVED_VALUES},
                     0f,
                     input);
 
@@ -207,7 +205,7 @@ public class TransformTest {
             Assert.assertEquals(
                     input.get("FUTURE_" + FieldName.TARGET).getShape(), new Shape(0, 32));
             Assert.assertEquals(
-                    input.getForeCastStartTime(), LocalDateTime.parse("2011-03-18T00:00"));
+                    input.getForecastStartTime(), LocalDateTime.parse("2011-03-18T00:00"));
         }
     }
 }

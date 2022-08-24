@@ -16,19 +16,17 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
 
-import java.util.List;
-
 /** Select preset field names. */
 public class SelectField implements TimeSeriesTransform {
 
-    private final List<String> inputFields;
+    private String[] inputFields;
 
     /**
      * Constructs a {@code SelectField} instance.
      *
      * @param inputFields field names to select from
      */
-    public SelectField(List<String> inputFields) {
+    public SelectField(String[] inputFields) {
         this.inputFields = inputFields;
     }
 

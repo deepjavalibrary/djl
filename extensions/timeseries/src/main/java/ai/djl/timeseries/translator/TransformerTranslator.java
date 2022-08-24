@@ -34,7 +34,6 @@ import ai.djl.translate.TranslatorContext;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -47,16 +46,16 @@ public class TransformerTranslator extends BaseTimeSeriesTranslator {
 
     private int historyLength;
 
-    private static final List<String> PRED_INPUT_FIELDS =
-            new ArrayList<>(
-                    Arrays.asList(
-                            FieldName.FEAT_STATIC_CAT.name(),
-                            "PAST_" + FieldName.FEAT_TIME.name(),
-                            "PAST_" + FieldName.TARGET.name(),
-                            "PAST_" + FieldName.OBSERVED_VALUES.name(),
-                            "FUTURE_" + FieldName.FEAT_TIME.name()));
-    private static final List<FieldName> TIME_SERIES_FIELDS =
-            new ArrayList<>(Arrays.asList(FieldName.FEAT_TIME, FieldName.OBSERVED_VALUES));
+    private static final String[] PRED_INPUT_FIELDS = {
+        FieldName.FEAT_STATIC_CAT.name(),
+        "PAST_" + FieldName.FEAT_TIME.name(),
+        "PAST_" + FieldName.TARGET.name(),
+        "PAST_" + FieldName.OBSERVED_VALUES.name(),
+        "FUTURE_" + FieldName.FEAT_TIME.name()
+    };
+    private static final FieldName[] TIME_SERIES_FIELDS = {
+        FieldName.FEAT_TIME, FieldName.OBSERVED_VALUES
+    };
     private final List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeatures;
 
     private final InstanceSampler instanceSampler;
@@ -81,8 +80,9 @@ public class TransformerTranslator extends BaseTimeSeriesTranslator {
     @Override
     public Forecast processOutput(TranslatorContext ctx, NDList list) {
         NDArray outputs = list.singletonOrThrow();
-        return new SampleForecast(
-                outputs, ((TimeSeriesData) ctx.getAttachment("input")).getStartTime(), this.freq);
+        TimeSeriesData data = (TimeSeriesData) ctx.getAttachment("input");
+        outputs.attach((NDManager) ctx.getAttachment("manager"));
+        return new SampleForecast(outputs, data.getStartTime(), this.freq);
     }
 
     /** {@inheritDoc} */
@@ -90,6 +90,7 @@ public class TransformerTranslator extends BaseTimeSeriesTranslator {
     public NDList processInput(TranslatorContext ctx, TimeSeriesData input) {
         NDManager manager = ctx.getNDManager();
         ctx.setAttachment("input", input);
+        ctx.setAttachment("manager", input.get(FieldName.TARGET).getManager());
 
         List<FieldName> removeFieldNames = new ArrayList<>();
         removeFieldNames.add(FieldName.FEAT_DYNAMIC_CAT);
@@ -120,12 +121,15 @@ public class TransformerTranslator extends BaseTimeSeriesTranslator {
         Feature.addAgeFeature(
                 manager, FieldName.TARGET, FieldName.FEAT_AGE, predictionLength, input);
 
-        List<FieldName> inputFields = new ArrayList<>();
-        inputFields.add(FieldName.FEAT_TIME);
-        inputFields.add(FieldName.FEAT_AGE);
+        FieldName[] inputFields;
         if (useFeatDynamicReal) {
-            inputFields.add(FieldName.FEAT_DYNAMIC_REAL);
+            inputFields = new FieldName[3];
+            inputFields[2] = FieldName.FEAT_DYNAMIC_REAL;
+        } else {
+            inputFields = new FieldName[2];
         }
+        inputFields[0] = FieldName.FEAT_TIME;
+        inputFields[1] = FieldName.FEAT_AGE;
         Convert.vstackFeatures(FieldName.FEAT_TIME, inputFields, input);
 
         Split.instanceSplit(

@@ -18,6 +18,7 @@ import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /** A utility class that used to operate field name in {@link TimeSeriesData}. */
@@ -56,9 +57,9 @@ public final class Field {
      * @param data the {@link TimeSeriesData} to operate on
      * @return the result {@link TimeSeriesData}
      */
-    public static TimeSeriesData selectField(List<String> inputFields, TimeSeriesData data) {
-        List<String> keys = new ArrayList<>(inputFields);
-        List<NDArray> values = new ArrayList<>();
+    public static TimeSeriesData selectField(String[] inputFields, TimeSeriesData data) {
+        List<String> keys = Arrays.asList(inputFields);
+        List<NDArray> values = new ArrayList<>(keys.size());
         for (String field : inputFields) {
             values.add(data.get(field));
         }
