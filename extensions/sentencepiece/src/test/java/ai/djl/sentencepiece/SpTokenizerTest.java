@@ -21,6 +21,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,6 +53,21 @@ public class SpTokenizerTest {
             Assert.assertEquals(tokens, expected);
             String recovered = tokenizer.buildSentence(tokens);
             Assert.assertEquals(original, recovered);
+        }
+    }
+
+    @Test
+    public void testLoadFromInputStream() throws IOException {
+        Path modelPath = Paths.get("build/test/sp_model/sp_model.model");
+        try (InputStream is = Files.newInputStream(modelPath)) {
+            try (SpTokenizer tokenizer = new SpTokenizer(is)) {
+                String original = "Hello World";
+                List<String> tokens = tokenizer.tokenize(original);
+                List<String> expected = Arrays.asList("▁He", "ll", "o", "▁", "W", "or", "l", "d");
+                Assert.assertEquals(tokens, expected);
+                String recovered = tokenizer.buildSentence(tokens);
+                Assert.assertEquals(original, recovered);
+            }
         }
     }
 
