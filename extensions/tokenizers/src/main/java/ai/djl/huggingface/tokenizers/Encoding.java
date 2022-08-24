@@ -25,7 +25,7 @@ public class Encoding {
     private long[] specialTokenMask;
     private CharSpan[] charTokenSpans;
 
-    Encoding(
+    protected Encoding(
             long[] ids,
             long[] typeIds,
             String[] tokens,
