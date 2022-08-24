@@ -13,9 +13,11 @@
 package ai.djl.sentencepiece;
 
 import ai.djl.modality.nlp.preprocess.Tokenizer;
+import ai.djl.util.Utils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -59,6 +61,17 @@ public class SpTokenizer implements Tokenizer, AutoCloseable {
     public SpTokenizer(byte[] serializedModel) {
         this.processor = SpProcessor.newInstance();
         processor.loadModelFromBytes(serializedModel);
+    }
+
+    /**
+     * Creates a SentencePiece Tokenizer from inputStream.
+     *
+     * @param is {@link InputStream} of the serialized model
+     * @throws IOException when IO operation fails in loading a resource
+     */
+    public SpTokenizer(InputStream is) throws IOException {
+        this.processor = SpProcessor.newInstance();
+        processor.loadModelFromBytes(Utils.toByteArray(is));
     }
 
     /** {@inheritDoc} */
