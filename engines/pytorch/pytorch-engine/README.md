@@ -74,7 +74,8 @@ If you are running on an older operating system (like CentOS 7), you have to use
 System.setProperty("PYTORCH_PRECXX11", "true");
 ```
 
-You can choose a native library based on your platform if you don't have network access at runtime.
+If you don't have network access, you can add a offline native library package based on your platform
+to avoid downloading the native libraries at runtime.
 
 ### macOS
 For macOS, you can use the following library:
@@ -92,7 +93,7 @@ For macOS, you can use the following library:
 </dependency>
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-jni</artifactId>
+    <artifactId>pytorch-jni</artifactId>
     <version>1.11.0-0.18.0</version>
     <scope>runtime</scope>
 </dependency>
