@@ -55,6 +55,14 @@ public class LgbmNDArray extends NDArrayAdapter {
         handle = new AtomicReference<>();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void returnResource(NDManager manager) {
+        detach();
+        this.manager = manager;
+        manager.attachUncappedInternal(getUid(), this);
+    }
+
     /**
      * Returns the native LightGBM handle to the array.
      *
