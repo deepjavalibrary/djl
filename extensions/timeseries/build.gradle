@@ -1,4 +1,4 @@
-group 'ai.dj.timeseries'
+group 'ai.djl.timeseries'
 
 dependencies {
     api project(":api")
