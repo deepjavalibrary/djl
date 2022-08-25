@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.evaluator.AbstractAccuracy;
 import ai.djl.training.evaluator.Accuracy;
+import ai.djl.training.evaluator.Coverage;
 import ai.djl.training.evaluator.TopKAccuracy;
 
 import org.testng.Assert;
@@ -51,6 +52,25 @@ public class EvaluatorTest {
             acc.updateAccumulator("", new NDList(labels), new NDList(predictions));
             accuracy = acc.getAccumulator("");
             expectedAccuracy = 2.f / 3;
+            Assert.assertEquals(
+                    accuracy,
+                    expectedAccuracy,
+                    "Wrong accuracy, expected: " + expectedAccuracy + ", actual: " + accuracy);
+        }
+    }
+
+    @Test
+    public void testCoverage() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+
+            NDArray predictions = manager.create(new float[] {0.3f, 0.7f, 0.0f}, new Shape(3));
+            NDArray labels = manager.create(new float[] {0.5f, 0.5f, 0.5f}, new Shape(3));
+
+            Coverage coverage = new Coverage();
+            coverage.addAccumulator("");
+            coverage.updateAccumulator("", new NDList(labels), new NDList(predictions));
+            float accuracy = coverage.getAccumulator("");
+            float expectedAccuracy = 1.f / 3;
             Assert.assertEquals(
                     accuracy,
                     expectedAccuracy,
