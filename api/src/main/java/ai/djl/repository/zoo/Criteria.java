@@ -406,12 +406,13 @@ public class Criteria<I, O> {
         Block block;
         String modelName;
         Progress progress;
-        private Translator<I, O> translator;
+        Translator<I, O> translator;
 
         Builder() {
             application = Application.UNDEFINED;
         }
 
+        @SuppressWarnings("unchecked")
         private Builder(Class<I> inputClass, Class<O> outputClass, Builder<?, ?> parent) {
             this.inputClass = inputClass;
             this.outputClass = outputClass;
@@ -419,12 +420,16 @@ public class Criteria<I, O> {
             engine = parent.engine;
             device = parent.device;
             groupId = parent.groupId;
+            artifactId = parent.artifactId;
+            modelZoo = parent.modelZoo;
             filters = parent.filters;
             arguments = parent.arguments;
             options = parent.options;
+            factory = parent.factory;
             block = parent.block;
             modelName = parent.modelName;
             progress = parent.progress;
+            translator = (Translator<I, O>) parent.translator;
         }
 
         /**
