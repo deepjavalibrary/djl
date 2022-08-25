@@ -17,6 +17,8 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.transform.Normalize;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.SemanticSegmentationTranslator;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
@@ -30,8 +32,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An example of inference using a semantic segmentation model.
@@ -55,13 +55,16 @@ public final class SemanticSegmentation {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
+        float[] mean = {0.485f, 0.456f, 0.406f};
+        float[] std = {0.229f, 0.224f, 0.225f};
+
         String url =
                 "https://mlrepo.djl.ai/model/cv/semantic_segmentation/ai/djl/pytorch/deeplabv3/0.0.1/deeplabv3.zip";
-        Map<String, String> arguments = new ConcurrentHashMap<>();
-        arguments.put("toTensor", "true");
-        arguments.put("normalize", "true");
         SemanticSegmentationTranslator translator =
-                SemanticSegmentationTranslator.builder(arguments).build();
+                SemanticSegmentationTranslator.builder()
+                        .addTransform(new ToTensor())
+                        .addTransform(new Normalize(mean, std))
+                        .build();
 
         Criteria<Image, Image> criteria =
                 Criteria.builder()
@@ -72,11 +75,10 @@ public final class SemanticSegmentation {
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
                         .build();
-        try (ZooModel<Image, Image> model = criteria.loadModel()) {
-            try (Predictor<Image, Image> predictor = model.newPredictor()) {
-                Image semanticImage = predictor.predict(img);
-                saveSemanticImage(semanticImage);
-            }
+        try (ZooModel<Image, Image> model = criteria.loadModel();
+                Predictor<Image, Image> predictor = model.newPredictor()) {
+            Image semanticImage = predictor.predict(img);
+            saveSemanticImage(semanticImage);
         }
     }
 
