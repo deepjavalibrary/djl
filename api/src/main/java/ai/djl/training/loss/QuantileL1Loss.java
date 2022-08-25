@@ -36,7 +36,8 @@ public class QuantileL1Loss extends Loss {
 
     private Number quantile;
 
-    /** Computes QuantileL1Loss for regression problem.
+    /**
+     * Computes QuantileL1Loss for regression problem.
      *
      * @param quantile the quantile position of the data to focus on
      */
@@ -44,7 +45,8 @@ public class QuantileL1Loss extends Loss {
         this("QuantileL1Loss", quantile);
     }
 
-    /** Computes QuantileL1Loss for regression problem.
+    /**
+     * Computes QuantileL1Loss for regression problem.
      *
      * @param name the name of the loss function, default "QuantileL1Loss"
      * @param quantile the quantile position of the data to focus on
