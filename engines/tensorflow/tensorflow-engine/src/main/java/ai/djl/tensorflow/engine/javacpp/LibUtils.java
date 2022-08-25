@@ -188,6 +188,7 @@ public final class LibUtils {
                             cudaArch);
                     return path.toAbsolutePath().toString();
                 }
+                flavor = cpuFlavor;
                 found = downloadFiles(lines, link, os, flavor, tmp);
             }
 
