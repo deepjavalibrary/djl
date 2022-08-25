@@ -82,7 +82,7 @@ public abstract class Loss extends Evaluator {
     /**
      * Returns a new instance of {@link QuantileL1Loss} with given quantile.
      *
-     * @param quantile the quantile of data labels to focus on
+     * @param quantile the quantile position of the data to focus on
      * @return a new instance of {@link QuantileL1Loss}
      */
     public static QuantileL1Loss quantileL1Loss(float quantile) {
@@ -93,7 +93,7 @@ public abstract class Loss extends Evaluator {
      * Returns a new instance of {@link QuantileL1Loss} with given quantile.
      *
      * @param name the name of the loss
-     * @param quantile the quantile of data labels to focus on
+     * @param quantile the quantile position of the data to focus on
      * @return a new instance of {@link QuantileL1Loss}
      */
     public static QuantileL1Loss quantileL1Loss(String name, float quantile) {
