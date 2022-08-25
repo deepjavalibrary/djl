@@ -45,6 +45,7 @@ dependencies {
         api "ai.djl.tensorflow:tensorflow-model-zoo:${version}"
         api "ai.djl.tensorrt:tensorrt:${version}"
         api "ai.djl.tflite:tflite-engine:${version}"
+        api "ai.djl.timeseries:timeseries:${version}"
     }
 }
 
