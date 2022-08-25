@@ -35,6 +35,19 @@ public class LossTest {
     }
 
     @Test
+    public void quantileL1LossTest() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
+            NDArray label = manager.ones(new Shape(5));
+            Assert.assertEquals(
+                    Loss.quantileL1Loss(0.9f)
+                            .evaluate(new NDList(label), new NDList(pred))
+                            .getFloat(),
+                    0.4000001f);
+        }
+    }
+
+    @Test
     public void l2LossTest() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
