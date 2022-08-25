@@ -56,3 +56,6 @@ class FillMaskConverter(HuggingfaceConverter):
     def encode_inputs(self, tokenizer):
         text = self.inputs.replace("[MASK]", tokenizer.mask_token)
         return tokenizer.encode_plus(text, return_tensors='pt')
+
+    def get_extra_arguments(self, hf_pipeline) -> dict:
+        return {"maskToken": hf_pipeline.tokenizer.mask_token}

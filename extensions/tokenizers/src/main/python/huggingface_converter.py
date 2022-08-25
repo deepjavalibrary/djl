@@ -57,7 +57,7 @@ class HuggingfaceConverter:
             return False, reason, -1
 
         size = self.save_to_model_zoo(model_id, output_dir, temp_dir,
-                                      hf_pipeline.tokenizer.mask_token)
+                                      hf_pipeline)
 
         return True, None, size
 
@@ -100,7 +100,7 @@ class HuggingfaceConverter:
         return model_file
 
     def save_to_model_zoo(self, model_id: str, output_dir: str, temp_dir: str,
-                          mask_token: str):
+                          hf_pipeline):
         artifact_ids = model_id.split("/")
         model_name = artifact_ids[-1]
 
@@ -111,13 +111,14 @@ class HuggingfaceConverter:
 
         # Save serving.properties
         serving_file = os.path.join(temp_dir, "serving.properties")
+        arguments = self.get_extra_arguments(hf_pipeline)
         with open(serving_file, 'w') as f:
             f.write(f"engine=PyTorch\n"
                     f"option.modelName={model_name}\n"
                     f"option.mapLocation=true\n"
                     f"translatorFactory={self.translator}\n")
-            if mask_token:
-                f.write(f"maskToken={mask_token}\n")
+            for k, v in arguments.items():
+                f.write(f"{k}={v}\n")
 
         # Save model as .zip file
         logging.info(f"Saving DJL model as zip: {model_name}.zip ...")
@@ -156,6 +157,9 @@ class HuggingfaceConverter:
         out = traced_model(input_ids, attention_mask)
 
         return self.verify_jit_output(hf_pipeline, encoding, out)
+
+    def get_extra_arguments(self, hf_pipeline) -> dict:
+        return {}
 
     def verify_jit_output(self, hf_pipeline, encoding, out):
         if not hasattr(out, "last_hidden_layer"):
