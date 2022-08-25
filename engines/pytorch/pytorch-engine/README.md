@@ -39,7 +39,7 @@ Since DJL 0.14.0, `pytorch-engine` can load older version of pytorch native libr
 ways to specify PyTorch version:
 
 1. Explicitly specify `pytorch-native-xxx` package version to override the version in the [BOM](../../../bom/README.md).
-2. Sets environment variable: `PYTORCH_VERSION` to override the package version defined by `pytorch-native-auto`.
+2. Sets environment variable: `PYTORCH_VERSION` to override the default package version.
 
 The following table illustrates which pytorch version that DJL supports:
 
