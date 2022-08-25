@@ -17,7 +17,9 @@ Although DJL itself has many packages, but in a real production environment, the
 
 - ai.djl:api
 - one of the engine package (e.g. ai.djl.pytorch:pytorch-engine)
-- native library of selected engine (e.g. ai.djl.pytorch:pytorch-native-auto)
+- native library of selected engine for no internet use case 
+  (e.g. ai.djl.pytorch:pytorch-native-cpu:1.11.0:linux-x86_64 + ai.djl.pytorch:pytorch-jni).
+  See [How to distribute DJL application](https://github.com/deepjavalibrary/djl-demo/tree/master/development/fatjar#readme) for more detail.
 
 We don't recommend include more than one engine into your project unless you need both of them. DJL will load
 all engines into memory as long as they are in classpath, and those engines usually consume significant of memory.

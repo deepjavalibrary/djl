@@ -57,11 +57,6 @@ will need to mention the type as pom and the scope as import) as the following:
         <groupId>ai.djl.mxnet</groupId>
         <artifactId>mxnet-engine</artifactId>
     </dependency>
-    <dependency>
-        <groupId>ai.djl.mxnet</groupId>
-        <artifactId>mxnet-native-auto</artifactId>
-        <scope>runtime</scope>
-    </dependency>
 </dependencies>
 ```
 
