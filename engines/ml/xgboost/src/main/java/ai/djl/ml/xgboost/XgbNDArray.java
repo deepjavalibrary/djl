@@ -100,6 +100,14 @@ public class XgbNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
+    public void returnResource(NDManager manager) {
+        detach();
+        this.manager = manager;
+        manager.attachUncappedInternal(getUid(), this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void detach() {
         manager.detachInternal(getUid());
         manager = XgbNDManager.getSystemManager();
