@@ -51,3 +51,6 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
             return False, f"Unexpected inference result: {last_hidden_state}"
 
         return True, None
+
+    def get_extra_arguments(self, hf_pipeline) -> dict:
+        return {"padding": "true"}

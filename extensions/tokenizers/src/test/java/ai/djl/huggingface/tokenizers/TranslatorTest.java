@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.huggingface.translator.FillMaskTranslatorFactory;
 import ai.djl.huggingface.translator.QuestionAnsweringTranslatorFactory;
+import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory;
 import ai.djl.huggingface.translator.TokenClassificationTranslatorFactory;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -26,6 +27,7 @@ import ai.djl.modality.nlp.translator.NamedEntity;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.repository.zoo.Criteria;
@@ -312,6 +314,85 @@ public class TranslatorTest {
 
             TokenClassificationTranslatorFactory factory =
                     new TokenClassificationTranslatorFactory();
+            Map<String, String> arguments = new HashMap<>();
+
+            Assert.assertThrows(
+                    TranslateException.class,
+                    () -> factory.newInstance(String.class, Integer.class, model, arguments));
+
+            arguments.put("tokenizer", "bert-base-uncased");
+
+            Assert.assertThrows(
+                    IllegalArgumentException.class,
+                    () -> factory.newInstance(String.class, Integer.class, model, arguments));
+        }
+    }
+
+    @Test
+    public void testTextEmbeddingTranslator()
+            throws ModelException, IOException, TranslateException {
+        TestRequirements.notArm();
+
+        String text = "This is an example sentence";
+
+        Block block =
+                new LambdaBlock(
+                        a -> {
+                            NDManager manager = a.getManager();
+                            NDArray arr = manager.ones(new Shape(1, 7, 384));
+                            arr.setName("last_hidden_state");
+                            return new NDList(arr);
+                        },
+                        "model");
+        Path modelDir = Paths.get("build/model");
+        Files.createDirectories(modelDir);
+
+        Criteria<String, float[]> criteria =
+                Criteria.builder()
+                        .setTypes(String.class, float[].class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String, float[]> model = criteria.loadModel();
+                Predictor<String, float[]> predictor = model.newPredictor()) {
+            float[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 384);
+            Assertions.assertAlmostEquals(res[0], 0.05103);
+        }
+
+        Criteria<Input, Output> criteria2 =
+                Criteria.builder()
+                        .setTypes(Input.class, Output.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<Input, Output> model = criteria2.loadModel();
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            Input input = new Input();
+            input.add(text);
+            Output out = predictor.predict(input);
+            float[] res = JsonUtils.GSON.fromJson(out.getAsString(0), float[].class);
+            Assert.assertEquals(res.length, 384);
+            Assertions.assertAlmostEquals(res[0], 0.05103);
+        }
+
+        try (Model model = Model.newInstance("test")) {
+            model.setBlock(block);
+            Map<String, String> options = new HashMap<>();
+            options.put("hasParameter", "false");
+            model.load(modelDir, "test", options);
+
+            TextEmbeddingTranslatorFactory factory = new TextEmbeddingTranslatorFactory();
             Map<String, String> arguments = new HashMap<>();
 
             Assert.assertThrows(
