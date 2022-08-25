@@ -69,7 +69,7 @@ public abstract class Loss extends Evaluator {
     }
 
     /**
-     * Returns a new instance of {@link L1Loss} with given weight and batch axis.
+     * Returns a new instance of {@link L1Loss} with given weight.
      *
      * @param name the name of the loss
      * @param weight the weight to apply on loss value, default 1
@@ -77,6 +77,27 @@ public abstract class Loss extends Evaluator {
      */
     public static L1Loss l1Loss(String name, float weight) {
         return new L1Loss(name, weight);
+    }
+
+    /**
+     * Returns a new instance of {@link QuantileL1Loss} with given quantile.
+     *
+     * @param quantile the quantile position of the data to focus on
+     * @return a new instance of {@link QuantileL1Loss}
+     */
+    public static QuantileL1Loss quantileL1Loss(float quantile) {
+        return new QuantileL1Loss(quantile);
+    }
+
+    /**
+     * Returns a new instance of {@link QuantileL1Loss} with given quantile.
+     *
+     * @param name the name of the loss
+     * @param quantile the quantile position of the data to focus on
+     * @return a new instance of {@link QuantileL1Loss}
+     */
+    public static QuantileL1Loss quantileL1Loss(String name, float quantile) {
+        return new QuantileL1Loss(name, quantile);
     }
 
     /**
