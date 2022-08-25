@@ -7,6 +7,7 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
     implementation project(":basicdataset")
     implementation project(":model-zoo")
+    implementation project(":extensions:timeseries")
 
     runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
     runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
