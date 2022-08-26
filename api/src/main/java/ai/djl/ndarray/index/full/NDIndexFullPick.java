@@ -27,7 +27,6 @@ public final class NDIndexFullPick {
 
     private NDArray indices;
     private int axis;
-    private boolean indexTake;
 
     /**
      * Constructs a new {@link NDIndexFullPick}.
@@ -73,7 +72,6 @@ public final class NDIndexFullPick {
                             "Only rank-1 indexing array is supported for pick");
                 }
                 fullPick = new NDIndexFullPick(indexElem, axis);
-                fullPick.setIndexTake(true);
             } else {
                 // Invalid dim for fullPick
                 return Optional.empty();
@@ -98,23 +96,5 @@ public final class NDIndexFullPick {
      */
     public int getAxis() {
         return axis;
-    }
-
-    /**
-     * Returns if a "take" rather than a "pick" operation is intended.
-     *
-     * @return <code>true</code> for "take"
-     */
-    public boolean isIndexTake() {
-        return indexTake;
-    }
-
-    /**
-     * Sets if a "take" rather than a "pick" operation is intended.
-     *
-     * @param indexTake <code>true</code> for "take"
-     */
-    public void setIndexTake(boolean indexTake) {
-        this.indexTake = indexTake;
     }
 }
