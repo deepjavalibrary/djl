@@ -149,6 +149,17 @@ public class NDIndexTest {
     }
 
     @Test
+    public void testEmptyArrayClosing() {
+        // This is to check the resource closing issue in MXNet engine is circumvented.
+        // MXNetError: Check failed: delay_alloc:
+        try (NDManager manager = NDManager.newBaseManager()) {
+            manager.create(new Shape(2, 2)).get(":4, 3:4");
+            manager.create(new Shape(2)).get("3:3");
+            manager.create(new Shape(2)).get("2:3");
+        }
+    }
+
+    @Test
     public void testSetArray() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
