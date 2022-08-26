@@ -35,7 +35,8 @@ class HuggingfaceConverter:
         self.inputs = None
         self.outputs = None
 
-    def save_model(self, model_id: str, output_dir: str, temp_dir: str):
+    def save_model(self, model_info, output_dir: str, temp_dir: str):
+        model_id = model_info.modelId
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
 
@@ -56,7 +57,7 @@ class HuggingfaceConverter:
         if not result:
             return False, reason, -1
 
-        size = self.save_to_model_zoo(model_id, output_dir, temp_dir,
+        size = self.save_to_model_zoo(model_info, output_dir, temp_dir,
                                       hf_pipeline)
 
         return True, None, size
@@ -99,8 +100,9 @@ class HuggingfaceConverter:
         script_module.save(model_file)
         return model_file
 
-    def save_to_model_zoo(self, model_id: str, output_dir: str, temp_dir: str,
+    def save_to_model_zoo(self, model_info, output_dir: str, temp_dir: str,
                           hf_pipeline):
+        model_id = model_info.modelId
         artifact_ids = model_id.split("/")
         model_name = artifact_ids[-1]
 
@@ -128,8 +130,9 @@ class HuggingfaceConverter:
         # Save metadata.json
         sha1 = sha1_sum(zip_file)
         file_size = os.path.getsize(zip_file)
-        metadata = HuggingfaceMetadata(artifact_ids, self.application,
-                                       self.translator, sha1, file_size)
+        metadata = HuggingfaceMetadata(model_info, artifact_ids,
+                                       self.application, self.translator, sha1,
+                                       file_size)
         metadata_file = os.path.join(repo_dir, "metadata.json")
         metadata.save_metadata(metadata_file)
 

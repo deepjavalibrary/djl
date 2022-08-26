@@ -27,6 +27,19 @@ ARCHITECTURES_2_TASK = {
     "ForMultipleChoice": "text-classification",
     "ForMaskedLM": "fill-mask"
 }
+LANGUAGES = ModelSearchArguments().language
+
+
+def get_lang_tags(model_info):
+    tags = {}
+    for tag in model_info.tags:
+        if tag in LANGUAGES:
+            tags[tag] = "true"
+
+    if not tags:
+        tags["en"] = "true"
+
+    return tags
 
 
 class HuggingfaceModels:
@@ -43,7 +56,6 @@ class HuggingfaceModels:
         self.temp_dir = f"{self.output_dir}/tmp"
 
     def list_models(self, args: Namespace) -> List[dict]:
-        languages = ModelSearchArguments().language
         api = HfApi()
         if args.model_name:
             models = api.list_models(filter="pytorch",
@@ -70,15 +82,8 @@ class HuggingfaceModels:
                 logging.info(f"Skip flair model: {model_id}.")
                 continue
 
-            is_english = "en" in model_info.tags
-            if not is_english:
-                is_english = True
-                for tag in model_info.tags:
-                    if tag in languages and tag != 'en':
-                        is_english = False
-                        break
-
-            if not is_english:
+            languages = get_lang_tags(model_info)
+            if "en" not in languages:
                 logging.warning(f"Skip non-English model: {model_id}.")
                 continue
 
