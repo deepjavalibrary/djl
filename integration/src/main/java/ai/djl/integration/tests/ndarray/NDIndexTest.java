@@ -149,7 +149,7 @@ public class NDIndexTest {
     }
 
     @Test
-    public void testEmpty() {
+    public void testEmptyArrayClosing() {
         // This is to check the resource closing issue in MXNet engine is circumvented.
         // MXNetError: Check failed: delay_alloc:
         try (NDManager manager = NDManager.newBaseManager()) {
