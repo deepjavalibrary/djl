@@ -68,7 +68,10 @@ public abstract class RecurrentBlock extends AbstractBlock {
         bidirectional = builder.bidirectional;
         returnState = builder.returnState;
 
-        Parameter.Type[] parameterTypes = {Parameter.Type.WEIGHT, Parameter.Type.BIAS};
+        Parameter.Type[] parameterTypes =
+                hasBiases
+                        ? new Parameter.Type[] {Parameter.Type.WEIGHT, Parameter.Type.BIAS}
+                        : new Parameter.Type[] {Parameter.Type.WEIGHT};
         String[] directions = {"l"};
         if (builder.bidirectional) {
             directions = new String[] {"l", "r"};

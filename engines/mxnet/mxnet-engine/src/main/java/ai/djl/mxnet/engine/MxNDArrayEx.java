@@ -835,7 +835,11 @@ class MxNDArrayEx implements NDArrayEx {
             boolean training,
             boolean bidirectional,
             boolean batchFirst) {
-        int numParams = numLayers * ((hasBiases) ? 4 : 2) * ((bidirectional) ? 2 : 1);
+        if (!hasBiases) {
+            throw new UnsupportedOperationException(
+                    "Setting hasBias to be false is not supported on MXNet engine.");
+        }
+        int numParams = numLayers * 4 * (bidirectional ? 2 : 1);
         Preconditions.checkArgument(
                 params.size() == numParams,
                 "The size of Params is incorrect expect "
