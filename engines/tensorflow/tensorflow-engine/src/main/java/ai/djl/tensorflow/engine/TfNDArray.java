@@ -210,7 +210,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
-    public NDArray take(NDArray index) {
+    public NDArray take(NDManager manager, NDArray index) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 

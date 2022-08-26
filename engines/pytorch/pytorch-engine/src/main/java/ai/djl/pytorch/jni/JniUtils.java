@@ -503,13 +503,12 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchGather(ndArray.getHandle(), index.getHandle(), dim, false));
     }
 
-    public static PtNDArray take(PtNDArray ndArray, PtNDArray index) {
+    public static PtNDArray take(PtNDArray ndArray, PtNDArray index, PtNDManager manager) {
         if (index.getDataType() != DataType.INT64) {
             index = index.toType(DataType.INT64, true);
         }
         return new PtNDArray(
-                ndArray.getManager(),
-                PyTorchLibrary.LIB.torchTake(ndArray.getHandle(), index.getHandle()));
+                manager, PyTorchLibrary.LIB.torchTake(ndArray.getHandle(), index.getHandle()));
     }
 
     public static PtNDArray put(PtNDArray ndArray, PtNDArray index, PtNDArray data) {

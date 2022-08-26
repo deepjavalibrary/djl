@@ -193,7 +193,7 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray take(NDArray index) {
+    public NDArray take(NDManager manager, NDArray index) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
