@@ -46,6 +46,15 @@ public class MxNDArrayIndexer extends NDArrayIndexer {
     @Override
     public NDArray get(NDArray array, NDIndexFullSlice fullSlice) {
         array = manager.from(array);
+        long[] min = fullSlice.getMin();
+        long[] max = fullSlice.getMax();
+        long[] s = array.getShape().getShape();
+        for (int i = 0; i < min.length; i++) {
+            if (min[i] >= max[i] || min[i] >= s[i]) {
+                return manager.create(new Shape(0));
+            }
+        }
+
         MxOpParams params = new MxOpParams();
         params.addTupleParam("begin", fullSlice.getMin());
         params.addTupleParam("end", fullSlice.getMax());
