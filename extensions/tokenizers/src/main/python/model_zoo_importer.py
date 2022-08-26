@@ -43,11 +43,10 @@ def main():
     for model in models:
         task = model["task"]
         model_info = model["model_info"]
-        model_id = model_info.modelId
         converter = SUPPORTED_TASK[task]
 
-        result, reason, size = converter.save_model(model_id, args.output_dir,
-                                                    temp_dir)
+        result, reason, size = converter.save_model(model_info,
+                                                    args.output_dir, temp_dir)
         if not result:
             logging.error(reason)
 

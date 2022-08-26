@@ -11,17 +11,14 @@
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
 import json
+from huggingface_models import get_lang_tags
 
 
 class HuggingfaceMetadata:
 
-    def __init__(self,
-                 artifact_ids: list[str],
-                 application: str,
-                 translator: str,
-                 sha1: str,
-                 file_size: int,
-                 tags: dict = None):
+    def __init__(self, model_info, artifact_ids: list[str], application: str,
+                 translator: str, sha1: str, file_size: int):
+        self.model_info = model_info
         self.model_name = artifact_ids[-1]
         artifact_ids[0:-1].insert(0, "ai.djl.huggingface")
         self.group_id = ".".join(artifact_ids)
@@ -29,9 +26,10 @@ class HuggingfaceMetadata:
         self.translator = translator
         self.sha1 = sha1
         self.file_size = file_size
-        self.tags = tags
 
     def save_metadata(self, metadata_file: str):
+        properties = get_lang_tags(self.model_info)
+
         metadata = {
             "metadataVersion": "0.2",
             "resourceType": "model",
@@ -52,7 +50,8 @@ class HuggingfaceMetadata:
                 "version": "0.0.1",
                 "snapshot": False,
                 "name": self.model_name,
-                "properties": self.tags,
+                "downloads": self.model_info.downloads,
+                "properties": properties,
                 "arguments": {
                     "translatorFactory": self.translator
                 },
