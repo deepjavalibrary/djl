@@ -13,6 +13,8 @@
 package ai.djl.pytorch.jni;
 
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.util.NativeResource;
@@ -156,11 +158,26 @@ public class IValue extends NativeResource<Long> {
     /**
      * Creates a new {@code IValue} of type {@code PtNDArray}.
      *
-     * @param value the NDArray value
+     * @param array the NDArray
      * @return a new {@code IValue} of type {@code PtNDArray}
      */
-    public static IValue from(PtNDArray value) {
-        return new IValue(PyTorchLibrary.LIB.iValueFromTensor(value.getHandle()));
+    public static IValue from(PtNDArray array) {
+        if (array.getDataType() == DataType.STRING) {
+            Shape shape = array.getShape();
+            String[] strs = array.toStringArray();
+            if (shape.isScalar()) {
+                return from(strs[0]);
+            }
+            IValue[] list = new IValue[strs.length];
+            PtNDManager manager = array.getManager();
+            for (int i = 0; i < strs.length; i++) {
+                IValue ivalue = from(strs[i]);
+                manager.attachUncappedInternal(ivalue.getUid(), ivalue);
+                list[i] = ivalue;
+            }
+            return listFrom(list);
+        }
+        return new IValue(PyTorchLibrary.LIB.iValueFromTensor(array.getHandle()));
     }
 
     /**
@@ -477,6 +494,8 @@ public class IValue extends NativeResource<Long> {
                 ivalue.close();
             }
             return list;
+        } else if (isString()) {
+            return new NDList(manager.create(toStringValue()));
         }
         throw new UnsupportedOperationException("Unsupported IValue type.");
     }

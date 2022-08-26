@@ -46,6 +46,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     private Boolean hasGradient;
     private PtNDManager manager;
     private PtNDArrayEx ptNDArrayEx;
+    private String[] strs;
 
     // keep a reference to direct buffer to avoid GC release the memory
     @SuppressWarnings("PMD.UnusedPrivateField")
@@ -79,6 +80,22 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         this.ptNDArrayEx = new PtNDArrayEx(this);
         manager.attachInternal(getUid(), this);
         dataRef = data;
+    }
+
+    /**
+     * Constructs a PyTorch {@code NDArray} to hold string array with a dummy native handle
+     * (internal. Use {@link NDManager} instead) with the data that is hold on Java side.
+     *
+     * @param manager the manager to attach the new array to
+     * @param strs the string array
+     * @param shape the {@link Shape} of the {@link NDArray}
+     */
+    public PtNDArray(PtNDManager manager, String[] strs, Shape shape) {
+        super(-1L);
+        this.manager = manager;
+        this.strs = strs;
+        this.shape = shape;
+        this.dataType = DataType.STRING;
     }
 
     /** {@inheritDoc} */
@@ -203,7 +220,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public String[] toStringArray(Charset charset) {
-        throw new UnsupportedOperationException("String NDArray is not supported!");
+        return strs;
     }
 
     /** {@inheritDoc} */
@@ -1477,7 +1494,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public void close() {
         Long pointer = handle.getAndSet(null);
-        if (pointer != null) {
+        if (pointer != null && pointer != -1) {
             JniUtils.deleteNDArray(pointer);
         }
         manager.detachInternal(getUid());
