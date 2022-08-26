@@ -13,12 +13,12 @@
 import json
 import logging
 import os
+from argparse import Namespace
 from typing import List
 
 from huggingface_hub import HfApi, ModelSearchArguments
 from huggingface_hub import hf_hub_download
 from huggingface_hub.hf_api import ModelInfo
-from argparse import Namespace
 
 ARCHITECTURES_2_TASK = {
     "ForQuestionAnswering": "question-answering",
@@ -87,11 +87,19 @@ class HuggingfaceModels:
                 logging.warning(f"Skip non-English model: {model_id}.")
                 continue
 
-            if self.processed_models.get(model_id):
+            existing_model = self.processed_models.get(model_id)
+            if existing_model:
+                existing_model["downloads"] = model_info.downloads
                 logging.info(f"Skip converted mode: {model_id}.")
                 continue
 
-            config = hf_hub_download(repo_id=model_id, filename="config.json")
+            try:
+                config = hf_hub_download(repo_id=model_id,
+                                         filename="config.json")
+            except EnvironmentError:
+                logging.info(f"Skip {model_id}, no config.json found.")
+                continue
+
             with open(config) as f:
                 config = json.load(f)
 
@@ -101,7 +109,8 @@ class HuggingfaceModels:
                 task, architecture = self.to_supported_task(config)
                 if not task:
                     logging.info(
-                        f"Unsupported model architecture: {architecture}")
+                        f"Unsupported model architecture: {architecture} for {model_id}."
+                    )
                     continue
 
             model = {
@@ -119,7 +128,8 @@ class HuggingfaceModels:
             "result": "success" if result else "failed",
             "application": application,
             "sha1": model_info.sha,
-            "size": size
+            "size": size,
+            "downloads": model_info.downloads,
         }
         if reason:
             status["reason"] = reason
@@ -135,7 +145,11 @@ class HuggingfaceModels:
 
     @staticmethod
     def to_supported_task(config: dict):
-        architecture = config.get("architectures")[0]
+        architectures = config.get("architectures")
+        if not architectures:
+            return None, "No architectures found"
+
+        architecture = architectures[0]
         for arch in ARCHITECTURES_2_TASK:
             if architecture.endswith(arch):
                 return ARCHITECTURES_2_TASK[arch], architecture

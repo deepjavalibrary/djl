@@ -73,8 +73,8 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
         NDArray endLogits = list.get(1).duplicate();
 
         // exclude <CLS>, TODO: exclude impossible ids properly and handle max answer length
-        startLogits.set(new NDIndex(0), 0);
-        endLogits.set(new NDIndex(0), 0);
+        startLogits.set(new NDIndex(0), -100000);
+        endLogits.set(new NDIndex(0), -100000);
         int startIdx = (int) startLogits.argMax().getLong();
         int endIdx = (int) endLogits.argMax().getLong();
         if (startIdx > endIdx) {

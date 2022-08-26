@@ -50,7 +50,7 @@ def main():
         result, reason, size = converter.save_model(model_info,
                                                     args.output_dir, temp_dir)
         if not result:
-            logging.error(reason)
+            logging.error(f"{model_info.modelId}: {reason}")
 
         huggingface_models.update_progress(model_info, converter.application,
                                            result, reason, size)

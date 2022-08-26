@@ -50,7 +50,6 @@ class HuggingfaceMetadata:
                 "version": "0.0.1",
                 "snapshot": False,
                 "name": self.model_name,
-                "downloads": self.model_info.downloads,
                 "properties": properties,
                 "arguments": {
                     "translatorFactory": self.translator

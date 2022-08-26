@@ -49,16 +49,28 @@ class HuggingfaceConverter:
         shutil.copyfile(config, os.path.join(temp_dir, "config.json"))
 
         # Save jit traced .pt file to temp dir
-        model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir)
+        include_types = False
+        model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
+                                          include_types)
         if not model_file:
             return False, "Failed to trace model", -1
 
-        result, reason = self.verify_jit_model(hf_pipeline, model_file)
+        result, reason = self.verify_jit_model(hf_pipeline, model_file,
+                                               include_types)
         if not result:
-            return False, reason, -1
+            include_types = True
+            model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
+                                              include_types)
+            if not model_file:
+                return False, reason, -1
+
+            result, reason = self.verify_jit_model(hf_pipeline, model_file,
+                                                   include_types)
+            if not result:
+                return False, reason, -1
 
         size = self.save_to_model_zoo(model_info, output_dir, temp_dir,
-                                      hf_pipeline)
+                                      hf_pipeline, include_types)
 
         return True, None, size
 
@@ -70,38 +82,43 @@ class HuggingfaceConverter:
             if path != "tokenizer.json":
                 os.remove(os.path.join(temp_dir, path))
 
-    def jit_trace_model(self, hf_pipeline, model_id: str, temp_dir: str):
-        logging.info(f"Tracing model: {model_id} ...")
+    def jit_trace_model(self, hf_pipeline, model_id: str, temp_dir: str,
+                        include_types: bool):
+        logging.info(
+            f"Tracing model: {model_id} include_token_types={include_types} ..."
+        )
         encoding = self.encode_inputs(hf_pipeline.tokenizer)
         input_ids = encoding["input_ids"]
         attention_mask = encoding["attention_mask"]
+        token_type_ids = encoding.get("token_type_ids")
+        if include_types and token_type_ids is None:
+            return None
 
         # noinspection PyBroadException
         try:
-            script_module = torch.jit.trace(hf_pipeline.model,
-                                            (input_ids, attention_mask),
-                                            strict=False)
-        except Exception as ex:
-            logging.info(
-                f"Trace with attention_mask failed, model: {model_id}.")
-            logging.debug(ex, exc_info=False)
-            try:
+            if include_types:
+                script_module = torch.jit.trace(
+                    hf_pipeline.model,
+                    (input_ids, attention_mask, token_type_ids),
+                    strict=False)
+            else:
                 script_module = torch.jit.trace(hf_pipeline.model,
-                                                input_ids,
+                                                (input_ids, attention_mask),
                                                 strict=False)
-            except Exception as e:
-                logging.warning(f"Failed to trace model: {model_id}.")
-                logging.warning(e, exc_info=True)
-                return None
 
-        model_name = model_id.split("/")[-1]
-        logging.info(f"Saving torchscript model: {model_name}.pt ...")
-        model_file = os.path.join(temp_dir, f"{model_name}.pt")
-        script_module.save(model_file)
+            model_name = model_id.split("/")[-1]
+            logging.info(f"Saving torchscript model: {model_name}.pt ...")
+            model_file = os.path.join(temp_dir, f"{model_name}.pt")
+            script_module.save(model_file)
+        except RuntimeError as e:
+            logging.warning(f"Failed to trace model: {model_id}.")
+            logging.warning(e, exc_info=True)
+            return None
+
         return model_file
 
     def save_to_model_zoo(self, model_info, output_dir: str, temp_dir: str,
-                          hf_pipeline):
+                          hf_pipeline, include_types: bool):
         model_id = model_info.modelId
         artifact_ids = model_id.split("/")
         model_name = artifact_ids[-1]
@@ -119,6 +136,9 @@ class HuggingfaceConverter:
                     f"option.modelName={model_name}\n"
                     f"option.mapLocation=true\n"
                     f"translatorFactory={self.translator}\n")
+            if include_types:
+                f.write(f"includeTokenTypes={include_types}\n")
+
             for k, v in arguments.items():
                 f.write(f"{k}={v}\n")
 
@@ -138,26 +158,39 @@ class HuggingfaceConverter:
 
         return file_size
 
-    def verify_jit_model(self, hf_pipeline, model_file: str):
-        logging.info(f"Verifying torchscript model: {model_file} ...")
+    def verify_jit_model(self, hf_pipeline, model_file: str,
+                         include_types: bool):
+        logging.info(
+            f"Verifying torchscript model(include_token_types={include_types}): {model_file} ..."
+        )
 
         tokenizer = hf_pipeline.tokenizer
         encoding = self.encode_inputs(tokenizer)
 
         input_ids = encoding["input_ids"]
         attention_mask = encoding["attention_mask"]
+        token_type_ids = encoding.get("token_type_ids")
         if torch.cuda.is_available():
             traced_model = torch.jit.load(model_file, map_location='cuda:0')
             traced_model.to(self.device)
             input_ids = input_ids.to(self.device)
             attention_mask = attention_mask.to(self.device)
+            if token_type_ids is not None:
+                token_type_ids = token_type_ids.to(self.device)
         else:
             traced_model = torch.jit.load(model_file)
 
         traced_model.eval()
 
-        # test traced model
-        out = traced_model(input_ids, attention_mask)
+        try:
+            # test traced model
+            if include_types:
+                out = traced_model(input_ids, attention_mask, token_type_ids)
+            else:
+                out = traced_model(input_ids, attention_mask)
+        except RuntimeError as e:
+            logging.warning(e, exc_info=True)
+            return False, "Failed to run inference on jit model"
 
         return self.verify_jit_output(hf_pipeline, encoding, out)
 
