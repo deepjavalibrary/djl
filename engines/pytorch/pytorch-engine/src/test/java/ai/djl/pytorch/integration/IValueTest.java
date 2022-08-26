@@ -40,6 +40,8 @@ public class IValueTest {
         try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
             PtNDArray array1 = (PtNDArray) manager.zeros(new Shape(1));
             PtNDArray array2 = (PtNDArray) manager.ones(new Shape(1));
+            PtNDArray array3 = (PtNDArray) manager.create("test");
+            PtNDArray array4 = (PtNDArray) manager.create(new String[] {"test1", "test2"});
 
             try (IValue ivalue = IValue.from(array1)) {
                 Assert.assertTrue(ivalue.isTensor());
@@ -67,6 +69,17 @@ public class IValueTest {
                 Assert.assertTrue(ivalue.isDouble());
                 Assert.assertEquals(ivalue.getType(), "float");
                 Assert.assertEquals(ivalue.toDouble(), 1d);
+            }
+
+            try (IValue ivalue = IValue.from(array3)) {
+                Assert.assertTrue(ivalue.isString());
+                Assert.assertEquals(ivalue.getType(), "str");
+                Assert.assertEquals(ivalue.toStringValue(), "test");
+            }
+
+            try (IValue ivalue = IValue.from(array4)) {
+                Assert.assertTrue(ivalue.isList());
+                Assert.assertEquals(ivalue.getType(), "str[]");
             }
 
             try (IValue ivalue = IValue.from("test")) {

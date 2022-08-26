@@ -26,6 +26,7 @@ import ai.djl.pytorch.jni.JniUtils;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 
 /** {@code PtNDManager} is the PyTorch implementation of {@link NDManager}. */
 public class PtNDManager extends BaseNDManager {
@@ -74,6 +75,12 @@ public class PtNDManager extends BaseNDManager {
         copyBuffer(data, buf);
         return JniUtils.createNdFromByteBuffer(
                 this, buf, shape, dataType, SparseFormat.DENSE, device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(String[] data, Charset charset, Shape shape) {
+        return new PtNDArray(this, data, shape);
     }
 
     /** {@inheritDoc} */
