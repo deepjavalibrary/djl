@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.index.NDArrayIndexer;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
+import ai.djl.ndarray.index.full.NDIndexFullTake;
 import ai.djl.ndarray.types.Shape;
 
 import java.util.Stack;
@@ -39,6 +40,17 @@ public class MxNDArrayIndexer extends NDArrayIndexer {
         params.addParam("keepdims", true);
         params.add("mode", "wrap");
         return manager.invoke("pick", new NDList(array, fullPick.getIndices()), params)
+                .singletonOrThrow();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray get(NDArray array, NDIndexFullTake fullTake) {
+        array = manager.from(array);
+        MxOpParams params = new MxOpParams();
+        params.addParam("axis", fullTake.getAxis());
+        params.add("mode", "wrap");
+        return manager.invoke("take", new NDList(array, fullTake.getIndices()), params)
                 .singletonOrThrow();
     }
 

@@ -18,6 +18,7 @@ import ai.djl.ndarray.index.dim.NDIndexBooleans;
 import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
+import ai.djl.ndarray.index.full.NDIndexFullTake;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,15 @@ public abstract class NDArrayIndexer {
      * @return the subArray
      */
     public abstract NDArray get(NDArray array, NDIndexFullPick fullPick);
+
+    /**
+     * Returns a subarray by taken the elements from one axis.
+     *
+     * @param array the array to get from
+     * @param fullTake the elements to pick
+     * @return the subArray
+     */
+    public abstract NDArray get(NDArray array, NDIndexFullTake fullTake);
 
     /**
      * Returns a subarray at the slice.
@@ -63,6 +73,11 @@ public abstract class NDArrayIndexer {
                         "get() currently doesn't support more that one boolean NDArray");
             }
             return array.booleanMask(((NDIndexBooleans) indices.get(0)).getIndex());
+        }
+
+        Optional<NDIndexFullTake> fullTake = NDIndexFullTake.fromIndex(index, array.getShape());
+        if (fullTake.isPresent()) {
+            return get(array, fullTake.get());
         }
 
         Optional<NDIndexFullPick> fullPick = NDIndexFullPick.fromIndex(index, array.getShape());

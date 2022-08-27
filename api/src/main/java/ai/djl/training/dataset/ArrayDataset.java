@@ -111,14 +111,15 @@ public class ArrayDataset extends RandomAccessDataset {
      */
     public Record getByIndices(NDManager manager, long... indices) {
         try (NDArray ndIndices = manager.create(indices)) {
+            NDIndex index = new NDIndex("{}", ndIndices);
             NDList datum = new NDList();
             NDList label = new NDList();
             for (NDArray array : data) {
-                datum.add(array.take(manager, ndIndices));
+                datum.add(array.get(manager, index));
             }
             if (labels != null) {
                 for (NDArray array : labels) {
-                    label.add(array.take(manager, ndIndices));
+                    label.add(array.get(manager, index));
                 }
             }
             return new Record(datum, label);
