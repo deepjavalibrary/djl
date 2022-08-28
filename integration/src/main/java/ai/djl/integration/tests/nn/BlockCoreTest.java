@@ -198,7 +198,7 @@ public class BlockCoreTest {
         // number of linear transformations modeled by LinearCollection
         int splitSize = 6;
 
-        // following ndarrays will be scoped to modelLinearCollection's ndmanager so they can be
+        // following ndarrays will be scoped to <code>sharedManager</code> so they can be
         // used later in the for-loop
         NDArray expectedWeightForLinearCollection;
         NDArray expectedBiasForLinearCollection;
@@ -256,21 +256,13 @@ public class BlockCoreTest {
                         // copy initial weight/bias values from LinearCollection
                         Shape inputShape = new Shape(batchSize, featureSize);
                         block.setInitializer(
-                                (m, s, t) -> {
-                                    NDArray w =
-                                            expectedWeightForLinearCollection
-                                                    .get(splitIndex)
-                                                    .transpose();
-                                    w.attach(m);
-                                    return w;
-                                },
+                                (m, s, t) ->
+                                        expectedWeightForLinearCollection
+                                                .get(m, splitIndex)
+                                                .transpose(),
                                 Parameter.Type.WEIGHT);
                         block.setInitializer(
-                                (m, s, t) -> {
-                                    NDArray w = expectedBiasForLinearCollection.get(splitIndex);
-                                    w.attach(m);
-                                    return w;
-                                },
+                                (m, s, t) -> expectedBiasForLinearCollection.get(m, splitIndex),
                                 Parameter.Type.BIAS);
                         trainer.initialize(inputShape);
 
