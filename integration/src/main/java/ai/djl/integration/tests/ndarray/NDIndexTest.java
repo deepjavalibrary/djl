@@ -50,6 +50,13 @@ public class NDIndexTest {
                     original.get(
                             new NDIndex().addAllDim().addPickDim(manager.create(new int[] {0, 1})));
             Assert.assertEquals(actual, expected);
+
+            // The difference between take and pick used combined with addAllDim()
+            NDArray yHat = manager.create(new float[][]{{0.1f, 0.3f, 0.6f}, {0.3f, 0.2f, 0.5f}});
+            NDArray yGet = yHat.get(new NDIndex(":, {}", manager.create(new int[]{0, 2})));
+            NDArray yPick = yHat.get(new NDIndex().addAllDim().addPickDim(manager.create(new int[]{0, 2})));
+            Assert.assertEquals(yGet, manager.create(new float[][]{{0.1f, 0.6f}, {0.3f, 0.5f}}));
+            Assert.assertEquals(yPick, manager.create(new float[][]{{0.1f}, {0.5f}}));
         }
     }
 

@@ -60,18 +60,6 @@ public final class NDIndexFullPick {
                 }
                 NDArray indexElem = ((NDIndexPick) el).getIndex();
                 fullPick = new NDIndexFullPick(indexElem, axis);
-            } else if (el instanceof NDIndexTake) {
-                if (fullPick != null) {
-                    // Don't support multiple picks
-                    throw new UnsupportedOperationException(
-                            "Only one pick per get is currently supported");
-                }
-                NDArray indexElem = ((NDIndexTake) el).getIndex();
-                if (!indexElem.getShape().isRankOne()) {
-                    throw new UnsupportedOperationException(
-                            "Only rank-1 indexing array is supported for pick");
-                }
-                fullPick = new NDIndexFullPick(indexElem, axis);
             } else {
                 // Invalid dim for fullPick
                 return Optional.empty();
