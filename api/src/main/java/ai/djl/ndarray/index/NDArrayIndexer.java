@@ -20,6 +20,9 @@ import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
 import ai.djl.ndarray.index.full.NDIndexFullTake;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -77,6 +80,11 @@ public abstract class NDArrayIndexer {
 
         Optional<NDIndexFullTake> fullTake = NDIndexFullTake.fromIndex(index, array.getShape());
         if (fullTake.isPresent()) {
+            Logger logger = LoggerFactory.getLogger(NDArrayIndexer.class);
+            logger.warn(
+                    "The definition of the getter by array NDIndex: get(NDIndex array) has changed"
+                        + " from pick to take.If you still want to use array index as pick, then do"
+                        + " it explicitly by get(new NDIndex().addPickDim(array));");
             return get(array, fullTake.get());
         }
 

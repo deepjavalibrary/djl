@@ -17,7 +17,6 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.dim.NDIndexAll;
 import ai.djl.ndarray.index.dim.NDIndexElement;
 import ai.djl.ndarray.index.dim.NDIndexPick;
-import ai.djl.ndarray.index.dim.NDIndexTake;
 import ai.djl.ndarray.types.Shape;
 
 import java.util.Optional;
