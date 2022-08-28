@@ -125,6 +125,7 @@ public class MnistTest {
                 }
             }
             Assert.assertEquals(10000, randomizedIndices.size());
+            Assert.assertFalse(BulkDataIterable.isRange(randomizedIndices));
             Collections.sort(randomizedIndices);
             Assert.assertTrue(BulkDataIterable.isRange(randomizedIndices));
         }
