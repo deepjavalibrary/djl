@@ -111,7 +111,7 @@ public class TimeFeatureTest {
         expectedLags.put(
                 "3W", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 16, 17, 18, 33, 34, 35, 51, 52, 53));
         expectedLags.put(
-                "5W", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 16, 17, 18, 33, 34, 35, 51, 52, 53));
+                "5W", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 19, 20, 21, 30, 31, 32));
         expectedLags.put(
                 "M", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 23, 24, 25, 35, 36, 37));
         expectedLags.put("6M", Arrays.asList(1, 2, 3, 4, 5, 6, 7));
