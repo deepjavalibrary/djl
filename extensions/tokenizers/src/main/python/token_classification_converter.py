@@ -65,12 +65,16 @@ class TokenClassificationConverter(HuggingfaceConverter):
             return False, "TokenClassification returns with empty result"
 
         pipeline_output = hf_pipeline(self.inputs)
-        entity = next(x for x in pipeline_output
-                      if x["word"] == entities[0]["word"])
+        for e in pipeline_output:
+            if e["word"] == entities[0]["word"]:
+                if e["entity"] == entities[0]["entity"]:
+                    logging.warning(
+                        f"pipeline output differs from expected: {pipeline_output}"
+                    )
+                    return True, None
+                else:
+                    break
 
-        if entities[0]["entity"] != entity["entity"]:
-            return False, f"Unexpected inference result: {entities}"
-        logging.warning(
-            f"pipeline output differs from expected: {pipeline_output}")
+        logging.error(f"Unexpected inference result: {entities[0]}")
 
-        return True, None
+        return False, "Unexpected inference result"

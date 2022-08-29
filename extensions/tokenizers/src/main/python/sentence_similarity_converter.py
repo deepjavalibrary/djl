@@ -43,12 +43,13 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
         return PipelineHolder(tokenizer, model)
 
     def verify_jit_output(self, hf_pipeline, encoding, out):
-        last_hidden_state = out["last_hidden_state"]
+        last_hidden_state = out["last_hidden_state"].to("cpu")
 
         pipeline_output = hf_pipeline.model(**encoding)
-        if not torch.allclose(pipeline_output.last_hidden_state,
-                              last_hidden_state):
-            return False, f"Unexpected inference result: {last_hidden_state}"
+        expected = pipeline_output.last_hidden_state
+        if not torch.allclose(
+                expected, last_hidden_state, atol=1e-05, rtol=1e-03):
+            return False, "Unexpected inference result"
 
         return True, None
 

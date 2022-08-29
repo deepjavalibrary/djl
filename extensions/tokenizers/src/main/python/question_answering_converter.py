@@ -39,8 +39,8 @@ class QuestionAnsweringConverter(HuggingfaceConverter):
 
         start_ = out["start_logits"]
         end_ = out["end_logits"]
-        start_[0, 0] = 0
-        end_[0, 0] = 0
+        start_[0, 0] = -10000
+        end_[0, 0] = -10000
         answer_start = torch.argmax(start_)
         answer_end = torch.argmax(end_) + 1
 
@@ -50,8 +50,10 @@ class QuestionAnsweringConverter(HuggingfaceConverter):
 
         if prediction.lower() != self.outputs:
             pipeline_output = hf_pipeline(self.inputs)
-            if pipeline_output != prediction:
-                return False, f"Unexpected inference result: {prediction}"
+            if pipeline_output["answer"].strip() != prediction:
+                logging.error(f"Unexpected inference result: {prediction}")
+                return False, "Unexpected inference result"
+
             logging.warning(
                 f"pipeline output differs from expected: {pipeline_output}")
 
