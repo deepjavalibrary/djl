@@ -18,14 +18,16 @@ from arg_parser import converter_args
 from fill_mask_converter import FillMaskConverter
 from huggingface_models import HuggingfaceModels
 from question_answering_converter import QuestionAnsweringConverter
-from token_classification_converter import TokenClassificationConverter
 from sentence_similarity_converter import SentenceSimilarityConverter
+from text_classification_converter import TextClassificationConverter
+from token_classification_converter import TokenClassificationConverter
 
 SUPPORTED_TASK = {
     "fill-mask": FillMaskConverter(),
     "question-answering": QuestionAnsweringConverter(),
+    "sentence-similarity": SentenceSimilarityConverter(),
+    "text-classification": TextClassificationConverter(),
     "token-classification": TokenClassificationConverter(),
-    "sentence-similarity": SentenceSimilarityConverter()
 }
 
 
