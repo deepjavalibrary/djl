@@ -187,17 +187,27 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
+        DataType arrayType = getDataType();
+        DataType inputType = DataType.fromBuffer(data);
+        if (arrayType != inputType) {
+            throw new IllegalArgumentException(
+                    "The input data type: "
+                            + inputType
+                            + " does not match target array data type: "
+                            + arrayType);
+        }
+
         if (getDevice().isGpu()) {
             // TODO: Implement set for GPU
             throw new UnsupportedOperationException("GPU Tensor cannot be modified after creation");
         }
         int size = Math.toIntExact(getShape().size());
-        BaseNDManager.validateBufferSize(data, getDataType(), size);
+        BaseNDManager.validateBufferSize(data, arrayType, size);
         if (data instanceof ByteBuffer) {
             JavacppUtils.setByteBuffer(getHandle(), (ByteBuffer) data);
             return;
         }
-        ByteBuffer buf = getManager().allocateDirect(size * getDataType().getNumOfBytes());
+        ByteBuffer buf = getManager().allocateDirect(size * arrayType.getNumOfBytes());
         BaseNDManager.copyBuffer(data, buf);
         JavacppUtils.setByteBuffer(getHandle(), buf);
     }

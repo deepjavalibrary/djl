@@ -63,6 +63,16 @@ public class TrtNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
+        DataType arrayType = getDataType();
+        DataType inputType = DataType.fromBuffer(data);
+        if (arrayType != inputType) {
+            throw new IllegalArgumentException(
+                    "The input data type: "
+                            + inputType
+                            + " does not match target array data type: "
+                            + arrayType);
+        }
+
         int size = Math.toIntExact(shape.size());
         BaseNDManager.validateBufferSize(data, dataType, size);
         BaseNDManager.copyBuffer(data, this.data);

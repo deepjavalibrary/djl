@@ -226,6 +226,16 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
+        DataType arrayType = getDataType();
+        DataType inputType = DataType.fromBuffer(data);
+        if (arrayType != inputType) {
+            throw new IllegalArgumentException(
+                    "The input data type: "
+                            + inputType
+                            + " does not match target array data type: "
+                            + arrayType);
+        }
+
         int size = Math.toIntExact(size());
         BaseNDManager.validateBufferSize(data, getDataType(), size);
         // TODO how do we handle the exception happened in the middle
@@ -240,7 +250,6 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             return;
         }
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
-        DataType inputType = DataType.fromBuffer(data);
         ByteBuffer buf = manager.allocateDirect(size * inputType.getNumOfBytes());
         BaseNDManager.copyBuffer(data, buf);
 
