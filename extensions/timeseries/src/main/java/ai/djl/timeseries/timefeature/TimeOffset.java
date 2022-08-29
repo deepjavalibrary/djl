@@ -25,7 +25,7 @@ public class TimeOffset {
     private int n;
 
     /**
-     * Constructs a new {@code DateOffset} instance;
+     * Constructs a new {@code DateOffset} instance.
      *
      * @param name offset granularity including "D", "M" etc
      * @param n offset multiple

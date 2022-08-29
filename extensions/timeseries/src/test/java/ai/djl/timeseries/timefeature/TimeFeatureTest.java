@@ -118,7 +118,7 @@ public class TimeFeatureTest {
         expectedLags.put("12M", Arrays.asList(1, 2, 3, 4, 5, 6, 7));
 
         // For the default multiple (1)
-        String[] defaultFreq = new String[]{"min", "H", "D", "W", "M"};
+        String[] defaultFreq = new String[] {"min", "H", "D", "W", "M"};
         for (String freq : defaultFreq) {
             expectedLags.put("1" + freq, expectedLags.get(freq));
         }
@@ -128,40 +128,15 @@ public class TimeFeatureTest {
         expectedLags.put("24H", expectedLags.get("1D"));
         expectedLags.put("7D", expectedLags.get("1W"));
 
-        String[] testFreqs = new String[]{"4S",
-            "min",
-            "1min",
-            "15min",
-            "30min",
-            "59min",
-            "60min",
-            "61min",
-            "H",
-            "1H",
-            "6H",
-            "12H",
-            "23H",
-            "24H",
-            "25H",
-            "D",
-            "1D",
-            "2D",
-            "6D",
-            "7D",
-            "8D",
-            "W",
-            "1W",
-            "3W",
-            "4W",
-            "5W",
-            "M",
-            "6M",
-            "12M"};
+        String[] testFreqs =
+                new String[] {
+                    "4S", "min", "1min", "15min", "30min", "59min", "60min", "61min", "H", "1H",
+                    "6H", "12H", "23H", "24H", "25H", "D", "1D", "2D", "6D", "7D", "8D", "W", "1W",
+                    "3W", "4W", "5W", "M", "6M", "12M"
+                };
         for (String freq : testFreqs) {
             List<Integer> lags = Lag.getLagsForFreq(freq);
-            if (!lags.equals(expectedLags.get(freq))) {
-                System.out.println(freq);
-            }
+            Assert.assertEquals(lags, expectedLags.get(freq));
         }
     }
 }
