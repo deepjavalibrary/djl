@@ -18,7 +18,6 @@ import ai.djl.audio.processor.AudioProcessor;
 import ai.djl.audio.processor.LinearSpecgram;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.repository.LocalRepository;
 
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
@@ -44,7 +43,7 @@ import java.util.List;
  */
 public class AudioData {
 
-    private static final Logger logger = LoggerFactory.getLogger(LocalRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(AudioData.class);
 
     private int sampleRate;
     private int audioChannels;
