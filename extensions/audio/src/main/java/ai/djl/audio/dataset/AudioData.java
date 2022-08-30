@@ -62,13 +62,11 @@ public class AudioData {
     }
 
     /**
-     * Returns a good default {@link AudioData.Configuration} to use for the constructor with
-     * defaults.
+     * Returns a good default {@link Configuration} to use for the constructor with defaults.
      *
-     * @return a good default {@link AudioData.Configuration} to use for the constructor with
-     *     defaults.
+     * @return a good default {@link Configuration} to use for the constructor with defaults.
      */
-    public static AudioData.Configuration getDefaultConfiguration() {
+    public static Configuration getDefaultConfiguration() {
         float targetDb = -20f;
         float strideMs = 10f;
         float windowsMs = 20f;
@@ -77,9 +75,7 @@ public class AudioData {
                 Arrays.asList(
                         new AudioNormalizer(targetDb),
                         new LinearSpecgram(strideMs, windowsMs, sampleRate));
-        return new AudioData.Configuration()
-                .setProcessorList(defaultProcessors)
-                .setSampleRate(sampleRate);
+        return new Configuration().setProcessorList(defaultProcessors).setSampleRate(sampleRate);
     }
 
     /**
@@ -176,10 +172,7 @@ public class AudioData {
         return audioPaths.size();
     }
 
-    /**
-     * The configuration for creating a {@link AudioData} value in a {@link
-     * ai.djl.audio.dataset.AudioData}.
-     */
+    /** The configuration for creating a {@code AudioData} value in a {@code AudioData}. */
     public static final class Configuration {
 
         private int sampleRate;
@@ -210,13 +203,12 @@ public class AudioData {
         }
 
         /**
-         * Updates this {@link AudioData.Configuration} with the non-null values from another
-         * configuration.
+         * Updates this {@link Configuration} with the non-null values from another configuration.
          *
          * @param other the other configuration to use to update this
          * @return this configuration after updating
          */
-        public AudioData.Configuration update(AudioData.Configuration other) {
+        public Configuration update(AudioData.Configuration other) {
             processorList = other.processorList;
             return this;
         }
