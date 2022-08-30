@@ -70,20 +70,24 @@ public class Application {
                 return CV.IMAGE_ENHANCEMENT;
             case "nlp":
                 return NLP.ANY;
-            case "nlp/question_answer":
-                return NLP.QUESTION_ANSWER;
-            case "nlp/text_classification":
-                return NLP.TEXT_CLASSIFICATION;
-            case "nlp/sentiment_analysis":
-                return NLP.SENTIMENT_ANALYSIS;
-            case "nlp/word_embedding":
-                return NLP.WORD_EMBEDDING;
+            case "nlp/fill_mask":
+                return NLP.FILL_MASK;
             case "nlp/machine_translation":
                 return NLP.MACHINE_TRANSLATION;
             case "nlp/multiple_choice":
                 return NLP.MULTIPLE_CHOICE;
+            case "nlp/question_answer":
+                return NLP.QUESTION_ANSWER;
+            case "nlp/sentiment_analysis":
+                return NLP.SENTIMENT_ANALYSIS;
+            case "nlp/text_classification":
+                return NLP.TEXT_CLASSIFICATION;
             case "nlp/text_embedding":
                 return NLP.TEXT_EMBEDDING;
+            case "nlp/token_classification":
+                return NLP.TOKEN_CLASSIFICATION;
+            case "nlp/word_embedding":
+                return NLP.WORD_EMBEDDING;
             case "tabular":
                 return Tabular.ANY;
             case "tabular/linear_regression":
@@ -211,6 +215,12 @@ public class Application {
         Application ANY = new Application("nlp");
 
         /**
+         * An application that masking some words in a sentence and predicting which words should
+         * replace those masks.
+         */
+        Application FILL_MASK = new Application("nlp/fill_mask");
+
+        /**
          * An application that a reference document and a question about the document and returns
          * text answering the question.
          *
@@ -228,10 +238,16 @@ public class Application {
         Application TEXT_CLASSIFICATION = new Application("nlp/text_classification");
 
         /**
-         * An application that classifies text into positive or negative, an specific case of {@link
+         * An application that classifies text into positive or negative, a specific case of {@link
          * #TEXT_CLASSIFICATION}.
          */
         Application SENTIMENT_ANALYSIS = new Application("nlp/sentiment_analysis");
+
+        /**
+         * A natural language understanding application that assigns a label to some tokens in a
+         * text.
+         */
+        Application TOKEN_CLASSIFICATION = new Application("nlp/token_classification");
 
         /**
          * An application that takes a word and returns a feature vector that represents the word.
