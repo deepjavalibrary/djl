@@ -15,10 +15,9 @@ package ai.djl.examples.inference;
 
 import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
+import ai.djl.modality.audio.Audio;
+import ai.djl.modality.audio.AudioFactory;
 import ai.djl.modality.audio.translator.SpeechRecognitionTranslator;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
@@ -27,13 +26,9 @@ import ai.djl.translate.TranslateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.nio.file.Paths;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
@@ -45,62 +40,41 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public final class SpeechRecognition {
 
-    public static final Logger logger =
-            LoggerFactory.getLogger((SpeechRecognitionTranslator.class));
+    public static final Logger logger = LoggerFactory.getLogger((SpeechRecognition.class));
 
     private SpeechRecognition() {}
 
     public static void main(String[] args)
             throws UnsupportedAudioFileException, IOException, TranslateException,
                     ModelNotFoundException, MalformedModelException {
-        SpeechRecognition.predict();
+        System.setProperty("ai.djl.default_engine", "PyTorch");
+        logger.info("Result: " + predict());
     }
 
     public static String predict()
             throws UnsupportedAudioFileException, IOException, ModelNotFoundException,
                     MalformedModelException, TranslateException {
+        SpeechRecognitionTranslator translator = new SpeechRecognitionTranslator();
 
-        String url =
-                "https://djl-misc.s3.amazonaws.com/tmp/speech_recognition/ai/djl/pytorch/wav2vec2/0.0.1/wav2vec2.ptl.zip";
-        Map<String, String> arguments = new ConcurrentHashMap<>();
-        SpeechRecognitionTranslator translator =
-                SpeechRecognitionTranslator.builder(arguments).build();
-
-        Criteria<NDList, NDList> criteria =
+        // Load model.
+        // Wav2Vec2 model is a speech model that accepts a float array corresponding to the raw
+        // waveform of the speech signal.
+        Criteria<Audio, String> criteria =
                 Criteria.builder()
-                        .setTypes(NDList.class, NDList.class)
-                        .optModelUrls(url)
+                        .setTypes(Audio.class, String.class)
+                        .optModelUrls(
+                                "https://djl-misc.s3.amazonaws.com/tmp/speech_recognition/ai/djl/pytorch/wav2vec2/0.0.1/wav2vec2.ptl.zip")
                         .optTranslator(translator)
                         .optModelName("wav2vec2.ptl")
                         .optEngine("PyTorch")
                         .build();
 
-        File f = new File("src/test/resources/SpeechRecognition_scent_of_a_woman_future.wav");
-
-        // read in audio file
-        NDList list;
-        try (NDManager manager = NDManager.newBaseManager()) {
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(f);
-            int bytesPerFrame = audioInputStream.getFormat().getFrameSize();
-            // Set an arbitrary buffer size of 1024 frames.
-            int numBytes = 1024 * bytesPerFrame;
-            byte[] audioBytes = new byte[numBytes];
-            int numBytesRead;
-            int numFramesRead;
-            int totalFramesRead = 0;
-            // Try to read numBytes bytes from the file.
-            while ((numBytesRead = audioInputStream.read(audioBytes)) != -1) {
-                // Calculate the number of frames actually read.
-                numFramesRead = numBytesRead / bytesPerFrame;
-                totalFramesRead += numFramesRead;
-            }
-            NDArray array = manager.create(audioBytes);
-            list = new NDList(array);
-        }
-
-        try (ZooModel<NDList, NDList> model = criteria.loadModel()) {
-            try (Predictor<NDList, NDList> predictor = model.newPredictor()) {
-                return predictor.predict(list).get(0).toString();
+        // Read in audio file
+        Audio audio =
+                AudioFactory.getInstance().fromFile(Paths.get("src/test/resources/speech.wav"));
+        try (ZooModel<Audio, String> model = criteria.loadModel()) {
+            try (Predictor<Audio, String> predictor = model.newPredictor()) {
+                return predictor.predict(audio);
             }
         }
     }
