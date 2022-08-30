@@ -120,10 +120,9 @@ class HuggingfaceConverter:
     def save_to_model_zoo(self, model_info, output_dir: str, temp_dir: str,
                           hf_pipeline, include_types: bool):
         model_id = model_info.modelId
-        artifact_ids = model_id.split("/")
-        model_name = artifact_ids[-1]
+        model_name = model_id.split("/")[-1]
 
-        repo_dir = f"{output_dir}/model/{self.application}/ai/djl/huggingface/{model_id}"
+        repo_dir = f"{output_dir}/model/{self.application}/ai/djl/huggingface/pytorch/{model_id}"
         model_dir = f"{repo_dir}/0.0.1"
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
@@ -150,9 +149,8 @@ class HuggingfaceConverter:
         # Save metadata.json
         sha1 = sha1_sum(zip_file)
         file_size = os.path.getsize(zip_file)
-        metadata = HuggingfaceMetadata(model_info, artifact_ids,
-                                       self.application, self.translator, sha1,
-                                       file_size)
+        metadata = HuggingfaceMetadata(model_info, self.application,
+                                       self.translator, sha1, file_size)
         metadata_file = os.path.join(repo_dir, "metadata.json")
         metadata.save_metadata(metadata_file)
 

@@ -135,7 +135,7 @@ class HuggingfaceModels:
             status["reason"] = reason
         self.processed_models[model_info.modelId] = status
 
-        dict_file = os.path.join(self.output_dir, "processed_models.json")
+        dict_file = os.path.join(self.output_dir, "models.json")
         with open(dict_file, 'w') as f:
             json.dump(self.processed_models,
                       f,
