@@ -15,9 +15,6 @@ package ai.djl.modality.audio;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDArray;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,8 +37,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public class SampledAudioFactory extends AudioFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(SampledAudioFactory.class);
-
     /** {@inheritDoc} */
     @Override
     public Audio fromFile(Path path) throws IOException {
@@ -54,9 +49,8 @@ public class SampledAudioFactory extends AudioFactory {
                             format.isBigEndian() ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
             return new Audio(floats, format.getSampleRate(), format.getChannels());
         } catch (UnsupportedAudioFileException e) {
-            logger.error(e.getMessage());
+            throw new IOException("Unsupported Audio file", e);
         }
-        return null;
     }
 
     /** {@inheritDoc} */
@@ -71,9 +65,8 @@ public class SampledAudioFactory extends AudioFactory {
                             format.isBigEndian() ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
             return new Audio(floats, format.getSampleRate(), format.getChannels());
         } catch (UnsupportedAudioFileException e) {
-            logger.error(e.getMessage());
+            throw new IOException("Unsupported Audio file", e);
         }
-        return null;
     }
 
     /** {@inheritDoc} */

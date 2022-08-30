@@ -45,7 +45,7 @@ public class Audio {
     }
 
     /**
-     * Gets the float array data.
+     * Returns the float array data.
      *
      * @return The float array data.
      */

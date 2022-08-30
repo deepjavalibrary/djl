@@ -19,8 +19,6 @@ import ai.djl.ndarray.NDArray;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,8 +33,6 @@ import java.util.List;
  */
 public class FFmpegAudioFactory extends AudioFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(FFmpegAudioFactory.class);
-
     /** {@inheritDoc} */
     @Override
     public Audio fromFile(Path path) throws IOException {
@@ -45,9 +41,8 @@ public class FFmpegAudioFactory extends AudioFactory {
             float[] floats = grab(grabber);
             return new Audio(floats, grabber.getSampleRate(), grabber.getAudioChannels());
         } catch (FrameGrabber.Exception e) {
-            logger.error(e.getMessage());
+            throw new IOException("Unsupported Audio file", e);
         }
-        return null;
     }
 
     /** {@inheritDoc} */
@@ -58,9 +53,8 @@ public class FFmpegAudioFactory extends AudioFactory {
             float[] floats = grab(grabber);
             return new Audio(floats, grabber.getSampleRate(), grabber.getAudioChannels());
         } catch (FrameGrabber.Exception e) {
-            logger.error(e.getMessage());
+            throw new IOException("Unsupported Audio file", e);
         }
-        return null;
     }
 
     /** {@inheritDoc} */

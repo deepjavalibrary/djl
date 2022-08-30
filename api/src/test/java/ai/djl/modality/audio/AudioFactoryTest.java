@@ -15,8 +15,10 @@ package ai.djl.modality.audio;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.training.util.DownloadUtils;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -26,25 +28,30 @@ import java.nio.file.Paths;
 
 public class AudioFactoryTest {
 
-    private static final String PATH = "src/test/resources/speech.wav";
+    private static final String URL = "https://resources.djl.ai/audios/test_01.wav";
+
+    @BeforeClass
+    public void setUp() throws IOException {
+        DownloadUtils.download(URL, "build/test/test_01.wav");
+    }
 
     @Test
     public void testFromFile() throws IOException {
-        Audio audio = AudioFactory.getInstance().fromFile(Paths.get(PATH));
+        Audio audio = AudioFactory.getInstance().fromFile(Paths.get("build/test/test_01.wav"));
         Assert.assertEquals(audio.getSampleRate(), 16000f);
         Assert.assertEquals(audio.getChannels(), 1);
     }
 
     @Test
     public void testFromUrl() throws IOException {
-        Audio audio = AudioFactory.getInstance().fromUrl(PATH);
+        Audio audio = AudioFactory.getInstance().fromUrl("build/test/test_01.wav");
         Assert.assertEquals(audio.getSampleRate(), 16000f);
         Assert.assertEquals(audio.getChannels(), 1);
     }
 
     @Test
     public void testFromInputStream() throws IOException {
-        try (InputStream is = Files.newInputStream(Paths.get(PATH))) {
+        try (InputStream is = Files.newInputStream(Paths.get("build/test/test_01.wav"))) {
             Audio audio = AudioFactory.getInstance().fromInputStream(is);
             Assert.assertEquals(audio.getSampleRate(), 16000f);
             Assert.assertEquals(audio.getChannels(), 1);
