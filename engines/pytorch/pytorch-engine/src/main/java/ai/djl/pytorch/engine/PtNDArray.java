@@ -229,11 +229,15 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         DataType arrayType = getDataType();
         DataType inputType = DataType.fromBuffer(data);
         if (arrayType != inputType) {
-            throw new IllegalArgumentException(
-                    "The input data type: "
-                            + inputType
-                            + " does not match target array data type: "
-                            + arrayType);
+            DataType[] types = {DataType.UINT8, DataType.INT8, DataType.BOOLEAN};
+            if (Arrays.stream(types).noneMatch(x -> x == arrayType)
+                    || Arrays.stream(types).noneMatch(x -> x == inputType)) {
+                throw new IllegalArgumentException(
+                        "The input data type: "
+                                + inputType
+                                + " does not match target array data type: "
+                                + arrayType);
+            }
         }
 
         int size = Math.toIntExact(size());

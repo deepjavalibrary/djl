@@ -21,6 +21,7 @@ import ai.djl.ndarray.types.Shape;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.UUID;
 
 /** {@code TrtNDArray} is the TensorRT implementation of {@link NDArray}. */
@@ -66,11 +67,15 @@ public class TrtNDArray extends NDArrayAdapter {
         DataType arrayType = getDataType();
         DataType inputType = DataType.fromBuffer(data);
         if (arrayType != inputType) {
-            throw new IllegalArgumentException(
-                    "The input data type: "
-                            + inputType
-                            + " does not match target array data type: "
-                            + arrayType);
+            DataType[] types = {DataType.UINT8, DataType.INT8, DataType.BOOLEAN};
+            if (Arrays.stream(types).noneMatch(x -> x == arrayType)
+                    || Arrays.stream(types).noneMatch(x -> x == inputType)) {
+                throw new IllegalArgumentException(
+                        "The input data type: "
+                                + inputType
+                                + " does not match target array data type: "
+                                + arrayType);
+            }
         }
 
         int size = Math.toIntExact(shape.size());

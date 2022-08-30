@@ -212,16 +212,6 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void set(Buffer data) {
-        DataType arrayType = getDataType();
-        DataType inputType = DataType.fromBuffer(data);
-        if (arrayType != inputType) {
-            throw new IllegalArgumentException(
-                    "The input data type: "
-                            + inputType
-                            + " does not match target array data type: "
-                            + arrayType);
-        }
-
         NDArray array = manager.create(data, getShape(), getDataType());
         intern(array);
         array.detach();
