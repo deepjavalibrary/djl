@@ -72,7 +72,7 @@ public class TimeOffset {
      *
      * @return the multiple of {@code TimeOffset}
      */
-    public double getN() {
+    public double getMultipleOfTimeOffset() {
         return n;
     }
 

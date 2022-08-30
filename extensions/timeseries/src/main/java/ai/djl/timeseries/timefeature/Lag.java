@@ -41,38 +41,50 @@ public final class Lag {
         TimeOffset timeOffset = TimeOffset.toOffset(freqStr);
         switch (timeOffset.getName()) {
             case "Q":
-                if (timeOffset.getN() != 1) {
+                if (timeOffset.getMultipleOfTimeOffset() != 1) {
                     throw new IllegalArgumentException(
                             "Only multiple 1 is supported for quarterly. Use x month instead.");
                 }
-                lags = makeLagsForMonth(3. * timeOffset.getN());
+                lags = makeLagsForTimeStep(3, 12, 1, 3. * timeOffset.getMultipleOfTimeOffset());
                 break;
             case "M":
-                lags = makeLagsForMonth(timeOffset.getN());
+                lags = makeLagsForTimeStep(3, 12, 1, timeOffset.getMultipleOfTimeOffset());
                 break;
             case "W":
-                lags = makeLagsForWeek(timeOffset.getN());
+                lags = makeLagsForTimeStep(3, 52, 1, timeOffset.getMultipleOfTimeOffset());
                 break;
             case "D":
-                lags = makeLagsForDay(timeOffset.getN());
-                lags.addAll(makeLagsForWeek(timeOffset.getN() / 7.));
+                lags = makeLagsForTimeStep(4, 7, 1, timeOffset.getMultipleOfTimeOffset());
+                lags.addAll(
+                        makeLagsForTimeStep(3, 52, 1, timeOffset.getMultipleOfTimeOffset() / 7.));
                 break;
             case "H":
-                lags = makeLagsForHour(timeOffset.getN());
-                lags.addAll(makeLagsForDay(timeOffset.getN() / 24.));
-                lags.addAll(makeLagsForWeek((timeOffset.getN() / (24. * 7.))));
+                lags = makeLagsForTimeStep(7, 24, 1, timeOffset.getMultipleOfTimeOffset());
+                lags.addAll(
+                        makeLagsForTimeStep(4, 7, 1, timeOffset.getMultipleOfTimeOffset() / 24.));
+                lags.addAll(
+                        makeLagsForTimeStep(
+                                3, 52, 1, (timeOffset.getMultipleOfTimeOffset() / (24. * 7.))));
                 break;
             case "min":
             case "T":
-                lags = makeLagsForMinute(timeOffset.getN());
-                lags.addAll(makeLagsForHour(timeOffset.getN() / 60.));
-                lags.addAll(makeLagsForDay(timeOffset.getN() / (60. * 24.)));
-                lags.addAll(makeLagsForWeek(timeOffset.getN() / (60. * 24. * 7.)));
+                lags = makeLagsForTimeStep(3, 60, 2, timeOffset.getMultipleOfTimeOffset());
+                lags.addAll(
+                        makeLagsForTimeStep(7, 24, 1, timeOffset.getMultipleOfTimeOffset() / 60.));
+                lags.addAll(
+                        makeLagsForTimeStep(
+                                4, 7, 1, timeOffset.getMultipleOfTimeOffset() / (60. * 24.)));
+                lags.addAll(
+                        makeLagsForTimeStep(
+                                3, 52, 1, timeOffset.getMultipleOfTimeOffset() / (60. * 24. * 7.)));
                 break;
             case "S":
-                lags = makeLagsForSecond(timeOffset.getN());
-                lags.addAll(makeLagsForMinute(timeOffset.getN() / 60.));
-                lags.addAll(makeLagsForHour(timeOffset.getN() / (60. * 60.)));
+                lags = makeLagsForTimeStep(3, 60, 2, timeOffset.getMultipleOfTimeOffset());
+                lags.addAll(
+                        makeLagsForTimeStep(3, 60, 2, timeOffset.getMultipleOfTimeOffset() / 60.));
+                lags.addAll(
+                        makeLagsForTimeStep(
+                                7, 24, 1, timeOffset.getMultipleOfTimeOffset() / (60. * 60.)));
                 break;
             default:
                 throw new IllegalArgumentException("invalid frequency");
@@ -106,61 +118,21 @@ public final class Lag {
         return getLagsForFreq(freqStr, 1200);
     }
 
-    private static List<List<Integer>> makeLagsForSecond(double multiple) {
-        int numCycles = 3;
+    private static List<List<Integer>> makeLagsForTimeStep(
+            int numCycles, int multiplier, int delta, double multiple) {
         List<List<Integer>> ret = new ArrayList<>();
         for (int i = 1; i < numCycles + 1; i++) {
-            ret.add(makeLags((int) (i * 60 / multiple), 2));
+            ret.add(makeLags((int) (i * multiplier / multiple), delta));
         }
-        return ret;
-    }
 
-    private static List<List<Integer>> makeLagsForMinute(double multiple) {
-        int numCycles = 3;
-        List<List<Integer>> ret = new ArrayList<>();
-        for (int i = 1; i < numCycles + 1; i++) {
-            ret.add(makeLags((int) (i * 60 / multiple), 2));
+        if (multiplier == 7) {
+            ret.add(makeLags((int) (30 / multiple), 1));
+        } else if (multiplier == 52) {
+            ret.add(
+                    Arrays.asList(
+                            (int) (4. / multiple), (int) (8. / multiple), (int) (12. / multiple)));
         }
-        return ret;
-    }
 
-    private static List<List<Integer>> makeLagsForHour(double multiple) {
-        int numCycles = 7;
-        List<List<Integer>> ret = new ArrayList<>();
-        for (int i = 1; i < numCycles + 1; i++) {
-            ret.add(makeLags((int) (i * 24 / multiple), 1));
-        }
-        return ret;
-    }
-
-    private static List<List<Integer>> makeLagsForDay(double multiple) {
-        int numCycles = 4;
-        List<List<Integer>> ret = new ArrayList<>();
-        for (int i = 1; i < numCycles + 1; i++) {
-            ret.add(makeLags((int) (i * 7 / multiple), 1));
-        }
-        ret.add(makeLags((int) (30 / multiple), 1));
-        return ret;
-    }
-
-    private static List<List<Integer>> makeLagsForWeek(double multiple) {
-        int numCycles = 3;
-        List<List<Integer>> ret = new ArrayList<>();
-        for (int i = 1; i < numCycles + 1; i++) {
-            ret.add(makeLags((int) (i * 52 / multiple), 1));
-        }
-        ret.add(
-                Arrays.asList(
-                        (int) (4. / multiple), (int) (8. / multiple), (int) (12. / multiple)));
-        return ret;
-    }
-
-    private static List<List<Integer>> makeLagsForMonth(double multiple) {
-        int numCycles = 3;
-        List<List<Integer>> ret = new ArrayList<>();
-        for (int i = 1; i < numCycles + 1; i++) {
-            ret.add(makeLags((int) (i * 12 / multiple), 1));
-        }
         return ret;
     }
 
