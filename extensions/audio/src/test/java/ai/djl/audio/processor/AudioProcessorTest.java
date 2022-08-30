@@ -14,8 +14,8 @@
 package ai.djl.audio.processor;
 
 import ai.djl.Device;
-import ai.djl.audio.AudioUtils;
 import ai.djl.audio.dataset.AudioData;
+import ai.djl.audio.util.AudioUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
