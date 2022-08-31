@@ -33,7 +33,6 @@ import ai.djl.nn.LambdaBlock;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
-import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
@@ -59,8 +58,6 @@ public class TranslatorTest {
 
     @Test
     public void testQATranslator() throws ModelException, IOException, TranslateException {
-        TestRequirements.notArm();
-
         String question = "When did BBC Japan start broadcasting?";
         String paragraph =
                 "BBC Japan was a general entertainment Channel. "
@@ -146,8 +143,6 @@ public class TranslatorTest {
 
     @Test
     public void testFillMaskTranslator() throws ModelException, IOException, TranslateException {
-        TestRequirements.notArm();
-
         String text = "Hello I'm a [MASK] model.";
 
         Block block =
@@ -235,8 +230,6 @@ public class TranslatorTest {
     @Test
     public void testTokenClassificationTranslator()
             throws ModelException, IOException, TranslateException {
-        TestRequirements.notArm();
-
         String text = "My name is Wolfgang and I live in Berlin.";
 
         Block block =
@@ -331,8 +324,6 @@ public class TranslatorTest {
     @Test
     public void testTextEmbeddingTranslator()
             throws ModelException, IOException, TranslateException {
-        TestRequirements.notArm();
-
         String text = "This is an example sentence";
 
         Block block =
