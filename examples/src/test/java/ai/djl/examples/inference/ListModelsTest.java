@@ -18,6 +18,7 @@ import ai.djl.Application.NLP;
 import ai.djl.ModelException;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.DefaultZooProvider;
 import ai.djl.repository.zoo.ModelZoo;
 
 import org.testng.Assert;
@@ -36,6 +37,7 @@ public class ListModelsTest {
     @AfterClass
     public void tearDown() {
         System.clearProperty("ai.djl.repository.zoo.location");
+        ModelZoo.registerModelZoo(new DefaultZooProvider());
     }
 
     @Test
@@ -43,6 +45,7 @@ public class ListModelsTest {
         Path path = Paths.get("../model-zoo/src/test/resources/mlrepo");
         String repoUrl = path.toRealPath().toAbsolutePath().toUri().toURL().toExternalForm();
         System.setProperty("ai.djl.repository.zoo.location", "src/test/resources," + repoUrl);
+        ModelZoo.registerModelZoo(new DefaultZooProvider());
         Map<Application, List<Artifact>> models = ModelZoo.listModels();
         System.out.println(Arrays.toString(models.keySet().toArray()));
         List<Artifact> artifacts = models.get(Application.UNDEFINED);
@@ -54,6 +57,7 @@ public class ListModelsTest {
         Path path = Paths.get("../model-zoo/src/test/resources/mlrepo");
         String repoUrl = path.toRealPath().toAbsolutePath().toUri().toURL().toExternalForm();
         System.setProperty("ai.djl.repository.zoo.location", "src/test/resources," + repoUrl);
+        ModelZoo.registerModelZoo(new DefaultZooProvider());
         Criteria<?, ?> criteria = Criteria.builder().optApplication(NLP.ANY).build();
         Map<Application, List<Artifact>> models = ModelZoo.listModels(criteria);
 

@@ -15,15 +15,10 @@ package ai.djl.onnxruntime.zoo;
 import ai.djl.Application.CV;
 import ai.djl.Application.Tabular;
 import ai.djl.onnxruntime.engine.OrtEngine;
-import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.BaseModelLoader;
-import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /** OrtModelZoo is a repository that contains all Onnx models for DJL. */
@@ -33,21 +28,9 @@ public class OrtModelZoo extends ModelZoo {
     private static final Repository REPOSITORY = Repository.newInstance("Ort", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.onnxruntime";
 
-    private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
-
-    static {
-        MRL resnet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(resnet));
-
-        MRL irisFlower =
-                REPOSITORY.model(Tabular.SOFTMAX_REGRESSION, GROUP_ID, "iris_flowers", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(irisFlower));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<ModelLoader> getModelLoaders() {
-        return MODEL_LOADERS;
+    OrtModelZoo() {
+        addModel(REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1"));
+        addModel(REPOSITORY.model(Tabular.SOFTMAX_REGRESSION, GROUP_ID, "iris_flowers", "0.0.1"));
     }
 
     /** {@inheritDoc} */

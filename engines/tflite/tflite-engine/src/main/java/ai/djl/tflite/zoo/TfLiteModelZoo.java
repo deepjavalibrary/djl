@@ -13,16 +13,11 @@
 package ai.djl.tflite.zoo;
 
 import ai.djl.Application.CV;
-import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.BaseModelLoader;
-import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.tflite.engine.TfLiteEngine;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /** TfLiteModelZoo is a repository that contains all TFLite models for DJL. */
@@ -32,17 +27,8 @@ public class TfLiteModelZoo extends ModelZoo {
     private static final Repository REPOSITORY = Repository.newInstance("TFLite", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.tflite";
 
-    private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
-
-    static {
-        MRL mobilenet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mobilenet", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(mobilenet));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<ModelLoader> getModelLoaders() {
-        return MODEL_LOADERS;
+    TfLiteModelZoo() {
+        addModel(REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mobilenet", "0.0.1"));
     }
 
     /** {@inheritDoc} */

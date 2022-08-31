@@ -15,6 +15,7 @@ package ai.djl.repository.zoo;
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class ModelZoo {
 
     private static final Map<String, ModelZoo> MODEL_ZOO_MAP = new ConcurrentHashMap<>();
+
+    private Map<String, ModelLoader> modelLoaders = new ConcurrentHashMap<>();
 
     static {
         ServiceLoader<ZooProvider> providers = ServiceLoader.load(ZooProvider.class);
@@ -54,7 +57,9 @@ public abstract class ModelZoo {
      *
      * @return the list of all available model families
      */
-    public abstract List<ModelLoader> getModelLoaders();
+    public Collection<ModelLoader> getModelLoaders() {
+        return modelLoaders.values();
+    }
 
     /**
      * Returns the {@link ModelLoader} based on the model name.
@@ -63,12 +68,7 @@ public abstract class ModelZoo {
      * @return the {@link ModelLoader} of the model
      */
     public ModelLoader getModelLoader(String name) {
-        for (ModelLoader loader : getModelLoaders()) {
-            if (name.equals(loader.getArtifactId())) {
-                return loader;
-            }
-        }
-        return null;
+        return modelLoaders.get(name);
     }
 
     /**
@@ -78,6 +78,14 @@ public abstract class ModelZoo {
      */
     public abstract Set<String> getSupportedEngines();
 
+    protected final void addModel(MRL mrl) {
+        modelLoaders.put(mrl.getArtifactId(), new BaseModelLoader(mrl));
+    }
+
+    protected final void addModel(ModelLoader loader) {
+        modelLoaders.put(loader.getArtifactId(), loader);
+    }
+
     /**
      * Refreshes model zoo.
      *
@@ -85,7 +93,7 @@ public abstract class ModelZoo {
      */
     public static void registerModelZoo(ZooProvider provider) {
         ModelZoo zoo = provider.getModelZoo();
-        MODEL_ZOO_MAP.putIfAbsent(zoo.getGroupId(), zoo);
+        MODEL_ZOO_MAP.put(zoo.getGroupId(), zoo);
     }
 
     /**
@@ -174,8 +182,7 @@ public abstract class ModelZoo {
                     continue;
                 }
             }
-            List<ModelLoader> list = zoo.getModelLoaders();
-            for (ModelLoader loader : list) {
+            for (ModelLoader loader : zoo.getModelLoaders()) {
                 Application app = loader.getApplication();
                 String loaderArtifactId = loader.getArtifactId();
                 if (artifactId != null && !artifactId.equals(loaderArtifactId)) {

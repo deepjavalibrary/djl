@@ -15,12 +15,9 @@ package ai.djl.fasttext.zoo;
 import ai.djl.engine.Engine;
 import ai.djl.fasttext.zoo.nlp.textclassification.TextClassificationModelLoader;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /** FtModelZoo is a repository that contains all fastText models for DJL. */
@@ -30,16 +27,8 @@ public class FtModelZoo extends ModelZoo {
     private static final Repository REPOSITORY = Repository.newInstance("Fasttext", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.fasttext";
 
-    private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
-
-    static {
-        MODEL_LOADERS.add(new TextClassificationModelLoader(REPOSITORY));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<ModelLoader> getModelLoaders() {
-        return MODEL_LOADERS;
+    FtModelZoo() {
+        addModel(new TextClassificationModelLoader(REPOSITORY));
     }
 
     /** {@inheritDoc} */

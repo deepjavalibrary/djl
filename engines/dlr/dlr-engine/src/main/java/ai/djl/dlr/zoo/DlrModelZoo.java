@@ -14,15 +14,10 @@ package ai.djl.dlr.zoo;
 
 import ai.djl.Application.CV;
 import ai.djl.dlr.engine.DlrEngine;
-import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.BaseModelLoader;
-import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /** DlrModelZoo is a repository that contains all dlr models for DJL. */
@@ -32,17 +27,8 @@ public class DlrModelZoo extends ModelZoo {
     private static final Repository REPOSITORY = Repository.newInstance("Dlr", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.dlr";
 
-    private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
-
-    static {
-        MRL resnet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(resnet));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<ModelLoader> getModelLoaders() {
-        return MODEL_LOADERS;
+    DlrModelZoo() {
+        addModel(REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1"));
     }
 
     /** {@inheritDoc} */
