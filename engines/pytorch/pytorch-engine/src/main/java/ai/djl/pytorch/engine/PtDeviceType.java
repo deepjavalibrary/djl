@@ -13,10 +13,9 @@
 package ai.djl.pytorch.engine;
 
 import ai.djl.Device;
-import ai.djl.DeviceType;
 
 /** DeviceType is the PyTorch equivalent of the types in {@link Device}. */
-public final class PtDeviceType implements DeviceType {
+public final class PtDeviceType {
 
     private PtDeviceType() {}
 

@@ -13,10 +13,9 @@
 package ai.djl.mxnet.engine;
 
 import ai.djl.Device;
-import ai.djl.DeviceType;
 
 /** DeviceType is the MXNet equivalent of the types in {@link Device}. */
-public final class MxDeviceType implements DeviceType {
+public final class MxDeviceType {
 
     private static final String CPU_PINNED = "cpu_pinned";
 
@@ -38,7 +37,7 @@ public final class MxDeviceType implements DeviceType {
         } else if (CPU_PINNED.equals(deviceType)) {
             return 3;
         } else {
-            throw new IllegalArgumentException("Unsupported device: " + device.toString());
+            throw new IllegalArgumentException("Unsupported device: " + device);
         }
     }
 
