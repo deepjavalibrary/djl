@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.TestRequirements;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.timeseries.timefeature.TimeFeature;
@@ -27,6 +28,7 @@ import ai.djl.timeseries.transform.field.Field;
 import ai.djl.timeseries.transform.split.Split;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
@@ -35,6 +37,11 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 public class TransformTest {
+
+    @BeforeClass
+    public void setUp() {
+        TestRequirements.notArm();
+    }
 
     @Test
     public void testVstackFeatures() {

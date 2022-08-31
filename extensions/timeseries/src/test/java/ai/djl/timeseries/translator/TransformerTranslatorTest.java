@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
@@ -37,6 +38,8 @@ public class TransformerTranslatorTest {
 
     @Test
     public void testTransformerTranslator() throws IOException, TranslateException, ModelException {
+        TestRequirements.notArm();
+
         String modelUrl = "https://resources.djl.ai/test-models/mxnet/timeseries/transformer.zip";
         Map<String, Object> arguments = new ConcurrentHashMap<>();
         arguments.put("prediction_length", 28);
