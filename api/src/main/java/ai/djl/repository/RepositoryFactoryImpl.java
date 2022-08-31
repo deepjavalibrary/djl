@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class RepositoryFactoryImpl implements RepositoryFactory {
 
@@ -40,6 +42,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
 
     private static final RepositoryFactory FACTORY = new RepositoryFactoryImpl();
     private static final Map<String, RepositoryFactory> REGISTRY = init();
+    private static final Pattern PATTERN = Pattern.compile("(.+)/([\\d.]+)(/(.*))?");
 
     static RepositoryFactory getFactory() {
         return FACTORY;
@@ -217,17 +220,21 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             if (groupId == null) {
                 throw new IllegalArgumentException("Invalid djl URL: " + uri);
             }
-            Path path = parseFilePath(uri);
-            int size = path.getNameCount();
-            if (size == 0) {
-                throw new IllegalArgumentException("Invalid djl URL: " + uri);
+            String artifactId = parseFilePath(uri).toString();
+            if (artifactId.startsWith("/")) {
+                artifactId = artifactId.substring(1);
             }
-            String artifactId = path.getName(0).toString();
             if (artifactId.isEmpty()) {
                 throw new IllegalArgumentException("Invalid djl URL: " + uri);
             }
-            String version = size > 1 ? path.getName(1).toString() : null;
-            String artifactName = size > 2 ? path.getName(2).toString() : null;
+            String version = null;
+            String artifactName = null;
+            Matcher m = PATTERN.matcher(artifactId);
+            if (m.matches()) {
+                artifactId = m.group(1);
+                version = m.group(2);
+                artifactName = m.group(4);
+            }
 
             ModelZoo zoo = ModelZoo.getModelZoo(groupId);
             if (zoo == null) {

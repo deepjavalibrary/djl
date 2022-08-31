@@ -14,15 +14,10 @@ package ai.djl.paddlepaddle.zoo;
 
 import ai.djl.Application.CV;
 import ai.djl.paddlepaddle.engine.PpEngine;
-import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.BaseModelLoader;
-import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /** PpModelZoo is a repository that contains all PaddlePaddle models for DJL. */
@@ -32,34 +27,14 @@ public class PpModelZoo extends ModelZoo {
     private static final Repository REPOSITORY = Repository.newInstance("Paddle", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.paddlepaddle";
 
-    private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
-
-    static {
-        MRL maskDetection =
-                REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mask_classification", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(maskDetection));
-
-        MRL wordRotation =
-                REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "word_rotation", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(wordRotation));
-
-        MRL faceDetection =
-                REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "face_detection", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(faceDetection));
-
-        MRL wordDetection =
-                REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "word_detection", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(wordDetection));
-
-        MRL wordRecognition =
-                REPOSITORY.model(CV.WORD_RECOGNITION, GROUP_ID, "word_recognition", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(wordRecognition));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<ModelLoader> getModelLoaders() {
-        return MODEL_LOADERS;
+    PpModelZoo() {
+        addModel(
+                REPOSITORY.model(
+                        CV.IMAGE_CLASSIFICATION, GROUP_ID, "mask_classification", "0.0.1"));
+        addModel(REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "word_rotation", "0.0.1"));
+        addModel(REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "face_detection", "0.0.1"));
+        addModel(REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "word_detection", "0.0.1"));
+        addModel(REPOSITORY.model(CV.WORD_RECOGNITION, GROUP_ID, "word_recognition", "0.0.1"));
     }
 
     /** {@inheritDoc} */

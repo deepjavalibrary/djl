@@ -15,15 +15,10 @@ package ai.djl.pytorch.zoo;
 import ai.djl.Application.CV;
 import ai.djl.Application.NLP;
 import ai.djl.pytorch.engine.PtEngine;
-import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.BaseModelLoader;
-import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -36,36 +31,14 @@ public class PtModelZoo extends ModelZoo {
     private static final Repository REPOSITORY = Repository.newInstance("PyTorch", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.pytorch";
 
-    private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
-
-    static {
-        MRL resnet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(resnet));
-
-        MRL ssd = REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(ssd));
-
-        MRL bertQa = REPOSITORY.model(NLP.QUESTION_ANSWER, GROUP_ID, "bertqa", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(bertQa));
-
-        MRL sentimentAnalysis =
-                REPOSITORY.model(NLP.SENTIMENT_ANALYSIS, GROUP_ID, "distilbert", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(sentimentAnalysis));
-
-        MRL bigGan = REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "biggan-deep", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(bigGan));
-
-        MRL cyclegan = REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "cyclegan", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(cyclegan));
-
-        MRL deeplabv3 = REPOSITORY.model(CV.SEMANTIC_SEGMENTATION, GROUP_ID, "deeplabv3", "0.0.1");
-        MODEL_LOADERS.add(new BaseModelLoader(deeplabv3));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<ModelLoader> getModelLoaders() {
-        return MODEL_LOADERS;
+    PtModelZoo() {
+        addModel(REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1"));
+        addModel(REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd", "0.0.1"));
+        addModel(REPOSITORY.model(NLP.QUESTION_ANSWER, GROUP_ID, "bertqa", "0.0.1"));
+        addModel(REPOSITORY.model(NLP.SENTIMENT_ANALYSIS, GROUP_ID, "distilbert", "0.0.1"));
+        addModel(REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "biggan-deep", "0.0.1"));
+        addModel(REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "cyclegan", "0.0.1"));
+        addModel(REPOSITORY.model(CV.SEMANTIC_SEGMENTATION, GROUP_ID, "deeplabv3", "0.0.1"));
     }
 
     /** {@inheritDoc} */

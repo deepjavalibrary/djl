@@ -13,15 +13,10 @@
 package ai.djl.basicmodelzoo;
 
 import ai.djl.Application.CV;
-import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.BaseModelLoader;
-import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /** Model Zoo is a repository that contains all models for DJL. */
@@ -31,23 +26,10 @@ public class BasicModelZoo extends ModelZoo {
     private static final Repository REPOSITORY = Repository.newInstance("zoo", REPO_URL);
     public static final String GROUP_ID = "ai.djl.zoo";
 
-    private static final List<ModelLoader> MODEL_LOADERS = new ArrayList<>();
-
-    static {
-        MRL mlp = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mlp", "0.0.3");
-        MODEL_LOADERS.add(new BaseModelLoader(mlp));
-
-        MRL resnet = REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.2");
-        MODEL_LOADERS.add(new BaseModelLoader(resnet));
-
-        MRL ssd = REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd", "0.0.2");
-        MODEL_LOADERS.add(new BaseModelLoader(ssd));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<ModelLoader> getModelLoaders() {
-        return MODEL_LOADERS;
+    BasicModelZoo() {
+        addModel(REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "mlp", "0.0.3"));
+        addModel(REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.2"));
+        addModel(REPOSITORY.model(CV.OBJECT_DETECTION, GROUP_ID, "ssd", "0.0.2"));
     }
 
     /** {@inheritDoc} */

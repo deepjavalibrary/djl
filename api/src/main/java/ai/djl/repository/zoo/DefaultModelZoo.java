@@ -19,9 +19,6 @@ import ai.djl.repository.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /** A {@link ModelZoo} that contains models in specified locations. */
@@ -31,10 +28,13 @@ public class DefaultModelZoo extends ModelZoo {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultModelZoo.class);
 
-    private List<ModelLoader> modelLoaders;
-
     /** Constructs a new {@code LocalModelZoo} instance. */
-    public DefaultModelZoo() {}
+    public DefaultModelZoo() {
+        String locations = System.getProperty("ai.djl.repository.zoo.location");
+        if (locations != null) {
+            parseLocation(locations);
+        }
+    }
 
     /**
      * Constructs a new {@code LocalModelZoo} instance from the given search locations.
@@ -42,20 +42,7 @@ public class DefaultModelZoo extends ModelZoo {
      * @param locations a comma separated urls where the models to be loaded from
      */
     public DefaultModelZoo(String locations) {
-        modelLoaders = parseLocation(locations);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<ModelLoader> getModelLoaders() {
-        if (modelLoaders != null) {
-            return modelLoaders;
-        }
-        String locations = System.getProperty("ai.djl.repository.zoo.location");
-        if (locations != null) {
-            return parseLocation(locations);
-        }
-        return Collections.emptyList();
+        parseLocation(locations);
     }
 
     /** {@inheritDoc} */
@@ -70,21 +57,18 @@ public class DefaultModelZoo extends ModelZoo {
         return Engine.getAllEngines();
     }
 
-    private List<ModelLoader> parseLocation(String locations) {
+    private void parseLocation(String locations) {
         String[] urls = locations.split("\\s*,\\s*");
-        List<ModelLoader> list = new ArrayList<>(urls.length);
         for (String url : urls) {
             if (!url.isEmpty()) {
                 Repository repo = Repository.newInstance(url, url);
                 logger.debug("Scanning models in repo: {}, {}", repo.getClass(), url);
-                List<MRL> mrls = repo.getResources();
-                for (MRL mrl : mrls) {
-                    list.add(new BaseModelLoader(mrl));
+                for (MRL mrl : repo.getResources()) {
+                    addModel(mrl);
                 }
             } else {
                 logger.warn("Model location is empty.");
             }
         }
-        return list;
     }
 }
