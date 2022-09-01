@@ -587,7 +587,19 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @param index picks the elements of an NDArray and output to the same entry as in index
      * @return the partial {@code NDArray} of the same shape as index
      */
-    NDArray take(NDArray index);
+    default NDArray take(NDArray index) {
+        return take(this.getManager(), index);
+    }
+
+    /**
+     * Returns a partial {@code NDArray} pointed by index according to linear indexing, and the of
+     * output is of the same shape as index.
+     *
+     * @param manager the manager used to create the arrays
+     * @param index picks the elements of an NDArray and output to the same entry as in index
+     * @return the partial {@code NDArray} of the same shape as index
+     */
+    NDArray take(NDManager manager, NDArray index);
 
     /**
      * Set the entries of {@code NDArray} pointed by index according to linear indexing, to be the

@@ -18,6 +18,7 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.index.dim.NDIndexBooleans;
 import ai.djl.ndarray.index.full.NDIndexFullPick;
 import ai.djl.ndarray.index.full.NDIndexFullSlice;
+import ai.djl.ndarray.index.full.NDIndexFullTake;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.jni.JniUtils;
 
@@ -37,6 +38,12 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
     public NDArray get(NDArray array, NDIndexFullPick fullPick) {
         return JniUtils.pick(
                 manager.from(array), manager.from(fullPick.getIndices()), fullPick.getAxis());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray get(NDArray array, NDIndexFullTake fullTake) {
+        return JniUtils.take(manager.from(array), manager.from(fullTake.getIndices()), manager);
     }
 
     /** {@inheritDoc} */
@@ -63,12 +70,12 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
             index.addAllDim();
         }
 
-        if (array == null || array instanceof PtNDArray && array.getManager() == manager) {
-            return JniUtils.indexAdv((PtNDArray) array, index);
+        if (array == null || array instanceof PtNDArray) {
+            return JniUtils.indexAdv((PtNDArray) array, index, manager);
         } else {
             PtNDArray arrayNew =
                     manager.create(array.toByteBuffer(), array.getShape(), array.getDataType());
-            return JniUtils.indexAdv(arrayNew, index);
+            return JniUtils.indexAdv(arrayNew, index, manager);
         }
     }
 

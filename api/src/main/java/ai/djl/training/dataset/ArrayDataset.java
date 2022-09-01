@@ -15,9 +15,14 @@ package ai.djl.training.dataset;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.index.NDIndex;
+import ai.djl.translate.Batchifier;
+import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Stream;
 
 /**
@@ -73,6 +78,8 @@ public class ArrayDataset extends RandomAccessDataset {
         }
     }
 
+    ArrayDataset() {}
+
     /** {@inheritDoc} */
     @Override
     protected long availableSize() {
@@ -93,6 +100,96 @@ public class ArrayDataset extends RandomAccessDataset {
             }
         }
         return new Record(datum, label);
+    }
+
+    /**
+     * Gets the {@link Record} for the given indices from the dataset.
+     *
+     * @param manager the manager used to create the arrays
+     * @param indices indices of the requested data items
+     * @return a {@link Record} that contains the data and label of the requested data items
+     */
+    public Record getByIndices(NDManager manager, long... indices) {
+        try (NDArray ndIndices = manager.create(indices)) {
+            NDIndex index = new NDIndex("{}", ndIndices);
+            NDList datum = new NDList();
+            NDList label = new NDList();
+            for (NDArray array : data) {
+                datum.add(array.get(manager, index));
+            }
+            if (labels != null) {
+                for (NDArray array : labels) {
+                    label.add(array.get(manager, index));
+                }
+            }
+            return new Record(datum, label);
+        }
+    }
+
+    /**
+     * Gets the {@link Record} for the given range from the dataset.
+     *
+     * @param manager the manager used to create the arrays
+     * @param fromIndex low endpoint (inclusive) of the dataset
+     * @param toIndex high endpoint (exclusive) of the dataset
+     * @return a {@link Record} that contains the data and label of the requested data items
+     */
+    public Record getByRange(NDManager manager, long fromIndex, long toIndex) {
+        NDIndex index = new NDIndex().addSliceDim(fromIndex, toIndex);
+        NDList datum = new NDList();
+        NDList label = new NDList();
+        for (NDArray array : data) {
+            datum.add(array.get(manager, index));
+        }
+        if (labels != null) {
+            for (NDArray array : labels) {
+                label.add(array.get(manager, index));
+            }
+        }
+        return new Record(datum, label);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected RandomAccessDataset newSubDataset(int[] indices, int from, int to) {
+        return new SubDataset(this, indices, from, to);
+    }
+
+    @Override
+    protected RandomAccessDataset newSubDataset(List<Long> subIndices) {
+        return new SubDatasetByIndices(this, subIndices);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Iterable<Batch> getData(
+            NDManager manager, Sampler sampler, ExecutorService executorService)
+            throws IOException, TranslateException {
+        prepare();
+        if (dataBatchifier == Batchifier.STACK && labelBatchifier == Batchifier.STACK) {
+            return new BulkDataIterable(
+                    this,
+                    manager,
+                    sampler,
+                    dataBatchifier,
+                    labelBatchifier,
+                    pipeline,
+                    targetPipeline,
+                    executorService,
+                    prefetchNumber,
+                    device);
+        }
+        return new DataIterable(
+                this,
+                manager,
+                sampler,
+                dataBatchifier,
+                labelBatchifier,
+                pipeline,
+                targetPipeline,
+                executorService,
+                prefetchNumber,
+                device);
     }
 
     /** {@inheritDoc} */
@@ -144,5 +241,123 @@ public class ArrayDataset extends RandomAccessDataset {
             }
             return new ArrayDataset(this);
         }
+    }
+
+    private static final class SubDataset extends ArrayDataset {
+
+        private ArrayDataset dataset;
+        private int[] indices;
+        private int from;
+        private int to;
+
+        public SubDataset(ArrayDataset dataset, int[] indices, int from, int to) {
+            this.dataset = dataset;
+            this.indices = indices;
+            this.from = from;
+            this.to = to;
+            this.sampler = dataset.sampler;
+            this.dataBatchifier = dataset.dataBatchifier;
+            this.labelBatchifier = dataset.labelBatchifier;
+            this.pipeline = dataset.pipeline;
+            this.targetPipeline = dataset.targetPipeline;
+            this.prefetchNumber = dataset.prefetchNumber;
+            this.device = dataset.device;
+
+            limit = Long.MAX_VALUE;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Record get(NDManager manager, long index) {
+            if (index >= size()) {
+                throw new IndexOutOfBoundsException("index(" + index + ") > size(" + size() + ").");
+            }
+            return dataset.get(manager, indices[Math.toIntExact(index) + from]);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Record getByIndices(NDManager manager, long... indices) {
+            long[] resolvedIndices = new long[indices.length];
+            int i = 0;
+            for (long index : indices) {
+                resolvedIndices[i++] = this.indices[Math.toIntExact(index) + from];
+            }
+            return dataset.getByIndices(manager, resolvedIndices);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Record getByRange(NDManager manager, long fromIndex, long toIndex) {
+            return dataset.getByRange(manager, fromIndex + from, toIndex + from);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected long availableSize() {
+            return to - from;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void prepare(Progress progress) {}
+    }
+
+    private static final class SubDatasetByIndices extends ArrayDataset {
+
+        private ArrayDataset dataset;
+        private List<Long> subIndices;
+
+        public SubDatasetByIndices(ArrayDataset dataset, List<Long> subIndices) {
+            this.dataset = dataset;
+            this.subIndices = subIndices;
+            this.sampler = dataset.sampler;
+            this.dataBatchifier = dataset.dataBatchifier;
+            this.labelBatchifier = dataset.labelBatchifier;
+            this.pipeline = dataset.pipeline;
+            this.targetPipeline = dataset.targetPipeline;
+            this.prefetchNumber = dataset.prefetchNumber;
+            this.device = dataset.device;
+
+            limit = Long.MAX_VALUE;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Record get(NDManager manager, long index) {
+            return dataset.get(manager, subIndices.get(Math.toIntExact(index)));
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Record getByIndices(NDManager manager, long... indices) {
+            long[] resolvedIndices = new long[indices.length];
+            int i = 0;
+            for (long index : indices) {
+                resolvedIndices[i++] = subIndices.get(Math.toIntExact(index));
+            }
+            return dataset.getByIndices(manager, resolvedIndices);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Record getByRange(NDManager manager, long fromIndex, long toIndex) {
+            long[] resolvedIndices = new long[(int) (toIndex - fromIndex)];
+            int i = 0;
+            for (long index = fromIndex; index < toIndex; index++) {
+                resolvedIndices[i++] = subIndices.get(Math.toIntExact(index));
+            }
+            return dataset.getByIndices(manager, resolvedIndices);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected long availableSize() {
+            return subIndices.size();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void prepare(Progress progress) {}
     }
 }

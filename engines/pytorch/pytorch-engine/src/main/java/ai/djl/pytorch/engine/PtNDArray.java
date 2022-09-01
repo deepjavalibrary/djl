@@ -268,11 +268,11 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray take(NDArray index) {
+    public NDArray take(NDManager manager, NDArray index) {
         if (!(index instanceof PtNDArray)) {
             throw new IllegalArgumentException("Only PtNDArray is supported.");
         }
-        return JniUtils.take(this, (PtNDArray) index);
+        return JniUtils.take(this, (PtNDArray) index, (PtNDManager) manager);
     }
 
     /** {@inheritDoc} */
