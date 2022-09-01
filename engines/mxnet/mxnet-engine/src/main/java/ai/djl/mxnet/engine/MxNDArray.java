@@ -302,31 +302,18 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void set(Buffer data) {
-        DataType arrayType = getDataType();
-        DataType inputType = DataType.fromBuffer(data);
-        if (arrayType != inputType) {
-            DataType[] types = {DataType.UINT8, DataType.INT8, DataType.BOOLEAN};
-            if (Arrays.stream(types).noneMatch(x -> x == arrayType)
-                    || Arrays.stream(types).noneMatch(x -> x == inputType)) {
-                throw new IllegalArgumentException(
-                        "The input data type: "
-                                + inputType
-                                + " does not match target array data type: "
-                                + arrayType);
-            }
-        }
-
+    public void set(Buffer buffer) {
         int size = Math.toIntExact(size());
-        BaseNDManager.validateBufferSize(data, getDataType(), size);
-        if (data.isDirect()) {
-            JnaUtils.syncCopyFromCPU(getHandle(), data, size);
+        DataType type = getDataType();
+        BaseNDManager.validateBufferSize(buffer, type, size);
+        if (buffer.isDirect()) {
+            JnaUtils.syncCopyFromCPU(getHandle(), buffer, size);
             return;
         }
 
-        ByteBuffer buf = manager.allocateDirect(size * getDataType().getNumOfBytes());
-        BaseNDManager.copyBuffer(data, buf);
-        JnaUtils.syncCopyFromCPU(getHandle(), buf, size);
+        ByteBuffer bb = manager.allocateDirect(size * type.getNumOfBytes());
+        BaseNDManager.copyBuffer(buffer, bb);
+        JnaUtils.syncCopyFromCPU(getHandle(), bb, size);
     }
 
     /** {@inheritDoc} */
