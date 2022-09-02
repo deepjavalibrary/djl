@@ -388,28 +388,19 @@ public final class LibUtils {
         String link = "https://publish.djl.ai/pytorch/" + matcher.group(1);
         Path tmp = null;
         
-        try {
-            Files.createDirectories(cacheDir);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create a pytorch cache directory", e);
+        Path indexFile = cacheDir.resolve(version + ".txt"); 
+        if (Files.notExists(indexFile)) {
+            Path tempFile = cacheDir.resolve(version + ".tmp"); 
+            try (InputStream is = new URL(link + "/files.txt").openStream()) {
+                Files.createDirectories(cacheDir);
+                Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING); 
+                Utils.moveQuietly(tempFile, indexFile); 
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to save pytorch index file", e); 
+            } finally { 
+                Utils.deleteQuietly(tempFile); 
+            }
         }
-         
-        Path localFiles = cacheDir.resolve("files.txt");
-        Path localTempFiles = cacheDir.resolve("tmpfiles.txt");
-        try (InputStream is = new URL(link + "/files.txt").openStream();
-             ReadableByteChannel rbc = Channels.newChannel(is);
-             FileOutputStream fos = new FileOutputStream(localTempFiles.toFile());
-            ) {
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-        } catch (Exception e) {
-            logger.warn("Could not download the PyTorch files: ", link);
-        }
-        
-        try {
-            Files.move(localTempFiles, localFiles, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception e) {
-            logger.warn("Could not download the PyTorch files: ", link);
-        }            
         
         try (InputStream is = Files.newInputStream(indexFile)) {
             // if files not found
