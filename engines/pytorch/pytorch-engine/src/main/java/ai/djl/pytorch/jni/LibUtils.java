@@ -23,9 +23,13 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -387,7 +391,20 @@ public final class LibUtils {
         }
         String link = "https://publish.djl.ai/pytorch/" + matcher.group(1);
         Path tmp = null;
-        try (InputStream is = new URL(link + "/files.txt").openStream()) {
+        
+        String localFiles = cacheDir + File.separator + "files.txt";
+        String localTempFiles = cacheDir + File.separator + "tmpfiles.txt";
+        try (InputStream is = new URL(link + "/files.txt").openStream();
+             ReadableByteChannel rbc = Channels.newChannel(is);
+             FileOutputStream fos = new FileOutputStream(localTempFiles);
+            ) {
+            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            Files.move(Path.of(localTempFiles), Path.of(localFiles), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            logger.warn("Could not download the PyTorch files: ", link);
+        }
+        
+        try (InputStream is =  new FileInputStream(localFiles)) {
             // if files not found
             Files.createDirectories(cacheDir);
             List<String> lines = Utils.readLines(is);
