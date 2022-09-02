@@ -405,11 +405,15 @@ public final class LibUtils {
              FileOutputStream fos = new FileOutputStream(localTempFiles.toFile());
             ) {
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            fos.close();
-            Files.move(localTempFiles, localFiles, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             logger.warn("Could not download the PyTorch files: ", link);
         }
+        
+        try {
+            Files.move(localTempFiles, localFiles, StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            logger.warn("Could not download the PyTorch files: ", link);
+        }            
         
         try (InputStream is =  new FileInputStream(localFiles.toFile())) {
             // if files not found
