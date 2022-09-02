@@ -137,7 +137,7 @@ public class TextClassificationTranslator implements Translator<String, Classifi
          * @param batchifier true to include token types
          * @return this builder
          */
-        public TextClassificationTranslator.Builder optBatchifier(Batchifier batchifier) {
+        public Builder optBatchifier(Batchifier batchifier) {
             this.batchifier = batchifier;
             return this;
         }

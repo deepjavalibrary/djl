@@ -119,7 +119,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
          * @param batchifier true to include token types
          * @return this builder
          */
-        public TextEmbeddingTranslator.Builder optBatchifier(Batchifier batchifier) {
+        public Builder optBatchifier(Batchifier batchifier) {
             this.batchifier = batchifier;
             return this;
         }
