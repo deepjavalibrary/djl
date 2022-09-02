@@ -14,8 +14,7 @@ package ai.djl.huggingface.translator;
 
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
-import ai.djl.huggingface.tokenizers.jni.CharSpan;
-import ai.djl.modality.nlp.translator.NamedEntity;
+import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -33,14 +32,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/** The translator for Huggingface token classification model. */
-public class TokenClassificationTranslator implements Translator<String, NamedEntity[]> {
+/** The translator for Huggingface text classification model. */
+public class TextClassificationTranslator implements Translator<String, Classifications> {
 
     private HuggingFaceTokenizer tokenizer;
     private Batchifier batchifier;
     private PretrainedConfig config;
 
-    TokenClassificationTranslator(HuggingFaceTokenizer tokenizer, Batchifier batchifier) {
+    TextClassificationTranslator(HuggingFaceTokenizer tokenizer, Batchifier batchifier) {
         this.tokenizer = tokenizer;
         this.batchifier = batchifier;
     }
@@ -77,38 +76,29 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
 
     /** {@inheritDoc} */
     @Override
-    public NamedEntity[] processOutput(TranslatorContext ctx, NDList list) {
+    public Classifications processOutput(TranslatorContext ctx, NDList list) {
         NDArray logits = list.get(0);
-        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
-        long[] inputIds = encoding.getIds();
-        CharSpan[] offsetMapping = encoding.getCharTokenSpans();
-        long[] specialTokenMasks = encoding.getSpecialTokenMask();
-        NDArray probabilities = logits.softmax(1);
-        List<NamedEntity> entities = new ArrayList<>();
-
-        for (int i = 0; i < inputIds.length; ++i) {
-            if (specialTokenMasks[i] != 0) {
-                continue;
-            }
-
-            int entityIdx = (int) probabilities.get(i).argMax().getLong();
-            String entity = config.id2label.get(String.valueOf(entityIdx));
-
-            if (!"O".equals(entity)) {
-                float score = probabilities.get(i).getFloat(entityIdx);
-                String word = encoding.getTokens()[i];
-                int start = offsetMapping[i].getStart();
-                int end = offsetMapping[i].getEnd();
-
-                NamedEntity item = new NamedEntity(entity, score, i, word, start, end);
-                entities.add(item);
-            }
+        int size = config.id2label.size();
+        if ("multi_label_classification".equals(config.problemType) || size == 1) {
+            logits = logits.getNDArrayInternal().sigmoid();
+        } else if ("single_label_classification".equals(config.problemType) || size > 1) {
+            logits = logits.softmax(0);
         }
-        return entities.toArray(new NamedEntity[0]);
+        long[] indices = logits.argSort(-1, false).toLongArray();
+        float[] buf = logits.toFloatArray();
+        List<String> classes = new ArrayList<>(size);
+        List<Double> probabilities = new ArrayList<>(size);
+        for (long l : indices) {
+            int index = Math.toIntExact(l);
+            classes.add(config.id2label.get(String.valueOf(index)));
+            probabilities.add((double) buf[index]);
+        }
+
+        return new Classifications(classes, probabilities);
     }
 
     /**
-     * Creates a builder to build a {@code TokenClassificationTranslator}.
+     * Creates a builder to build a {@code TextClassificationTranslator}.
      *
      * @param tokenizer the tokenizer
      * @return a new builder
@@ -118,7 +108,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
     }
 
     /**
-     * Creates a builder to build a {@code TokenClassificationTranslator}.
+     * Creates a builder to build a {@code TextClassificationTranslator}.
      *
      * @param tokenizer the tokenizer
      * @param arguments the models' arguments
@@ -147,7 +137,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          * @param batchifier true to include token types
          * @return this builder
          */
-        public Builder optBatchifier(Batchifier batchifier) {
+        public TextClassificationTranslator.Builder optBatchifier(Batchifier batchifier) {
             this.batchifier = batchifier;
             return this;
         }
@@ -168,8 +158,8 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          * @return the new translator
          * @throws IOException if I/O error occurs
          */
-        public TokenClassificationTranslator build() throws IOException {
-            return new TokenClassificationTranslator(tokenizer, batchifier);
+        public TextClassificationTranslator build() throws IOException {
+            return new TextClassificationTranslator(tokenizer, batchifier);
         }
     }
 }
