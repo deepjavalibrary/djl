@@ -392,6 +392,12 @@ public final class LibUtils {
         String link = "https://publish.djl.ai/pytorch/" + matcher.group(1);
         Path tmp = null;
         
+        try {
+            Files.createDirectories(cacheDir);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create a pytorch cache directory", e);
+        }
+        
         String localFiles = cacheDir + File.separator + "files.txt";
         String localTempFiles = cacheDir + File.separator + "tmpfiles.txt";
         try (InputStream is = new URL(link + "/files.txt").openStream();
@@ -399,6 +405,7 @@ public final class LibUtils {
              FileOutputStream fos = new FileOutputStream(localTempFiles);
             ) {
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            fos.close();
             Files.move(Path.of(localTempFiles), Path.of(localFiles), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             logger.warn("Could not download the PyTorch files: ", link);
