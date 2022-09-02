@@ -387,21 +387,21 @@ public final class LibUtils {
         }
         String link = "https://publish.djl.ai/pytorch/" + matcher.group(1);
         Path tmp = null;
-        
-        Path indexFile = cacheDir.resolve(version + ".txt"); 
+
+        Path indexFile = cacheDir.resolve(version + ".txt");
         if (Files.notExists(indexFile)) {
-            Path tempFile = cacheDir.resolve(version + ".tmp"); 
+            Path tempFile = cacheDir.resolve(version + ".tmp");
             try (InputStream is = new URL(link + "/files.txt").openStream()) {
                 Files.createDirectories(cacheDir);
-                Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING); 
-                Utils.moveQuietly(tempFile, indexFile); 
+                Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
+                Utils.moveQuietly(tempFile, indexFile);
             } catch (IOException e) {
-                throw new IllegalStateException("Failed to save pytorch index file", e); 
-            } finally { 
-                Utils.deleteQuietly(tempFile); 
+                throw new IllegalStateException("Failed to save pytorch index file", e);
+            } finally {
+                Utils.deleteQuietly(tempFile);
             }
         }
-        
+
         try (InputStream is = Files.newInputStream(indexFile)) {
             // if files not found
             Files.createDirectories(cacheDir);
