@@ -411,7 +411,7 @@ public final class LibUtils {
             logger.warn("Could not download the PyTorch files: ", link);
         }            
         
-        try (InputStream is =  new FileInputStream(localFiles.toFile())) {
+        try (InputStream is = Files.newInputStream(indexFile)) {
             // if files not found
             Files.createDirectories(cacheDir);
             List<String> lines = Utils.readLines(is);
