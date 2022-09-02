@@ -397,21 +397,21 @@ public final class LibUtils {
         } catch (IOException e) {
             throw new RuntimeException("Failed to create a pytorch cache directory", e);
         }
-        
-        String localFiles = cacheDir + File.separator + "files.txt";
-        String localTempFiles = cacheDir + File.separator + "tmpfiles.txt";
+         
+        Path localFiles = cacheDir.resolve("files.txt");
+        Path localTempFiles = cacheDir.resolve("tmpfiles.txt");
         try (InputStream is = new URL(link + "/files.txt").openStream();
              ReadableByteChannel rbc = Channels.newChannel(is);
-             FileOutputStream fos = new FileOutputStream(localTempFiles);
+             FileOutputStream fos = new FileOutputStream(localTempFiles.toFile());
             ) {
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
-            Files.move(Path.of(localTempFiles), Path.of(localFiles), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(localTempFiles, localFiles, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             logger.warn("Could not download the PyTorch files: ", link);
         }
         
-        try (InputStream is =  new FileInputStream(localFiles)) {
+        try (InputStream is =  new FileInputStream(localFiles.toFile())) {
             // if files not found
             Files.createDirectories(cacheDir);
             List<String> lines = Utils.readLines(is);
