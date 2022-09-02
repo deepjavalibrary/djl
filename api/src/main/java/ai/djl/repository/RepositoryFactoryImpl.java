@@ -83,7 +83,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             return new SimpleUrlRepository(name, uri, modelName);
         }
 
-        Path path = parseFilePath(uri);
+        Path path = Paths.get(parseFilePath(uri));
         String fileName = path.toFile().getName();
         if (FilenameUtils.isArchiveFile(fileName)) {
             fileName = FilenameUtils.getNamePart(fileName);
@@ -119,7 +119,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         return registry;
     }
 
-    static Path parseFilePath(URI uri) {
+    static String parseFilePath(URI uri) {
         String uriPath = uri.getPath();
         if (uriPath == null) {
             uriPath = uri.getSchemeSpecificPart();
@@ -131,7 +131,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         if (uriPath.startsWith("/") && System.getProperty("os.name").startsWith("Win")) {
             uriPath = uriPath.substring(1);
         }
-        return Paths.get(uriPath);
+        return uriPath;
     }
 
     private static final class JarRepositoryFactory implements RepositoryFactory {
@@ -154,7 +154,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                 throw new IllegalArgumentException("Resource not found: " + uri, e);
             }
 
-            Path path = parseFilePath(uri);
+            Path path = Paths.get(parseFilePath(uri));
             String fileName = path.toFile().getName();
             if (!FilenameUtils.isArchiveFile(fileName)) {
                 throw new IllegalArgumentException("Only archive file is supported for res URL.");
@@ -176,7 +176,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         /** {@inheritDoc} */
         @Override
         public Repository newInstance(String name, URI uri) {
-            Path path = parseFilePath(uri);
+            Path path = Paths.get(parseFilePath(uri));
             if (Files.exists(path) && Files.isDirectory(path)) {
                 try {
                     if (Files.walk(path)
@@ -220,7 +220,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             if (groupId == null) {
                 throw new IllegalArgumentException("Invalid djl URL: " + uri);
             }
-            String artifactId = parseFilePath(uri).toString();
+            String artifactId = parseFilePath(uri);
             if (artifactId.startsWith("/")) {
                 artifactId = artifactId.substring(1);
             }
