@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.huggingface.translator.FillMaskTranslatorFactory;
 import ai.djl.huggingface.translator.QuestionAnsweringTranslatorFactory;
+import ai.djl.huggingface.translator.TextClassificationTranslatorFactory;
 import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory;
 import ai.djl.huggingface.translator.TokenClassificationTranslatorFactory;
 import ai.djl.inference.Predictor;
@@ -384,6 +385,93 @@ public class TranslatorTest {
             model.load(modelDir, "test", options);
 
             TextEmbeddingTranslatorFactory factory = new TextEmbeddingTranslatorFactory();
+            Map<String, String> arguments = new HashMap<>();
+
+            Assert.assertThrows(
+                    TranslateException.class,
+                    () -> factory.newInstance(String.class, Integer.class, model, arguments));
+
+            arguments.put("tokenizer", "bert-base-uncased");
+
+            Assert.assertThrows(
+                    IllegalArgumentException.class,
+                    () -> factory.newInstance(String.class, Integer.class, model, arguments));
+        }
+    }
+
+    @Test
+    public void testTextClassificationTranslator()
+            throws ModelException, IOException, TranslateException {
+        String text = "DJL is the best.";
+
+        Block block =
+                new LambdaBlock(
+                        a -> {
+                            NDManager manager = a.getManager();
+                            float[] logits = new float[] {0.02f, 0.2f, 0.97f};
+                            NDArray arr = manager.create(logits, new Shape(1, 3));
+                            arr.setName("logits");
+                            return new NDList(arr);
+                        },
+                        "model");
+        Path modelDir = Paths.get("build/model");
+        Files.createDirectories(modelDir);
+
+        Path path = modelDir.resolve("config.json");
+        Map<String, Map<String, String>> map = new HashMap<>();
+        Map<String, String> id2label = new HashMap<>();
+        id2label.put("0", "LABEL_0");
+        id2label.put("1", "LABEL_1");
+        id2label.put("2", "LABEL_2");
+        map.put("id2label", id2label);
+        try (Writer writer = Files.newBufferedWriter(path)) {
+            writer.write(JsonUtils.GSON.toJson(map));
+        }
+
+        Criteria<String, Classifications> criteria =
+                Criteria.builder()
+                        .setTypes(String.class, Classifications.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextClassificationTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String, Classifications> model = criteria.loadModel();
+                Predictor<String, Classifications> predictor = model.newPredictor()) {
+            Classifications res = predictor.predict(text);
+            Assert.assertEquals(res.best().getClassName(), "LABEL_2");
+        }
+
+        Criteria<Input, Output> criteria2 =
+                Criteria.builder()
+                        .setTypes(Input.class, Output.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextClassificationTranslatorFactory())
+                        .build();
+
+        try (ZooModel<Input, Output> model = criteria2.loadModel();
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            Input input = new Input();
+            input.add(text);
+            Output out = predictor.predict(input);
+            Classifications res = (Classifications) out.getData();
+            Assert.assertEquals(res.best().getClassName(), "LABEL_2");
+        }
+
+        try (Model model = Model.newInstance("test")) {
+            model.setBlock(block);
+            Map<String, String> options = new HashMap<>();
+            options.put("hasParameter", "false");
+            model.load(modelDir, "test", options);
+
+            TextClassificationTranslatorFactory factory = new TextClassificationTranslatorFactory();
             Map<String, String> arguments = new HashMap<>();
 
             Assert.assertThrows(

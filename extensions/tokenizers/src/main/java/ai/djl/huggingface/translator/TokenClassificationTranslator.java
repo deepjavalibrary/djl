@@ -38,7 +38,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
 
     private HuggingFaceTokenizer tokenizer;
     private Batchifier batchifier;
-    private Config config;
+    private PretrainedConfig config;
 
     TokenClassificationTranslator(HuggingFaceTokenizer tokenizer, Batchifier batchifier) {
         this.tokenizer = tokenizer;
@@ -57,7 +57,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
         Path path = ctx.getModel().getModelPath();
         Path file = path.resolve("config.json");
         try (Reader reader = Files.newBufferedReader(file)) {
-            config = JsonUtils.GSON.fromJson(reader, Config.class);
+            config = JsonUtils.GSON.fromJson(reader, PretrainedConfig.class);
         }
     }
 
@@ -171,10 +171,5 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
         public TokenClassificationTranslator build() throws IOException {
             return new TokenClassificationTranslator(tokenizer, batchifier);
         }
-    }
-
-    private static final class Config {
-
-        Map<String, String> id2label;
     }
 }

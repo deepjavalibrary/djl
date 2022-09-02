@@ -14,27 +14,32 @@ package ai.djl.huggingface.translator;
 
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
+import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.JsonUtils;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-/** The translator for Huggingface text embedding model. */
-public class TextEmbeddingTranslator implements Translator<String, float[]> {
-
-    private static final int[] AXIS = {0};
+/** The translator for Huggingface text classification model. */
+public class TextClassificationTranslator implements Translator<String, Classifications> {
 
     private HuggingFaceTokenizer tokenizer;
     private Batchifier batchifier;
+    private PretrainedConfig config;
 
-    TextEmbeddingTranslator(HuggingFaceTokenizer tokenizer, Batchifier batchifier) {
+    TextClassificationTranslator(HuggingFaceTokenizer tokenizer, Batchifier batchifier) {
         this.tokenizer = tokenizer;
         this.batchifier = batchifier;
     }
@@ -43,6 +48,16 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     @Override
     public Batchifier getBatchifier() {
         return batchifier;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(TranslatorContext ctx) throws IOException {
+        Path path = ctx.getModel().getModelPath();
+        Path file = path.resolve("config.json");
+        try (Reader reader = Files.newBufferedReader(file)) {
+            config = JsonUtils.GSON.fromJson(reader, PretrainedConfig.class);
+        }
     }
 
     /** {@inheritDoc} */
@@ -61,26 +76,29 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
 
     /** {@inheritDoc} */
     @Override
-    public float[] processOutput(TranslatorContext ctx, NDList list) {
-        NDArray embeddings = list.get("last_hidden_state");
-        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
-        long[] attentionMask = encoding.getAttentionMask();
-        NDManager manager = ctx.getNDManager();
-        NDArray inputAttentionMask = manager.create(attentionMask).toType(DataType.FLOAT32, true);
-        long[] shape = embeddings.getShape().getShape();
-        inputAttentionMask = inputAttentionMask.tile(shape[shape.length - 1]);
-        inputAttentionMask = inputAttentionMask.reshape(embeddings.getShape());
-        NDArray inputAttentionMaskSum = inputAttentionMask.sum(AXIS);
-        NDArray clamp = inputAttentionMaskSum.clip(1e-9, 1e12);
-        NDArray prod = embeddings.mul(inputAttentionMask);
-        NDArray sum = prod.sum(AXIS);
-        embeddings = sum.div(clamp).normalize(2, 0);
+    public Classifications processOutput(TranslatorContext ctx, NDList list) {
+        NDArray logits = list.get(0);
+        int size = config.id2label.size();
+        if ("multi_label_classification".equals(config.problemType) || size == 1) {
+            logits = logits.getNDArrayInternal().sigmoid();
+        } else if ("single_label_classification".equals(config.problemType) || size > 1) {
+            logits = logits.softmax(0);
+        }
+        long[] indices = logits.argSort(-1, false).toLongArray();
+        float[] buf = logits.toFloatArray();
+        List<String> classes = new ArrayList<>(size);
+        List<Double> probabilities = new ArrayList<>(size);
+        for (long l : indices) {
+            int index = Math.toIntExact(l);
+            classes.add(config.id2label.get(String.valueOf(index)));
+            probabilities.add((double) buf[index]);
+        }
 
-        return embeddings.toFloatArray();
+        return new Classifications(classes, probabilities);
     }
 
     /**
-     * Creates a builder to build a {@code TextEmbeddingTranslator}.
+     * Creates a builder to build a {@code TextClassificationTranslator}.
      *
      * @param tokenizer the tokenizer
      * @return a new builder
@@ -90,7 +108,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     }
 
     /**
-     * Creates a builder to build a {@code TextEmbeddingTranslator}.
+     * Creates a builder to build a {@code TextClassificationTranslator}.
      *
      * @param tokenizer the tokenizer
      * @param arguments the models' arguments
@@ -140,8 +158,8 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
          * @return the new translator
          * @throws IOException if I/O error occurs
          */
-        public TextEmbeddingTranslator build() throws IOException {
-            return new TextEmbeddingTranslator(tokenizer, batchifier);
+        public TextClassificationTranslator build() throws IOException {
+            return new TextClassificationTranslator(tokenizer, batchifier);
         }
     }
 }
