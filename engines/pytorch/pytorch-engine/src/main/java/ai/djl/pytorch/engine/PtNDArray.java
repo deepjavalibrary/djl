@@ -228,7 +228,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     public void set(Buffer buffer) {
         int size = Math.toIntExact(size());
         DataType type = getDataType();
-        BaseNDManager.validateBufferSize(buffer, type, size);
+        BaseNDManager.validateBuffer(buffer, type, size);
         // TODO how do we handle the exception happened in the middle
         dataRef = null;
         if (buffer.isDirect() && buffer instanceof ByteBuffer) {

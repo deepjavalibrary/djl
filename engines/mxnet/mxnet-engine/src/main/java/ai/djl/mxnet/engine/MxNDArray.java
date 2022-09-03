@@ -305,7 +305,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     public void set(Buffer buffer) {
         int size = Math.toIntExact(size());
         DataType type = getDataType();
-        BaseNDManager.validateBufferSize(buffer, type, size);
+        BaseNDManager.validateBuffer(buffer, type, size);
         if (buffer.isDirect()) {
             JnaUtils.syncCopyFromCPU(getHandle(), buffer, size);
             return;

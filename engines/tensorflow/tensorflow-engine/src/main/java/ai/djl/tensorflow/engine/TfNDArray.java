@@ -193,7 +193,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
         }
         int size = Math.toIntExact(getShape().size());
         DataType type = getDataType();
-        BaseNDManager.validateBufferSize(buffer, type, size);
+        BaseNDManager.validateBuffer(buffer, type, size);
         if (buffer instanceof ByteBuffer) {
             JavacppUtils.setByteBuffer(getHandle(), (ByteBuffer) buffer);
             return;

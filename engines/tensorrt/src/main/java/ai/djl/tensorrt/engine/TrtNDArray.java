@@ -64,7 +64,7 @@ public class TrtNDArray extends NDArrayAdapter {
     @Override
     public void set(Buffer buffer) {
         int size = Math.toIntExact(shape.size());
-        BaseNDManager.validateBufferSize(buffer, dataType, size);
+        BaseNDManager.validateBuffer(buffer, dataType, size);
         BaseNDManager.copyBuffer(buffer, data);
     }
 }

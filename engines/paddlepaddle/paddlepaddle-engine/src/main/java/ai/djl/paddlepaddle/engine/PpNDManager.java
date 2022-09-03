@@ -91,7 +91,7 @@ public class PpNDManager extends BaseNDManager {
     @Override
     public PpNDArray create(Buffer data, Shape shape, DataType dataType) {
         int size = Math.toIntExact(shape.size());
-        BaseNDManager.validateBufferSize(data, dataType, size);
+        BaseNDManager.validateBuffer(data, dataType, size);
         if (data.isDirect() && data instanceof ByteBuffer) {
             return JniUtils.createNdArray(this, (ByteBuffer) data, shape, dataType);
         }

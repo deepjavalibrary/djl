@@ -72,7 +72,7 @@ public class TrtNDManager extends BaseNDManager {
     @Override
     public TrtNDArray create(Buffer data, Shape shape, DataType dataType) {
         int size = Math.toIntExact(shape.size());
-        BaseNDManager.validateBufferSize(data, dataType, size);
+        BaseNDManager.validateBuffer(data, dataType, size);
         if (data.isDirect() && data instanceof ByteBuffer) {
             return new TrtNDArray(this, alternativeManager, (ByteBuffer) data, shape, dataType);
         }

@@ -85,7 +85,7 @@ public class TfNDManager extends BaseNDManager {
                     "Use NDManager.create(String[], Charset, Shape) to create String NDArray.");
         }
         int size = Math.toIntExact(shape.size());
-        BaseNDManager.validateBufferSize(data, dataType, size);
+        BaseNDManager.validateBuffer(data, dataType, size);
         if (data.isDirect() && data instanceof ByteBuffer) {
             TFE_TensorHandle handle =
                     JavacppUtils.createTFETensorFromByteBuffer(

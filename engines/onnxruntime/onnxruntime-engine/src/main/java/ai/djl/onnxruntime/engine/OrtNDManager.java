@@ -73,7 +73,7 @@ public class OrtNDManager extends BaseNDManager {
                     "Use NDManager.create(String[], Shape) to create String NDArray.");
         }
         int size = Math.toIntExact(shape.size());
-        BaseNDManager.validateBufferSize(data, dataType, size);
+        BaseNDManager.validateBuffer(data, dataType, size);
         OnnxTensor tensor = OrtUtils.toTensor(env, data, shape, dataType);
         return new OrtNDArray(this, alternativeManager, tensor);
     }
