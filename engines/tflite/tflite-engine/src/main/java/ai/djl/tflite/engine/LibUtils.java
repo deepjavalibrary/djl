@@ -123,7 +123,7 @@ public final class LibUtils {
         String link = "https://publish.djl.ai/tflite/" + matcher.group(1);
 
         Path tmp = null;
-        try (InputStream is = new URL(link + "/files.txt").openStream()) {
+        try (InputStream is = Utils.openUrl(link + "/files.txt")) {
             Files.createDirectories(cacheDir);
             List<String> lines = Utils.readLines(is);
             if (flavor.startsWith("cu")
@@ -148,7 +148,7 @@ public final class LibUtils {
                     URL url = new URL(link + '/' + line);
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
                     logger.info("Downloading {} ...", url);
-                    try (InputStream fis = new GZIPInputStream(url.openStream())) {
+                    try (InputStream fis = new GZIPInputStream(Utils.openUrl(url))) {
                         Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }

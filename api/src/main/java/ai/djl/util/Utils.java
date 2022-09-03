@@ -22,6 +22,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -429,5 +430,32 @@ public final class Utils {
             logger.warn("Security manager doesn't allow access to the environment variable");
         }
         return Collections.emptyMap();
+    }
+
+    /**
+     * Opens a connection to this URL and returns an InputStream for reading from that connection.
+     *
+     * @param url the url to open
+     * @return an input stream for reading from the URL connection.
+     * @throws IOException if an I/O exception occurs
+     */
+    public static InputStream openUrl(String url) throws IOException {
+        return openUrl(new URL(url));
+    }
+
+    /**
+     * Opens a connection to this URL and returns an InputStream for reading from that connection.
+     *
+     * @param url the url to open
+     * @return an input stream for reading from the URL connection.
+     * @throws IOException if an I/O exception occurs
+     */
+    public static InputStream openUrl(URL url) throws IOException {
+        String protocol = url.getProtocol();
+        if (Boolean.getBoolean("offline")
+                && ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol))) {
+            throw new IOException("Offline model is enabled.");
+        }
+        return new BufferedInputStream(url.openStream());
     }
 }

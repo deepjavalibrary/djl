@@ -169,7 +169,7 @@ public final class LibUtils {
 
         Path tmp = null;
         String link = "https://publish.djl.ai/tensorflow-" + matcher.group(1);
-        try (InputStream is = new URL(link + "/files.txt").openStream()) {
+        try (InputStream is = Utils.openUrl(link + "/files.txt")) {
             Files.createDirectories(cacheDir);
             tmp = Files.createTempDirectory(cacheDir, "tmp");
 
@@ -218,7 +218,7 @@ public final class LibUtils {
                 URL url = new URL(link + '/' + line.replace("+", "%2B"));
                 String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
                 logger.info("Downloading {} ...", url);
-                try (InputStream fis = new GZIPInputStream(url.openStream())) {
+                try (InputStream fis = new GZIPInputStream(Utils.openUrl(url))) {
                     Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                 }
             }

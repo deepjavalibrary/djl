@@ -212,7 +212,7 @@ public final class LibUtils {
 
         Path tmp = null;
         String link = "https://publish.djl.ai/mxnet-" + matcher.group(1);
-        try (InputStream is = new URL(link + "/files.txt").openStream()) {
+        try (InputStream is = Utils.openUrl(link + "/files.txt")) {
             Files.createDirectories(cacheFolder);
             tmp = Files.createTempDirectory(cacheFolder, "tmp");
 
@@ -272,7 +272,7 @@ public final class LibUtils {
                         }
                     }
                     logger.info("Downloading {} ...", fileName);
-                    try (InputStream fis = new GZIPInputStream(url.openStream())) {
+                    try (InputStream fis = new GZIPInputStream(Utils.openUrl(url))) {
                         Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
