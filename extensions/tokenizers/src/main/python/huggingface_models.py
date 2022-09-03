@@ -25,7 +25,7 @@ ARCHITECTURES_2_TASK = {
     "ForTokenClassification": "token-classification",
     "ForSequenceClassification": "text-classification",
     "ForMultipleChoice": "text-classification",
-    "ForMaskedLM": "fill-mask"
+    "ForMaskedLM": "fill-mask",
 }
 LANGUAGES = ModelSearchArguments().language
 
@@ -48,7 +48,7 @@ class HuggingfaceModels:
         self.output_dir = output_dir
         self.processed_models = {}
 
-        output_path = os.path.join(output_dir, "processed_models.json")
+        output_path = os.path.join(output_dir, "models.json")
         if os.path.exists(output_path):
             with open(output_path, "r") as f:
                 self.processed_models = json.load(f)
@@ -90,8 +90,9 @@ class HuggingfaceModels:
             existing_model = self.processed_models.get(model_id)
             if existing_model:
                 existing_model["downloads"] = model_info.downloads
-                logging.info(f"Skip converted mode: {model_id}.")
-                continue
+                if not args.retry_failed:
+                    logging.info(f"Skip converted mode: {model_id}.")
+                    continue
 
             try:
                 config = hf_hub_download(repo_id=model_id,
