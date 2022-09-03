@@ -15,7 +15,6 @@ package ai.djl.modality.cv.translator;
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.translate.ArgumentsUtil;
-import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -36,13 +35,13 @@ public class BigGANTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
-            throws TranslateException {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
         float truncation = ArgumentsUtil.floatValue(arguments, "truncation", 0.5f);
-        return new BigGANTranslator(truncation);
+        return (Translator<I, O>) new BigGANTranslator(truncation);
     }
 }

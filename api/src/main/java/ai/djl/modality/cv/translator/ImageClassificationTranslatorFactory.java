@@ -53,20 +53,21 @@ public class ImageClassificationTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
+        ImageClassificationTranslator translator =
+                ImageClassificationTranslator.builder(arguments).build();
         if (input == Image.class && output == Classifications.class) {
-            return ImageClassificationTranslator.builder(arguments).build();
+            return (Translator<I, O>) translator;
         } else if (input == Path.class && output == Classifications.class) {
-            return new FileTranslator<>(ImageClassificationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new FileTranslator<>(translator);
         } else if (input == URL.class && output == Classifications.class) {
-            return new UrlTranslator<>(ImageClassificationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new UrlTranslator<>(translator);
         } else if (input == InputStream.class && output == Classifications.class) {
-            return new InputStreamTranslator<>(
-                    ImageClassificationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new InputStreamTranslator<>(translator);
         } else if (input == Input.class && output == Output.class) {
-            return new ImageServingTranslator(
-                    ImageClassificationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new ImageServingTranslator(translator);
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

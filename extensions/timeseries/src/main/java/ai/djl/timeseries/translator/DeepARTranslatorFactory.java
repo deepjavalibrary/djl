@@ -15,7 +15,6 @@ package ai.djl.timeseries.translator;
 import ai.djl.Model;
 import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.TimeSeriesData;
-import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -36,12 +35,12 @@ public class DeepARTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
-            throws TranslateException {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
-        return DeepARTranslator.builder(arguments).build();
+        return (Translator<I, O>) DeepARTranslator.builder(arguments).build();
     }
 }

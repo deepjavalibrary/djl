@@ -51,8 +51,8 @@ public class DeferredTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments)
             throws TranslateException {
         String factoryClass = ArgumentsUtil.stringValue(arguments, "translatorFactory");
         if (factoryClass == null || factoryClass.isEmpty()) {

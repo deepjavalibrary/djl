@@ -42,20 +42,21 @@ public class SemanticSegmentationTranslatorFactory implements TranslatorFactory 
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
+        SemanticSegmentationTranslator translator =
+                SemanticSegmentationTranslator.builder(arguments).build();
         if (input == Image.class && output == Image.class) {
-            return SemanticSegmentationTranslator.builder(arguments).build();
+            return (Translator<I, O>) translator;
         } else if (input == Path.class && output == Image.class) {
-            return new FileTranslator<>(SemanticSegmentationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new FileTranslator<>(translator);
         } else if (input == URL.class && output == Image.class) {
-            return new UrlTranslator<>(SemanticSegmentationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new UrlTranslator<>(translator);
         } else if (input == InputStream.class && output == Image.class) {
-            return new InputStreamTranslator<>(
-                    SemanticSegmentationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new InputStreamTranslator<>(translator);
         } else if (input == Input.class && output == Output.class) {
-            return new ImageServingTranslator(
-                    SemanticSegmentationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new ImageServingTranslator(translator);
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

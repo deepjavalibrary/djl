@@ -52,18 +52,20 @@ public class PpWordRecognitionTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
+        PpWordRecognitionTranslator translator = new PpWordRecognitionTranslator();
         if (input == Image.class && output == String.class) {
-            return new PpWordRecognitionTranslator();
+            return (Translator<I, O>) translator;
         } else if (input == Path.class && output == String.class) {
-            return new FileTranslator<>(new PpWordRecognitionTranslator());
+            return (Translator<I, O>) new FileTranslator<>(translator);
         } else if (input == URL.class && output == String.class) {
-            return new UrlTranslator<>(new PpWordRecognitionTranslator());
+            return (Translator<I, O>) new UrlTranslator<>(translator);
         } else if (input == InputStream.class && output == String.class) {
-            return new InputStreamTranslator<>(new PpWordRecognitionTranslator());
+            return (Translator<I, O>) new InputStreamTranslator<>(translator);
         } else if (input == Input.class && output == Output.class) {
-            return new ImageServingTranslator(new PpWordRecognitionTranslator());
+            return (Translator<I, O>) new ImageServingTranslator(translator);
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

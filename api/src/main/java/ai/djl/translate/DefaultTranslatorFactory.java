@@ -74,18 +74,19 @@ public class DefaultTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments)
             throws TranslateException {
         if (translators != null) {
             Translator<?, ?> translator = translators.get(new Pair<Type, Type>(input, output));
             if (translator != null) {
-                return translator;
+                return (Translator<I, O>) translator;
             }
         }
 
         if (input == NDList.class && output == NDList.class) {
-            return new NoopTranslator();
+            return (Translator<I, O>) new NoopTranslator();
         }
         if (servingTranslatorFactory.isSupported(input, output)) {
             return servingTranslatorFactory.newInstance(input, output, model, arguments);

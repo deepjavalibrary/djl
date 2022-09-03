@@ -16,7 +16,6 @@ import ai.djl.Model;
 import ai.djl.ndarray.NDList;
 import ai.djl.nn.core.Embedding;
 import ai.djl.translate.ArgumentsUtil;
-import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.translate.TranslatorFactory;
@@ -38,14 +37,14 @@ public class GloveWordEmbeddingTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
-            throws TranslateException {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
         String unknownToken = ArgumentsUtil.stringValue(arguments, "unknownToken");
-        return new GloveWordEmbeddingTranslator(unknownToken);
+        return (Translator<I, O>) new GloveWordEmbeddingTranslator(unknownToken);
     }
 
     private static final class GloveWordEmbeddingTranslator implements Translator<String, NDList> {

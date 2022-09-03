@@ -17,7 +17,6 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.nlp.translator.TextClassificationServingTranslator;
-import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -45,16 +44,16 @@ public class PtDistilBertTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
-            throws TranslateException {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
         Translator<String, Classifications> translator = new PtDistilBertTranslator();
         if (input == Input.class && output == Output.class) {
-            return new TextClassificationServingTranslator(translator);
+            return (Translator<I, O>) new TextClassificationServingTranslator(translator);
         }
-        return translator;
+        return (Translator<I, O>) translator;
     }
 }

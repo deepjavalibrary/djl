@@ -42,8 +42,9 @@ public class PpImageClassificationTranslatorFactory extends ImageClassificationT
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         ImageClassificationTranslator translator =
                 ImageClassificationTranslator.builder()
                         .addTransform(new Resize(128, 128))
@@ -55,15 +56,15 @@ public class PpImageClassificationTranslatorFactory extends ImageClassificationT
                         .addTransform(nd -> nd.flip(0)) // RGB -> GBR
                         .build();
         if (input == Image.class && output == Classifications.class) {
-            return translator;
+            return (Translator<I, O>) translator;
         } else if (input == Path.class && output == Classifications.class) {
-            return new FileTranslator<>(translator);
+            return (Translator<I, O>) new FileTranslator<>(translator);
         } else if (input == URL.class && output == Classifications.class) {
-            return new UrlTranslator<>(translator);
+            return (Translator<I, O>) new UrlTranslator<>(translator);
         } else if (input == InputStream.class && output == Classifications.class) {
-            return new InputStreamTranslator<>(translator);
+            return (Translator<I, O>) new InputStreamTranslator<>(translator);
         } else if (input == Input.class && output == Output.class) {
-            return new ImageServingTranslator(translator);
+            return (Translator<I, O>) new ImageServingTranslator(translator);
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

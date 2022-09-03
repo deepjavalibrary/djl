@@ -18,7 +18,6 @@ import ai.djl.modality.Output;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.modality.nlp.translator.QATranslator;
 import ai.djl.modality.nlp.translator.QaServingTranslator;
-import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -46,16 +45,16 @@ public class MxBertQATranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
-            throws TranslateException {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
         QATranslator translator = MxBertQATranslator.builder(arguments).build();
         if (input == Input.class && output == Output.class) {
-            return new QaServingTranslator(translator);
+            return (Translator<I, O>) new QaServingTranslator(translator);
         }
-        return translator;
+        return (Translator<I, O>) translator;
     }
 }

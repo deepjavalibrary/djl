@@ -35,18 +35,19 @@ public class PpWordRotateTranslatorFactory extends ImageClassificationTranslator
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         if (input == Image.class && output == Classifications.class) {
-            return new PpWordRotateTranslator();
+            return (Translator<I, O>) new PpWordRotateTranslator();
         } else if (input == Path.class && output == Classifications.class) {
-            return new FileTranslator<>(new PpWordRotateTranslator());
+            return (Translator<I, O>) new FileTranslator<>(new PpWordRotateTranslator());
         } else if (input == URL.class && output == Classifications.class) {
-            return new UrlTranslator<>(new PpWordRotateTranslator());
+            return (Translator<I, O>) new UrlTranslator<>(new PpWordRotateTranslator());
         } else if (input == InputStream.class && output == Classifications.class) {
-            return new InputStreamTranslator<>(new PpWordRotateTranslator());
+            return (Translator<I, O>) new InputStreamTranslator<>(new PpWordRotateTranslator());
         } else if (input == Input.class && output == Output.class) {
-            return new ImageServingTranslator(new PpWordRotateTranslator());
+            return (Translator<I, O>) new ImageServingTranslator(new PpWordRotateTranslator());
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

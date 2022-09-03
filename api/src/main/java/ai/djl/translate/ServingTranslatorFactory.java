@@ -18,8 +18,6 @@ import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.translator.ImageServingTranslator;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Pair;
 
@@ -62,8 +60,9 @@ public class ServingTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments)
             throws TranslateException {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
@@ -87,16 +86,16 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         if (!Files.isDirectory(libPath)) {
             libPath = modelDir.resolve("lib");
             if (!Files.isDirectory(libPath) && className == null) {
-                return loadDefaultTranslator(arguments);
+                return (Translator<I, O>) loadDefaultTranslator(arguments);
             }
         }
         ServingTranslator translator = findTranslator(libPath, className);
         if (translator != null) {
             translator.setArguments(arguments);
             logger.info("Using translator: {}", translator.getClass().getName());
-            return translator;
+            return (Translator<I, O>) translator;
         }
-        return loadDefaultTranslator(arguments);
+        return (Translator<I, O>) loadDefaultTranslator(arguments);
     }
 
     private ServingTranslator findTranslator(Path path, String className) {
@@ -222,8 +221,8 @@ public class ServingTranslatorFactory implements TranslatorFactory {
                 return getImageClassificationTranslator(arguments);
             }
         }
-        String batchifier = ArgumentsUtil.stringValue(arguments, "batchifier", "none");
-        return new RawTranslator(Batchifier.fromString(batchifier));
+        NoopServingTranslatorFactory factory = new NoopServingTranslatorFactory();
+        return factory.newInstance(Input.class, Output.class, null, arguments);
     }
 
     private Translator<Input, Output> getImageClassificationTranslator(Map<String, ?> arguments) {
@@ -249,51 +248,6 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             }
         } catch (Throwable e) {
             logger.warn("Failed to compile bundled java file", e);
-        }
-    }
-
-    private static final class RawTranslator implements Translator<Input, Output> {
-
-        private Batchifier batchifier;
-
-        RawTranslator(Batchifier batchifier) {
-            this.batchifier = batchifier;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Batchifier getBatchifier() {
-            return batchifier;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public NDList processInput(TranslatorContext ctx, Input input) throws TranslateException {
-            NDManager manager = ctx.getNDManager();
-            try {
-                ctx.setAttachment("properties", input.getProperties());
-                return input.getDataAsNDList(manager);
-            } catch (IllegalArgumentException e) {
-                throw new TranslateException("Input is not a NDList data type", e);
-            }
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        @SuppressWarnings("unchecked")
-        public Output processOutput(TranslatorContext ctx, NDList list) {
-            Map<String, String> prop = (Map<String, String>) ctx.getAttachment("properties");
-            String contentType = prop.get("Content-Type");
-
-            Output output = new Output();
-            if ("tensor/npz".equalsIgnoreCase(contentType)) {
-                output.add(list.encode(true));
-                output.addProperty("Content-Type", "tensor/npz");
-            } else {
-                output.add(list.encode(false));
-                output.addProperty("Content-Type", "tensor/ndlist");
-            }
-            return output;
         }
     }
 }

@@ -48,8 +48,9 @@ public class TokenClassificationTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments)
             throws TranslateException {
         Path modelPath = model.getModelPath();
         try {
@@ -61,9 +62,9 @@ public class TokenClassificationTranslatorFactory implements TranslatorFactory {
             TokenClassificationTranslator translator =
                     TokenClassificationTranslator.builder(tokenizer, arguments).build();
             if (input == String.class && output == NamedEntity[].class) {
-                return translator;
+                return (Translator<I, O>) translator;
             } else if (input == Input.class && output == Output.class) {
-                return new TokenClassificationServingTranslator(translator);
+                return (Translator<I, O>) new TokenClassificationServingTranslator(translator);
             }
             throw new IllegalArgumentException("Unsupported input/output types.");
         } catch (IOException e) {
