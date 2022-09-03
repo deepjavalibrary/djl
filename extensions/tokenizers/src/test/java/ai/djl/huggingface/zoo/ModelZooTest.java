@@ -12,6 +12,7 @@
  */
 package ai.djl.huggingface.zoo;
 
+import ai.djl.Application.NLP;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.nlp.qa.QAInput;
@@ -19,11 +20,18 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.JsonUtils;
+import ai.djl.util.Utils;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ModelZooTest {
 
@@ -47,5 +55,38 @@ public class ModelZooTest {
             String res = predictor.predict(input);
             Assert.assertEquals(res, "december 2004");
         }
+    }
+
+    @Test
+    public void testFutureVersion() throws IOException {
+        Map<String, Map<String, Object>> map = new ConcurrentHashMap<>();
+        Map<String, Object> model = new ConcurrentHashMap<>();
+        model.put("result", "failed");
+        map.put("model1", model);
+
+        model = new ConcurrentHashMap<>();
+        model.put("requires", "10.100.0+");
+        map.put("model2", model);
+
+        model = new ConcurrentHashMap<>();
+        model.put("requires", "0.19.0+");
+        map.put("model3", model);
+        map.put("model4", new ConcurrentHashMap<>());
+
+        String path = "model/" + NLP.QUESTION_ANSWER.getPath() + "/ai/djl/huggingface/pytorch/";
+        Path dir = Utils.getCacheDir().resolve("cache/repo/" + path);
+        Files.createDirectories(dir);
+        Path file = dir.resolve("models.json");
+        try (Writer writer = Files.newBufferedWriter(file)) {
+            writer.write(JsonUtils.GSON_PRETTY.toJson(map));
+        }
+        HfModelZoo zoo = new HfModelZoo();
+
+        Assert.assertNull(zoo.getModelLoader("model1"));
+        Assert.assertNull(zoo.getModelLoader("model2"));
+        Assert.assertNull(zoo.getModelLoader("model3"));
+        Assert.assertNotNull(zoo.getModelLoader("model4"));
+
+        Utils.deleteQuietly(file);
     }
 }
