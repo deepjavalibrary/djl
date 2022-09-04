@@ -2013,6 +2013,23 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray exp();
 
     /**
+     * Return the log of the absolute value of the gamma function of this {@code NDArray}
+     * element-wise.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0.5f, 1f, 1.5f});
+     * jshell&gt; array.gammaln();
+     * ND: (2) cpu() float32
+     * [ 0.5724,  0.0000, -0.1208]
+     * </pre>
+     *
+     * @return the result {@code NDArray}
+     */
+    NDArray gammaln();
+
+    /**
      * Returns the natural logarithmic value of this {@code NDArray} element-wise.
      *
      * <p>Examples
