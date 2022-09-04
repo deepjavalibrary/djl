@@ -81,7 +81,7 @@ public class DlrNDManager extends BaseNDManager {
             throw new UnsupportedOperationException("DlrNDArray only supports float32.");
         }
         int size = Math.toIntExact(shape.size());
-        BaseNDManager.validateBufferSize(data, dataType, size);
+        BaseNDManager.validateBuffer(data, dataType, size);
         if (data instanceof ByteBuffer) {
             return new DlrNDArray(this, alternativeManager, (ByteBuffer) data, shape, dataType);
         }

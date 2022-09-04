@@ -66,7 +66,7 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public PtNDArray create(Buffer data, Shape shape, DataType dataType) {
         int size = Math.toIntExact(shape.size());
-        BaseNDManager.validateBufferSize(data, dataType, size);
+        BaseNDManager.validateBuffer(data, dataType, size);
         if (data.isDirect() && data instanceof ByteBuffer) {
             return JniUtils.createNdFromByteBuffer(
                     this, (ByteBuffer) data, shape, dataType, SparseFormat.DENSE, device);

@@ -211,8 +211,8 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void set(Buffer data) {
-        NDArray array = manager.create(data, getShape(), getDataType());
+    public void set(Buffer buffer) {
+        NDArray array = manager.create(buffer, getShape(), getDataType());
         intern(array);
         array.detach();
     }

@@ -225,24 +225,24 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void set(Buffer data) {
+    public void set(Buffer buffer) {
         int size = Math.toIntExact(size());
-        BaseNDManager.validateBufferSize(data, getDataType(), size);
+        DataType type = getDataType();
+        BaseNDManager.validateBuffer(buffer, type, size);
         // TODO how do we handle the exception happened in the middle
         dataRef = null;
-        if (data.isDirect() && data instanceof ByteBuffer) {
+        if (buffer.isDirect() && buffer instanceof ByteBuffer) {
             // If NDArray is on the GPU, it is native code responsibility to control the data life
             // cycle
             if (!getDevice().isGpu()) {
-                dataRef = (ByteBuffer) data;
+                dataRef = (ByteBuffer) buffer;
             }
-            JniUtils.set(this, (ByteBuffer) data);
+            JniUtils.set(this, (ByteBuffer) buffer);
             return;
         }
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
-        DataType inputType = DataType.fromBuffer(data);
-        ByteBuffer buf = manager.allocateDirect(size * inputType.getNumOfBytes());
-        BaseNDManager.copyBuffer(data, buf);
+        ByteBuffer buf = manager.allocateDirect(size * type.getNumOfBytes());
+        BaseNDManager.copyBuffer(buffer, buf);
 
         // If NDArray is on the GPU, it is native code responsibility to control the data life cycle
         if (!getDevice().isGpu()) {

@@ -403,10 +403,21 @@ public abstract class BaseNDManager implements NDManager {
      * @param expected the expected size
      * @throws IllegalArgumentException if buffer size is invalid
      */
-    public static void validateBufferSize(Buffer buffer, DataType dataType, int expected) {
+    public static void validateBuffer(Buffer buffer, DataType dataType, int expected) {
+        boolean isByteBuffer = buffer instanceof ByteBuffer;
+        DataType type = DataType.fromBuffer(buffer);
+        if (type != dataType && !isByteBuffer) {
+            // It's ok if type != datatype and buffer is ByteBuffer,
+            // since buffer will be copied into ByteBuffer
+            throw new IllegalArgumentException(
+                    "The input data type: "
+                            + type
+                            + " does not match target array data type: "
+                            + dataType);
+        }
+
         int remaining = buffer.remaining();
-        int expectedSize =
-                buffer instanceof ByteBuffer ? dataType.getNumOfBytes() * expected : expected;
+        int expectedSize = isByteBuffer ? dataType.getNumOfBytes() * expected : expected;
         if (remaining < expectedSize) {
             throw new IllegalArgumentException(
                     "The NDArray size is: " + expected + ", but buffer size is: " + remaining);

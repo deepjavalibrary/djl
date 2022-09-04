@@ -400,9 +400,9 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Sets this {@code NDArray} value from {@link Buffer}.
      *
-     * @param data the input buffered data
+     * @param buffer the input buffered data
      */
-    void set(Buffer data);
+    void set(Buffer buffer);
 
     /**
      * Sets this {@code NDArray} value from an array of floats.
