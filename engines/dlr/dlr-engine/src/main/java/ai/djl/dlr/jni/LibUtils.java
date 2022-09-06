@@ -200,7 +200,7 @@ public final class LibUtils {
         }
         String link = "https://publish.djl.ai/dlr-" + matcher.group(1) + "/native";
         Path tmp = null;
-        try (InputStream is = new URL(link + "/files.txt").openStream()) {
+        try (InputStream is = Utils.openUrl(link + "/files.txt")) {
             Files.createDirectories(dlrCacheRoot);
             List<String> lines = Utils.readLines(is);
             if (flavor.startsWith("cu")
@@ -224,7 +224,7 @@ public final class LibUtils {
                     URL url = new URL(link + '/' + line);
                     String fileName = line.substring(line.lastIndexOf('/') + 1);
                     logger.info("Downloading {} ...", url);
-                    try (InputStream fis = url.openStream()) {
+                    try (InputStream fis = Utils.openUrl(url)) {
                         Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }

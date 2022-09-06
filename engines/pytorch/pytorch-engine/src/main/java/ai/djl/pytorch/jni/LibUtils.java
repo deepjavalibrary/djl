@@ -229,7 +229,7 @@ public final class LibUtils {
             String jniVersion = null;
             if (url != null) {
                 Properties prop = new Properties();
-                try (InputStream is = url.openStream()) {
+                try (InputStream is = Utils.openUrl(url)) {
                     prop.load(is);
                 }
                 jniVersion = prop.getProperty("jni_version");
@@ -391,7 +391,7 @@ public final class LibUtils {
         Path indexFile = cacheDir.resolve(version + ".txt");
         if (Files.notExists(indexFile)) {
             Path tempFile = cacheDir.resolve(version + ".tmp");
-            try (InputStream is = new URL(link + "/files.txt").openStream()) {
+            try (InputStream is = Utils.openUrl(link + "/files.txt")) {
                 Files.createDirectories(cacheDir);
                 Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
                 Utils.moveQuietly(tempFile, indexFile);
@@ -453,7 +453,7 @@ public final class LibUtils {
                     String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);
                     fileName = URLDecoder.decode(fileName, "UTF-8");
                     logger.info("Downloading {} ...", url);
-                    try (InputStream fis = new GZIPInputStream(url.openStream())) {
+                    try (InputStream fis = new GZIPInputStream(Utils.openUrl(url))) {
                         Files.copy(fis, tmp.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
@@ -494,7 +494,7 @@ public final class LibUtils {
                         + JNI_LIB_NAME;
         logger.info("Downloading jni {} to cache ...", url);
         Path tmp = null;
-        try (InputStream is = new URL(url).openStream()) {
+        try (InputStream is = Utils.openUrl(url)) {
             Files.createDirectories(cacheDir);
             tmp = Files.createTempFile(cacheDir, "jni", "tmp");
             Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
