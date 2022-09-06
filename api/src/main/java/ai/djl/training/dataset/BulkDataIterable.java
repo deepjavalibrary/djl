@@ -73,23 +73,23 @@ public class BulkDataIterable extends DataIterable {
         subManager.setName("dataIter fetch");
         int batchSize = indices.size();
 
-        Record record;
+        Batch raw;
         if (isRange(indices)) {
             long fromIndex = indices.get(0);
             long toIndex = fromIndex + indices.size();
-            record = ((ArrayDataset) dataset).getByRange(subManager, fromIndex, toIndex);
+            raw = ((ArrayDataset) dataset).getByRange(subManager, fromIndex, toIndex);
         } else {
             long[] indicesArr = indices.stream().mapToLong(Long::longValue).toArray();
-            record = ((ArrayDataset) dataset).getByIndices(subManager, indicesArr);
+            raw = ((ArrayDataset) dataset).getByIndices(subManager, indicesArr);
         }
 
-        NDList batchData = record.getData();
+        NDList batchData = raw.getData();
         // apply transform
         if (pipeline != null) {
             batchData = pipeline.transform(batchData);
         }
 
-        NDList batchLabels = record.getLabels();
+        NDList batchLabels = raw.getLabels();
 
         // apply label transform
         if (targetPipeline != null) {
