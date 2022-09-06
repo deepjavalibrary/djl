@@ -91,7 +91,7 @@ class HuggingfaceModels:
             if existing_model:
                 existing_model["downloads"] = model_info.downloads
                 if not args.retry_failed:
-                    logging.info(f"Skip converted mode: {model_id}.")
+                    logging.info(f"Skip converted model: {model_id}.")
                     continue
 
             try:
