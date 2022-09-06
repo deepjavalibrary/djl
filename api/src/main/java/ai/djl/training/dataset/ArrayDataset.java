@@ -103,13 +103,13 @@ public class ArrayDataset extends RandomAccessDataset {
     }
 
     /**
-     * Gets the {@link Record} for the given indices from the dataset.
+     * Gets the {@link Batch} for the given indices from the dataset.
      *
      * @param manager the manager used to create the arrays
      * @param indices indices of the requested data items
-     * @return a {@link Record} that contains the data and label of the requested data items
+     * @return a {@link Batch} that contains the data and label of the requested data items
      */
-    public Record getByIndices(NDManager manager, long... indices) {
+    public Batch getByIndices(NDManager manager, long... indices) {
         try (NDArray ndIndices = manager.create(indices)) {
             NDIndex index = new NDIndex("{}", ndIndices);
             NDList datum = new NDList();
@@ -122,19 +122,27 @@ public class ArrayDataset extends RandomAccessDataset {
                     label.add(array.get(manager, index));
                 }
             }
-            return new Record(datum, label);
+            return new Batch(
+                    manager,
+                    datum,
+                    label,
+                    indices.length,
+                    Batchifier.STACK,
+                    Batchifier.STACK,
+                    -1,
+                    -1);
         }
     }
 
     /**
-     * Gets the {@link Record} for the given range from the dataset.
+     * Gets the {@link Batch} for the given range from the dataset.
      *
      * @param manager the manager used to create the arrays
      * @param fromIndex low endpoint (inclusive) of the dataset
      * @param toIndex high endpoint (exclusive) of the dataset
-     * @return a {@link Record} that contains the data and label of the requested data items
+     * @return a {@link Batch} that contains the data and label of the requested data items
      */
-    public Record getByRange(NDManager manager, long fromIndex, long toIndex) {
+    public Batch getByRange(NDManager manager, long fromIndex, long toIndex) {
         NDIndex index = new NDIndex().addSliceDim(fromIndex, toIndex);
         NDList datum = new NDList();
         NDList label = new NDList();
@@ -146,7 +154,8 @@ public class ArrayDataset extends RandomAccessDataset {
                 label.add(array.get(manager, index));
             }
         }
-        return new Record(datum, label);
+        int size = Math.toIntExact(toIndex - fromIndex);
+        return new Batch(manager, datum, label, size, Batchifier.STACK, Batchifier.STACK, -1, -1);
     }
 
     /** {@inheritDoc} */
@@ -277,7 +286,7 @@ public class ArrayDataset extends RandomAccessDataset {
 
         /** {@inheritDoc} */
         @Override
-        public Record getByIndices(NDManager manager, long... indices) {
+        public Batch getByIndices(NDManager manager, long... indices) {
             long[] resolvedIndices = new long[indices.length];
             int i = 0;
             for (long index : indices) {
@@ -288,7 +297,7 @@ public class ArrayDataset extends RandomAccessDataset {
 
         /** {@inheritDoc} */
         @Override
-        public Record getByRange(NDManager manager, long fromIndex, long toIndex) {
+        public Batch getByRange(NDManager manager, long fromIndex, long toIndex) {
             return dataset.getByRange(manager, fromIndex + from, toIndex + from);
         }
 
@@ -330,7 +339,7 @@ public class ArrayDataset extends RandomAccessDataset {
 
         /** {@inheritDoc} */
         @Override
-        public Record getByIndices(NDManager manager, long... indices) {
+        public Batch getByIndices(NDManager manager, long... indices) {
             long[] resolvedIndices = new long[indices.length];
             int i = 0;
             for (long index : indices) {
@@ -341,7 +350,7 @@ public class ArrayDataset extends RandomAccessDataset {
 
         /** {@inheritDoc} */
         @Override
-        public Record getByRange(NDManager manager, long fromIndex, long toIndex) {
+        public Batch getByRange(NDManager manager, long fromIndex, long toIndex) {
             long[] resolvedIndices = new long[(int) (toIndex - fromIndex)];
             int i = 0;
             for (long index = fromIndex; index < toIndex; index++) {
