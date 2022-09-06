@@ -23,6 +23,10 @@ def converter_args():
                         default=1,
                         help="Max amount of models to convert")
     parser.add_argument("-o", "--output-dir", help="Model output directory")
+    parser.add_argument("-r",
+                        "--retry-failed",
+                        action='store_true',
+                        help="Retry failed model")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "-c",
