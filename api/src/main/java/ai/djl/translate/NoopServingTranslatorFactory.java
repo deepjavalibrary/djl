@@ -35,14 +35,14 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
-            throws TranslateException {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
         String batchifier = ArgumentsUtil.stringValue(arguments, "batchifier", "none");
-        return new NoopServingTranslator(Batchifier.fromString(batchifier));
+        return (Translator<I, O>) new NoopServingTranslator(Batchifier.fromString(batchifier));
     }
 
     static final class NoopServingTranslator implements Translator<Input, Output> {
@@ -77,9 +77,11 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
         public Output processOutput(TranslatorContext ctx, NDList list) {
             Map<String, String> prop = (Map<String, String>) ctx.getAttachment("properties");
             String contentType = prop.get("Content-Type");
+            String accept = prop.get("Accept");
 
             Output output = new Output();
-            if ("tensor/npz".equalsIgnoreCase(contentType)) {
+            if ("tensor/npz".equalsIgnoreCase(accept)
+                    || "tensor/npz".equalsIgnoreCase(contentType)) {
                 output.add(list.encode(true));
                 output.addProperty("Content-Type", "tensor/npz");
             } else {

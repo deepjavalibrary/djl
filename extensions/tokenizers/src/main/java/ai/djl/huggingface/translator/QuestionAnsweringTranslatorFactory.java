@@ -48,8 +48,9 @@ public class QuestionAnsweringTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments)
             throws TranslateException {
         Path modelPath = model.getModelPath();
         try {
@@ -61,9 +62,9 @@ public class QuestionAnsweringTranslatorFactory implements TranslatorFactory {
             QuestionAnsweringTranslator translator =
                     QuestionAnsweringTranslator.builder(tokenizer, arguments).build();
             if (input == QAInput.class && output == String.class) {
-                return translator;
+                return (Translator<I, O>) translator;
             } else if (input == Input.class && output == Output.class) {
-                return new QaServingTranslator(translator);
+                return (Translator<I, O>) new QaServingTranslator(translator);
             }
             throw new IllegalArgumentException("Unsupported input/output types.");
         } catch (IOException e) {

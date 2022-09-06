@@ -35,18 +35,20 @@ public class PpWordDetectionTranslatorFactory extends ObjectDetectionTranslatorF
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
+        PpWordDetectionTranslator translator = new PpWordDetectionTranslator(arguments);
         if (input == Image.class && output == DetectedObjects.class) {
-            return new PpWordDetectionTranslator(arguments);
+            return (Translator<I, O>) translator;
         } else if (input == Path.class && output == DetectedObjects.class) {
-            return new FileTranslator<>(new PpWordDetectionTranslator(arguments));
+            return (Translator<I, O>) new FileTranslator<>(translator);
         } else if (input == URL.class && output == DetectedObjects.class) {
-            return new UrlTranslator<>(new PpWordDetectionTranslator(arguments));
+            return (Translator<I, O>) new UrlTranslator<>(translator);
         } else if (input == InputStream.class && output == DetectedObjects.class) {
-            return new InputStreamTranslator<>(new PpWordDetectionTranslator(arguments));
+            return (Translator<I, O>) new InputStreamTranslator<>(translator);
         } else if (input == Input.class && output == Output.class) {
-            return new ImageServingTranslator(new PpWordDetectionTranslator(arguments));
+            return (Translator<I, O>) new ImageServingTranslator(translator);
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

@@ -42,12 +42,13 @@ public class IrisClassificationTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         if (!isSupported(input, output)) {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
-        return new IrisTranslator();
+        return (Translator<I, O>) new IrisTranslator();
     }
 
     private static final class IrisTranslator

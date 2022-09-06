@@ -14,7 +14,6 @@ package ai.djl.modality.audio.translator;
 
 import ai.djl.Model;
 import ai.djl.modality.audio.Audio;
-import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -41,11 +40,11 @@ public class SpeechRecognitionTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
-            throws TranslateException {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         if (input == Audio.class && output == String.class) {
-            return new SpeechRecognitionTranslator();
+            return (Translator<I, O>) new SpeechRecognitionTranslator();
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

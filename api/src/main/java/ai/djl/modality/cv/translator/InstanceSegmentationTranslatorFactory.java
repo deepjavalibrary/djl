@@ -33,20 +33,21 @@ public class InstanceSegmentationTranslatorFactory extends ObjectDetectionTransl
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
+        InstanceSegmentationTranslator translator =
+                InstanceSegmentationTranslator.builder(arguments).build();
         if (input == Image.class && output == DetectedObjects.class) {
-            return InstanceSegmentationTranslator.builder(arguments).build();
+            return (Translator<I, O>) translator;
         } else if (input == Path.class && output == DetectedObjects.class) {
-            return new FileTranslator<>(InstanceSegmentationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new FileTranslator<>(translator);
         } else if (input == URL.class && output == DetectedObjects.class) {
-            return new UrlTranslator<>(InstanceSegmentationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new UrlTranslator<>(translator);
         } else if (input == InputStream.class && output == DetectedObjects.class) {
-            return new InputStreamTranslator<>(
-                    InstanceSegmentationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new InputStreamTranslator<>(translator);
         } else if (input == Input.class && output == Output.class) {
-            return new ImageServingTranslator(
-                    InstanceSegmentationTranslator.builder(arguments).build());
+            return (Translator<I, O>) new ImageServingTranslator(translator);
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

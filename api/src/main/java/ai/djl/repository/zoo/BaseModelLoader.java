@@ -69,7 +69,6 @@ public class BaseModelLoader implements ModelLoader {
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
     public <I, O> ZooModel<I, O> loadModel(Criteria<I, O> criteria)
             throws IOException, ModelNotFoundException, MalformedModelException {
         Artifact artifact = mrl.match(criteria.getFilters());
@@ -158,8 +157,7 @@ public class BaseModelLoader implements ModelLoader {
                             arguments,
                             engine);
             model.load(modelPath, null, options);
-            Translator<I, O> translator =
-                    (Translator<I, O>) factory.newInstance(input, output, model, arguments);
+            Translator<I, O> translator = factory.newInstance(input, output, model, arguments);
             return new ZooModel<>(model, translator);
         } catch (TranslateException e) {
             throw new ModelNotFoundException("No matching translator found", e);

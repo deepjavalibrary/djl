@@ -29,7 +29,7 @@ import java.nio.file.Paths;
 public class NoopServingTranslatorFactoryTest {
 
     @Test
-    public void testRawTranslatorFactory() throws ModelException, IOException {
+    public void testNoopTranslatorFactory() throws ModelException, IOException {
         NoopServingTranslatorFactory factory = new NoopServingTranslatorFactory();
         Assert.assertEquals(factory.getSupportedTypes().size(), 1);
 

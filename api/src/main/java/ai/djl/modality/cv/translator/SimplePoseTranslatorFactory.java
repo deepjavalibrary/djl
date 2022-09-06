@@ -44,14 +44,15 @@ public class SimplePoseTranslatorFactory implements TranslatorFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments) {
-        if (!isSupported(input, output)) {
-            throw new IllegalArgumentException("Unsupported input/output types.");
+    @SuppressWarnings("unchecked")
+    public <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
+        SimplePoseTranslator translator = SimplePoseTranslator.builder(arguments).build();
+        if (input == Image.class && output == Joints.class) {
+            return (Translator<I, O>) translator;
+        } else if (input == Input.class && output == Output.class) {
+            return (Translator<I, O>) new ImageServingTranslator(translator);
         }
-        if (input == Input.class && output == Output.class) {
-            return new ImageServingTranslator(SimplePoseTranslator.builder(arguments).build());
-        }
-        return SimplePoseTranslator.builder(arguments).build();
+        throw new IllegalArgumentException("Unsupported input/output types.");
     }
 }

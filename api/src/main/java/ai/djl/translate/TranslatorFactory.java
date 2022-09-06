@@ -43,6 +43,8 @@ public interface TranslatorFactory {
     /**
      * Returns a new instance of the {@link Translator} class.
      *
+     * @param <I> the input data type
+     * @param <O> the output data type
      * @param input the input class
      * @param output the output class
      * @param model the {@link Model} that uses the {@link Translator}
@@ -50,7 +52,7 @@ public interface TranslatorFactory {
      * @return a new instance of the {@code Translator} class
      * @throws TranslateException if failed to create Translator instance
      */
-    Translator<?, ?> newInstance(
-            Class<?> input, Class<?> output, Model model, Map<String, ?> arguments)
+    <I, O> Translator<I, O> newInstance(
+            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments)
             throws TranslateException;
 }
