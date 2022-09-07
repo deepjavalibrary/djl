@@ -1384,6 +1384,75 @@ public interface NDManager extends AutoCloseable {
     NDArray randomMultinomial(int n, NDArray pValues, Shape shape);
 
     /**
+     * Concurrent sampling from multiple normal distributions with parameters *mu* (mean) and
+     * *sigma* (standard deviation).
+     *
+     * @param mu Means of the distributions
+     * @param sigma Standard deviations of the distributions
+     * @return the drawn samples {@link NDArray}
+     */
+    NDArray sampleNormal(NDArray mu, NDArray sigma);
+
+    /**
+     * Concurrent sampling from multiple normal distributions with parameters *mu* (mean) and
+     * *sigma* (standard deviation).
+     *
+     * @param mu Means of the distributions
+     * @param sigma Standard deviations of the distributions
+     * @param shape Shape to be sampled from each random distribution
+     * @return the drawn samples {@link NDArray}
+     */
+    NDArray sampleNormal(NDArray mu, NDArray sigma, Shape shape);
+
+    /**
+     * Draw random samples from a Poisson distribution.
+     *
+     * <p>Samples are distributed according to a Poisson distribution parametrized by *lambda*
+     * (rate). Samples will always be returned as a floating point data type.
+     *
+     * @param lam Lambda (rate) parameters of the distributions
+     * @return the drawn samples {@link NDArray}
+     */
+    NDArray samplePoisson(NDArray lam);
+
+    /**
+     * Draw random samples from a Poisson distribution.
+     *
+     * <p>Samples are distributed according to a Poisson distribution parametrized by *lambda*
+     * (rate). Samples will always be returned as a floating point data type.
+     *
+     * @param lam Lambda (rate) parameters of the distributions
+     * @param shape Shape to be sampled from each random distribution
+     * @return the drawn samples {@link NDArray}
+     */
+    NDArray samplePoisson(NDArray lam, Shape shape);
+
+    /**
+     * Draw random samples from a gamma distribution.
+     *
+     * <p>Samples are distributed according to a gamma distribution parametrized by *alpha* (shape)
+     * and *beta* (scale).
+     *
+     * @param alpha The shape of the gamma distribution
+     * @param beta The scale of the gamma distribution
+     * @return the drawn samples {@link NDArray}
+     */
+    NDArray sampleGamma(NDArray alpha, NDArray beta);
+
+    /**
+     * Draw random samples from a gamma distribution.
+     *
+     * <p>Samples are distributed according to a gamma distribution parametrized by *alpha* (shape)
+     * and *beta* (scale).
+     *
+     * @param alpha The shape of the gamma distribution
+     * @param beta The scale of the gamma distribution
+     * @param shape Shape to be sampled from each random distribution
+     * @return the drawn samples {@link NDArray}
+     */
+    NDArray sampleGamma(NDArray alpha, NDArray beta, Shape shape);
+
+    /**
      * Check if the manager is still valid.
      *
      * @return the current status

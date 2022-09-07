@@ -446,4 +446,58 @@ public class NDArrayCreationOpTest {
             Assertions.assertAlmostEquals(expectedNormal, actualNormal, 1e-2f, 1e-2f);
         }
     }
+
+    @Test
+    public void testSamplePoisson() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            manager.getEngine().setRandomSeed(100);
+            NDArray lam = manager.create(new double[] {1., 8.5});
+            NDArray expected = manager.create(new double[] {1., 11.});
+            NDArray poisson = manager.samplePoisson(lam);
+            Assertions.assertAlmostEquals(poisson, expected);
+            expected =
+                    manager.create(new double[] {1., 1., 1., 2., 9., 10., 11., 10.})
+                            .reshape(new Shape(2, 2, 2));
+            poisson = manager.samplePoisson(lam, new Shape(2, 2));
+            Assertions.assertAlmostEquals(poisson, expected);
+        }
+    }
+
+    public void testSampleGamma() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            manager.getEngine().setRandomSeed(100);
+            NDArray alpha = manager.create(new double[] {0., 2.5});
+            NDArray beta = manager.create(new double[] {1., 0.7});
+            NDArray expected = manager.create(new double[] {0., 2.4592676});
+            NDArray gamma = manager.sampleGamma(alpha, beta);
+            Assertions.assertAlmostEquals(gamma, expected);
+            expected =
+                    manager.create(
+                                    new double[] {
+                                        0., 0., 0., 0., 2.286353, 0.90269035, 2.0772479, 3.3737767
+                                    })
+                            .reshape(new Shape(2, 2, 2));
+            gamma = manager.sampleGamma(alpha, beta, new Shape(2, 2));
+            Assertions.assertAlmostEquals(gamma, expected);
+        }
+    }
+
+    public void testSampleNormal() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            manager.getEngine().setRandomSeed(100);
+            NDArray alpha = manager.create(new double[] {0., 2.5});
+            NDArray beta = manager.create(new double[] {1., 3.7});
+            NDArray expected = manager.create(new double[] {0., 12.998987});
+            NDArray gamma = manager.sampleGamma(alpha, beta);
+            Assertions.assertAlmostEquals(gamma, expected);
+            expected =
+                    manager.create(
+                                    new double[] {
+                                        0., 0., 0., 0., 12.085011, 4.7713637, 10.979739, 17.83282
+                                    })
+                            .reshape(new Shape(2, 2, 2));
+            gamma = manager.sampleGamma(alpha, beta, new Shape(2, 2));
+            Assertions.assertAlmostEquals(gamma, expected);
+        }
+    }
 }

@@ -234,6 +234,42 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sampleNormal(NDArray mu, NDArray sigma) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sampleNormal(NDArray mu, NDArray sigma, Shape shape) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray samplePoisson(NDArray lam) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray samplePoisson(NDArray lam, Shape shape) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sampleGamma(NDArray alpha, NDArray beta) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sampleGamma(NDArray alpha, NDArray beta, Shape shape) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public boolean isOpen() {
         return !closed.get();
     }

@@ -277,6 +277,48 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray sampleNormal(NDArray mu, NDArray sigma) {
+        return invoke("sample_normal", new NDArray[] {mu, sigma}, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sampleNormal(NDArray mu, NDArray sigma, Shape shape) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("shape", shape);
+        return invoke("sample_normal", new NDArray[] {mu, sigma}, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray samplePoisson(NDArray lam) {
+        return invoke("sample_poisson", lam, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray samplePoisson(NDArray lam, Shape shape) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("shape", shape);
+        return invoke("sample_poisson", lam, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sampleGamma(NDArray alpha, NDArray beta) {
+        return invoke("sample_gamma", new NDArray[] {alpha, beta}, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray sampleGamma(NDArray alpha, NDArray beta, Shape shape) {
+        MxOpParams params = new MxOpParams();
+        params.addParam("shape", shape);
+        return invoke("sample_gamma", new NDArray[] {alpha, beta}, params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public MxNDManager newSubManager(Device dev) {
         MxNDManager manager = new MxNDManager(this, dev, version);
         attachUncappedInternal(manager.uid, manager);
