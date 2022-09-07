@@ -463,6 +463,7 @@ public class NDArrayCreationOpTest {
         }
     }
 
+    @Test
     public void testSampleGamma() {
         try (NDManager manager = NDManager.newBaseManager()) {
             manager.getEngine().setRandomSeed(100);
@@ -482,6 +483,7 @@ public class NDArrayCreationOpTest {
         }
     }
 
+    @Test
     public void testSampleNormal() {
         try (NDManager manager = NDManager.newBaseManager()) {
             manager.getEngine().setRandomSeed(100);
