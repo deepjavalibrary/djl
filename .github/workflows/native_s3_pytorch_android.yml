@@ -49,8 +49,8 @@ jobs:
         run: |
           aws s3 cp android_pytorch_tmp/build_android/${{ matrix.format }}_native.zip s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/android_native/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/android_native*"
-      - name: Upload pytorch src
-        uses: actions/upload-artifact@v3
-        with:
-          name: pytorch-src-${{ matrix.format }}
-          path: android_pytorch_tmp
+#      - name: Upload pytorch src
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: pytorch-src-${{ matrix.format }}
+#          path: android_pytorch_tmp
