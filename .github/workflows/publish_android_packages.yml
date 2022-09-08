@@ -27,10 +27,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: publish android core and pytorch-native to sonatype
+        if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
         working-directory: android
         run: |
           ./gradlew :pytorch-native:assemble
-          ./gradlew publish -P${{ github.event.inputs.mode }}
+          ./gradlew publish -Psnapshot
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
+          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
+      - name: publish android core and pytorch-native to sonatype
+        if: ${{ github.event.inputs.mode == 'staging' }}
+        working-directory: android
+        run: |
+          ./gradlew :pytorch-native:assemble
+          ./gradlew publish -Pstaging
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
