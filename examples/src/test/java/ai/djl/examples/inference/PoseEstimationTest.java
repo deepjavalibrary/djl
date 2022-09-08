@@ -21,6 +21,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 public class PoseEstimationTest {
 
@@ -28,7 +29,7 @@ public class PoseEstimationTest {
     public void testPoseEstimation() throws ModelException, TranslateException, IOException {
         TestRequirements.engine("MXNet");
 
-        Joints result = PoseEstimation.predict();
-        Assert.assertTrue(result.getJoints().get(0).getConfidence() > 0.6d);
+        List<Joints> result = PoseEstimation.predict();
+        Assert.assertTrue(result.get(0).getJoints().get(0).getConfidence() > 0.6d);
     }
 }
