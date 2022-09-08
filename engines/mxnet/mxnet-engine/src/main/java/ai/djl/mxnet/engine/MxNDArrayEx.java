@@ -656,14 +656,19 @@ class MxNDArrayEx implements NDArrayEx {
                                                         - normalizedShape.dimension()))
                                 .add(normalizedShape.size()));
 
+        // Cause of gamma and betta attached to model manager we must attach them to input NDManager
+        // to avoid memory leak.
+        final NDArray reshapedGamma = gamma.reshape(normalizedShape.size());
+        final NDArray reshapedBeta = beta.reshape(normalizedShape.size());
+        final NDManager inputManager = input.getManager();
+        reshapedBeta.attach(inputManager);
+        reshapedGamma.attach(inputManager);
+
         return new NDList(
                 getManager()
                         .invoke(
                                 "_npx_layer_norm",
-                                new NDList(
-                                        reshapedInput,
-                                        gamma.reshape(normalizedShape.size()),
-                                        beta.reshape(normalizedShape.size())),
+                                new NDList(reshapedInput, reshapedGamma, reshapedBeta),
                                 params)
                         .get(0)
                         .reshape(input.getShape()));
