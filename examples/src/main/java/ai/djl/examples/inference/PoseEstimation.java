@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -51,25 +52,25 @@ public final class PoseEstimation {
     private PoseEstimation() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        Joints joints = PoseEstimation.predict();
+        List<Joints> joints = PoseEstimation.predict();
         logger.info("{}", joints);
     }
 
-    public static Joints predict() throws IOException, ModelException, TranslateException {
+    public static List<Joints> predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/pose_soccer.png");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
-        Image person = predictPersonInImage(img);
+        List<Image> people = predictPeopleInImage(img);
 
-        if (person == null) {
-            logger.warn("No person found in image.");
-            return new Joints(Collections.emptyList());
+        if (people.isEmpty()) {
+            logger.warn("No people found in image.");
+            return Collections.emptyList();
         }
 
-        return predictJointsInPerson(person);
+        return predictJointsForPeople(people);
     }
 
-    private static Image predictPersonInImage(Image img)
+    private static List<Image> predictPeopleInImage(Image img)
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
 
@@ -93,22 +94,24 @@ public final class PoseEstimation {
         }
 
         List<DetectedObjects.DetectedObject> items = detectedObjects.items();
+        List<Image> people = new ArrayList<>();
         for (DetectedObjects.DetectedObject item : items) {
             if ("person".equals(item.getClassName())) {
                 Rectangle rect = item.getBoundingBox().getBounds();
                 int width = img.getWidth();
                 int height = img.getHeight();
-                return img.getSubImage(
-                        (int) (rect.getX() * width),
-                        (int) (rect.getY() * height),
-                        (int) (rect.getWidth() * width),
-                        (int) (rect.getHeight() * height));
+                people.add(
+                        img.getSubImage(
+                                (int) (rect.getX() * width),
+                                (int) (rect.getY() * height),
+                                (int) (rect.getWidth() * width),
+                                (int) (rect.getHeight() * height)));
             }
         }
-        return null;
+        return people;
     }
 
-    private static Joints predictJointsInPerson(Image person)
+    private static List<Joints> predictJointsForPeople(List<Image> people)
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
 
@@ -121,21 +124,26 @@ public final class PoseEstimation {
                         .optFilter("dataset", "imagenet")
                         .build();
 
+        List<Joints> allJoints = new ArrayList<>();
         try (ZooModel<Image, Joints> pose = criteria.loadModel();
                 Predictor<Image, Joints> predictor = pose.newPredictor()) {
-            Joints joints = predictor.predict(person);
-            saveJointsImage(person, joints);
-            return joints;
+            int count = 0;
+            for (Image person : people) {
+                Joints joints = predictor.predict(person);
+                saveJointsImage(person, joints, count++);
+                allJoints.add(joints);
+            }
         }
+        return allJoints;
     }
 
-    private static void saveJointsImage(Image img, Joints joints) throws IOException {
+    private static void saveJointsImage(Image img, Joints joints, int count) throws IOException {
         Path outputDir = Paths.get("build/output");
         Files.createDirectories(outputDir);
 
         img.drawJoints(joints);
 
-        Path imagePath = outputDir.resolve("joints.png");
+        Path imagePath = outputDir.resolve("joints-" + count + ".png");
         // Must use png format because you can't save as jpg with an alpha channel
         img.save(Files.newOutputStream(imagePath), "png");
         logger.info("Pose image has been saved in: {}", imagePath);
