@@ -89,6 +89,8 @@ Your output should look like the following:
 
 Output images with the detected joints for each person will be saved in the build/output directory:
 
-![joints-0](img/joints-0.png)
-![joints-1](img/joints-1.png)
-![joints-2](img/joints-2.png)
+![joints-0](https://resources.djl.ai/images/joints-0.png)
+
+![joints-1](https://resources.djl.ai/images/joints-1.png)
+
+![joints-2](https://resources.djl.ai/images/joints-2.png)
