@@ -286,7 +286,7 @@ public class MxNDManager extends BaseNDManager {
     public NDArray sampleNormal(NDArray mu, NDArray sigma, Shape shape) {
         MxOpParams params = new MxOpParams();
         params.addParam("shape", shape);
-        return invoke("sample_normal", new NDArray[] {mu, sigma}, null);
+        return invoke("sample_normal", new NDArray[] {mu, sigma}, params);
     }
 
     /** {@inheritDoc} */
