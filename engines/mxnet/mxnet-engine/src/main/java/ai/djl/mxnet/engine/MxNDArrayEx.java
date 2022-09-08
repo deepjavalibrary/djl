@@ -668,10 +668,7 @@ class MxNDArrayEx implements NDArrayEx {
                 getManager()
                         .invoke(
                                 "_npx_layer_norm",
-                                new NDList(
-                                        reshapedInput,
-                                        reshapedGamma,
-                                        reshapedBeta),
+                                new NDList(reshapedInput, reshapedGamma, reshapedBeta),
                                 params)
                         .get(0)
                         .reshape(input.getShape()));
