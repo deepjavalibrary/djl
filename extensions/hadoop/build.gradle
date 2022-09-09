@@ -9,6 +9,7 @@ dependencies {
 
     testImplementation project(":engines:mxnet:mxnet-engine")
     testImplementation "org.apache.hadoop:hadoop-minicluster:${hadoop_version}"
+    testImplementation "org.mockito:mockito-core:${mockito_version}"
     testImplementation(project(":testing"))
 
     testImplementation "org.testng:testng:${testng_version}"
