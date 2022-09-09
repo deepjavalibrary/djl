@@ -833,6 +833,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDArray gammaln() {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray log() {
         return manager.opExecutor("Log").addInput(this).buildSingletonOrThrow();
     }

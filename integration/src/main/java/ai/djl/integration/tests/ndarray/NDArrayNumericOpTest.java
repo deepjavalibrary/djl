@@ -258,6 +258,30 @@ public class NDArrayNumericOpTest {
     }
 
     @Test
+    public void testGammaln() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            double[] data = {0.5, 1., 1.3782, 1.5};
+            NDArray array = manager.create(data);
+            data = new double[] {0.5724, 0.0000, -0.1180, -0.1208};
+            NDArray expected = manager.create(data);
+            Assertions.assertAlmostEquals(array.gammaln(), expected);
+            // test multi-dim
+            array = manager.create(new float[] {0.1f, 0.2f, 0.3f, 0.4f}, new Shape(2, 2));
+            expected =
+                    manager.create(
+                            new float[] {2.2527f, 1.5241f, 1.0958f, 0.7967f}, new Shape(2, 2));
+            Assertions.assertAlmostEquals(array.gammaln(), expected);
+            // test scalar
+            array = manager.create(0.8f);
+            expected = manager.create(0.1521f);
+            Assertions.assertAlmostEquals(array.gammaln(), expected);
+            // test zero-dim
+            array = manager.create(new Shape(0, 3, 3, 2));
+            Assertions.assertAlmostEquals(array.gammaln(), array);
+        }
+    }
+
+    @Test
     public void testLog() {
         try (NDManager manager = NDManager.newBaseManager()) {
             double[] data = {1.0, 2.2312, 3.584, 4.343234, 5.11111, 223.23423};

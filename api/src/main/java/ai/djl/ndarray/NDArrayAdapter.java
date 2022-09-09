@@ -608,6 +608,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray gammaln() {
+        return getAlternativeArray().gammaln();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray log() {
         return getAlternativeArray().log();
     }

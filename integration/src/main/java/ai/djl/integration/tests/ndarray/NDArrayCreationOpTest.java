@@ -446,4 +446,68 @@ public class NDArrayCreationOpTest {
             Assertions.assertAlmostEquals(expectedNormal, actualNormal, 1e-2f, 1e-2f);
         }
     }
+
+    @Test
+    public void testSamplePoisson() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray lam = manager.create(new double[] {1., 8.5});
+
+            NDArray poisson = manager.samplePoisson(lam);
+            Assert.assertEquals(poisson.getShape(), new Shape(2));
+
+            poisson = manager.samplePoisson(lam, new Shape(1000, 1000));
+            Assert.assertEquals(poisson.getShape(), new Shape(2, 1000, 1000));
+
+            NDArray mean = poisson.mean(new int[] {1, 2});
+            NDArray std = poisson.transpose(1, 2, 0).sub(mean).pow(2).mean(new int[] {0, 1});
+
+            Assertions.assertAlmostEquals(mean.toFloatArray()[0], 1f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(mean.toFloatArray()[1], 8.5f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(std.toFloatArray()[0], 1f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(std.toFloatArray()[1], 8.5f, 2e-2f, 2e-2f);
+        }
+    }
+
+    @Test
+    public void testSampleGamma() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray alpha = manager.create(new double[] {0., 2.5});
+            NDArray beta = manager.create(new double[] {1., 0.7});
+
+            NDArray gamma = manager.sampleGamma(alpha, beta);
+            Assert.assertEquals(gamma.getShape(), new Shape(2));
+
+            gamma = manager.sampleGamma(alpha, beta, new Shape(1000, 1000));
+            Assert.assertEquals(gamma.getShape(), new Shape(2, 1000, 1000));
+
+            NDArray mean = gamma.mean(new int[] {1, 2});
+            NDArray std = gamma.transpose(1, 2, 0).sub(mean).pow(2).mean(new int[] {0, 1});
+
+            Assertions.assertAlmostEquals(mean.toFloatArray()[0], 0f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(mean.toFloatArray()[1], 1.75f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(std.toFloatArray()[0], 0f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(std.toFloatArray()[1], 1.225f, 2e-2f, 2e-2f);
+        }
+    }
+
+    @Test
+    public void testSampleNormal() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray mu = manager.create(new double[] {0., 2.5});
+            NDArray sigma = manager.create(new double[] {1., 3.7});
+            NDArray normal = manager.sampleNormal(mu, sigma);
+            Assert.assertEquals(normal.getShape(), new Shape(2));
+
+            normal = manager.sampleNormal(mu, sigma, new Shape(1000, 1000));
+            Assert.assertEquals(normal.getShape(), new Shape(2, 1000, 1000));
+
+            NDArray mean = normal.mean(new int[] {1, 2});
+            NDArray std = normal.transpose(1, 2, 0).sub(mean).pow(2).mean(new int[] {0, 1});
+
+            Assertions.assertAlmostEquals(mean.toFloatArray()[0], 0f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(mean.toFloatArray()[1], 2.5f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(std.toFloatArray()[0], 1f, 2e-2f, 2e-2f);
+            Assertions.assertAlmostEquals(std.toFloatArray()[1], 13.69f, 2e-2f, 2e-2f);
+        }
+    }
 }
