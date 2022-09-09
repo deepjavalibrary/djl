@@ -2,7 +2,7 @@
 
 This module contains the NLP support with SentencePiece implementation.
 
-This is an implementation from [SentencePiece's](https://github.com/google/sentencepiece) C++ API.
+This is an implementation from [SentencePiece](https://github.com/google/sentencepiece)'s C++ API.
 
 ## Documentation
 
