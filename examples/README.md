@@ -15,12 +15,16 @@ The following examples are included for inference:
 
 - [Image classification example](docs/image_classification.md)
 - [Single-shot object detection example](docs/object_detection.md)
-- [Bert question and answer example](docs/BERT_question_and_answer.md)
+- [Face detection example](docs/face_detection.md)
+- [Face recognition example](docs/face_recognition.md)
 - [Instance segmentation example](docs/instance_segmentation.md)
+- [Semantic segmentation example](docs/semantic_segmentation.md)
 - [Pose estimation example](docs/pose_estimation.md)
 - [Action recognition example](docs/action_recognition.md)
 - [Image generation with BigGAN example](docs/biggan.md)
 - [Image enhancement with Super-Resolution example](docs/super_resolution.md)
+- [Bert question and answer example](docs/BERT_question_and_answer.md)
+- [Speech recognition example](docs/speech_recognition.md)
 
 These examples focus on the overall experience of training and inference. We keep components
 that are reusable within separate modules for other users to take advantage of in their own
