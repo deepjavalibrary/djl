@@ -81,7 +81,7 @@ The following pseudocode demonstrates how to create a `DeepARTranslator` with `a
 
 If you want to customize your own time series model translator, you can easily use the transform package for your data preprocess.
 
-See [examples](../../examples) for more details.
+See [examples](src/test/java/ai/djl/timeseries/translator/DeepARTranslatorTest.java) for more details.
 
 We plan to add the following features in the future:
 
@@ -98,3 +98,15 @@ You can build the latest javadocs locally using the following command:
 ```
 
 The javadocs output is built in the `build/doc/javadoc` folder.
+
+## Installation
+
+You can pull the module from the central Maven repository by including the following dependency in your `pom.xml` file:
+
+```xml
+<dependency>
+    <groupId>ai.djl.timeseries</groupId>
+    <artifactId>timeseries</artifactId>
+    <version>0.19.0</version>
+</dependency>
+```
