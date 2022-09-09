@@ -378,6 +378,25 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 }
 
 #[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getOverflowing(
+    env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) -> jlongArray {
+    let encoding = cast_handle::<Encoding>(handle);
+    let handles = encoding
+            .get_overflowing()
+            .clone()
+            .into_iter()
+            .map(|c| to_handle(c))
+            .collect::<Vec<_>>();
+    let size = handles.len() as jsize;
+    let ret = env.new_long_array(size).unwrap();
+    env.set_long_array_region(ret, 0, &handles).unwrap();
+    ret
+}
+
+#[no_mangle]
 pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_decode(
     env: JNIEnv,
     _: JObject,
