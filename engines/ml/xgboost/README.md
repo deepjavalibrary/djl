@@ -17,7 +17,7 @@ User can only create two-dimension NDArray to form as the input.
 
 ## Documentation
 
-The latest javadocs can be found on [here](https://javadoc.io/doc/ai.djl.onnxruntime/onnxruntime-engine/latest/index.html).
+The latest javadocs can be found on [here](https://javadoc.io/doc/ai.djl.ml.xgboost/xgboost/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 

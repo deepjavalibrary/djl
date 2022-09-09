@@ -1,6 +1,6 @@
 # TimeSeries support
 
-This module contains the time series model support extension with [gluon-ts](https://github.com/awslabs/gluon-ts).
+This module contains the time series model support extension with [GluonTS](https://github.com/awslabs/gluonts).
 
 Right now, the package provides the `BaseTimeSeriesTranslator` and transform package that allows you to do inference from your pre-trained time series model.
 
@@ -81,7 +81,7 @@ The following pseudocode demonstrates how to create a `DeepARTranslator` with `a
 
 If you want to customize your own time series model translator, you can easily use the transform package for your data preprocess.
 
-See [examples](../src/main/java/ai/djl/timeseries/examples) for more details.
+See [examples](../../examples) for more details.
 
 We plan to add the following features in the future:
 
