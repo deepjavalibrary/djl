@@ -51,6 +51,8 @@ public final class TokenizersLibrary {
 
     public native CharSpan[] getTokenCharSpans(long encoding);
 
+    public native long[] getOverflowing(long encoding);
+
     public native String decode(long tokenizer, long[] ids, boolean addSpecialTokens);
 
     public native String getTruncationStrategy(long tokenizer);

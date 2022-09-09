@@ -419,10 +419,23 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         long[] attentionMask = TokenizersLibrary.LIB.getAttentionMask(encoding);
         long[] specialTokenMask = TokenizersLibrary.LIB.getSpecialTokenMask(encoding);
         CharSpan[] charSpans = TokenizersLibrary.LIB.getTokenCharSpans(encoding);
+        long[] overflowingHandles = TokenizersLibrary.LIB.getOverflowing(encoding);
+
+        Encoding[] overflowing = new Encoding[overflowingHandles.length];
+        for (int i = 0; i < overflowingHandles.length; ++i) {
+            overflowing[i] = toEncoding(overflowingHandles[i]);
+        }
 
         TokenizersLibrary.LIB.deleteEncoding(encoding);
         return new Encoding(
-                ids, typeIds, tokens, wordIds, attentionMask, specialTokenMask, charSpans);
+                ids,
+                typeIds,
+                tokens,
+                wordIds,
+                attentionMask,
+                specialTokenMask,
+                charSpans,
+                overflowing);
     }
 
     /** {@inheritDoc} */
@@ -618,6 +631,18 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
          */
         public Builder optPadToMultipleOf(int padToMultipleOf) {
             options.put("padToMultipleOf", String.valueOf(padToMultipleOf));
+            return this;
+        }
+
+        /**
+         * Sets the stride to use in overflow overlap when truncating sequences longer than the
+         * model supports.
+         *
+         * @param stride the number of tokens to overlap when truncating long sequences
+         * @return this builder
+         */
+        public Builder optStride(int stride) {
+            options.put("stride", String.valueOf(stride));
             return this;
         }
 

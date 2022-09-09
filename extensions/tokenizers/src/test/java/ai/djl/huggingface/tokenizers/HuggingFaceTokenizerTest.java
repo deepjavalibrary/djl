@@ -283,6 +283,52 @@ public class HuggingFaceTokenizerTest {
     }
 
     @Test
+    public void testTruncationStride() throws IOException {
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.builder()
+                        .optTokenizerName("bert-base-cased")
+                        .optAddSpecialTokens(false)
+                        .optTruncation(true)
+                        .optMaxLength(3)
+                        .optStride(1)
+                        .build()) {
+            String[] inputs = {"Hello there my good friend", "How are you today"};
+            Encoding[] encodings = tokenizer.batchEncode(inputs);
+            int[] expectedOverflowEncodings = {1, 1};
+            int[][] expectedNumberOfOverflowingTokens = {{3}, {2}};
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(
+                        encodings[i].getOverflowing().length, expectedOverflowEncodings[i]);
+                for (int j = 0; j < expectedOverflowEncodings[i]; ++j) {
+                    Assert.assertEquals(
+                            encodings[i].getOverflowing()[j].getTokens().length,
+                            expectedNumberOfOverflowingTokens[i][j]);
+                }
+            }
+        }
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.builder()
+                        .optTokenizerName("bert-base-cased")
+                        .optAddSpecialTokens(false)
+                        .optTruncation(true)
+                        .optMaxLength(8)
+                        .optStride(2)
+                        .build()) {
+            String text = "Hello there my friend I am happy to see you";
+            String textPair = "How are you my friend";
+            Encoding[] overflowing = tokenizer.encode(text, textPair).getOverflowing();
+
+            int expectedNumberOfOverflowEncodings = 7;
+            Assert.assertEquals(overflowing.length, expectedNumberOfOverflowEncodings);
+            int[] expectedOverflowEncodingLengths = {8, 7, 8, 7, 8, 7, 7};
+            for (int i = 0; i < expectedNumberOfOverflowEncodings; ++i) {
+                Assert.assertEquals(
+                        overflowing[i].getIds().length, expectedOverflowEncodingLengths[i]);
+            }
+        }
+    }
+
+    @Test
     public void testTruncationAndPaddingForPairInputs() throws IOException {
         String text = "Hello there my friend";
         String textPair = "How are you";

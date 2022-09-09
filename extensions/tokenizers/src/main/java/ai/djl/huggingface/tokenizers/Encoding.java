@@ -24,6 +24,7 @@ public class Encoding {
     private long[] attentionMask;
     private long[] specialTokenMask;
     private CharSpan[] charTokenSpans;
+    private Encoding[] overflowing;
 
     protected Encoding(
             long[] ids,
@@ -32,7 +33,8 @@ public class Encoding {
             long[] wordIds,
             long[] attentionMask,
             long[] specialTokenMask,
-            CharSpan[] charTokenSpans) {
+            CharSpan[] charTokenSpans,
+            Encoding[] overflowing) {
         this.ids = ids;
         this.typeIds = typeIds;
         this.tokens = tokens;
@@ -40,6 +42,7 @@ public class Encoding {
         this.attentionMask = attentionMask;
         this.specialTokenMask = specialTokenMask;
         this.charTokenSpans = charTokenSpans;
+        this.overflowing = overflowing;
     }
 
     /**
@@ -103,5 +106,14 @@ public class Encoding {
      */
     public CharSpan[] getCharTokenSpans() {
         return charTokenSpans;
+    }
+
+    /**
+     * Returns an array of overflowing encodings.
+     *
+     * @return the array of overflowing encodings
+     */
+    public Encoding[] getOverflowing() {
+        return overflowing;
     }
 }
