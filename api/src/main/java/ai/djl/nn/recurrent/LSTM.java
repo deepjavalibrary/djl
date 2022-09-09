@@ -77,6 +77,16 @@ public class LSTM extends RecurrentBlock {
             // cell
             inputs.add(input.getManager().zeros(stateShape));
         }
+        if (inputs.size() == 2) {
+            int batchIndex = batchFirst ? 0 : 1;
+            Shape stateShape =
+                    new Shape(
+                            (long) numLayers * getNumDirections(),
+                            input.size(batchIndex),
+                            stateSize);
+            // cell
+            inputs.add(input.getManager().zeros(stateShape));
+        }
         NDList outputs =
                 ex.lstm(
                         input,
