@@ -145,7 +145,8 @@ public final class TimeFeature {
      */
     public static List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeaturesFromFreqStr(
             String freqStr) {
-        return FEATURES_BY_OFFSETS.get(freqStr);
+        TimeOffset timeOffset = TimeOffset.toOffset(freqStr);
+        return FEATURES_BY_OFFSETS.get(timeOffset.getName());
     }
 
     private static Map<String, List<BiFunction<NDManager, List<LocalDateTime>, NDArray>>> init() {
