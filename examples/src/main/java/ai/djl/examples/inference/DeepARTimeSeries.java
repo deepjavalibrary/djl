@@ -72,8 +72,8 @@ public final class DeepARTimeSeries {
     public static Map<String, Float> predict()
             throws IOException, TranslateException, ModelException {
         // M5 Forecasting - Accuracy dataset requires manual download
-        Path m5ForecastFile =
-                Paths.get(System.getProperty("user.home") + "/Desktop/m5-forecasting-accuracy");
+        String pathToData = "/Desktop/m5example/m5-forecasting-accuracy";
+        Path m5ForecastFile = Paths.get(System.getProperty("user.home") + pathToData);
         NDManager manager = NDManager.newBaseManager();
         M5Dataset dataset = M5Dataset.builder().setManager(manager).setRoot(m5ForecastFile).build();
 
@@ -109,6 +109,13 @@ public final class DeepARTimeSeries {
                 input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
                 input.setField(FieldName.TARGET, pastTarget);
                 Forecast forecast = predictor.predict(input);
+                // Here we focus on the metric Weighted Root Mean Squared Scaled Error (RMSSE) same
+                // as
+                // https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/evaluation
+                // The error is not small compared to the data values (sale amount). This is because
+                // The model is trained on a sparse data with many zeros. This will be improved by
+                // aggregating/coarse graining the data which will appear in the next PR.
+                // TODO: coarse graining the data.
                 evaluator.aggregateMetrics(evaluator.getMetricsPerTs(gt, pastTarget, forecast));
                 progress.increment(1);
             }
