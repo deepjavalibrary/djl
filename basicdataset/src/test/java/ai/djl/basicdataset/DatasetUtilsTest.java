@@ -13,6 +13,7 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Device;
+import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -24,6 +25,7 @@ import ai.djl.translate.Batchifier;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.nio.FloatBuffer;
 import java.util.Locale;
 
 public class DatasetUtilsTest {
@@ -160,5 +162,35 @@ public class DatasetUtilsTest {
                         fromDef[i].singletonOrThrow(), fromStack[i].singletonOrThrow());
             }
         }
+    }
+
+    @Test
+    public void testDynamicBuffer() {
+        DynamicBuffer bb = new DynamicBuffer();
+        // Do not expand
+        for (int i = 0; i < 128; i++) {
+            bb.put((float) i);
+        }
+        FloatBuffer buf = bb.getBuffer();
+        Assert.assertEquals(buf.limit(), 128);
+        Assert.assertEquals(buf.get(127), 127f);
+
+        bb = new DynamicBuffer();
+        // expand 1 time
+        for (int i = 0; i < 129; i++) {
+            bb.put((float) i);
+        }
+        buf = bb.getBuffer();
+        Assert.assertEquals(buf.limit(), 129);
+        Assert.assertEquals(buf.get(128), 128f);
+
+        bb = new DynamicBuffer();
+        // expand 2 times
+        for (int i = 0; i < 257; i++) {
+            bb.put((float) i);
+        }
+        buf = bb.getBuffer();
+        Assert.assertEquals(buf.limit(), 257);
+        Assert.assertEquals(buf.get(256), 256f);
     }
 }

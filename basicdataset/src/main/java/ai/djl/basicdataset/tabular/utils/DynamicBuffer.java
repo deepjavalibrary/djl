@@ -33,13 +33,13 @@ public class DynamicBuffer {
      */
     public DynamicBuffer put(float f) {
         ++length;
+        buffer.put(f);
         if (buffer.capacity() == length) {
             FloatBuffer buf = buffer;
             buf.rewind();
             buffer = FloatBuffer.allocate(length * 2);
             buffer.put(buf);
         }
-        buffer.put(f);
         return this;
     }
 
