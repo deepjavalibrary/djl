@@ -16,7 +16,6 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
@@ -55,7 +54,7 @@ public class DeepARTranslatorTest {
 
         try (NDManager manager = NDManager.newBaseManager()) {
             manager.getEngine().setRandomSeed(1);
-            NDArray target = manager.randomUniform(0f, 50f, new Shape(1857));
+            NDArray target = manager.arange(0.0f, 50.0f, (float) 50 / 1856);
 
             TimeSeriesData input = new TimeSeriesData(1);
             input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
@@ -64,7 +63,14 @@ public class DeepARTranslatorTest {
             try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
                     Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
                 Forecast forecast = predictor.predict(input);
-                // TODO: forecast is random???
+                // TODO： The argument prediction_length = 28 is too far away from predict().
+                // Here forecast.mean() is a predicted sequence of length = "prediction_length" set
+                // above. That forecast.mean() still has randomness here is because the model
+                // imported here was trained on a sparse dataSet with many zeros (inactive sale
+                // amount). So here the model also predict for such inactive data once in a while
+                // interweaving the active data.
+                // TODO: Either preprocess the data to choose a proper time spacing to reduce the
+                // sparsity of the sequence ie the inactive numbers (ie. 0).
                 Assert.assertEquals(forecast.mean().toFloatArray().length, 28);
             }
         }
