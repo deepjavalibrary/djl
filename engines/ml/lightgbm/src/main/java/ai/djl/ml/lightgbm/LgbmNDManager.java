@@ -88,22 +88,10 @@ public class LgbmNDManager extends BaseNDManager {
     }
 
     /** The SystemManager is the root {@link LgbmNDManager} of which all others are children. */
-    private static final class SystemManager extends LgbmNDManager {
+    private static final class SystemManager extends LgbmNDManager implements SystemNDManager {
 
         SystemManager() {
             super(null, null);
         }
-
-        /** {@inheritDoc} */
-        @Override
-        public void attachInternal(String resourceId, AutoCloseable resource) {}
-
-        /** {@inheritDoc} */
-        @Override
-        public void detachInternal(String resourceId) {}
-
-        /** {@inheritDoc} */
-        @Override
-        public void close() {}
     }
 }
