@@ -6,7 +6,7 @@ our [examples](../examples/README.md).
 
 You can also view our 1.5 hour long (in 8 x ~10 minute segments) DJL 101 tutorial video series:
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/?list=PLC1JzXeHJitDmZBHupMGZE2zHzU8fEvfD&listType=playlist" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[<img src="https://resources.djl.ai/images/djl-101.jpg" width="560" height="315">](https://www.youtube.com/embed/?list=PLC1JzXeHJitDmZBHupMGZE2zHzU8fEvfD&listType=playlist)
 
 ## Prerequisites
 
