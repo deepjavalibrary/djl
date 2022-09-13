@@ -52,7 +52,9 @@ public final class StyleTransfer {
         Image input = ImageFactory.getInstance().fromFile(Paths.get(imagePath));
         Image output = transfer(input, artist);
 
-        logger.info("Using PyTorch Engine. " + artist + " painting generated.");
+        logger.info(
+                "Using PyTorch Engine. {} painting generated. Image saved in build/output/cyclegan",
+                artist);
         save(output, artist.toString(), "build/output/cyclegan/");
     }
 
