@@ -29,18 +29,17 @@ The following pseudocode demonstrates running inference:
     Criteria<Image, Classifications> criteria =
             Criteria.builder()
                     .optApplication(Application.CV.OBJECT_DETECTION) // find object dection model
-                    .setTypes(Image.class, Classifications.class) // define input and output
-                    .optFilter("backbone", "resnet50") // choose network architecture
+                    .setTypes(Image.class, Classifications.class)    // define input and output
+                    .optFilter("backbone", "resnet50")               // choose network architecture
                     .build();
 
-    try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
-        try (Predictor<Image, Classifications> predictor = model.newPredictor()) {
-            Image img = ImageFactory.getInstance().fromUrl("http://..."); // read image
-            Classifications result = predictor.predict(img);
+    Image img = ImageFactory.getInstance().fromUrl("http://...");    // read image
+    try (ZooModel<Image, Classifications> model = criteria.loadModel();
+         Predictor<Image, Classifications> predictor = model.newPredictor()) {
+        Classifications result = predictor.predict(img);
 
-            // get the classification and probability
-            ...
-        }
+        // get the classification and probability
+        ...
     }
 ```
 
@@ -50,30 +49,30 @@ The following pseudocode demonstrates running training:
     // Construct your neural network with built-in blocks
     Block block = new Mlp(28 * 28, 10, new int[] {128, 64});
 
-    try (Model model = Model.newInstance("mlp")) { // Create an empty model
-        model.setBlock(block); // set neural network to model
+    Model model = Model.newInstance("mlp"); // Create an empty model
+    model.setBlock(block);                  // set neural network to model
 
-        // Get training and validation dataset (MNIST dataset)
-        Dataset trainingSet = new Mnist.Builder().setUsage(Usage.TRAIN) ... .build();
-        Dataset validateSet = new Mnist.Builder().setUsage(Usage.TEST) ... .build();
+    // Get training and validation dataset (MNIST dataset)
+    Dataset trainingSet = new Mnist.Builder().setUsage(Usage.TRAIN) ... .build();
+    Dataset validateSet = new Mnist.Builder().setUsage(Usage.TEST) ... .build();
 
-        // Setup training configurations, such as Initializer, Optimizer, Loss ...
-        TrainingConfig config = setupTrainingConfig();
-        try (Trainer trainer = model.newTrainer(config)) {
-            /*
-             * Configure input shape based on dataset to initialize the trainer.
-             * 1st axis is batch axis, we can use 1 for initialization.
-             * MNIST is 28x28 grayscale image and pre processed into 28 * 28 NDArray.
-             */
-            Shape inputShape = new Shape(1, 28 * 28);
-            trainer.initialize(new Shape[] {inputShape});
+    // Setup training configurations, such as Initializer, Optimizer, Loss ...
+    TrainingConfig config = setupTrainingConfig();
+    Trainer trainer = model.newTrainer(config);
+    /*
+     * Configure input shape based on dataset to initialize the trainer.
+     * 1st axis is batch axis, we can use 1 for initialization.
+     * MNIST is 28x28 grayscale image and pre processed into 28 * 28 NDArray.
+     */
+    trainer.initialize(new Shape(1, 28 * 28));
+    EasyTrain.fit(trainer, epoch, trainingSet, validateSet);
 
-            EasyTrain.fit(trainer, epoch, trainingSet, validateSet);
-        }
+    // Save the model
+    model.save(modelDir, "mlp");
 
-        // Save the model
-        model.save(modelDir, "mlp");
-    }
+    // Close the resources
+    trainer.close();
+    model.close();
 ```
 
 ## [Getting Started](docs/quick_start.md)
@@ -86,6 +85,7 @@ The following pseudocode demonstrates running training:
 
 ## Release Notes
 
+* [0.19.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.19.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.19.0))
 * [0.18.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.18.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.18.0))
 * [0.17.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.17.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.17.0))
 * [0.16.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.16.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.16.0))
@@ -104,7 +104,7 @@ The following pseudocode demonstrates running training:
 * [0.2.1](https://github.com/deepjavalibrary/djl/releases/tag/v0.2.1) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.2.1))
 * [0.2.0 Initial release](https://github.com/deepjavalibrary/djl/releases/tag/v0.2.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.2.0))
 
-The release of DJL 0.19.0 is planned for August or September 2022.
+The release of DJL 0.20.0 is planned for October or November 2022.
 
 ## Building From Source
 

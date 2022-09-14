@@ -29,13 +29,13 @@ The javadocs output is generated in the `build/doc/javadoc` folder.
 ## Installation
 You can pull the DLR engine from the central Maven repository by including the following dependency:
 
-- ai.djl.dlr:dlr-engine:0.18.0
+- ai.djl.dlr:dlr-engine:0.19.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.dlr</groupId>
     <artifactId>dlr-engine</artifactId>
-    <version>0.18.0</version>
+    <version>0.19.0</version>
     <scope>runtime</scope>
 </dependency>
 ```

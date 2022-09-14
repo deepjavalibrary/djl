@@ -17,7 +17,6 @@ import ai.djl.engine.Engine;
 import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.NDResource;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -180,27 +179,10 @@ public class PtNDManager extends BaseNDManager {
     }
 
     /** The SystemManager is the root {@link PtNDManager} of which all others are children. */
-    private static final class SystemManager extends PtNDManager {
+    private static final class SystemManager extends PtNDManager implements SystemNDManager {
 
         SystemManager() {
             super(null, null);
         }
-
-        /** {@inheritDoc} */
-        @Override
-        public void detachInternal(String resourceId) {}
-
-        /** {@inheritDoc} */
-        @Override
-        public void attachUncappedInternal(String resourceId, AutoCloseable resource) {}
-
-        /** {@inheritDoc} */
-        @Override
-        public void tempAttachInternal(
-                NDManager originalManager, String resourceId, NDResource resource) {}
-
-        /** {@inheritDoc} */
-        @Override
-        public void close() {}
     }
 }

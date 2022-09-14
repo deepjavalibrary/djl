@@ -315,6 +315,9 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public synchronized void attachInternal(String resourceId, AutoCloseable resource) {
+        if (this instanceof SystemNDManager) {
+            return;
+        }
         if (capped.get()) {
             throw new IllegalStateException("NDManager is capped for addition of resources.");
         }
@@ -324,6 +327,9 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public synchronized void attachUncappedInternal(String resourceId, AutoCloseable resource) {
+        if (this instanceof SystemNDManager) {
+            return;
+        }
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
@@ -349,6 +355,9 @@ public abstract class BaseNDManager implements NDManager {
     @Override
     public void tempAttachInternal(
             NDManager originalManager, String resourceId, NDResource resource) {
+        if (this instanceof SystemNDManager) {
+            return;
+        }
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
@@ -358,6 +367,9 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public synchronized void detachInternal(String resourceId) {
+        if (this instanceof SystemNDManager) {
+            return;
+        }
         if (closed.get()) {
             // This may happen in the middle of BaseNDManager.close()
             return;
@@ -387,6 +399,9 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public void close() {
+        if (this instanceof SystemNDManager) {
+            return;
+        }
         if (!closed.getAndSet(true)) {
             for (AutoCloseable closeable : resources.values()) {
                 try {
