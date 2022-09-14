@@ -33,14 +33,13 @@ The following pseudocode demonstrates running inference:
                     .optFilter("backbone", "resnet50")               // choose network architecture
                     .build();
 
-    try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
-        try (Predictor<Image, Classifications> predictor = model.newPredictor()) {
-            Image img = ImageFactory.getInstance().fromUrl("http://..."); // read image
-            Classifications result = predictor.predict(img);
+    Image img = ImageFactory.getInstance().fromUrl("http://...");    // read image
+    try (ZooModel<Image, Classifications> model = criteria.loadModel();
+         Predictor<Image, Classifications> predictor = model.newPredictor()) {
+        Classifications result = predictor.predict(img);
 
-            // get the classification and probability
-            ...
-        }
+        // get the classification and probability
+        ...
     }
 ```
 
@@ -60,7 +59,7 @@ The following pseudocode demonstrates running training:
     // Setup training configurations, such as Initializer, Optimizer, Loss ...
     TrainingConfig config = setupTrainingConfig();
     Trainer trainer = model.newTrainer(config);
-    /**
+    /*
      * Configure input shape based on dataset to initialize the trainer.
      * 1st axis is batch axis, we can use 1 for initialization.
      * MNIST is 28x28 grayscale image and pre processed into 28 * 28 NDArray.
