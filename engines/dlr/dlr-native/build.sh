@@ -10,7 +10,7 @@ elif [[ -n $(command -v sysctl) ]]; then
     NUM_PROC=$(sysctl -n hw.ncpu)
 fi
 
-VERSION=v"$(cat ../../gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
+VERSION=v"$(cat ../../../gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
 
 if [ ! -d "neo-ai-dlr" ];
 then
