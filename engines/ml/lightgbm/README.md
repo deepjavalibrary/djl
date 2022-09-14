@@ -36,13 +36,13 @@ LightGBM can only run on top of the Linux/Mac/Windows machine using x86_64.
 ## Installation
 You can pull the LightGBM engine from the central Maven repository by including the following dependency:
 
-- ai.djl.ml.lightgbm:lightgbm:0.18.0
+- ai.djl.ml.lightgbm:lightgbm:0.19.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.ml.lightgbm</groupId>
     <artifactId>lightgbm</artifactId>
-    <version>0.18.0</version>
+    <version>0.19.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
