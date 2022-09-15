@@ -43,7 +43,7 @@ Then you can use system properties to configure slf4j-simple log level:
 -Dorg.slf4j.simpleLogger.defaultLogLevel=debug
 ```
 
-See [SimpleLogger](http://www.slf4j.org/api/org/slf4j/impl/SimpleLogger.html) for more detail.
+See [SimpleLogger](https://www.slf4j.org/api/org/slf4j/simple/SimpleLogger.html) for more detail.
 
 ### Use log4j2
 
