@@ -35,7 +35,7 @@ public class RemoveFields implements TimeSeriesTransform {
 
     /** {@inheritDoc} */
     @Override
-    public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
+    public TimeSeriesData transform(NDManager manager, TimeSeriesData data, boolean isTrain) {
         Field.removeFields(fieldNames, data);
         return data;
     }

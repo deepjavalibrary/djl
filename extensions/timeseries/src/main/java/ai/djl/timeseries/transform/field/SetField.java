@@ -37,7 +37,7 @@ public class SetField implements TimeSeriesTransform {
 
     /** {@inheritDoc} */
     @Override
-    public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
+    public TimeSeriesData transform(NDManager manager, TimeSeriesData data, boolean isTrain) {
         NDArray copyValue = value.duplicate();
         Field.setField(outputField, copyValue, data);
         return data;

@@ -100,7 +100,7 @@ public final class Split {
                     shape = shape.slice(0, dims - 1).add(padLength);
                     NDArray padBlock = manager.full(shape, dummyValue, tsData.getDataType());
 
-                    pastPiece = padBlock.concat(tsData.get("..., :{}", i), -1);
+                    pastPiece = i == 0 ? padBlock : padBlock.concat(tsData.get("..., :{}", i), -1);
                 } else {
                     pastPiece = tsData.get("..., :{}", i);
                 }

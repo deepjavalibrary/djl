@@ -54,7 +54,7 @@ public class AddAgeFeature implements TimeSeriesTransform {
 
     /** {@inheritDoc} */
     @Override
-    public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
+    public TimeSeriesData transform(NDManager manager, TimeSeriesData data, boolean isTrain) {
         return Feature.addAgeFeature(
                 manager, targetField, outputField, predictionLength, logScale, data);
     }

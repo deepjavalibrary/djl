@@ -59,7 +59,7 @@ public class AddTimeFeature implements TimeSeriesTransform {
 
     /** {@inheritDoc} */
     @Override
-    public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
+    public TimeSeriesData transform(NDManager manager, TimeSeriesData data, boolean isTrain) {
         Feature.addTimeFeature(
                 manager,
                 startField,

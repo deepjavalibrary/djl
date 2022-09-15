@@ -50,9 +50,9 @@ public abstract class InstanceSampler {
      * @return the indices bound
      */
     public int[] getBounds(NDArray ts) {
-        int start = this.minPast;
-        int posAxis = this.axis < 0 ? ts.getShape().dimension() + this.axis : this.axis;
-        int end = (int) ts.getShape().get(posAxis) - this.minFuture;
+        int start = minPast;
+        int posAxis = axis < 0 ? ts.getShape().dimension() + axis : axis;
+        int end = (int) ts.getShape().get(posAxis) - minFuture;
         return new int[] {start, end};
     }
 
