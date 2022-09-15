@@ -58,14 +58,14 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - name: Publish snapshot deb
+      - name: Copy serving snapshot artifacts to S3
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
         run: |
           ./gradlew :serving:createDeb -Psnapshot
           DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
           aws s3 cp serving/build/distributions/*.deb s3://djl-ai/publish/djl-serving/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/djl-serving_${DJL_VERSION}*"
-      - name: Publish release deb, tar and zip
+      - name: Copy serving release artifacts to S3
         if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
           ./gradlew :serving:dZ :serving:createDeb -Pstaging
@@ -75,3 +75,11 @@ jobs:
           aws s3 cp serving/build/distributions/*.tar s3://djl-ai/publish/djl-serving/
           aws s3 cp serving/build/distributions/*.zip s3://djl-ai/publish/djl-serving/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/serving-${DJL_VERSION}*"
+      - name: Copy benchmark release artifacts to S3
+        run: |
+          ./gradlew :benchmark:dZ :benchmark:createDeb -Pstaging
+          DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
+          aws s3 cp benchmark/build/distributions/*.deb s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
+          aws s3 cp benchmark/build/distributions/*.tar s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
+          aws s3 cp benchmark/build/distributions/*.zip s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-bench/${DJL_VERSION}/*"
