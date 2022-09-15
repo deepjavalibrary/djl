@@ -59,16 +59,27 @@ public final class Activation {
     }
 
     /**
+     * Applies ReLU6 activation on the input {@link NDArray}.
+     *
+     * <p>ReLU6 is defined by: \( y = min(6,max(0, x)) \)
+     *
+     * @param array the input singleton {@link NDArray}
+     * @return the {@link NDArray} after applying ReLU6 activation
+     */
+    public static NDArray relu6(NDArray array){
+        return NDArrays.minimum(6,array.getNDArrayInternal().relu());
+    }
+
+    /**
      * Applies ReLU6 activation on the input singleton {@link NDList}.
      *
-     * <p>ReLU is defined by: \( y = min(6,max(0, x)) \)
+     * <p>ReLU6 is defined by: \( y = min(6,max(0, x)) \)
      *
      * @param arrays the input singleton {@link NDList}
      * @return the singleton {@link NDList} after applying ReLU6 activation
      */
     public static NDList relu6(NDList arrays) {
-        return new NDList(
-                NDArrays.minimum(6, arrays.singletonOrThrow().getNDArrayInternal().relu()));
+        return new NDList(relu6(arrays.singletonOrThrow()));
     }
 
     /**
