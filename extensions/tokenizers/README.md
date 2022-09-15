@@ -6,7 +6,9 @@ This is an implementation from [Huggingface tokenizers](https://github.com/huggi
 
 ## Documentation
 
-You can build the latest javadocs locally using the following command:
+The latest javadocs can be found on [here](https://javadoc.io/doc/ai.djl.huggingface/tokenizers/latest/index.html).
+
+You can also build the latest javadocs locally using the following command:
 
 ```sh
 ./gradlew javadoc

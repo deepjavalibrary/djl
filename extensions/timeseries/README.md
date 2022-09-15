@@ -91,7 +91,9 @@ We plan to add the following features in the future:
 
 ## Documentation
 
-You can build the latest javadocs locally using the following command:
+The latest javadocs can be found on [here](https://javadoc.io/doc/ai.djl.timeseries/timeseries/latest/index.html).
+
+You can also build the latest javadocs locally using the following command:
 
 ```sh
 ./gradlew javadoc

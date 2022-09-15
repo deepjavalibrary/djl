@@ -16,7 +16,7 @@ User can only create two-dimension NDArray to form as the input.
 
 ## Documentation
 
-The latest javadocs can be found on [here](https://javadoc.io/doc/ai.djl.engines.ml.lightgbm/lightgbm-engine/latest/index.html).
+The latest javadocs can be found on [here](https://javadoc.io/doc/ai.djl.ml.lightgbm/lightgbm/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 
