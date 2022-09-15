@@ -66,8 +66,8 @@ public final class Activation {
      * @param array the input singleton {@link NDArray}
      * @return the {@link NDArray} after applying ReLU6 activation
      */
-    public static NDArray relu6(NDArray array) {
-        return NDArrays.minimum(6, array.getNDArrayInternal().relu());
+    public static NDArray relu6(NDArray array){
+        return NDArrays.minimum(6,array.getNDArrayInternal().relu());
     }
 
     /**
