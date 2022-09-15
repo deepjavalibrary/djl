@@ -33,6 +33,7 @@ public class SparseMax extends AbstractBlock{
 
     @Override
     public Shape[] getOutputShapes(Shape[] inputShapes) {
+        //the shape of input and output are the same
         return new Shape[0];
     }
 
@@ -45,6 +46,7 @@ public class SparseMax extends AbstractBlock{
             input = input.swapAxes(this.axis,-1);   //swap the axes and get what we want to the last
         }
 
+        //have a problem here with argSort
         System.out.println("input = "+input);
         NDArray mask = input.argSort(-1,false);
         System.out.println("mask = "+mask);
