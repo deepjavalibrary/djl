@@ -76,6 +76,7 @@ jobs:
           aws s3 cp serving/build/distributions/*.zip s3://djl-ai/publish/djl-serving/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/serving-${DJL_VERSION}*"
       - name: Copy benchmark release artifacts to S3
+        if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
           ./gradlew :benchmark:dZ :benchmark:createDeb -Pstaging
           DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
