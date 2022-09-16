@@ -16,11 +16,14 @@ package ai.djl.timeseries.distribution.output;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.timeseries.distribution.Distribution;
-import ai.djl.timeseries.distribution.DistributionLoss;
 import ai.djl.util.PairList;
 
+/**
+ * {@code StudentTOutput} is a {@link DistributionOutput} that for Student's t-test distribution.
+ */
 public class StudentTOutput extends DistributionOutput {
 
+    /** Construct a negative binomial output with two arguments, {@code mu} and {@code sigma}. */
     public StudentTOutput() {
         argsDim = new PairList<>(3);
         argsDim.add("mu", 1);

@@ -19,14 +19,20 @@ import ai.djl.ndarray.NDList;
 import ai.djl.timeseries.distribution.output.DistributionOutput;
 import ai.djl.training.loss.Loss;
 
+/**
+ * {@code DistributionLoss} calculates loss for a given distribution
+ *
+ * <p>Distribution Loss is calculated by {@link Distribution#logProb(NDArray)} at label point
+ */
 public class DistributionLoss extends Loss {
 
     private DistributionOutput distrOutput;
 
     /**
-     * Base class for metric with abstract update methods.
+     * Calculates Distribution Loss between the label and distribution.
      *
-     * @param name The display name of the Loss
+     * @param name the name of the loss
+     * @param distrOutput the {@link DistributionOutput} to construct the target distribution
      */
     public DistributionLoss(String name, DistributionOutput distrOutput) {
         super(name);
@@ -49,11 +55,10 @@ public class DistributionLoss extends Loss {
 
         if (predictions.contains("loss_weights")) {
             NDArray lossWeights = predictions.get("loss_weights");
-            NDArray weightedValue = NDArrays.where(
-                    lossWeights.neq(0), loss.mul(lossWeights), loss.zerosLike()
-            );
-            NDArray sumWeights = lossWeights.sum(new int[]{1}).maximum(1.);
-            loss = weightedValue.sum(new int[]{1}).div(sumWeights);
+            NDArray weightedValue =
+                    NDArrays.where(lossWeights.neq(0), loss.mul(lossWeights), loss.zerosLike());
+            NDArray sumWeights = lossWeights.sum(new int[] {1}).maximum(1.);
+            loss = weightedValue.sum(new int[] {1}).div(sumWeights);
         }
         return loss;
     }

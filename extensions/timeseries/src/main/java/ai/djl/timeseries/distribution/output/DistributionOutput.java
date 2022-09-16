@@ -15,21 +15,29 @@ package ai.djl.timeseries.distribution.output;
 
 import ai.djl.ndarray.NDList;
 import ai.djl.timeseries.distribution.Distribution;
-import ai.djl.timeseries.distribution.DistributionLoss;
 import ai.djl.util.PairList;
 
+/** A class to construct a distribution given the output of a network. */
 public abstract class DistributionOutput {
 
     protected PairList<String, Integer> argsDim;
     private float valueInSupport = 0f;
 
+    /**
+     * A float that will have a valid numeric value when computing the log-loss of the corresponding
+     * distribution.
+     *
+     * <p>By default {@code 0f}. This value will be used when padding data series.
+     *
+     * @return the valueInSupport
+     */
     public float getValueInSupport() {
         return valueInSupport;
     }
 
     /**
-     * Return the corresponding projection block based on the args dimension of different
-     * ditributions.
+     * Return the corresponding projection block based on the arguments dimension of different
+     * distributions.
      *
      * @return the corresponding projection block
      */
@@ -38,7 +46,7 @@ public abstract class DistributionOutput {
     }
 
     /**
-     * Return the corresponding projection block based on the args dimension of different
+     * Return the corresponding projection block based on the arguments dimension of different
      * ditributions.
      *
      * @param prefix the prefix string of projection layer block
@@ -65,7 +73,8 @@ public abstract class DistributionOutput {
     public abstract NDList domainMap(NDList arrays);
 
     /**
-     * Return the associated {@code DistributionBuilder}, given the collection of constructor arguments and, optionally, a scale tensor.
+     * Return the associated {@code DistributionBuilder}, given the collection of constructor
+     * arguments and, optionally, a scale tensor.
      *
      * @return the associated {@code DistributionBuilder}
      */

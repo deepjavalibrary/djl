@@ -13,7 +13,6 @@
 
 package ai.djl.timeseries.distribution.output;
 
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/** A Block that can be used to project from a dense layer to distribution arguments */
 public final class ArgProj extends AbstractBlock {
 
     private Block domainMap;
@@ -47,8 +47,10 @@ public final class ArgProj extends AbstractBlock {
                 addChildBlock(String.format("%s_domain_map", builder.prefix), builder.domainMap);
     }
 
+    /** {@inheritDoc} */
     @Override
-    protected void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
+    protected void initializeChildBlocks(
+            NDManager manager, DataType dataType, Shape... inputShapes) {
         for (Block block : proj) {
             block.initialize(manager, dataType, inputShapes);
         }
@@ -79,30 +81,59 @@ public final class ArgProj extends AbstractBlock {
         return domainMap.getOutputShapes(projOutShapes);
     }
 
+    /**
+     * Creates a builder to build a {@code ArgProj}.
+     *
+     * @return a new builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /** The Builder to construct a {@code ArgProj} type of {@link Block}. */
     public static final class Builder {
         private PairList<String, Integer> argsDim;
         private Function<NDList, NDList> domainMap;
         private String prefix = "";
 
+        /**
+         * Set the arguments dimensions of distribution
+         *
+         * @param argsDim the arguments dimension
+         * @return this builder
+         */
         public Builder setArgsDim(PairList<String, Integer> argsDim) {
             this.argsDim = argsDim;
             return this;
         }
 
+        /**
+         * Set the domain map function
+         *
+         * @param domainMap the domain map function
+         * @return this builder
+         */
         public Builder setDomainMap(Function<NDList, NDList> domainMap) {
             this.domainMap = domainMap;
             return this;
         }
 
+        /**
+         * Set the block name prefix
+         *
+         * @param prefix the prefix
+         * @return this builder
+         */
         public Builder optPrefix(String prefix) {
             this.prefix = prefix;
             return this;
         }
 
+        /**
+         * Build a {@link ArgProj} block.
+         *
+         * @return the {@link ArgProj} block.
+         */
         public ArgProj build() {
             Preconditions.checkArgument(argsDim != null, "must specify dim args");
             Preconditions.checkArgument(domainMap != null, "must specify domain PairList function");

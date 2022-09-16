@@ -16,12 +16,16 @@ package ai.djl.timeseries.distribution.output;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.timeseries.distribution.Distribution;
-import ai.djl.timeseries.distribution.DistributionLoss;
 import ai.djl.timeseries.distribution.NegativeBinomial;
 import ai.djl.util.PairList;
 
+/**
+ * {@code NegativeBinomialOutput} is a {@link DistributionOutput} that for negative binomial
+ * distribution.
+ */
 public final class NegativeBinomialOutput extends DistributionOutput {
 
+    /** Construct a negative binomial output with two arguments, {@code mu} and {@code alpha}. */
     public NegativeBinomialOutput() {
         argsDim = new PairList<>(2);
         argsDim.add("mu", 1);

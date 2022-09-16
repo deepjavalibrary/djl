@@ -14,10 +14,17 @@
 package ai.djl.timeseries.distribution;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.util.Preconditions;
 
+/**
+ * Negative binomial distribution.
+ *
+ * <p>The distribution of the number of successes in a sequence of independent Bernoulli trials.
+ *
+ * <p>Two arguments for this distribution. {@code mu} mean of the distribution, {@code alpha} the
+ * inverse number of negative Bernoulli trials to stop
+ */
 public final class NegativeBinomial extends Distribution {
 
     private NDArray mu;
@@ -28,20 +35,21 @@ public final class NegativeBinomial extends Distribution {
         alpha = builder.distrArgs.get("alpha");
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray logProb(NDArray target) {
 
         NDArray alphaInv = alpha.getNDArrayInternal().rdiv(1);
         NDArray alphaTimesMu = alpha.mul(mu);
 
-        return target
-                .mul(alphaTimesMu.div(alphaTimesMu.add(1)).log())
+        return target.mul(alphaTimesMu.div(alphaTimesMu.add(1)).log())
                 .sub(alphaInv.mul(alphaTimesMu.add(1).log()))
                 .add(target.add(alphaInv).gammaln())
                 .sub(target.add(1.).gammaln())
                 .sub(alphaInv.gammaln());
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray sample(int numSamples) {
         NDManager manager = mu.getManager();
@@ -53,24 +61,35 @@ public final class NegativeBinomial extends Distribution {
         return manager.samplePoisson(manager.sampleGamma(r, theta));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray mean() {
         return mu;
     }
 
+    /**
+     * Creates a builder to build a {@code NegativeBinomial}.
+     *
+     * @return a new builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /** The builder to construct a {@code NegativeBinomial}. */
     public static final class Builder extends DistributionBuilder<Builder> {
 
+        /** {@inheritDoc} */
         @Override
         public Distribution build() {
-            Preconditions.checkArgument(distrArgs.contains("mu"), "NegativeBinomial's args must contain mu.");
-            Preconditions.checkArgument(distrArgs.contains("alpha"), "NegativeBinomial's args must contain alpha.");
+            Preconditions.checkArgument(
+                    distrArgs.contains("mu"), "NegativeBinomial's args must contain mu.");
+            Preconditions.checkArgument(
+                    distrArgs.contains("alpha"), "NegativeBinomial's args must contain alpha.");
             return new NegativeBinomial(this);
         }
 
+        /** {@inheritDoc} */
         @Override
         protected Builder self() {
             return this;
