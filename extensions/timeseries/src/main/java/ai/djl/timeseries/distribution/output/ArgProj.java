@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-/** A Block that can be used to project from a dense layer to distribution arguments */
+/** A Block that can be used to project from a dense layer to distribution arguments. */
 public final class ArgProj extends AbstractBlock {
 
     private Block domainMap;
@@ -97,7 +97,7 @@ public final class ArgProj extends AbstractBlock {
         private String prefix = "";
 
         /**
-         * Set the arguments dimensions of distribution
+         * Set the arguments dimensions of distribution.
          *
          * @param argsDim the arguments dimension
          * @return this builder
@@ -108,7 +108,7 @@ public final class ArgProj extends AbstractBlock {
         }
 
         /**
-         * Set the domain map function
+         * Set the domain map function.
          *
          * @param domainMap the domain map function
          * @return this builder
@@ -119,7 +119,7 @@ public final class ArgProj extends AbstractBlock {
         }
 
         /**
-         * Set the block name prefix
+         * Set the block name prefix.
          *
          * @param prefix the prefix
          * @return this builder

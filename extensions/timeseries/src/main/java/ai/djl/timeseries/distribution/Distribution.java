@@ -20,7 +20,7 @@ import ai.djl.ndarray.NDList;
 public abstract class Distribution {
 
     /**
-     * Compute the log of the probability density/mass function evaluated at target
+     * Compute the log of the probability density/mass function evaluated at target.
      *
      * @param target {@link NDArray} of shape (*batch_shape, *event_shape)
      * @return Tensor of shape (batch_shape) containing the probability log-density for each event
@@ -79,7 +79,7 @@ public abstract class Distribution {
         }
 
         /**
-         * Set the affine location of the probability
+         * Set the affine location of the probability.
          *
          * @param loc the affine location
          * @return this builder
@@ -89,6 +89,11 @@ public abstract class Distribution {
             return self();
         }
 
+        /**
+         * Build a {@code Distribution}.
+         *
+         * @return the {@code Distribution}
+         */
         public abstract Distribution build();
 
         protected abstract T self();

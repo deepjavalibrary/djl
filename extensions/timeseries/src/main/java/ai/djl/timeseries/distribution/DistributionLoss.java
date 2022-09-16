@@ -20,7 +20,7 @@ import ai.djl.timeseries.distribution.output.DistributionOutput;
 import ai.djl.training.loss.Loss;
 
 /**
- * {@code DistributionLoss} calculates loss for a given distribution
+ * {@code DistributionLoss} calculates loss for a given distribution.
  *
  * <p>Distribution Loss is calculated by {@link Distribution#logProb(NDArray)} at label point
  */

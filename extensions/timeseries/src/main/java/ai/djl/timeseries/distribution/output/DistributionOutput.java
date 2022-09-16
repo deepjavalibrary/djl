@@ -21,7 +21,7 @@ import ai.djl.util.PairList;
 public abstract class DistributionOutput {
 
     protected PairList<String, Integer> argsDim;
-    private float valueInSupport = 0f;
+    private float valueInSupport;
 
     /**
      * A float that will have a valid numeric value when computing the log-loss of the corresponding
