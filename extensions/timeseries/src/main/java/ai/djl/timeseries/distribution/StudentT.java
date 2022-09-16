@@ -23,11 +23,11 @@ public class StudentT extends Distribution {
         NDArray part1 = nu.getNDArrayInternal().rdiv(1.).mul(target.sub(mu).div(sigma).square());
 
         NDArray z = nup1Half.gammaln()
-            .sub(nu.sub(2.).gammaln())
+            .sub(nu.div(2.).gammaln())
             .sub(nu.mul(Math.PI).log().mul(0.5))
             .sub(sigma.log());
 
-        return z.sub(nup1Half).mul(part1.add(1.).log());
+        return z.sub(nup1Half.mul(part1.add(1.).log()));
     }
 
     @Override
