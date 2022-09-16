@@ -55,12 +55,24 @@ public final class NDIndexFullTake {
                 if (fullTake != null) {
                     // Don't support multiple takes
                     throw new UnsupportedOperationException(
-                            "Only one take per get is currently supported");
+                            "Only one take per get is currently supported.If this is triggered by"
+                                + " array NDIndex: get(NDIndex array), then you should be aware of"
+                                + " the following change: previously this was equivalent to"
+                                + " .get(new NDIndex().addPickDim(array)), but now equivalent to"
+                                + " .take(array). So please check if you want to restore the"
+                                + " previous behaviour ie .get(new NDIndex().addPickDim(array)). If"
+                                + " so do it explicitly.");
                 }
                 NDArray indexElem = ((NDIndexTake) el).getIndex();
                 if (!indexElem.getShape().isRankOne()) {
                     throw new UnsupportedOperationException(
-                            "Only rank-1 indexing array is supported for take");
+                            "Only rank-1 indexing array is supported for take. If this is triggered"
+                                + " by array NDIndex: get(NDIndex array), then you should be aware"
+                                + " of the following change: previously this was equivalent to"
+                                + " .get(new NDIndex().addPickDim(array)), but now equivalent to"
+                                + " .take(array). So please check if you want to restore the"
+                                + " previous behaviour ie .get(new NDIndex().addPickDim(array)). If"
+                                + " so do it explicitly.");
                 }
                 fullTake = new NDIndexFullTake(indexElem, axis);
             } else {
