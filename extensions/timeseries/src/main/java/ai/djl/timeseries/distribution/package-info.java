@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains tests for the distribution module. */
+/** Contains classes to support distribution in djl. */
 package ai.djl.timeseries.distribution;
