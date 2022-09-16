@@ -57,22 +57,28 @@ public final class NDIndexFullTake {
                     throw new UnsupportedOperationException(
                             "Only one take per get is currently supported.If this is triggered by"
                                 + " array NDIndex: get(NDIndex array), then you should be aware of"
-                                + " the following change: previously this was equivalent to"
+                                + " the following changes. 1. previously this was equivalent to"
                                 + " .get(new NDIndex().addPickDim(array)), but now equivalent to"
                                 + " .take(array). So please check if you want to restore the"
                                 + " previous behaviour ie .get(new NDIndex().addPickDim(array)). If"
-                                + " so do it explicitly.");
+                                + " so do it explicitly. 2. Check if the array index is supposed to"
+                                + " be boolean index. If so, remember to change the datatype of"
+                                + " index to boolean. Or you can explicitly do new"
+                                + " NDIndex().addBooleanIndex(array)");
                 }
                 NDArray indexElem = ((NDIndexTake) el).getIndex();
                 if (!indexElem.getShape().isRankOne()) {
                     throw new UnsupportedOperationException(
                             "Only rank-1 indexing array is supported for take. If this is triggered"
                                 + " by array NDIndex: get(NDIndex array), then you should be aware"
-                                + " of the following change: previously this was equivalent to"
+                                + " of the following changes. 1. previously this was equivalent to"
                                 + " .get(new NDIndex().addPickDim(array)), but now equivalent to"
                                 + " .take(array). So please check if you want to restore the"
                                 + " previous behaviour ie .get(new NDIndex().addPickDim(array)). If"
-                                + " so do it explicitly.");
+                                + " so do it explicitly. 2. Check if the array index is supposed to"
+                                + " be boolean index. If so, remember to change the datatype of"
+                                + " index to boolean. Or you can explicitly do new"
+                                + " NDIndex().addBooleanIndex(array)");
                 }
                 fullTake = new NDIndexFullTake(indexElem, axis);
             } else {
