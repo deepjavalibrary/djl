@@ -11,8 +11,9 @@ import ai.djl.util.PairList;
 /**
  * {@code SparseMax} contains a generic implementation of sparsemax function
  * the definition of SparseMax can be referred to https://arxiv.org/pdf/1602.02068.pdf
- * this implementation is a simpler implementation of sparseMax function
- * where we set K as a hyperParameter, and we only do softmax on those max-K data and we set
+ * this implementation is a simpler implementation of sparseMax function,
+ * where we set K as a hyperParameter, and we only do softmax on those max-K data
+ * and we set all the other value as 0.
  */
 public class SparseMax extends AbstractBlock{
     private static final Byte VERSION = 1;
@@ -48,7 +49,7 @@ public class SparseMax extends AbstractBlock{
 
         //have a problem here with argSort
         System.out.println("input = "+input);
-        NDArray mask = input.argSort(-1,false);
+        NDArray mask = input.argSort(1,true);
         System.out.println("mask = "+mask);
 
         mask = NDArrays.where(mask.lt(K),manager.ones(mask.getShape()),manager.zeros(mask.getShape()));
