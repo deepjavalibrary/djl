@@ -60,6 +60,10 @@ public abstract class DistributionOutput {
                 .build();
     }
 
+    public String[] getArgsArray() {
+        return argsDim.keyArray(new String[argsDim.size()]);
+    }
+
     /**
      * Convert arguments to the right shape and domain. The domain depends on the type of
      * distribution, while the correct shape is obtained by reshaping the trailing axis in such a
