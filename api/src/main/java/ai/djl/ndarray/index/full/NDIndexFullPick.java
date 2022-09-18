@@ -55,7 +55,10 @@ public final class NDIndexFullPick {
                 if (fullPick != null) {
                     // Don't support multiple picks
                     throw new UnsupportedOperationException(
-                            "Only one pick per get is currently supported");
+                            "Only one pick per get is currently supported. Check if the array index"
+                                + " is supposed to be boolean index. If so, remember to change the"
+                                + " datatype of index to boolean. Or you can explicitly do new"
+                                + " NDIndex().addBooleanIndex(array)");
                 }
                 NDArray indexElem = ((NDIndexPick) el).getIndex();
                 fullPick = new NDIndexFullPick(indexElem, axis);
