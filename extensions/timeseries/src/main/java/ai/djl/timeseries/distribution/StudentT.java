@@ -93,7 +93,11 @@ public class StudentT extends Distribution {
                     distrArgs.contains("sigma"), "StudentTl's args must contain sigma.");
             Preconditions.checkArgument(
                     distrArgs.contains("nu"), "StudentTl's args must contain nu.");
-            return new StudentT(this);
+            StudentT baseDistr = new StudentT(this);
+            if (scale == null && loc == null) {
+                return baseDistr;
+            }
+            return new AffineTransformed(baseDistr, loc, scale);
         }
 
         /** {@inheritDoc} */

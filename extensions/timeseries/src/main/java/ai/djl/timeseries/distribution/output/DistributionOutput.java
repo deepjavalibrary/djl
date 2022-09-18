@@ -60,6 +60,11 @@ public abstract class DistributionOutput {
                 .build();
     }
 
+    /**
+     * Return an array containing all the argument names.
+     *
+     * @return an array containing all the argument names
+     */
     public String[] getArgsArray() {
         return argsDim.keyArray(new String[argsDim.size()]);
     }

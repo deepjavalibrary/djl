@@ -86,6 +86,15 @@ public final class NegativeBinomial extends Distribution {
                     distrArgs.contains("mu"), "NegativeBinomial's args must contain mu.");
             Preconditions.checkArgument(
                     distrArgs.contains("alpha"), "NegativeBinomial's args must contain alpha.");
+            // We cannot scale using the affine transformation since negative binomial should return
+            // integers. Instead we scale the parameters.
+            if (scale != null) {
+                NDArray mu = distrArgs.get("mu");
+                mu = mu.mul(scale);
+                mu.setName("mu");
+                distrArgs.remove("mu");
+                distrArgs.add(mu);
+            }
             return new NegativeBinomial(this);
         }
 
