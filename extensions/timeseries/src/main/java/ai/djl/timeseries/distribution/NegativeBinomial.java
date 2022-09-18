@@ -53,8 +53,8 @@ public final class NegativeBinomial extends Distribution {
     @Override
     public NDArray sample(int numSamples) {
         NDManager manager = mu.getManager();
-        NDArray expandedMu = mu.expandDims(0).repeat(0, numSamples);
-        NDArray expandedAlpha = alpha.expandDims(0).repeat(0, numSamples);
+        NDArray expandedMu = numSamples > 0 ? mu.expandDims(0).repeat(0, numSamples) : mu;
+        NDArray expandedAlpha = numSamples > 0 ? alpha.expandDims(0).repeat(0, numSamples) : alpha;
 
         NDArray r = expandedAlpha.getNDArrayInternal().rdiv(1f);
         NDArray theta = expandedAlpha.mul(expandedMu);

@@ -55,9 +55,9 @@ public class StudentT extends Distribution {
     @Override
     public NDArray sample(int numSamples) {
         NDManager manager = mu.getManager();
-        NDArray expandedMu = mu.expandDims(0).repeat(0, numSamples);
-        NDArray expandedSigma = sigma.expandDims(0).repeat(0, numSamples);
-        NDArray expandedNu = nu.expandDims(0).repeat(0, numSamples);
+        NDArray expandedMu = numSamples > 0 ? mu.expandDims(0).repeat(0, numSamples) : mu;
+        NDArray expandedSigma = numSamples > 0 ? sigma.expandDims(0).repeat(0, numSamples) : sigma;
+        NDArray expandedNu = numSamples > 0 ? nu.expandDims(0).repeat(0, numSamples) : nu;
 
         NDArray gammas =
                 manager.sampleGamma(

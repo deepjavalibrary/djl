@@ -31,12 +31,24 @@ public abstract class Distribution {
     /**
      * Draw samples from the distribution.
      *
-     * <p>The first dimension of the output will be numSamples.
+     * <p>This function would expand the dimension of arguments, the first dimension of the output
+     * will be numSamples.
      *
      * @param numSamples Number of samples to be drawn
      * @return a {@link NDArray} has shape (num_samples, *batch_shape, *target_shape)
      */
     public abstract NDArray sample(int numSamples);
+
+    /**
+     * Draw samples from the distribution.
+     *
+     * <p>This function would not expand the dimension
+     *
+     * @return a sampled {@link NDArray}
+     */
+    public NDArray sample() {
+        return sample(0);
+    }
 
     /**
      * Return the mean of the distribution.
