@@ -29,7 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-/** A Block used to map the output of a dense layer to statistical parameters, like mean and standard deviation. It will be used in both training and inference. */
+/**
+ * A Block used to map the output of a dense layer to statistical parameters, like mean and standard
+ * deviation. It will be used in both training and inference.
+ */
 public final class ArgProj extends AbstractBlock {
 
     private Block domainMap;
