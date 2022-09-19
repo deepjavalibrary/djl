@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-/** A Block that can be used to project from a dense layer to distribution arguments. */
+/** A Block used to map the output of a dense layer to statistical parameters, like mean and standard deviation. It will be used in both training and inference. */
 public final class ArgProj extends AbstractBlock {
 
     private Block domainMap;
