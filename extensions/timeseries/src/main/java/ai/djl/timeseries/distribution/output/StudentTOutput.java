@@ -20,7 +20,7 @@ import ai.djl.timeseries.distribution.StudentT;
 import ai.djl.util.PairList;
 
 /**
- * {@code StudentTOutput} is a {@link DistributionOutput} that for Student's t-test distribution.
+ * {@code StudentTOutput} is a {@link DistributionOutput} for the Student's t-test distribution.
  */
 public class StudentTOutput extends DistributionOutput {
 
