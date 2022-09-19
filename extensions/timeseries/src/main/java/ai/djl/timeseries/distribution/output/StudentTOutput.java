@@ -16,6 +16,7 @@ package ai.djl.timeseries.distribution.output;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.timeseries.distribution.Distribution;
+import ai.djl.timeseries.distribution.StudentT;
 import ai.djl.util.PairList;
 
 /**
@@ -50,6 +51,6 @@ public class StudentTOutput extends DistributionOutput {
     /** {@inheritDoc} */
     @Override
     public Distribution.DistributionBuilder<?> distributionBuilder() {
-        return null;
+        return StudentT.builder();
     }
 }

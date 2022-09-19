@@ -37,8 +37,8 @@ public final class NegativeBinomialOutput extends DistributionOutput {
     public NDList domainMap(NDList arrays) {
         NDArray mu = arrays.get(0);
         NDArray alpha = arrays.get(1);
-        mu = mu.getNDArrayInternal().softPlus().squeeze(-1);
-        alpha = alpha.getNDArrayInternal().softPlus().squeeze(-1);
+        mu = mu.getNDArrayInternal().softPlus().maximum(Float.MIN_VALUE).squeeze(-1);
+        alpha = alpha.getNDArrayInternal().softPlus().maximum(Float.MIN_VALUE).squeeze(-1);
         // TODO: make setName() must be implemented
         mu.setName("mu");
         alpha.setName("alpha");
