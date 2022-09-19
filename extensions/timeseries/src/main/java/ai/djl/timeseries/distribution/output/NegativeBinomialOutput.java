@@ -20,7 +20,7 @@ import ai.djl.timeseries.distribution.NegativeBinomial;
 import ai.djl.util.PairList;
 
 /**
- * {@code NegativeBinomialOutput} is a {@link DistributionOutput} that for negative binomial
+ * {@code NegativeBinomialOutput} is a {@link DistributionOutput} for the negative binomial
  * distribution.
  */
 public final class NegativeBinomialOutput extends DistributionOutput {
