@@ -9,14 +9,17 @@ import ai.djl.nn.Parameter;
 import ai.djl.nn.SparseMax;
 import ai.djl.training.ParameterStore;
 
+import java.util.stream.IntStream;
+
 public class TabNetTest {
     public static void main(String[] args) {
         NDManager manager = NDManager.newBaseManager();
-        NDArray array = manager.randomUniform(0,1,new Shape(2,4), DataType.FLOAT32);
-        System.out.println(array);
-        System.out.println(array.argSort(-1,false));
-        SparseMax sparseMax = new SparseMax();
+        //System.out.println(IntStream.range(0,3));
+        NDArray array = manager.randomUniform(0,1,new Shape(4,2), DataType.FLOAT32);
+        //System.out.println(array);
+        SparseMax sparseMax = new SparseMax(0);
         ParameterStore parameterStore = new ParameterStore();
-        sparseMax.forward(parameterStore,new NDList(array),true);
+        NDArray output = sparseMax.forward(parameterStore,new NDList(array),true).singletonOrThrow();
+        System.out.println(output);
     }
 }
