@@ -19,6 +19,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Parameter;
+import ai.djl.nn.core.SparseMax;
 import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -238,6 +239,30 @@ public class ActivationTest {
                 NDArray expected = manager.create(new float[] {-1, 0, 2});
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
                 Assert.assertEquals(result, expected);
+            }
+        }
+    }
+
+    @Test
+    public void testSparseMax() {
+        try (Model model = Model.newInstance("model")) {
+            model.setBlock(new SparseMax());
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(4));
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.create(new float[] {0, 1, 2, 3});
+                double expSum = Math.exp(1) + Math.exp(2) + Math.exp(3);
+                NDArray expected =
+                        manager.create(
+                                new float[] {
+                                    0,
+                                    (float) (Math.exp(1) / expSum),
+                                    (float) (Math.exp(2) / expSum),
+                                    (float) (Math.exp(3) / expSum)
+                                });
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                Assertions.assertAlmostEquals(result, expected);
             }
         }
     }
