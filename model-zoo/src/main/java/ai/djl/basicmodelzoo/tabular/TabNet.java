@@ -1,4 +1,4 @@
-package ai.djl.basicmodelzoo.nlp.tabular;
+package ai.djl.basicmodelzoo.tabular;
 
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
@@ -26,6 +26,7 @@ public class TabNet {
         featureBlock.add(Activation.swishBlock(1f));
         return featureBlock;
     }
+
     public static class Builder{
         float batchNormMomentum = 0.9f;
 

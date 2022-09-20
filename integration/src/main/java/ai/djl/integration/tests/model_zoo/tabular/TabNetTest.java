@@ -5,11 +5,8 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.Parameter;
-import ai.djl.nn.SparseMax;
+import ai.djl.nn.core.SparseMax;
 import ai.djl.training.ParameterStore;
-
-import java.util.stream.IntStream;
 
 public class TabNetTest {
     public static void main(String[] args) {

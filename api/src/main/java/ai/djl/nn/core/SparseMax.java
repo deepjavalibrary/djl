@@ -1,4 +1,4 @@
-package ai.djl.nn;
+package ai.djl.nn.core;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -6,6 +6,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.AbstractBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 
@@ -18,7 +19,7 @@ import java.util.stream.IntStream;
  * where we set K as a hyperParameter(default 3). We only do softmax on those max-K data,
  * and we set all the other value as 0.
  */
-public class SparseMax extends AbstractBlock{
+public class SparseMax extends AbstractBlock {
     private static final Byte VERSION = 1;
 
     private int axis;
