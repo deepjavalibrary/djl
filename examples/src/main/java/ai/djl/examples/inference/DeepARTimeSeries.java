@@ -234,7 +234,8 @@ public final class DeepARTimeSeries {
         }
     }
 
-    private static final class M5Evaluator {
+    /** An evaluator that calculates performance metrics. */
+    public static final class M5Evaluator {
         private float[] quantiles;
         Map<String, Float> totalMetrics;
         Map<String, Integer> totalNum;
@@ -252,15 +253,14 @@ public final class DeepARTimeSeries {
                     new ConcurrentHashMap<>((8 + quantiles.length * 2) * 3 / 2);
             NDArray meanFcst = forecast.mean();
             NDArray medianFcst = forecast.median();
-            NDArray target = NDArrays.concat(new NDList(pastTarget, gtTarget), -1);
 
-            NDArray successiveDiff = target.get("1:").sub(target.get(":-1"));
-            successiveDiff = successiveDiff.square();
-            successiveDiff = successiveDiff.get(":{}", -forecast.getPredictionLength());
-            NDArray denom = successiveDiff.mean();
+            NDArray meanSquare = gtTarget.sub(meanFcst).square().mean();
+            NDArray scaleDenom = gtTarget.get("1:").sub(gtTarget.get(":-1")).square().mean();
 
-            NDArray num = gtTarget.sub(meanFcst).square().mean();
-            retMetrics.put("RMSSE", num.getFloat() / denom.getFloat());
+            NDArray rmsse = meanSquare.div(scaleDenom).sqrt();
+            rmsse = NDArrays.where(scaleDenom.eq(0), rmsse.onesLike(), rmsse);
+
+            retMetrics.put("RMSSE", rmsse.getFloat());
 
             retMetrics.put("MSE", gtTarget.sub(meanFcst).square().mean().getFloat());
             retMetrics.put("abs_error", gtTarget.sub(medianFcst).abs().sum().getFloat());
