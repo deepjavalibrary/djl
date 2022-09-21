@@ -25,24 +25,26 @@ import ai.djl.util.PairList;
  */
 public final class NegativeBinomialOutput extends DistributionOutput {
 
-    /** Construct a negative binomial output with two arguments, {@code mu} and {@code alpha}. */
+    /**
+     * Construct a negative binomial output with two arguments, {@code total_count} and {@code
+     * logits}.
+     */
     public NegativeBinomialOutput() {
         argsDim = new PairList<>(2);
-        argsDim.add("mu", 1);
-        argsDim.add("alpha", 1);
+        argsDim.add("total_count", 1);
+        argsDim.add("logits", 1);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList domainMap(NDList arrays) {
-        NDArray mu = arrays.get(0);
-        NDArray alpha = arrays.get(1);
-        mu = mu.getNDArrayInternal().softPlus().maximum(Float.MIN_VALUE).squeeze(-1);
-        alpha = alpha.getNDArrayInternal().softPlus().maximum(Float.MIN_VALUE).squeeze(-1);
-        // TODO: make setName() must be implemented
-        mu.setName("mu");
-        alpha.setName("alpha");
-        return new NDList(mu, alpha);
+        NDArray totalCount = arrays.get(0);
+        NDArray logits = arrays.get(1);
+        totalCount = totalCount.getNDArrayInternal().softPlus().squeeze(-1);
+        logits = logits.squeeze(-1);
+        totalCount.setName("total_count");
+        logits.setName("logits");
+        return new NDList(totalCount, logits);
     }
 
     /** {@inheritDoc} */
