@@ -36,13 +36,13 @@ public class SparseMax extends AbstractBlock {
     private int axis;
     private int topK;
 
-    /** creates a sparseMax activation function with default parameters. */
+    /** Creates a sparseMax activation function for the last axis and 3 elements. */
     public SparseMax() {
         this(-1, 3);
     }
 
     /**
-     * creates a sparseMax activation function along a given axis.
+     * Creates a sparseMax activation function along a given axis for 3 elements.
      *
      * @param axis the axis to do sparseMax for
      */
@@ -51,7 +51,7 @@ public class SparseMax extends AbstractBlock {
     }
 
     /**
-     * creates a sparseMax activation function along a given axis with hyperParameter K.
+     * Creates a sparseMax activation function along a given axis and number of elements.
      *
      * @param axis the axis to do sparseMax for
      * @param topK hyperParameter K
