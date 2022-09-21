@@ -24,7 +24,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Transform;
 import ai.djl.translate.TranslatorContext;
-import ai.djl.util.RandomUtils;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -59,6 +58,7 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
     public NDList processInput(TranslatorContext ctx, Image image) {
         ctx.setAttachment("originalHeight", image.getHeight());
         ctx.setAttachment("originalWidth", image.getWidth());
+        ctx.setAttachment("originalImage", image);
         return super.processInput(ctx, image);
     }
 
@@ -70,23 +70,17 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
         Shape shape = list.get(1).getShape();
         int width = (int) shape.get(2);
         int height = (int) shape.get(1);
+        Image originalImage = (Image) ctx.getAttachment("originalImage");
 
         // build image array
         try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray imageArray = originalImage.toNDArray(manager);
+            imageArray = NDImageUtils.resize(imageArray, width, height);
+            imageArray.toUint8Array();
+
             int imageSize = width * height;
             ByteBuffer bb = manager.allocateDirect(CHANNEL * imageSize);
-            int r = 0; // adjustment for red pixel
-            int g = 1; // adjustment for green pixel
-            int b = 2; // adjustment for blue pixel
-            byte[][] colors = new byte[CLASSNUM][3];
-            for (int i = 0; i < CLASSNUM; i++) {
-                byte red = (byte) RandomUtils.nextInt(256);
-                byte green = (byte) RandomUtils.nextInt(256);
-                byte blue = (byte) RandomUtils.nextInt(256);
-                colors[i][r] = red;
-                colors[i][g] = green;
-                colors[i][b] = blue;
-            }
+            int[] row = imageArray.toType(DataType.UINT8, false).toUint8Array();
 
             // change color of pixels in image array where objects have been detected
             for (int h = 0; h < height; h++) {
@@ -103,9 +97,9 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
                         }
                     }
                     if (maxi > 0) {
-                        bb.put(colors[maxi][r]);
-                        bb.put(colors[maxi][g]);
-                        bb.put(colors[maxi][b]);
+                        bb.put((byte) (row[3 * index]));
+                        bb.put((byte) (row[3 * index + 1]));
+                        bb.put((byte) (row[3 * index + 2]));
                     } else {
                         bb.position(bb.position() + 3);
                     }
