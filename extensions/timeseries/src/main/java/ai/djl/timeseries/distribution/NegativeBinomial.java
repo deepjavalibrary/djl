@@ -22,49 +22,55 @@ import ai.djl.util.Preconditions;
  *
  * <p>The distribution of the number of successes in a sequence of independent Bernoulli trials.
  *
- * <p>Two arguments for this distribution. {@code mu} mean of the distribution, {@code alpha} the
- * inverse number of negative Bernoulli trials to stop
+ * <p>Two arguments for this distribution. {@code total_count} non-negative number of negative
+ * Bernoulli trials to stop, {@code logits} Event log-odds for probabilities of success
  */
 public final class NegativeBinomial extends Distribution {
 
-    private NDArray mu;
-    private NDArray alpha;
+    private NDArray totalCount;
+    private NDArray logits;
 
     NegativeBinomial(Builder builder) {
-        mu = builder.distrArgs.get("mu");
-        alpha = builder.distrArgs.get("alpha");
+        totalCount = builder.distrArgs.get("total_count");
+        logits = builder.distrArgs.get("logits");
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logProb(NDArray target) {
+        NDArray logUnnormalizedProb =
+                totalCount.mul(logSigmoid(logits.mul(-1))).add(target.mul(logSigmoid(logits)));
 
-        NDArray alphaInv = alpha.getNDArrayInternal().rdiv(1);
-        NDArray alphaTimesMu = alpha.mul(mu);
-
-        return target.mul(alphaTimesMu.div(alphaTimesMu.add(1)).log())
-                .sub(alphaInv.mul(alphaTimesMu.add(1).log()))
-                .add(target.add(alphaInv).gammaln())
-                .sub(target.add(1.).gammaln())
-                .sub(alphaInv.gammaln());
+        NDArray logNormalization =
+                totalCount
+                        .add(target)
+                        .gammaln()
+                        .mul(-1)
+                        .add(target.add(1).gammaln())
+                        .add(totalCount.gammaln());
+        return logUnnormalizedProb.sub(logNormalization);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sample(int numSamples) {
-        NDManager manager = mu.getManager();
-        NDArray expandedMu = numSamples > 0 ? mu.expandDims(0).repeat(0, numSamples) : mu;
-        NDArray expandedAlpha = numSamples > 0 ? alpha.expandDims(0).repeat(0, numSamples) : alpha;
+        NDManager manager = totalCount.getManager();
+        NDArray expandedTotalCount =
+                numSamples > 0 ? totalCount.expandDims(0).repeat(0, numSamples) : totalCount;
+        NDArray expandedLogits =
+                numSamples > 0 ? logits.expandDims(0).repeat(0, numSamples) : logits;
 
-        NDArray r = expandedAlpha.getNDArrayInternal().rdiv(1f);
-        NDArray theta = expandedAlpha.mul(expandedMu);
-        return manager.samplePoisson(manager.sampleGamma(r, theta));
+        return manager.samplePoisson(manager.sampleGamma(expandedTotalCount, expandedLogits.exp()));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray mean() {
-        return mu;
+        return totalCount.mul(logits.exp());
+    }
+
+    private NDArray logSigmoid(NDArray x) {
+        return x.mul(-1).exp().add(1).getNDArrayInternal().rdiv(1).log();
     }
 
     /**
@@ -83,17 +89,18 @@ public final class NegativeBinomial extends Distribution {
         @Override
         public Distribution build() {
             Preconditions.checkArgument(
-                    distrArgs.contains("mu"), "NegativeBinomial's args must contain mu.");
+                    distrArgs.contains("total_count"),
+                    "NegativeBinomial's args must contain total_count.");
             Preconditions.checkArgument(
-                    distrArgs.contains("alpha"), "NegativeBinomial's args must contain alpha.");
+                    distrArgs.contains("logits"), "NegativeBinomial's args must contain logits.");
             // We cannot scale using the affine transformation since negative binomial should return
             // integers. Instead we scale the parameters.
             if (scale != null) {
-                NDArray mu = distrArgs.get("mu");
-                mu = mu.mul(scale);
-                mu.setName("mu");
-                distrArgs.remove("mu");
-                distrArgs.add(mu);
+                NDArray logits = distrArgs.get("logits");
+                logits.add(scale.log());
+                logits.setName("logits");
+                distrArgs.remove("logits");
+                distrArgs.add(logits);
             }
             return new NegativeBinomial(this);
         }
