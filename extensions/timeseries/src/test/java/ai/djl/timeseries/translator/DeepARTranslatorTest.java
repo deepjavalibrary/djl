@@ -64,13 +64,14 @@ public class DeepARTranslatorTest {
                     Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
                 Forecast forecast = predictor.predict(input);
                 // TODO： The argument prediction_length = 28 is too far away from predict().
-                // Here forecast.mean() is a predicted sequence of length = "prediction_length" set
-                // above. That forecast.mean() still has randomness here is because the model
+                // Here forecast.mean() is a predicted sequence of length = "prediction_length"。
+                // That forecast.mean() still has randomness here is because the model
                 // imported here was trained on a sparse dataSet with many zeros (inactive sale
-                // amount). So here the model also predict for such inactive data once in a while
-                // interweaving the active data.
+                // amount). So here the trained model is also predicting for such inactive data once
+                // in a while interweaving the active data.
                 // TODO: Either preprocess the data to choose a proper time spacing to reduce the
-                // sparsity of the sequence ie the inactive numbers (ie. 0).
+                // sparsity of the sequence ie the inactive numbers (ie. 0), or use another model to
+                // predict for how the active data are sparsified in a finer time spacing.
                 Assert.assertEquals(forecast.mean().toFloatArray().length, 28);
             }
         }
