@@ -253,6 +253,7 @@ public final class LibUtils {
         String libPath = "jnilib/" + classifier + '/' + flavor + '/' + JNI_LIB_NAME;
         logger.info("Extracting {} to cache ...", libPath);
         try (InputStream is = ClassLoaderUtils.getResourceAsStream(libPath)) {
+            Files.createDirectories(dir);
             tmp = Files.createTempFile(dir, "jni", "tmp");
             Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
             Utils.moveQuietly(tmp, path);
