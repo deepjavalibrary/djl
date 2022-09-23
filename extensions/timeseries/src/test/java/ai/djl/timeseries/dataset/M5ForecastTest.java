@@ -21,7 +21,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
-import ai.djl.testing.TestRequirements;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -43,8 +42,7 @@ public class M5ForecastTest {
 
     @Test
     public void testM5Forecast() throws IOException, TranslateException {
-        TestRequirements.weekly();
-
+//        TestRequirements.weekly();
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);

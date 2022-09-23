@@ -42,7 +42,7 @@ import java.util.Set;
  * M5 Forecasting - Accuracy from <a
  * href="https://www.kaggle.com/competitions/m5-forecasting-accuracy">https://www.kaggle.com/competitions/m5-forecasting-accuracy</a>
  *
- * <p>To improve the model performance, we coarse graining target of the dataset by summing the sale
+ * <p>To improve the model performance, we coarse grain the target of the dataset by summing the sale
  * amount every seven days. And set the column names of sum as 'w_i'. This can reduce occurrence of
  * invalid values 0 and reduce the noise learned by model.
  */
@@ -109,11 +109,9 @@ public class M5Forecast extends CsvTimeSeriesDataset {
         // file as 'weekly_***'
         switch (usage) {
             case TRAIN:
-                //                return "weekly_sales_train_validation.csv";
-                return "sales_train_validation.csv";
+                return "weekly_sales_train_validation.csv";
             case TEST:
-                //                return "weekly_sales_train_evaluation.csv";
-                return "sales_train_evaluation.csv";
+                return "weekly_sales_train_evaluation.csv";
             case VALIDATION:
             default:
                 throw new UnsupportedOperationException("Data not available.");
