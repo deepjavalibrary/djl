@@ -4,8 +4,8 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.nn.*;
 import ai.djl.nn.core.Linear;
+import ai.djl.nn.core.SparseMax;
 import ai.djl.nn.norm.GhostBatchNorm;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -67,6 +67,8 @@ public class TabNet {
     public static Block attentiveTransformer(int featureDim,float batchNormMomentum){
         return new SequentialBlock().add(
                 featureBlock(null,featureDim,false,batchNormMomentum)
+        ).add(
+                new SparseMax(-1,10)
         );
     }
 
