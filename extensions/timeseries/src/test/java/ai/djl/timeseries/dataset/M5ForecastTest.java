@@ -93,7 +93,7 @@ public class M5ForecastTest {
             NDList label = record.getLabels();
             NDArray featStatCat = data.get(1);
             Assert.assertEquals(featStatCat.toFloatArray(), new float[] {0f, 0f, 1f, 3f, 1437f});
-            Assert.assertEquals(label.head().toFloatArray(), new float[] {10f, 10f, 10f});
+            Assert.assertEquals(label.head().toFloatArray(), new float[] {12f, 14f, 10f});
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Batch batch = trainer.iterateDataset(m5Forecast).iterator().next();

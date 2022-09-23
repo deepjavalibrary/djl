@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -223,7 +224,9 @@ public class M5Forecast extends CsvTimeSeriesDataset {
             if (mf == null) {
                 try (InputStream is =
                                 Objects.requireNonNull(
-                                        M5Forecast.class.getResourceAsStream("m5forecast.json"));
+                                        new URL(
+                                                        "https://mlrepo.djl.ai/dataset/timeseries/ai/djl/basicdataset/m5forecast-parser/0.1/m5forecast_parser.json")
+                                                .openStream());
                         Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                     mf = JsonUtils.GSON.fromJson(reader, M5Features.class);
                 } catch (IOException e) {
