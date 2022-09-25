@@ -8,11 +8,10 @@ import ai.djl.nn.Activation;
 public class TabNetTest {
     public static void main(String[] args) {
         NDManager manager = NDManager.newBaseManager();
-        NDArray array = manager.randomUniform(0,1,new Shape(2,2));
+        NDArray array = manager.create(new float[]{1,2,3,4});
+        array = array.reshape(new Shape(2,2));
         System.out.println(array);
-        array = array.concat(array,1);
-        System.out.println(array);
-        NDArray res = Activation.tabNetGLU(array,2);
+        NDArray res = Activation.tabNetGLU(array,1);
         System.out.println(res);
     }
 }
