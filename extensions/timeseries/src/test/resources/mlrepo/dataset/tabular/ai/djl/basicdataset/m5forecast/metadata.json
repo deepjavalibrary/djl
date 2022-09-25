@@ -1,0 +1,28 @@
+{
+  "metadataVersion": "0.1",
+  "resourceType": "dataset",
+  "application": "tabular",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "m5forecast",
+  "name": "m5forecast",
+  "description": "This dataset provides the rules for m5 dataset feature parser.",
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "name": "m5forecast",
+      "files": {
+        "train": {
+          "uri": "1.0/sales_train_evaluation.csv.gz",
+          "sha1Hash": "29ba8ac60e18dd7220e8ca7e42158bcd51f8f1ad",
+          "size": 16084525
+        },
+        "test": {
+          "uri": "1.0/sales_train_validation.csv.gz",
+          "sha1Hash": "f9ef7720df345f65b277fcf4634fb959956af28d",
+          "size": 15781698
+        }
+      }
+    }
+  ]
+}

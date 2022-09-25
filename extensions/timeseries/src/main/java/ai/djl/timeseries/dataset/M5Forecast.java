@@ -13,13 +13,16 @@
 
 package ai.djl.timeseries.dataset;
 
+import ai.djl.Application;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.tabular.utils.Feature;
 import ai.djl.basicdataset.tabular.utils.Featurizers;
+import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
-import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
+import ai.djl.util.Utils;
 
 import org.apache.commons.csv.CSVFormat;
 
@@ -27,10 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +48,12 @@ import java.util.Set;
  */
 public class M5Forecast extends CsvTimeSeriesDataset {
 
+    private static final String ARTIFACT_ID = "m5forecast";
+    private static final String VERSION = "1.0";
+
     private Usage usage;
     private MRL mrl;
     private boolean prepared;
-    private Path root;
     private List<Integer> cardinality;
 
     /**
@@ -61,9 +64,7 @@ public class M5Forecast extends CsvTimeSeriesDataset {
     protected M5Forecast(Builder builder) {
         super(builder);
         usage = builder.usage;
-        String path = builder.repository.getBaseUri().toString();
-        mrl = MRL.undefined(builder.repository, DefaultModelZoo.GROUP_ID, path);
-        root = Paths.get(mrl.getRepository().getBaseUri());
+        mrl = builder.getMrl();
         cardinality = builder.cardinality;
     }
 
@@ -74,7 +75,10 @@ public class M5Forecast extends CsvTimeSeriesDataset {
             return;
         }
 
-        mrl.prepare(null, progress);
+        Artifact artifact = mrl.getDefaultArtifact();
+        mrl.prepare(artifact, progress);
+
+        Path root = mrl.getRepository().getResourceDirectory(artifact);
         Path csvFile = root.resolve(getUsagePath(usage));
 
         csvUrl = csvFile.toUri().toURL();
@@ -103,14 +107,13 @@ public class M5Forecast extends CsvTimeSeriesDataset {
     private String getUsagePath(Usage usage) {
         // We coarse graining the data by summing the sale amount every 7 days and rename the .csv
         // file as 'weekly_***'
-        String usagePath;
         switch (usage) {
             case TRAIN:
-                usagePath = "weekly_sales_train_validation.csv";
-                return usagePath;
+                //                return "weekly_sales_train_validation.csv";
+                return "sales_train_validation.csv";
             case TEST:
-                usagePath = "weekly_sales_train_evaluation.csv";
-                return usagePath;
+                //                return "weekly_sales_train_evaluation.csv";
+                return "sales_train_evaluation.csv";
             case VALIDATION:
             default:
                 throw new UnsupportedOperationException("Data not available.");
@@ -135,6 +138,11 @@ public class M5Forecast extends CsvTimeSeriesDataset {
                             .setTrim(true)
                             .build();
             cardinality = new ArrayList<>();
+        }
+
+        MRL getMrl() {
+            return repository.dataset(
+                    Application.Tabular.ANY, BasicDatasets.GROUP_ID, ARTIFACT_ID, VERSION);
         }
 
         /** {@inheritDoc} */
@@ -222,11 +230,9 @@ public class M5Forecast extends CsvTimeSeriesDataset {
 
         private void parseFeatures() {
             if (mf == null) {
-                try (InputStream is =
-                                Objects.requireNonNull(
-                                        new URL(
-                                                        "https://mlrepo.djl.ai/dataset/timeseries/ai/djl/basicdataset/m5forecast-parser/0.1/m5forecast_parser.json")
-                                                .openStream());
+                String url =
+                        "https://mlrepo.djl.ai/dataset/tabular/ai/djl/basicdataset/m5forecast/1.0/m5forecast_parser.json";
+                try (InputStream is = Objects.requireNonNull(Utils.openUrl(url));
                         Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                     mf = JsonUtils.GSON.fromJson(reader, M5Features.class);
                 } catch (IOException e) {

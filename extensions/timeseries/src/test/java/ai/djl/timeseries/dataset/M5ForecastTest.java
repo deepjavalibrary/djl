@@ -14,13 +14,14 @@
 package ai.djl.timeseries.dataset;
 
 import ai.djl.Model;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.tabular.utils.Feature;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
-import ai.djl.repository.Repository;
+import ai.djl.testing.TestRequirements;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -36,24 +37,17 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 public class M5ForecastTest {
 
-    // M5Forecast requires running manual download so can't be automatically tested
-    @Test(enabled = false)
+    @Test
     public void testM5Forecast() throws IOException, TranslateException {
+        TestRequirements.weekly();
+
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-
-        Repository repository =
-                Repository.newInstance(
-                        "test",
-                        Paths.get(
-                                System.getProperty("user.home")
-                                        + "/Desktop/m5-forecasting-accuracy"));
 
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Blocks.identityBlock());
@@ -62,7 +56,7 @@ public class M5ForecastTest {
             M5Forecast.Builder builder =
                     M5Forecast.builder()
                             .optUsage(Dataset.Usage.TEST)
-                            .setRepository(repository)
+                            .setRepository(BasicDatasets.REPOSITORY)
                             .setTransformation(TimeSeriesTransform.identityTransformation())
                             .setContextLength(4)
                             .setSampling(32, true);
