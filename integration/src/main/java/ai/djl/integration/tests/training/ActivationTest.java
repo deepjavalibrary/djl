@@ -268,19 +268,17 @@ public class ActivationTest {
     }
 
     @Test
-    public void testTabNetGLU(){
+    public void testTabNetGLU() {
         try (Model model = Model.newInstance("model")) {
             model.setBlock(Activation.tabNetGLUBlock(1));
 
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(4));
                 NDManager manager = trainer.getManager();
-                NDArray data = manager.create(new float[] {1,2,3,4});
-                data = data.reshape(2,2);
-                //expected calculated through pytorch
-                NDArray expected = manager.create(new float[]{
-                        0.8808f,2.946f
-                });
+                NDArray data = manager.create(new float[] {1, 2, 3, 4});
+                data = data.reshape(2, 2);
+                // expected calculated through pytorch
+                NDArray expected = manager.create(new float[] {0.8808f, 2.946f});
                 NDArray result = trainer.forward(new NDList(data)).singletonOrThrow().squeeze();
                 Assertions.assertAlmostEquals(result, expected);
             }

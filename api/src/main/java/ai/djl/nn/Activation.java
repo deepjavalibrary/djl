@@ -66,8 +66,8 @@ public final class Activation {
      * @param array the input singleton {@link NDArray}
      * @return the {@link NDArray} after applying ReLU6 activation
      */
-    public static NDArray relu6(NDArray array){
-        return NDArrays.minimum(6,array.getNDArrayInternal().relu());
+    public static NDArray relu6(NDArray array) {
+        return NDArrays.minimum(6, array.getNDArrayInternal().relu());
     }
 
     /**
@@ -260,22 +260,25 @@ public final class Activation {
 
     /**
      * Applies tabNetGLU activation(which is mostly used in tabNet) on the input {@link NDArray}.
+     *
      * @param array the input {@link NDArray}
      * @param units the half number of the resultant features
      * @return the {@link NDArray} after applying tabNetGLU function
      */
-    public static NDArray tabNetGLU(NDArray array,int units){
-        return array.get(":,:{}",units).mul(sigmoid(array.get(":, {}:",units)));
+    public static NDArray tabNetGLU(NDArray array, int units) {
+        return array.get(":,:{}", units).mul(sigmoid(array.get(":, {}:", units)));
     }
 
     /**
-     * Applies tabNetGLU activation(which is mostly used in tabNet) on the input singleton {@link NDList}.
+     * Applies tabNetGLU activation(which is mostly used in tabNet) on the input singleton {@link
+     * NDList}.
+     *
      * @param arrays the input singleton {@link NDList}
      * @param units the half number of the resultant features
      * @return the singleton {@link NDList} after applying tabNetGLU function
      */
-    public static NDList tabNetGLU(NDList arrays,int units){
-        return new NDList(tabNetGLU(arrays.singletonOrThrow(),units));
+    public static NDList tabNetGLU(NDList arrays, int units) {
+        return new NDList(tabNetGLU(arrays.singletonOrThrow(), units));
     }
 
     /**
@@ -480,10 +483,10 @@ public final class Activation {
      *
      * @param units the half number of feature
      * @return {@link LambdaBlock} that applies the {@link #tabNetGLU(NDArray, int)} activation
-     * function
+     *     function
      */
-    public static Block tabNetGLUBlock(int units){
-        return new LambdaBlock(arrays -> Activation.tabNetGLU(arrays,units), "tabNetGLU");
+    public static Block tabNetGLUBlock(int units) {
+        return new LambdaBlock(arrays -> Activation.tabNetGLU(arrays, units), "tabNetGLU");
     }
 
     /**
