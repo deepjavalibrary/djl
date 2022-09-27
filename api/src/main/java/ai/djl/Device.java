@@ -21,8 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The {@code Device} class provides the specified assignment for CPU/GPU/MPS processing on the {@code
- * NDArray}.
+ * The {@code Device} class provides the specified assignment for CPU/GPU/MPS processing on the
+ * {@code NDArray}.
  *
  * <p>Users can use this to specify whether to load/compute the {@code NDArray} on CPU/GPU/MPS with
  * deviceType and deviceId provided.
@@ -220,11 +220,13 @@ public final class Device {
     }
 
     /**
-     * Returns the default  Metal Performance Shaders (MPS) Device.
+     * Returns the default Metal Performance Shaders (MPS) Device.
      *
      * @return the default MPS Device
      */
-    public static Device mps() { return MPS; }
+    public static Device mps() {
+        return MPS;
+    }
 
     /** Contains device type string constants. */
     public interface Type {
