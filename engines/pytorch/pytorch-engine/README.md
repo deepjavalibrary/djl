@@ -99,6 +99,28 @@ For macOS, you can use the following library:
 </dependency>
 ```
 
+### macOS M1
+For macOS M1, you can use the following library:
+
+- ai.djl.pytorch:pytorch-jni:1.12.1-0.19.0
+- ai.djl.pytorch:pytorch-native-cpu:1.12.1:osx-aarch64
+
+```xml
+<dependency>
+    <groupId>ai.djl.pytorch</groupId>
+    <artifactId>pytorch-native-cpu</artifactId>
+    <classifier>osx-aarch64</classifier>
+    <version>1.12.1</version>
+    <scope>runtime</scope>
+</dependency>
+<dependency>
+    <groupId>ai.djl.pytorch</groupId>
+    <artifactId>pytorch-jni</artifactId>
+    <version>1.12.1-0.19.0</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
 ### Linux
 For the Linux platform, you can choose between CPU, GPU. If you have NVIDIA [CUDA](https://en.wikipedia.org/wiki/CUDA)
 installed on your GPU machine, you can use one of the following library:
