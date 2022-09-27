@@ -42,7 +42,7 @@ public class M5ForecastTest {
 
     @Test
     public void testM5Forecast() throws IOException, TranslateException {
-//        TestRequirements.weekly();
+        //        TestRequirements.weekly();
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
