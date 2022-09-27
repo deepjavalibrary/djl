@@ -21,10 +21,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The {@code Device} class provides the specified assignment for CPU/GPU processing on the {@code
+ * The {@code Device} class provides the specified assignment for CPU/GPU/MPS processing on the {@code
  * NDArray}.
  *
- * <p>Users can use this to specify whether to load/compute the {@code NDArray} on CPU/GPU with
+ * <p>Users can use this to specify whether to load/compute the {@code NDArray} on CPU/GPU/MPS with
  * deviceType and deviceId provided.
  *
  * @see <a href="https://d2l.djl.ai/chapter_deep-learning-computation/use-gpu.html">The D2L chapter
@@ -36,6 +36,7 @@ public final class Device {
 
     private static final Device CPU = new Device(Type.CPU, -1);
     private static final Device GPU = Device.of(Type.GPU, 0);
+    private static final Device MPS = Device.of(Type.MPS, -1);
 
     private static final Pattern DEVICE_NAME = Pattern.compile("([a-z]+)([0-9]*)");
 
@@ -45,7 +46,7 @@ public final class Device {
     /**
      * Creates a {@code Device} with basic information.
      *
-     * @param deviceType the device type, typically CPU or GPU
+     * @param deviceType the device type, typically CPU, GPU, or MPS
      * @param deviceId the deviceId on the hardware. For example, if you have multiple GPUs, you can
      *     choose which GPU to process the NDArray
      */
@@ -57,7 +58,7 @@ public final class Device {
     /**
      * Returns a {@code Device} with device type and device id.
      *
-     * @param deviceType the device type, typically CPU or GPU
+     * @param deviceType the device type, typically CPU, GPU, or MPS
      * @param deviceId the deviceId on the hardware.
      * @return a {@code Device} instance
      */
@@ -83,7 +84,7 @@ public final class Device {
     /**
      * Parses a deviceName string into a device.
      *
-     * <p>The main format of a device name string is "cpu", "gpu0", or "nc1". This is simply
+     * <p>The main format of a device name string is "cpu", "gpu0","mps", or "nc1". This is simply
      * deviceType concatenated with the deviceId. If no deviceId is used, -1 will be assumed.
      *
      * <p>There are also several simplified formats. The "-1", deviceNames corresponds to cpu.
@@ -150,6 +151,15 @@ public final class Device {
         return Type.GPU.equals(deviceType);
     }
 
+    /**
+     * Returns if the {@code Device} is MPS.
+     *
+     * @return if the {@code Device} is MPS.
+     */
+    public boolean isMps() {
+        return Type.MPS.equals(deviceType);
+    }
+
     /** {@inheritDoc} */
     @Override
     public String toString() {
@@ -209,9 +219,17 @@ public final class Device {
         return of(Type.GPU, deviceId);
     }
 
+    /**
+     * Returns the default  Metal Performance Shaders (MPS) Device.
+     *
+     * @return the default MPS Device
+     */
+    public static Device mps() { return MPS; }
+
     /** Contains device type string constants. */
     public interface Type {
         String CPU = "cpu";
         String GPU = "gpu";
+        String MPS = "mps";
     }
 }
