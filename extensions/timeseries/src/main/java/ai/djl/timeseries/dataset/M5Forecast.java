@@ -42,9 +42,9 @@ import java.util.Set;
  * M5 Forecasting - Accuracy from <a
  * href="https://www.kaggle.com/competitions/m5-forecasting-accuracy">https://www.kaggle.com/competitions/m5-forecasting-accuracy</a>
  *
- * <p>To improve the model performance, we coarse grain the target of the dataset by summing the
- * sale amount every seven days. And set the column names of sum as 'w_i'. This can reduce
- * occurrence of invalid values 0 and reduce the noise learned by model.
+ * <p>To improve the model performance, we coarse grain the target of the dataset by summing the sale
+ * amount every seven days. And set the column names of sum as 'w_i'. This can reduce occurrence of
+ * invalid values 0 and reduce the noise learned by model.
  */
 public class M5Forecast extends CsvTimeSeriesDataset {
 
