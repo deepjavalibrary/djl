@@ -38,6 +38,7 @@ public class TabNetLoss extends Loss {
     @Override
     public NDArray evaluate(NDList labels, NDList predictions) {
         // loss is already calculated inside the forward of tabNet
+        // so here we just need to get it out from prediction
         return predictions.get(1);
     }
 }

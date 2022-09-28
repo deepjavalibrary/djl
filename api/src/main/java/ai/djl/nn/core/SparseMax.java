@@ -65,7 +65,7 @@ public class SparseMax extends AbstractBlock {
     @Override
     public Shape[] getOutputShapes(Shape[] inputShapes) {
         // the shape of input and output are the same
-        return new Shape[0];
+        return new Shape[] {inputShapes[0]};
     }
 
     /** {@inheritDoc} */

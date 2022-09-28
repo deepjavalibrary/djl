@@ -259,29 +259,6 @@ public final class Activation {
     }
 
     /**
-     * Applies tabNetGLU activation(which is mostly used in tabNet) on the input {@link NDArray}.
-     *
-     * @param array the input {@link NDArray}
-     * @param units the half number of the resultant features
-     * @return the {@link NDArray} after applying tabNetGLU function
-     */
-    public static NDArray tabNetGLU(NDArray array, int units) {
-        return array.get(":,:{}", units).mul(sigmoid(array.get(":, {}:", units)));
-    }
-
-    /**
-     * Applies tabNetGLU activation(which is mostly used in tabNet) on the input singleton {@link
-     * NDList}.
-     *
-     * @param arrays the input singleton {@link NDList}
-     * @param units the half number of the resultant features
-     * @return the singleton {@link NDList} after applying tabNetGLU function
-     */
-    public static NDList tabNetGLU(NDList arrays, int units) {
-        return new NDList(tabNetGLU(arrays.singletonOrThrow(), units));
-    }
-
-    /**
      * Applies GELU(Gaussian Error Linear Unit) activation on the input {@link NDArray}.
      *
      * @param array the input {@link NDArray}
@@ -475,18 +452,6 @@ public final class Activation {
      */
     public static Block swishBlock(float beta) {
         return new LambdaBlock(arrays -> Activation.swish(arrays, beta), "Swish");
-    }
-
-    /**
-     * Creates a {@link LambdaBlock} that applies the {@link #tabNetGLU(NDArray, int)} activation
-     * function in its forward function.
-     *
-     * @param units the half number of feature
-     * @return {@link LambdaBlock} that applies the {@link #tabNetGLU(NDArray, int)} activation
-     *     function
-     */
-    public static Block tabNetGLUBlock(int units) {
-        return new LambdaBlock(arrays -> Activation.tabNetGLU(arrays, units), "tabNetGLU");
     }
 
     /**

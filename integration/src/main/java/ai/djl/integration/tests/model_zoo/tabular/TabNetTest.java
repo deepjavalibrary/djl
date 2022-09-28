@@ -13,7 +13,7 @@
 package ai.djl.integration.tests.model_zoo.tabular;
 
 import ai.djl.Model;
-import ai.djl.basicmodelzoo.cv.classification.MobileNetV2;
+import ai.djl.basicmodelzoo.tabular.TabNet;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -29,29 +29,51 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.training.loss.TabNetLoss;
 import ai.djl.translate.Batchifier;
 import ai.djl.util.PairList;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TabNetTest {
     @Test
-    public void testTrain() {
-        // TODO: the test of tabNet has not been implemented yet
+    public void testTabNetGLU() {
         TrainingConfig config =
-                new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Engine.getInstance().getDevices(2))
+                new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
-        Block mobilenet = MobileNetV2.builder().setOutSize(10).build();
-        try (Model model = Model.newInstance("mobilenet")) {
-            model.setBlock(mobilenet);
+        try (Model model = Model.newInstance("model")) {
+            model.setBlock(TabNet.tabNetGLUBlock(1));
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(4));
+                NDManager manager = trainer.getManager();
+                NDArray data = manager.create(new float[] {1, 2, 3, 4});
+                data = data.reshape(2, 2);
+                // expected calculated through pytorch
+                NDArray expected = manager.create(new float[] {0.8808f, 2.946f});
+                NDArray result = trainer.forward(new NDList(data)).singletonOrThrow().squeeze();
+                Assertions.assertAlmostEquals(result, expected);
+            }
+        }
+    }
+
+    @Test
+    public void testTrainingAndLogic() {
+        TrainingConfig config =
+                new DefaultTrainingConfig(new TabNetLoss())
+                        .optDevices(Engine.getInstance().getDevices(2));
+
+        Block tabNet = TabNet.builder().setOutDim(10).build();
+        try (Model model = Model.newInstance("tabNet")) {
+            model.setBlock(tabNet);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = 1;
-                Shape inputShape = new Shape(batchSize, 3, 224, 224);
+                Shape inputShape = new Shape(batchSize, 128);
                 trainer.initialize(inputShape);
                 NDManager manager = trainer.getManager();
                 NDArray input = manager.randomUniform(0, 1, inputShape);
-                NDArray label = manager.ones(new Shape(batchSize, 1));
+                NDArray label = manager.ones(new Shape(batchSize, 10));
                 Batch batch =
                         new Batch(
                                 manager.newSubManager(),
@@ -62,30 +84,28 @@ public class TabNetTest {
                                 Batchifier.STACK,
                                 0,
                                 0);
-                PairList<String, Parameter> parameters = mobilenet.getParameters();
+                PairList<String, Parameter> parameters = tabNet.getParameters();
                 EasyTrain.trainBatch(trainer, batch);
                 trainer.step();
+                // the gamma of batchNorm Layer
+                Assert.assertEquals(
+                        parameters.get(0).getValue().getArray().getShape(), new Shape(1));
 
-                NDArray expectedAtIndex0 =
-                        manager.ones(new Shape(32, 3, 1, 1)); // 32*3*1*1 for first layer
-                NDArray expectedAtIndex5 =
-                        manager.ones(new Shape(32, 32, 1, 1)); // 32*32*1*1 for pointWiseLayer1
-                NDArray expectedAtIndex10 =
-                        manager.ones(new Shape(32, 1, 3, 3)); // 32*1*3*3 for depthWiseLayer1
-                NDArray expectedAtIndex260 =
-                        manager.ones(
-                                new Shape(
-                                        1280, 320, 1,
-                                        1)); // 1280*320*1*1  for pointWiseLayer at last
+                // weight of shared fullyConnected Block0
+                Assert.assertEquals(
+                        parameters.get(4).getValue().getArray().getShape(), new Shape(256, 128));
 
-                Assertions.assertAlmostEquals(
-                        parameters.get(0).getValue().getArray(), expectedAtIndex0);
-                Assertions.assertAlmostEquals(
-                        parameters.get(5).getValue().getArray(), expectedAtIndex5);
-                Assertions.assertAlmostEquals(
-                        parameters.get(10).getValue().getArray(), expectedAtIndex10);
-                Assertions.assertAlmostEquals(
-                        parameters.get(260).getValue().getArray(), expectedAtIndex260);
+                // the parameter value of a shared fc Block should be the same
+                Assert.assertEquals(parameters.get(8).getValue(), parameters.get(4).getValue());
+                Assert.assertEquals(parameters.get(32).getValue(), parameters.get(4).getValue());
+
+                // fc's weight of attention Transformer of step01
+                Assert.assertEquals(
+                        parameters.get(56).getValue().getArray().getShape(), new Shape(128, 64));
+
+                // the final fc Block
+                Assert.assertEquals(
+                        parameters.get(152).getValue().getArray().getShape(), new Shape(10, 64));
             }
         }
     }

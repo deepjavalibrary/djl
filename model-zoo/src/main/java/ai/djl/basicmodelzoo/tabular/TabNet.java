@@ -22,6 +22,7 @@ import ai.djl.nn.AbstractBlock;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
+import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.ParallelBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
@@ -29,6 +30,7 @@ import ai.djl.nn.core.SparseMax;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.norm.GhostBatchNorm;
 import ai.djl.training.ParameterStore;
+import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 
 import java.util.ArrayList;
@@ -55,6 +57,7 @@ public final class TabNet extends AbstractBlock {
     private Block fullyConnected;
     private Block batchNorm;
     private int numD;
+    private int numA;
 
     /**
      * Creates a {@link TabNet} instance with given builder.
@@ -66,7 +69,10 @@ public final class TabNet extends AbstractBlock {
         batchNorm =
                 addChildBlock(
                         "batchNorm",
-                        BatchNorm.builder().optMomentum(builder.batchNormMomentum).build());
+                        BatchNorm.builder()
+                                .optAxis(0)
+                                .optMomentum(builder.batchNormMomentum)
+                                .build());
         List<Block> sharedBlocks = new ArrayList<>();
         for (int i = 0; i < builder.numShared; i++) {
             sharedBlocks.add(
@@ -91,6 +97,7 @@ public final class TabNet extends AbstractBlock {
                     addChildBlock(
                             "steps" + (i + 1),
                             new DecisionStep(
+                                    builder.inputDim,
                                     builder.numD,
                                     builder.numA,
                                     sharedBlocks,
@@ -102,17 +109,53 @@ public final class TabNet extends AbstractBlock {
                 addChildBlock(
                         "fullyConnected", Linear.builder().setUnits(builder.finalOutDim).build());
         this.numD = builder.numD;
+        this.numA = builder.numA;
     }
 
     /**
-     * Creates a FC->BN->GLU block used in tabNet. In order to do GLU, we double the dimension of
-     * the input features to the GLU using a fc layer.
+     * Applies tabNetGLU activation(which is mostly used in tabNet) on the input {@link NDArray}.
+     *
+     * @param array the input {@link NDArray}
+     * @param units the half number of the resultant features
+     * @return the {@link NDArray} after applying tabNetGLU function
+     */
+    public static NDArray tabNetGLU(NDArray array, int units) {
+        return array.get(":,:{}", units).mul(Activation.sigmoid(array.get(":, {}:", units)));
+    }
+
+    /**
+     * Applies tabNetGLU activation(which is mostly used in tabNet) on the input singleton {@link
+     * NDList}.
+     *
+     * @param arrays the input singleton {@link NDList}
+     * @param units the half number of the resultant features
+     * @return the singleton {@link NDList} after applying tabNetGLU function
+     */
+    public static NDList tabNetGLU(NDList arrays, int units) {
+        return new NDList(tabNetGLU(arrays.singletonOrThrow(), units));
+    }
+
+    /**
+     * Creates a {@link LambdaBlock} that applies the {@link #tabNetGLU(NDArray, int)} activation
+     * function in its forward function.
+     *
+     * @param units the half number of feature
+     * @return {@link LambdaBlock} that applies the {@link #tabNetGLU(NDArray, int)} activation
+     *     function
+     */
+    public static Block tabNetGLUBlock(int units) {
+        return new LambdaBlock(arrays -> tabNetGLU(arrays, units), "tabNetGLU");
+    }
+
+    /**
+     * Creates a FC-BN-GLU block used in tabNet. In order to do GLU, we double the dimension of the
+     * input features to the GLU using a fc layer.
      *
      * @param sharedBlock the shared fully connected layer
      * @param outDim the output feature dimension
      * @param virtualBatchSize the virtualBatchSize
      * @param batchNormMomentum the momentum used for ghost batchNorm layer
-     * @return a FC->BN->GLU block
+     * @return a FC-BN-GLU block
      */
     public static Block gluBlock(
             Block sharedBlock, int outDim, int virtualBatchSize, float batchNormMomentum) {
@@ -126,10 +169,11 @@ public final class TabNet extends AbstractBlock {
         featureBlock
                 .add(
                         GhostBatchNorm.builder()
+                                .optAxis(0)
                                 .optVirtualBatchSize(virtualBatchSize)
                                 .optMomentum(batchNormMomentum)
                                 .build())
-                .add(Activation.tabNetGLUBlock(outDim));
+                .add(tabNetGLUBlock(outDim));
 
         return featureBlock;
     }
@@ -192,9 +236,14 @@ public final class TabNet extends AbstractBlock {
             boolean training,
             PairList<String, Object> params) {
         NDManager manager = inputs.getManager();
-        NDArray x = inputs.singletonOrThrow();
-        x = batchNorm.forward(parameterStore, new NDList(x), training).singletonOrThrow();
-        NDArray xa = firstStep.forward(parameterStore, new NDList(x), training).singletonOrThrow();
+        NDArray input = inputs.singletonOrThrow();
+        NDArray x =
+                batchNorm.forward(parameterStore, new NDList(input), training).singletonOrThrow();
+        NDArray xa =
+                firstStep
+                        .forward(parameterStore, new NDList(x), training)
+                        .singletonOrThrow()
+                        .get(":," + this.numD + ":");
         NDArray sparseLoss = null;
         NDArray out = null;
         NDArray priors = manager.ones(x.getShape());
@@ -224,15 +273,20 @@ public final class TabNet extends AbstractBlock {
         Shape[] xShapes = batchNorm.getOutputShapes(shapes);
 
         Shape[] xaShapes = firstStep.getOutputShapes(xShapes); // input shape for xa
+        xaShapes[0] = Shape.update(xaShapes[0], xaShapes[0].dimension() - 1, this.numA);
         shapes =
                 new Shape[] {
                     xShapes[0], xaShapes[0], xShapes[0]
                 }; // shape of priors should be the same as x
-        Shape[] outShapes = null;
+        Shape outputShape = new Shape();
+        Shape lossShape = new Shape();
         for (Block step : steps) {
-            outShapes = step.getOutputShapes(shapes);
+            Shape[] outputShapes = step.getOutputShapes(shapes);
+            outputShape = Shape.update(outputShapes[0], outputShapes[0].dimension() - 1, numD);
+            lossShape = outputShapes[1];
         }
-        return outShapes;
+        outputShape = fullyConnected.getOutputShapes(new Shape[] {outputShape})[0];
+        return new Shape[] {outputShape, lossShape};
     }
 
     /** {@inheritDoc} */
@@ -242,16 +296,20 @@ public final class TabNet extends AbstractBlock {
         Shape[] shapes = inputShapes;
         batchNorm.initialize(manager, dataType, shapes);
         Shape[] xShapes = batchNorm.getOutputShapes(shapes);
-
         firstStep.initialize(manager, dataType, xShapes);
         Shape[] xaShapes = firstStep.getOutputShapes(xShapes); // input shape for xa
+        xaShapes[0] = Shape.update(xaShapes[0], xaShapes[0].dimension() - 1, this.numD);
         shapes =
                 new Shape[] {
                     xShapes[0], xaShapes[0], xShapes[0]
                 }; // shape of priors should be the same as x
+        Shape outputShape = new Shape();
         for (Block step : steps) {
             step.initialize(manager, dataType, shapes);
+            Shape[] outputShapes = step.getOutputShapes(shapes);
+            outputShape = Shape.update(outputShapes[0], outputShapes[0].dimension() - 1, numD);
         }
+        fullyConnected.initialize(manager, dataType, outputShape);
     }
 
     /**
@@ -277,19 +335,19 @@ public final class TabNet extends AbstractBlock {
         /**
          * Creates an attentionTransformer Block with given parameters.
          *
-         * @param units the units for fullyConnected Block
+         * @param inputDim the input Dimension of the TabNet
          * @param virtualBatchSize the virtual batch size for ghost batchNorm
          * @param batchNormMomentum the momentum for batchNorm layer
          */
-        private AttentionTransformer(int units, int virtualBatchSize, float batchNormMomentum) {
+        private AttentionTransformer(int inputDim, int virtualBatchSize, float batchNormMomentum) {
             super(VERSION);
             fullyConnected =
-                    addChildBlock("fullyConnected", Linear.builder().setUnits(units).build());
-            // fc = Linear.builder().setUnits(units).build();
+                    addChildBlock("fullyConnected", Linear.builder().setUnits(inputDim).build());
             batchNorm =
                     addChildBlock(
                             "ghostBatchNorm",
                             GhostBatchNorm.builder()
+                                    .optAxis(0)
                                     .optVirtualBatchSize(virtualBatchSize)
                                     .optMomentum(batchNormMomentum)
                                     .build());
@@ -315,8 +373,8 @@ public final class TabNet extends AbstractBlock {
         @Override
         public Shape[] getOutputShapes(Shape[] inputShapes) {
             Shape[] shapes = {inputShapes[0]};
-            for (Block child : getChildren().values()) {
-                shapes = child.getOutputShapes(shapes);
+            for (Pair<String, Block> child : getChildren()) {
+                shapes = child.getValue().getOutputShapes(shapes);
             }
             return shapes;
         }
@@ -342,6 +400,7 @@ public final class TabNet extends AbstractBlock {
         /**
          * Creates a {@link DecisionStep} with given parameters.
          *
+         * @param inputDim the number of input dimension for attentionTransformer
          * @param numD the number of dimension except attentionTransformer
          * @param numA the number of dimension for attentionTransformer
          * @param shared the shared fullyConnected layers
@@ -350,6 +409,7 @@ public final class TabNet extends AbstractBlock {
          * @param batchNormMomentum the momentum for batchNorm layer
          */
         public DecisionStep(
+                int inputDim,
                 int numD,
                 int numA,
                 List<Block> shared,
@@ -369,7 +429,8 @@ public final class TabNet extends AbstractBlock {
             this.attentionTransformer =
                     addChildBlock(
                             "attentionTransformer",
-                            new AttentionTransformer(numA, virtualBatchSize, batchNormMomentum));
+                            new AttentionTransformer(
+                                    inputDim, virtualBatchSize, batchNormMomentum));
         }
 
         /** {@inheritDoc} */
@@ -416,6 +477,7 @@ public final class TabNet extends AbstractBlock {
 
     /** The Builder to construct a {@link TabNet} object. */
     public static class Builder {
+        int inputDim = 128;
         int finalOutDim = 10;
         int numD = 64;
         int numA = 64;
@@ -424,6 +486,17 @@ public final class TabNet extends AbstractBlock {
         int numSteps = 5;
         int virtualBatchSize = 128;
         float batchNormMomentum = 0.9f;
+
+        /**
+         * Sets the input dimension of TabNet.
+         *
+         * @param inputDim the input dimension
+         * @return this {@code Builder}
+         */
+        public Builder setInputDim(int inputDim) {
+            this.inputDim = inputDim;
+            return this;
+        }
 
         /**
          * Sets the output dimension for TabNet.
