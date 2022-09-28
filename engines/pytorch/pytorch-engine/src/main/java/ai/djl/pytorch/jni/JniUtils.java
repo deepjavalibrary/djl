@@ -1544,6 +1544,10 @@ public final class JniUtils {
             String[] extraFileKeys,
             String[] extraFileValues) {
         Device device = manager.getDevice();
+        // MPS doesn't support mapLocation
+        if ("mps".equals(device.getDeviceType())) {
+            mapLocation = false;
+        }
         logger.debug("mapLocation: {}", mapLocation);
         logger.debug("extraFileKeys: {}", Arrays.toString(extraFileKeys));
         long handle =
@@ -1571,6 +1575,11 @@ public final class JniUtils {
         if (hasSize) {
             size = new DataInputStream(is).readLong();
         }
+        // MPS doesn't support mapLocation
+        if ("mps".equals(device.getDeviceType())) {
+            mapLocation = false;
+        }
+        logger.debug("mapLocation: {}", mapLocation);
         return PyTorchLibrary.LIB.moduleLoad(
                 is,
                 new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},

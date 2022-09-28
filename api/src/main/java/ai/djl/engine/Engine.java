@@ -55,7 +55,7 @@ public abstract class Engine {
 
     private static final String DEFAULT_ENGINE = initEngine();
 
-    private Device defaultDevice;
+    protected Device defaultDevice;
 
     // use object to check if it's set
     private Integer seed;
