@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
+import ai.djl.nn.UninitializeParameterException;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.Evaluator;
@@ -121,7 +122,20 @@ public class Trainer implements AutoCloseable {
                 .forEach(
                         pair -> {
                             for (Device device : devices) {
-                                parameterStore.getValue(pair.getValue(), device, true);
+                                try {
+                                    parameterStore.getValue(pair.getValue(), device, true);
+                                } catch (UninitializeParameterException e) {
+                                    throw new IllegalStateException(
+                                            "Failed to initialize parameter: "
+                                                    + pair.getKey()
+                                                    + ".\n"
+                                                    + "If you are defining a Block extending"
+                                                    + " AbstractBlock, check that you are"
+                                                    + " initializing all child blocks as part of"
+                                                    + " the overload for"
+                                                    + " AbstractBlock.initializeChildBlocks().",
+                                            e);
+                                }
                             }
                         });
     }
