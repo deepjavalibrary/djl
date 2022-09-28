@@ -12,17 +12,23 @@
  */
 package ai.djl.modality;
 
+import ai.djl.translate.Ensembleable;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class EnsembleTest {
 
     @Test
     public void testEnsembleClassifications() {
+        Classifications actual = Ensembleable.ensemble(Collections.<Classifications>emptyList());
+        Assert.assertNull(actual);
+
         List<String> classNames = Arrays.asList("a", "b", "c");
         List<Classifications> list = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
@@ -30,7 +36,8 @@ public class EnsembleTest {
             List<Double> probs = Arrays.asList(prob, prob, prob);
             list.add(new Classifications(classNames, probs));
         }
-        Classifications actual = list.get(0).ensemble(list);
+        actual = Ensembleable.ensemble(list);
+        Assert.assertNotNull(actual);
         Assert.assertEquals(actual.getClassNames(), classNames);
         Assert.assertEquals(actual.getProbabilities(), Arrays.asList(1.0, 1.0, 1.0));
     }

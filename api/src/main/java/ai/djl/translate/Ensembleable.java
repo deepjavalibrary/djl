@@ -12,6 +12,7 @@
  */
 package ai.djl.translate;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -20,15 +21,30 @@ import java.util.List;
  * <p>Typically, ensembling is used for the output of models/translators. By averaging multiple
  * models, it is often possible to get greater accuracy then running each model individually.
  */
-public interface Ensembleable {
+public interface Ensembleable<T> {
+
+    /**
+     * Creates an ensembled output with a list of outputs.
+     *
+     * @param iterator the outputs to ensemble with. It uses the caller class to determine how to
+     *     ensemble.
+     * @return the ensembled (averaged) output
+     */
+    T ensembleWith(Iterator<T> iterator);
 
     /**
      * Finds the ensemble of a list of outputs.
      *
-     * @param outputs the outputs to ensemble. It uses the caller class to determine how to
-     *     ensemble, but should include the caller object in the list.
-     * @return the ensembled (averaged) output
+     * @param outputs the outputs to ensemble.
      * @param <T> the type of object to ensemble. Usually also the type returned
+     * @return the ensembled (averaged) output
      */
-    <T extends Ensembleable> Ensembleable ensemble(List<T> outputs);
+    static <T extends Ensembleable<T>> T ensemble(List<T> outputs) {
+        if (outputs.isEmpty()) {
+            return null;
+        }
+        Iterator<T> it = outputs.iterator();
+        T item = it.next();
+        return item.ensembleWith(it);
+    }
 }

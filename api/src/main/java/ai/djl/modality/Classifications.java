@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
  * {@code Classifications} is the container that stores the classification results for
  * classification on a single input.
  */
-public class Classifications implements JsonSerializable, Ensembleable {
+public class Classifications implements JsonSerializable, Ensembleable<Classifications> {
 
     private static final long serialVersionUID = 1L;
 
@@ -231,39 +232,20 @@ public class Classifications implements JsonSerializable, Ensembleable {
 
     /** {@inheritDoc} */
     @Override
-    public <T extends Ensembleable> Classifications ensemble(List<T> outputs) {
-        List<Classifications> classifications = new ArrayList<>(outputs.size());
-        for (Ensembleable output : outputs) {
-            if (output instanceof Classifications) {
-                classifications.add((Classifications) output);
-            } else {
-                throw new IllegalArgumentException(
-                        "Invalid type of Ensembleable. Expected Classifications in list but found: "
-                                + output.getClass().getName());
-            }
-        }
-
-        boolean foundThisInOutputs = false;
-        for (Classifications c : classifications) {
-            if (!c.classNames.equals(classNames)) {
-                throw new IllegalArgumentException("Classifications have different classes");
-            }
-            if (c == this) {
-                foundThisInOutputs = true;
-            }
-        }
-        if (!foundThisInOutputs) {
-            throw new IllegalArgumentException("Expected to find this in outputs list, but didn't");
-        }
-
-        List<Double> newProbabilities = new ArrayList<>(probabilities.size());
-        newProbabilities.addAll(classifications.get(0).probabilities);
-        for (Classifications c : classifications.subList(1, classifications.size())) {
-            for (int i = 0; i < probabilities.size(); i++) {
+    public Classifications ensembleWith(Iterator<Classifications> it) {
+        int size = probabilities.size();
+        List<Double> newProbabilities = new ArrayList<>(size);
+        newProbabilities.addAll(probabilities);
+        int count = 1;
+        while (it.hasNext()) {
+            ++count;
+            Classifications c = it.next();
+            for (int i = 0; i < size; ++i) {
                 newProbabilities.set(i, newProbabilities.get(i) + c.probabilities.get(i));
             }
         }
-        newProbabilities.replaceAll(p -> p / classifications.size());
+        final int total = count;
+        newProbabilities.replaceAll(p -> p / total);
         return new Classifications(classNames, newProbabilities);
     }
 
