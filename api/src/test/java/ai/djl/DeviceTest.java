@@ -28,7 +28,7 @@ public class DeviceTest {
         if (engine.getGpuCount() > 0) {
             Assert.assertEquals(Device.gpu(), engine.defaultDevice());
         } else {
-            Assert.assertEquals(Device.cpu(), engine.defaultDevice());
+            Assert.assertEquals(engine.defaultDevice().getDeviceId(), -1);
         }
         Assert.assertEquals(Device.gpu(), Device.of("gpu", 0));
         Assert.assertEquals(Device.gpu(3), Device.of("gpu", 3));

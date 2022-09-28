@@ -63,7 +63,7 @@ public abstract class Engine {
     private static final Pattern PATTERN =
             Pattern.compile("KEY|TOKEN|PASSWORD", Pattern.CASE_INSENSITIVE);
 
-    private Device defaultDevice;
+    protected Device defaultDevice;
 
     // use object to check if it's set
     private Integer seed;
