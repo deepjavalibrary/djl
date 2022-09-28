@@ -32,8 +32,10 @@ public final class PtDeviceType {
             return 0;
         } else if (Device.Type.GPU.equals(deviceType)) {
             return 1;
+        } else if ("mps".equals(deviceType)) {
+            return 13;
         } else {
-            throw new IllegalArgumentException("Unsupported device: " + device.toString());
+            throw new IllegalArgumentException("Unsupported device: " + device);
         }
     }
 
@@ -49,6 +51,8 @@ public final class PtDeviceType {
                 return Device.Type.CPU;
             case 1:
                 return Device.Type.GPU;
+            case 13:
+                return "mps";
             default:
                 throw new IllegalArgumentException("Unsupported deviceType: " + deviceType);
         }
