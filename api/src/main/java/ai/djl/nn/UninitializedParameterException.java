@@ -13,7 +13,7 @@
 package ai.djl.nn;
 
 /** Thrown to indicate that a {@link Parameter} was not initialized. */
-public class UninitializeParameterException extends RuntimeException {
+public class UninitializedParameterException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
     private final Parameter parameter;
@@ -26,7 +26,7 @@ public class UninitializeParameterException extends RuntimeException {
      * @param message the detail message that is saved for later retrieval by the {@link
      *     #getMessage()} method
      */
-    public UninitializeParameterException(Parameter parameter, String message) {
+    public UninitializedParameterException(Parameter parameter, String message) {
         super(message);
         this.parameter = parameter;
     }
@@ -43,7 +43,7 @@ public class UninitializeParameterException extends RuntimeException {
      * @param cause the cause that is saved for later retrieval by the {@link #getCause()} method. A
      *     {@code null} value is permitted, and indicates that the cause is nonexistent or unknown
      */
-    public UninitializeParameterException(Parameter parameter, String message, Throwable cause) {
+    public UninitializedParameterException(Parameter parameter, String message, Throwable cause) {
         super(message, cause);
         this.parameter = parameter;
     }
@@ -58,7 +58,7 @@ public class UninitializeParameterException extends RuntimeException {
      * @param cause the cause that is saved for later retrieval by the {@link #getCause()} method. A
      *     {@code null} value is permitted, and indicates that the cause is nonexistent or unknown
      */
-    public UninitializeParameterException(Parameter parameter, Throwable cause) {
+    public UninitializedParameterException(Parameter parameter, Throwable cause) {
         super(cause);
         this.parameter = parameter;
     }

@@ -21,7 +21,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
-import ai.djl.nn.UninitializeParameterException;
+import ai.djl.nn.UninitializedParameterException;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.evaluator.Evaluator;
@@ -124,7 +124,7 @@ public class Trainer implements AutoCloseable {
                             for (Device device : devices) {
                                 try {
                                     parameterStore.getValue(pair.getValue(), device, true);
-                                } catch (UninitializeParameterException e) {
+                                } catch (UninitializedParameterException e) {
                                     throw new IllegalStateException(
                                             "Failed to initialize parameter: "
                                                     + pair.getKey()
