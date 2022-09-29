@@ -40,5 +40,14 @@ public class EnsembleTest {
         Assert.assertNotNull(actual);
         Assert.assertEquals(actual.getClassNames(), classNames);
         Assert.assertEquals(actual.getProbabilities(), Arrays.asList(1.0, 1.0, 1.0));
+
+        Assert.assertThrows(
+                () -> {
+                    List<String> badClassNames = Arrays.asList("b", "c", "d");
+                    List<Classifications> badList = new ArrayList<>();
+                    badList.addAll(list);
+                    badList.add(new Classifications(badClassNames, Arrays.asList(1.0, 1.0, 1.0)));
+                    Ensembleable.ensemble(badList);
+                });
     }
 }

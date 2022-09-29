@@ -243,6 +243,11 @@ public class Classifications implements JsonSerializable, Ensembleable<Classific
             for (int i = 0; i < size; ++i) {
                 newProbabilities.set(i, newProbabilities.get(i) + c.probabilities.get(i));
             }
+            if (!c.classNames.equals(classNames)) {
+                throw new IllegalArgumentException(
+                        "Found a classNames mismatch during ensembling. All input Classifications"
+                                + " should have the same classNames, but some were different");
+            }
         }
         final int total = count;
         newProbabilities.replaceAll(p -> p / total);
