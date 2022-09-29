@@ -47,13 +47,12 @@ def main():
         model_info = model["model_info"]
         converter = SUPPORTED_TASK[task]
 
-        result, reason, size = converter.save_model(model_info,
-                                                    args.output_dir, temp_dir)
+        result, reason, size = converter.save_model(model_info, args, temp_dir)
         if not result:
             logging.error(f"{model_info.modelId}: {reason}")
 
         huggingface_models.update_progress(model_info, converter.application,
-                                           result, reason, size)
+                                           result, reason, size, args.cpu_only)
         shutil.rmtree(temp_dir)
 
     logging.info("finished.")

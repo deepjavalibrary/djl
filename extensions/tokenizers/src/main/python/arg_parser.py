@@ -27,6 +27,10 @@ def converter_args():
                         "--retry-failed",
                         action='store_true',
                         help="Retry failed model")
+    parser.add_argument("-u",
+                        "--cpu-only",
+                        action='store_true',
+                        help="Only validate jit traced model on CPU")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "-c",

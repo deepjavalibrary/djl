@@ -14,6 +14,7 @@
 import logging
 import os.path
 import shutil
+from argparse import Namespace
 
 import torch
 from huggingface_hub import hf_hub_download
@@ -35,7 +36,7 @@ class HuggingfaceConverter:
         self.inputs = None
         self.outputs = None
 
-    def save_model(self, model_info, output_dir: str, temp_dir: str):
+    def save_model(self, model_info, args: Namespace, temp_dir: str):
         model_id = model_info.modelId
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
@@ -56,7 +57,7 @@ class HuggingfaceConverter:
             return False, "Failed to trace model", -1
 
         result, reason = self.verify_jit_model(hf_pipeline, model_file,
-                                               include_types)
+                                               include_types, args.cpu_only)
         if not result:
             include_types = True
             model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
@@ -65,11 +66,12 @@ class HuggingfaceConverter:
                 return False, reason, -1
 
             result, reason = self.verify_jit_model(hf_pipeline, model_file,
-                                                   include_types)
+                                                   include_types,
+                                                   args.cpu_only)
             if not result:
                 return False, reason, -1
 
-        size = self.save_to_model_zoo(model_info, output_dir, temp_dir,
+        size = self.save_to_model_zoo(model_info, args.output_dir, temp_dir,
                                       hf_pipeline, include_types)
 
         return True, None, size
@@ -157,7 +159,7 @@ class HuggingfaceConverter:
         return file_size
 
     def verify_jit_model(self, hf_pipeline, model_file: str,
-                         include_types: bool):
+                         include_types: bool, cpu_only: bool):
         logging.info(
             f"Verifying torchscript model(include_token_types={include_types}): {model_file} ..."
         )
@@ -168,7 +170,7 @@ class HuggingfaceConverter:
         input_ids = encoding["input_ids"]
         attention_mask = encoding["attention_mask"]
         token_type_ids = encoding.get("token_type_ids")
-        if torch.cuda.is_available():
+        if torch.cuda.is_available() and not cpu_only:
             traced_model = torch.jit.load(model_file, map_location='cuda:0')
             traced_model.to(self.device)
             input_ids = input_ids.to(self.device)
