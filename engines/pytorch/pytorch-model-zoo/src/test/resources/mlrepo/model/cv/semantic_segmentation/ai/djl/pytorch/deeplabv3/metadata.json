@@ -31,9 +31,9 @@
       "files": {
         "model": {
           "uri": "0.0.1/deeplabv3.zip",
-          "sha1Hash": "06b8471f40d41d5f4fce7736cdd24081b9fa2e8e",
+          "sha1Hash": "417241c13140e8ad307fdb5884442183fb94e130",
           "name": "",
-          "size": 155844147
+          "size": 155844400
         }
       }
     }
