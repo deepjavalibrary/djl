@@ -16,6 +16,7 @@ package ai.djl.examples.inference;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
 import ai.djl.basicdataset.tabular.utils.Feature;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -77,11 +78,10 @@ public final class DeepARTimeSeries {
         NDManager manager = NDManager.newBaseManager();
         M5Dataset dataset = M5Dataset.builder().setManager(manager).setRoot(m5ForecastFile).build();
 
-        String modelUrl = "https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip";
         Map<String, Object> arguments = new ConcurrentHashMap<>();
-        int predictionLength = 28;
+        int predictionLength = 4;
         arguments.put("prediction_length", predictionLength);
-        arguments.put("freq", "D");
+        arguments.put("freq", "W");
         arguments.put("use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(), false);
         arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), false);
         arguments.put("use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(), false);
@@ -91,7 +91,8 @@ public final class DeepARTimeSeries {
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
                         .setTypes(TimeSeriesData.class, Forecast.class)
-                        .optModelUrls(modelUrl)
+                        .optFilter("backbone", "deepar")
+                        .optFilter("dataset", "m5forecast")
                         .optTranslator(translator)
                         .optProgress(new ProgressBar())
                         .build();
@@ -150,7 +151,7 @@ public final class DeepARTimeSeries {
         }
 
         private void prepare(Builder builder) throws IOException {
-            URL csvUrl = builder.root.resolve("sales_train_evaluation.csv").toUri().toURL();
+            URL csvUrl = builder.root.resolve("weekly_sales_train_evaluation.csv").toUri().toURL();
             try (Reader reader =
                     new InputStreamReader(
                             new BufferedInputStream(csvUrl.openStream()), StandardCharsets.UTF_8)) {
@@ -213,8 +214,8 @@ public final class DeepARTimeSeries {
                                 .setTrim(true)
                                 .build();
                 target = new ArrayList<>();
-                for (int i = 1; i <= 1941; i++) {
-                    target.add(new Feature("d_" + i, true));
+                for (int i = 1; i <= 277; i++) {
+                    target.add(new Feature("w_" + i, true));
                 }
             }
 
