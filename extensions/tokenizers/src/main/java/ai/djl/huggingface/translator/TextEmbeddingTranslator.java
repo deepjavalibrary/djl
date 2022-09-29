@@ -68,8 +68,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         NDManager manager = ctx.getNDManager();
         NDArray inputAttentionMask = manager.create(attentionMask).toType(DataType.FLOAT32, true);
         long[] shape = embeddings.getShape().getShape();
-        inputAttentionMask = inputAttentionMask.tile(shape[shape.length - 1]);
-        inputAttentionMask = inputAttentionMask.reshape(embeddings.getShape());
+        inputAttentionMask = inputAttentionMask.expandDims(-1).broadcast(shape);
         NDArray inputAttentionMaskSum = inputAttentionMask.sum(AXIS);
         NDArray clamp = inputAttentionMaskSum.clip(1e-9, 1e12);
         NDArray prod = embeddings.mul(inputAttentionMask);
