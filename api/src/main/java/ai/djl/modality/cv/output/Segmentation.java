@@ -12,6 +12,7 @@
  */
 package ai.djl.modality.cv.output;
 
+import ai.djl.modality.cv.Image;
 import ai.djl.util.JsonSerializable;
 import ai.djl.util.JsonUtils;
 
@@ -23,6 +24,7 @@ import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * A class representing the segmentation result of an image in an {@link
@@ -37,6 +39,7 @@ public class Segmentation implements JsonSerializable {
                     .registerTypeAdapter(Segmentation.class, new SegmentationSerializer())
                     .create();
 
+    private transient List<String> classes;
     private int[][] mask;
 
     /**
@@ -44,8 +47,13 @@ public class Segmentation implements JsonSerializable {
      *
      * @param mask the category mask for each pixel in the image
      */
-    public Segmentation(int[][] mask) {
+    public Segmentation(List<String> classes, int[][] mask) {
+        this.classes = classes;
         this.mask = mask;
+    }
+
+    public List<String> getClasses() {
+        return classes;
     }
 
     /**
@@ -68,6 +76,42 @@ public class Segmentation implements JsonSerializable {
     public String toJson() {
         return GSON.toJson(this) + '\n';
     }
+
+    /**
+     * Highlights the detected object on the image with random colors.
+     *
+     * @param image the original image
+     * @param transparency the transparency of the overlay
+     */
+    public void drawMask(Image image, float transparency) {}
+
+    /**
+     * Highlights the detected object on the image with random colors.
+     *
+     * @param image the original image
+     * @param transparency the transparency of the overlay
+     * @param background replace the background with specified background color, use transparent
+     *     color to remove background
+     */
+    public void drawMask(Image image, float transparency, int background) {}
+
+    /**
+     * Highlights the detected object on the image with random colors.
+     *
+     * @param image the original image
+     * @param transparency the transparency of the overlay
+     * @param background replace the background with specified image
+     */
+    public void drawMask(Image image, float transparency, Image background) {}
+
+    /**
+     * Highlights the specified object with specific color.
+     *
+     * @param image the original image
+     * @param classId the class to draw on the image
+     * @param rgba the rgb color with transparency
+     */
+    public void drawMask(Image image, int classId, int rgba) {}
 
     /** A customized Gson serializer to serialize the {@code Segmentation} object. */
     public static final class SegmentationSerializer implements JsonSerializer<Segmentation> {

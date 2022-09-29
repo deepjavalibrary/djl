@@ -23,6 +23,8 @@ import ai.djl.translate.Transform;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,10 +33,11 @@ import java.util.Map;
  */
 public class SemanticSegmentationTranslator extends BaseImageTranslator<Segmentation> {
 
+    private SynsetLoader synsetLoader;
     private final int shortEdge;
     private final int maxEdge;
 
-    private static final int CLASSNUM = 21;
+    private List<String> classes;
 
     /**
      * Creates the Semantic Segmentation translator from the given builder.
@@ -43,10 +46,19 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Segmenta
      */
     public SemanticSegmentationTranslator(Builder builder) {
         super(builder);
+        this.synsetLoader = builder.synsetLoader;
         this.shortEdge = builder.shortEdge;
         this.maxEdge = builder.maxEdge;
 
         pipeline.insert(0, null, new ResizeShort());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(TranslatorContext ctx) throws IOException {
+        if (classes == null) {
+            classes = synsetLoader.load(ctx.getModel());
+        }
     }
 
     /** {@inheritDoc} */
@@ -68,14 +80,15 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Segmenta
         int imageSize = width * height;
 
         // Build mask array
+        int numOfClasses = classes.size();
         for (int h = 0; h < height; h++) {
             for (int w = 0; w < width; w++) {
                 int index = h * width + w;
                 int maxi = 0;
                 double maxnum = -Double.MAX_VALUE;
-                for (int i = 0; i < CLASSNUM; i++) {
+                for (int i = 0; i < numOfClasses; ++i) {
                     // get score for each i at the h,w pixel of the image
-                    float score = scores[i * (imageSize) + index];
+                    float score = scores[i * imageSize + index];
                     if (score > maxnum) {
                         maxnum = score;
                         maxi = i;
@@ -84,7 +97,7 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Segmenta
                 mask[w][h] = maxi;
             }
         }
-        return new Segmentation(mask);
+        return new Segmentation(classes, mask);
     }
 
     /**
