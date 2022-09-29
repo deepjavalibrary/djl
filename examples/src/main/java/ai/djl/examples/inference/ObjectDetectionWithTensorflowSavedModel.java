@@ -88,7 +88,7 @@ public final class ObjectDetectionWithTensorflowSavedModel {
                         .setTypes(Image.class, DetectedObjects.class)
                         .optModelUrls(modelUrl)
                         // saved_model.pb file is in the subfolder of the model archive file
-                        .optModelName("ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model")
+                        .optModelName("saved_model")
                         .optTranslator(new MyTranslator())
                         .optEngine("TensorFlow")
                         .optProgress(new ProgressBar())
