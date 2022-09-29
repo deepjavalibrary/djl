@@ -14,6 +14,7 @@ package ai.djl.modality;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.translate.Ensembleable;
 import ai.djl.util.JsonSerializable;
 import ai.djl.util.JsonUtils;
 
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +38,7 @@ import java.util.stream.Collectors;
  * {@code Classifications} is the container that stores the classification results for
  * classification on a single input.
  */
-public class Classifications implements JsonSerializable {
+public class Classifications implements JsonSerializable, Ensembleable<Classifications> {
 
     private static final long serialVersionUID = 1L;
 
@@ -91,6 +93,24 @@ public class Classifications implements JsonSerializable {
                 Arrays.stream(array.toDoubleArray()).boxed().collect(Collectors.toList());
         array.close();
         this.topK = topK;
+    }
+
+    /**
+     * Returns the classes that were classified into.
+     *
+     * @return the classes that were classified into
+     */
+    public List<String> getClassNames() {
+        return classNames;
+    }
+
+    /**
+     * Returns the list of probabilities for each class (matching the order of the class names).
+     *
+     * @return the list of probabilities for each class (matching the order of the class names)
+     */
+    public List<Double> getProbabilities() {
+        return probabilities;
     }
 
     /**
@@ -208,6 +228,30 @@ public class Classifications implements JsonSerializable {
         }
         sb.append(']');
         return sb.toString();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Classifications ensembleWith(Iterator<Classifications> it) {
+        int size = probabilities.size();
+        List<Double> newProbabilities = new ArrayList<>(size);
+        newProbabilities.addAll(probabilities);
+        int count = 1;
+        while (it.hasNext()) {
+            ++count;
+            Classifications c = it.next();
+            for (int i = 0; i < size; ++i) {
+                newProbabilities.set(i, newProbabilities.get(i) + c.probabilities.get(i));
+            }
+            if (!c.classNames.equals(classNames)) {
+                throw new IllegalArgumentException(
+                        "Found a classNames mismatch during ensembling. All input Classifications"
+                                + " should have the same classNames, but some were different");
+            }
+        }
+        final int total = count;
+        newProbabilities.replaceAll(p -> p / total);
+        return new Classifications(classNames, newProbabilities);
     }
 
     /**
