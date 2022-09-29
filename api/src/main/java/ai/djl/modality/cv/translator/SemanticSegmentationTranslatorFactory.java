@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.output.Segmentation;
 import ai.djl.modality.cv.translator.wrapper.FileTranslator;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
@@ -47,13 +48,13 @@ public class SemanticSegmentationTranslatorFactory implements TranslatorFactory 
             Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         SemanticSegmentationTranslator translator =
                 SemanticSegmentationTranslator.builder(arguments).build();
-        if (input == Image.class && output == Image.class) {
+        if (input == Image.class && output == Segmentation.class) {
             return (Translator<I, O>) translator;
-        } else if (input == Path.class && output == Image.class) {
+        } else if (input == Path.class && output == Segmentation.class) {
             return (Translator<I, O>) new FileTranslator<>(translator);
-        } else if (input == URL.class && output == Image.class) {
+        } else if (input == URL.class && output == Segmentation.class) {
             return (Translator<I, O>) new UrlTranslator<>(translator);
-        } else if (input == InputStream.class && output == Image.class) {
+        } else if (input == InputStream.class && output == Segmentation.class) {
             return (Translator<I, O>) new InputStreamTranslator<>(translator);
         } else if (input == Input.class && output == Output.class) {
             return (Translator<I, O>) new ImageServingTranslator(translator);

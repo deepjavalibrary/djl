@@ -17,6 +17,7 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.output.Segmentation;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.SemanticSegmentationTranslator;
@@ -29,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -48,10 +48,10 @@ public final class SemanticSegmentation {
     private SemanticSegmentation() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        SemanticSegmentation.predict();
+        logger.info("Result: {}", predict().getMask().length);
     }
 
-    public static void predict() throws IOException, ModelException, TranslateException {
+    public static Segmentation predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
@@ -66,28 +66,18 @@ public final class SemanticSegmentation {
                         .addTransform(new Normalize(mean, std))
                         .build();
 
-        Criteria<Image, Image> criteria =
+        Criteria<Image, Segmentation> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.SEMANTIC_SEGMENTATION)
-                        .setTypes(Image.class, Image.class)
+                        .setTypes(Image.class, Segmentation.class)
                         .optModelUrls(url)
                         .optTranslator(translator)
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
                         .build();
-        try (ZooModel<Image, Image> model = criteria.loadModel();
-                Predictor<Image, Image> predictor = model.newPredictor()) {
-            Image semanticImage = predictor.predict(img);
-            saveSemanticImage(semanticImage);
+        try (ZooModel<Image, Segmentation> model = criteria.loadModel();
+                Predictor<Image, Segmentation> predictor = model.newPredictor()) {
+            return predictor.predict(img);
         }
-    }
-
-    private static void saveSemanticImage(Image img) throws IOException {
-        Path outputDir = Paths.get("build/output");
-        Files.createDirectories(outputDir);
-
-        Path imagePath = outputDir.resolve("semantic_instances.png");
-        img.save(Files.newOutputStream(imagePath), "png");
-        logger.info("Segmentation result image has been saved in: {}", imagePath);
     }
 }
