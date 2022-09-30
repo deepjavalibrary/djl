@@ -51,6 +51,7 @@ public class DailyDelhiClimateTest {
                             .optUsage(Dataset.Usage.TEST)
                             .addFeature("humidity")
                             .addFeature("wind_speed")
+                            .noLabels()
                             .setSampling(32, true)
                             .build();
 

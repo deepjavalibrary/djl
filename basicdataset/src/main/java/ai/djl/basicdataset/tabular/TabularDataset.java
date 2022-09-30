@@ -44,6 +44,13 @@ public abstract class TabularDataset extends RandomAccessDataset {
         super(builder);
         features = builder.features;
         labels = builder.labels;
+
+        if (features.isEmpty()) {
+            throw new IllegalArgumentException("Missing features.");
+        }
+        if (labels.isEmpty() && !builder.allowNoLabels) {
+            throw new IllegalArgumentException("Missing labels.");
+        }
     }
 
     /** {@inheritDoc} */
@@ -117,6 +124,7 @@ public abstract class TabularDataset extends RandomAccessDataset {
 
         protected List<Feature> features;
         protected List<Feature> labels;
+        protected boolean allowNoLabels;
 
         protected BaseBuilder() {
             features = new ArrayList<>();
@@ -265,17 +273,13 @@ public abstract class TabularDataset extends RandomAccessDataset {
         }
 
         /**
-         * Validates the builder to ensure it is correct.
+         * Indicates the dataset should not have any labels.
          *
-         * @throws IllegalArgumentException if there is an error with the builder arguments
+         * @return this builder
          */
-        protected void validate() {
-            if (features.isEmpty()) {
-                throw new IllegalArgumentException("Missing features.");
-            }
-            if (labels.isEmpty()) {
-                throw new IllegalArgumentException("Missing labels.");
-            }
+        public T noLabels() {
+            allowNoLabels = true;
+            return self();
         }
     }
 }

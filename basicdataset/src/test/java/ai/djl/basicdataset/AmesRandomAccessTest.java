@@ -64,6 +64,7 @@ public class AmesRandomAccessTest {
                             .addFeature("MiscVal")
                             .addFeature("id")
                             .addFeature("alley", true)
+                            .addNumericLabel("saleprice")
                             .setSampling(32, true)
                             .build();
 
@@ -75,7 +76,7 @@ public class AmesRandomAccessTest {
             Record record = amesRandomAccess.get(manager, 0);
             NDList data = record.getData();
             NDList labels = record.getLabels();
-            Assert.assertEquals(data.head().toFloatArray(), new float[] {0, 1, 1, 0, 0});
+            Assert.assertEquals(data.head().toFloatArray(), new float[] {0, 1, 0, 1, 0});
             Assert.assertEquals(labels.singletonOrThrow().toFloatArray()[0], 208500.0);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -85,5 +86,40 @@ public class AmesRandomAccessTest {
                 batch.close();
             }
         }
+    }
+
+    @Test
+    public void testAmesRandomAccessAllFeatures() throws IOException, TranslateException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            AmesRandomAccess amesRandomAccess =
+                    AmesRandomAccess.builder()
+                            .optUsage(Dataset.Usage.TRAIN)
+                            .addAllFeatures()
+                            .setSampling(32, true)
+                            .build();
+
+            amesRandomAccess.prepare();
+
+            long size = amesRandomAccess.size();
+            Assert.assertEquals(size, 1460);
+
+            Record record = amesRandomAccess.get(manager, 0);
+            NDList data = record.getData();
+            Assert.assertEquals(data.head().size(), 79);
+        }
+    }
+
+    @Test
+    public void testAmesNoFeatures() {
+        Assert.assertThrows(
+                () -> {
+                    AmesRandomAccess amesRandomAccess =
+                            AmesRandomAccess.builder()
+                                    .optUsage(Dataset.Usage.TRAIN)
+                                    .setSampling(32, true)
+                                    .build();
+
+                    amesRandomAccess.prepare();
+                });
     }
 }

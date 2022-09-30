@@ -155,7 +155,6 @@ public class CsvDataset extends TabularDataset {
          * @return the new {@link CsvDataset}
          */
         public CsvDataset build() {
-            validate();
             return new CsvDataset(this);
         }
     }
