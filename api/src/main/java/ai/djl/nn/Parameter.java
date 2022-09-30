@@ -121,7 +121,7 @@ public class Parameter implements AutoCloseable {
     public NDArray getArray() {
         if (!isInitialized()) {
             throw new UninitializedParameterException(
-                    this, "The array for parameter \"" + getName() + "\" has not been initialized");
+                    "The array for parameter \"" + getName() + "\" has not been initialized");
         }
         return array;
     }

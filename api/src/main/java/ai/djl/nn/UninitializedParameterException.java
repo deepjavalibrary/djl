@@ -16,19 +16,16 @@ package ai.djl.nn;
 public class UninitializedParameterException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    private final Parameter parameter;
 
     /**
      * Constructs a new exception with the specified detail message. The cause is not initialized,
      * and may subsequently be initialized by a call to {@link #initCause}.
      *
-     * @param parameter the parameter that was not initialized
      * @param message the detail message that is saved for later retrieval by the {@link
      *     #getMessage()} method
      */
-    public UninitializedParameterException(Parameter parameter, String message) {
+    public UninitializedParameterException(String message) {
         super(message);
-        this.parameter = parameter;
     }
 
     /**
@@ -37,15 +34,13 @@ public class UninitializedParameterException extends RuntimeException {
      * <p>Note that the detail message associated with {@code cause} is <i>not</i> automatically
      * incorporated in this exception's detail message.
      *
-     * @param parameter the parameter that was not initialized
      * @param message the detail message that is saved for later retrieval by the {@link
      *     #getMessage()} method
      * @param cause the cause that is saved for later retrieval by the {@link #getCause()} method. A
      *     {@code null} value is permitted, and indicates that the cause is nonexistent or unknown
      */
-    public UninitializedParameterException(Parameter parameter, String message, Throwable cause) {
+    public UninitializedParameterException(String message, Throwable cause) {
         super(message, cause);
-        this.parameter = parameter;
     }
 
     /**
@@ -54,21 +49,10 @@ public class UninitializedParameterException extends RuntimeException {
      * message of {@code cause}. This constructor is useful for exceptions that are little more than
      * wrappers for other throwables. For example, {@link java.security.PrivilegedActionException}.
      *
-     * @param parameter the parameter that was not initialized
      * @param cause the cause that is saved for later retrieval by the {@link #getCause()} method. A
      *     {@code null} value is permitted, and indicates that the cause is nonexistent or unknown
      */
-    public UninitializedParameterException(Parameter parameter, Throwable cause) {
+    public UninitializedParameterException(Throwable cause) {
         super(cause);
-        this.parameter = parameter;
-    }
-
-    /**
-     * Returns the parameter that was not initialized.
-     *
-     * @return the parameter that was not initialized
-     */
-    public Parameter getParameter() {
-        return parameter;
     }
 }
