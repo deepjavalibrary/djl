@@ -124,7 +124,7 @@ class HuggingfaceModels:
         return ret
 
     def update_progress(self, model_info: ModelInfo, application: str,
-                        result: bool, reason: str, size: int):
+                        result: bool, reason: str, size: int, cpu_only: bool):
         status = {
             "result": "success" if result else "failed",
             "application": application,
@@ -134,6 +134,9 @@ class HuggingfaceModels:
         }
         if reason:
             status["reason"] = reason
+        if cpu_only:
+            status["cpu_only"] = True
+
         self.processed_models[model_info.modelId] = status
 
         dict_file = os.path.join(self.output_dir, "models.json")
