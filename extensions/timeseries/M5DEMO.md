@@ -15,7 +15,7 @@ Now it contains:
 
 [M5 Forecasting competition]([M5 Forecasting - Accuracy | Kaggle](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/description)) goal is to forecast future sales at Walmart based on hierarchical sales in the states of California, Texas, and Wisconsin. It provides information on daily sales, product attributes, prices, and calendars.
 
-> Notes: Taking into account the model training performance, we sum the sales every 7 days,  coarse-grained the data, so that the model can better learn the time series information. **If you want to run this demo, you need to do some preprocessing on the raw data. (coarse-grained the d_i to w_i)**
+> Notes: Taking into account the model training performance, we sum the sales every 7 days,  coarse-grained the data, so that the model can better learn the time series information. **After downloading the dataset from [M5 Forecasting competition]([M5 Forecasting - Accuracy | Kaggle](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/description)), you can use our [script](https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008) to get coarse-grained data. This script will create "weekly_xxx.csv" files representing weekly data in the dataset directory you specify.**
 
 ## DeepAR model
 
@@ -24,6 +24,30 @@ DeepAR forecasting algorithm is a supervised learning algorithm for forecasting 
 Unlike traditional time series forecasting models, DeepAR estimates the future probability distribution of time series based on the past. In retail businesses, probabilistic demand forecasting is critical to delivering the right inventory at the right time and in the right place.
 
 Therefore, we choose the sales data set in the real scene as an example to describe how to use the timeseries package for forecasting
+
+### Metrics
+
+We use the following metrics to evaluate the performance of the DeepAR model in the [M5 Forecasting competition]([M5 Forecasting - Accuracy | Kaggle](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/description)).
+
+```
+> [INFO ] - metric: Coverage[0.99]:	0.92
+> [INFO ] - metric: Coverage[0.67]:	0.51
+> [INFO ] - metric: abs_target_sum:	1224665.00
+> [INFO ] - metric: abs_target_mean:	10.04
+> [INFO ] - metric: NRMSE:	0.84
+> [INFO ] - metric: RMSE:	8.40
+> [INFO ] - metric: RMSSE:	1.00
+> [INFO ] - metric: abs_error:	14.47
+> [INFO ] - metric: QuantileLoss[0.67]:	18.23
+> [INFO ] - metric: QuantileLoss[0.99]:	103.07
+> [INFO ] - metric: QuantileLoss[0.50]:	9.49
+> [INFO ] - metric: QuantileLoss[0.95]:	66.69
+> [INFO ] - metric: Coverage[0.95]:	0.87
+> [INFO ] - metric: Coverage[0.50]:	0.33
+> [INFO ] - metric: MSE:	70.64
+```
+
+As you can see, our pretrained model has some effect on the data prediction of item value. And some metrics can basically meet expectations. For example, **RMSSE**, which is a measure of the relative error between the predicted value and the actual value. 1.00 means that the model can reflect the changes of the time series data to a certain extent.
 
 ## Run the M5 Forecasting example
 
@@ -240,32 +264,10 @@ logger.info("0.5-quantile(Median) of the prediction windows:\n" + forecast.quant
 
 We visualize the forecast result with mean, prediction intervals, etc.
 
-![forecast_0](./src/test/resources/forecast_0.jpg)
+![m5_forecast_0](./src/test/resources/m5_forecast_0.jpg)
 
 ### Metrics
 
-For the M5 competition, we can also write our own Evaluator to estimate the **RMSSE** or other metrics in the competition.
-
-Here we compute aggregate performance metrics in the [source code](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/DeepARTimeSeries.java).
-
-```
-> [INFO ] - metric: Coverage[0.99]:	0.92
-> [INFO ] - metric: Coverage[0.67]:	0.51
-> [INFO ] - metric: abs_target_sum:	1224665.00
-> [INFO ] - metric: abs_target_mean:	10.04
-> [INFO ] - metric: NRMSE:	0.84
-> [INFO ] - metric: RMSE:	8.40
-> [INFO ] - metric: RMSSE:	1.00
-> [INFO ] - metric: abs_error:	14.47
-> [INFO ] - metric: QuantileLoss[0.67]:	18.23
-> [INFO ] - metric: QuantileLoss[0.99]:	103.07
-> [INFO ] - metric: QuantileLoss[0.50]:	9.49
-> [INFO ] - metric: QuantileLoss[0.95]:	66.69
-> [INFO ] - metric: Coverage[0.95]:	0.87
-> [INFO ] - metric: Coverage[0.50]:	0.33
-> [INFO ] - metric: MSE:	70.64
-```
-
-As you can see, our pretrained model has some effect on the data prediction of item value. And some metrics can basically meet expectations. For example, **RMSSE**, which is a measure of the relative error between the predicted value and the actual value. 1.00 means that the model can reflect the changes of the time series data to a certain extent.
+Here we compute aggregate performance metrics in the [source code](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/DeepARTimeSeries.java)
 
 Click [here]([djl/DeepARTimeSeries.java at master · deepjavalibrary/djl (github.com)](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/DeepARTimeSeries.java)) to see the **full source code**.

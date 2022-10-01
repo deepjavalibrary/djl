@@ -16,7 +16,6 @@ package ai.djl.examples.inference;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
 import ai.djl.basicdataset.tabular.utils.Feature;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -144,8 +143,7 @@ public final class DeepARTimeSeries {
             try {
                 prepare(builder);
             } catch (Exception e) {
-                throw new AssertionError(
-                        "Failed to read m5-forecast-accuracy/sales_train_evaluation.csv file.", e);
+                throw new AssertionError("Failed to read files.", e);
             }
             size = csvRecords.size();
         }
