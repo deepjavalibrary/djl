@@ -4,6 +4,15 @@ This module contains the time series model support extension with [GluonTS](http
 
 Right now, the package provides the `BaseTimeSeriesTranslator` and transform package that allows you to do inference from your pre-trained time series model.
 
+Now it contains:
+
+- Translator for preprocess and postprocess data, and also includes the corresponding data transform modules.
+- Components for building and training new probabilistic prediction models.
+- Time series data loading and processing.
+- A M5-forecast dataset.
+- Two pre-trained model.
+- A pre-built trainable model (DeepAR).
+
 ## Module structure
 
 ### Forecast
@@ -83,11 +92,115 @@ If you want to customize your own time series model translator, you can easily u
 
 See [examples](src/test/java/ai/djl/timeseries/translator/DeepARTranslatorTest.java) for more details.
 
-We plan to add the following features in the future:
+## Simple Example
 
-- a `TimeSeriesDataset`class to support creating data entry and transforming raw csv data like in TimeSeries.
-- Many time series models that can be trained in djl.
-- ......
+To demonstrate how to use the timeseries package, we trained a DeepAR model on a simple dataset and used it for prediction. This dataset contains monthly air passenger numbers from 1949 to 1960. We will train on the first 9 years of data and predict the last 36 months of data.
+
+### Define Data
+
+In order to realize the preprocessing of time series data, we define the `TimeSeriesData` as the input of the Translator, which is used to store the feature fields and perform corresponding transformations.
+
+Here we define how to get `TimeSeriesData` from the dataset.
+
+
+```java
+public static class AirPassengers {
+
+    private Path path;
+    private AirPassengerData data;
+
+    public AirPassengers(Path path) {
+        this.path = path;
+        prepare();
+    }
+
+    public TimeSeriesData get(NDManager manager) {
+        LocalDateTime start =
+            data.start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        NDArray target = manager.create(data.target);
+        TimeSeriesData ret = new TimeSeriesData(10);
+        // A TimeSeriesData must contain start time and target value.
+        ret.setStartTime(start);
+        ret.setField(FieldName.TARGET, target);
+        return ret;
+    }
+
+    /** prepare the file data */
+    private void prepare() {
+        Path filePath = path.resolve("test").resolve("data.json.gz");
+        try {
+            URL url = filePath.toUri().toURL();
+            try (GZIPInputStream is = new GZIPInputStream(url.openStream())) {
+                Reader reader = new InputStreamReader(is);
+                data =
+                    new GsonBuilder()
+                    .setDateFormat("yyyy-MM")
+                    .create()
+                    .fromJson(reader, AirPassengerData.class);
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Invalid url: " + filePath, e);
+        }
+    }
+
+    private static class AirPassengerData {
+        Date start;
+        float[] target;
+    }
+}
+```
+
+### Predict
+
+In djl we need to define `Translator` to help us with data pre- and post-processing.
+
+```java
+public static float[] predict() throws IOException, TranslateException, ModelException {
+    Map<String, Object> arguments = new ConcurrentHashMap<>();
+    	// set parameter
+        arguments.put("prediction_length", 12);
+        arguments.put("freq", "M");
+        arguments.put("use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(), false);
+        arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), false);
+        arguments.put("use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(), false);
+
+    	// build translator
+        DeepARTranslator translator = DeepARTranslator.builder(arguments).build();
+
+    	// create criteria
+        Criteria<TimeSeriesData, Forecast> criteria =
+                Criteria.builder()
+                        .setTypes(TimeSeriesData.class, Forecast.class)
+                        .optModelPath(Paths.get(modelUrl))
+                        .optTranslator(translator)
+                        .optProgress(new ProgressBar())
+                        .build();
+
+    	// load model
+        try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
+                Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
+            NDManager manager = model.getNDManager();
+
+            AirPassengers ap = new AirPassengers(Paths.get("Not implemented"));
+            TimeSeriesData data = ap.get(manager);
+
+            // prediction
+            Forecast forecast = predictor.predict(data);
+
+            return forecast.mean().toFloatArray();
+        }
+}
+
+```
+### Visualize
+
+![simple_forecast](./src/test/resources/simple_forecast.png)
+
+Note that the prediction results are displayed in the form of probability distributions, and the shaded areas represent different prediction intervals.
+
+Since djl doesn't support drawing yet, you can find our script for visualization [here]([README.md (github.com)](https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008)).
+
+The **full source code** for this example is available [here](../../examples/src/main/java/ai/djl/examples/inference/TimeSeriesAirPassengers.java)
 
 ## Documentation
 

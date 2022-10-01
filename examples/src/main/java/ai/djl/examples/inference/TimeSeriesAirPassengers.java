@@ -24,19 +24,22 @@ import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.SampleForecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
-
 import ai.djl.timeseries.translator.DeepARTranslator;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+
 import com.google.gson.GsonBuilder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -45,11 +48,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.zip.GZIPInputStream;
 
-public class TimeSeriesAirPassengers {
+public final class TimeSeriesAirPassengers {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeSeriesAirPassengers.class);
+
+    private TimeSeriesAirPassengers() {}
 
     public static void main(String[] args) throws IOException, TranslateException, ModelException {
         float[] results = predict();
@@ -57,7 +61,6 @@ public class TimeSeriesAirPassengers {
     }
 
     public static float[] predict() throws IOException, TranslateException, ModelException {
-        String modelUrl = "Not implemented";
 
         Map<String, Object> arguments = new ConcurrentHashMap<>();
         arguments.put("prediction_length", 12);
@@ -69,20 +72,20 @@ public class TimeSeriesAirPassengers {
         DeepARTranslator translator = DeepARTranslator.builder(arguments).build();
 
         Criteria<TimeSeriesData, Forecast> criteria =
-            Criteria.builder()
-                .setTypes(TimeSeriesData.class, Forecast.class)
-                .optModelPath(Paths.get(modelUrl))
-                .optTranslator(translator)
-                .optProgress(new ProgressBar())
-                .build();
+                Criteria.builder()
+                        .setTypes(TimeSeriesData.class, Forecast.class)
+                        .optFilter("backbone", "deepar")
+                        .optFilter("dataset", "airpassengers")
+                        .optTranslator(translator)
+                        .optProgress(new ProgressBar())
+                        .build();
 
         try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
-             Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
+                Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
             NDManager manager = model.getNDManager();
 
-            AirPassengers ap =
-                new AirPassengers(
-                    Paths.get("Not implemented"));
+            Path dataFile = Paths.get("src/test/resources/air_passengers.json");
+            AirPassengers ap = new AirPassengers(dataFile);
             TimeSeriesData data = ap.get(manager);
 
             // save data for plotting
@@ -92,10 +95,18 @@ public class TimeSeriesAirPassengers {
 
             Forecast forecast = predictor.predict(data);
 
+            // save data for plotting. Please see the corresponding python script from
+            // https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008
             NDArray samples = ((SampleForecast) forecast).getSortedSamples();
             samples.setName("samples");
             saveNDArray(samples, Paths.get("./samples.zip"));
             return forecast.mean().toFloatArray();
+        }
+    }
+
+    public static void saveNDArray(NDArray array, Path path) throws IOException {
+        try (OutputStream os = Files.newOutputStream(path)) {
+            new NDList(new NDList(array)).encode(os, true);
         }
     }
 
@@ -116,17 +127,14 @@ public class TimeSeriesAirPassengers {
             TimeSeriesData ret = new TimeSeriesData(10);
             ret.setStartTime(start);
             ret.setField(FieldName.TARGET, target);
-            System.out.println(start);
-            System.out.println(target.toDebugString(10000, 10000, 10000, 10000));
             return ret;
         }
 
         private void prepare() {
-            Path filePath = path.resolve("test").resolve("data.json.gz");
             try {
-                URL url = filePath.toUri().toURL();
-                try (GZIPInputStream is = new GZIPInputStream(url.openStream())) {
-                    Reader reader = new InputStreamReader(is);
+                URL url = path.toUri().toURL();
+                try (Reader reader =
+                        new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
                     data =
                             new GsonBuilder()
                                     .setDateFormat("yyyy-MM")
@@ -134,19 +142,13 @@ public class TimeSeriesAirPassengers {
                                     .fromJson(reader, AirPassengerData.class);
                 }
             } catch (IOException e) {
-                throw new IllegalArgumentException("Invalid url: " + filePath, e);
+                throw new IllegalArgumentException("Invalid url: " + path, e);
             }
         }
 
         private static class AirPassengerData {
             Date start;
             float[] target;
-        }
-    }
-
-    public static void saveNDArray(NDArray array, Path path) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(path.toFile())) {
-            new NDList(new NDList(array)).encode(fos, true);
         }
     }
 }
