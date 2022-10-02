@@ -67,6 +67,7 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         this.bundle = bundle;
         graphHandle = bundle.getGraph();
         sessionHandle = bundle.getSession();
+        targetOpHandles = bundle.getTargetOpHandles();
         MetaGraphDef metaGraphDef = bundle.getMetaGraphDef();
         Map<String, SignatureDef> signatureDefMap = metaGraphDef.getSignatureDefMap();
         if (signatureDefMap.containsKey(signatureDefKey)) {
@@ -89,8 +90,6 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         }
         describeInput();
         describeOutput();
-        // we don't use target for now
-        targetOpHandles = new TF_Operation[0];
     }
 
     /** {@inheritDoc} */
@@ -215,10 +214,6 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             for (String key : keys) {
                 TensorInfo tensorInfo = outputsMap.get(key);
                 TensorShapeProto shapeProto = tensorInfo.getTensorShape();
-                // does not support string tensors
-                if (tensorInfo.getDtype() == org.tensorflow.proto.framework.DataType.DT_STRING) {
-                    continue;
-                }
                 outputDescriptions.add(
                         key,
                         new Shape(

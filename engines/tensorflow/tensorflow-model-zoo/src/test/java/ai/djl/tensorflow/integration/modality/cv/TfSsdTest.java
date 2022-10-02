@@ -19,11 +19,16 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
 
@@ -59,14 +64,21 @@ public class TfSsdTest {
                 Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
             Assert.assertEquals(model.describeInput().get(0).getValue(), new Shape(-1, -1, -1, 3));
             for (Pair<String, Shape> pair : model.describeOutput()) {
-                if (pair.getKey().contains("label")) {
-                    Assert.assertEquals(pair.getValue(), new Shape(-1, 1));
-                } else if (pair.getKey().contains("box")) {
-                    Assert.assertEquals(pair.getValue(), new Shape(-1, 4));
-                } else if (pair.getKey().contains("score")) {
-                    Assert.assertEquals(pair.getValue(), new Shape(-1, 1));
-                } else {
-                    throw new IllegalStateException("Unexpected output name:" + pair.getKey());
+                switch (pair.getKey()) {
+                    case "box":
+                    case "detection_boxes":
+                        Assert.assertEquals(pair.getValue(), new Shape(-1, 4));
+                        break;
+                    case "label":
+                    case "score":
+                    case "detection_class_entities":
+                    case "detection_class_labels":
+                    case "detection_class_names":
+                    case "detection_scores":
+                        Assert.assertEquals(pair.getValue(), new Shape(-1, 1));
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected output name: " + pair.getKey());
                 }
             }
 
@@ -79,6 +91,32 @@ public class TfSsdTest {
             Assert.assertTrue(classes.contains("Bicycle"));
             Assert.assertTrue(classes.contains("Car"));
             saveBoundingBoxImage(img, result);
+        }
+    }
+
+    @Test
+    public void testStringInputOutput() throws IOException, ModelException, TranslateException {
+        TestRequirements.notArm();
+
+        Criteria<NDList, NDList> criteria =
+                Criteria.builder()
+                        .optApplication(Application.CV.OBJECT_DETECTION)
+                        .setTypes(NDList.class, NDList.class)
+                        .optArtifactId("ssd")
+                        .optFilter("backbone", "mobilenet_v2")
+                        .optEngine("TensorFlow")
+                        .optProgress(new ProgressBar())
+                        .optTranslator(new NoopTranslator())
+                        .build();
+
+        try (ZooModel<NDList, NDList> model = criteria.loadModel();
+                Predictor<NDList, NDList> predictor = model.newPredictor();
+                NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.zeros(new Shape(1, 224, 224, 3));
+            NDList output = predictor.predict(new NDList(array));
+            Assert.assertEquals(output.size(), 5);
+            NDArray entities = output.get("detection_class_entities");
+            Assert.assertEquals(entities.getDataType(), DataType.STRING);
         }
     }
 
