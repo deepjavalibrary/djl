@@ -215,10 +215,6 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             for (String key : keys) {
                 TensorInfo tensorInfo = outputsMap.get(key);
                 TensorShapeProto shapeProto = tensorInfo.getTensorShape();
-                // does not support string tensors
-                if (tensorInfo.getDtype() == org.tensorflow.proto.framework.DataType.DT_STRING) {
-                    continue;
-                }
                 outputDescriptions.add(
                         key,
                         new Shape(
