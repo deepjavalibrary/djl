@@ -68,7 +68,7 @@ public class TabNetTest {
         try (Model model = Model.newInstance("tabNet")) {
             model.setBlock(tabNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 1;
+                int batchSize = 32;
                 Shape inputShape = new Shape(batchSize, 128);
                 trainer.initialize(inputShape);
                 NDManager manager = trainer.getManager();
@@ -89,7 +89,7 @@ public class TabNetTest {
                 trainer.step();
                 // the gamma of batchNorm Layer
                 Assert.assertEquals(
-                        parameters.get(0).getValue().getArray().getShape(), new Shape(1));
+                        parameters.get(0).getValue().getArray().getShape(), new Shape(128));
 
                 // weight of shared fullyConnected Block0
                 Assert.assertEquals(

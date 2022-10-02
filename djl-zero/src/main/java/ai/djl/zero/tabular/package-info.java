@@ -11,8 +11,5 @@
  * and limitations under the License.
  */
 
-/**
- * Contains classes for the tabular section ({@link ai.djl.Application.Tabular}) of the {@link
- * ai.djl.basicmodelzoo.BasicModelZoo}.
- */
-package ai.djl.basicmodelzoo.tabular;
+/** Contains training for Tabular({@link ai.djl.Application.Tabular}) tasks. */
+package ai.djl.zero.tabular;
