@@ -29,7 +29,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.loss.TabNetLoss;
+import ai.djl.training.loss.TabNetRegressionLoss;
 import ai.djl.translate.Batchifier;
 import ai.djl.util.PairList;
 
@@ -61,7 +61,7 @@ public class TabNetTest {
     @Test
     public void testTrainingAndLogic() {
         TrainingConfig config =
-                new DefaultTrainingConfig(new TabNetLoss())
+                new DefaultTrainingConfig(new TabNetRegressionLoss())
                         .optDevices(Engine.getInstance().getDevices(2));
 
         Block tabNet = TabNet.builder().setOutDim(10).build();

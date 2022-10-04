@@ -16,24 +16,24 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 
 /**
- * Calculates the loss for tabNet. I set the loss as the combination of L2Loss and sparseLoss
- * together for airfoil dateset. If the output of tabNet should be classification and so on, the
- * loss should set as softmaxLoss. Actually, tabNet is not only used for Supervised Learning, it's
- * also widely used in unsupervised learning. For unsupervised learning, it should come from the
- * decoder(aka attentionTransformer of tabNet)
+ * Calculates the loss of tabNet for regression tasks.
+ *
+ * <p>Actually, tabNet is not only used for Supervised Learning, it's also widely used in
+ * unsupervised learning. For unsupervised learning, it should come from the decoder(aka
+ * attentionTransformer of tabNet)
  */
-public class TabNetLoss extends Loss {
-    /** Calculates the loss of a TabNet instance. */
-    public TabNetLoss() {
-        this("TabNetLoss");
+public class TabNetRegressionLoss extends Loss {
+    /** Calculates the loss of a TabNet instance for regression tasks. */
+    public TabNetRegressionLoss() {
+        this("TabNetRegressionLoss");
     }
 
     /**
-     * Calculates the loss of a TabNet instance.
+     * Calculates the loss of a TabNet instance for regression tasks.
      *
      * @param name the name of the loss function
      */
-    public TabNetLoss(String name) {
+    public TabNetRegressionLoss(String name) {
         super(name);
     }
 

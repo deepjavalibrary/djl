@@ -25,8 +25,10 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.listener.TrainingListener;
-import ai.djl.training.loss.TabNetLoss;
+import ai.djl.training.loss.TabNetRegressionLoss;
+import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
+import ai.djl.zero.Performance;
 
 import java.io.IOException;
 
@@ -34,32 +36,55 @@ import java.io.IOException;
 public final class Tabular {
 
     private Tabular() {}
+
     /**
-     * Trains a TabNet model on a custom dataset.
+     * Trains a Model on a custom dataset. Currently, trains a TabNet Model.
      *
      * <p>In order to train on a custom dataset, you must create a custom {@link TabularDataset} to
      * load your data.
      *
      * @param dataset the data to train with
-     * @param featureSize the size of input features from dataset
-     * @param labelSize the size of labels from dataset
+     * @param performance to determine the desired model tradeoffs
      * @return the model as a {@link ZooModel}
      * @throws IOException if the dataset could not be loaded
      * @throws TranslateException if the translator has errors
      */
-    public static ZooModel<NDList, NDList> train(
-            TabularDataset dataset, int featureSize, int labelSize)
+    public static ZooModel<NDList, NDList> train(TabularDataset dataset, Performance performance)
             throws IOException, TranslateException {
         Dataset[] splitDataset = dataset.randomSplit(8, 2);
         Dataset trainDataset = splitDataset[0];
         Dataset validateDataset = splitDataset[1];
-        Block tabNet = TabNet.builder().setInputDim(featureSize).setOutDim(labelSize).build();
+        int featureSize = dataset.getFeatureSize();
+        int labelSize = dataset.getLabelSize();
+
+        Block block;
+        if (performance.equals(Performance.FAST)) {
+            // for fast cases, we set the number of independent layers and shared layers lower
+            block =
+                    TabNet.builder()
+                            .setInputDim(featureSize)
+                            .setOutDim(labelSize)
+                            .optNumIndependent(1)
+                            .optNumShared(1)
+                            .build();
+        } else if (performance.equals(Performance.BALANCED)) {
+            block = TabNet.builder().setInputDim(featureSize).setOutDim(labelSize).build();
+        } else {
+            // for accurate cases, we set the number of independent layers and shared layers higher
+            block =
+                    TabNet.builder()
+                            .setInputDim(featureSize)
+                            .setOutDim(labelSize)
+                            .optNumIndependent(4)
+                            .optNumShared(4)
+                            .build();
+        }
 
         Model model = Model.newInstance("tabular");
-        model.setBlock(tabNet);
+        model.setBlock(block);
 
         TrainingConfig trainingConfig =
-                new DefaultTrainingConfig(new TabNetLoss())
+                new DefaultTrainingConfig(new TabNetRegressionLoss())
                         .addTrainingListeners(TrainingListener.Defaults.basic());
 
         try (Trainer trainer = model.newTrainer(trainingConfig)) {
@@ -67,6 +92,6 @@ public final class Tabular {
             EasyTrain.fit(trainer, 20, trainDataset, validateDataset);
         }
 
-        return new ZooModel<>(model, null);
+        return new ZooModel<>(model, new NoopTranslator());
     }
 }
