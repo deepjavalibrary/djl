@@ -16,29 +16,36 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 
 /**
- * Calculates the loss for tabNet. Actually, loss has been calculated through the forward function
- * of tabNet. What's done here is just getting the loss function from prediction.
+ * Calculates the loss of tabNet for regression tasks.
+ *
+ * <p>Actually, tabNet is not only used for Supervised Learning, it's also widely used in
+ * unsupervised learning. For unsupervised learning, it should come from the decoder(aka
+ * attentionTransformer of tabNet)
  */
-public class TabNetLoss extends Loss {
-    /** Calculates the loss of a TabNet instance. */
-    public TabNetLoss() {
-        this("TabNetLoss");
+public class TabNetRegressionLoss extends Loss {
+    /** Calculates the loss of a TabNet instance for regression tasks. */
+    public TabNetRegressionLoss() {
+        this("TabNetRegressionLoss");
     }
 
     /**
-     * Calculates the loss of a TabNet instance.
+     * Calculates the loss of a TabNet instance for regression tasks.
      *
      * @param name the name of the loss function
      */
-    public TabNetLoss(String name) {
+    public TabNetRegressionLoss(String name) {
         super(name);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray evaluate(NDList labels, NDList predictions) {
-        // loss is already calculated inside the forward of tabNet
+        // sparseLoss is already calculated inside the forward of tabNet
         // so here we just need to get it out from prediction
-        return predictions.get(1);
+        return labels.singletonOrThrow()
+                .sub(predictions.get(0))
+                .square()
+                .mean()
+                .add(predictions.get(1));
     }
 }

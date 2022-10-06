@@ -29,7 +29,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
-import ai.djl.training.loss.TabNetLoss;
+import ai.djl.training.loss.TabNetRegressionLoss;
 import ai.djl.translate.Batchifier;
 import ai.djl.util.PairList;
 
@@ -61,14 +61,14 @@ public class TabNetTest {
     @Test
     public void testTrainingAndLogic() {
         TrainingConfig config =
-                new DefaultTrainingConfig(new TabNetLoss())
+                new DefaultTrainingConfig(new TabNetRegressionLoss())
                         .optDevices(Engine.getInstance().getDevices(2));
 
         Block tabNet = TabNet.builder().setOutDim(10).build();
         try (Model model = Model.newInstance("tabNet")) {
             model.setBlock(tabNet);
             try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = 1;
+                int batchSize = 32;
                 Shape inputShape = new Shape(batchSize, 128);
                 trainer.initialize(inputShape);
                 NDManager manager = trainer.getManager();
@@ -89,7 +89,7 @@ public class TabNetTest {
                 trainer.step();
                 // the gamma of batchNorm Layer
                 Assert.assertEquals(
-                        parameters.get(0).getValue().getArray().getShape(), new Shape(1));
+                        parameters.get(0).getValue().getArray().getShape(), new Shape(128));
 
                 // weight of shared fullyConnected Block0
                 Assert.assertEquals(

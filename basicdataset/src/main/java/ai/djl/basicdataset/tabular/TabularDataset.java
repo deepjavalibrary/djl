@@ -46,6 +46,24 @@ public abstract class TabularDataset extends RandomAccessDataset {
         labels = builder.labels;
     }
 
+    /**
+     * Gets the feature size of current {@link TabularDataset}.
+     *
+     * @return the feature size
+     */
+    public int getFeatureSize() {
+        return features.size();
+    }
+
+    /**
+     * Gets the label size of current {@link TabularDataset}.
+     *
+     * @return the feature size
+     */
+    public int getLabelSize() {
+        return labels.size();
+    }
+
     /** {@inheritDoc} */
     @Override
     public Record get(NDManager manager, long index) {

@@ -69,10 +69,7 @@ public final class TabNet extends AbstractBlock {
         batchNorm =
                 addChildBlock(
                         "batchNorm",
-                        BatchNorm.builder()
-                                .optAxis(0)
-                                .optMomentum(builder.batchNormMomentum)
-                                .build());
+                        BatchNorm.builder().optMomentum(builder.batchNormMomentum).build());
         List<Block> sharedBlocks = new ArrayList<>();
         for (int i = 0; i < builder.numShared; i++) {
             sharedBlocks.add(
@@ -169,7 +166,6 @@ public final class TabNet extends AbstractBlock {
         featureBlock
                 .add(
                         GhostBatchNorm.builder()
-                                .optAxis(0)
                                 .optVirtualBatchSize(virtualBatchSize)
                                 .optMomentum(batchNormMomentum)
                                 .build())
@@ -237,6 +233,7 @@ public final class TabNet extends AbstractBlock {
             PairList<String, Object> params) {
         NDManager manager = inputs.getManager();
         NDArray input = inputs.singletonOrThrow();
+        input = input.reshape(input.size(0), input.size() / input.size(0)); // batch flatten
         NDArray x =
                 batchNorm.forward(parameterStore, new NDList(input), training).singletonOrThrow();
         NDArray xa =
@@ -347,11 +344,10 @@ public final class TabNet extends AbstractBlock {
                     addChildBlock(
                             "ghostBatchNorm",
                             GhostBatchNorm.builder()
-                                    .optAxis(0)
                                     .optVirtualBatchSize(virtualBatchSize)
                                     .optMomentum(batchNormMomentum)
                                     .build());
-            sparseMax = addChildBlock("sparseMax", new SparseMax(-1, 8));
+            sparseMax = addChildBlock("sparseMax", new SparseMax());
         }
 
         /** {@inheritDoc} */
