@@ -99,4 +99,13 @@ public class OpenCVImageFactory extends ImageFactory {
         Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2BGR);
         return new OpenCVImage(img);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public Image fromArray(int[] pixels, int width, int height) {
+        Mat img = new Mat(height, width, CvType.CV_8UC3);
+        img.put(0, 0, pixels);
+        Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2BGR);
+        return new OpenCVImage(img);
+    }
 }

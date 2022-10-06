@@ -138,4 +138,14 @@ public abstract class ImageFactory {
      * @return {@link Image}
      */
     public abstract Image fromNDArray(NDArray array);
+
+    /**
+     * Gets {@link Image} from array.
+     *
+     * @param pixels Array of RGB values used to initialize the pixels.
+     * @param width The width of the image
+     * @param height The height of the image
+     * @return {@link Image}
+     */
+    public abstract Image fromArray(int[] pixels, int width, int height);
 }

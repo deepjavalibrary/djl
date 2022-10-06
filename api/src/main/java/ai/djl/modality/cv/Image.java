@@ -50,6 +50,15 @@ public interface Image {
     Object getWrappedImage();
 
     /**
+     * Creates a new resized image.
+     *
+     * @param w The new image's desired width.
+     * @param h The new image's desired height.
+     * @return The new resized image.
+     */
+    Image resize(int w, int h);
+
+    /**
      * Gets the subimage defined by a specified rectangular region.
      *
      * @param x the X coordinate of the upper-left corner of the specified rectangular region
@@ -115,6 +124,20 @@ public interface Image {
      * @param joints the joints of the body
      */
     void drawJoints(Joints joints);
+
+    /**
+     * Draws the overlay on the image.
+     *
+     * @param overlay the overlay image
+     */
+    void drawOverlay(Image overlay);
+
+    /**
+     * Set the background of the image.
+     *
+     * @param background the background image
+     */
+    void setBackground(Image background);
 
     /** Flag indicates the color channel options for images. */
     enum Flag {

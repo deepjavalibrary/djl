@@ -81,6 +81,14 @@ class OpenCVImage implements Image {
 
     /** {@inheritDoc} */
     @Override
+    public Image resize(int w, int h) {
+        Mat resized = new Mat();
+        Imgproc.resize(image, resized, new Size(w, h));
+        return new OpenCVImage(resized);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Image getSubImage(int x, int y, int w, int h) {
         Mat mat = image.submat(new Rect(x, y, w, h));
         return new OpenCVImage(mat);
@@ -184,6 +192,14 @@ class OpenCVImage implements Image {
             Imgproc.circle(image, point, 6, color, -1, Imgproc.LINE_AA);
         }
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public void drawOverlay(Image overlay) {}
+
+    /** {@inheritDoc} */
+    @Override
+    public void setBackground(Image background) {}
 
     /** {@inheritDoc} */
     @Override

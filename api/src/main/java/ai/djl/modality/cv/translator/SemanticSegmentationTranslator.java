@@ -13,7 +13,7 @@
 package ai.djl.modality.cv.translator;
 
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.output.Segmentation;
+import ai.djl.modality.cv.output.CategoryMask;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A {@link Translator} that post-process the {@link Image} into {@link Segmentation} with output
+ * A {@link Translator} that post-process the {@link Image} into {@link CategoryMask} with output
  * mask representing the class that each pixel in the original image belong to.
  */
-public class SemanticSegmentationTranslator extends BaseImageTranslator<Segmentation> {
+public class SemanticSegmentationTranslator extends BaseImageTranslator<CategoryMask> {
 
     private SynsetLoader synsetLoader;
     private final int shortEdge;
@@ -69,13 +69,13 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Segmenta
 
     /** {@inheritDoc} */
     @Override
-    public Segmentation processOutput(TranslatorContext ctx, NDList list) {
+    public CategoryMask processOutput(TranslatorContext ctx, NDList list) {
         // scores contains the probabilities of each pixel being a certain object
         float[] scores = list.get(1).toFloatArray();
         Shape shape = list.get(1).getShape();
         int width = (int) shape.get(2);
         int height = (int) shape.get(1);
-        int[][] mask = new int[width][height];
+        int[][] mask = new int[height][width];
 
         int imageSize = width * height;
 
@@ -94,10 +94,10 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Segmenta
                         maxi = i;
                     }
                 }
-                mask[w][h] = maxi;
+                mask[h][w] = maxi;
             }
         }
-        return new Segmentation(classes, mask);
+        return new CategoryMask(classes, mask);
     }
 
     /**

@@ -127,6 +127,14 @@ public class BufferedImageFactory extends ImageFactory {
         return new BufferedImageWrapper(image);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Image fromArray(int[] pixels, int width, int height) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        image.setRGB(0, 0, width, height, pixels, 0, width);
+        return new BufferedImageWrapper(image);
+    }
+
     protected void save(BufferedImage image, OutputStream os, String type) throws IOException {
         ImageIO.write(image, type, os);
     }
@@ -155,6 +163,17 @@ public class BufferedImageFactory extends ImageFactory {
         @Override
         public Object getWrappedImage() {
             return image;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Image resize(int w, int h) {
+            java.awt.Image img = image.getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH);
+            BufferedImage scaled = new BufferedImage(w, h, image.getType());
+            Graphics2D g2d = scaled.createGraphics();
+            g2d.drawImage(img, 0, 0, null);
+            g2d.dispose();
+            return new BufferedImageWrapper(scaled);
         }
 
         /** {@inheritDoc} */
@@ -306,6 +325,42 @@ public class BufferedImageFactory extends ImageFactory {
                 g.fillOval(x, y, 10, 10);
             }
             g.dispose();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void drawOverlay(Image overlay) {
+            if (!(overlay.getWrappedImage() instanceof BufferedImage)) {
+                throw new IllegalArgumentException("Only BufferedImage allowed");
+            }
+            BufferedImage overlayImg =
+                    (BufferedImage) overlay.resize(image.getWidth(), getHeight()).getWrappedImage();
+            BufferedImage target =
+                    new BufferedImage(
+                            image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = (Graphics2D) target.getGraphics();
+            g.drawImage(image, 0, 0, null);
+            g.drawImage(overlayImg, 0, 0, null);
+            g.dispose();
+            image = target;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void setBackground(Image background) {
+            if (!(background.getWrappedImage() instanceof BufferedImage)) {
+                throw new IllegalArgumentException("Only BufferedImage allowed");
+            }
+            BufferedImage backgroundImg =
+                    (BufferedImage)
+                            background.resize(background.getWidth(), getHeight()).getWrappedImage();
+            BufferedImage target =
+                    new BufferedImage(
+                            image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = (Graphics2D) target.getGraphics();
+            g.drawImage(backgroundImg, 0, 0, null);
+            g.dispose();
+            image = target;
         }
 
         private Color randomColor() {
