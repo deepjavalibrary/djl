@@ -87,7 +87,7 @@ public final class TrainPikachu {
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
 
-                Shape inputShape = new Shape(1, 3, 256, 256);
+                Shape inputShape = new Shape(arguments.getBatchSize(), 3, 256, 256);
                 trainer.initialize(inputShape);
 
                 EasyTrain.fit(trainer, arguments.getEpoch(), trainingSet, validateSet);

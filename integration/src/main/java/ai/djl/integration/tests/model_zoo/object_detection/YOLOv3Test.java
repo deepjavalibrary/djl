@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.testing.Assertions;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
@@ -29,9 +30,11 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
+import ai.djl.training.loss.YOLOv3Loss;
 import ai.djl.translate.Batchifier;
 import ai.djl.util.PairList;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class YOLOv3Test {
@@ -71,12 +74,12 @@ public class YOLOv3Test {
                 NDArray expectedAtIndex6 =
                         manager.ones(new Shape(64, 32, 3, 3)); // 64*32*3*3 for second layer
                 NDArray expectedAtIndex120 =
-                        manager.ones(
-                                new Shape(
-                                        128, 256, 1, 1)); // 128*256*1*1  for pointWiseLayer at last
+                        manager.ones(new Shape(128, 256, 1, 1)); // 128*256*1*1  for 20th layer
                 NDArray expectedLinear =
                         manager.ones(
-                                new Shape(10, 1024)); // outSize = 10, AvgPoolSize should be 10*1024
+                                new Shape(
+                                        10,
+                                        1024)); // outSize = 10, linear layer size should be 10*1024
 
                 // test if the shape of the kernel sizes are right
                 Assertions.assertAlmostEquals(
@@ -87,6 +90,63 @@ public class YOLOv3Test {
                         parameters.get(120).getValue().getArray(), expectedAtIndex120);
                 Assertions.assertAlmostEquals(
                         parameters.get(312).getValue().getArray(), expectedLinear);
+            }
+        }
+    }
+
+    @Test
+    public void testYoloV3() {
+        TestRequirements.engine("PyTorch");
+
+        float[] anchorsArray = YOLOv3Loss.getPresetAnchors();
+        for (int i = 0; i < anchorsArray.length; i++) {
+            anchorsArray[i] = anchorsArray[i] * 256 / 416; // reshaping into the
+        }
+        TrainingConfig config =
+                new DefaultTrainingConfig(
+                                YOLOv3Loss.builder()
+                                        .setNumClasses(1)
+                                        .setInputShape(new Shape(256, 256))
+                                        .setAnchorsArray(anchorsArray)
+                                        .build())
+                        .optDevices(Engine.getInstance().getDevices(2))
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+
+        Block yolov3 = YOLOV3.builder().setNumClasses(1).build();
+        try (Model model = Model.newInstance("yolov3")) {
+            model.setBlock(yolov3);
+            try (Trainer trainer = model.newTrainer(config)) {
+                int batchSize = 4;
+                Shape inputShape = new Shape(batchSize, 3, 256, 256);
+                trainer.initialize(inputShape);
+                NDManager manager = trainer.getManager();
+                NDArray input = manager.ones(inputShape);
+                NDArray label = manager.zeros(new Shape(batchSize, 1, 5));
+                Batch batch =
+                        new Batch(
+                                manager.newSubManager(),
+                                new NDList(input),
+                                new NDList(label),
+                                batchSize,
+                                Batchifier.STACK,
+                                Batchifier.STACK,
+                                0,
+                                0);
+                PairList<String, Parameter> parameters = yolov3.getParameters();
+                EasyTrain.trainBatch(trainer, batch);
+                trainer.step();
+
+                // expected shapes
+                Shape expectedAtIndex312 =
+                        new Shape(512, 1024, 1, 1); // the layer where output0 concat to 1
+                Shape expectedAtIndex330 =
+                        new Shape(1024, 512, 3, 3); // the layer where output1 concat to 2
+
+                // test if the shape of the kernel sizes are right
+                Assert.assertEquals(
+                        parameters.get(312).getValue().getArray().getShape(), expectedAtIndex312);
+                Assert.assertEquals(
+                        parameters.get(330).getValue().getArray().getShape(), expectedAtIndex330);
             }
         }
     }

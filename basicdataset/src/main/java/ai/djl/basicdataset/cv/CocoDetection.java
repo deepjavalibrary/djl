@@ -52,7 +52,6 @@ public class CocoDetection extends ObjectDetectionDataset {
     private Usage usage;
     private List<Path> imagePaths;
     private List<PairList<Long, Rectangle>> labels;
-    private List<String> synset;
     private MRL mrl;
     private boolean prepared;
 
@@ -62,7 +61,6 @@ public class CocoDetection extends ObjectDetectionDataset {
         mrl = builder.getMrl();
         imagePaths = new ArrayList<>();
         labels = new ArrayList<>();
-        synset = new ArrayList<>();
     }
 
     /**
@@ -83,7 +81,8 @@ public class CocoDetection extends ObjectDetectionDataset {
     /** {@inheritDoc} */
     @Override
     public List<String> getClasses() {
-        return synset;
+        throw new UnsupportedOperationException(
+                "getClasses() for CocoDetection has not been implemented yet.");
     }
 
     /** {@inheritDoc} */
