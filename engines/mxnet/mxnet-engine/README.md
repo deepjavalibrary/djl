@@ -73,11 +73,11 @@ installed on your GPU machine, you can use one of the following library:
 **Important:** Since cuda 11.0, you must install CUDNN and NCCL matches the CUDA version manually.
 Apache MXNet no longer statically link CUDNN and NCCL in it.
 
-Apache MXNet 1.8.0 cu110 package supports SM 5.0, 6.0, 7.0 and 8.0 cuda architectures.
-Apache MXNet 1.8.0 cu102 package supports SM 3.0, 5.0, 6.0, 7.0 and 7.5 cuda architectures.
+Apache MXNet 1.9.1 cu112 package supports SM 5.0, 6.0, 7.0 and 8.0 cuda architectures.
+Apache MXNet 1.9.1 cu102 package supports SM 3.0, 5.0, 6.0, 7.0 and 7.5 cuda architectures.
 
-- ai.djl.mxnet:mxnet-native-cu102mkl:1.9.1:linux-x86_64 - CUDA 11.2
-- ai.djl.mxnet:mxnet-native-cu101mkl:1.9.1:linux-x86_64 - CUDA 10.2
+- ai.djl.mxnet:mxnet-native-cu112mkl:1.9.1:linux-x86_64 - CUDA 11.2
+- ai.djl.mxnet:mxnet-native-cu102mkl:1.9.1:linux-x86_64 - CUDA 10.2
 
 ```xml
 <dependency>
