@@ -90,6 +90,12 @@ public class BananaDetection extends ObjectDetectionDataset {
 
     /** {@inheritDoc} */
     @Override
+    public List<String> getClasses() {
+        return Collections.singletonList("banana");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     protected long availableSize() {
         return imagePaths.size();
     }

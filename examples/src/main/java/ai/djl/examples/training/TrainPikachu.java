@@ -134,7 +134,7 @@ public final class TrainPikachu {
                         .optUsage(usage)
                         .optLimit(arguments.getLimit())
                         .optPipeline(pipeline)
-                        .setSampling(arguments.getBatchSize(), true)
+                        .setSampling(1, true)
                         .build();
         pikachuDetection.prepare(new ProgressBar());
 
