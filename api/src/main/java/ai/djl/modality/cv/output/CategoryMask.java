@@ -117,13 +117,20 @@ public class CategoryMask implements JsonSerializable {
      * @param transparency the transparency of the overlay
      * @param background replace the background with specified image
      */
-    public void drawMask(Image image, int transparency, Image background) {
-        int[] colors = generateColors(0, transparency);
-        Image colorOverlay = getColorOverlay(colors);
-        Image maskImage = image.getMask(mask);
-        image.drawImage(background, true);
-        image.drawImage(maskImage, true);
-        image.drawImage(colorOverlay, true);
+    public Image getMaskImage(Image image) {
+        return image.getMask(mask);
+    }
+
+    /**
+     * Highlights the detected object on the image with random colors.
+     *
+     * @param image the original image
+     * @param transparency the transparency of the overlay
+     * @param background replace the background with specified image
+     */
+    public Image getBackgroundImage(Image image) {
+        int[][] bg = new int[][];
+        return image.getMask(mask);
     }
 
     /**

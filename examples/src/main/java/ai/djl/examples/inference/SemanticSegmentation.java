@@ -81,8 +81,18 @@ public final class SemanticSegmentation {
         try (ZooModel<Image, CategoryMask> model = criteria.loadModel();
                 Predictor<Image, CategoryMask> predictor = model.newPredictor()) {
             CategoryMask mask = predictor.predict(img);
-            mask.drawMask(img, 180, bg);
-            saveSemanticImage(img);
+            /*
+             1. pure color
+             2. highlight all objects
+             3. highlight dog only
+             4. remove bg -> getMaskImage
+             5. replace bg
+             */
+
+            Image maskImage = mask.getMaskImage(img);
+            bg = bg.resize(img.getWidth(), img.getHeight(), true);
+            bg.drawImage(maskImage, true);
+            saveSemanticImage(bg);
         }
     }
 
