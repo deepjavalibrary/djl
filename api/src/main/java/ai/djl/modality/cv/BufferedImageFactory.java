@@ -129,8 +129,8 @@ public class BufferedImageFactory extends ImageFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Image fromArray(int[] pixels, int width, int height) {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    public Image fromPixels(int[] pixels, int width, int height) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         image.setRGB(0, 0, width, height, pixels, 0, width);
         return new BufferedImageWrapper(image);
     }
@@ -167,9 +167,14 @@ public class BufferedImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
-        public Image resize(int w, int h) {
-            java.awt.Image img = image.getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH);
-            BufferedImage scaled = new BufferedImage(w, h, image.getType());
+        public Image resize(int width, int height, boolean copy) {
+            if (!copy && image.getWidth() == width && image.getHeight() == height) {
+                return this;
+            }
+
+            java.awt.Image img =
+                    image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+            BufferedImage scaled = new BufferedImage(width, height, image.getType());
             Graphics2D g2d = scaled.createGraphics();
             g2d.drawImage(img, 0, 0, null);
             g2d.dispose();
@@ -191,6 +196,24 @@ public class BufferedImageFactory extends ImageFactory {
             byte[] biData = ((DataBufferByte) copy.getRaster().getDataBuffer()).getData();
             System.arraycopy(sourceData, 0, biData, 0, sourceData.length);
             return new BufferedImageWrapper(copy);
+        }
+
+        public Image getMask(int[][] mask) {
+            int w = mask[0].length;
+            int h = mask.length;
+            Image resized = resize(w, h, true);
+            BufferedImage img = (BufferedImage) resized.getWrappedImage();
+            int[] pixels = new int[w * h];
+            int index = 0;
+            for (int y = 0; y < h; ++y) {
+                for (int x = 0; x < w; ++x) {
+                    if (mask[y][x] != 0) {
+                        pixels[index] = img.getRGB(x, y);
+                    }
+                    index++;
+                }
+            }
+            return fromPixels(pixels, w, h);
         }
 
         private void convertIdNeeded() {
@@ -329,36 +352,18 @@ public class BufferedImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
-        public void drawOverlay(Image overlay) {
+        public void drawImage(Image overlay, boolean resize) {
             if (!(overlay.getWrappedImage() instanceof BufferedImage)) {
                 throw new IllegalArgumentException("Only BufferedImage allowed");
             }
-            BufferedImage overlayImg =
-                    (BufferedImage) overlay.resize(image.getWidth(), getHeight()).getWrappedImage();
+            if (resize) {
+                overlay = overlay.resize(getWidth(), getHeight(), false);
+            }
             BufferedImage target =
-                    new BufferedImage(
-                            image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                    new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = (Graphics2D) target.getGraphics();
             g.drawImage(image, 0, 0, null);
-            g.drawImage(overlayImg, 0, 0, null);
-            g.dispose();
-            image = target;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void setBackground(Image background) {
-            if (!(background.getWrappedImage() instanceof BufferedImage)) {
-                throw new IllegalArgumentException("Only BufferedImage allowed");
-            }
-            BufferedImage backgroundImg =
-                    (BufferedImage)
-                            background.resize(background.getWidth(), getHeight()).getWrappedImage();
-            BufferedImage target =
-                    new BufferedImage(
-                            image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = (Graphics2D) target.getGraphics();
-            g.drawImage(backgroundImg, 0, 0, null);
+            g.drawImage((BufferedImage) overlay.getWrappedImage(), 0, 0, null);
             g.dispose();
             image = target;
         }

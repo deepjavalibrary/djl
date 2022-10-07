@@ -81,9 +81,9 @@ class OpenCVImage implements Image {
 
     /** {@inheritDoc} */
     @Override
-    public Image resize(int w, int h) {
+    public Image resize(int width, int height) {
         Mat resized = new Mat();
-        Imgproc.resize(image, resized, new Size(w, h));
+        Imgproc.resize(image, resized, new Size(width, height));
         return new OpenCVImage(resized);
     }
 

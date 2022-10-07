@@ -147,5 +147,5 @@ public abstract class ImageFactory {
      * @param height The height of the image
      * @return {@link Image}
      */
-    public abstract Image fromArray(int[] pixels, int width, int height);
+    public abstract Image fromPixels(int[] pixels, int width, int height);
 }

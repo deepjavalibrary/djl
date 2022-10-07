@@ -102,7 +102,7 @@ public class OpenCVImageFactory extends ImageFactory {
 
     /** {@inheritDoc} */
     @Override
-    public Image fromArray(int[] pixels, int width, int height) {
+    public Image fromPixels(int[] pixels, int width, int height) {
         Mat img = new Mat(height, width, CvType.CV_8UC3);
         img.put(0, 0, pixels);
         Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2BGR);

@@ -52,11 +52,13 @@ public interface Image {
     /**
      * Creates a new resized image.
      *
-     * @param w The new image's desired width.
-     * @param h The new image's desired height.
-     * @return The new resized image.
+     * @param width the new image's desired width.
+     * @param height the new image's desired height.
+     * @return the new resized image.
      */
-    Image resize(int w, int h);
+    Image resize(int width, int height, boolean copy);
+
+    Image getMask(int[][] mask);
 
     /**
      * Gets the subimage defined by a specified rectangular region.
@@ -130,14 +132,7 @@ public interface Image {
      *
      * @param overlay the overlay image
      */
-    void drawOverlay(Image overlay);
-
-    /**
-     * Set the background of the image.
-     *
-     * @param background the background image
-     */
-    void setBackground(Image background);
+    void drawImage(Image overlay, boolean resize);
 
     /** Flag indicates the color channel options for images. */
     enum Flag {

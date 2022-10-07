@@ -76,10 +76,12 @@ public final class SemanticSegmentation {
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
                         .build();
+        Image bg =
+                ImageFactory.getInstance().fromFile(Paths.get("src/test/resources/airplane1.png"));
         try (ZooModel<Image, CategoryMask> model = criteria.loadModel();
                 Predictor<Image, CategoryMask> predictor = model.newPredictor()) {
             CategoryMask mask = predictor.predict(img);
-            mask.drawMask(img, 0f);
+            mask.drawMask(img, 180, bg);
             saveSemanticImage(img);
         }
     }

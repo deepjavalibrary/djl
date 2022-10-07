@@ -23,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import java.awt.Color;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -91,19 +92,8 @@ public class CategoryMask implements JsonSerializable {
      * @param image the original image
      * @param transparency the transparency of the overlay
      */
-    public void drawMask(Image image, float transparency) {
-        int[] colors = generateColors(transparency);
-        int height = mask.length;
-        int width = mask[0].length;
-        int[] pixels = new int[width * height];
-        for (int h = 0; h < height; h++) {
-            for (int w = 0; w < width; w++) {
-                int index = mask[h][w];
-                pixels[h * width + w] = colors[index];
-            }
-        }
-        Image maskImage = ImageFactory.getInstance().fromArray(pixels, width, height);
-        image.drawOverlay(maskImage);
+    public void drawMask(Image image, int transparency) {
+        drawMask(image, transparency, Color.BLACK.getRGB());
     }
 
     /**
@@ -114,23 +104,10 @@ public class CategoryMask implements JsonSerializable {
      * @param background replace the background with specified background color, use transparent
      *     color to remove background
      */
-    public void drawMask(Image image, float transparency, int background) {
-        int[] colors = generateColors(transparency);
-        int height = mask.length;
-        int width = mask[0].length;
-        int[] pixels = new int[width * height];
-        for (int h = 0; h < height; h++) {
-            for (int w = 0; w < width; w++) {
-                int index = mask[h][w];
-                if (index == 0) { // Set background with the specified color
-                    pixels[h * width + w] = background;
-                } else {
-                    pixels[h * width + w] = colors[index];
-                }
-            }
-        }
-        Image maskImage = ImageFactory.getInstance().fromArray(pixels, width, height);
-        image.setBackground(maskImage);
+    public void drawMask(Image image, int transparency, int background) {
+        int[] colors = generateColors(background, transparency);
+        Image maskImage = getColorOverlay(colors);
+        image.drawImage(maskImage, true);
     }
 
     /**
@@ -140,24 +117,13 @@ public class CategoryMask implements JsonSerializable {
      * @param transparency the transparency of the overlay
      * @param background replace the background with specified image
      */
-    public void drawMask(Image image, float transparency, Image background) {
-        int[] colors = generateColors(transparency);
-        int height = mask.length;
-        int width = mask[0].length;
-        int[] pixels = new int[width * height];
-        for (int h = 0; h < height; h++) {
-            for (int w = 0; w < width; w++) {
-                int index = mask[h][w];
-                if (index == 0) {
-                    pixels[h * width + w] = 0;
-                } else {
-                    pixels[h * width + w] = colors[index];
-                }
-            }
-        }
-        Image maskImage = ImageFactory.getInstance().fromArray(pixels, width, height);
-        image.setBackground(background);
-        image.drawOverlay(maskImage);
+    public void drawMask(Image image, int transparency, Image background) {
+        int[] colors = generateColors(0, transparency);
+        Image colorOverlay = getColorOverlay(colors);
+        Image maskImage = image.getMask(mask);
+        image.drawImage(background, true);
+        image.drawImage(maskImage, true);
+        image.drawImage(colorOverlay, true);
     }
 
     /**
@@ -165,37 +131,37 @@ public class CategoryMask implements JsonSerializable {
      *
      * @param image the original image
      * @param classId the class to draw on the image
-     * @param rgba the rgb color with transparency
+     * @param color the rgb color with transparency
+     * @param transparency the transparency of the overlay
      */
-    public void drawMask(Image image, int classId, int rgba) {
+    public void drawMask(Image image, int classId, int color, int transparency) {
+        int[] colors = new int[classes.size()];
+        colors[classId] = color | transparency << 24;
+        Image colorOverlay = getColorOverlay(colors);
+        image.drawImage(colorOverlay, true);
+    }
+
+    private Image getColorOverlay(int[] colors) {
         int height = mask.length;
         int width = mask[0].length;
         int[] pixels = new int[width * height];
         for (int h = 0; h < height; h++) {
             for (int w = 0; w < width; w++) {
                 int index = mask[h][w];
-                if (index == classId) { // Set class with the specified color
-                    pixels[h * width + w] = rgba;
-                } else {
-                    pixels[h * width + w] = 0;
-                }
+                pixels[h * width + w] = colors[index];
             }
         }
-        Image maskImage = ImageFactory.getInstance().fromArray(pixels, width, height);
-        image.drawOverlay(maskImage);
+        return ImageFactory.getInstance().fromPixels(pixels, width, height);
     }
 
-    private int[] generateColors(float transparency) {
+    private int[] generateColors(int background, int transparency) {
         int[] colors = new int[classes.size()];
-        for (int i = 0; i < classes.size(); i++) {
+        colors[0] = background;
+        for (int i = 1; i < classes.size(); i++) {
             int red = RandomUtils.nextInt(256);
             int green = RandomUtils.nextInt(256);
             int blue = RandomUtils.nextInt(256);
-            colors[i] =
-                    ((int) ((1 - transparency) * 255.0f + 0.5f) << 24)
-                            | (red << 16)
-                            | (green << 8)
-                            | blue;
+            colors[i] = transparency << 24 | red << 16 | green << 8 | blue;
         }
         return colors;
     }
