@@ -13,33 +13,31 @@
 package ai.djl.modality.cv.translator;
 
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.output.CategoryMask;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Transform;
+import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import ai.djl.util.RandomUtils;
 
-import java.nio.ByteBuffer;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
- * A {@link BaseImageTranslator} that post-process the {@link NDArray} into {@link DetectedObjects}
- * with boundaries at the detailed pixel level.
+ * A {@link Translator} that post-process the {@link Image} into {@link CategoryMask} with output
+ * mask representing the class that each pixel in the original image belong to.
  */
-public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
+public class SemanticSegmentationTranslator extends BaseImageTranslator<CategoryMask> {
 
+    private SynsetLoader synsetLoader;
     private final int shortEdge;
     private final int maxEdge;
 
-    private static final int CHANNEL = 3;
-    private static final int CLASSNUM = 21;
+    private List<String> classes;
 
     /**
      * Creates the Semantic Segmentation translator from the given builder.
@@ -48,6 +46,7 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
      */
     public SemanticSegmentationTranslator(Builder builder) {
         super(builder);
+        this.synsetLoader = builder.synsetLoader;
         this.shortEdge = builder.shortEdge;
         this.maxEdge = builder.maxEdge;
 
@@ -56,70 +55,49 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Image> {
 
     /** {@inheritDoc} */
     @Override
+    public void prepare(TranslatorContext ctx) throws IOException {
+        if (classes == null) {
+            classes = synsetLoader.load(ctx.getModel());
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList processInput(TranslatorContext ctx, Image image) {
-        ctx.setAttachment("originalHeight", image.getHeight());
-        ctx.setAttachment("originalWidth", image.getWidth());
         return super.processInput(ctx, image);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Image processOutput(TranslatorContext ctx, NDList list) {
+    public CategoryMask processOutput(TranslatorContext ctx, NDList list) {
         // scores contains the probabilities of each pixel being a certain object
         float[] scores = list.get(1).toFloatArray();
         Shape shape = list.get(1).getShape();
         int width = (int) shape.get(2);
         int height = (int) shape.get(1);
+        int[][] mask = new int[height][width];
 
-        // build image array
-        try (NDManager manager = NDManager.newBaseManager()) {
-            int imageSize = width * height;
-            ByteBuffer bb = manager.allocateDirect(CHANNEL * imageSize);
-            int r = 0; // adjustment for red pixel
-            int g = 1; // adjustment for green pixel
-            int b = 2; // adjustment for blue pixel
-            byte[][] colors = new byte[CLASSNUM][3];
-            for (int i = 0; i < CLASSNUM; i++) {
-                byte red = (byte) RandomUtils.nextInt(256);
-                byte green = (byte) RandomUtils.nextInt(256);
-                byte blue = (byte) RandomUtils.nextInt(256);
-                colors[i][r] = red;
-                colors[i][g] = green;
-                colors[i][b] = blue;
-            }
+        int imageSize = width * height;
 
-            // change color of pixels in image array where objects have been detected
-            for (int h = 0; h < height; h++) {
-                for (int w = 0; w < width; w++) {
-                    int index = h * width + w;
-                    int maxi = 0;
-                    double maxnum = -Double.MAX_VALUE;
-                    for (int i = 0; i < CLASSNUM; i++) {
-                        // get score for each i at the h,w pixel of the image
-                        float score = scores[i * (imageSize) + index];
-                        if (score > maxnum) {
-                            maxnum = score;
-                            maxi = i;
-                        }
-                    }
-                    if (maxi > 0) {
-                        bb.put(colors[maxi][r]);
-                        bb.put(colors[maxi][g]);
-                        bb.put(colors[maxi][b]);
-                    } else {
-                        bb.position(bb.position() + 3);
+        // Build mask array
+        int numOfClasses = classes.size();
+        for (int h = 0; h < height; h++) {
+            for (int w = 0; w < width; w++) {
+                int index = h * width + w;
+                int maxi = 0;
+                double maxnum = -Double.MAX_VALUE;
+                for (int i = 0; i < numOfClasses; ++i) {
+                    // get score for each i at the h,w pixel of the image
+                    float score = scores[i * imageSize + index];
+                    if (score > maxnum) {
+                        maxnum = score;
+                        maxi = i;
                     }
                 }
+                mask[h][w] = maxi;
             }
-            bb.rewind();
-            int originW = (int) ctx.getAttachment("originalWidth");
-            int originH = (int) ctx.getAttachment("originalHeight");
-            NDArray fullImage =
-                    manager.create(bb, new Shape(height, width, CHANNEL), DataType.UINT8);
-            NDArray resized = NDImageUtils.resize(fullImage, originW, originH);
-
-            return ImageFactory.getInstance().fromNDArray(resized);
         }
+        return new CategoryMask(classes, mask);
     }
 
     /**

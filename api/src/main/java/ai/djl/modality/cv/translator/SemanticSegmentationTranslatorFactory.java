@@ -13,20 +13,13 @@
 package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
-import ai.djl.modality.Input;
-import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.translator.wrapper.FileTranslator;
-import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
-import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
+import ai.djl.modality.cv.output.CategoryMask;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
 
-import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +30,7 @@ public class SemanticSegmentationTranslatorFactory implements TranslatorFactory 
     private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();
 
     static {
-        SUPPORTED_TYPES.add(new Pair<>(Image.class, Image.class));
+        SUPPORTED_TYPES.add(new Pair<>(Image.class, CategoryMask.class));
     }
 
     /** {@inheritDoc} */
@@ -45,18 +38,8 @@ public class SemanticSegmentationTranslatorFactory implements TranslatorFactory 
     @SuppressWarnings("unchecked")
     public <I, O> Translator<I, O> newInstance(
             Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
-        SemanticSegmentationTranslator translator =
-                SemanticSegmentationTranslator.builder(arguments).build();
-        if (input == Image.class && output == Image.class) {
-            return (Translator<I, O>) translator;
-        } else if (input == Path.class && output == Image.class) {
-            return (Translator<I, O>) new FileTranslator<>(translator);
-        } else if (input == URL.class && output == Image.class) {
-            return (Translator<I, O>) new UrlTranslator<>(translator);
-        } else if (input == InputStream.class && output == Image.class) {
-            return (Translator<I, O>) new InputStreamTranslator<>(translator);
-        } else if (input == Input.class && output == Output.class) {
-            return (Translator<I, O>) new ImageServingTranslator(translator);
+        if (input == Image.class && output == CategoryMask.class) {
+            return (Translator<I, O>) SemanticSegmentationTranslator.builder(arguments).build();
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

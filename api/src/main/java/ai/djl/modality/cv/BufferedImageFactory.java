@@ -127,6 +127,14 @@ public class BufferedImageFactory extends ImageFactory {
         return new BufferedImageWrapper(image);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Image fromPixels(int[] pixels, int width, int height) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        image.setRGB(0, 0, width, height, pixels, 0, width);
+        return new BufferedImageWrapper(image);
+    }
+
     protected void save(BufferedImage image, OutputStream os, String type) throws IOException {
         ImageIO.write(image, type, os);
     }
@@ -153,8 +161,24 @@ public class BufferedImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
-        public Object getWrappedImage() {
+        public BufferedImage getWrappedImage() {
             return image;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public BufferedImageWrapper resize(int width, int height, boolean copy) {
+            if (!copy && image.getWidth() == width && image.getHeight() == height) {
+                return this;
+            }
+
+            java.awt.Image img =
+                    image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+            BufferedImage scaled = new BufferedImage(width, height, image.getType());
+            Graphics2D g2d = scaled.createGraphics();
+            g2d.drawImage(img, 0, 0, null);
+            g2d.dispose();
+            return new BufferedImageWrapper(scaled);
         }
 
         /** {@inheritDoc} */
@@ -172,6 +196,26 @@ public class BufferedImageFactory extends ImageFactory {
             byte[] biData = ((DataBufferByte) copy.getRaster().getDataBuffer()).getData();
             System.arraycopy(sourceData, 0, biData, 0, sourceData.length);
             return new BufferedImageWrapper(copy);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Image getMask(int[][] mask) {
+            int w = mask[0].length;
+            int h = mask.length;
+            BufferedImageWrapper resized = resize(w, h, true);
+            BufferedImage img = resized.getWrappedImage();
+            int[] pixels = new int[w * h];
+            int index = 0;
+            for (int y = 0; y < h; ++y) {
+                for (int x = 0; x < w; ++x) {
+                    if (mask[y][x] != 0) {
+                        pixels[index] = img.getRGB(x, y);
+                    }
+                    index++;
+                }
+            }
+            return fromPixels(pixels, w, h);
         }
 
         private void convertIdNeeded() {
@@ -306,6 +350,24 @@ public class BufferedImageFactory extends ImageFactory {
                 g.fillOval(x, y, 10, 10);
             }
             g.dispose();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void drawImage(Image overlay, boolean resize) {
+            if (!(overlay.getWrappedImage() instanceof BufferedImage)) {
+                throw new IllegalArgumentException("Only BufferedImage allowed");
+            }
+            if (resize) {
+                overlay = overlay.resize(getWidth(), getHeight(), false);
+            }
+            BufferedImage target =
+                    new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = (Graphics2D) target.getGraphics();
+            g.drawImage(image, 0, 0, null);
+            g.drawImage((BufferedImage) overlay.getWrappedImage(), 0, 0, null);
+            g.dispose();
+            image = target;
         }
 
         private Color randomColor() {

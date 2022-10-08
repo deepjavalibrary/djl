@@ -39,7 +39,9 @@ import org.opencv.imgproc.Imgproc;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -75,8 +77,39 @@ class OpenCVImage implements Image {
 
     /** {@inheritDoc} */
     @Override
-    public Object getWrappedImage() {
+    public Mat getWrappedImage() {
         return image;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public OpenCVImage resize(int width, int height, boolean copy) {
+        if (!copy && image.width() == width && image.height() == height) {
+            return this;
+        }
+
+        Mat resized = new Mat();
+        Imgproc.resize(image, resized, new Size(width, height));
+        return new OpenCVImage(resized);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Image getMask(int[][] mask) {
+        int w = mask[0].length;
+        int h = mask.length;
+        OpenCVImage resized = resize(w, h, false);
+        Mat img = resized.getWrappedImage();
+        Mat ret = new Mat(h, w, CvType.CV_8UC4);
+        for (int y = 0; y < h; ++y) {
+            for (int x = 0; x < w; ++x) {
+                if (mask[y][x] != 0) {
+                    double[] data = img.get(y, x);
+                    ret.put(y, x, data[0], data[1], data[2], 255);
+                }
+            }
+        }
+        return new OpenCVImage(ret);
     }
 
     /** {@inheritDoc} */
@@ -187,6 +220,50 @@ class OpenCVImage implements Image {
 
     /** {@inheritDoc} */
     @Override
+    public void drawImage(Image overlay, boolean resize) {
+        if (!(overlay instanceof OpenCVImage)) {
+            throw new IllegalArgumentException("Only OpenCVImage allowed");
+        }
+        if (resize) {
+            overlay = overlay.resize(getWidth(), getHeight(), false);
+        }
+        Mat mat = (Mat) overlay.getWrappedImage();
+        if (mat.elemSize() != 4) {
+            mat.copyTo(image);
+            return;
+        }
+        int w = Math.min(image.width(), mat.width());
+        int h = Math.min(image.height(), mat.height());
+        for (int y = 0; y < h; ++y) {
+            for (int x = 0; x < w; ++x) {
+                /*
+                 * RA = SA + DA × (1 − SA)
+                 * R[0] = (S[0]×SA + D[0]×DA×(1 − SA)) / RA
+                 */
+                double[] src = mat.get(y, x);
+                double[] dest = image.get(y, x);
+                double sa = src[3];
+                double da;
+                double ra;
+                if (dest.length == 3) {
+                    da = 255 - sa;
+                    ra = 255;
+                } else {
+                    da = dest[3] * (255 - sa) / 255;
+                    ra = sa + da;
+                    dest[3] = ra;
+                }
+
+                dest[0] = (src[0] * sa + dest[0] * da) / ra;
+                dest[1] = (src[1] * sa + dest[1] * da) / ra;
+                dest[2] = (src[2] * sa + dest[2] * da) / ra;
+                image.put(y, x, dest);
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public List<BoundingBox> findBoundingBoxes() {
         List<MatOfPoint> points = new ArrayList<>();
         Imgproc.findContours(
@@ -260,8 +337,21 @@ class OpenCVImage implements Image {
     private static Mat image2Mat(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
-        byte[] data = ((DataBufferByte) img.getRaster().getDataBuffer()).getData();
-        Mat mat = new Mat(height, width, CvType.CV_8UC3);
+        byte[] data;
+        Mat mat;
+        DataBuffer buf = img.getRaster().getDataBuffer();
+        if (buf instanceof DataBufferByte) {
+            data = ((DataBufferByte) buf).getData();
+            mat = new Mat(height, width, CvType.CV_8UC3);
+        } else if (buf instanceof DataBufferInt) {
+            int[] intData = ((DataBufferInt) buf).getData();
+            data = new byte[intData.length * 4];
+            ByteBuffer bb = ByteBuffer.wrap(data);
+            bb.asIntBuffer().put(intData);
+            mat = new Mat(height, width, CvType.CV_8UC4);
+        } else {
+            throw new IllegalArgumentException("Unsupported image type: " + buf.getClass());
+        }
         mat.put(0, 0, data);
         return mat;
     }
