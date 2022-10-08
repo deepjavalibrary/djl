@@ -262,7 +262,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleGetPar
   auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(jhandle);
   std::vector<jlong> jptrs;
   for (const auto& tensor : module_ptr->parameters()) {
-    jptrs.push_back(reinterpret_cast<uintptr_t>(new torch::Tensor(tensor)));
+    jptrs.emplace_back(reinterpret_cast<uintptr_t>(new torch::Tensor(tensor)));
   }
   size_t len = jptrs.size();
   jlongArray jarray = env->NewLongArray(len);
@@ -277,7 +277,7 @@ JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleGetP
   auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(jhandle);
   std::vector<std::string> jptrs;
   for (const auto& named_tensor : module_ptr->named_parameters()) {
-    jptrs.push_back(named_tensor.name);
+    jptrs.emplace_back(named_tensor.name);
   }
   return djl::utils::jni::GetStringArrayFromVec(env, jptrs);
   API_END_RETURN()

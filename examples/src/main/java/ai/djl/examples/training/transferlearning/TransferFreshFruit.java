@@ -19,7 +19,9 @@ import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToOneHot;
 import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.transform.Transpose;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -48,13 +50,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
-public final class TransferImage {
+public final class TransferFreshFruit {
 
-    private TransferImage() {}
+    private TransferFreshFruit() {}
 
     public static void main(String[] args)
             throws IOException, TranslateException, ModelException, URISyntaxException {
-        TransferImage.runExample(args);
+        TransferFreshFruit.runExample(args);
     }
 
     public static TrainingResult runExample(String[] args)
@@ -63,8 +65,9 @@ public final class TransferImage {
         if (arguments == null) {
             return null;
         }
-        System.out.println(Engine.getDefaultEngineName());
 
+        // Also available at
+        // "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/resnet18_embedding/0.1/traced_resnet18_embedding.pt.gz";
         String modelUrls = "/Users/fenkexin/Desktop/transferDJL/code/base_nw.pt";
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
@@ -72,7 +75,7 @@ public final class TransferImage {
                         .optModelUrls(modelUrls)
                         .optEngine(Engine.getDefaultEngineName())
                         .optProgress(new ProgressBar())
-                        .optOption("retrain", "1")
+                        .optOption("retrain", arguments.isPreTrained() ? "0" : "1")
                         .build();
 
         ZooModel<NDList, NDList> embedding = criteria.loadModel();
@@ -85,51 +88,43 @@ public final class TransferImage {
                         .add(Linear.builder().setUnits(2).build()) // linear on which dim?
                         .addSingleton(nd -> nd.softmax(1));
 
-        Model model = Model.newInstance("TransferImage");
+        Model model = Model.newInstance("TransferFreshFruit");
         model.setBlock(blocks);
 
         // Config trainer
         DefaultTrainingConfig config = setupTrainingConfig(arguments);
 
-        /// Customized learning rate
+        // Customized learning rate
+        float lr = 0.001f;
         FixedPerVarTracker.Builder learningRateTrackerBuilder =
-                FixedPerVarTracker.builder().setDefaultValue(0.001f);
+                FixedPerVarTracker.builder().setDefaultValue(lr);
         for (Pair<String, Parameter> paramPair : baseBlock.getParameters()) {
-            learningRateTrackerBuilder.put(paramPair.getValue().getId(), 0.0001f);
+            learningRateTrackerBuilder.put(paramPair.getValue().getId(), 0.1f * lr);
         }
         Optimizer optimizer =
                 Adam.builder().optLearningRateTracker(learningRateTrackerBuilder.build()).build();
         config.optOptimizer(optimizer);
 
+        // Config trainer
         Trainer trainer = model.newTrainer(config);
         trainer.setMetrics(new Metrics());
 
+        // Initialize the parameter shape and value
         int batchSize = 32;
         Shape inputShape = new Shape(batchSize, 3, 224, 224);
-
-        // initialize trainer with proper input shape
         trainer.initialize(inputShape);
 
         // Data
-        String folderUrl = "/Users/fenkexin/Desktop/transferDJL/code/data/banana";
-        String subfolder = "/test/";
-        Repository repository = Repository.newInstance("banana", Paths.get(folderUrl + subfolder));
-        ImageFolder datasetTrain =
-                ImageFolder.builder()
-                        .setRepository(repository)
-                        .addTransform(new ToTensor())
-                        .addTransform(new Resize(224, 224))
-                        //                        .addTargetTransform(new ToOneHot(2))
-                        .setSampling(batchSize, true)
-                        .build();
-        datasetTrain.prepare();
+        ImageFolder datasetTrain = getData("test", "banana", batchSize);
 
-        // train
-        EasyTrain.fit(trainer, 50, datasetTrain, null);
+        // Train
+        EasyTrain.fit(trainer, 10, datasetTrain, null);
 
         // Save model
         // model.save("your-model-path");
 
+        model.close();
+        embedding.close();
         return null;
     }
 
@@ -145,10 +140,32 @@ public final class TransferImage {
                     model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
                 });
 
-        return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss("SoftmaxCrossEntropy"))
+        return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss("SoftmaxCrossEntropy", true))
                 .addEvaluator(new Accuracy())
                 .optDevices(Engine.getInstance().getDevices(1))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
+    }
+
+    private static ImageFolder getData(String subfolderName, String fruit, int batchSize)
+            throws TranslateException, IOException {
+        // The dataset is from <a
+        // href="https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification">https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification</a>
+        String folderUrl = "/Users/fenkexin/Desktop/transferDJL/code/data/" + fruit;
+        String subfolder = "/" + subfolderName + "/";
+        Repository repositoryTrain =
+                Repository.newInstance("banana", Paths.get(folderUrl + subfolder));
+        ImageFolder dataset =
+                ImageFolder.builder()
+                        .setRepository(repositoryTrain)
+                        .addTransform(new ToTensor())
+                        .addTransform(new Transpose(1, 2, 0))
+                        .addTransform(new Resize(224, 224))
+                        .addTransform(new Transpose(2, 0, 1))
+                        .addTargetTransform(new ToOneHot(2))
+                        .setSampling(batchSize, true)
+                        .build();
+        dataset.prepare();
+        return dataset;
     }
 }

@@ -12,26 +12,26 @@
  */
 package ai.djl.modality.cv.transform;
 
-import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
 
-/** A {@link Transform} that converts the labels {@link NDArray} to one-hot labels. */
-public class ToOneHot implements Transform {
-    private final int numClass;
+/** A {@link Transform} that transposes the image. */
+public class Transpose implements Transform {
+
+    private int[] axis;
 
     /**
-     * Creates a {@code toOneHot} {@link Transform} that converts the sparse label to one-hot label.
+     * Creates a {@code Resize} {@link Transform} that transposes to the given size.
      *
-     * @param numClass number of classes
+     * @param axis the new order of axis
      */
-    public ToOneHot(int numClass) {
-        this.numClass = numClass;
+    public Transpose(int... axis) {
+        this.axis = axis;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray transform(NDArray label) {
-        return NDImageUtils.toOneHot(label, numClass);
+    public NDArray transform(NDArray array) {
+        return array.transpose(axis);
     }
 }
