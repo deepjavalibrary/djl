@@ -51,7 +51,7 @@ import java.util.Arrays;
  * // set the image folder path
  * Repository repository = Repository.newInstance("folder", Paths.get("/path/to/imagefolder/root");
  * ImageFolder dataset =
- *     new ImageFolder.Builder()
+ *     ImageFolder.builder()
  *         .setRepository(repository)
  *         .addTransform(new Resize(100, 100)) // Use image transforms as necessary for your data
  *         .addTransform(new ToTensor()) // Usually required as the last transform to convert images to tensors

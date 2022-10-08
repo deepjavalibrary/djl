@@ -77,7 +77,11 @@ public class StackBatchifier implements Batchifier {
                     NDArray currInput = input.get(i);
                     if (!currInput.getShape().equals(kindDataShape)) {
                         throw new IllegalArgumentException(
-                                "You cannot batch data with different input shapes", e);
+                                "You cannot batch data with different input shapes"
+                                        + currInput.getShape()
+                                        + " vs "
+                                        + kindDataShape,
+                                e);
                     }
                     if (!currInput.getDataType().equals(kindDataType)) {
                         throw new IllegalArgumentException(

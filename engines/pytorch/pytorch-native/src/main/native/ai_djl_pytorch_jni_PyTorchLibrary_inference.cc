@@ -30,9 +30,9 @@ struct JITCallGuard {
 };
 
 JNIEXPORT jlong JNICALL
-Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljava_lang_String_2_3Ljava_lang_String_2(
+Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljava_lang_String_2_3Ljava_lang_String_2Z(
     JNIEnv* env, jobject jthis, jstring jpath, jintArray jarray, jboolean jmap_location, jobjectArray jefnames,
-    jobjectArray jefvalues) {
+    jobjectArray jefvalues, jboolean jretrain) {
   API_BEGIN()
   const std::string path = djl::utils::jni::GetStringFromJString(env, jpath);
   const torch::Device device = utils::GetDeviceFromJDevice(env, jarray);
@@ -44,7 +44,25 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljav
     map[name] = "";
   }
 
-  JITCallGuard guard;
+  if (!jretrain) {
+    JITCallGuard guard;
+    torch::jit::Module module;
+    if (jmap_location) {
+      module = torch::jit::load(path, device, map);
+      module.eval();
+    } else {
+      module = torch::jit::load(path, torch::nullopt, map);
+      module.eval();
+      module.to(device);
+    }
+    const auto* module_ptr = new torch::jit::Module(module);
+    for (size_t i = 0; i < len; ++i) {
+      auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
+      auto name = djl::utils::jni::GetStringFromJString(env, jname);
+      env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
+    }
+    return reinterpret_cast<uintptr_t>(module_ptr);
+  }
   torch::jit::Module module;
   if (jmap_location) {
     module = torch::jit::load(path, device, map);

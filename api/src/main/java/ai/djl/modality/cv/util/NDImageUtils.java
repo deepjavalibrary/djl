@@ -131,6 +131,18 @@ public final class NDImageUtils {
     }
 
     /**
+     * Converts the labels {@link NDArray} to one-hot labels.
+     *
+     * <p>Converts the labels {@link NDArray} to one-hot labels.
+     *
+     * @param label the label to convert
+     * @return the converted label
+     */
+    public static NDArray toOneHot(NDArray label, int numClass) {
+        return label.getNDArrayInternal().toOneHot(numClass);
+    }
+
+    /**
      * Crops an image to a square of size {@code min(width, height)}.
      *
      * @param image the image to crop

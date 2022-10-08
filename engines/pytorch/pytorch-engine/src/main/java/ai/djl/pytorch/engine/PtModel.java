@@ -78,11 +78,19 @@ public class PtModel extends BaseModel {
             String[] extraFileKeys = new String[0];
             String[] extraFileValues = new String[0];
             boolean mapLocation = false;
+            boolean retrain = false;
             // load jit extra files
             if (options != null) {
                 if (options.containsKey("extraFiles")) {
                     extraFileKeys = ((String) options.get("extraFiles")).split(",");
                     extraFileValues = new String[extraFileKeys.length];
+                }
+                if (options.containsKey("retrain")) {
+                    String value = (String) options.get("retrain");
+                    retrain =
+                            "1".equalsIgnoreCase(value)
+                                    || "true".equalsIgnoreCase(value)
+                                    || "on".equalsIgnoreCase(value);
                 }
                 mapLocation = Boolean.parseBoolean((String) options.get("mapLocation"));
             }
@@ -92,9 +100,14 @@ public class PtModel extends BaseModel {
                             modelFile,
                             mapLocation,
                             extraFileKeys,
-                            extraFileValues);
+                            extraFileValues,
+                            retrain);
             for (int i = 0; i < extraFileKeys.length; i++) {
                 properties.put(extraFileKeys[i], extraFileValues[i]);
+            }
+            // Freeze the parameters if not retrain
+            for (Pair<String, Parameter> paramPair : block.getParameters()) {
+                paramPair.getValue().freeze(!retrain);
             }
         } else {
             boolean hasParameter = true;

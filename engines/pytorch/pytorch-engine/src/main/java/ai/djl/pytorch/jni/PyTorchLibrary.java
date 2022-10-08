@@ -491,7 +491,8 @@ final class PyTorchLibrary {
             int[] device,
             boolean mapLocation,
             String[] extraFileNames,
-            String[] extraFileValues);
+            String[] extraFileValues,
+            boolean retrain);
 
     native long moduleLoad(
             InputStream is, int[] device, boolean mapLocation, byte[] buffer, long size);

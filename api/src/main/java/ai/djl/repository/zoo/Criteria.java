@@ -369,7 +369,7 @@ public class Criteria<I, O> {
                 .optModelZoo(modelZoo)
                 .optFilters(filters)
                 .optArguments(arguments)
-                .optOptions(options)
+                .optOption(options)
                 .optTranslatorFactory(factory)
                 .optBlock(block)
                 .optModelName(modelName)
@@ -627,7 +627,7 @@ public class Criteria<I, O> {
          * @param options the model loading options
          * @return this {@code Builder}
          */
-        public Builder<I, O> optOptions(Map<String, String> options) {
+        public Builder<I, O> optOption(Map<String, String> options) {
             this.options = options;
             return this;
         }

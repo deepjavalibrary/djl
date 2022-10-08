@@ -35,10 +35,10 @@ import java.util.Collections;
  * <p>It has the following shapes:
  *
  * <ul>
- *   <li>input X: [x1, x2, …, xn, input_dim]
+ *   <li>input X: [batch_num, input_dim]
  *   <li>weight W: [units, input_dim]
  *   <li>Bias b: [units]
- *   <li>output Y: [x1, x2, …, xn, units]
+ *   <li>output Y: [batch_num, units]
  * </ul>
  *
  * <p>The Linear block should be constructed using {@link Linear.Builder}.

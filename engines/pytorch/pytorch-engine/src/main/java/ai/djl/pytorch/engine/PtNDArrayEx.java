@@ -571,21 +571,30 @@ public class PtNDArrayEx implements NDArrayEx {
             if (result.getDataType() != DataType.FLOAT32) {
                 result = result.toType(DataType.FLOAT32, true);
             }
+
             int dim = result.getShape().dimension();
             if (dim == 3) {
                 result = result.expandDims(0);
             }
-            result = result.transpose(0, 3, 1, 2);
+            boolean orderHWC = false;
+            if (result.getShape().get(1) != 3) {
+                // HWC order -> CHW order
+                orderHWC = true;
+                result = result.transpose(0, 3, 1, 2);
+            }
             result =
                     JniUtils.interpolate(
-                                    array.getManager().from(result),
-                                    new long[] {height, width},
-                                    getInterpolationMode(interpolation),
-                                    false)
-                            .transpose(0, 2, 3, 1);
+                            array.getManager().from(result),
+                            new long[] {height, width},
+                            getInterpolationMode(interpolation),
+                            false);
+            if (orderHWC) {
+                result = result.transpose(0, 2, 3, 1);
+            }
             if (dim == 3) {
                 result = result.squeeze(0);
             }
+
             array.attach(subManager.getParentManager());
             result.attach(subManager.getParentManager());
             return (PtNDArray) result;
