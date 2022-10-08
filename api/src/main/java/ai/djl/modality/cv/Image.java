@@ -58,6 +58,12 @@ public interface Image {
      */
     Image resize(int width, int height, boolean copy);
 
+    /**
+     * Creates a new resized image.
+     *
+     * @param mask the category mask for each pixel in the image
+     * @return the mask image.
+     */
     Image getMask(int[][] mask);
 
     /**

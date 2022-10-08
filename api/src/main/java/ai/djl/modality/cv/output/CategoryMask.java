@@ -87,10 +87,38 @@ public class CategoryMask implements JsonSerializable {
     }
 
     /**
+     * Get the detected object on the image.
+     *
+     * @param image the original image
+     */
+    public Image getMaskImage(Image image) {
+        return image.getMask(mask);
+    }
+
+    /**
+     * Get the background of the image.
+     *
+     * @param image the original image
+     */
+    public Image getBackgroundImage(Image image) {
+        int width = mask[0].length;
+        int height = mask.length;
+        int[][] bg = new int[width][height];
+        for (int h = 0; h < height; ++h) {
+            for (int w = 0; w < width; ++w) {
+                bg[h][w] = mask[h][w] == 0 ? 1 : 0;
+            }
+        }
+        return image.getMask(bg);
+    }
+
+    /**
      * Highlights the detected object on the image with random colors.
      *
      * @param image the original image
-     * @param transparency the transparency of the overlay
+     * @param transparency the transparency of the overlay. Value is between 0 and 255 inclusive,
+     *     where 0 means the overlay is completely opaque and 255 means the overlay is completely
+     *     transparent.
      */
     public void drawMask(Image image, int transparency) {
         drawMask(image, transparency, Color.BLACK.getRGB());
@@ -100,7 +128,9 @@ public class CategoryMask implements JsonSerializable {
      * Highlights the detected object on the image with random colors.
      *
      * @param image the original image
-     * @param transparency the transparency of the overlay
+     * @param transparency the transparency of the overlay. Value is between 0 and 255 inclusive,
+     *     where 0 means the overlay is completely opaque and 255 means the overlay is completely
+     *     transparent.
      * @param background replace the background with specified background color, use transparent
      *     color to remove background
      */
@@ -111,39 +141,18 @@ public class CategoryMask implements JsonSerializable {
     }
 
     /**
-     * Highlights the detected object on the image with random colors.
-     *
-     * @param image the original image
-     * @param transparency the transparency of the overlay
-     * @param background replace the background with specified image
-     */
-    public Image getMaskImage(Image image) {
-        return image.getMask(mask);
-    }
-
-    /**
-     * Highlights the detected object on the image with random colors.
-     *
-     * @param image the original image
-     * @param transparency the transparency of the overlay
-     * @param background replace the background with specified image
-     */
-    public Image getBackgroundImage(Image image) {
-        int[][] bg = new int[][];
-        return image.getMask(mask);
-    }
-
-    /**
      * Highlights the specified object with specific color.
      *
      * @param image the original image
      * @param classId the class to draw on the image
      * @param color the rgb color with transparency
-     * @param transparency the transparency of the overlay
+     * @param transparency the transparency of the overlay. Value is between 0 and 255 inclusive,
+     *     where 0 means the overlay is completely opaque and 255 means the overlay is completely
+     *     transparent.
      */
     public void drawMask(Image image, int classId, int color, int transparency) {
         int[] colors = new int[classes.size()];
-        colors[classId] = color | transparency << 24;
+        colors[classId] = (color & 0x00FFFFFF) | transparency << 24;
         Image colorOverlay = getColorOverlay(colors);
         image.drawImage(colorOverlay, true);
     }

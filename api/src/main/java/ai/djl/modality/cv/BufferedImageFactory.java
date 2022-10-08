@@ -198,6 +198,8 @@ public class BufferedImageFactory extends ImageFactory {
             return new BufferedImageWrapper(copy);
         }
 
+        /** {@inheritDoc} */
+        @Override
         public Image getMask(int[][] mask) {
             int w = mask[0].length;
             int h = mask.length;
