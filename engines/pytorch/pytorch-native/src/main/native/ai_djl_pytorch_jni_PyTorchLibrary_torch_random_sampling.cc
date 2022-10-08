@@ -36,6 +36,21 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRandint(JNIE
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRandPerm(
+    JNIEnv* env, jobject jthis, jlong jn, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequire_grad) {
+  API_BEGIN()
+  const auto options = utils::CreateTensorOptions(env, jdtype, jlayout, jdevice, jrequire_grad);
+  torch::Tensor tensor = torch::randperm(jn, options);
+  // Tensor Option for mkldnn is not working
+  // explicitly convert to mkldnn
+  if (jlayout == 2) {
+    tensor = tensor.to_mkldnn();
+  }
+  const auto* result_ptr = new torch::Tensor(tensor);
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNormal(JNIEnv* env, jobject jthis, jdouble jmean,
     jdouble jstd, jlongArray jsizes, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequire_grad) {
   API_BEGIN()

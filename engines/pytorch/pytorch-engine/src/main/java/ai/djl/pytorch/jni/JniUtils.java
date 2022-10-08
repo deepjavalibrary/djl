@@ -1114,6 +1114,18 @@ public final class JniUtils {
                         false));
     }
 
+    public static PtNDArray randperm(
+            PtNDManager manager, long n, DataType dataType, Device device) {
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchRandPerm(
+                        n,
+                        dataType.ordinal(),
+                        layoutMapper(SparseFormat.DENSE, device),
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
+                        false));
+    }
+
     public static PtNDArray normal(
             PtNDManager manager,
             double mean,
