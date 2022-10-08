@@ -23,6 +23,7 @@ import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.Parameter;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.repository.Repository;
@@ -36,8 +37,12 @@ import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
+import ai.djl.training.optimizer.Adam;
+import ai.djl.training.optimizer.Optimizer;
+import ai.djl.training.tracker.FixedPerVarTracker;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.Pair;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -67,7 +72,7 @@ public final class TransferImage {
                         .optModelUrls(modelUrls)
                         .optEngine(Engine.getDefaultEngineName())
                         .optProgress(new ProgressBar())
-                        .optOption("retrain", "0")
+                        .optOption("retrain", "1")
                         .build();
 
         ZooModel<NDList, NDList> embedding = criteria.loadModel();
@@ -86,16 +91,15 @@ public final class TransferImage {
         // Config trainer
         DefaultTrainingConfig config = setupTrainingConfig(arguments);
 
-        //        /// Customized learning rate
-        //        FixedPerVarTracker.Builder learningRateTrackerBuilder =
-        //                FixedPerVarTracker.builder().setDefaultValue(0.001f);
-        //        for (Pair<String, Parameter> paramPair : baseBlock.getParameters()) {
-        //            learningRateTrackerBuilder.put(paramPair.getValue().getId(), 0.0001f);
-        //        }
-        //        Optimizer optimizer =
-        //
-        // Adam.builder().optLearningRateTracker(learningRateTrackerBuilder.build()).build();
-        //        config.optOptimizer(optimizer);
+        /// Customized learning rate
+        FixedPerVarTracker.Builder learningRateTrackerBuilder =
+                FixedPerVarTracker.builder().setDefaultValue(0.001f);
+        for (Pair<String, Parameter> paramPair : baseBlock.getParameters()) {
+            learningRateTrackerBuilder.put(paramPair.getValue().getId(), 0.0001f);
+        }
+        Optimizer optimizer =
+                Adam.builder().optLearningRateTracker(learningRateTrackerBuilder.build()).build();
+        config.optOptimizer(optimizer);
 
         Trainer trainer = model.newTrainer(config);
         trainer.setMetrics(new Metrics());
@@ -109,10 +113,7 @@ public final class TransferImage {
         // Data
         String folderUrl = "/Users/fenkexin/Desktop/transferDJL/code/data/banana";
         String subfolder = "/test/";
-
-        // set the image folder path
         Repository repository = Repository.newInstance("banana", Paths.get(folderUrl + subfolder));
-
         ImageFolder datasetTrain =
                 ImageFolder.builder()
                         .setRepository(repository)
@@ -121,13 +122,13 @@ public final class TransferImage {
                         //                        .addTargetTransform(new ToOneHot(2))
                         .setSampling(batchSize, true)
                         .build();
-
-        // call prepare before using
         datasetTrain.prepare();
 
+        // train
         EasyTrain.fit(trainer, 50, datasetTrain, null);
 
-        // model.save("your-model-path"); // save the model
+        // Save model
+        // model.save("your-model-path");
 
         return null;
     }

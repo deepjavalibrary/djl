@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.training.tracker.FixedPerVarTracker;
 import ai.djl.training.tracker.Tracker;
 
 import java.util.Map;
@@ -56,6 +57,9 @@ public class Sgd extends Optimizer {
     /** {@inheritDoc} */
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
+        if (learningRateTracker instanceof FixedPerVarTracker) {
+            ((FixedPerVarTracker) learningRateTracker).setParameterId(parameterId);
+        }
         // TODO: Support Mixed precision Sparse
         float weightDecay = getWeightDecay();
         float learningRate = learningRateTracker.getNewValue(updateCount(parameterId));

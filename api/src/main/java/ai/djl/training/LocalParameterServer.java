@@ -48,17 +48,17 @@ public class LocalParameterServer implements ParameterServer {
         // use duplicate because after the first optimizer.update
         // PyTorch optimizer will zero grads[0]
         // the second copy is to move the grads[0] to the device the weight is on
-        try (NDArray aggregatedGrad = grads[0].duplicate()) {
-            for (NDArray param : params) {
-                if (param.getDevice().equals(firstDevice)) {
-                    optimizer.update(parameterId, param, aggregatedGrad);
-                } else {
-                    try (NDArray gradSumCopy = aggregatedGrad.toDevice(param.getDevice(), true)) {
-                        optimizer.update(parameterId, param, gradSumCopy);
-                    }
-                }
+        NDArray aggregatedGrad = grads[0].duplicate();
+        for (NDArray param : params) {
+            if (param.getDevice().equals(firstDevice)) {
+                optimizer.update(parameterId, param, aggregatedGrad);
+            } else {
+                NDArray gradSumCopy = aggregatedGrad.toDevice(param.getDevice(), true);
+                optimizer.update(parameterId, param, gradSumCopy);
+                gradSumCopy.close();
             }
         }
+        aggregatedGrad.close();
     }
 
     /** {@inheritDoc} */

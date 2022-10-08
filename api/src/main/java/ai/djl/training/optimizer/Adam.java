@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
+import ai.djl.training.tracker.FixedPerVarTracker;
 import ai.djl.training.tracker.Tracker;
 import ai.djl.util.Preconditions;
 
@@ -64,6 +65,9 @@ public class Adam extends Optimizer {
     /** {@inheritDoc} */
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
+        if (learningRateTracker instanceof FixedPerVarTracker) {
+            ((FixedPerVarTracker) learningRateTracker).setParameterId(parameterId);
+        }
         int t = updateCount(parameterId);
         double coef1 = 1.0 - Math.pow(beta1, t);
         double coef2 = 1.0 - Math.pow(beta2, t);
@@ -118,6 +122,8 @@ public class Adam extends Optimizer {
     public static final class Builder extends OptimizerBuilder<Builder> {
 
         private Tracker learningRateTracker = Tracker.fixed(0.001f);
+        //        private Tracker learningRateTracker = Tracker.fixedPerVar(functional: String ->
+        // 0.001f);
         private float beta1 = 0.9f;
         private float beta2 = 0.999f;
         private float epsilon = 1e-8f;

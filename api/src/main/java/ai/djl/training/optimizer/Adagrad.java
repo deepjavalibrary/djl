@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.training.tracker.FixedPerVarTracker;
 import ai.djl.training.tracker.Tracker;
 
 import java.util.Map;
@@ -60,6 +61,9 @@ public class Adagrad extends Optimizer {
     /** {@inheritDoc} */
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
+        if (learningRateTracker instanceof FixedPerVarTracker) {
+            ((FixedPerVarTracker) learningRateTracker).setParameterId(parameterId);
+        }
         int t = updateCount(parameterId);
         float newLearningRate = learningRateTracker.getNewValue(t);
         float weightDecay = getWeightDecay();

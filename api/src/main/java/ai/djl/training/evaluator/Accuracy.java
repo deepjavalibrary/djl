@@ -61,7 +61,8 @@ public class Accuracy extends AbstractAccuracy {
             predictionReduced = predictionReduced.reshape(label.getShape());
         } else {
             // Multi-class, one-hot label
-            predictionReduced = prediction;
+            predictionReduced = prediction.argMax(axis);
+            label = label.argMax(axis);
         }
         // result of sum is int64 now
         long total = label.size();
