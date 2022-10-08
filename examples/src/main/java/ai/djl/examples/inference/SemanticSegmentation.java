@@ -12,7 +12,6 @@
  */
 package ai.djl.examples.inference;
 
-import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
@@ -52,22 +51,21 @@ public final class SemanticSegmentation {
 
     public static void predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
-        Image img = ImageFactory.getInstance().fromFile(imageFile);
+        ImageFactory factory = ImageFactory.getInstance();
+        Image img = factory.fromFile(imageFile);
 
         String url =
                 "https://mlrepo.djl.ai/model/cv/semantic_segmentation/ai/djl/pytorch/deeplabv3/0.0.1/deeplabv3.zip";
 
         Criteria<Image, CategoryMask> criteria =
                 Criteria.builder()
-                        .optApplication(Application.CV.SEMANTIC_SEGMENTATION)
                         .setTypes(Image.class, CategoryMask.class)
                         .optModelUrls(url)
                         .optTranslatorFactory(new SemanticSegmentationTranslatorFactory())
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
                         .build();
-        Image bg =
-                ImageFactory.getInstance().fromFile(Paths.get("src/test/resources/airplane1.png"));
+        Image bg = factory.fromFile(Paths.get("../website/img/stars-in-the-night-sky.jpg"));
         try (ZooModel<Image, CategoryMask> model = criteria.loadModel();
                 Predictor<Image, CategoryMask> predictor = model.newPredictor()) {
             CategoryMask mask = predictor.predict(img);
@@ -79,21 +77,22 @@ public final class SemanticSegmentation {
 
             // Highlights the detected object on the image with random colors.
             Image img2 = img.duplicate();
-            mask.drawMask(img2, 100);
+            mask.drawMask(img2, 180, 0);
             saveSemanticImage(img2, "semantic_instances2.png");
 
-            // Highlights the dog with blue color.
+            // Highlights only the dog with blue color.
             Image img3 = img.duplicate();
-            mask.drawMask(img3, 12, Color.BLUE.getRGB(), 100);
+            mask.drawMask(img3, 12, Color.BLUE.brighter().getRGB(), 180);
             saveSemanticImage(img3, "semantic_instances3.png");
 
-            // Remove background
-            Image maskImage = mask.getMaskImage(img);
-            saveSemanticImage(maskImage, "semantic_instances4.png");
+            // Extract dog from the image
+            Image dog = mask.getMaskImage(img, 12);
+            dog = dog.resize(img.getWidth(), img.getHeight(), true);
+            saveSemanticImage(dog, "semantic_instances4.png");
 
             // Replace background with an image
             bg = bg.resize(img.getWidth(), img.getHeight(), true);
-            bg.drawImage(maskImage, true);
+            bg.drawImage(dog, true);
             saveSemanticImage(bg, "semantic_instances5.png");
         }
     }

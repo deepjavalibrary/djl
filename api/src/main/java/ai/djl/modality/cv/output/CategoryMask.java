@@ -87,29 +87,42 @@ public class CategoryMask implements JsonSerializable {
     }
 
     /**
-     * Get the detected object on the image.
+     * Extracts the detected objects from the image.
      *
      * @param image the original image
+     * @return the detected objects from the image
      */
     public Image getMaskImage(Image image) {
         return image.getMask(mask);
     }
 
     /**
-     * Get the background of the image.
+     * Extracts the specified object from the image.
      *
      * @param image the original image
+     * @param classId the class to extract from the image
+     * @return the specific object on the image
      */
-    public Image getBackgroundImage(Image image) {
+    public Image getMaskImage(Image image, int classId) {
         int width = mask[0].length;
         int height = mask.length;
-        int[][] bg = new int[width][height];
+        int[][] selected = new int[height][width];
         for (int h = 0; h < height; ++h) {
             for (int w = 0; w < width; ++w) {
-                bg[h][w] = mask[h][w] == 0 ? 1 : 0;
+                selected[h][w] = mask[h][w] == classId ? 1 : 0;
             }
         }
-        return image.getMask(bg);
+        return image.getMask(selected);
+    }
+
+    /**
+     * Extracts the background from the image.
+     *
+     * @param image the original image
+     * @return the background of the image
+     */
+    public Image getBackgroundImage(Image image) {
+        return getMaskImage(image, 0);
     }
 
     /**
@@ -117,8 +130,8 @@ public class CategoryMask implements JsonSerializable {
      *
      * @param image the original image
      * @param transparency the transparency of the overlay. Value is between 0 and 255 inclusive,
-     *     where 0 means the overlay is completely opaque and 255 means the overlay is completely
-     *     transparent.
+     *     where 0 means the overlay is completely transparent and 255 means the overlay is
+     *     completely opaque.
      */
     public void drawMask(Image image, int transparency) {
         drawMask(image, transparency, Color.BLACK.getRGB());
@@ -146,13 +159,11 @@ public class CategoryMask implements JsonSerializable {
      * @param image the original image
      * @param classId the class to draw on the image
      * @param color the rgb color with transparency
-     * @param transparency the transparency of the overlay. Value is between 0 and 255 inclusive,
-     *     where 0 means the overlay is completely opaque and 255 means the overlay is completely
-     *     transparent.
+     * @param transparency the transparency of the overlay
      */
     public void drawMask(Image image, int classId, int color, int transparency) {
         int[] colors = new int[classes.size()];
-        colors[classId] = (color & 0x00FFFFFF) | transparency << 24;
+        colors[classId] = color & 0xFFFFFF | transparency << 24;
         Image colorOverlay = getColorOverlay(colors);
         image.drawImage(colorOverlay, true);
     }

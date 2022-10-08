@@ -161,13 +161,13 @@ public class BufferedImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
-        public Object getWrappedImage() {
+        public BufferedImage getWrappedImage() {
             return image;
         }
 
         /** {@inheritDoc} */
         @Override
-        public Image resize(int width, int height, boolean copy) {
+        public BufferedImageWrapper resize(int width, int height, boolean copy) {
             if (!copy && image.getWidth() == width && image.getHeight() == height) {
                 return this;
             }
@@ -203,8 +203,8 @@ public class BufferedImageFactory extends ImageFactory {
         public Image getMask(int[][] mask) {
             int w = mask[0].length;
             int h = mask.length;
-            Image resized = resize(w, h, true);
-            BufferedImage img = (BufferedImage) resized.getWrappedImage();
+            BufferedImageWrapper resized = resize(w, h, true);
+            BufferedImage img = resized.getWrappedImage();
             int[] pixels = new int[w * h];
             int index = 0;
             for (int y = 0; y < h; ++y) {

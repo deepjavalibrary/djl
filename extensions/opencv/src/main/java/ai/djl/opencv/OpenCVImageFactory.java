@@ -30,6 +30,8 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.file.Path;
 
 /** {@code OpenCVImageFactory} is a high performance implementation of {@link ImageFactory}. */
@@ -46,6 +48,7 @@ public class OpenCVImageFactory extends ImageFactory {
     /** {@inheritDoc} */
     @Override
     public Image fromFile(Path path) throws IOException {
+        // Load image without alpha channel
         Mat img = Imgcodecs.imread(path.toAbsolutePath().toString());
         if (img.empty()) {
             throw new IOException("Read image failed: " + path);
@@ -103,9 +106,16 @@ public class OpenCVImageFactory extends ImageFactory {
     /** {@inheritDoc} */
     @Override
     public Image fromPixels(int[] pixels, int width, int height) {
-        Mat img = new Mat(height, width, CvType.CV_8UC3);
-        img.put(0, 0, pixels);
-        Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2BGR);
+        Mat img = new Mat(height, width, CvType.CV_8UC4);
+        byte[] data = new byte[width * height * 4];
+        IntBuffer buf = ByteBuffer.wrap(data).asIntBuffer();
+        for (int pixel : pixels) {
+            int r = pixel >> 8 & 0xff00;
+            int g = pixel << 8 & 0xff0000;
+            int b = pixel << 24 & 0xff000000;
+            buf.put(pixel >>> 24 | b | g | r);
+        }
+        img.put(0, 0, data);
         return new OpenCVImage(img);
     }
 }

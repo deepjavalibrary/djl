@@ -142,9 +142,9 @@ public abstract class ImageFactory {
     /**
      * Gets {@link Image} from array.
      *
-     * @param pixels Array of RGB values used to initialize the pixels.
-     * @param width The width of the image
-     * @param height The height of the image
+     * @param pixels the array of ARGB values used to initialize the pixels.
+     * @param width the width of the image
+     * @param height the height of the image
      * @return {@link Image}
      */
     public abstract Image fromPixels(int[] pixels, int width, int height);

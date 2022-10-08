@@ -25,9 +25,11 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.testing.TestRequirements;
 
+import org.opencv.core.Mat;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -155,5 +157,44 @@ public class OpenCVImageFactoryTest {
                 Assert.assertEquals(rectangles.get(i).toString(), expected.get(i).toString());
             }
         }
+    }
+
+    @Test
+    public void testDrawImage() throws IOException {
+        ImageFactory factory = ImageFactory.getInstance();
+        int[] pixels = new int[64];
+        int index = 0;
+        for (int i = 0; i < 16; ++i) {
+            pixels[index++] = Color.RED.getRGB() & 0x7fffffff;
+        }
+        for (int i = 0; i < 16; ++i) {
+            pixels[index++] = Color.GREEN.getRGB() & 0x7fffffff;
+        }
+        for (int i = 0; i < 16; ++i) {
+            pixels[index++] = Color.BLUE.getRGB() & 0x7fffffff;
+        }
+        for (int i = 0; i < 16; ++i) {
+            pixels[index++] = Color.BLACK.getRGB() & 0x7fffffff;
+        }
+        Image img1 = factory.fromPixels(pixels, 8, 8);
+
+        pixels = new int[16];
+        for (int i = 0; i < 16; ++i) {
+            pixels[i] = Color.RED.getRGB() & 0x7fffffff;
+        }
+        Image img2 = factory.fromPixels(pixels, 2, 8);
+        Image mask = img2.getMask(new int[][] {{1, 1}, {1, 1}, {0, 0}, {0, 0}});
+        Image dup = img1.duplicate();
+        img1.drawImage(img2, false);
+        Mat mat = (Mat) img1.getWrappedImage();
+        byte[] data = new byte[64 * 4];
+        mat.get(0, 0, data);
+        Assert.assertEquals(data[2], -1); // red
+        Assert.assertEquals(data[3], -65); // alpha
+
+        dup.drawImage(mask, true);
+        ((Mat) dup.getWrappedImage()).get(0, 0, data);
+        Assert.assertEquals(data[2], -1); // red
+        Assert.assertEquals(data[3], -1); // alpha
     }
 }

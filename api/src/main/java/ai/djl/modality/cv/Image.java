@@ -52,16 +52,17 @@ public interface Image {
     /**
      * Creates a new resized image.
      *
-     * @param width the new image's desired width.
-     * @param height the new image's desired height.
+     * @param width the new image's desired width
+     * @param height the new image's desired height
+     * @param copy false to return original image if size is the same
      * @return the new resized image.
      */
     Image resize(int width, int height, boolean copy);
 
     /**
-     * Creates a new resized image.
+     * Returns a new {@code Image} of masked area.
      *
-     * @param mask the category mask for each pixel in the image
+     * @param mask the mask for each pixel in the image
      * @return the mask image.
      */
     Image getMask(int[][] mask);
@@ -137,6 +138,7 @@ public interface Image {
      * Draws the overlay on the image.
      *
      * @param overlay the overlay image
+     * @param resize true to resize the overlay image to match the image
      */
     void drawImage(Image overlay, boolean resize);
 
