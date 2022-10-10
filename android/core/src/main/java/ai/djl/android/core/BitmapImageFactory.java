@@ -120,6 +120,13 @@ public class BitmapImageFactory extends ImageFactory {
         return new BitMapWrapper(bitmap);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Image fromPixels(int[] pixels, int width, int height) {
+        Bitmap  bitmap = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888);
+        return new BitMapWrapper(bitmap);
+    }
+
     static class BitMapWrapper implements Image {
         private Bitmap bitmap;
 
@@ -141,8 +148,37 @@ public class BitmapImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
-        public Object getWrappedImage() {
+        public Bitmap getWrappedImage() {
             return bitmap;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public BitMapWrapper resize(int width, int height, boolean copy) {
+            if (!copy && bitmap.getWidth() == width && bitmap.getHeight() == height) {
+                return this;
+            }
+            return new BitMapWrapper(Bitmap.createScaledBitmap(bitmap, width, height, true));
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Image getMask(int[][] mask) {
+            int w = mask[0].length;
+            int h = mask.length;
+            BitMapWrapper resized = resize(w, h, true);
+            Bitmap img = resized.getWrappedImage();
+            int[] pixels = new int[w * h];
+            int index = 0;
+            for (int y = 0; y < h; ++y) {
+                for (int x = 0; x < w; ++x) {
+                    if (mask[y][x] != 0) {
+                        pixels[index] = img.getPixel(x, y);
+                    }
+                    index++;
+                }
+            }
+            return new BitMapWrapper(Bitmap.createBitmap(pixels, w, h, Bitmap.Config.ARGB_8888));
         }
 
         /** {@inheritDoc} */
@@ -268,6 +304,24 @@ public class BitmapImageFactory extends ImageFactory {
             }
             Bitmap oldBitmap = bitmap;
             bitmap = mutableBitmap;
+            oldBitmap.recycle();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void drawImage(Image overlay, boolean resize) {
+            if (!(overlay.getWrappedImage() instanceof Bitmap)) {
+                throw new IllegalArgumentException("Only Bitmap allowed");
+            }
+            if (resize) {
+                overlay = overlay.resize(getWidth(), getHeight(), false);
+            }
+            Bitmap target = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(target);
+            canvas.drawBitmap(bitmap, 0, 0, null);
+            canvas.drawBitmap((Bitmap) overlay.getWrappedImage(), 0, 0, null);
+            Bitmap oldBitmap = bitmap;
+            bitmap = target;
             oldBitmap.recycle();
         }
 
