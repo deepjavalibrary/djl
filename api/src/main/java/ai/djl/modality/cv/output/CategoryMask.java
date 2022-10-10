@@ -23,7 +23,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import java.awt.Color;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +35,8 @@ import java.util.List;
 public class CategoryMask implements JsonSerializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final int COLOR_BLACK = 0xFF000000;
 
     private static final Gson GSON =
             JsonUtils.builder()
@@ -134,7 +135,7 @@ public class CategoryMask implements JsonSerializable {
      *     completely opaque.
      */
     public void drawMask(Image image, int transparency) {
-        drawMask(image, transparency, Color.BLACK.getRGB());
+        drawMask(image, transparency, COLOR_BLACK);
     }
 
     /**
