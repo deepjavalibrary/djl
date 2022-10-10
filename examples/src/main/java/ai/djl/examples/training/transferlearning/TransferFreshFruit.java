@@ -18,8 +18,8 @@ import ai.djl.basicdataset.cv.classification.ImageFolder;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
+import ai.djl.modality.cv.transform.OneHot;
 import ai.djl.modality.cv.transform.Resize;
-import ai.djl.modality.cv.transform.ToOneHot;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.transform.Transpose;
 import ai.djl.ndarray.NDList;
@@ -162,7 +162,7 @@ public final class TransferFreshFruit {
                         .addTransform(new Transpose(1, 2, 0))
                         .addTransform(new Resize(224, 224))
                         .addTransform(new Transpose(2, 0, 1))
-                        .addTargetTransform(new ToOneHot(2))
+                        .addTargetTransform(new OneHot(2))
                         .setSampling(batchSize, true)
                         .build();
         dataset.prepare();

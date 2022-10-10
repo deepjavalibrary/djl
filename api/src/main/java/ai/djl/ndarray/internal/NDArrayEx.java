@@ -16,7 +16,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDArrayIndexer;
-import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -444,21 +443,6 @@ public interface NDArrayEx {
             array.attach(manager);
             result.attach(manager);
             return result;
-        }
-    }
-
-    default NDArray toOneHot(int numClass) {
-        NDManager manager = getArray().getManager();
-        try (NDManager subManager = manager.newSubManager()) {
-            NDArray label = getArray();
-            int batchSize = (int) label.getShape().get(0);
-            NDArray resultLabel = subManager.zeros(new Shape(batchSize, numClass), DataType.INT32);
-            for (int i = 0; i < batchSize; ++i) {
-                resultLabel.set(new NDIndex(i, label.getLong(i)), 1);
-                // TODO: label.getInt(i) report mismatch. getInt() should contain type convertion
-            }
-            resultLabel.attach(manager);
-            return resultLabel;
         }
     }
 
