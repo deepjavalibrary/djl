@@ -45,7 +45,7 @@ JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_loadExtraDir(
   int size = vec_arg.size();
   argv.reserve(vec_arg.size());
   for (auto& arg : vec_arg) {
-    argv.emplace_back(const_cast<char*>(arg.data()));
+    argv.push_back(const_cast<char*>(arg.data()));
   }
   char** array = argv.data();
   std::cout << "Pending Paddle fix to proceed with the option" << std::endl;
