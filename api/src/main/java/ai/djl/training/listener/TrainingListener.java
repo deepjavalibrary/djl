@@ -76,7 +76,7 @@ public interface TrainingListener {
     interface Defaults {
 
         /**
-         * A basic {@link TrainingListener} set with minimal recommended functionality.
+         * A basic {@link TrainingListener} set with the minimal recommended functionality.
          *
          * <p>This contains:
          *

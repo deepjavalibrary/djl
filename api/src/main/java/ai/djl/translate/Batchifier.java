@@ -18,8 +18,8 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 /**
- * An interface that provides methods to convert an un-batched {@link NDList} into a batched {@link
- * NDList} and vice versa.
+ * An interface for different strategies to convert between {@link ai.djl.training.dataset.Record}
+ * {@link NDList}s and {@link ai.djl.training.dataset.Batch} {@link NDList}.
  *
  * <p>Different implementations of {@code Batchifier} represent different ways of creating batches.
  * The most common would be the {@link StackBatchifier} that batchifies by creating a new batch axis
@@ -49,7 +49,8 @@ public interface Batchifier {
     }
 
     /**
-     * Converts an array of {@link NDList} into an NDList.
+     * Converts an array of {@link ai.djl.training.dataset.Record} {@link NDList}s into a combined
+     * {@link ai.djl.training.dataset.Batch} NDList.
      *
      * <p>The size of the input array is the batch size. The data in each of the {@link NDList} are
      * assumed to be the same, and are batched together to form one batched {@link NDList}.
@@ -60,7 +61,10 @@ public interface Batchifier {
     NDList batchify(NDList[] inputs);
 
     /**
-     * Reverses the {@link #batchify(NDList[]) batchify} operation.
+     * Splits a combined {@link ai.djl.training.dataset.Batch} {@link NDList} into it's constituent
+     * {@link ai.djl.training.dataset.Record} {@link NDList}s.
+     *
+     * <p>This reverses the {@link #batchify(NDList[]) batchify} operation.
      *
      * @param inputs the {@link NDList} that needs to be 'unbatchified'
      * @return an array of NDLists, of size equal to batch size, where each NDList is one element
@@ -69,7 +73,11 @@ public interface Batchifier {
     NDList[] unbatchify(NDList inputs);
 
     /**
-     * Splits the given {@link NDList} into the given number of slices.
+     * Partitions the given {@link ai.djl.training.dataset.Batch} {@link NDList} into multiple
+     * {@link ai.djl.training.dataset.Batch} lists with smaller batch size.
+     *
+     * <p>As an example, this function might be used for multi-GPU training where it takes the main
+     * batch and splits it into sub-batches that can be run on each GPU.
      *
      * <p>This function unbatchifies the input {@link NDList}, redistributes them into the given
      * number of slices, and then batchify each of the slices to form an array of {@link NDList}.
