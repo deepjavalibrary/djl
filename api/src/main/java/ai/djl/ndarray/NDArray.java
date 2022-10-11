@@ -4582,7 +4582,17 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return the debug string representation of this {@code NDArray}
      */
     default String toDebugString() {
-        return toDebugString(100, 10, 10, 20);
+        return NDFormat.format(this, 100, 10, 10, 20);
+    }
+
+    /**
+     * Runs the debug string representation of this {@code NDArray}.
+     *
+     * @param withContent true to show the content of NDArray
+     * @return the debug string representation of this {@code NDArray}
+     */
+    default String toDebugString(boolean withContent) {
+        return toDebugString(1000, 10, 10, 20, withContent);
     }
 
     /**
@@ -4592,10 +4602,12 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @param maxDepth the maximum depth to print out
      * @param maxRows the maximum rows to print out
      * @param maxColumns the maximum columns to print out
+     * @param withContent true to show the content of NDArray
      * @return the debug string representation of this {@code NDArray}
      */
-    default String toDebugString(int maxSize, int maxDepth, int maxRows, int maxColumns) {
-        return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns);
+    default String toDebugString(
+            int maxSize, int maxDepth, int maxRows, int maxColumns, boolean withContent) {
+        return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns, withContent);
     }
 
     /** {@inheritDoc} */
