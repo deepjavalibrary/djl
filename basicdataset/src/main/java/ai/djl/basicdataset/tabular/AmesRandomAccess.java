@@ -29,7 +29,6 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -44,6 +43,9 @@ import java.util.Set;
  * <p>Test Set: 1459 Records
  *
  * <p>Can enable/disable features Set one hot vector for categorical variables
+ *
+ * <p>Call {@link Builder#addAllFeatures()} to include all features from the dataset. The label is a
+ * numeric column named "saleprice".
  */
 public class AmesRandomAccess extends CsvDataset {
 
@@ -200,13 +202,27 @@ public class AmesRandomAccess extends CsvDataset {
         public Builder addFeature(String name, boolean onehotEncode) {
             parseFeatures();
             if (af.categorical.contains(name)) {
-                Map<String, Integer> map = af.featureToMap.get(name);
-                if (map == null) {
-                    return addCategoricalFeature(name, onehotEncode);
-                }
-                return addCategoricalFeature(name, map, onehotEncode);
+                return addCategoricalFeature(name, onehotEncode);
             }
             return addNumericFeature(name);
+        }
+
+        /**
+         * Adds all features to the features set.
+         *
+         * @return this builder
+         */
+        public Builder addAllFeatures() {
+            if (features.isEmpty()) {
+                parseFeatures();
+                for (String name : af.featureArray) {
+                    addFeature(name);
+                }
+            }
+            if (labels.isEmpty()) {
+                addNumericLabel("saleprice");
+            }
+            return this;
         }
 
         /**
@@ -226,15 +242,6 @@ public class AmesRandomAccess extends CsvDataset {
          */
         @Override
         public AmesRandomAccess build() {
-            if (features.isEmpty()) {
-                parseFeatures();
-                for (String name : af.featureArray) {
-                    addFeature(name);
-                }
-            }
-            if (labels.isEmpty()) {
-                addNumericLabel("saleprice");
-            }
             return new AmesRandomAccess(this);
         }
 
@@ -260,6 +267,5 @@ public class AmesRandomAccess extends CsvDataset {
 
         List<String> featureArray;
         Set<String> categorical;
-        Map<String, Map<String, Integer>> featureToMap;
     }
 }

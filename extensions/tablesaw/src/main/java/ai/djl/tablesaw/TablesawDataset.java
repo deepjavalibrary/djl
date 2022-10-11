@@ -104,7 +104,6 @@ public class TablesawDataset extends TabularDataset {
          * @return the new {@link TablesawDataset}
          */
         public TablesawDataset build() {
-            validate();
             return new TablesawDataset(this);
         }
     }
