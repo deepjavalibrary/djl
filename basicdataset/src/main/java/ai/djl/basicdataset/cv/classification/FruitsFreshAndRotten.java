@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -29,25 +29,39 @@ import java.util.Arrays;
 
 /**
  * FruitRottenFresh classification dataset that contains the same fruit where rotten and fresh class
- * are stored in two subfolders. It is structured similar to ImageFolders as follows:
- * root/shoes/Aerobic Shoes1.png root/shoes/Aerobic Shose2.png ... root/boots/Black Boots.png
- * root/boots/White Boots.png ... root/pumps/Red Pumps.png root/pumps/Pink Pumps.png ...
+ * are stored in different sub folders.
+ *
+ * <pre>
+ * It is structured similar to ImageFolders as follows:
+ *      freshapples/1.png
+ *      freshapples/2.png
+ *      ...
+ *      rottenapples/1.png
+ *      rottenapples/2.png
+ *      ...
+ *      freshbanana/1.png
+ *      freshbanana/2.png
+ *      ...
+ *      rottenbanana/1.png
+ *      rottenbanana/2.png
+ *      ...
+ * </pre>
  */
-public final class FruitRottenFresh extends AbstractImageFolder {
+public final class FruitsFreshAndRotten extends AbstractImageFolder {
 
     private static final String VERSION = "1.0";
-    private static final String ARTIFACT_ID = "fruit-unittest";
+    private static final String ARTIFACT_ID = "fruit";
 
     private MRL mrl;
     private boolean prepared;
 
-    private FruitRottenFresh(Builder builder) {
+    private FruitsFreshAndRotten(Builder builder) {
         super(builder);
         mrl = builder.getMrl();
     }
 
     /**
-     * Creates a new builder to build a {@link FruitRottenFresh}.
+     * Creates a new builder to build a {@link FruitsFreshAndRotten}.
      *
      * @return a new builder
      */
@@ -64,7 +78,6 @@ public final class FruitRottenFresh extends AbstractImageFolder {
     /** {@inheritDoc} */
     @Override
     public void prepare(Progress progress) throws IOException {
-
         if (prepared) {
             return;
         }
@@ -97,7 +110,7 @@ public final class FruitRottenFresh extends AbstractImageFolder {
         }
     }
 
-    /** A builder for the {@link FruitRottenFresh}. */
+    /** A builder for the {@link FruitsFreshAndRotten}. */
     public static final class Builder extends ImageFolderBuilder<Builder> {
 
         String groupId;
@@ -169,12 +182,12 @@ public final class FruitRottenFresh extends AbstractImageFolder {
         }
 
         /**
-         * Builds the {@link FruitRottenFresh}.
+         * Builds the {@link FruitsFreshAndRotten}.
          *
-         * @return the {@link FruitRottenFresh}
+         * @return the {@link FruitsFreshAndRotten}
          * @throws IOException if there is an issue
          */
-        public FruitRottenFresh build() throws IOException {
+        public FruitsFreshAndRotten build() throws IOException {
             if (pipeline == null) {
                 pipeline = new Pipeline(new ToTensor());
             }
@@ -199,7 +212,7 @@ public final class FruitRottenFresh extends AbstractImageFolder {
             Path root = mrl.getRepository().getFile(item, "").toAbsolutePath();
 
             repository = Repository.newInstance("banana", root);
-            return new FruitRottenFresh(this);
+            return new FruitsFreshAndRotten(this);
         }
 
         MRL getMrl() {

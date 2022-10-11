@@ -25,15 +25,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class TransferFreshFruitTest {
+
     @Test
     public void testTransferFreshFruit()
             throws ModelException, TranslateException, IOException, URISyntaxException {
         TestRequirements.engine("PyTorch");
-        TestRequirements.nightly();
 
-        String[][] args = new String[2][];
-        args[0] = new String[] {};
-        args[1] = new String[] {"-p"};
+        String[][] args = {{}, {"-p"}};
         TrainingResult result;
         for (String[] arg : args) {
             result = TransferFreshFruit.runExample(arg);

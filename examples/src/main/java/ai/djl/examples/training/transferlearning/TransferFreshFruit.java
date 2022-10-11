@@ -14,9 +14,8 @@ package ai.djl.examples.training.transferlearning;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
-import ai.djl.basicdataset.cv.classification.FruitRottenFresh;
+import ai.djl.basicdataset.cv.classification.FruitsFreshAndRotten;
 import ai.djl.engine.Engine;
-import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.Normalize;
@@ -66,22 +65,14 @@ public final class TransferFreshFruit {
 
     public static TrainingResult runExample(String[] args)
             throws IOException, TranslateException, ModelException, URISyntaxException {
-        Arguments arguments = new Arguments().parseArgs(args);
-        if (arguments == null) {
-            return null;
-        }
-
-        String modelUrls =
-                "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/resnet18_embedding/0.0.1/resnet18_embedding.zip";
+        boolean retrain = args.length == 1 && "-p".equals(args[0]);
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
-                        .optModelUrls(modelUrls)
-                        .optEngine(Engine.getDefaultEngineName())
+                        .optModelUrls("djl://ai.djl.pytorch/resnet18_embedding")
+                        .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
-                        // Here the argument "pretrained" is borrowed.
-                        // Pretrained means no need to retrain, and vice versa.
-                        .optOption("retrain", arguments.isPreTrained() ? "false" : "true")
+                        .optOption("retrain", String.valueOf(retrain))
                         .build();
 
         ZooModel<NDList, NDList> embedding = criteria.loadModel();
@@ -98,7 +89,7 @@ public final class TransferFreshFruit {
         model.setBlock(blocks);
 
         // Configure trainer
-        DefaultTrainingConfig config = setupTrainingConfig(arguments);
+        DefaultTrainingConfig config = setupTrainingConfig();
 
         float lr = 0.001f; // Customized learning rate
         FixedPerVarTracker.Builder learningRateTrackerBuilder =
@@ -135,13 +126,14 @@ public final class TransferFreshFruit {
 
     private static RandomAccessDataset getData(Dataset.Usage usage, int batchSize)
             throws TranslateException, IOException {
-        // The dataset is accessible from <a
-        // href="https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification">https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification</a>
+        // The dataset is accessible from:
+        // https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification
         float[] mean = {0.485f, 0.456f, 0.406f};
         float[] std = {0.229f, 0.224f, 0.225f};
-        FruitRottenFresh dataset =
-                FruitRottenFresh.builder()
+        FruitsFreshAndRotten dataset =
+                FruitsFreshAndRotten.builder()
                         .optUsage(usage)
+                        .optArtifactId("fruit-unittest")
                         .addTransform(new RandomResizedCrop(256, 256)) // only in training
                         .addTransform(new RandomFlipTopBottom()) // only in training
                         .addTransform(new RandomFlipLeftRight()) // only in training
@@ -157,8 +149,8 @@ public final class TransferFreshFruit {
         return dataset;
     }
 
-    private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
-        String outputDir = arguments.getOutputDir();
+    private static DefaultTrainingConfig setupTrainingConfig() {
+        String outputDir = "build/fruits";
         SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
         listener.setSaveModelCallback(
                 trainer -> {
