@@ -327,7 +327,7 @@ public class BitmapImageFactory extends ImageFactory {
 
         private int randomColor() {
             return Color.rgb(
-                    RandomUtils.nextInt(255), RandomUtils.nextInt(255), RandomUtils.nextInt(255));
+                    RandomUtils.nextInt(256), RandomUtils.nextInt(256), RandomUtils.nextInt(256));
         }
 
         private int darker(int color) {
