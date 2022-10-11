@@ -119,7 +119,7 @@ public class Parameter implements AutoCloseable {
      * @return the shape of this {@code Parameter}
      */
     public Shape getShape() {
-        return this.shape;
+        return shape;
     }
 
     /**
@@ -180,7 +180,7 @@ public class Parameter implements AutoCloseable {
     }
 
     /**
-     * Gets the {@link Initializer} for this {@code Parameter}, if not already set. If overwrite
+     * Returns the {@link Initializer} for this {@code Parameter}, if not already set. If overwrite
      * flag is true, sets the initializer regardless.
      *
      * @return the initializer of this {@code Parameter}

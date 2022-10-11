@@ -17,6 +17,7 @@ import ai.djl.translate.Transform;
 
 /** A {@link Transform} that converts the labels {@link NDArray} to one-hot labels. */
 public class OneHot implements Transform {
+
     private int numClass;
 
     /**

@@ -87,10 +87,6 @@ public abstract class NDFormat {
             return sb.toString();
         }
 
-        if (DEBUG) {
-            sb.append(" ~>");
-        }
-
         NDFormat format;
         DataType dataType = array.getDataType();
 
