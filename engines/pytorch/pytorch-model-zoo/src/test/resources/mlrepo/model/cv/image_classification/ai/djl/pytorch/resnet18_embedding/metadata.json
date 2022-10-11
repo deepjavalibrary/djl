@@ -1,0 +1,42 @@
+{
+  "metadataVersion": "0.1",
+  "resourceType": "model",
+  "application": "cv/image_classification",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "resnet18_embedding",
+  "name": "resnet18_embedding",
+  "description": "A pretrained resnet18 model as an embedding base model",
+  "website": "http://www.djl.ai/engines/pytorch/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "resnet18_embedding",
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "resize": 256,
+        "centerCrop": true,
+        "normalize": true,
+        "translatorFactory": "ai.djl.modality.cv.translator.ImageFeatureExtractorFactory"
+      },
+      "options": {
+        "mapLocation": "true"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/resnet18_embedding.zip",
+          "name": "",
+          "sha1Hash": "e37db339e87dc13ae0831e45818fca454f526ffb",
+          "size": 41574720
+        }
+      }
+    }
+  ]
+}
