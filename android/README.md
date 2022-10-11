@@ -16,9 +16,12 @@ In gradle, you can add the 5 modules in your dependencies:
 
 ```
 dependencies {
-    implementation "ai.djl:api:0.20.0"
+    implementation platform("ai.djl:bom:0.20.0")
+
+    implementation "ai.djl:api"
+    // TODO: remove djl android package version in 0.21.0
     implementation "ai.djl.android:core:0.20.0"
-    runtimeOnly "ai.djl.pytorch:pytorch-engine:0.20.0"
+    runtimeOnly "ai.djl.pytorch:pytorch-engine"
     runtimeOnly "ai.djl.android:pytorch-native:0.20.0"
     runtimeOnly "ai.djl.android:onnxruntime:0.20.0"
 }
