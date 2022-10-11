@@ -197,19 +197,6 @@ public abstract class Loss extends Evaluator {
     }
 
     /**
-     * Returns a new instance of {@link SoftmaxCrossEntropyLoss}, which assumes softmax already
-     * applied.
-     *
-     * @param name the name of the loss
-     * @param fromSoftmax the input prediction is from the output of softmax, default false
-     * @return a new instance of {@link SoftmaxCrossEntropyLoss}
-     */
-    public static SoftmaxCrossEntropyLoss softmaxCrossEntropyLoss(
-            String name, boolean fromSoftmax) {
-        return new SoftmaxCrossEntropyLoss(name, fromSoftmax);
-    }
-
-    /**
      * Returns a new instance of {@link MaskedSoftmaxCrossEntropyLoss} with default arguments.
      *
      * @return a new instance of {@link MaskedSoftmaxCrossEntropyLoss}

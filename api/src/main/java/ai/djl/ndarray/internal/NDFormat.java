@@ -88,7 +88,7 @@ public abstract class NDFormat {
         }
 
         if (DEBUG) {
-            sb.append(" ->");
+            sb.append(" ~>");
         }
 
         NDFormat format;

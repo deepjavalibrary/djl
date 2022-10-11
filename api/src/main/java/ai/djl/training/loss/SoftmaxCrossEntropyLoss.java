@@ -31,7 +31,6 @@ public class SoftmaxCrossEntropyLoss extends Loss {
     private int classAxis;
     private boolean sparseLabel;
     private boolean fromLogit;
-    private boolean fromSoftmax;
 
     /** Creates a new instance of {@code SoftmaxCrossEntropyLoss} with default parameters. */
     public SoftmaxCrossEntropyLoss() {
@@ -67,22 +66,6 @@ public class SoftmaxCrossEntropyLoss extends Loss {
         this.classAxis = classAxis;
         this.sparseLabel = sparseLabel;
         this.fromLogit = fromLogit;
-        this.fromSoftmax = false;
-    }
-
-    /**
-     * Creates a new instance of {@code SoftmaxCrossEntropyLoss} from the output of softmax.
-     *
-     * @param name the name of the loss function
-     * @param fromSoftmax the input prediction is from the output of softmax, default false
-     */
-    public SoftmaxCrossEntropyLoss(String name, boolean fromSoftmax) {
-        super(name);
-        this.weight = 1;
-        this.classAxis = -1;
-        this.sparseLabel = false;
-        this.fromLogit = false;
-        this.fromSoftmax = fromSoftmax;
     }
 
     /** {@inheritDoc} */
@@ -91,9 +74,6 @@ public class SoftmaxCrossEntropyLoss extends Loss {
         NDArray pred = prediction.singletonOrThrow();
         if (fromLogit) {
             pred = pred.logSoftmax(classAxis);
-        }
-        if (fromSoftmax) {
-            pred = pred.log();
         }
         NDArray loss;
         NDArray lab = label.singletonOrThrow();

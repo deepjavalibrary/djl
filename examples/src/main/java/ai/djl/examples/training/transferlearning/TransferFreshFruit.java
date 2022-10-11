@@ -22,6 +22,7 @@ import ai.djl.modality.cv.transform.OneHot;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.transform.Transpose;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -118,7 +119,7 @@ public final class TransferFreshFruit {
         ImageFolder datasetTrain = getData("test", "banana", batchSize);
 
         // Train
-        EasyTrain.fit(trainer, 10, datasetTrain, null);
+        EasyTrain.fit(trainer, 6, datasetTrain, null);
 
         // Save model
         // model.save("your-model-path");
@@ -126,25 +127,6 @@ public final class TransferFreshFruit {
         model.close();
         embedding.close();
         return null;
-    }
-
-    private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
-        String outputDir = arguments.getOutputDir();
-        SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
-        listener.setSaveModelCallback(
-                trainer -> {
-                    TrainingResult result = trainer.getTrainingResult();
-                    Model model = trainer.getModel();
-                    float accuracy = result.getValidateEvaluation("Accuracy");
-                    model.setProperty("Accuracy", String.format("%.5f", accuracy));
-                    model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
-                });
-
-        return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss("SoftmaxCrossEntropy", true))
-                .addEvaluator(new Accuracy())
-                .optDevices(Engine.getInstance().getDevices(1))
-                .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
-                .addTrainingListeners(listener);
     }
 
     private static ImageFolder getData(String subfolderName, String fruit, int batchSize)
@@ -167,5 +149,47 @@ public final class TransferFreshFruit {
                         .build();
         dataset.prepare();
         return dataset;
+    }
+
+    private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
+        String outputDir = arguments.getOutputDir();
+        SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
+        listener.setSaveModelCallback(
+                trainer -> {
+                    TrainingResult result = trainer.getTrainingResult();
+                    Model model = trainer.getModel();
+                    float accuracy = result.getValidateEvaluation("Accuracy");
+                    model.setProperty("Accuracy", String.format("%.5f", accuracy));
+                    model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
+                });
+
+        return new DefaultTrainingConfig(new SoftmaxCrossEntropy("SoftmaxCrossEntropy"))
+                .addEvaluator(new Accuracy())
+                .optDevices(Engine.getInstance().getDevices(1))
+                .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
+                .addTrainingListeners(listener);
+    }
+
+    private static class SoftmaxCrossEntropy extends Loss {
+
+        /**
+         * Base class for metric with abstract update methods.
+         *
+         * @param name The display name of the Loss
+         */
+        public SoftmaxCrossEntropy(String name) {
+            super(name);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public NDArray evaluate(NDList labels, NDList predictions) {
+            // Here the labels are supposed to be one-hot
+            int classAxis = -1;
+            NDArray pred = predictions.singletonOrThrow().log();
+            NDArray lab = labels.singletonOrThrow().reshape(pred.getShape());
+            NDArray loss = pred.mul(lab).neg().sum(new int[] {classAxis}, true);
+            return loss.mean();
+        }
     }
 }
