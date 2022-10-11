@@ -76,6 +76,8 @@ public final class TransferFreshFruit {
                         .optModelUrls(modelUrls)
                         .optEngine(Engine.getDefaultEngineName())
                         .optProgress(new ProgressBar())
+                        // Here the argument pretrained is borrowed.
+                        // Pretrained means no need to retrain, and vice versa.
                         .optOption("retrain", arguments.isPreTrained() ? "0" : "1")
                         .build();
 

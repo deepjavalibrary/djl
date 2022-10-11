@@ -28,6 +28,7 @@ public class TransferFreshFruitTest {
 
     // TransferFreshFruit requires manually downloading the dataset from <a
     // href="https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification">https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification</a> so can't be automatically tested
+    // https://zenodo.org/record/4788775/files/Data.zip?download=1
     @Test(enabled = false)
     public void testTransferFreshFruit()
             throws ModelException, TranslateException, IOException, URISyntaxException {
