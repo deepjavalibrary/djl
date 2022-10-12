@@ -68,7 +68,7 @@ public final class TransferFreshFruit {
         }
 
         // Also available at
-        // "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/resnet18_embedding/0.1/traced_resnet18_embedding.pt.gz";
+        // "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/resnet18_embedding/0.0.1/traced_resnet18_embedding.pt.gz";
         String modelUrls = "/Users/fenkexin/Desktop/transferDJL/code/base_nw.pt";
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
@@ -137,11 +137,11 @@ public final class TransferFreshFruit {
         // href="https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification">https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification</a>
         String folderUrl = "/Users/fenkexin/Desktop/transferDJL/code/data/" + fruit;
         String subfolder = "/" + subfolderName + "/";
-        Repository repositoryTrain =
+        Repository repository =
                 Repository.newInstance("banana", Paths.get(folderUrl + subfolder));
         ImageFolder dataset =
                 ImageFolder.builder()
-                        .setRepository(repositoryTrain)
+                        .setRepository(repository)
                         .addTransform(new ToTensor())
                         .addTransform(new Transpose(1, 2, 0))
                         .addTransform(new Resize(224, 224))
