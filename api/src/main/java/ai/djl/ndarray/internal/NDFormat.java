@@ -29,9 +29,10 @@ public abstract class NDFormat {
     private static final int PRECISION = 8;
     private static final String LF = System.getProperty("line.separator");
     private static final Pattern PATTERN = Pattern.compile("\\s*\\d\\.(\\d*?)0*e[+-](\\d+)");
-    private static final boolean DEBUG =
-            ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
-                    .anyMatch(arg -> arg.startsWith("-agentlib:jdwp"));
+    private static final boolean DEBUGGER =
+            !Boolean.getBoolean("jshell")
+                    && ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
+                            .anyMatch(arg -> arg.startsWith("-agentlib:jdwp"));
 
     /**
      * Formats the contents of an array as a pretty printable string.
@@ -45,6 +46,27 @@ public abstract class NDFormat {
      */
     public static String format(
             NDArray array, int maxSize, int maxDepth, int maxRows, int maxColumns) {
+        return format(array, maxSize, maxDepth, maxRows, maxColumns, !DEBUGGER);
+    }
+
+    /**
+     * Formats the contents of an array as a pretty printable string.
+     *
+     * @param array the array to print
+     * @param maxSize the maximum elements to print out
+     * @param maxDepth the maximum depth to print out
+     * @param maxRows the maximum rows to print out
+     * @param maxColumns the maximum columns to print out
+     * @param withContent true to show the content of NDArray
+     * @return the string representation of the array
+     */
+    public static String format(
+            NDArray array,
+            int maxSize,
+            int maxDepth,
+            int maxRows,
+            int maxColumns,
+            boolean withContent) {
         StringBuilder sb = new StringBuilder(1000);
         String name = array.getName();
         if (name != null) {
@@ -60,7 +82,7 @@ public abstract class NDFormat {
         if (array.hasGradient()) {
             sb.append(" hasGradient");
         }
-        if (DEBUG) {
+        if (!withContent) {
             return sb.toString();
         }
 
