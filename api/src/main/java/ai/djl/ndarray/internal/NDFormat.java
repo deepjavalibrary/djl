@@ -83,7 +83,7 @@ public abstract class NDFormat {
             sb.append(" hasGradient");
         }
         if (!withContent) {
-            sb.append("\nTo enable array display, check the \"Development Guideline->Debug\".\n");
+            sb.append("\nCheck the \"Development Guideline\"->Debug to enable array display.\n");
             return sb.toString();
         }
 
