@@ -137,8 +137,7 @@ public final class TransferFreshFruit {
         // href="https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification">https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification</a>
         String folderUrl = "/Users/fenkexin/Desktop/transferDJL/code/data/" + fruit;
         String subfolder = "/" + subfolderName + "/";
-        Repository repository =
-                Repository.newInstance("banana", Paths.get(folderUrl + subfolder));
+        Repository repository = Repository.newInstance("banana", Paths.get(folderUrl + subfolder));
         ImageFolder dataset =
                 ImageFolder.builder()
                         .setRepository(repository)
