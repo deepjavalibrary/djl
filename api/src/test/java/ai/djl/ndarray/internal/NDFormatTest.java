@@ -136,4 +136,14 @@ public class NDFormatTest {
             Assert.assertEquals(str, "ND: (3) cpu() float64" + LF + "[  1.,   2., 100.]" + LF);
         }
     }
+
+    @Test
+    public void testLargeArray() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray large = manager.arange(0f, 100000000f).reshape(100, 100, 100, 100);
+            String str = large.toString();
+            Assert.assertEquals(
+                    str, "ND: (100, 100, 100, 100) cpu() float32\n[ Exceed max print size ]");
+        }
+    }
 }

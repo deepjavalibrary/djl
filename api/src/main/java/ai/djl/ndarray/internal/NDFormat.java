@@ -83,6 +83,7 @@ public abstract class NDFormat {
             sb.append(" hasGradient");
         }
         if (!withContent) {
+            sb.append("\nCheck the \"Development Guideline\"->Debug to enable array display.\n");
             return sb.toString();
         }
 
@@ -114,9 +115,7 @@ public abstract class NDFormat {
             int maxDepth,
             int maxRows,
             int maxColumns) {
-        init(array);
         sb.append(LF);
-
         long size = array.size();
         long dimension = array.getShape().dimension();
         if (size == 0) {
@@ -130,6 +129,7 @@ public abstract class NDFormat {
         } else if (dimension > maxDepth) {
             sb.append("[ Exceed max print dimension ]");
         } else {
+            init(array);
             dump(sb, array, 0, true, maxRows, maxColumns);
         }
         return sb.toString();
