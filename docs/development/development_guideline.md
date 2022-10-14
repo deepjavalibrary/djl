@@ -156,9 +156,9 @@ IntelliJ allows you to [customize the data view in the Debug Tools](https://www.
 You can create your own NDArray renderer as follows:
 ![](img/custom_debug_view.png)
 
-Opening the IDE settings (`⌘ ,`), in *Java Type Renderer* section, you can enable array display by:
-- Change the "Use following expression" field to [toDebugString(true)](https://javadoc.io/static/ai.djl/api/0.19.0/ai/djl/ndarray/NDArray.html#toDebugString-int-int-int-int-) to show NDArray content
-- Change the "Use following expression" field to something like [toDebugString(100, 10, 10, 20, true)](https://javadoc.io/static/ai.djl/api/0.19.0/ai/djl/ndarray/NDArray.html#toDebugString-int-int-int-int-)
+Opening the IDE Settings/Preferences (`⌘ ,`), in *Java Type Renderer* section, you can enable array display by:
+- Change the "Use following expression" field to [toDebugString(true)](https://javadoc.io/static/ai.djl/api/0.19.0/ai/djl/ndarray/NDArray.html#toDebugString(boolean)) to show NDArray content
+- Change the "Use following expression" field to something like [toDebugString(100, 10, 10, 20, true)](https://javadoc.io/static/ai.djl/api/0.19.0/ai/djl/ndarray/NDArray.html#toDebugString(int,int,int,int,boolean))
 if you want to adjust the range of NDArray's debug output.
 - Check the "On-demand" option, if you want the IntelliJ to render the NDArray only on clicking the variable.
 
