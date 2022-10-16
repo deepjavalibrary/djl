@@ -53,13 +53,14 @@ public abstract class BaseNDManager implements NDManager {
 
     protected BaseNDManager(NDManager parent, Device device) {
         this.parent = parent;
-        this.device = device == null ? defaultDevice() : device;
+        Engine engine = parent.getEngine();
+        this.device = device == null ? engine.defaultDevice() : device;
         resources = new ConcurrentHashMap<>();
         tempResources = new ConcurrentHashMap<>();
         uid = UUID.randomUUID().toString();
-        Engine engine = getEngine().getAlternativeEngine();
-        if (engine != null) {
-            alternativeManager = engine.newBaseManager(Device.cpu());
+        Engine alternativeEngine = engine.getAlternativeEngine();
+        if (alternativeEngine != null) {
+            alternativeManager = alternativeEngine.newBaseManager(Device.cpu());
         }
     }
 
