@@ -1,6 +1,7 @@
 configure([
         project(':api'),
         project(':basicdataset'),
+        project(':djl-zero'),
         project(':engines:dlr:dlr-engine'),
         project(':engines:ml:xgboost'),
         project(':engines:ml:lightgbm'),

@@ -32,10 +32,10 @@ import ai.djl.zero.Performance;
 
 import java.io.IOException;
 
-/** Tabular takes a NDList as input and output an NDList (for supervised learning). */
-public final class Tabular {
+/** TabularRegression takes a NDList as input and output an NDList (for supervised learning). */
+public final class TabularRegression {
 
-    private Tabular() {}
+    private TabularRegression() {}
 
     /**
      * Trains a Model on a custom dataset. Currently, trains a TabNet Model.
