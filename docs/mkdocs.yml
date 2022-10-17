@@ -147,6 +147,7 @@ nav:
           - 'docs/serving/serving/docs/management_api.md'
           - 'docs/serving/serving/docs/plugin_management.md'
       - 'docs/serving/wlm/README.md'
+      - DJL Zero: 'djl-zero/README.md'
   - Demos:
       - Demos: 'docs/demos/README.md'
       - AWS:
