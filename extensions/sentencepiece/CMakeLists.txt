@@ -17,6 +17,8 @@ if (MSVC)
   add_definitions("/wd4267 /wd4244 /wd4305 /Zc:strictStrings /utf-8")
 endif()
 
+set(JAVA_AWT_LIBRARY NotNeeded)
+set(JAVA_AWT_INCLUDE_PATH NotNeeded)
 find_package(JNI REQUIRED)
 find_path(UTILS_INCLUDE_DIR NAMES djl/utils.h PATHS ${PROJECT_SOURCE_DIR}/../../api/src/main/native REQUIRED)
 
