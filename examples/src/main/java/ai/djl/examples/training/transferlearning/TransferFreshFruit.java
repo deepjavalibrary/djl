@@ -14,7 +14,7 @@ package ai.djl.examples.training.transferlearning;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
-import ai.djl.basicdataset.cv.classification.ImageFolder;
+import ai.djl.basicdataset.cv.classification.FruitRottenFresh;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
@@ -29,13 +29,14 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
-import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
+import ai.djl.training.dataset.Dataset;
+import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.evaluator.Accuracy;
 import ai.djl.training.listener.SaveModelTrainingListener;
 import ai.djl.training.listener.TrainingListener;
@@ -49,7 +50,6 @@ import ai.djl.util.Pair;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 
 public final class TransferFreshFruit {
 
@@ -68,15 +68,15 @@ public final class TransferFreshFruit {
         }
 
         // Also available at
-        // "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/resnet18_embedding/0.0.1/traced_resnet18_embedding.pt.gz";
-        String modelUrls = "/Users/fenkexin/Desktop/transferDJL/code/base_nw.pt";
+        String modelUrls =
+                "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/resnet18_embedding/0.0.1/resnet18_embedding.zip";
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
                         .optModelUrls(modelUrls)
                         .optEngine(Engine.getDefaultEngineName())
                         .optProgress(new ProgressBar())
-                        // Here the argument pretrained is borrowed.
+                        // Here the argument "pretrained" is borrowed.
                         // Pretrained means no need to retrain, and vice versa.
                         .optOption("retrain", arguments.isPreTrained() ? "0" : "1")
                         .build();
@@ -118,29 +118,27 @@ public final class TransferFreshFruit {
         trainer.initialize(inputShape);
 
         // Data
-        ImageFolder datasetTrain = getData("test", "banana", batchSize);
+        RandomAccessDataset datasetTrain = getData(Dataset.Usage.TRAIN, batchSize);
+        RandomAccessDataset datasetTest = getData(Dataset.Usage.TEST, batchSize);
 
         // Train
-        EasyTrain.fit(trainer, 6, datasetTrain, null);
+        EasyTrain.fit(trainer, 10, datasetTrain, datasetTest);
 
         // Save model
         // model.save("your-model-path");
 
         model.close();
         embedding.close();
-        return null;
+        return trainer.getTrainingResult();
     }
 
-    private static ImageFolder getData(String subfolderName, String fruit, int batchSize)
+    private static RandomAccessDataset getData(Dataset.Usage usage, int batchSize)
             throws TranslateException, IOException {
-        // The dataset is from <a
+        // The dataset is accessible from <a
         // href="https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification">https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification</a>
-        String folderUrl = "/Users/fenkexin/Desktop/transferDJL/code/data/" + fruit;
-        String subfolder = "/" + subfolderName + "/";
-        Repository repository = Repository.newInstance("banana", Paths.get(folderUrl + subfolder));
-        ImageFolder dataset =
-                ImageFolder.builder()
-                        .setRepository(repository)
+        FruitRottenFresh dataset =
+                FruitRottenFresh.builder()
+                        .optUsage(usage)
                         .addTransform(new ToTensor())
                         .addTransform(new Transpose(1, 2, 0))
                         .addTransform(new Resize(224, 224))
@@ -148,6 +146,7 @@ public final class TransferFreshFruit {
                         .addTargetTransform(new OneHot(2))
                         .setSampling(batchSize, true)
                         .build();
+
         dataset.prepare();
         return dataset;
     }
