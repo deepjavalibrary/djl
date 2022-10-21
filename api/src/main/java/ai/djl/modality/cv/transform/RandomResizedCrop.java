@@ -51,6 +51,21 @@ public class RandomResizedCrop implements Transform {
         this.maxAspectRatio = maxAspectRatio;
     }
 
+    /**
+     * Creates a {@code RandomResizedCrop} {@link Transform}.
+     *
+     * @param width the output width of the image
+     * @param height the output height of the image
+     */
+    public RandomResizedCrop(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.minAreaScale = 0.08;
+        this.maxAreaScale = 1.0;
+        this.minAspectRatio = 3.0 / 4.0;
+        this.maxAspectRatio = 4.0 / 3.0;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray transform(NDArray array) {

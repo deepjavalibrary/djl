@@ -18,10 +18,14 @@ import ai.djl.basicdataset.cv.classification.FruitRottenFresh;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
+import ai.djl.modality.cv.transform.CenterCrop;
+import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.OneHot;
+import ai.djl.modality.cv.transform.RandomFlipLeftRight;
+import ai.djl.modality.cv.transform.RandomFlipTopBottom;
+import ai.djl.modality.cv.transform.RandomResizedCrop;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.modality.cv.transform.Transpose;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
@@ -67,7 +71,6 @@ public final class TransferFreshFruit {
             return null;
         }
 
-        // Also available at
         String modelUrls =
                 "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/pytorch/resnet18_embedding/0.0.1/resnet18_embedding.zip";
         Criteria<NDList, NDList> criteria =
@@ -94,11 +97,10 @@ public final class TransferFreshFruit {
         Model model = Model.newInstance("TransferFreshFruit");
         model.setBlock(blocks);
 
-        // Config trainer
+        // Configure trainer
         DefaultTrainingConfig config = setupTrainingConfig(arguments);
 
-        // Customized learning rate
-        float lr = 0.001f;
+        float lr = 0.001f; // Customized learning rate
         FixedPerVarTracker.Builder learningRateTrackerBuilder =
                 FixedPerVarTracker.builder().setDefaultValue(lr);
         for (Pair<String, Parameter> paramPair : baseBlock.getParameters()) {
@@ -108,7 +110,6 @@ public final class TransferFreshFruit {
                 Adam.builder().optLearningRateTracker(learningRateTrackerBuilder.build()).build();
         config.optOptimizer(optimizer);
 
-        // Config trainer
         Trainer trainer = model.newTrainer(config);
         trainer.setMetrics(new Metrics());
 
@@ -136,13 +137,18 @@ public final class TransferFreshFruit {
             throws TranslateException, IOException {
         // The dataset is accessible from <a
         // href="https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification">https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification</a>
+        float[] mean = {0.485f, 0.456f, 0.406f};
+        float[] std = {0.229f, 0.224f, 0.225f};
         FruitRottenFresh dataset =
                 FruitRottenFresh.builder()
                         .optUsage(usage)
+                        .addTransform(new RandomResizedCrop(256, 256)) // only in training
+                        .addTransform(new RandomFlipTopBottom()) // only in training
+                        .addTransform(new RandomFlipLeftRight()) // only in training
+                        .addTransform(new Resize(256, 256))
+                        .addTransform(new CenterCrop(224, 224))
                         .addTransform(new ToTensor())
-                        .addTransform(new Transpose(1, 2, 0))
-                        .addTransform(new Resize(224, 224))
-                        .addTransform(new Transpose(2, 0, 1))
+                        .addTransform(new Normalize(mean, std))
                         .addTargetTransform(new OneHot(2))
                         .setSampling(batchSize, true)
                         .build();

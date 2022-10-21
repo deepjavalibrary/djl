@@ -172,6 +172,7 @@ public final class FruitRottenFresh extends AbstractImageFolder {
          * Builds the {@link FruitRottenFresh}.
          *
          * @return the {@link FruitRottenFresh}
+         * @throws IOException if there is an issue
          */
         public FruitRottenFresh build() throws IOException {
             if (pipeline == null) {
