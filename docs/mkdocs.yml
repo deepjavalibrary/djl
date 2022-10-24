@@ -139,14 +139,6 @@ nav:
       - OpenCV: 'extensions/opencv/README.md'
       - SentencePiece: 'extensions/sentencepiece/README.md'
       - Tablesaw: 'extensions/tablesaw/README.md'
-      - DJL Serving:
-          - 'docs/serving/README.md'
-          - 'docs/serving/serving/docs/workflows.md'
-          - 'docs/serving/serving/docs/configuration.md'
-          - 'docs/serving/serving/docs/inference_api.md'
-          - 'docs/serving/serving/docs/management_api.md'
-          - 'docs/serving/serving/docs/plugin_management.md'
-      - 'docs/serving/wlm/README.md'
       - DJL Zero: 'djl-zero/README.md'
   - Demos:
       - Demos: 'docs/demos/README.md'
@@ -190,5 +182,16 @@ nav:
       - Extensions:
           - Visualizing Training with DJL: 'docs/demos/visualization-vue/README.md'
           - Interactive JShell and Block Runner for DJL: 'docs/demos/web-demo/interactive-console/README.md'
+  - DJL Serving:
+      - Why DJL Serving?: 'docs/serving/README.md'
+      - 'docs/serving/serving/docs/starting.md'
+      - 'docs/serving/serving/docs/configuration.md'
+      - 'docs/serving/serving/docs/workflows.md'
+      - 'docs/serving/serving/docs/architecture.md'
+      - HTTP API:
+        - 'docs/serving/serving/docs/inference_api.md'
+        - 'docs/serving/serving/docs/management_api.md'
+      - 'docs/serving/serving/docs/plugin_management.md'
+      - 'docs/serving/wlm/README.md'
 
 
