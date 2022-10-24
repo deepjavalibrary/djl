@@ -31,6 +31,9 @@ public interface GradientCollector extends AutoCloseable {
      */
     void backward(NDArray target);
 
+    /** Sets all the gradients within the engine to zero. */
+    void zeroGradients();
+
     /** {@inheritDoc} */
     @Override
     void close();
