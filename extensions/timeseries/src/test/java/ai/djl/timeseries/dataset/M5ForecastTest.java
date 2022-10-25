@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
+import ai.djl.testing.TestRequirements;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -40,9 +41,10 @@ import java.time.LocalDateTime;
 
 public class M5ForecastTest {
 
+    // Here for the purpose of unittest, we use the fake M5 forecast data. The real data needs to be downloaded from https://www.kaggle.com/competitions/m5-forecasting-accuracy/data
     @Test
-    public void testM5Forecast() throws IOException, TranslateException {
-//        TestRequirements.weekly();
+    public static void main(String[] args) throws IOException, TranslateException {
+        TestRequirements.weekly();
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
@@ -85,7 +87,7 @@ public class M5ForecastTest {
             NDList label = record.getLabels();
             NDArray featStatCat = data.get(1);
             Assert.assertEquals(featStatCat.toFloatArray(), new float[] {0f, 0f, 1f, 3f, 1437f});
-            Assert.assertEquals(label.head().toFloatArray(), new float[] {12f, 14f, 10f});
+            Assert.assertEquals(label.head().toFloatArray(), new float[] {16f, 11f, 7f});
 
             try (Trainer trainer = model.newTrainer(config)) {
                 Batch batch = trainer.iterateDataset(m5Forecast).iterator().next();

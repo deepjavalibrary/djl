@@ -109,9 +109,9 @@ public class M5Forecast extends CsvTimeSeriesDataset {
         // file as 'weekly_***'
         switch (usage) {
             case TRAIN:
-                return "weekly_sales_train_validation.csv";
+                return "fake_weekly_sales_train_validation.csv";
             case TEST:
-                return "weekly_sales_train_evaluation.csv";
+                return "fake_weekly_sales_train_evaluation.csv";
             case VALIDATION:
             default:
                 throw new UnsupportedOperationException("Data not available.");

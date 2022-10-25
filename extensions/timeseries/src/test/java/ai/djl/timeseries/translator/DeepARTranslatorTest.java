@@ -41,9 +41,9 @@ public class DeepARTranslatorTest {
 
         String modelUrl = "https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip";
         Map<String, Object> arguments = new ConcurrentHashMap<>();
-        arguments.put("prediction_length", 28);
-        DeepARTranslator.Builder builder = DeepARTranslator.builder(arguments);
-        DeepARTranslator translator = builder.build();
+        int prediction_length = 28;
+        arguments.put("prediction_length", prediction_length);
+        DeepARTranslator translator = DeepARTranslator.builder(arguments).build();
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
                         .setTypes(TimeSeriesData.class, Forecast.class)
@@ -63,16 +63,16 @@ public class DeepARTranslatorTest {
             try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
                     Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
                 Forecast forecast = predictor.predict(input);
-                // TODO： The argument prediction_length = 28 is too far away from predict().
-                // Here forecast.mean() is a predicted sequence of length = "prediction_length"。
-                // That forecast.mean() still has randomness here is because the model
-                // imported here was trained on a sparse dataSet with many zeros (inactive sale
-                // amount). So here the trained model is also predicting for such inactive data once
-                // in a while interweaving the active data.
+                // Here forecast.mean() is a predicted sequence of length "prediction_length"。
+                // That forecast.mean() still has randomness here is because the model imported
+                // from https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip
+                // was trained on a sparse dataSet with many zero sales (inactive sale
+                // amount). So during the inference it also predict for such inactive data once
+                // in a while interweaving the active non-zero data.
                 // TODO: Either preprocess the data to choose a proper time spacing to reduce the
-                // sparsity of the sequence ie the inactive numbers (ie. 0), or use another model to
+                // sparsity of the sequence, ie the zeros, or use another model to
                 // predict for how the active data are sparsified in a finer time spacing.
-                Assert.assertEquals(forecast.mean().toFloatArray().length, 28);
+                Assert.assertEquals(forecast.mean().toFloatArray().length, prediction_length);
             }
         }
     }
