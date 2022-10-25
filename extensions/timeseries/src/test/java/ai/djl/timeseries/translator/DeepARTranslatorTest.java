@@ -41,8 +41,8 @@ public class DeepARTranslatorTest {
 
         String modelUrl = "https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip";
         Map<String, Object> arguments = new ConcurrentHashMap<>();
-        int prediction_length = 28;
-        arguments.put("prediction_length", prediction_length);
+        int predictionLength = 28;
+        arguments.put("predictionLength", predictionLength);
         DeepARTranslator translator = DeepARTranslator.builder(arguments).build();
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
@@ -63,16 +63,19 @@ public class DeepARTranslatorTest {
             try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
                     Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
                 Forecast forecast = predictor.predict(input);
-                // Here forecast.mean() is a predicted sequence of length "prediction_length"。
-                // That forecast.mean() still has randomness here is because the model imported
-                // from https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip
-                // was trained on a sparse dataSet with many zero sales (inactive sale
+                // Here forecast.mean() is a predicted sequence of length "predictionLength"。
+                // Doing System.out.println(forecast.mean()); the result still has randomness.
+                // This is because the model imported from
+                // https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip
+                // was trained on a sparse data with many zero sales (inactive sale
                 // amount). So during the inference it also predict for such inactive data once
                 // in a while interweaving the active non-zero data.
                 // TODO: Either preprocess the data to choose a proper time spacing to reduce the
                 // sparsity of the sequence, ie the zeros, or use another model to
                 // predict for how the active data are sparsified in a finer time spacing.
-                Assert.assertEquals(forecast.mean().toFloatArray().length, prediction_length);
+                // A model trained on a weekly aggregated dataset is presented in
+                // https://github.com/Carkham/m5_blog/blob/main/bloh.md
+                Assert.assertEquals(forecast.mean().toFloatArray().length, predictionLength);
             }
         }
     }

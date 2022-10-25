@@ -44,7 +44,7 @@ public class M5ForecastTest {
     // Here for the purpose of unittest, we use the fake M5 forecast data. The real data needs to be
     // downloaded from https://www.kaggle.com/competitions/m5-forecasting-accuracy/data
     @Test
-    public static void main(String[] args) throws IOException, TranslateException {
+    public void testM5Forecast() throws IOException, TranslateException {
         TestRequirements.weekly();
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
