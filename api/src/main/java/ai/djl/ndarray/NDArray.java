@@ -30,6 +30,8 @@ import java.nio.LongBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -4566,6 +4568,12 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return The inverse of gauss error of the {@code NDArray}, element-wise
      */
     NDArray erfinv();
+
+    /** {@inheritDoc} */
+    @Override
+    default List<NDArray> getResourceNDArrays() {
+        return Collections.singletonList(this);
+    }
 
     /**
      * Returns an internal representative of Native {@code NDArray}.
