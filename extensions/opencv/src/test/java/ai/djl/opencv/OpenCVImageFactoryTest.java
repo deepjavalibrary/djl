@@ -161,6 +161,8 @@ public class OpenCVImageFactoryTest {
 
     @Test
     public void testDrawImage() throws IOException {
+        TestRequirements.notWindows(); // failed on Windows ServerCore container
+        TestRequirements.notArm();
         ImageFactory factory = ImageFactory.getInstance();
         int[] pixels = new int[64];
         int index = 0;
