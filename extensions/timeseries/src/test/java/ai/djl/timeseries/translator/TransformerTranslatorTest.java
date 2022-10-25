@@ -55,7 +55,9 @@ public class TransformerTranslatorTest {
 
         try (NDManager manager = NDManager.newBaseManager()) {
             manager.getEngine().setRandomSeed(1);
-            NDArray target = manager.randomUniform(0f, 50f, new Shape(1857));
+            // The "target" here is a fake series data which precedes the forecast series.
+            // It plays the role of input based on which the prediction is made.
+            NDArray target = manager.arange(51f, 1f, -(float) 50 / 1856);
             TimeSeriesData input = new TimeSeriesData(1);
             input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
             input.setField(FieldName.TARGET, target);
@@ -63,7 +65,16 @@ public class TransformerTranslatorTest {
             try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
                     Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
                 Forecast forecast = predictor.predict(input);
-                // TODO: forecast is random???
+                // Here forecast.mean() is a predicted sequence of length "predictionLength"。
+                // Doing `System.out.println(forecast.mean());` the result still has randomness.
+                // This is because the model imported from
+                // https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip
+                // was trained on a sparse data with many zero sales (inactive sale
+                // amount). So during the inference it also predict for such inactive data once
+                // in a while interweaving the active non-zero data.
+                // A model trained on an aggregated dataset (aggregated by week) is presented in
+                // https://github.com/Carkham/m5_blog/blob/main/bloh.md
+                System.out.println(forecast.mean());
                 Assert.assertEquals(forecast.mean().toFloatArray().length, 28);
             }
         }

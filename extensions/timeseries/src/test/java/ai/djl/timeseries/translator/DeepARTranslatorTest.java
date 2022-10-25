@@ -54,6 +54,8 @@ public class DeepARTranslatorTest {
 
         try (NDManager manager = NDManager.newBaseManager()) {
             manager.getEngine().setRandomSeed(1);
+            // The "target" here is a fake series data which precedes the forecast series.
+            // It plays the role of input based on which the prediction is made.
             NDArray target = manager.arange(0.0f, 50.0f, (float) 50 / 1856);
 
             TimeSeriesData input = new TimeSeriesData(1);
@@ -64,16 +66,13 @@ public class DeepARTranslatorTest {
                     Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
                 Forecast forecast = predictor.predict(input);
                 // Here forecast.mean() is a predicted sequence of length "predictionLength"。
-                // Doing System.out.println(forecast.mean()); the result still has randomness.
+                // Doing `System.out.println(forecast.mean());` the result still has randomness.
                 // This is because the model imported from
                 // https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip
                 // was trained on a sparse data with many zero sales (inactive sale
                 // amount). So during the inference it also predict for such inactive data once
                 // in a while interweaving the active non-zero data.
-                // TODO: Either preprocess the data to choose a proper time spacing to reduce the
-                // sparsity of the sequence, ie the zeros, or use another model to
-                // predict for how the active data are sparsified in a finer time spacing.
-                // A model trained on a weekly aggregated dataset is presented in
+                // A model trained on an aggregated dataset (aggregated by week) is presented in
                 // https://github.com/Carkham/m5_blog/blob/main/bloh.md
                 Assert.assertEquals(forecast.mean().toFloatArray().length, predictionLength);
             }
