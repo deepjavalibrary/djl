@@ -33,17 +33,17 @@ import java.util.Arrays;
  *
  * <pre>
  * It is structured similar to ImageFolders as follows:
- *      freshapples/1.png
- *      freshapples/2.png
+ *      root/freshapples/1.png
+ *      root/freshapples/2.png
  *      ...
- *      rottenapples/1.png
- *      rottenapples/2.png
+ *      root/rottenapples/1.png
+ *      root/rottenapples/2.png
  *      ...
- *      freshbanana/1.png
- *      freshbanana/2.png
+ *      root/freshbanana/1.png
+ *      root/freshbanana/2.png
  *      ...
- *      rottenbanana/1.png
- *      rottenbanana/2.png
+ *      root/rottenbanana/1.png
+ *      root/rottenbanana/2.png
  *      ...
  * </pre>
  */

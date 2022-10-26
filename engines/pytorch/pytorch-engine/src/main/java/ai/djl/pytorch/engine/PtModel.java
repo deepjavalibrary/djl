@@ -85,9 +85,7 @@ public class PtModel extends BaseModel {
                     extraFileKeys = ((String) options.get("extraFiles")).split(",");
                     extraFileValues = new String[extraFileKeys.length];
                 }
-                if (options.containsKey("retrain")) {
-                    retrain = Boolean.parseBoolean((String) options.get("retrain"));
-                }
+                retrain = Boolean.parseBoolean((String) options.get("retrain"));
                 mapLocation = Boolean.parseBoolean((String) options.get("mapLocation"));
             }
             block =
