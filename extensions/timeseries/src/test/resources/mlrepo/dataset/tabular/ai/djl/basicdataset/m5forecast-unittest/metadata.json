@@ -1,0 +1,28 @@
+{
+  "metadataVersion": "0.1",
+  "resourceType": "dataset",
+  "application": "tabular",
+  "groupId": "ai.djl.basicdataset",
+  "artifactId": "m5forecast-unittest",
+  "name": "m5forecast",
+  "description": "This dataset provides the unittest m5 dataset.",
+  "artifacts": [
+    {
+      "version": "1.0",
+      "snapshot": false,
+      "name": "m5forecast",
+      "files": {
+        "train": {
+          "uri": "1.0/weekly_sales_train_evaluation.csv.gz",
+          "sha1Hash": "5505126866a94bccb0019035114bd95271a3505e",
+          "size": 13837
+        },
+        "test": {
+          "uri": "1.0/weekly_sales_train_validation.csv.gz",
+          "sha1Hash": "80812b80777009bc5a0e93980b683a87bb34e225",
+          "size": 13615
+        }
+      }
+    }
+  ]
+}
