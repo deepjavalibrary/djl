@@ -21,7 +21,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
-import ai.djl.testing.TestRequirements;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -38,14 +37,17 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class M5ForecastTest {
 
-    // Here for the purpose of unittest, we use the fake M5 forecast data. The real data needs to be
-    // downloaded from https://www.kaggle.com/competitions/m5-forecasting-accuracy/data
+    /*
+     * Here for the purpose of unittest, we use the M5 forecast unittest dataset.
+     * The real data needs to be downloaded from:
+     * https://www.kaggle.com/competitions/m5-forecasting-accuracy/data
+     */
     @Test
     public void testM5Forecast() throws IOException, TranslateException {
-        TestRequirements.weekly();
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
@@ -57,10 +59,14 @@ public class M5ForecastTest {
             M5Forecast.Builder builder =
                     M5Forecast.builder()
                             .optUsage(Dataset.Usage.TEST)
-                            .setRepository(BasicDatasets.REPOSITORY)
+                            .optRepository(BasicDatasets.REPOSITORY)
+                            .optGroupId(BasicDatasets.GROUP_ID)
+                            .optArtifactId("m5forecast-unittest")
                             .setTransformation(TimeSeriesTransform.identityTransformation())
                             .setContextLength(4)
                             .setSampling(32, true);
+            List<String> features = builder.getAvailableFeatures();
+            Assert.assertEquals(features.size(), 5);
             for (int i = 1; i <= 277; i++) {
                 builder.addFeature("w_" + i, FieldName.TARGET);
             }
@@ -80,8 +86,8 @@ public class M5ForecastTest {
 
             m5Forecast.prepare();
 
-            long size = m5Forecast.size();
-            Assert.assertEquals(size, 30490);
+            Assert.assertEquals(m5Forecast.getCardinality().size(), 5);
+            Assert.assertEquals(m5Forecast.size(), 64);
 
             Record record = m5Forecast.get(manager, 0);
             NDList data = record.getData();
