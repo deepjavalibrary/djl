@@ -81,7 +81,7 @@ public final class TransferFreshFruit {
                         .optProgress(new ProgressBar())
                         // Here the argument "pretrained" is borrowed.
                         // Pretrained means no need to retrain, and vice versa.
-                        .optOption("retrain", arguments.isPreTrained() ? "0" : "1")
+                        .optOption("retrain", arguments.isPreTrained() ? "false" : "true")
                         .build();
 
         ZooModel<NDList, NDList> embedding = criteria.loadModel();

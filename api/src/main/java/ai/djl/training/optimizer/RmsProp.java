@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.training.tracker.FixedPerVarTracker;
 import ai.djl.training.tracker.Tracker;
 
 import java.util.Map;
@@ -86,9 +85,7 @@ public class RmsProp extends Optimizer {
     /** {@inheritDoc} */
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
-        if (learningRateTracker instanceof FixedPerVarTracker) {
-            ((FixedPerVarTracker) learningRateTracker).setParameterId(parameterId);
-        }
+        learningRateTracker.setParameterId(parameterId);
         float newLearningRate = learningRateTracker.getNewValue(updateCount(parameterId));
         float weightDecay = getWeightDecay();
 

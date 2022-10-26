@@ -86,11 +86,7 @@ public class PtModel extends BaseModel {
                     extraFileValues = new String[extraFileKeys.length];
                 }
                 if (options.containsKey("retrain")) {
-                    String value = (String) options.get("retrain");
-                    retrain =
-                            "1".equalsIgnoreCase(value)
-                                    || "true".equalsIgnoreCase(value)
-                                    || "on".equalsIgnoreCase(value);
+                    retrain = Boolean.parseBoolean((String) options.get("retrain"));
                 }
                 mapLocation = Boolean.parseBoolean((String) options.get("mapLocation"));
             }
@@ -105,10 +101,11 @@ public class PtModel extends BaseModel {
             for (int i = 0; i < extraFileKeys.length; i++) {
                 properties.put(extraFileKeys[i], extraFileValues[i]);
             }
-            // Freeze the parameters if not retrain
-            for (Pair<String, Parameter> paramPair : block.getParameters()) {
-                paramPair.getValue().freeze(!retrain);
-            }
+            // By default, the parameters are frozen, since before adding this training feature
+            // `retrain`, it was frozen already by setting `JITCallGuard guard`, which disables
+            // autograd. Also, the pretrained parameters usually should not be updated too much. It
+            // is safe to freeze it. Users may unfreeze it and set their learning rate small.
+            block.freezeParameters(!retrain);
         } else {
             boolean hasParameter = true;
             if (options != null) {
