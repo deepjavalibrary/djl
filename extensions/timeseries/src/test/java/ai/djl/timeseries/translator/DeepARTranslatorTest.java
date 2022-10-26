@@ -42,7 +42,7 @@ public class DeepARTranslatorTest {
         String modelUrl = "https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip";
         Map<String, Object> arguments = new ConcurrentHashMap<>();
         int predictionLength = 28;
-        arguments.put("predictionLength", predictionLength);
+        arguments.put("prediction_length", predictionLength);
         DeepARTranslator translator = DeepARTranslator.builder(arguments).build();
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
