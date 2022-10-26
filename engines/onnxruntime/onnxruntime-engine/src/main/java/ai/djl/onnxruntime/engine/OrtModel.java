@@ -179,6 +179,11 @@ public class OrtModel extends BaseModel {
             ortSession.setCPUArenaAllocator(true);
         }
 
+        String disablePerSessionThreads = (String) options.get("disablePerSessionThreads");
+        if (Boolean.parseBoolean(disablePerSessionThreads)) {
+            ortSession.disablePerSessionThreads();
+        }
+
         String customOpLibrary = (String) options.get("customOpLibrary");
         if (customOpLibrary != null) {
             ortSession.registerCustomOpLibrary(customOpLibrary);

@@ -127,7 +127,7 @@ public class OrtNDManager extends BaseNDManager {
     private static final class SystemManager extends OrtNDManager implements SystemNDManager {
 
         SystemManager() {
-            super(null, null, OrtEnvironment.getEnvironment());
+            super(null, null, ((OrtEngine) Engine.getEngine(OrtEngine.ENGINE_NAME)).getEnv());
         }
 
         /** {@inheritDoc} */
