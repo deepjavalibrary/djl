@@ -73,7 +73,6 @@ public class TransformerTranslatorTest {
                 // in a while interweaving the active non-zero data.
                 // A model trained on an aggregated dataset (aggregated by week) is presented in
                 // https://github.com/Carkham/m5_blog/blob/main/bloh.md
-                System.out.println(forecast.mean());
                 Assert.assertEquals(forecast.mean().toFloatArray().length, 28);
             }
         }
