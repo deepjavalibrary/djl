@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** A class used to calculate Root Mean Squared Scaled Error. */
-public class RMSSE extends Evaluator {
+public class Rmsse extends Evaluator {
 
     private DistributionOutput distributionOutput;
     private int axis;
@@ -39,7 +39,7 @@ public class RMSSE extends Evaluator {
      *
      * @param distributionOutput the {@link DistributionOutput} to construct the target distribution
      */
-    public RMSSE(DistributionOutput distributionOutput) {
+    public Rmsse(DistributionOutput distributionOutput) {
         this("RMSSE", 1, distributionOutput);
     }
 
@@ -54,7 +54,7 @@ public class RMSSE extends Evaluator {
      * @param axis the axis that represent time length in prediction, default 1
      * @param distributionOutput the {@link DistributionOutput} to construct the target distribution
      */
-    public RMSSE(String name, int axis, DistributionOutput distributionOutput) {
+    public Rmsse(String name, int axis, DistributionOutput distributionOutput) {
         super(name);
         this.axis = axis;
         this.distributionOutput = distributionOutput;
@@ -96,7 +96,13 @@ public class RMSSE extends Evaluator {
     public void updateAccumulator(String key, NDList labels, NDList predictions) {
         Pair<Long, NDArray> update = evaluateHelper(labels, predictions);
         totalInstances.compute(key, (k, v) -> v + update.getKey());
-        totalLoss.compute(key, (k, v) -> v + update.getValue().sum().getFloat());
+        totalLoss.compute(
+                key,
+                (k, v) -> {
+                    try (NDArray array = update.getValue().sum()) {
+                        return v + array.getFloat();
+                    }
+                });
     }
 
     /** {@inheritDoc} */

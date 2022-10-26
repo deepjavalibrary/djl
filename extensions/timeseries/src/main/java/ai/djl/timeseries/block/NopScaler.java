@@ -22,9 +22,9 @@ import ai.djl.util.PairList;
  * A class assigns a scaling factor equal to 1 along dimension {@code dim}, and therefore applies no
  * scaling to the input data.
  */
-public class NOPScaler extends Scaler {
+public class NopScaler extends Scaler {
 
-    NOPScaler(Builder builder) {
+    NopScaler(Builder builder) {
         super(builder);
     }
 
@@ -63,9 +63,9 @@ public class NOPScaler extends Scaler {
          *
          * @return the constructed {@code NOPScaler}
          */
-        public NOPScaler build() {
+        public NopScaler build() {
             validate();
-            return new NOPScaler(this);
+            return new NopScaler(this);
         }
     }
 }

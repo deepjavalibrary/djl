@@ -24,7 +24,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.timeseries.block.FeatureEmbedder;
 import ai.djl.timeseries.block.MeanScaler;
-import ai.djl.timeseries.block.NOPScaler;
+import ai.djl.timeseries.block.NopScaler;
 import ai.djl.timeseries.block.Scaler;
 import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.timeseries.distribution.output.DistributionOutput;
@@ -143,7 +143,7 @@ public abstract class DeepARNetwork extends AbstractBlock {
                                     .build());
         } else {
             scaler =
-                    addChildBlock("scaler", NOPScaler.builder().setDim(1).optKeepDim(true).build());
+                    addChildBlock("scaler", NopScaler.builder().setDim(1).optKeepDim(true).build());
         }
 
         rnn =
