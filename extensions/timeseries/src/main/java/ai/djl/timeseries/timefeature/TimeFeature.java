@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -124,7 +125,8 @@ public final class TimeFeature {
      * @return the result feature
      */
     public static NDArray weekOfYear(NDManager manager, List<LocalDateTime> index) {
-        throw new UnsupportedOperationException("weekOfYear is not supported yet");
+        float[] data = getFeature(index, a -> a.get(ChronoField.ALIGNED_WEEK_OF_YEAR));
+        return manager.create(data).sub(1f).div(52f).sub(0.5f);
     }
 
     private static float[] getFeature(

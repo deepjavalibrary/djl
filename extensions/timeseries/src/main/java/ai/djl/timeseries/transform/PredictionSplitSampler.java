@@ -40,7 +40,7 @@ public class PredictionSplitSampler extends InstanceSampler {
     /** {@inheritDoc} * */
     @Override
     public List<Integer> call(NDArray ts) {
-        int[] bound = this.getBounds(ts);
+        int[] bound = getBounds(ts);
         List<Integer> ret = new ArrayList<>();
         if (bound[0] < bound[1]) {
             ret.add(bound[1]);

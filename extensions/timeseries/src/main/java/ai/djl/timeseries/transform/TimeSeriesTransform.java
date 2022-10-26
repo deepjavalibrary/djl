@@ -13,7 +13,12 @@
 package ai.djl.timeseries.transform;
 
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.timeseries.TimeSeriesData;
+import ai.djl.timeseries.dataset.FieldName;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** This interface is used for data transformation on the {@link TimeSeriesData}. */
 public interface TimeSeriesTransform {
@@ -23,7 +28,31 @@ public interface TimeSeriesTransform {
      *
      * @param manager The default manager for data process
      * @param data The data to be operated on
+     * @param isTrain Whether it is training
      * @return The result {@link TimeSeriesData}.
      */
-    TimeSeriesData transform(NDManager manager, TimeSeriesData data);
+    TimeSeriesData transform(NDManager manager, TimeSeriesData data, boolean isTrain);
+
+    /**
+     * Construct a list of {@link TimeSeriesTransform} that performs identity function.
+     *
+     * @return a list of identity {@link TimeSeriesTransform}
+     */
+    static List<TimeSeriesTransform> identityTransformation() {
+        List<TimeSeriesTransform> ret = new ArrayList<>();
+        ret.add(new IdentityTransform());
+        return ret;
+    }
+
+    /** An identity transformation. */
+    class IdentityTransform implements TimeSeriesTransform {
+
+        /** {@inheritDoc} */
+        @Override
+        public TimeSeriesData transform(NDManager manager, TimeSeriesData data, boolean isTrain) {
+            data.setField("PAST_" + FieldName.TARGET, data.get(FieldName.TARGET));
+            data.setField("FUTURE_" + FieldName.TARGET, manager.create(new Shape(0)));
+            return data;
+        }
+    }
 }

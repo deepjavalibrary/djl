@@ -41,9 +41,9 @@ public class DeepARTranslatorTest {
 
         String modelUrl = "https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip";
         Map<String, Object> arguments = new ConcurrentHashMap<>();
-        arguments.put("prediction_length", 28);
-        DeepARTranslator.Builder builder = DeepARTranslator.builder(arguments);
-        DeepARTranslator translator = builder.build();
+        int predictionLength = 28;
+        arguments.put("prediction_length", predictionLength);
+        DeepARTranslator translator = DeepARTranslator.builder(arguments).build();
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
                         .setTypes(TimeSeriesData.class, Forecast.class)
@@ -54,6 +54,8 @@ public class DeepARTranslatorTest {
 
         try (NDManager manager = NDManager.newBaseManager()) {
             manager.getEngine().setRandomSeed(1);
+            // The "target" here is a fake series data which precedes the forecast series.
+            // It plays the role of input based on which the prediction is made.
             NDArray target = manager.arange(0.0f, 50.0f, (float) 50 / 1856);
 
             TimeSeriesData input = new TimeSeriesData(1);
@@ -63,15 +65,16 @@ public class DeepARTranslatorTest {
             try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
                     Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor()) {
                 Forecast forecast = predictor.predict(input);
-                // TODO： The argument prediction_length = 28 is too far away from predict().
-                // Here forecast.mean() is a predicted sequence of length = "prediction_length" set
-                // above. That forecast.mean() still has randomness here is because the model
-                // imported here was trained on a sparse dataSet with many zeros (inactive sale
-                // amount). So here the model also predict for such inactive data once in a while
-                // interweaving the active data.
-                // TODO: Either preprocess the data to choose a proper time spacing to reduce the
-                // sparsity of the sequence ie the inactive numbers (ie. 0).
-                Assert.assertEquals(forecast.mean().toFloatArray().length, 28);
+                // Here forecast.mean() is a predicted sequence of length "predictionLength"。
+                // Doing `System.out.println(forecast.mean());` the result still has randomness.
+                // This is because the model imported from
+                // https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip
+                // was trained on a sparse data with many zero sales (inactive sale
+                // amount). So during the inference it also predict for such inactive data once
+                // in a while interweaving the active non-zero data.
+                // A model trained on an aggregated dataset (aggregated by week) is presented in
+                // https://github.com/Carkham/m5_blog/blob/main/bloh.md
+                Assert.assertEquals(forecast.mean().toFloatArray().length, predictionLength);
             }
         }
     }

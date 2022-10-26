@@ -72,12 +72,47 @@ public final class Feature {
             int predictionLength,
             String freq,
             TimeSeriesData data) {
+        addTimeFeature(
+                manager,
+                startField,
+                targetField,
+                outputField,
+                timeFeatures,
+                predictionLength,
+                freq,
+                data,
+                false);
+    }
+
+    /**
+     * Adds a set of time features.
+     *
+     * @param manager default {@link NDManager}
+     * @param startField Field with the start time stamp of the time series
+     * @param targetField Field with the array containing the time series values
+     * @param outputField Field name for result
+     * @param timeFeatures list of time features to use
+     * @param predictionLength Prediction length
+     * @param freq Prediction time frequency
+     * @param data the {@link TimeSeriesData} to operate on
+     * @param isTrain Whether it is training
+     */
+    public static void addTimeFeature(
+            NDManager manager,
+            FieldName startField,
+            FieldName targetField,
+            FieldName outputField,
+            List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeatures,
+            int predictionLength,
+            String freq,
+            TimeSeriesData data,
+            boolean isTrain) {
         if (timeFeatures.isEmpty()) {
             data.setField(outputField, null);
         }
 
         LocalDateTime start = data.getStartTime();
-        int length = targetTransformationLength(data.get(targetField), predictionLength, false);
+        int length = targetTransformationLength(data.get(targetField), predictionLength, isTrain);
 
         StringBuilder sb = new StringBuilder();
         sb.append(freq);
@@ -131,9 +166,37 @@ public final class Feature {
             int predictionLength,
             boolean logScale,
             TimeSeriesData data) {
+        return addAgeFeature(
+                manager, targetField, outputField, predictionLength, logScale, data, false);
+    }
+
+    /**
+     * Adds on 'age' feature to the {@link TimeSeriesData}.
+     *
+     * <p>The age feature starts with a small value at the start of the time series and grows over
+     * time.
+     *
+     * @param manager default {@link NDManager}
+     * @param targetField Field with target values (array) of time series
+     * @param outputField Field name to use for the output
+     * @param predictionLength Prediction length
+     * @param logScale If set to true the age feature grows logarithmically otherwise linearly over
+     *     time.
+     * @param data the {@link TimeSeriesData} to operate on
+     * @param isTrain Whether it is training
+     * @return the result {@link TimeSeriesData}
+     */
+    public static TimeSeriesData addAgeFeature(
+            NDManager manager,
+            FieldName targetField,
+            FieldName outputField,
+            int predictionLength,
+            boolean logScale,
+            TimeSeriesData data,
+            boolean isTrain) {
 
         NDArray targetData = data.get(targetField);
-        int length = targetTransformationLength(targetData, predictionLength, false);
+        int length = targetTransformationLength(targetData, predictionLength, isTrain);
 
         NDArray age = manager.arange(0, length, 1, targetData.getDataType());
         if (logScale) {

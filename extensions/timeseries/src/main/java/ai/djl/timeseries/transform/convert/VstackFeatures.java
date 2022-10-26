@@ -54,7 +54,7 @@ public class VstackFeatures implements TimeSeriesTransform {
 
     /** {@inheritDoc} */
     @Override
-    public TimeSeriesData transform(NDManager manager, TimeSeriesData data) {
+    public TimeSeriesData transform(NDManager manager, TimeSeriesData data, boolean isTrain) {
         Convert.vstackFeatures(outputField, inputFields, dropInputs, hStack, data);
         return data;
     }
