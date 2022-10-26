@@ -29,6 +29,7 @@ import ai.onnxruntime.OrtException;
 
 import org.testng.Assert;
 import org.testng.SkipException;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -38,6 +39,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class OrtTest {
+
+    @BeforeClass
+    public void setUp() {
+        System.setProperty("ai.djl.onnxruntime.num_threads", "1");
+        System.setProperty("ai.djl.onnxruntime.num_interop_threads", "1");
+    }
 
     @Test
     public void testOrt() throws TranslateException, ModelException, IOException {
@@ -52,6 +59,7 @@ public class OrtTest {
                             .optOption("optLevel", "NO_OPT")
                             .optOption("memoryPatternOptimization", "true")
                             .optOption("cpuArenaAllocator", "true")
+                            .optOption("disablePerSessionThreads", "true")
                             .build();
 
             IrisFlower virginica = new IrisFlower(1.0f, 2.0f, 3.0f, 4.0f);

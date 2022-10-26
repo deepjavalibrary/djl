@@ -22,6 +22,7 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
+import ai.onnxruntime.OrtLoggingLevel;
 import ai.onnxruntime.OrtSession;
 
 /**
@@ -42,11 +43,31 @@ public final class OrtEngine extends Engine {
 
     private OrtEngine() {
         // init OrtRuntime
-        this.env = OrtEnvironment.getEnvironment();
+        OrtEnvironment.ThreadingOptions options = new OrtEnvironment.ThreadingOptions();
+        try {
+            Integer interOpThreads = Integer.getInteger("ai.djl.onnxruntime.num_interop_threads");
+            Integer intraOpsThreads = Integer.getInteger("ai.djl.onnxruntime.num_threads");
+            if (interOpThreads != null) {
+                options.setGlobalInterOpNumThreads(interOpThreads);
+            }
+            if (intraOpsThreads != null) {
+                options.setGlobalIntraOpNumThreads(intraOpsThreads);
+            }
+            OrtLoggingLevel logging = OrtLoggingLevel.ORT_LOGGING_LEVEL_WARNING;
+            String name = OrtEnvironment.DEFAULT_NAME;
+            this.env = OrtEnvironment.getEnvironment(logging, name, options);
+        } catch (OrtException e) {
+            options.close();
+            throw new AssertionError("Failed to config OrtEnvironment", e);
+        }
     }
 
     static Engine newInstance() {
         return new OrtEngine();
+    }
+
+    OrtEnvironment getEnv() {
+        return env;
     }
 
     /** {@inheritDoc} */
@@ -87,8 +108,7 @@ public final class OrtEngine extends Engine {
         if (StandardCapabilities.MKL.equals(capability)) {
             return true;
         } else if (StandardCapabilities.CUDA.equals(capability)) {
-            try {
-                OrtSession.SessionOptions sessionOptions = new OrtSession.SessionOptions();
+            try (OrtSession.SessionOptions sessionOptions = new OrtSession.SessionOptions()) {
                 sessionOptions.addCUDA();
                 return true;
             } catch (OrtException e) {
