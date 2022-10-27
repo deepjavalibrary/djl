@@ -35,7 +35,7 @@ import ai.djl.timeseries.dataset.TimeFeaturizers;
 import ai.djl.timeseries.distribution.DistributionLoss;
 import ai.djl.timeseries.distribution.output.DistributionOutput;
 import ai.djl.timeseries.distribution.output.NegativeBinomialOutput;
-import ai.djl.timeseries.evaluator.RMSSE;
+import ai.djl.timeseries.evaluator.Rmsse;
 import ai.djl.timeseries.model.deepar.DeepARNetwork;
 import ai.djl.timeseries.timefeature.TimeFeature;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
@@ -227,7 +227,7 @@ public final class TrainTimeSeries {
                 });
 
         return new DefaultTrainingConfig(new DistributionLoss("Loss", distributionOutput))
-                .addEvaluator(new RMSSE(distributionOutput))
+                .addEvaluator(new Rmsse(distributionOutput))
                 .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
                 .optInitializer(new XavierInitializer(), Parameter.Type.WEIGHT)
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
