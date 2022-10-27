@@ -35,6 +35,15 @@ import java.util.Collections;
  * <p>It has the following shapes:
  *
  * <ul>
+ *   <li>input X: [x1, x2, ..., xn, input_dim]
+ *   <li>weight W: [units, input_dim]
+ *   <li>Bias b: [units]
+ *   <li>output Y: [x1, x2, ..., xn, units]
+ * </ul>
+ *
+ * <p>It is most typically used with a simple batched 1D input. In that case, the shape would be:
+ *
+ * <ul>
  *   <li>input X: [batch_num, input_dim]
  *   <li>weight W: [units, input_dim]
  *   <li>Bias b: [units]

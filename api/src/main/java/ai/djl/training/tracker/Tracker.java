@@ -19,7 +19,7 @@ package ai.djl.training.tracker;
  * @see <a href="https://d2l.djl.ai/chapter_optimization/lr-scheduler.html">For tracking learning
  *     rates, the D2L chapter on learning rate scheduling</a>
  */
-public interface Tracker {
+public interface Tracker extends ParameterTracker {
 
     /**
      * Fetches the value after the given number of steps/updates.
@@ -29,13 +29,11 @@ public interface Tracker {
      */
     float getNewValue(int numUpdate);
 
-    /**
-     * Set parameterId for this Tracker.
-     *
-     * @param parameterId the parameter id
-     */
-    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    default void setParameterId(String parameterId) {}
+    /** {@inheritDoc} */
+    @Override
+    default float getNewValue(String parameterId, int numUpdate) {
+        return getNewValue(numUpdate);
+    }
 
     /**
      * Returns a new instance of {@link ai.djl.training.tracker.FactorTracker.Builder} that can

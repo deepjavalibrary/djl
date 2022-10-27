@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @see Tracker
  */
-public class FixedPerVarTracker implements Tracker {
+public class FixedPerVarTracker implements ParameterTracker {
 
     private float value;
     private Map<String, Float> valueMap;
@@ -38,18 +38,8 @@ public class FixedPerVarTracker implements Tracker {
 
     /** {@inheritDoc} */
     @Override
-    public float getNewValue(int numUpdate) {
+    public float getNewValue(String parameterId, int numUpdate) {
         return valueMap.getOrDefault(this.parameterId, this.value);
-    }
-
-    /**
-     * Set parameterId for this Tracker.
-     *
-     * @param parameterId the parameter Id
-     */
-    @Override
-    public void setParameterId(String parameterId) {
-        this.parameterId = parameterId;
     }
 
     /**

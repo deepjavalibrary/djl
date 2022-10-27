@@ -23,6 +23,7 @@ import ai.djl.testing.Assertions;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
+import ai.djl.training.tracker.ParameterTracker;
 import ai.djl.training.tracker.Tracker;
 
 import org.testng.Assert;
@@ -99,7 +100,7 @@ public class MxParameterStoreTest {
 
     private static class TestOptimizer extends Optimizer {
 
-        private Tracker learningRateTracker;
+        private ParameterTracker learningRateTracker;
         int updateCount;
 
         protected TestOptimizer(TestOptimizer.Builder builder) {
@@ -110,9 +111,8 @@ public class MxParameterStoreTest {
         /** {@inheritDoc} */
         @Override
         public void update(String parameterId, NDArray weight, NDArray grad) {
-            learningRateTracker.setParameterId(parameterId);
             weight.addi(
-                    grad.mul(learningRateTracker.getNewValue(0))
+                    grad.mul(learningRateTracker.getNewValue(parameterId, 0))
                             .toDevice(weight.getDevice(), false));
             updateCount++;
         }

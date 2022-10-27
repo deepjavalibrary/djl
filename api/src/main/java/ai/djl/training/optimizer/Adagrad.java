@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.training.tracker.ParameterTracker;
 import ai.djl.training.tracker.Tracker;
 
 import java.util.Map;
@@ -40,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Adagrad extends Optimizer {
 
-    private Tracker learningRateTracker;
+    private ParameterTracker learningRateTracker;
     private float epsilon;
 
     private Map<String, Map<Device, NDArray>> history;
@@ -60,9 +61,8 @@ public class Adagrad extends Optimizer {
     /** {@inheritDoc} */
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
-        learningRateTracker.setParameterId(parameterId);
         int t = updateCount(parameterId);
-        float newLearningRate = learningRateTracker.getNewValue(t);
+        float newLearningRate = learningRateTracker.getNewValue(parameterId, t);
         float weightDecay = getWeightDecay();
 
         if (Float.isNaN(newLearningRate)
@@ -99,7 +99,7 @@ public class Adagrad extends Optimizer {
     /** The Builder to construct an {@link Adagrad} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
-        private Tracker learningRateTracker = Tracker.fixed(0.001f);
+        private ParameterTracker learningRateTracker = Tracker.fixed(0.001f);
         private float epsilon = 1e-8f;
 
         Builder() {}
@@ -111,12 +111,12 @@ public class Adagrad extends Optimizer {
         }
 
         /**
-         * Sets the {@link Tracker} for this optimizer.
+         * Sets the {@link ParameterTracker} for this optimizer.
          *
-         * @param learningRateTracker the {@link Tracker} to be set
+         * @param learningRateTracker the {@link ParameterTracker} to be set
          * @return this {@code Builder}
          */
-        public Builder optLearningRateTracker(Tracker learningRateTracker) {
+        public Builder optLearningRateTracker(ParameterTracker learningRateTracker) {
             this.learningRateTracker = learningRateTracker;
             return this;
         }
