@@ -24,6 +24,7 @@ import java.io.IOException;
 public class TrainAirfoilWithTabNetTest {
     @Test
     public void testTrainAirfoilWithTabNet() throws TranslateException, IOException {
+        TestRequirements.nightly();
         TestRequirements.engine("MXNet", "PyTorch");
         String[] args = new String[] {"-g", "1", "-e", "20", "-b", "32"};
         TrainingResult result = TrainAirfoilWithTabNet.runExample(args);
