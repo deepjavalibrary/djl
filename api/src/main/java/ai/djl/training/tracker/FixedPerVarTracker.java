@@ -24,7 +24,6 @@ public class FixedPerVarTracker implements ParameterTracker {
 
     private float value;
     private Map<String, Float> valueMap;
-    private String parameterId;
 
     /**
      * Creates a new instance of {@link FixedPerVarTracker}.
@@ -39,7 +38,7 @@ public class FixedPerVarTracker implements ParameterTracker {
     /** {@inheritDoc} */
     @Override
     public float getNewValue(String parameterId, int numUpdate) {
-        return valueMap.getOrDefault(this.parameterId, this.value);
+        return valueMap.getOrDefault(parameterId, this.value);
     }
 
     /**
