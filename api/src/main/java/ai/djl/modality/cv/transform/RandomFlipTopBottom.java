@@ -12,18 +12,38 @@
  */
 package ai.djl.modality.cv.transform;
 
-import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
+import ai.djl.util.RandomUtils;
+
+import java.util.Random;
 
 /**
  * A {@link Transform} that randomly flip the input image top to bottom with a probability of 0.5.
  */
 public class RandomFlipTopBottom implements Transform {
 
+    Integer seed;
+
+    /** Creates a new instance of {@code RandomFlipTopBottom}. */
+    public RandomFlipTopBottom() {}
+
+    /**
+     * Creates a new instance of {@code RandomFlipTopBottom} with the given seed.
+     *
+     * @param seed the value of the seed
+     */
+    public RandomFlipTopBottom(int seed) {
+        this.seed = seed;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray transform(NDArray array) {
-        return NDImageUtils.randomFlipTopBottom(array);
+        Random rnd = (seed != null) ? new Random(seed) : RandomUtils.RANDOM;
+        if (rnd.nextFloat() > 0.5) {
+            array.flip(0);
+        }
+        return array;
     }
 }

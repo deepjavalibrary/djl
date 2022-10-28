@@ -194,7 +194,8 @@ public interface Block {
     void initialize(NDManager manager, DataType dataType, Shape... inputShapes);
 
     /**
-     * Returns a boolean whether the block is initialized.
+     * Returns a boolean whether the block is initialized (block has inputShape and params have
+     * nonNull array).
      *
      * @return whether the block is initialized
      */

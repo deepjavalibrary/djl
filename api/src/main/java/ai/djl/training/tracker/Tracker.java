@@ -13,13 +13,13 @@
 package ai.djl.training.tracker;
 
 /**
- * A {@code Tracker} represents a hyper-parameter that changes gradually through the training
+ * A {@code Tracker} represents a hyperparameter that changes gradually through the training
  * process.
  *
  * @see <a href="https://d2l.djl.ai/chapter_optimization/lr-scheduler.html">For tracking learning
  *     rates, the D2L chapter on learning rate scheduling</a>
  */
-public interface Tracker {
+public interface Tracker extends ParameterTracker {
 
     /**
      * Fetches the value after the given number of steps/updates.
@@ -28,6 +28,12 @@ public interface Tracker {
      * @return this {@code Builder}
      */
     float getNewValue(int numUpdate);
+
+    /** {@inheritDoc} */
+    @Override
+    default float getNewValue(String parameterId, int numUpdate) {
+        return getNewValue(numUpdate);
+    }
 
     /**
      * Returns a new instance of {@link ai.djl.training.tracker.FactorTracker.Builder} that can
@@ -84,7 +90,7 @@ public interface Tracker {
      * Returns a new instance of {@link Tracker} with a fixed value.
      *
      * @param value the fixed value
-     * @return a instance of {@link Tracker} with a fixed value
+     * @return an instance of {@link Tracker} with a fixed value
      */
     static Tracker fixed(float value) {
         return FixedTracker.builder().setValue(value).build();

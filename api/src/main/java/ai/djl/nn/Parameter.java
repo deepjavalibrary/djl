@@ -114,6 +114,15 @@ public class Parameter implements AutoCloseable {
     }
 
     /**
+     * Gets the shape of this {@code Parameter}.
+     *
+     * @return the shape of this {@code Parameter}
+     */
+    public Shape getShape() {
+        return shape;
+    }
+
+    /**
      * Gets the values of this {@code Parameter} as an {@link NDArray}.
      *
      * @return an {@link NDArray} that contains values of this {@code Parameter}
@@ -171,6 +180,16 @@ public class Parameter implements AutoCloseable {
     }
 
     /**
+     * Returns the {@link Initializer} for this {@code Parameter}, if not already set. If overwrite
+     * flag is true, sets the initializer regardless.
+     *
+     * @return the initializer of this {@code Parameter}
+     */
+    public Initializer getInitializer() {
+        return initializer;
+    }
+
+    /**
      * Initializes the parameter with the given {@link NDManager}, with given {@link DataType} for
      * the given expected input shapes.
      *
@@ -178,9 +197,13 @@ public class Parameter implements AutoCloseable {
      * @param dataType the datatype of the {@code Parameter}
      */
     public void initialize(NDManager manager, DataType dataType) {
-        Objects.requireNonNull(initializer, "No initializer has been set");
-        Objects.requireNonNull(shape, "No parameter shape has been set");
         if (!isInitialized()) {
+            // Params in a PtSymbolBlock is set during model loading and its isInitialized()=true.
+            // Shouldn't further initialize it.
+            Objects.requireNonNull(initializer, "No initializer has been set");
+            // Params in a PtSymbolBlock can have null shape, but are still initialized (has nonNull
+            // array)
+            Objects.requireNonNull(shape, "No parameter shape has been set");
             array = initializer.initialize(manager, shape, dataType);
             array.setName(name);
         }

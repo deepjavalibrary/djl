@@ -43,6 +43,8 @@ public class SoftmaxCrossEntropyLoss extends Loss {
      * @param name the name of the loss
      */
     public SoftmaxCrossEntropyLoss(String name) {
+        // By default, fromLogit=true, means it takes the prediction before being
+        // applied softmax.
         this(name, 1, -1, true, true);
     }
 
@@ -52,10 +54,10 @@ public class SoftmaxCrossEntropyLoss extends Loss {
      * @param name the name of the loss
      * @param weight the weight to apply on the loss value, default 1
      * @param classAxis the axis that represents the class probabilities, default -1
-     * @param sparseLabel whether labels are 1-D integer array or 2-D probabilities of [batch_size,
-     *     n-class], default true
-     * @param fromLogit whether predictions are un-normalized numbers or log probabilities, if true,
-     *     logSoftmax will be applied to input, default true
+     * @param sparseLabel whether labels are rank-1 integer array of [batch_size] (false) or rank-2
+     *     one-hot of [batch_size, n-class] (true), default true
+     * @param fromLogit if true, the inputs are assumed to be the numbers before being applied with
+     *     softmax. Then logSoftmax will be applied to input, default true
      */
     public SoftmaxCrossEntropyLoss(
             String name, float weight, int classAxis, boolean sparseLabel, boolean fromLogit) {

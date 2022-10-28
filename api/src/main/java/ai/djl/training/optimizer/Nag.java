@@ -17,7 +17,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.training.tracker.Tracker;
+import ai.djl.training.tracker.ParameterTracker;
 import ai.djl.util.Preconditions;
 
 import java.util.Map;
@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Nag extends Optimizer {
 
-    private Tracker learningRateTracker;
+    private ParameterTracker learningRateTracker;
     private float momentum;
     private Map<String, Map<Device, NDArray>> momentumStates;
 
@@ -53,7 +53,8 @@ public class Nag extends Optimizer {
     @Override
     public void update(String parameterId, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
-        float newLearningRate = learningRateTracker.getNewValue(updateCount(parameterId));
+        float newLearningRate =
+                learningRateTracker.getNewValue(parameterId, updateCount(parameterId));
         float weightDecay = getWeightDecay();
         NDList inputs;
         if (momentum != 0f) {
@@ -79,18 +80,18 @@ public class Nag extends Optimizer {
     /** The Builder to construct an {@link Nag} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
-        Tracker learningRateTracker;
+        ParameterTracker learningRateTracker;
         float momentum;
 
         Builder() {}
 
         /**
-         * Sets the {@link Tracker} for this optimizer.
+         * Sets the {@link ParameterTracker} for this optimizer.
          *
-         * @param learningRateTracker the {@link Tracker} to be set
+         * @param learningRateTracker the {@link ParameterTracker} to be set
          * @return this {@code Builder}
          */
-        public Builder setLearningRateTracker(Tracker learningRateTracker) {
+        public Builder setLearningRateTracker(ParameterTracker learningRateTracker) {
             this.learningRateTracker = learningRateTracker;
             return this;
         }

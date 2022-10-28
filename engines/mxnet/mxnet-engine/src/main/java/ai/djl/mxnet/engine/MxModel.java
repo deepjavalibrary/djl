@@ -107,7 +107,11 @@ public class MxModel extends BaseModel {
             paramFile = paramPathResolver(prefix, options);
             if (paramFile == null && block == null) {
                 throw new FileNotFoundException(
-                        "Parameter file with prefix: " + prefix + " not found in: " + modelDir);
+                        "Parameter file with prefix: "
+                                + prefix
+                                + " not found in: "
+                                + modelDir
+                                + " or not readable by the engine.");
             }
         }
 

@@ -12,18 +12,37 @@
  */
 package ai.djl.modality.cv.transform;
 
-import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.translate.Transform;
+import ai.djl.util.RandomUtils;
+
+import java.util.Random;
 
 /**
  * A {@link Transform} that randomly flip the input image left to right with a probability of 0.5.
  */
 public class RandomFlipLeftRight implements Transform {
+    Integer seed;
+
+    /** Creates a new instance of {@code RandomFlipLeftRight}. */
+    public RandomFlipLeftRight() {}
+
+    /**
+     * Creates a new instance of {@code RandomFlipLeftRight} with the given seed.
+     *
+     * @param seed the value of the seed
+     */
+    public RandomFlipLeftRight(int seed) {
+        this.seed = seed;
+    }
 
     /** {@inheritDoc} */
     @Override
     public NDArray transform(NDArray array) {
-        return NDImageUtils.randomFlipLeftRight(array);
+        Random rnd = (seed != null) ? new Random(seed) : RandomUtils.RANDOM;
+        if (rnd.nextFloat() > 0.5) {
+            array.flip(1);
+        }
+        return array;
     }
 }

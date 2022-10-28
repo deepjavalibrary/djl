@@ -30,7 +30,7 @@ public final class NDImageUtils {
      *
      * @param image the image to resize
      * @param size the desired size
-     * @return the resized NDList
+     * @return the resized NDArray
      */
     public static NDArray resize(NDArray image, int size) {
         return resize(image, size, size, Image.Interpolation.BILINEAR);
@@ -42,7 +42,7 @@ public final class NDImageUtils {
      * @param image the image to resize
      * @param width the desired width
      * @param height the desired height
-     * @return the resized NDList
+     * @return the resized NDArray
      */
     public static NDArray resize(NDArray image, int width, int height) {
         return resize(image, width, height, Image.Interpolation.BILINEAR);
@@ -55,7 +55,7 @@ public final class NDImageUtils {
      * @param width the desired width
      * @param height the desired height
      * @param interpolation the desired interpolation
-     * @return the resized NDList
+     * @return the resized NDArray
      */
     public static NDArray resize(
             NDArray image, int width, int height, Image.Interpolation interpolation) {
@@ -334,6 +334,6 @@ public final class NDImageUtils {
         } else if (shape.get(2) == 1 || shape.get(2) == 3) {
             return false;
         }
-        throw new IllegalArgumentException("Image is not CHW or HWC");
+        throw new IllegalArgumentException("Image is neither CHW nor HWC");
     }
 }

@@ -16,6 +16,7 @@ package ai.djl.training;
 import ai.djl.training.tracker.CosineTracker;
 import ai.djl.training.tracker.CyclicalTracker;
 import ai.djl.training.tracker.FactorTracker;
+import ai.djl.training.tracker.FixedPerVarTracker;
 import ai.djl.training.tracker.MultiFactorTracker;
 import ai.djl.training.tracker.Tracker;
 
@@ -141,6 +142,22 @@ public class LearningRateTest {
         Assert.assertEquals(cyclicalTrackerCustom.getNewValue(0), baseValue);
         Assert.assertEquals(cyclicalTrackerCustom.getNewValue(50), 0.055f, epsilon);
         Assert.assertEquals(cyclicalTrackerCustom.getNewValue(500), 0.04f, epsilon);
+    }
+
+    @Test
+    public void testFixedPerVarTracker() {
+        float lr = 0.001f; // Customized learning rate
+        FixedPerVarTracker.Builder fixedPerVarTrackerBuilder =
+                FixedPerVarTracker.builder().setDefaultValue(lr);
+        String[] parameterIds = {"id1", "id2"};
+        for (String param : parameterIds) {
+            fixedPerVarTrackerBuilder.put(param, 0.1f * lr);
+        }
+        FixedPerVarTracker fixedPerVarTracker = fixedPerVarTrackerBuilder.build();
+
+        Assert.assertEquals(fixedPerVarTracker.getNewValue("id1", 0), 0.1f * lr);
+        Assert.assertEquals(fixedPerVarTracker.getNewValue("id2", 1), 0.1f * lr);
+        Assert.assertEquals(fixedPerVarTracker.getNewValue("unknown", 2), lr);
     }
 
     private static class CustomScaleFunction implements CyclicalTracker.ScaleFunction {

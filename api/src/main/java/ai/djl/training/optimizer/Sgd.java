@@ -16,7 +16,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.internal.NDArrayEx;
-import ai.djl.training.tracker.Tracker;
+import ai.djl.training.tracker.ParameterTracker;
 
 import java.util.Map;
 import java.util.Objects;
@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Sgd extends Optimizer {
 
-    private Tracker learningRateTracker;
+    private ParameterTracker learningRateTracker;
     private float momentum;
     private Map<String, Map<Device, NDArray>> momentumStates;
 
@@ -58,7 +58,7 @@ public class Sgd extends Optimizer {
     public void update(String parameterId, NDArray weight, NDArray grad) {
         // TODO: Support Mixed precision Sparse
         float weightDecay = getWeightDecay();
-        float learningRate = learningRateTracker.getNewValue(updateCount(parameterId));
+        float learningRate = learningRateTracker.getNewValue(parameterId, updateCount(parameterId));
         NDList inputs;
         if (momentum != 0f) {
             NDArray state =
@@ -81,7 +81,7 @@ public class Sgd extends Optimizer {
     /** The Builder to construct an {@link Sgd} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
-        Tracker learningRateTracker;
+        ParameterTracker learningRateTracker;
         float momentum;
 
         Builder() {}
@@ -93,12 +93,12 @@ public class Sgd extends Optimizer {
         }
 
         /**
-         * Sets the {@link Tracker} for this optimizer.
+         * Sets the {@link ParameterTracker} for this optimizer.
          *
-         * @param learningRateTracker the {@link Tracker} to be set
+         * @param learningRateTracker the {@link ParameterTracker} to be set
          * @return this {@code Builder}
          */
-        public Builder setLearningRateTracker(Tracker learningRateTracker) {
+        public Builder setLearningRateTracker(ParameterTracker learningRateTracker) {
             this.learningRateTracker = learningRateTracker;
             return this;
         }

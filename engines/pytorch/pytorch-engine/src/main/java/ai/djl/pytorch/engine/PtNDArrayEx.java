@@ -575,6 +575,7 @@ public class PtNDArrayEx implements NDArrayEx {
             if (dim == 3) {
                 result = result.expandDims(0);
             }
+            // change from HWC to CHW order
             result = result.transpose(0, 3, 1, 2);
             result =
                     JniUtils.interpolate(
