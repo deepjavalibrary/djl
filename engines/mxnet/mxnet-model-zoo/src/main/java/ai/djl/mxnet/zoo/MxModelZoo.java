@@ -14,6 +14,7 @@ package ai.djl.mxnet.zoo;
 
 import ai.djl.Application.CV;
 import ai.djl.Application.NLP;
+import ai.djl.Application.TimeSeries;
 import ai.djl.mxnet.engine.MxEngine;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
@@ -53,6 +54,7 @@ public class MxModelZoo extends ModelZoo {
         addModel(REPOSITORY.model(CV.ACTION_RECOGNITION, GROUP_ID, "action_recognition", "0.0.1"));
         addModel(REPOSITORY.model(NLP.QUESTION_ANSWER, GROUP_ID, "bertqa", "0.0.1"));
         addModel(REPOSITORY.model(NLP.WORD_EMBEDDING, GROUP_ID, "glove", "0.0.2"));
+        addModel(REPOSITORY.model(TimeSeries.FORECASTING, GROUP_ID, "deepar", "0.0.1"));
     }
 
     /** {@inheritDoc} */

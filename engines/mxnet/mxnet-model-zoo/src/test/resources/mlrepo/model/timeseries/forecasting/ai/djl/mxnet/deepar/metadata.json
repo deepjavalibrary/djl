@@ -1,0 +1,66 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "timeseries/forecasting",
+  "groupId": "ai.djl.mxnet",
+  "artifactId": "resnest",
+  "name": "deepar",
+  "description": "DeepAR model for timeseries forecasting",
+  "website": "http://www.djl.ai/engines/mxnet/model-zoo",
+  "licenses": {
+    "apache": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "airpassengers",
+      "properties": {
+        "dataset": "airpassengers"
+      },
+      "arguments": {
+        "prediction_length": 12,
+        "freq": "M",
+        "use_feat_dynamic_real": false,
+        "use_feat_static_cat": false,
+        "use_feat_static_real": false,
+        "translatorFactory": "ai.djl.timeseries.translator.DeepARTranslatorFactory"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/airpassengers.zip",
+          "sha1Hash": "1c99cdaefb79c3e63bc7ff1965b0fb2ba45e96c3",
+          "name": "",
+          "size": 106895
+        }
+      }
+    },
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "m5forecast",
+      "properties": {
+        "dataset": "m5forecast"
+      },
+      "arguments": {
+        "prediction_length": 4,
+        "freq": "W",
+        "use_feat_dynamic_real": false,
+        "use_feat_static_cat": false,
+        "use_feat_static_real": false,
+        "translatorFactory": "ai.djl.timeseries.translator.DeepARTranslatorFactory"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/m5forecast.zip",
+          "sha1Hash": "e251628df3a246911479de0ed36762515a5df241",
+          "name": "",
+          "size": 96363
+        }
+      }
+    }
+  ]
+}

@@ -314,4 +314,14 @@ public class Application {
         /** Any audio application, including those in {@link Audio}. */
         Application ANY = new Application("audio");
     }
+
+    /** The common set of applications for timeseries extension. */
+    public interface TimeSeries {
+
+        /**
+         * An application that take a past target vector with corresponding feature and predicts a
+         * probability distribution based on it.
+         */
+        Application FORECASTING = new Application("timeseries/forecasting");
+    }
 }

@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.timeseries;
 
 import ai.djl.ModelException;
 import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
@@ -27,8 +27,8 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
-import ai.djl.timeseries.translator.DeepARTranslator;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.DeferredTranslatorFactory;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 
@@ -55,17 +55,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class DeepARTimeSeries {
+public final class M5ForecastingDeepAR {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeepARTimeSeries.class);
+    private static final Logger logger = LoggerFactory.getLogger(M5ForecastingDeepAR.class);
 
-    private DeepARTimeSeries() {}
+    private M5ForecastingDeepAR() {}
 
     public static void main(String[] args) throws IOException, TranslateException, ModelException {
-        logger.info("model: DeepAR");
         Map<String, Float> metrics = predict();
         for (Map.Entry<String, Float> entry : metrics.entrySet()) {
-            logger.info(String.format("metric: %s:\t%.2f", entry.getKey(), entry.getValue()));
+            logger.info("{}", String.format("metric: %s:\t%.2f", entry.getKey(), entry.getValue()));
         }
     }
 
@@ -74,25 +73,21 @@ public final class DeepARTimeSeries {
         // M5 Forecasting - Accuracy dataset requires manual download
         String pathToData = "/Desktop/m5example/m5-forecasting-accuracy";
         Path m5ForecastFile = Paths.get(System.getProperty("user.home") + pathToData);
-        NDManager manager = NDManager.newBaseManager();
+        NDManager manager = NDManager.newBaseManager(null, "MXNet");
         M5Dataset dataset = M5Dataset.builder().setManager(manager).setRoot(m5ForecastFile).build();
 
-        String modelUrl = "https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip";
-        Map<String, Object> arguments = new ConcurrentHashMap<>();
-        int predictionLength = 28;
-        arguments.put("prediction_length", predictionLength);
-        arguments.put("freq", "D");
-        arguments.put("use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(), false);
-        arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), false);
-        arguments.put("use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(), false);
-
-        DeepARTranslator.Builder builder = DeepARTranslator.builder(arguments);
-        DeepARTranslator translator = builder.build();
+        int predictionLength = 4;
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
                         .setTypes(TimeSeriesData.class, Forecast.class)
-                        .optModelUrls(modelUrl)
-                        .optTranslator(translator)
+                        .optModelUrls("djl://ai.djl.mxnet/deepar/0.0.1/m5forecast")
+                        .optEngine("MXNet")
+                        .optTranslatorFactory(new DeferredTranslatorFactory())
+                        .optArgument("prediction_length", predictionLength)
+                        .optArgument("freq", "W")
+                        .optArgument("use_feat_dynamic_real", "false")
+                        .optArgument("use_feat_static_cat", "false")
+                        .optArgument("use_feat_static_real", "false")
                         .optProgress(new ProgressBar())
                         .build();
 
@@ -119,6 +114,8 @@ public final class DeepARTimeSeries {
                 evaluator.aggregateMetrics(evaluator.getMetricsPerTs(gt, pastTarget, forecast));
                 progress.increment(1);
             }
+
+            manager.close();
             return evaluator.computeTotalMetrics();
         }
     }
@@ -143,14 +140,13 @@ public final class DeepARTimeSeries {
             try {
                 prepare(builder);
             } catch (Exception e) {
-                throw new AssertionError(
-                        "Failed to read m5-forecast-accuracy/sales_train_evaluation.csv file.", e);
+                throw new AssertionError("Failed to read files.", e);
             }
             size = csvRecords.size();
         }
 
         private void prepare(Builder builder) throws IOException {
-            URL csvUrl = builder.root.resolve("sales_train_evaluation.csv").toUri().toURL();
+            URL csvUrl = builder.root.resolve("weekly_sales_train_evaluation.csv").toUri().toURL();
             try (Reader reader =
                     new InputStreamReader(
                             new BufferedInputStream(csvUrl.openStream()), StandardCharsets.UTF_8)) {
@@ -213,8 +209,8 @@ public final class DeepARTimeSeries {
                                 .setTrim(true)
                                 .build();
                 target = new ArrayList<>();
-                for (int i = 1; i <= 1941; i++) {
-                    target.add(new Feature("d_" + i, true));
+                for (int i = 1; i <= 277; i++) {
+                    target.add(new Feature("w_" + i, true));
                 }
             }
 
@@ -234,7 +230,8 @@ public final class DeepARTimeSeries {
         }
     }
 
-    private static final class M5Evaluator {
+    /** An evaluator that calculates performance metrics. */
+    public static final class M5Evaluator {
         private float[] quantiles;
         Map<String, Float> totalMetrics;
         Map<String, Integer> totalNum;
@@ -252,15 +249,14 @@ public final class DeepARTimeSeries {
                     new ConcurrentHashMap<>((8 + quantiles.length * 2) * 3 / 2);
             NDArray meanFcst = forecast.mean();
             NDArray medianFcst = forecast.median();
-            NDArray target = NDArrays.concat(new NDList(pastTarget, gtTarget), -1);
 
-            NDArray successiveDiff = target.get("1:").sub(target.get(":-1"));
-            successiveDiff = successiveDiff.square();
-            successiveDiff = successiveDiff.get(":{}", -forecast.getPredictionLength());
-            NDArray denom = successiveDiff.mean();
+            NDArray meanSquare = gtTarget.sub(meanFcst).square().mean();
+            NDArray scaleDenom = gtTarget.get("1:").sub(gtTarget.get(":-1")).square().mean();
 
-            NDArray num = gtTarget.sub(meanFcst).square().mean();
-            retMetrics.put("RMSSE", num.getFloat() / denom.getFloat());
+            NDArray rmsse = meanSquare.div(scaleDenom).sqrt();
+            rmsse = NDArrays.where(scaleDenom.eq(0), rmsse.onesLike(), rmsse);
+
+            retMetrics.put("RMSSE", rmsse.getFloat());
 
             retMetrics.put("MSE", gtTarget.sub(meanFcst).square().mean().getFloat());
             retMetrics.put("abs_error", gtTarget.sub(medianFcst).abs().sum().getFloat());

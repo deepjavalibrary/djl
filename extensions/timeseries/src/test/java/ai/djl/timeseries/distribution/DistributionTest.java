@@ -25,16 +25,19 @@ public class DistributionTest {
     @Test
     public void testNegativeBinomial() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray mu = manager.create(new float[] {1000f, 1f});
-            NDArray alpha = manager.create(new float[] {1f, 2f});
-            mu.setName("mu");
-            alpha.setName("alpha");
+            NDArray totalCount = manager.create(new float[] {5f, 1f});
+            NDArray logits = manager.create(new float[] {0.1f, 2f});
+            totalCount.setName("total_count");
+            logits.setName("logits");
             Distribution negativeBinomial =
-                    NegativeBinomial.builder().setDistrArgs(new NDList(mu, alpha)).build();
+                    NegativeBinomial.builder().setDistrArgs(new NDList(totalCount, logits)).build();
 
-            NDArray expected = manager.create(new float[] {-6.9098f, -1.6479f});
-            NDArray real = negativeBinomial.logProb(manager.create(new float[] {1f, 1f}));
+            NDArray expected = manager.create(new float[] {-2.3027f, -2.2539f});
+            NDArray real = negativeBinomial.logProb(manager.create(new float[] {2f, 1f}));
             Assertions.assertAlmostEquals(real, expected);
+
+            NDArray samplesMean = negativeBinomial.sample(100000).mean(new int[] {0});
+            Assertions.assertAlmostEquals(samplesMean, negativeBinomial.mean(), 2e-2f, 2e-2f);
         }
     }
 
@@ -53,6 +56,9 @@ public class DistributionTest {
             NDArray expected = manager.create(new float[] {-0.9779f, -1.6940f});
             NDArray real = studentT.logProb(manager.create(new float[] {1000f, -1000f}));
             Assertions.assertAlmostEquals(real, expected);
+
+            NDArray samplesMean = studentT.sample(100000).mean(new int[] {0});
+            Assertions.assertAlmostEquals(samplesMean, studentT.mean(), 2e-2f, 2e-2f);
         }
     }
 }

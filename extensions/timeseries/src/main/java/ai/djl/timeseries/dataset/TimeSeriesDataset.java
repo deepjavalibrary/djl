@@ -54,17 +54,27 @@ public abstract class TimeSeriesDataset extends RandomAccessDataset {
         TimeSeriesData data = getTimeSeriesData(manager, index);
 
         if (transformation.isEmpty()) {
-            // For inference
+            // For inference with translator
             return new Record(data.toNDList(), new NDList());
         }
         data = apply(manager, data);
-        if (!data.contains("PAST_" + FieldName.TARGET)
-                || !data.contains("FUTURE_" + FieldName.TARGET)) {
+
+        // For both training and prediction
+        if (!data.contains("PAST_" + FieldName.TARGET)) {
             throw new IllegalArgumentException(
                     "Transformation must include InstanceSampler to split data into past and future"
                             + " part");
         }
 
+        if (!data.contains("FUTURE_" + FieldName.TARGET)) {
+            // Warning: We do not recommend using TimeSeriesDataset directly to generate the
+            // inference input, using Translator instead
+            // For prediction without translator, we don't need labels and corresponding
+            // FUTURE_TARGET.
+            return new Record(data.toNDList(), new NDList());
+        }
+
+        // For training, we must have the FUTURE_TARGET label to compute Loss.
         NDArray contextTarget = data.get("PAST_" + FieldName.TARGET).get("{}:", -contextLength + 1);
         NDArray futureTarget = data.get("FUTURE_" + FieldName.TARGET);
         NDList label = new NDList(contextTarget.concat(futureTarget, 0));
