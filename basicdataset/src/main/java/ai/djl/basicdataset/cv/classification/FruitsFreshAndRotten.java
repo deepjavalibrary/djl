@@ -78,24 +78,21 @@ public final class FruitsFreshAndRotten extends AbstractImageFolder {
     /** {@inheritDoc} */
     @Override
     public void prepare(Progress progress) throws IOException {
-        if (prepared) {
-            return;
-        }
-
         // Use the code in ImageFolder
-        mrl.prepare(null, progress);
-        loadSynset();
-        Path root = Paths.get(mrl.getRepository().getBaseUri());
-        if (progress != null) {
-            progress.reset("Preparing", 2);
-            progress.start(0);
-            listImages(root, synset);
-            progress.end();
-        } else {
-            listImages(root, synset);
+        if (!prepared) {
+            mrl.prepare(null, progress);
+            loadSynset();
+            Path root = Paths.get(mrl.getRepository().getBaseUri());
+            if (progress != null) {
+                progress.reset("Preparing", 2);
+                progress.start(0);
+                listImages(root, synset);
+                progress.end();
+            } else {
+                listImages(root, synset);
+            }
+            prepared = true;
         }
-
-        prepared = true;
     }
 
     private void loadSynset() {
@@ -116,6 +113,7 @@ public final class FruitsFreshAndRotten extends AbstractImageFolder {
         String groupId;
         String artifactId;
         Usage usage;
+        private Repository optRepository;
 
         /** Constructs a new builder. */
         Builder() {
@@ -149,7 +147,7 @@ public final class FruitsFreshAndRotten extends AbstractImageFolder {
          * @return this builder
          */
         public Builder optRepository(Repository repository) {
-            this.repository = repository;
+            this.optRepository = repository;
             return self();
         }
 
@@ -192,26 +190,31 @@ public final class FruitsFreshAndRotten extends AbstractImageFolder {
                 pipeline = new Pipeline(new ToTensor());
             }
 
-            MRL mrl = getMrl();
-            Artifact artifact = mrl.getDefaultArtifact();
-            // Downloading the cache happens here
-            mrl.prepare(artifact, null);
+            if (optRepository != null) {
+                repository = optRepository;
+            } else {
+                MRL mrl = getMrl();
+                Artifact artifact = mrl.getDefaultArtifact();
+                // Downloading the cache happens here
+                mrl.prepare(artifact, null);
 
-            Artifact.Item item;
-            switch (usage) {
-                case TRAIN:
-                    item = artifact.getFiles().get("train");
-                    break;
-                case TEST:
-                    item = artifact.getFiles().get("test");
-                    break;
-                case VALIDATION:
-                default:
-                    throw new IOException("Only training and testing dataset supported.");
+                Artifact.Item item;
+                switch (usage) {
+                    case TRAIN:
+                        item = artifact.getFiles().get("train");
+                        break;
+                    case TEST:
+                        item = artifact.getFiles().get("test");
+                        break;
+                    case VALIDATION:
+                    default:
+                        throw new IOException("Only training and testing dataset supported.");
+                }
+                Path root = mrl.getRepository().getFile(item, "").toAbsolutePath();
+
+                // set repository
+                repository = Repository.newInstance("banana", root);
             }
-            Path root = mrl.getRepository().getFile(item, "").toAbsolutePath();
-
-            repository = Repository.newInstance("banana", root);
             return new FruitsFreshAndRotten(this);
         }
 

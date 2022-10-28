@@ -130,6 +130,14 @@ public final class TransferFreshFruit {
         // https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification
         float[] mean = {0.485f, 0.456f, 0.406f};
         float[] std = {0.229f, 0.224f, 0.225f};
+
+        // If the user wants to use local repository, then the dataset can be loaded as follows
+        // Repository repository = Repository.newInstance("banana", Paths.get(LOCAL_FOLDER/{train OR
+        // test}));
+        // FruitsFreshAndRotten dataset =
+        //        FruitsFreshAndRotten.builder()
+        //                            .optRepository(repository)
+        //                            .build()
         FruitsFreshAndRotten dataset =
                 FruitsFreshAndRotten.builder()
                         .optUsage(usage)
