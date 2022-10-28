@@ -92,14 +92,16 @@ public final class DeepARTrainingNetwork extends DeepARNetwork {
         Shape rnnOutShape = rnn.getOutputShapes(new Shape[] {rnnInputShape})[0];
         Shape[] argShapes = paramProj.getOutputShapes(new Shape[] {rnnOutShape});
 
-        long[] observedValueShape = inputShapes[8].getShape();
+        long[] observedValueShape = new long[inputShapes[8].dimension()];
+        System.arraycopy(
+                inputShapes[8].getShape(), 0, observedValueShape, 0, observedValueShape.length);
         observedValueShape[1] += contextLength - 1;
         Shape lossWeightsShape = new Shape(observedValueShape);
 
         Shape[] ret = new Shape[argShapes.length + 2];
         System.arraycopy(argShapes, 0, ret, 0, argShapes.length);
-        ret[argShapes.length + 1] = scaleShape;
-        ret[argShapes.length + 2] = lossWeightsShape;
+        ret[argShapes.length] = scaleShape;
+        ret[argShapes.length + 1] = lossWeightsShape;
         return ret;
     }
 }
