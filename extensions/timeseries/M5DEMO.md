@@ -1,6 +1,7 @@
 # DJL timeseries package applied on M5forecasting dataset
 
-The timeseries package contains components and tools for building time series models and inferring on pretrained models using DJL.
+The timeseries package contains components and tools for building time series models and
+inferring on pretrained models using DJL.
 
 Now it contains:
 
@@ -13,21 +14,33 @@ Now it contains:
 
 ## M5 Forecasting data
 
-[M5 Forecasting competition]([M5 Forecasting - Accuracy | Kaggle](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/description)) goal is to forecast future sales at Walmart based on hierarchical sales in the states of California, Texas, and Wisconsin. It provides information on daily sales, product attributes, prices, and calendars.
+[M5 Forecasting competition]([M5 Forecasting - Accuracy | Kaggle](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/description)) 
+goal is to forecast future sales at Walmart based on hierarchical sales in the states of California,
+Texas, and Wisconsin. It provides information on daily sales, product attributes, prices, and calendars.
 
-> Notes: Taking into account the model training performance, we sum the sales every 7 days,  coarse-grained the data, so that the model can better learn the time series information. **After downloading the dataset from [M5 Forecasting competition]([M5 Forecasting - Accuracy | Kaggle](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/description)), you can use our [script](https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008) to get coarse-grained data. This script will create "weekly_xxx.csv" files representing weekly data in the dataset directory you specify.**
+> Notes: Taking into account the model training performance, we sum the sales every 7 days,  
+> coarse-grained the data, so that the model can better learn the time series information.
+> **After downloading the dataset from [M5 Forecasting competition](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/description),
+> you can use our [script](https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008)
+> to get coarse-grained data. This script will create "weekly_xxx.csv" files representing weekly
+> data in the dataset directory you specify.**
 
 ## DeepAR model
 
-DeepAR forecasting algorithm is a supervised learning algorithm for forecasting scalar (one-dimensional) time series using recurrent neural networks (RNN).
+DeepAR forecasting algorithm is a supervised learning algorithm for forecasting scalar
+(one-dimensional) time series using recurrent neural networks (RNN).
 
-Unlike traditional time series forecasting models, DeepAR estimates the future probability distribution of time series based on the past. In retail businesses, probabilistic demand forecasting is critical to delivering the right inventory at the right time and in the right place.
+Unlike traditional time series forecasting models, DeepAR estimates the future probability
+distribution of time series based on the past. In retail businesses, probabilistic demand
+forecasting is critical to delivering the right inventory at the right time and in the right place.
 
-Therefore, we choose the sales data set in the real scene as an example to describe how to use the timeseries package for forecasting
+Therefore, we choose the sales data set in the real scene as an example to describe how to use
+the timeseries package for forecasting
 
 ### Metrics
 
-We use the following metrics to evaluate the performance of the DeepAR model in the [M5 Forecasting competition]([M5 Forecasting - Accuracy | Kaggle](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/description)).
+We use the following metrics to evaluate the performance of the DeepAR model in the
+[M5 Forecasting competition](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/description).
 
 ```
 > [INFO ] - metric: Coverage[0.99]:	0.92
@@ -47,15 +60,21 @@ We use the following metrics to evaluate the performance of the DeepAR model in 
 > [INFO ] - metric: MSE:	70.64
 ```
 
-As you can see, our pretrained model has some effect on the data prediction of item value. And some metrics can basically meet expectations. For example, **RMSSE**, which is a measure of the relative error between the predicted value and the actual value. 1.00 means that the model can reflect the changes of the time series data to a certain extent.
+As you can see, our pretrained model has some effect on the data prediction of item value. And
+some metrics can basically meet expectations. For example, **RMSSE**, which is a measure of the
+relative error between the predicted value and the actual value. 1.00 means that the model can
+reflect the changes of the time series data to a certain extent.
 
 ## Run the M5 Forecasting example
 
 ### Define your dataset
 
-In order to realize the preprocessing of time series data, we define the `TimeSeriesData` as the input of the Translator, which is used to store the feature fields and perform corresponding transformations.
+In order to realize the preprocessing of time series data, we define the `TimeSeriesData` as
+the input of the Translator, which is used to store the feature fields and perform corresponding
+transformations.
 
-So for your own dataset, you need to customize the way you get the data and put it into `TimeSeriesData` as the input to the translator.
+So for your own dataset, you need to customize the way you get the data and put it into
+`TimeSeriesData` as the input to the translator.
 
 For M5 dataset we have:
 
@@ -183,7 +202,10 @@ M5Dataset dataset = M5Dataset.builder().setManager(manager).setRoot(m5ForecastFi
 
 ### Config your translator
 
-`DeepARTranslator` provides support for data preprocessing and postprocessing for probabilistic prediction models. Referring to GluonTS, our translator can perform corresponding preprocessing on `TimeseriesData` containing data according to different parameters to obtain the input of the network model. And post-processing the output of the network to get the prediction result.
+`DeepARTranslator` provides support for data preprocessing and postprocessing for probabilistic
+prediction models. Referring to GluonTS, our translator can perform corresponding preprocessing
+on `TimeseriesData` containing data according to different parameters to obtain the input of
+the network model. And post-processing the output of the network to get the prediction result.
 
 For DeepAR models, you must set the following arguments.
 
@@ -204,11 +226,16 @@ arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), false);
 arguments.put("use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(), false);
 ```
 
-For any other GluonTS model, you can quickly develop your own translator using the classes in `transform` modules (etc. `TransformerTranslator`).
+For any other GluonTS model, you can quickly develop your own translator using the classes
+in `transform` modules (etc. `TransformerTranslator`).
 
 ### Load your own model from the local file system
 
-At this step, you need to construct the `Criteria` API, which is used as search criteria to look for a ZooModel. In this application, you can customize your local pretrained model path (local directory or an archive file containing .`params` and `symbol.json`.) with .`optModelPath()`. The following code snippet loads the model with the file path: `/YOUR PATH/deepar.zip` .
+At this step, you need to construct the `Criteria` API, which is used as search criteria to look
+for a ZooModel. In this application, you can customize your local pretrained model path
+(local directory or an archive file containing .`params` and `symbol.json`.)
+with .`optModelPath()`. The following code snippet loads the model with the file
+path: `/YOUR PATH/deepar.zip` .
 
 ```java
 DeepARTranslator translator = DeepARTranslator.builder(arguments).build();
@@ -225,7 +252,8 @@ Criteria<TimeSeriesData, Forecast> criteria =
 
 Now, you are ready to used the model bundled with the translator created above to run inference.
 
-Since we need to generate features based on dates and make predictions with reference to the context, for each `TimeSeriesData` you must set the values of its **`StartTime`** and **`TARGET`** fields.
+Since we need to generate features based on dates and make predictions with reference to the
+context, for each `TimeSeriesData` you must set the values of its **`StartTime`** and **`TARGET`** fields.
 
 ```java
 try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
@@ -243,9 +271,12 @@ try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
 
 ### Results
 
-The `Forecast` are objects that contain all the sample paths in the form of `NDArray` with dimension `(numSamples, predictionLength)`, the start date of the forecast. You can access all these information by simply invoking the corresponding function.
+The `Forecast` are objects that contain all the sample paths in the form of `NDArray`
+with dimension `(numSamples, predictionLength)`, the start date of the forecast. You can access
+all these information by simply invoking the corresponding function.
 
-You can summarize the sample paths by computing, including the mean and quantile, for each step in the prediction window.
+You can summarize the sample paths by computing, including the mean and quantile, for each step
+in the prediction window.
 
 ```java
 logger.info("Mean of the prediction windows:\n" + forecast.mean().toDebugString());
@@ -264,10 +295,9 @@ logger.info("0.5-quantile(Median) of the prediction windows:\n" + forecast.quant
 
 We visualize the forecast result with mean, prediction intervals, etc.
 
-![m5_forecast_0](./src/test/resources/m5_forecast_0.jpg)
+![m5_forecast_0](https://resources.djl.ai/images/timeseries/m5_forecast_0.jpg)
 
 ### Metrics
 
-Here we compute aggregate performance metrics in the [source code](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/DeepARTimeSeries.java)
-
-Click [here]([djl/DeepARTimeSeries.java at master · deepjavalibrary/djl (github.com)](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/DeepARTimeSeries.java)) to see the **full source code**.
+Here we compute aggregate performance metrics in the
+[source code](../../examples/src/main/java/ai/djl/examples/inference/timeseries/M5ForecastingDeepAR.java)

@@ -17,7 +17,7 @@ import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.tabular.utils.Feature;
 import ai.djl.engine.Engine;
-import ai.djl.examples.inference.DeepARTimeSeries;
+import ai.djl.examples.inference.timeseries.M5ForecastingDeepAR;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -171,8 +171,8 @@ public final class TrainTimeSeries {
             arguments.put("use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(), false);
             DeepARTranslator translator = DeepARTranslator.builder(arguments).build();
 
-            DeepARTimeSeries.M5Evaluator evaluator =
-                    new DeepARTimeSeries.M5Evaluator(0.5f, 0.67f, 0.95f, 0.99f);
+            M5ForecastingDeepAR.M5Evaluator evaluator =
+                    new M5ForecastingDeepAR.M5Evaluator(0.5f, 0.67f, 0.95f, 0.99f);
             Progress progress = new ProgressBar();
             progress.reset("Inferring", testSet.size());
             try (Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor(translator)) {
@@ -272,7 +272,7 @@ public final class TrainTimeSeries {
         M5Forecast.Builder builder =
                 M5Forecast.builder()
                         .optUsage(usage)
-                        .setRepository(repository)
+                        .optRepository(repository)
                         .setTransformation(transformation)
                         .setContextLength(contextLength)
                         .setSampling(32, usage == Dataset.Usage.TRAIN);

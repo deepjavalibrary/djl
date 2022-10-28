@@ -322,6 +322,6 @@ public class Application {
          * An application that take a past target vector with corresponding feature and predicts a
          * probability distribution based on it.
          */
-        Application FORECAST = new Application("timeseries/forecast");
+        Application FORECASTING = new Application("timeseries/forecasting");
     }
 }

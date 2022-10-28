@@ -264,7 +264,8 @@ public class M5Forecast extends CsvTimeSeriesDataset {
                         Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                     mf = JsonUtils.GSON.fromJson(reader, M5Features.class);
                 } catch (IOException e) {
-                    throw new AssertionError("Failed to read m5forecast.json from classpath", e);
+                    throw new AssertionError(
+                            "Failed to read m5forecast_parser.json from classpath", e);
                 }
             }
         }

@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.timeseries;
 
 import ai.djl.ModelException;
 import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
@@ -27,8 +27,8 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
-import ai.djl.timeseries.translator.DeepARTranslator;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.DeferredTranslatorFactory;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 
@@ -55,17 +55,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class DeepARTimeSeries {
+public final class M5ForecastingDeepAR {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeepARTimeSeries.class);
+    private static final Logger logger = LoggerFactory.getLogger(M5ForecastingDeepAR.class);
 
-    private DeepARTimeSeries() {}
+    private M5ForecastingDeepAR() {}
 
     public static void main(String[] args) throws IOException, TranslateException, ModelException {
-        logger.info("model: DeepAR");
         Map<String, Float> metrics = predict();
         for (Map.Entry<String, Float> entry : metrics.entrySet()) {
-            logger.info(String.format("metric: %s:\t%.2f", entry.getKey(), entry.getValue()));
+            logger.info("{}", String.format("metric: %s:\t%.2f", entry.getKey(), entry.getValue()));
         }
     }
 
@@ -74,25 +73,21 @@ public final class DeepARTimeSeries {
         // M5 Forecasting - Accuracy dataset requires manual download
         String pathToData = "/Desktop/m5example/m5-forecasting-accuracy";
         Path m5ForecastFile = Paths.get(System.getProperty("user.home") + pathToData);
-        NDManager manager = NDManager.newBaseManager();
+        NDManager manager = NDManager.newBaseManager(null, "MXNet");
         M5Dataset dataset = M5Dataset.builder().setManager(manager).setRoot(m5ForecastFile).build();
 
-        Map<String, Object> arguments = new ConcurrentHashMap<>();
         int predictionLength = 4;
-        arguments.put("prediction_length", predictionLength);
-        arguments.put("freq", "W");
-        arguments.put("use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(), false);
-        arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), false);
-        arguments.put("use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(), false);
-
-        DeepARTranslator.Builder builder = DeepARTranslator.builder(arguments);
-        DeepARTranslator translator = builder.build();
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
                         .setTypes(TimeSeriesData.class, Forecast.class)
-                        .optFilter("backbone", "deepar")
-                        .optFilter("dataset", "m5forecast")
-                        .optTranslator(translator)
+                        .optModelUrls("djl://ai.djl.mxnet/deepar/0.0.1/m5forecast")
+                        .optEngine("MXNet")
+                        .optTranslatorFactory(new DeferredTranslatorFactory())
+                        .optArgument("prediction_length", predictionLength)
+                        .optArgument("freq", "W")
+                        .optArgument("use_feat_dynamic_real", "false")
+                        .optArgument("use_feat_static_cat", "false")
+                        .optArgument("use_feat_static_real", "false")
                         .optProgress(new ProgressBar())
                         .build();
 
@@ -119,6 +114,8 @@ public final class DeepARTimeSeries {
                 evaluator.aggregateMetrics(evaluator.getMetricsPerTs(gt, pastTarget, forecast));
                 progress.increment(1);
             }
+
+            manager.close();
             return evaluator.computeTotalMetrics();
         }
     }
