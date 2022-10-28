@@ -97,8 +97,11 @@ public final class TransferFreshFruit {
         for (Pair<String, Parameter> paramPair : baseBlock.getParameters()) {
             learningRateTrackerBuilder.put(paramPair.getValue().getId(), 0.1f * lr);
         }
+        FixedPerVarTracker learningRateTracker = learningRateTrackerBuilder.build();
         Optimizer optimizer =
-                Adam.builder().optLearningRateTracker(learningRateTrackerBuilder.build()).build();
+                Adam.builder()
+                        .optLearningRateTracker(learningRateTracker)
+                        .build();
         config.optOptimizer(optimizer);
 
         Trainer trainer = model.newTrainer(config);
@@ -131,7 +134,7 @@ public final class TransferFreshFruit {
         float[] mean = {0.485f, 0.456f, 0.406f};
         float[] std = {0.229f, 0.224f, 0.225f};
 
-        // If the user wants to use local repository, then the dataset can be loaded as follows
+        // If users want to use local repository, then the dataset can be loaded as follows
         // Repository repository = Repository.newInstance("banana", Paths.get(LOCAL_FOLDER/{train OR
         // test}));
         // FruitsFreshAndRotten dataset =
