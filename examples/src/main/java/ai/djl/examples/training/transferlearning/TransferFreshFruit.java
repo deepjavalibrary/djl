@@ -98,10 +98,7 @@ public final class TransferFreshFruit {
             learningRateTrackerBuilder.put(paramPair.getValue().getId(), 0.1f * lr);
         }
         FixedPerVarTracker learningRateTracker = learningRateTrackerBuilder.build();
-        Optimizer optimizer =
-                Adam.builder()
-                        .optLearningRateTracker(learningRateTracker)
-                        .build();
+        Optimizer optimizer = Adam.builder().optLearningRateTracker(learningRateTracker).build();
         config.optOptimizer(optimizer);
 
         Trainer trainer = model.newTrainer(config);
