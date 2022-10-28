@@ -142,7 +142,7 @@ public final class M5ForecastingDeepAR {
                 // https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008
                 NDArray samples = ((SampleForecast) forecast).getSortedSamples();
                 samples.setName("samples");
-                saveNDArray(samples);
+                saveNDArray(samples, "build");
             }
 
             manager.close();
@@ -150,8 +150,8 @@ public final class M5ForecastingDeepAR {
         }
     }
 
-    private static void saveNDArray(NDArray array) throws IOException {
-        Path path = Paths.get("build").resolve(array.getName() + ".npz");
+    private static void saveNDArray(NDArray array, String saveDir) throws IOException {
+        Path path = Paths.get(saveDir).resolve(array.getName() + ".npz");
         try (OutputStream os = Files.newOutputStream(path)) {
             new NDList(new NDList(array)).encode(os, true);
         }
