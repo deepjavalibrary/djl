@@ -131,13 +131,10 @@ public final class TransferFreshFruit {
         float[] mean = {0.485f, 0.456f, 0.406f};
         float[] std = {0.229f, 0.224f, 0.225f};
 
-        // If users want to use local repository, then the dataset can be loaded as follows
-        // Repository repository = Repository.newInstance("banana", Paths.get(LOCAL_FOLDER/{train OR
-        // test}));
-        // FruitsFreshAndRotten dataset =
-        //        FruitsFreshAndRotten.builder()
-        //                            .optRepository(repository)
-        //                            .build()
+        // To use local dataset, users can load it as follows
+        // Repository repository = Repository.newInstance("banana",
+        // Paths.get("local_data_root/banana/train"));
+        // Then add the setting `Builder.optRepository(repository)` to the builder below
         FruitsFreshAndRotten dataset =
                 FruitsFreshAndRotten.builder()
                         .optUsage(usage)
