@@ -30,25 +30,31 @@ import java.io.IOException;
 import java.util.Collections;
 
 /**
- * A LinearCollection block applies \(m\) linear transformations \(Y_i = X_i W_i + b_i\) for each
- * \(i \in [1, \ldots, m]\) and \(m = \prod_{j=1}^t s_j\). \(t\) is typically 1, so compared to a
- * {@link Linear} block, the involved shapes have typically one split dimension added which
- * separates the different linear transformations from each other. Another difference to a {@link
- * Linear} block is that the weight is not transposed (to align with the internally used algebraic
- * operation {@link NDArray#matMul(NDArray)} ).
+ * A Multiplication block performs an element-wise multiplication of samples and weights as opposed
+ * to a {@link Linear} block which additionally sums up each element-wise multiplication. Similar to
+ * a {@link LinearCollection}, multiple split dimensions are supported but they remain optional
+ * (i.e. \(t\) can be zero). Other differences to a {@link Linear} block are that the weight has an
+ * additional dimension of size 1 interspersed (to broadcast the weight to every batch sample when
+ * applying the internally used algebraic operation {@link NDArray#mul(NDArray)} ) and that biases
+ * are not supported.
+ *
+ * <p>Caution: the output-channel is the left-most dimension as opposed to traditionally being the
+ * right-most dimension. As the output is one dimension larger than that of a {@link Linear} block,
+ * it is more efficient and therefore recommended to apply an aggregating function (like the sum)
+ * first and only then shift the first axis of the aggregated and thus smaller {@link NDArray}
+ * instance into last position.
  *
  * <p>It has the following shapes:
  *
  * <ul>
  *   <li>input X: [x_1, s_1, s_2, …, s_t, input_dim]
- *   <li>weight W: [s_1, s_2, …, s_t, input_dim, units]
- *   <li>Bias b: [s_1, s_2, …, s_t, units]
- *   <li>output Y: [x_1, s_1, s_2, …, s_t, units]
+ *   <li>weight W: [units, 1, s_1, s_2, …, s_t, input_dim]
+ *   <li>output Y: [units, x_1, s_1, s_2, …, s_t, input_dim]
  * </ul>
  *
- * <p>The LinearCollection block should be constructed using {@link LinearCollection.Builder}.
+ * <p>The Multiplication block should be constructed using {@link Multiplication.Builder}.
  */
-public class LinearCollection extends AbstractBlock {
+public class Multiplication extends AbstractBlock {
 
     private static final byte VERSION = 1;
 
@@ -58,13 +64,8 @@ public class LinearCollection extends AbstractBlock {
     private Shape inputShape;
 
     private Parameter weight;
-    private Parameter bias;
 
-    private int[] shiftBatchAxis;
-
-    private int[] reverseShiftBatchAxis;
-
-    LinearCollection(Builder builder) {
+    Multiplication(Builder builder) {
         super(VERSION);
         units = builder.units;
         weight =
@@ -73,14 +74,6 @@ public class LinearCollection extends AbstractBlock {
                                 .setName("weight")
                                 .setType(Parameter.Type.WEIGHT)
                                 .build());
-        if (builder.bias) {
-            bias =
-                    addParameter(
-                            Parameter.builder()
-                                    .setName("bias")
-                                    .setType(Parameter.Type.BIAS)
-                                    .build());
-        }
     }
 
     /** {@inheritDoc} */
@@ -93,14 +86,13 @@ public class LinearCollection extends AbstractBlock {
         NDArray input = inputs.singletonOrThrow();
         Device device = input.getDevice();
         NDArray weightArr = parameterStore.getValue(weight, device, training);
-        NDArray biasArr = parameterStore.getValue(bias, device, training);
-        return linear(input, weightArr, biasArr);
+        return multiply(input, weightArr);
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(Shape[] inputs) {
-        return new Shape[] {inputs[0].slice(0, inputs[0].dimension() - 1).add(units)};
+        return new Shape[] {new Shape(units).addAll(inputs[0])};
     }
 
     /** {@inheritDoc} */
@@ -124,10 +116,7 @@ public class LinearCollection extends AbstractBlock {
     @Override
     public void prepare(Shape[] inputShapes) {
         Shape input = inputShapes[0];
-        weight.setShape(input.slice(1).add(units));
-        if (bias != null) {
-            bias.setShape(input.slice(1, input.dimension() - 1).add(units));
-        }
+        weight.setShape(new Shape(units, 1).addAll(input.slice(1)));
     }
 
     /** {@inheritDoc} */
@@ -153,38 +142,8 @@ public class LinearCollection extends AbstractBlock {
         inputShape = Shape.decode(is);
     }
 
-    /**
-     * Applies linear transformations to the incoming data.
-     *
-     * @param input input X: [x_1, s_1, s_2, …, s_t, input_dim]
-     * @param weight weight W: [s_1, s_2, …, s_t, input_dim, units]
-     * @param bias bias b: [s_1, s_2, …, s_t, units]
-     * @return output Y: [x_1, s_1, s_2, …, s_t, units]
-     */
-    public NDList linear(NDArray input, NDArray weight, NDArray bias) {
-        if (shiftBatchAxis == null) {
-            // as the batch axis is the first axis in the shape of the input resp. output
-            // arrays, it needs to be shifted in order to bring the split axes in front resp. back
-            // again to be suitable for matMul;
-            // in case there is only one split axis, the transpose array (1,0,2) could be used for
-            // both shifts, but for the general case we calculate the transpose arrays here
-            int dim = input.getShape().dimension();
-            shiftBatchAxis = new int[dim];
-            reverseShiftBatchAxis = new int[dim];
-            for (int d = 0; d < dim - 2; d++) {
-                shiftBatchAxis[d] = d + 1;
-                reverseShiftBatchAxis[d + 1] = d;
-            }
-            shiftBatchAxis[dim - 1] = dim - 1;
-            reverseShiftBatchAxis[dim - 1] = dim - 1;
-            shiftBatchAxis[dim - 2] = 0;
-            reverseShiftBatchAxis[0] = dim - 2;
-        }
-        NDArray resultArr =
-                input.transpose(shiftBatchAxis).matMul(weight).transpose(reverseShiftBatchAxis);
-        if (bias != null) {
-            resultArr.addi(bias);
-        }
+    public NDList multiply(NDArray input, NDArray weight) {
+        NDArray resultArr = input.mul(weight);
         return new NDList(resultArr);
     }
 
@@ -197,11 +156,10 @@ public class LinearCollection extends AbstractBlock {
         return new Builder();
     }
 
-    /** The Builder to construct a {@link LinearCollection} type of {@link Block}. */
+    /** The Builder to construct a {@link Multiplication} type of {@link Block}. */
     public static final class Builder {
 
         private long units;
-        private boolean bias = true;
 
         Builder() {}
 
@@ -217,27 +175,15 @@ public class LinearCollection extends AbstractBlock {
         }
 
         /**
-         * Sets the optional parameter that indicates whether to include a bias vector with default
-         * value of true.
-         *
-         * @param bias whether to use a bias vector parameter
-         * @return this Builder
-         */
-        public Builder optBias(boolean bias) {
-            this.bias = bias;
-            return this;
-        }
-
-        /**
          * Returns the constructed {@code Linear}.
          *
          * @return the constructed {@code Linear}
          * @throws IllegalArgumentException if all required parameters (outChannels) have not been
          *     set
          */
-        public LinearCollection build() {
+        public Multiplication build() {
             Preconditions.checkArgument(units > 0, "You must specify unit");
-            return new LinearCollection(this);
+            return new Multiplication(this);
         }
     }
 }
