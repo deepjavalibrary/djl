@@ -111,7 +111,7 @@ inline std::vector<std::string> GetVecFromJStringArray(JNIEnv* env, jobjectArray
 
 // String[]
 inline jobjectArray GetStringArrayFromVec(JNIEnv* env, const std::vector <std::string> &vec) {
-  jobjectArray array = env->NewObjectArray(vec.size(), env->FindClass("Ljava/lang/String;"), nullptr);
+  jobjectArray array = env->NewObjectArray(vec.size(), env->FindClass("java/lang/String"), nullptr);
 
   // TODO: cache reflection to improve performance
   const jclass string_class = env->FindClass("java/lang/String");
