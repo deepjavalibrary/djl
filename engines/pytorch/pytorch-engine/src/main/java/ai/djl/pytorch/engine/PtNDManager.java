@@ -154,6 +154,12 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray randomPermutation(long n) {
+        return JniUtils.randperm(this, n, DataType.INT64, device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         return JniUtils.uniform(this, low, high, shape, dataType, device);
     }

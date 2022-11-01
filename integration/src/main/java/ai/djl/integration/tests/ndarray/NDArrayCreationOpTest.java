@@ -395,6 +395,21 @@ public class NDArrayCreationOpTest {
     }
 
     @Test
+    public void testRandomPermutation() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            long size = 3;
+            NDArray array = manager.randomPermutation(size);
+            Assert.assertTrue(
+                    array.contentEquals(manager.create(new long[] {0, 1, 2}))
+                            || array.contentEquals(manager.create(new long[] {0, 2, 1}))
+                            || array.contentEquals(manager.create(new long[] {1, 0, 2}))
+                            || array.contentEquals(manager.create(new long[] {1, 2, 0}))
+                            || array.contentEquals(manager.create(new long[] {2, 0, 1}))
+                            || array.contentEquals(manager.create(new long[] {2, 1, 0})));
+        }
+    }
+
+    @Test
     public void testRandomUniform() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray uniform = manager.randomUniform(0, 10, new Shape(1000, 1000));

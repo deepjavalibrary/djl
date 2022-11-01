@@ -345,6 +345,8 @@ final class PyTorchLibrary {
             int[] device,
             boolean requiredGrad);
 
+    native long torchRandPerm(long n, int dType, int layout, int[] device, boolean requireGrad);
+
     native long torchNormal(
             double mean,
             double std,

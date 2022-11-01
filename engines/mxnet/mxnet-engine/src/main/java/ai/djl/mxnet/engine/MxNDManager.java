@@ -235,6 +235,14 @@ public class MxNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray randomPermutation(long n) {
+        NDArray array = arange(0, n, 1, DataType.INT64);
+        MxOpParams params = new MxOpParams();
+        return invoke("_npi_shuffle", new NDList(array), params).singletonOrThrow();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray randomUniform(float low, float high, Shape shape, DataType dataType) {
         MxOpParams params = new MxOpParams();
         params.addParam("low", low);

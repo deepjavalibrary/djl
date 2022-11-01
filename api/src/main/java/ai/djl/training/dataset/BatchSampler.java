@@ -73,7 +73,7 @@ public class BatchSampler implements Sampler {
 
         private long size;
         private long current;
-        private Iterator<Long> itemSampler;
+        private Iterator<Long> subSample;
 
         Iterate(RandomAccessDataset dataset) {
             current = 0;
@@ -82,7 +82,7 @@ public class BatchSampler implements Sampler {
             } else {
                 this.size = (dataset.size() + batchSize - 1) / batchSize;
             }
-            itemSampler = subSampler.sample(dataset);
+            subSample = subSampler.sample(dataset);
         }
 
         /** {@inheritDoc} */
@@ -95,8 +95,8 @@ public class BatchSampler implements Sampler {
         @Override
         public List<Long> next() {
             List<Long> batchIndices = new ArrayList<>();
-            while (itemSampler.hasNext()) {
-                batchIndices.add(itemSampler.next());
+            while (subSample.hasNext()) {
+                batchIndices.add(subSample.next());
                 if (batchIndices.size() == batchSize) {
                     break;
                 }

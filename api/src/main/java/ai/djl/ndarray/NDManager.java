@@ -1177,6 +1177,14 @@ public interface NDManager extends AutoCloseable {
     NDArray randomInteger(long low, long high, Shape shape, DataType dataType);
 
     /**
+     * Returns a random permutation of integers from 0 to n - 1.
+     *
+     * @param n (int) – the upper bound (exclusive)
+     * @return a random permutation of integers from 0 to n - 1.
+     */
+    NDArray randomPermutation(long n);
+
+    /**
      * Draws samples from a uniform distribution.
      *
      * <p>Samples are uniformly distributed over the half-open interval [low, high) (includes low,
