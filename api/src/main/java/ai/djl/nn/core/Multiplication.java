@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -31,12 +31,13 @@ import java.util.Collections;
 
 /**
  * A Multiplication block performs an element-wise multiplication of inputs and weights as opposed
- * to a {@link Linear} block which additionally sums up each element-wise multiplication. Similar to
- * a {@link LinearCollection}, multiple split dimensions are supported but they remain optional
- * (i.e. \(t\) can be zero). Other differences to a {@link Linear} block are that the weight has an
- * additional dimension of size 1 interspersed (to broadcast the weight to every input of the batch
- * when applying the internally used algebraic operation {@link NDArray#mul(NDArray)} ) and that
- * biases are not supported.
+ * to a {@link Linear} block which additionally sums up each element-wise multiplication.
+ *
+ * <p>Similar to a {@link LinearCollection}, multiple split dimensions are supported but they remain
+ * optional (i.e. \(t\) can be zero). Other differences to a {@link Linear} block are that the
+ * weight has an additional dimension of size 1 interspersed (to broadcast the weight to every input
+ * of the batch when applying the internally used algebraic operation {@link NDArray#mul(NDArray)} )
+ * and that biases are not supported.
  *
  * <p>Caution: the output-channel is the left-most dimension as opposed to traditionally being the
  * right-most dimension. As the output is one dimension larger than that of a {@link Linear} block,
@@ -131,13 +132,11 @@ public class Multiplication extends AbstractBlock {
     @Override
     public void loadMetadata(byte loadVersion, DataInputStream is)
             throws IOException, MalformedModelException {
-        switch (loadVersion) {
-            case VERSION:
-                units = is.readLong();
-                inputFeatures = is.readLong();
-                break;
-            default:
-                throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
+        if (loadVersion == VERSION) {
+            units = is.readLong();
+            inputFeatures = is.readLong();
+        } else {
+            throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
         inputShape = Shape.decode(is);
     }
