@@ -121,6 +121,46 @@ public class GradientCollectorIntegrationTest {
         }
     }
 
+    /** Tests that the gradients do accumulate within the same gradient collector. */
+    @Test
+    public void testAccumulateGradients() {
+        // TODO: MXNet support for accumulating gradients does not currently work
+        TestRequirements.notEngine("MXNet");
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray a = manager.create(0.0f);
+            a.setRequiresGradient(true);
+
+            try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+                for (int i = 1; i <= 3; i++) {
+                    NDArray b = a.mul(2);
+                    gc.backward(b);
+                    Assert.assertEquals(a.getGradient().getFloat(), 2.0f * i);
+                }
+            }
+        }
+    }
+
+    /**
+     * Ensures that a gradient collector does not start when one is already created because they are
+     * global.
+     */
+    @Test
+    @SuppressWarnings({"try", "PMD.UseTryWithResources"})
+    public void testMultipleGradientCollectors() {
+        Assert.assertThrows(
+                () -> {
+                    GradientCollector gc2 = null;
+                    try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+                        gc2 = Engine.getInstance().newGradientCollector();
+                        gc2.close();
+                    } finally {
+                        if (gc2 != null) {
+                            gc2.close();
+                        }
+                    }
+                });
+    }
+
     @Test
     public void testFreezeParameters() {
         try (Model model = Model.newInstance("model")) {
