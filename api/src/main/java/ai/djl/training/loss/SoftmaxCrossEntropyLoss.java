@@ -22,8 +22,9 @@ import ai.djl.ndarray.index.NDIndex;
  *
  * <p>If {@code sparse_label} is {@code true} (default), {@code label} should contain integer
  * category indicators. Then, \(L = -\sum_i \log p_{i, label_i}\). If {@code sparse_label} is {@code
- * false}, {@code label} should contain probability distribution and its shape should be the same as
- * the shape of {@code prediction}. Then, \(L = -\sum_i \sum_j {label}_j \log p_{ij}\).
+ * false}, {@code label} should be one-hot class coding or probability distribution and its shape
+ * should be the same as the shape of {@code prediction}. Then, \(L = -\sum_i \sum_j {label}_j \log
+ * p_{ij}\).
  */
 public class SoftmaxCrossEntropyLoss extends Loss {
 
@@ -54,8 +55,8 @@ public class SoftmaxCrossEntropyLoss extends Loss {
      * @param name the name of the loss
      * @param weight the weight to apply on the loss value, default 1
      * @param classAxis the axis that represents the class probabilities, default -1
-     * @param sparseLabel whether labels are rank-1 integer array of [batch_size] (false) or rank-2
-     *     one-hot of [batch_size, n-class] (true), default true
+     * @param sparseLabel whether labels are rank-1 integer array of [batch_size] (true) or rank-2
+     *     one-hot or probability distribution of shape [batch_size, n-class] (false), default true
      * @param fromLogit if true, the inputs are assumed to be the numbers before being applied with
      *     softmax. Then logSoftmax will be applied to input, default true
      */
