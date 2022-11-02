@@ -7,17 +7,18 @@ jobs:
   build-osx:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
+          distribution: 'corretto'
           java-version: 11
       - name: Get DLR_VERSION
         run: |
           DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
           echo "DLR_VERSION=${DLR_VERSION}" >> $GITHUB_ENV
       - name: Checkout DLR repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: neo-ai/neo-ai-dlr
           ref: v${{ env.DLR_VERSION }}
@@ -52,17 +53,18 @@ jobs:
           yum -y install patch cmake3
           ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
+          distribution: 'corretto'
           java-version: 11
       - name: Get DLR_VERSION
         run: |
           DLR_VERSION="$(cat gradle.properties | awk -F '=' '/dlr_version/ {print $2}')"
           echo "DLR_VERSION=${DLR_VERSION}" >> $GITHUB_ENV
       - name: Checkout DLR repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: neo-ai/neo-ai-dlr
           ref: v${{ env.DLR_VERSION }}
