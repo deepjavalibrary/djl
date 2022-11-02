@@ -16,16 +16,19 @@ package ai.djl.timeseries.evaluator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.testing.TestRequirements;
 import ai.djl.timeseries.distribution.output.NegativeBinomialOutput;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class RmsseTest {
 
-    public static void main(String[] args) {
-        RmsseTest t = new RmsseTest();
-        t.testRmsse();
+    @BeforeClass
+    public void setUp() {
+        // TODO: Remove this once we support PyTorch support for timeseries extension
+        TestRequirements.notArm();
     }
 
     @Test

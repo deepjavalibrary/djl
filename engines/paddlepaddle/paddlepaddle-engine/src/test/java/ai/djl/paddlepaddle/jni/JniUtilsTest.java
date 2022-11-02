@@ -19,14 +19,18 @@ import ai.djl.paddlepaddle.engine.PpNDArray;
 import ai.djl.testing.TestRequirements;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class JniUtilsTest {
 
-    @Test
-    void createNDArray() {
+    @BeforeClass
+    public void setUp() {
         TestRequirements.notArm();
+    }
 
+    @Test
+    public void createNDArray() {
         try (NDManager manager = NDManager.newBaseManager(null, "PaddlePaddle")) {
             NDArray array = manager.zeros(new Shape(1, 2));
             float[] expected = new float[] {0, 0};
@@ -41,9 +45,7 @@ public class JniUtilsTest {
     }
 
     @Test
-    void testLoD() {
-        TestRequirements.notArm();
-
+    public void testLoD() {
         try (NDManager manager = NDManager.newBaseManager(null, "PaddlePaddle")) {
             PpNDArray array = (PpNDArray) manager.zeros(new Shape(1, 4));
             long[][] lodInfo = new long[][] {new long[] {1, 3}};

@@ -20,16 +20,24 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.testing.Assertions;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class BlockTest {
+
+    @BeforeClass
+    public void setUp() {
+        // TODO: Remove this once we support PyTorch support for timeseries extension
+        TestRequirements.notArm();
+    }
 
     @Test
     public void testFeature() {

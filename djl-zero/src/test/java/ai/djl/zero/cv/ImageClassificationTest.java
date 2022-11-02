@@ -33,6 +33,7 @@ public class ImageClassificationTest {
     public void testImageClassificationPretrained()
             throws IOException, ModelNotFoundException, MalformedModelException {
         Class<?>[] inputClasses = {Image.class, Path.class, URL.class, InputStream.class};
+        TestRequirements.notArm();
         TestRequirements.nightly();
 
         for (Class<?> inputClass : inputClasses) {

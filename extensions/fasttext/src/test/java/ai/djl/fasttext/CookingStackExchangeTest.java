@@ -36,6 +36,7 @@ import ai.djl.translate.TranslateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -53,11 +54,14 @@ public class CookingStackExchangeTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CookingStackExchangeTest.class);
 
-    @Test
-    public void testTrainTextClassification() throws IOException {
+    @BeforeClass
+    public void setUp() {
         TestRequirements.notWindows(); // fastText is not supported on windows
         TestRequirements.notArm();
+    }
 
+    @Test
+    public void testTrainTextClassification() throws IOException {
         CookingStackExchange dataset = CookingStackExchange.builder().build();
 
         // setup training configuration
@@ -79,9 +83,6 @@ public class CookingStackExchangeTest {
     public void testTextClassification()
             throws IOException, MalformedModelException, ModelNotFoundException,
                     TranslateException {
-        TestRequirements.notWindows(); // fastText is not supported on windows
-        TestRequirements.notArm();
-
         Criteria<String, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(String.class, Classifications.class)
@@ -105,9 +106,6 @@ public class CookingStackExchangeTest {
 
     @Test
     public void testWord2Vec() throws IOException, MalformedModelException, ModelNotFoundException {
-        TestRequirements.notWindows(); // fastText is not supported on windows
-        TestRequirements.notArm();
-
         Criteria<String, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(String.class, Classifications.class)
@@ -128,8 +126,6 @@ public class CookingStackExchangeTest {
 
     @Test
     public void testBlazingText() throws IOException, ModelException {
-        TestRequirements.notWindows(); // fastText is not supported on windows
-        TestRequirements.notArm();
         TestRequirements.nightly();
 
         URL url = new URL("https://resources.djl.ai/test-models/blazingtext_classification.bin");

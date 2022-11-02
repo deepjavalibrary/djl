@@ -77,9 +77,6 @@ public class XgbModelTest {
 
     @Test
     public void testLoad() throws MalformedModelException, IOException, TranslateException {
-        TestRequirements.notArm();
-        TestRequirements.notWindows();
-
         try (Model model = Model.newInstance("XGBoost")) {
             model.load(Paths.get("build/model"), "regression");
             Predictor<NDList, NDList> predictor = model.newPredictor(new NoopTranslator());
@@ -94,9 +91,6 @@ public class XgbModelTest {
 
     @Test
     public void testNDArray() {
-        TestRequirements.notArm();
-        TestRequirements.notWindows();
-
         try (XgbNDManager manager =
                 (XgbNDManager) XgbNDManager.getSystemManager().newSubManager()) {
             manager.setMissingValue(Float.NaN);

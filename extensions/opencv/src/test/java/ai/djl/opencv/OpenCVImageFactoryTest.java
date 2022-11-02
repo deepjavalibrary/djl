@@ -27,6 +27,7 @@ import ai.djl.testing.TestRequirements;
 
 import org.opencv.core.Mat;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.awt.Color;
@@ -42,11 +43,14 @@ import java.util.List;
 
 public class OpenCVImageFactoryTest {
 
-    @Test
-    public void testImage() throws IOException {
+    @BeforeClass
+    public void setUp() {
         TestRequirements.notWindows(); // failed on Windows ServerCore container
         TestRequirements.notArm();
+    }
 
+    @Test
+    public void testImage() throws IOException {
         ImageFactory factory = ImageFactory.getInstance();
         ImageFactory defFactory = new BufferedImageFactory();
         Path path = Paths.get("../../examples/src/test/resources/kitten.jpg");
@@ -132,9 +136,6 @@ public class OpenCVImageFactoryTest {
 
     @Test
     public void testBoundingBoxes() {
-        TestRequirements.notWindows(); // failed on Windows ServerCore container
-        TestRequirements.notArm();
-
         ImageFactory factory = ImageFactory.getInstance();
         try (NDManager manager = NDManager.newBaseManager()) {
             int[][] arr =
@@ -161,8 +162,6 @@ public class OpenCVImageFactoryTest {
 
     @Test
     public void testDrawImage() throws IOException {
-        TestRequirements.notWindows(); // failed on Windows ServerCore container
-        TestRequirements.notArm();
         ImageFactory factory = ImageFactory.getInstance();
         int[] pixels = new int[64];
         int index = 0;

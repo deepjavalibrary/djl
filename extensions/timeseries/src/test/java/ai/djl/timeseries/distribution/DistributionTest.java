@@ -17,10 +17,18 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.testing.Assertions;
+import ai.djl.testing.TestRequirements;
 
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class DistributionTest {
+
+    @BeforeClass
+    public void setUp() {
+        // TODO: Remove this once we support PyTorch support for timeseries extension
+        TestRequirements.notArm();
+    }
 
     @Test
     public void testNegativeBinomial() {
