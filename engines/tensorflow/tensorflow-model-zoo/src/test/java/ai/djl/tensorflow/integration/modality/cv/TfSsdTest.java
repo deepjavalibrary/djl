@@ -33,6 +33,7 @@ import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -44,10 +45,13 @@ import java.util.stream.Collectors;
 
 public class TfSsdTest {
 
+    @BeforeClass
+    public void setUp() {
+        TestRequirements.notArm();
+    }
+
     @Test
     public void testTfSSD() throws IOException, ModelException, TranslateException {
-        TestRequirements.notArm();
-
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
@@ -96,8 +100,6 @@ public class TfSsdTest {
 
     @Test
     public void testStringInputOutput() throws IOException, ModelException, TranslateException {
-        TestRequirements.notArm();
-
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)

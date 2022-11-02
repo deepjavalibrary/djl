@@ -37,6 +37,7 @@ public class DeepARTranslatorTest {
 
     @Test
     public void testDeepARTranslator() throws IOException, TranslateException, ModelException {
+        // TODO: Remove this once we support PyTorch support for timeseries extension
         TestRequirements.notArm();
 
         String modelUrl = "https://resources.djl.ai/test-models/mxnet/timeseries/deepar.zip";

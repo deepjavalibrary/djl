@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
+import ai.djl.testing.TestRequirements;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -33,6 +34,7 @@ import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -40,6 +42,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class M5ForecastTest {
+
+    @BeforeClass
+    public void setUp() {
+        // TODO: Remove this once we support PyTorch support for timeseries extension
+        TestRequirements.notArm();
+    }
 
     /*
      * Here for the purpose of unittest, we use the M5 forecast unittest dataset.

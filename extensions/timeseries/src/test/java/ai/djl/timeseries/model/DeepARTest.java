@@ -23,6 +23,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
+import ai.djl.testing.TestRequirements;
 import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.timeseries.dataset.M5Forecast;
 import ai.djl.timeseries.dataset.TimeFeaturizers;
@@ -46,6 +47,7 @@ import ai.djl.translate.TranslateException;
 import ai.djl.util.PairList;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -60,9 +62,10 @@ public class DeepARTest {
     private static int predictionLength = 4;
     private static String freq = "D";
 
-    public static void main(String[] args) throws TranslateException, IOException {
-        DeepARTest test = new DeepARTest();
-        test.testPredictionTransformation();
+    @BeforeClass
+    public void setUp() {
+        // TODO: Remove this once we support PyTorch support for timeseries extension
+        TestRequirements.notArm();
     }
 
     @Test

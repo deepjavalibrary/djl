@@ -29,6 +29,7 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -36,10 +37,13 @@ import java.util.List;
 
 public class OCRTest {
 
+    @BeforeClass
+    public void setUp() {
+        TestRequirements.notArm();
+    }
+
     @Test
     public void testOCR() throws IOException, ModelException, TranslateException {
-        TestRequirements.notArm();
-
         // load Character model
         Predictor<Image, DetectedObjects> detector = getWordDetector();
         Predictor<Image, String> recognizer = getRecognizer();
@@ -65,8 +69,6 @@ public class OCRTest {
 
     private static Predictor<Image, DetectedObjects> getWordDetector()
             throws ModelException, IOException {
-        TestRequirements.notArm();
-
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)
@@ -77,8 +79,6 @@ public class OCRTest {
     }
 
     private static Predictor<Image, String> getRecognizer() throws ModelException, IOException {
-        TestRequirements.notArm();
-
         Criteria<Image, String> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, String.class)
