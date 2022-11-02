@@ -25,12 +25,12 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import ai.onnxruntime.OnnxJavaType;
+import ai.onnxruntime.OnnxMap;
 import ai.onnxruntime.OnnxSequence;
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OnnxValue;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
-import ai.onnxruntime.SequenceInfo;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -135,7 +135,12 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
                 output.add(manager.createInternal((OnnxTensor) value));
             } else if (value instanceof OnnxSequence) {
                 // TODO: avoid memory copying to heap
-                output.add(seq2Nd((OnnxSequence) value));
+                OnnxSequence seq = (OnnxSequence) value;
+                if (seq.getInfo().isSequenceOfMaps()) {
+                    output.add(seq2Nd(seq));
+                } else {
+                    output.addAll(seq2NdList(seq));
+                }
             } else {
                 throw new UnsupportedOperationException("Unsupported output type! " + r.getKey());
             }
@@ -146,45 +151,53 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
     @SuppressWarnings("unchecked")
     private NDArray seq2Nd(OnnxSequence seq) {
         try {
-            List<Object> values = seq.getValue();
-            OnnxJavaType type = seq.getInfo().sequenceType;
-            Shape shape = new Shape(values.size());
+            List<OnnxMap> values = (List<OnnxMap>) seq.getValue();
             DataType dp;
-            SequenceInfo info = seq.getInfo();
-            if (info.sequenceOfMaps) {
-                type = info.mapInfo.valueType;
-                List<Object> valuesTmp = new ArrayList<>();
-                values.forEach(map -> valuesTmp.addAll(((Map<Object, Object>) map).values()));
-                shape = new Shape(values.size(), valuesTmp.size() / values.size());
-                values = valuesTmp;
+            List<Object> finalData = new ArrayList<>();
+            OnnxJavaType type = seq.getInfo().mapInfo.valueType;
+            for (OnnxMap map : values) {
+                finalData.addAll(((Map<Object, Object>) map.getValue()).values());
             }
-            ByteBuffer buffer = ByteBuffer.allocate(values.size() * type.size);
+            Shape shape = new Shape(values.size(), finalData.size() / values.size());
+            ByteBuffer buffer = ByteBuffer.allocate(finalData.size() * type.size);
             switch (type) {
                 case FLOAT:
-                    values.forEach(ele -> buffer.putFloat((Float) ele));
+                    finalData.forEach(ele -> buffer.putFloat((Float) ele));
                     buffer.rewind();
                     return manager.create(buffer.asFloatBuffer(), shape, DataType.FLOAT32);
                 case DOUBLE:
-                    values.forEach(ele -> buffer.putDouble((Double) ele));
+                    finalData.forEach(ele -> buffer.putDouble((Double) ele));
                     buffer.rewind();
                     return manager.create(buffer.asDoubleBuffer(), shape, DataType.FLOAT64);
                 case BOOL:
                 case INT8:
                     dp = (type == OnnxJavaType.BOOL) ? DataType.BOOLEAN : DataType.INT8;
-                    values.forEach(ele -> buffer.put((Byte) ele));
+                    finalData.forEach(ele -> buffer.put((Byte) ele));
                     buffer.rewind();
                     return manager.create(buffer, shape, dp);
                 case INT32:
-                    values.forEach(ele -> buffer.putInt((Integer) ele));
+                    finalData.forEach(ele -> buffer.putInt((Integer) ele));
                     buffer.rewind();
                     return manager.create(buffer.asIntBuffer(), shape, DataType.INT32);
                 case INT64:
-                    values.forEach(ele -> buffer.putLong((Long) ele));
+                    finalData.forEach(ele -> buffer.putLong((Long) ele));
                     buffer.rewind();
                     return manager.create(buffer.asLongBuffer(), shape, DataType.INT64);
                 default:
                     throw new UnsupportedOperationException("type is not supported: " + type);
             }
+        } catch (OrtException e) {
+            throw new EngineException(e);
+        }
+    }
+
+    private NDList seq2NdList(OnnxSequence sequence) {
+        try {
+            NDList list = new NDList();
+            for (OnnxValue value : sequence.getValue()) {
+                list.add(manager.createInternal((OnnxTensor) value));
+            }
+            return list;
         } catch (OrtException e) {
             throw new EngineException(e);
         }

@@ -54,7 +54,7 @@ public class XgbModelTest {
     @Test
     public void testVersion() {
         Engine engine = Engine.getEngine("XGBoost");
-        Assert.assertEquals("1.6.1", engine.getVersion());
+        Assert.assertEquals("1.6.2", engine.getVersion());
     }
 
     /*
