@@ -187,6 +187,10 @@ public final class CudaUtils {
             logger.debug("cudart library not found.");
             logger.trace("", e);
             return null;
+        } catch (IncompatibleClassChangeError e) {
+            logger.warn("You have a conflict version of JNA in the classpath.");
+            logger.debug("", e);
+            return null;
         } catch (SecurityException e) {
             logger.warn("Access denied during loading cudart library.");
             logger.trace("", e);
