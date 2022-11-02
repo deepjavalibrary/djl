@@ -7,7 +7,7 @@ configurations {
 dependencies {
     api "org.bytedeco:javacpp:${javacpp_version}"
     api "com.google.protobuf:protobuf-java:${protobuf_version}"
-    api "org.tensorflow:tensorflow-core-api:0.4.0"
+    api "org.tensorflow:tensorflow-core-api:0.4.2"
 
     exclusion "org.bytedeco:javacpp:${javacpp_version}"
     exclusion "com.google.protobuf:protobuf-java:${protobuf_version}"
