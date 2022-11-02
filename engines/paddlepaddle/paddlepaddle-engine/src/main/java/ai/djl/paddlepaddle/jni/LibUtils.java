@@ -70,6 +70,8 @@ public final class LibUtils {
             loadLinuxDependencies(libName);
         } else if (System.getProperty("os.name").startsWith("Win")) {
             loadWindowsDependencies(libName);
+        } else if (System.getProperty("os.name").startsWith("Mac")) {
+            loadMacOsDependencies(libName);
         }
         logger.debug("Now loading " + libName);
         System.load(libName); // NOPMD
@@ -91,7 +93,13 @@ public final class LibUtils {
                             + libDir
                             + ", the current one is set to: "
                             + Utils.getenv("LD_LIBRARY_PATH"));
-            List<String> names = Arrays.asList("libdnnl.so.2", "libiomp5.so", "libmklml_intel.so");
+            List<String> names =
+                    Arrays.asList(
+                            "libdnnl.so.2",
+                            "libiomp5.so",
+                            "libmklml_intel.so",
+                            "libonnxruntime.so",
+                            "libpaddle2onnx.so");
             names.forEach(
                     name -> {
                         Path path = libDir.resolve(name);
@@ -108,7 +116,24 @@ public final class LibUtils {
 
     public static void loadWindowsDependencies(String libName) {
         Path libDir = Paths.get(libName).getParent();
-        List<String> names = Arrays.asList("openblas.dll", "mkldnn.dll");
+        List<String> names =
+                Arrays.asList("openblas.dll", "mkldnn.dll", "onnxruntime.dll", "paddle2onnx.dll");
+        names.forEach(
+                name -> {
+                    Path path = libDir.resolve(name);
+                    if (Files.isRegularFile(path)) {
+                        String lib = path.toAbsolutePath().toString();
+                        logger.debug("Now loading " + lib);
+                        System.load(lib);
+                    } else {
+                        logger.debug(name + " is not found, skip loading...");
+                    }
+                });
+    }
+
+    public static void loadMacOsDependencies(String libName) {
+        Path libDir = Paths.get(libName).getParent();
+        List<String> names = Arrays.asList("libonnxruntime.dylib", "libpaddle2onnx.dylib");
         names.forEach(
                 name -> {
                     Path path = libDir.resolve(name);

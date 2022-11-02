@@ -14,21 +14,21 @@ pushd $WORK_DIR
 
 echo "Trying to find paddle folder..."
 
-# https://www.paddlepaddle.org.cn/inference/v2.2/user_guides/download_lib.html 2.2.2
+# https://www.paddlepaddle.org.cn/inference/v2.3/user_guides/download_lib.html 2.3.2
 
 if [[ ! -d "paddle" ]]; then
   echo "Folder not found. Downloading C++ package..."
   if [[ $PLATFORM == 'linux' ]]; then
     if [[ $1 == "cpu" ]]; then
-      curl -s https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/CPU/gcc5.4_avx_openblas/paddle_inference.tgz -o paddle.tgz
+      curl -s https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/Linux/CPU/gcc5.4_avx_openblas/paddle_inference.tgz -o paddle.tgz
       tar -xvzf paddle.tgz
       mv paddle_inference paddle
     elif [[ $1 == "cu102" ]]; then
-      curl -s https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc5.4_avx_mkl_cuda10.2_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz -o paddle.tgz
+      curl -s https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/Linux/GPU/x86-64_gcc5.4_avx_mkl_cuda10.2_cudnn7.6.5_trt6.0.1.5/paddle_inference.tgz -o paddle.tgz
         tar -xvzf paddle.tgz
         mv paddle_inference paddle
     elif [[ $1 == "cu112" ]]; then
-      curl -s https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc5.4_avx_mkl_cuda11.2_cudnn8.2.1_trt8.0.3.4/paddle_inference.tgz -o paddle.tgz
+      curl -s https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/Linux/GPU/x86-64_gcc5.4_avx_mkl_cuda11.2_cudnn8.2.1_trt8.0.3.4/paddle_inference.tgz -o paddle.tgz
         tar -xvzf paddle.tgz
         mv paddle_inference paddle
     else
@@ -36,7 +36,7 @@ if [[ ! -d "paddle" ]]; then
       exit 1
     fi
   elif [[ $PLATFORM == 'darwin' ]]; then
-    curl -s https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/MacOS/CPU/x86-64_clang_avx_openb/paddle_inference_install_dir.tgz -o paddle.tgz
+    curl -s https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/MacOS/CPU/x86-64_clang_avx_openblas/paddle_inference_install_dir.tgz -o paddle.tgz
     tar -xvzf paddle.tgz
     mv paddle_inference_install_dir paddle
   else

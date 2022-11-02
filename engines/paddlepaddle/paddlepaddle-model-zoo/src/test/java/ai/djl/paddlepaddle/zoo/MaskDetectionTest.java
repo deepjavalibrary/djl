@@ -109,6 +109,8 @@ public class MaskDetectionTest {
                         .setTypes(Image.class, Classifications.class)
                         .optArtifactId("ai.djl.paddlepaddle:mask_classification")
                         .optFilter("flavor", "server")
+                        .optOption("enableONNXRuntime", "true")
+                        .optOption("enableOrtOptimization", "true")
                         .build();
         ZooModel<Image, Classifications> model = criteria.loadModel();
         return model.newPredictor();
@@ -121,6 +123,8 @@ public class MaskDetectionTest {
                         .setTypes(Image.class, DetectedObjects.class)
                         .optArtifactId("ai.djl.paddlepaddle:face_detection")
                         .optFilter("flavor", "server")
+                        .optOption("enableONNXRuntime", "true")
+                        .optOption("enableOrtOptimization", "true")
                         .build();
 
         try (ZooModel<Image, DetectedObjects> model = criteria.loadModel();
