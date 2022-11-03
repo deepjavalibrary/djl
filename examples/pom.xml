@@ -55,6 +55,10 @@
             <groupId>ai.djl</groupId>
             <artifactId>model-zoo</artifactId>
         </dependency>
+        <dependency>
+            <groupId>ai.djl.timeseries</groupId>
+            <artifactId>timeseries</artifactId>
+        </dependency>
         <!-- MXNet -->
         <dependency>
             <groupId>ai.djl.mxnet</groupId>
