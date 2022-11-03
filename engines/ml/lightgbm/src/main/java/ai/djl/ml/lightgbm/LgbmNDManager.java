@@ -24,6 +24,8 @@ import ai.djl.ndarray.types.Shape;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 import java.nio.file.Path;
 
 /** {@code LgbmNDManager} is the LightGBM implementation of {@link NDManager}. */
@@ -74,11 +76,23 @@ public class LgbmNDManager extends BaseNDManager {
         if (data instanceof ByteBuffer) {
             // output only NDArray
             return new LgbmNDArray(this, alternativeManager, (ByteBuffer) data, shape, dataType);
+        } else if (data instanceof FloatBuffer && dataType == DataType.FLOAT32) {
+            ByteBuffer bb = ByteBuffer.allocateDirect(data.capacity() * 4);
+            bb.asFloatBuffer().put((FloatBuffer) data);
+            bb.rewind();
+            return new LgbmNDArray(this, alternativeManager, bb, shape, dataType);
+        } else if (data instanceof DoubleBuffer && dataType == DataType.FLOAT64) {
+            ByteBuffer bb = ByteBuffer.allocateDirect(data.capacity() * 8);
+            bb.asDoubleBuffer().put((DoubleBuffer) data);
+            bb.rewind();
+            return new LgbmNDArray(this, alternativeManager, bb, shape, dataType);
         }
         if (alternativeManager != null) {
             return alternativeManager.create(data, shape, dataType);
         }
-        throw new UnsupportedOperationException("LgbmNDArray only supports float32.");
+        throw new UnsupportedOperationException(
+                "LgbmNDArray only supports float32 and float64. Please pass either a ByteBuffer, a"
+                        + " FloatBuffer with Float32, or a DoubleBuffer with Float64.");
     }
 
     /** {@inheritDoc} */

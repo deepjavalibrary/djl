@@ -15,12 +15,12 @@ package ai.djl.ml.lightgbm;
 import ai.djl.ml.lightgbm.jni.JniUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.ParameterList;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.ParameterStore;
+import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 
 import com.microsoft.ml.lightgbm.SWIGTYPE_p_p_void;
@@ -64,13 +64,14 @@ public class LgbmSymbolBlock extends AbstractSymbolBlock implements AutoCloseabl
         NDArray array = inputs.singletonOrThrow();
         try (LgbmNDManager sub = (LgbmNDManager) manager.newSubManager()) {
             LgbmNDArray lgbmNDArray = sub.from(array);
-            // TODO: return DirectBuffer from JNI to avoid copy
-            double[] result = JniUtils.inference(handle.get(), iterations, lgbmNDArray);
-            ByteBuffer buf = manager.allocateDirect(result.length * 8);
-            buf.asDoubleBuffer().put(result);
-            buf.rewind();
+            Pair<Integer, ByteBuffer> result =
+                    JniUtils.inference(handle.get(), iterations, lgbmNDArray);
 
-            NDArray ret = manager.create(buf, new Shape(result.length), DataType.FLOAT64);
+            NDArray ret =
+                    manager.create(
+                            result.getValue(),
+                            new Shape(result.getKey()),
+                            lgbmNDArray.getDataType());
             ret.attach(array.getManager());
             return new NDList(ret);
         }
