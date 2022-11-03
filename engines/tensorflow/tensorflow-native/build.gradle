@@ -13,11 +13,11 @@ configurations {
 }
 
 dependencies {
-    download "org.tensorflow:tensorflow-core-api:0.4.0:linux-x86_64-gpu"
-    download "org.tensorflow:tensorflow-core-api:0.4.0:linux-x86_64"
-    download "org.tensorflow:tensorflow-core-api:0.4.0:macosx-x86_64"
-    download "org.tensorflow:tensorflow-core-api:0.4.0:windows-x86_64"
-    download "org.tensorflow:tensorflow-core-api:0.4.0:windows-x86_64-gpu"
+    download "org.tensorflow:tensorflow-core-api:0.4.2:linux-x86_64-gpu"
+    download "org.tensorflow:tensorflow-core-api:0.4.2:linux-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.4.2:macosx-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.4.2:windows-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.4.2:windows-x86_64-gpu"
 }
 
 task uploadTensorflowNativeLibs() {
