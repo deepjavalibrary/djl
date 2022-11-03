@@ -21,7 +21,7 @@ jobs:
           distribution: 'corretto'
           java-version: 11
       - name: Set up Python3
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v3
         with:
           python-version: '3.x'
       - name: Install CN fonts

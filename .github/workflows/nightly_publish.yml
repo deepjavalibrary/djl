@@ -37,7 +37,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew -Dnightly=true build jRR jRV
       - name: Upload test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: reports
@@ -75,14 +75,14 @@ jobs:
         operating-system: [ macos-latest, ubuntu-18.04, windows-latest ]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
           java-version: 11
       # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -109,7 +109,7 @@ jobs:
           java-version: 11
           distribution: corretto
           architecture: aarch64
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -144,7 +144,7 @@ jobs:
         with:
           java-version: 11
           distribution: corretto
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -182,7 +182,7 @@ jobs:
         with:
           java-version: 11
           distribution: corretto
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
