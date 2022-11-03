@@ -20,15 +20,15 @@ import org.testng.annotations.BeforeClass;
 
 public abstract class OutputShapeTest {
 
-    static NDManager manager;
+    protected NDManager manager;
 
     @BeforeClass
-    public static void setupManager() {
+    public void setupManager() {
         manager = NDManager.newBaseManager();
     }
 
     @AfterClass
-    public static void teardownManager() {
+    public void teardownManager() {
         manager.close();
     }
 }
