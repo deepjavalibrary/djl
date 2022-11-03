@@ -107,6 +107,14 @@ public final class JniUtils {
         PaddleLibrary.LIB.useFeedFetchOp(config);
     }
 
+    public static void enableONNXRuntime(long config) {
+        PaddleLibrary.LIB.analysisConfigEnableONNXRuntime(config);
+    }
+
+    public static void enableOrtOptimization(long config) {
+        PaddleLibrary.LIB.analysisConfigEnableORTOptimization(config);
+    }
+
     public static void deleteConfig(long config) {
         PaddleLibrary.LIB.deleteAnalysisConfig(config);
     }

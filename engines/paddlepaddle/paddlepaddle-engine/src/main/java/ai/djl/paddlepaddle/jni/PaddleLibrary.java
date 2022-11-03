@@ -54,6 +54,10 @@ final class PaddleLibrary {
 
     native void analysisConfigRemovePass(long handle, String pass);
 
+    native void analysisConfigEnableONNXRuntime(long handle);
+
+    native void analysisConfigEnableORTOptimization(long handle);
+
     native void useFeedFetchOp(long handle);
 
     native void deleteAnalysisConfig(long handle);

@@ -94,6 +94,12 @@ public class PpModel extends BaseModel {
                 JniUtils.switchIrOptim(
                         config, ArgumentsUtil.booleanValue(options, "SwitchIrOptim"));
             }
+            if (options.containsKey("enableONNXRuntime")) {
+                JniUtils.enableONNXRuntime(config);
+            }
+            if (options.containsKey("enableOrtOptimization")) {
+                JniUtils.enableOrtOptimization(config);
+            }
         }
         paddlePredictor = new PaddlePredictor(JniUtils.createPredictor(config));
         JniUtils.deleteConfig(config);

@@ -7,9 +7,9 @@
 set FILEPATH="paddle"
 
 if "%1" == "cpu" (
-  set DOWNLOAD_URL="https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Windows/CPU/x86-64_vs2017_avx_openblas/paddle_inference.zip"
-) else if "%1" == "cu110" (
-  set DOWNLOAD_URL="https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Windows/GPU/x86-64_vs2017_avx_mkl_cuda11.0_cudnn8/paddle_inference.zip"
+  set DOWNLOAD_URL="https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/Windows/CPU/x86-64_avx-openblas-vs2017/paddle_inference.zip"
+) else if "%1" == "cu112" (
+  set DOWNLOAD_URL="https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/Windows/GPU/x86-64_cuda11.2_cudnn8.2.1_trt8.0.1.6_mkl_avx_vs2019/paddle_inference.zip"
 )
 
 if exist %FILEPATH% (

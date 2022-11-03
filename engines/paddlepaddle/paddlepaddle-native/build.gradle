@@ -53,12 +53,12 @@ task prepareNativeLibs() {
         delete "${buildDir}/native"
 
         def files = [
-                "cpu/linux"  : "https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/CPU/gcc5.4_avx_openblas/paddle_inference.tgz",
-                "cu102/linux": "https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc5.4_avx_mkl_cuda10.2_cudnn8.1.1_trt7.2.3.4/paddle_inference.tgz",
-                "cu112/linux": "https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Linux/GPU/x86-64_gcc5.4_avx_mkl_cuda11.2_cudnn8.2.1_trt8.0.3.4/paddle_inference.tgz",
-                "cpu/osx"    : "https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/MacOS/CPU/x86-64_clang_avx_openb/paddle_inference_install_dir.tgz",
-                "cpu/win"    : "https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Windows/CPU/x86-64_vs2017_avx_openblas/paddle_inference.zip",
-                "cu110/win"  : "https://paddle-inference-lib.bj.bcebos.com/2.2.2/cxx_c/Windows/GPU/x86-64_vs2017_avx_mkl_cuda11.0_cudnn8/paddle_inference.zip"
+                "cpu/linux"  : "https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/Linux/CPU/gcc5.4_avx_openblas/paddle_inference.tgz",
+                "cu102/linux": "https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/Linux/GPU/x86-64_gcc5.4_avx_mkl_cuda10.2_cudnn8.1.1_trt7.2.3.4/paddle_inference.tgz",
+                "cu112/linux": "https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/Linux/GPU/x86-64_gcc5.4_avx_mkl_cuda11.2_cudnn8.2.1_trt8.0.3.4/paddle_inference.tgz",
+                "cpu/osx"    : "https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/MacOS/CPU/x86-64_clang_avx_openblas/paddle_inference_install_dir.tgz",
+                "cpu/win"    : "https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/Windows/CPU/x86-64_avx-openblas-vs2017/paddle_inference.zip",
+                "cu112/win"  : "https://paddle-inference-lib.bj.bcebos.com/2.3.2/cxx_c/Windows/GPU/x86-64_cuda11.2_cudnn8.2.1_trt8.0.1.6_mkl_avx_vs2019/paddle_inference.zip"
         ]
 
         def downloadDir = file("${buildDir}/download")
@@ -124,7 +124,7 @@ task uploadS3 {
                 "${buildDir}/native/cu112/linux/native/lib/",
                 "${buildDir}/native/cpu/osx/native/lib/",
                 "${buildDir}/native/cpu/win/native/lib/",
-                "${buildDir}/native/cu110/win/native/lib/"
+                "${buildDir}/native/cu112/win/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
