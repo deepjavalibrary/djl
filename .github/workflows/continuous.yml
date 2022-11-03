@@ -52,13 +52,13 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build jRR jRV
       - name: Upload test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: reports
           path: ${{ github.workspace }}/**/build/reports/**/*
       - name: upload to codecov
-        uses: codecov/codecov-action@v1.5.0
+        uses: codecov/codecov-action@v3
         with:
           files: ./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
           fail_ci_if_error: false

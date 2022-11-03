@@ -29,7 +29,7 @@ jobs:
       - name: Release JNI prep
         run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Upload compiled jni library
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: jnilib-${{ runner.os }}
@@ -70,7 +70,7 @@ jobs:
         run: |
           ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Upload compiled jni library
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: jnilib-${{ runner.os }}
@@ -83,17 +83,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download compiledJNI Mac
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: jnilib-macOS
           path: jnilib
       - name: Download compiledJNI Windows
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: jnilib-Windows
           path: jnilib
       - name: Download compiledJNI Linux CPU
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: jnilib-Linux
           path: jnilib
