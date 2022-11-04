@@ -44,7 +44,11 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;
@@ -135,6 +139,13 @@ public final class M5ForecastingDeepAR {
 
             manager.close();
             return evaluator.computeTotalMetrics();
+        }
+    }
+
+    private static void saveNDArray(NDArray array) throws IOException {
+        Path path = Paths.get("build").resolve(array.getName() + ".npz");
+        try (OutputStream os = Files.newOutputStream(path)) {
+            new NDList(new NDList(array)).encode(os, true);
         }
     }
 
@@ -370,13 +381,6 @@ public final class M5ForecastingDeepAR {
                 totalMetrics.put(metricName, 0f);
                 totalNum.put(metricName, 0);
             }
-        }
-    }
-
-    private static void saveNDArray(NDArray array) throws IOException {
-        Path path = Paths.get("build").resolve(array.getName() + ".npz");
-        try (OutputStream os = Files.newOutputStream(path)) {
-            new NDList(new NDList(array)).encode(os, true);
         }
     }
 }
