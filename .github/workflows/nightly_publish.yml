@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ macos-latest, ubuntu-18.04 ]
+        operating-system: [ macos-12, ubuntu-18.04 ]
 
     steps:
       - uses: actions/checkout@v3
@@ -152,14 +152,15 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Test with Gradle
         run: |
+          export PADDLE_VERSION=$(cat gradle.properties | awk -F '=' '/paddlepaddle_version/ {print $2}')
           ./gradlew :integration:test
           ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=PyTorch
           ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=OnnxRuntime
           ./gradlew :engines:mxnet:mxnet-model-zoo:test
           ./gradlew :engines:pytorch:pytorch-model-zoo:test
           ./gradlew :engines:onnxruntime:onnxruntime-engine:test
-          mkdir -p /root/.djl.ai/paddle/2.2.2-cu102-linux-x86_64
-          LD_LIBRARY_PATH=/root/.djl.ai/paddle/2.2.2-cu102-linux-x86_64:/usr/local/cuda/lib64 \
+          mkdir -p /root/.djl.ai/paddle/${PADDLE_VERSION}-cu102-linux-x86_64
+          LD_LIBRARY_PATH=/root/.djl.ai/paddle/${PADDLE_VERSION}-cu102-linux-x86_64:/usr/local/cuda/lib64 \
           ./gradlew :engines:paddlepaddle:paddlepaddle-model-zoo:test
 
   test-cuda-113:
