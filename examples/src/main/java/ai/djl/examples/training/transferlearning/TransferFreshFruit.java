@@ -134,7 +134,7 @@ public final class TransferFreshFruit {
         // To use local dataset, users can load it as follows
         // Repository repository = Repository.newInstance("banana",
         // Paths.get("local_data_root/banana/train"));
-        // Then add the setting `Builder.optRepository(repository)` to the builder below
+        // Then add the setting `.optRepository(repository)` to the builder below
         FruitsFreshAndRotten dataset =
                 FruitsFreshAndRotten.builder()
                         .optUsage(usage)
