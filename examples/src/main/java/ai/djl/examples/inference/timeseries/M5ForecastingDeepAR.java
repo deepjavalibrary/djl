@@ -125,11 +125,6 @@ public final class M5ForecastingDeepAR {
                 evaluator.aggregateMetrics(evaluator.getMetricsPerTs(gt, pastTarget, forecast));
                 progress.increment(1);
 
-                // save data for plotting
-                NDArray target = input.get(FieldName.TARGET);
-                target.setName("target");
-                saveNDArray(target);
-
                 // save data for plotting. Please see the corresponding python script from
                 // https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008
                 NDArray samples = ((SampleForecast) forecast).getSortedSamples();
