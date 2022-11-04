@@ -43,14 +43,13 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,11 +78,11 @@ public final class M5ForecastingDeepAR {
         // To use local dataset, users can load data as follows
         // Repository repository = Repository.newInstance("local_dataset",
         // Paths.get("rootPath/m5-forecasting-accuracy"));
-        // Then set `Builder.optRepository(repository)`
+        // Then add the setting `.optRepository(repository)` to the builder below
         M5Dataset dataset = M5Dataset.builder().setManager(manager).build();
 
         // The modelUrl can be replaced by local model path. E.g.,
-        // String modelUrl = "rootPath/m5forecast.zip";
+        // String modelUrl = "rootPath/deepar.zip";
         String modelUrl = "djl://ai.djl.mxnet/deepar/0.0.1/m5forecast";
         int predictionLength = 4;
         Criteria<TimeSeriesData, Forecast> criteria =
@@ -120,6 +119,9 @@ public final class M5ForecastingDeepAR {
                 // aggregating/coarse graining the data. See https://github.com/Carkham/m5_blog
                 evaluator.aggregateMetrics(evaluator.getMetricsPerTs(gt, pastTarget, forecast));
                 progress.increment(1);
+                // save result and plot it with `plot.py` shown in
+                // https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008
+                saveNDArray(forecast.mean());
             }
 
             manager.close();
@@ -359,6 +361,13 @@ public final class M5ForecastingDeepAR {
                 totalMetrics.put(metricName, 0f);
                 totalNum.put(metricName, 0);
             }
+        }
+    }
+
+    private static void saveNDArray(NDArray array) throws IOException {
+        Path path = Paths.get("build").resolve(array.getName() + ".npz");
+        try (OutputStream os = Files.newOutputStream(path)) {
+            new NDList(new NDList(array)).encode(os, true);
         }
     }
 }
