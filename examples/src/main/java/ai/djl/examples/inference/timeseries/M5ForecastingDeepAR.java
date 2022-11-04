@@ -30,6 +30,7 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.timeseries.Forecast;
+import ai.djl.timeseries.SampleForecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.training.util.ProgressBar;
@@ -119,9 +120,17 @@ public final class M5ForecastingDeepAR {
                 // aggregating/coarse graining the data. See https://github.com/Carkham/m5_blog
                 evaluator.aggregateMetrics(evaluator.getMetricsPerTs(gt, pastTarget, forecast));
                 progress.increment(1);
-                // save result and plot it with `plot.py` shown in
+
+                // save data for plotting
+                NDArray target = input.get(FieldName.TARGET);
+                target.setName("target");
+                saveNDArray(target);
+
+                // save data for plotting. Please see the corresponding python script from
                 // https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008
-                saveNDArray(forecast.mean());
+                NDArray samples = ((SampleForecast) forecast).getSortedSamples();
+                samples.setName("samples");
+                saveNDArray(samples);
             }
 
             manager.close();

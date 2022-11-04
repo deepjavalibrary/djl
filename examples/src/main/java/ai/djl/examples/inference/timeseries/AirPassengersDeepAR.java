@@ -77,14 +77,14 @@ public final class AirPassengersDeepAR {
         try (ZooModel<TimeSeriesData, Forecast> model = criteria.loadModel();
                 Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor();
                 NDManager manager = NDManager.newBaseManager(null, "MXNet")) {
-            TimeSeriesData data = getTimeSeriesData(manager, new URL(url));
+            TimeSeriesData input = getTimeSeriesData(manager, new URL(url));
 
             // save data for plotting
-            NDArray target = data.get(FieldName.TARGET);
+            NDArray target = input.get(FieldName.TARGET);
             target.setName("target");
             saveNDArray(target);
 
-            Forecast forecast = predictor.predict(data);
+            Forecast forecast = predictor.predict(input);
 
             // save data for plotting. Please see the corresponding python script from
             // https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008
