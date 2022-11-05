@@ -67,8 +67,8 @@ public class HuggingFaceTokenizerTest {
                 new CharSpan(14, 17),
                 new CharSpan(18, 21),
                 new CharSpan(22, 25),
-                new CharSpan(26, 30),
-                new CharSpan(31, 32),
+                new CharSpan(26, 27),
+                new CharSpan(28, 29),
                 null
             };
             int expectedLength = charSpansExpected.length;
@@ -387,6 +387,31 @@ public class HuggingFaceTokenizerTest {
                         .build()) {
             Encoding encoding = tokenizer.encode(text, textPair);
             Assert.assertEquals(encoding.getIds().length, 8);
+        }
+    }
+
+    @Test
+    public void testSpecialTokenHandling() throws IOException {
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.builder()
+                        .optTokenizerName("distilbert-base-uncased")
+                        .build()) {
+            String someText = "¥$9";
+            Encoding encodedText = tokenizer.encode(someText);
+
+            CharSpan[] expected =
+                    new CharSpan[] {
+                        new CharSpan(-1, -1),
+                        new CharSpan(0, 1),
+                        new CharSpan(1, 2),
+                        new CharSpan(2, 3),
+                        new CharSpan(-1, -1)
+                    };
+            CharSpan[] charSpans = encodedText.getCharTokenSpans();
+            for (int i = 1; i < charSpans.length - 1; i++) {
+                Assert.assertEquals(expected[i].getStart(), charSpans[i].getStart());
+                Assert.assertEquals(expected[i].getEnd(), charSpans[i].getEnd());
+            }
         }
     }
 }
