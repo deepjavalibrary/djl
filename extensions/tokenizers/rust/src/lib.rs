@@ -94,7 +94,7 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 
     let input_sequence = tk::InputSequence::from(sequence);
     let encoded_input = EncodeInput::Single(input_sequence);
-    let encoding = tokenizer.encode(encoded_input, add_special_tokens == JNI_TRUE);
+    let encoding = tokenizer.encode_char_offsets(encoded_input, add_special_tokens == JNI_TRUE);
 
     match encoding {
         Ok(output) => to_handle(output),
@@ -127,7 +127,7 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     let input_sequence1 = tk::InputSequence::from(sequence1);
     let input_sequence2 = tk::InputSequence::from(sequence2);
     let encoded_input = EncodeInput::Dual(input_sequence1, input_sequence2);
-    let encoding = tokenizer.encode(encoded_input, add_special_tokens == JNI_TRUE);
+    let encoding = tokenizer.encode_char_offsets(encoded_input, add_special_tokens == JNI_TRUE);
 
     match encoding {
         Ok(output) => to_handle(output),
@@ -160,7 +160,7 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 
     let input_sequence = tk::InputSequence::from(array);
     let encoded_input = EncodeInput::from(input_sequence);
-    let encoding = tokenizer.encode(encoded_input, add_special_tokens == JNI_TRUE);
+    let encoding = tokenizer.encode_char_offsets(encoded_input, add_special_tokens == JNI_TRUE);
 
     match encoding {
         Ok(output) => to_handle(output),
@@ -192,7 +192,7 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     }
 
     let encodings = tokenizer
-        .encode_batch(array, add_special_tokens == JNI_TRUE)
+        .encode_batch_char_offsets(array, add_special_tokens == JNI_TRUE)
         .unwrap();
     let handles = encodings
         .into_iter()
