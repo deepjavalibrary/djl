@@ -29,6 +29,7 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -119,6 +120,7 @@ public final class LibUtils {
 
         Set<String> loadLater = new HashSet<>(deferred);
         try (Stream<Path> paths = Files.walk(libDir)) {
+            List<Path> dependants = new ArrayList<>();
             paths.filter(
                             path -> {
                                 String name = path.getFileName().toString();
@@ -126,6 +128,10 @@ public final class LibUtils {
                                         && name.contains("nvrtc")
                                         && name.contains("cudart")
                                         && name.contains("nvTools")) {
+                                    return false;
+                                }
+                                if (name.startsWith("libarm_compute_")) {
+                                    dependants.add(path);
                                     return false;
                                 }
                                 return !loadLater.contains(name)
@@ -137,6 +143,10 @@ public final class LibUtils {
                             })
                     .map(Path::toString)
                     .forEach(LibUtils::loadNativeLibrary);
+            for (Path dep : dependants) {
+                loadNativeLibrary(dep.toAbsolutePath().toString());
+            }
+
             if (Files.exists((libDir.resolve("cudnn64_8.dll")))) {
                 loadNativeLibrary(libDir.resolve("cudnn64_8.dll").toString());
                 loadNativeLibrary(libDir.resolve("cudnn_ops_infer64_8.dll").toString());

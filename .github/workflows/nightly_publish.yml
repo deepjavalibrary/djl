@@ -154,7 +154,6 @@ jobs:
         run: |
           export PADDLE_VERSION=$(cat gradle.properties | awk -F '=' '/paddlepaddle_version/ {print $2}')
           ./gradlew :integration:test
-          ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=PyTorch
           ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=OnnxRuntime
           ./gradlew :engines:mxnet:mxnet-model-zoo:test
           ./gradlew :engines:pytorch:pytorch-model-zoo:test
@@ -222,9 +221,9 @@ jobs:
       - name: Publish to snapshot repository
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
         run: |
-          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.10.0 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.11.0 -Psnapshot
-          ./gradlew clean engines:ml:xgboost:publish -Pgpu -Psnapshot 
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.12.1 -Psnapshot
+          ./gradlew clean engines:ml:xgboost:publish -Pgpu -Psnapshot
           ./gradlew clean publish -Psnapshot
           cd bom
           ./gradlew publish -Psnapshot
@@ -236,9 +235,9 @@ jobs:
       - name: Publish to staging repository
         if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
-          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.10.0 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.11.0 -P${{ github.event.inputs.mode }}
-          ./gradlew clean engines:ml:xgboost:publish -Pgpu -P${{ github.event.inputs.mode }} 
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.12.1 -P${{ github.event.inputs.mode }}
+          ./gradlew clean engines:ml:xgboost:publish -Pgpu -P${{ github.event.inputs.mode }}
           ./gradlew clean publish -P${{ github.event.inputs.mode }}
           cd bom
           ./gradlew publish -P${{ github.event.inputs.mode }}

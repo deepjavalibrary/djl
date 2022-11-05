@@ -20,12 +20,17 @@ processResources {
         String url = "https://publish.djl.ai/pytorch/${ptVersion}/jnilib/${djl_version}"
         def files = [
                 "linux-x86_64/cpu/libdjl_torch.so",
-                "linux-x86_64/cu102/libdjl_torch.so",
                 "linux-x86_64/cpu-precxx11/libdjl_torch.so",
                 "osx-x86_64/cpu/libdjl_torch.dylib",
                 "win-x86_64/cpu/djl_torch.dll"
         ]
-        if (ptVersion.startsWith("1.12.")) {
+        if (ptVersion.startsWith("1.13.")) {
+            files.add("linux-aarch64/cpu-precxx11/libdjl_torch.so")
+            files.add("linux-x86_64/cu117/libdjl_torch.so")
+            files.add("linux-x86_64/cu117-precxx11/libdjl_torch.so")
+            files.add("win-x86_64/cu117/djl_torch.dll")
+            files.add("osx-aarch64/cpu/libdjl_torch.dylib")
+        } else if (ptVersion.startsWith("1.12.")) {
             files.add("linux-aarch64/cpu-precxx11/libdjl_torch.so")
             files.add("linux-x86_64/cu116/libdjl_torch.so")
             files.add("linux-x86_64/cu116-precxx11/libdjl_torch.so")
@@ -38,10 +43,7 @@ processResources {
             files.add("win-x86_64/cu113/djl_torch.dll")
             files.add("osx-aarch64/cpu/libdjl_torch.dylib")
         } else {
-            files.add("linux-x86_64/cu113/libdjl_torch.so")
-            files.add("linux-x86_64/cu113-precxx11/libdjl_torch.so")
-            files.add("win-x86_64/cu113/djl_torch.dll")
-            files.add("win-x86_64/cu102/djl_torch.dll")
+            throw new GradleException("Unsupported version: ${ptVersion}.")
         }
         String jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
