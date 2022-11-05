@@ -13,7 +13,9 @@
 
 package ai.djl.examples.inference.timeseries;
 
+import ai.djl.Application;
 import ai.djl.ModelException;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
 import ai.djl.basicdataset.tabular.utils.Feature;
 import ai.djl.inference.Predictor;
@@ -22,9 +24,13 @@ import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
+import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.timeseries.Forecast;
+import ai.djl.timeseries.SampleForecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.training.util.ProgressBar;
@@ -41,10 +47,12 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -70,17 +78,22 @@ public final class M5ForecastingDeepAR {
 
     public static Map<String, Float> predict()
             throws IOException, TranslateException, ModelException {
-        // M5 Forecasting - Accuracy dataset requires manual download
-        String pathToData = "/Desktop/m5example/m5-forecasting-accuracy";
-        Path m5ForecastFile = Paths.get(System.getProperty("user.home") + pathToData);
         NDManager manager = NDManager.newBaseManager(null, "MXNet");
-        M5Dataset dataset = M5Dataset.builder().setManager(manager).setRoot(m5ForecastFile).build();
 
+        // To use local dataset, users can load data as follows
+        // Repository repository = Repository.newInstance("local_dataset",
+        // Paths.get("rootPath/m5-forecasting-accuracy"));
+        // Then add the setting `.optRepository(repository)` to the builder below
+        M5Dataset dataset = M5Dataset.builder().setManager(manager).build();
+
+        // The modelUrl can be replaced by local model path. E.g.,
+        // String modelUrl = "rootPath/deepar.zip";
+        String modelUrl = "djl://ai.djl.mxnet/deepar/0.0.1/m5forecast";
         int predictionLength = 4;
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
                         .setTypes(TimeSeriesData.class, Forecast.class)
-                        .optModelUrls("djl://ai.djl.mxnet/deepar/0.0.1/m5forecast")
+                        .optModelUrls(modelUrl)
                         .optEngine("MXNet")
                         .optTranslatorFactory(new DeferredTranslatorFactory())
                         .optArgument("prediction_length", predictionLength)
@@ -104,19 +117,30 @@ public final class M5ForecastingDeepAR {
                 input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
                 input.setField(FieldName.TARGET, pastTarget);
                 Forecast forecast = predictor.predict(input);
-                // Here we focus on the metric Weighted Root Mean Squared Scaled Error (RMSSE) same
-                // as
+                // We focus on the metric Weighted Root Mean Squared Scaled Error (RMSSE) same as
                 // https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/evaluation
                 // The error is not small compared to the data values (sale amount). This is because
                 // The model is trained on a sparse data with many zeros. This will be improved by
-                // aggregating/coarse graining the data which will appear in the next PR.
-                // TODO: coarse graining the data.
+                // aggregating/coarse graining the data. See https://github.com/Carkham/m5_blog
                 evaluator.aggregateMetrics(evaluator.getMetricsPerTs(gt, pastTarget, forecast));
                 progress.increment(1);
+
+                // save data for plotting. Please see the corresponding python script from
+                // https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008
+                NDArray samples = ((SampleForecast) forecast).getSortedSamples();
+                samples.setName("samples");
+                saveNDArray(samples);
             }
 
             manager.close();
             return evaluator.computeTotalMetrics();
+        }
+    }
+
+    private static void saveNDArray(NDArray array) throws IOException {
+        Path path = Paths.get("build").resolve(array.getName() + ".npz");
+        try (OutputStream os = Files.newOutputStream(path)) {
+            new NDList(new NDList(array)).encode(os, true);
         }
     }
 
@@ -146,7 +170,14 @@ public final class M5ForecastingDeepAR {
         }
 
         private void prepare(Builder builder) throws IOException {
-            URL csvUrl = builder.root.resolve("weekly_sales_train_evaluation.csv").toUri().toURL();
+            MRL mrl = builder.getMrl();
+            Artifact artifact = mrl.getDefaultArtifact();
+            mrl.prepare(artifact, null);
+
+            Path root = mrl.getRepository().getResourceDirectory(artifact);
+            Path csvFile = root.resolve("weekly_sales_train_evaluation.csv");
+
+            URL csvUrl = csvFile.toUri().toURL();
             try (Reader reader =
                     new InputStreamReader(
                             new BufferedInputStream(csvUrl.openStream()), StandardCharsets.UTF_8)) {
@@ -197,9 +228,17 @@ public final class M5ForecastingDeepAR {
             NDManager manager;
             List<Feature> target;
             CSVFormat csvFormat;
-            Path root;
+
+            Repository repository;
+            String groupId;
+            String artifactId;
+            String version;
 
             Builder() {
+                repository = BasicDatasets.REPOSITORY;
+                groupId = BasicDatasets.GROUP_ID;
+                artifactId = "m5forecast-unittest";
+                version = "1.0";
                 csvFormat =
                         CSVFormat.DEFAULT
                                 .builder()
@@ -214,8 +253,8 @@ public final class M5ForecastingDeepAR {
                 }
             }
 
-            public Builder setRoot(Path root) {
-                this.root = root;
+            public Builder optRepository(Repository repository) {
+                this.repository = repository;
                 return this;
             }
 
@@ -226,6 +265,10 @@ public final class M5ForecastingDeepAR {
 
             public M5Dataset build() {
                 return new M5Dataset(this);
+            }
+
+            MRL getMrl() {
+                return repository.dataset(Application.Tabular.ANY, groupId, artifactId, version);
             }
         }
     }

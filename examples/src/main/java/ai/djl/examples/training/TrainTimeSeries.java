@@ -15,6 +15,7 @@ package ai.djl.examples.training;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
+import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.tabular.utils.Feature;
 import ai.djl.engine.Engine;
 import ai.djl.examples.inference.timeseries.M5ForecastingDeepAR;
@@ -26,7 +27,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
-import ai.djl.repository.Repository;
 import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
@@ -83,13 +83,6 @@ public final class TrainTimeSeries {
     }
 
     public static TrainingResult runExample(String[] args) throws IOException, TranslateException {
-        // use data path to create a custom repository
-        Repository repository =
-                Repository.newInstance(
-                        "test",
-                        Paths.get(
-                                System.getProperty("user.home")
-                                        + "/Desktop/m5-forecasting-accuracy"));
 
         Arguments arguments = new Arguments().parseArgs(args);
         try (Model model = Model.newInstance("deepar")) {
@@ -106,8 +99,7 @@ public final class TrainTimeSeries {
             int contextLength = trainingNetwork.getContextLength();
 
             M5Forecast trainSet =
-                    getDataset(
-                            trainingTransformation, repository, contextLength, Dataset.Usage.TRAIN);
+                    getDataset(trainingTransformation, contextLength, Dataset.Usage.TRAIN);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
@@ -144,13 +136,6 @@ public final class TrainTimeSeries {
 
     public static Map<String, Float> predict(String outputDir)
             throws IOException, TranslateException, ModelException {
-        Repository repository =
-                Repository.newInstance(
-                        "test",
-                        Paths.get(
-                                System.getProperty("user.home")
-                                        + "/Desktop/m5-forecasting-accuracy"));
-
         try (Model model = Model.newInstance("deepar")) {
             DeepARNetwork predictionNetwork = getDeepARModel(new NegativeBinomialOutput(), false);
             model.setBlock(predictionNetwork);
@@ -159,7 +144,6 @@ public final class TrainTimeSeries {
             M5Forecast testSet =
                     getDataset(
                             new ArrayList<>(),
-                            repository,
                             predictionNetwork.getContextLength(),
                             Dataset.Usage.TEST);
 
@@ -262,17 +246,16 @@ public final class TrainTimeSeries {
     }
 
     private static M5Forecast getDataset(
-            List<TimeSeriesTransform> transformation,
-            Repository repository,
-            int contextLength,
-            Dataset.Usage usage)
+            List<TimeSeriesTransform> transformation, int contextLength, Dataset.Usage usage)
             throws IOException {
         // In order to create a TimeSeriesDataset, you must specify the transformation of the data
         // preprocessing
         M5Forecast.Builder builder =
                 M5Forecast.builder()
                         .optUsage(usage)
-                        .optRepository(repository)
+                        .optRepository(BasicDatasets.REPOSITORY)
+                        .optGroupId(BasicDatasets.GROUP_ID)
+                        .optArtifactId("m5forecast-unittest")
                         .setTransformation(transformation)
                         .setContextLength(contextLength)
                         .setSampling(32, usage == Dataset.Usage.TRAIN);
