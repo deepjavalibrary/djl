@@ -81,16 +81,16 @@ JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfig
   config_ptr->pass_builder()->DeletePass(djl::utils::jni::GetStringFromJString(env, jpass));
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigEnableONNXRuntime
-        (JNIEnv* env, jobject jthis, jlong jhandle) {
-    auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
-    config_ptr->EnableONNXRuntime();
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigEnableONNXRuntime(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+  config_ptr->EnableONNXRuntime();
 }
 
-JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigEnableORTOptimization
-        (JNIEnv* env, jobject jthis, jlong jhandle) {
-    auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
-    config_ptr->EnableORTOptimization();
+JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_analysisConfigEnableORTOptimization(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  auto* config_ptr = reinterpret_cast<paddle::AnalysisConfig*>(jhandle);
+  config_ptr->EnableORTOptimization();
 }
 
 JNIEXPORT void JNICALL Java_ai_djl_paddlepaddle_jni_PaddleLibrary_deleteAnalysisConfig(

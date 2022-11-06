@@ -334,7 +334,7 @@ JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRequiresG
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  return tensor_ptr->requires_grad();
+  return tensor_ptr->requires_grad() && (tensor_ptr->is_leaf() || tensor_ptr->retains_grad());
   API_END_RETURN()
 }
 
