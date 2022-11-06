@@ -46,7 +46,7 @@ public class IntegrationTests {
         for (String engine : engines) {
             System.setProperty("ai.djl.default_engine", engine);
             logger.info("Testing engine: {} ...", engine);
-            System.out.println("===============" + engine + "======================");
+            System.out.println("===============" + engine + "===============");
             Assert.assertTrue(new IntegrationTest(IntegrationTest.class).runTests(args));
             // currently each engine will reserve a certain amount of memory and hold it until
             // process terminate so running 3 different engines sequentially without
