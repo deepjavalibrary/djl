@@ -20,6 +20,7 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.translator.wrapper.FileTranslator;
 import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
 import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
+import ai.djl.translate.ExpansionTranslatorFactory;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
@@ -28,47 +29,37 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /** A {@link TranslatorFactory} that creates an {@link ImageClassificationTranslator}. */
-public class ImageClassificationTranslatorFactory implements TranslatorFactory {
+public class ImageClassificationTranslatorFactory
+        extends ExpansionTranslatorFactory<Image, Classifications> {
 
-    private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();
+    private static final Map<
+                    Pair<Type, Type>,
+                    Function<Translator<Image, Classifications>, Translator<?, ?>>>
+            EXPANSIONS = new ConcurrentHashMap<>();
 
     static {
-        SUPPORTED_TYPES.add(new Pair<>(Image.class, Classifications.class));
-        SUPPORTED_TYPES.add(new Pair<>(Path.class, Classifications.class));
-        SUPPORTED_TYPES.add(new Pair<>(URL.class, Classifications.class));
-        SUPPORTED_TYPES.add(new Pair<>(InputStream.class, Classifications.class));
-        SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
+        EXPANSIONS.put(new Pair<>(Image.class, Classifications.class), t -> t);
+        EXPANSIONS.put(new Pair<>(Path.class, Classifications.class), FileTranslator::new);
+        EXPANSIONS.put(new Pair<>(URL.class, Classifications.class), UrlTranslator::new);
+        EXPANSIONS.put(
+                new Pair<>(InputStream.class, Classifications.class), InputStreamTranslator::new);
+        EXPANSIONS.put(new Pair<>(Input.class, Output.class), ImageServingTranslator::new);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Set<Pair<Type, Type>> getSupportedTypes() {
-        return SUPPORTED_TYPES;
+    protected Translator<Image, Classifications> buildBaseTranslator(
+            Model model, Map<String, ?> arguments) {
+        return ImageClassificationTranslator.builder(arguments).build();
     }
 
-    /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
-    public <I, O> Translator<I, O> newInstance(
-            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
-        ImageClassificationTranslator translator =
-                ImageClassificationTranslator.builder(arguments).build();
-        if (input == Image.class && output == Classifications.class) {
-            return (Translator<I, O>) translator;
-        } else if (input == Path.class && output == Classifications.class) {
-            return (Translator<I, O>) new FileTranslator<>(translator);
-        } else if (input == URL.class && output == Classifications.class) {
-            return (Translator<I, O>) new UrlTranslator<>(translator);
-        } else if (input == InputStream.class && output == Classifications.class) {
-            return (Translator<I, O>) new InputStreamTranslator<>(translator);
-        } else if (input == Input.class && output == Output.class) {
-            return (Translator<I, O>) new ImageServingTranslator(translator);
-        }
-        throw new IllegalArgumentException("Unsupported input/output types.");
+    protected Map<Pair<Type, Type>, Function<Translator<Image, Classifications>, Translator<?, ?>>>
+            getExpansions() {
+        return EXPANSIONS;
     }
 }
