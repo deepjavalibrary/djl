@@ -55,7 +55,7 @@ public class LgbmModelTest {
             try (NDManager manager = NDManager.newBaseManager()) {
                 NDArray array = manager.ones(new Shape(10, 4));
                 NDList output = predictor.predict(new NDList(array));
-                Assert.assertEquals(output.singletonOrThrow().getDataType(), DataType.FLOAT64);
+                Assert.assertEquals(output.singletonOrThrow().getDataType(), DataType.FLOAT32);
                 Assert.assertEquals(output.singletonOrThrow().getShape().size(), 10);
             }
         }

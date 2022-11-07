@@ -18,6 +18,8 @@ import ai.djl.ml.lightgbm.LgbmNDArray;
 import ai.djl.ml.lightgbm.LgbmNDManager;
 import ai.djl.ml.lightgbm.LgbmSymbolBlock;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.util.Pair;
 
 import com.microsoft.ml.lightgbm.SWIGTYPE_p_double;
 import com.microsoft.ml.lightgbm.SWIGTYPE_p_int;
@@ -25,6 +27,10 @@ import com.microsoft.ml.lightgbm.SWIGTYPE_p_long_long;
 import com.microsoft.ml.lightgbm.SWIGTYPE_p_p_void;
 import com.microsoft.ml.lightgbm.lightgbmlib;
 import com.microsoft.ml.lightgbm.lightgbmlibJNI;
+
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 
 /** DJL class that has access to LightGBM JNI. */
 @SuppressWarnings("MissingJavadocMethod")
@@ -53,7 +59,8 @@ public final class JniUtils {
         checkCall(result);
     }
 
-    public static double[] inference(SWIGTYPE_p_p_void model, int iterations, NDArray a) {
+    public static Pair<Integer, ByteBuffer> inference(
+            SWIGTYPE_p_p_void model, int iterations, NDArray a) {
         if (a instanceof LgbmDataset) {
             LgbmDataset dataset = (LgbmDataset) a;
             switch (dataset.getSrcType()) {
@@ -72,7 +79,8 @@ public final class JniUtils {
         throw new IllegalArgumentException("LightGBM inference must be called with a LgbmNDArray");
     }
 
-    public static double[] inferenceMat(SWIGTYPE_p_p_void model, int iterations, LgbmNDArray a) {
+    public static Pair<Integer, ByteBuffer> inferenceMat(
+            SWIGTYPE_p_p_void model, int iterations, LgbmNDArray a) {
         SWIGTYPE_p_long_long outLength = lightgbmlib.new_int64_tp();
         SWIGTYPE_p_double outBuffer = null;
         try {
@@ -92,12 +100,29 @@ public final class JniUtils {
                             outLength,
                             outBuffer);
             checkCall(result);
-            long length = lightgbmlib.int64_tp_value(outLength);
-            double[] values = new double[(int) length];
-            for (int i = 0; i < length; i++) {
-                values[i] = lightgbmlib.doubleArray_getitem(outBuffer, i);
+            int length = Math.toIntExact(lightgbmlib.int64_tp_value(outLength));
+            if (a.getDataType() == DataType.FLOAT32) {
+                ByteBuffer bb = ByteBuffer.allocateDirect(length * 4);
+                FloatBuffer wrapped = bb.asFloatBuffer();
+                for (int i = 0; i < length; i++) {
+                    wrapped.put((float) lightgbmlib.doubleArray_getitem(outBuffer, i));
+                }
+                bb.rewind();
+                return new Pair<>(length, bb);
+            } else if (a.getDataType() == DataType.FLOAT64) {
+                ByteBuffer bb = ByteBuffer.allocateDirect(length * 8);
+                DoubleBuffer wrapped = bb.asDoubleBuffer();
+                for (int i = 0; i < length; i++) {
+                    wrapped.put(lightgbmlib.doubleArray_getitem(outBuffer, i));
+                }
+                bb.rewind();
+                return new Pair<>(length, bb);
+            } else {
+                throw new IllegalArgumentException(
+                        "Unexpected data type for LightGBM inference. Expected Float32 or Float64,"
+                                + " but found "
+                                + a.getDataType());
             }
-            return values;
         } catch (EngineException e) {
             throw new EngineException("Failed to run inference using LightGBM native engine", e);
         } finally {
