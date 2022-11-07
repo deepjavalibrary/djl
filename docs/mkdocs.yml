@@ -1,6 +1,7 @@
 site_name: Deep Java Library
 repo_name: deepjavalibrary/djl
-repo_url: https://github.com/deepjavalibrary/djl/
+repo_url: https://github.com/deepjavalibrary/djl
+edit_uri: https://github.com/deepjavalibrary/djl/edit/master/
 site_url: https://djl.ai
 use_directory_urls: false
 markdown_extensions:
