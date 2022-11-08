@@ -36,6 +36,7 @@ import ai.djl.nn.convolutional.Conv2dTranspose;
 import ai.djl.nn.convolutional.Conv3d;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.core.LinearCollection;
+import ai.djl.nn.core.Multiplication;
 import ai.djl.nn.norm.BatchNorm;
 import ai.djl.nn.norm.Dropout;
 import ai.djl.nn.norm.GhostBatchNorm;
@@ -328,6 +329,72 @@ public class BlockCoreTest {
                             actualLabels);
 
                     testEncode(manager, block);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testMultiplication() throws IOException, MalformedModelException {
+
+        // 4 samples times 3 features
+        float[][] dataArr = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {9, 10, 11}};
+
+        // 2 units times 3 features
+        float[][] weightArr = {{0, 1, 2}, {10, 11, 12}};
+
+        // store sum on Multiplication block's result
+        NDArray sum;
+
+        try (NDManager sharedManager = NDManager.newBaseManager()) {
+
+            // test algebraic expectation of Multiplication block
+            long outSize = 2;
+            Block block = Multiplication.builder().setUnits(outSize).build();
+            try (Model model = Model.newInstance("model")) {
+                model.setBlock(block);
+
+                TrainingConfig config =
+                        new DefaultTrainingConfig(Loss.l2Loss())
+                                .optInitializer(
+                                        (m, s, t) -> m.create(weightArr).expandDims(1),
+                                        Parameter.Type.WEIGHT);
+                try (Trainer trainer = model.newTrainer(config)) {
+                    Shape inputShape = new Shape(4, 3);
+                    trainer.initialize(inputShape);
+
+                    NDManager manager = trainer.getManager();
+                    NDArray data = manager.create(dataArr);
+                    NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                    NDArray expected = data.mul(manager.create(weightArr).expandDims(1));
+                    Assert.assertEquals(result, expected);
+
+                    testEncode(manager, block);
+
+                    sum = result.sum(new int[] {-1}).transpose();
+                    sum.attach(sharedManager);
+                }
+            }
+
+            // test "sum" is equal to linear transformation without bias
+            block = Linear.builder().setUnits(outSize).optBias(false).build();
+            try (Model model = Model.newInstance("model")) {
+                model.setBlock(block);
+
+                TrainingConfig config =
+                        new DefaultTrainingConfig(Loss.l2Loss())
+                                .optInitializer(
+                                        (m, s, t) -> m.create(weightArr), Parameter.Type.WEIGHT);
+                try (Trainer trainer = model.newTrainer(config)) {
+                    Shape inputShape = new Shape(4, 3);
+                    trainer.initialize(inputShape);
+
+                    NDManager manager = trainer.getManager();
+                    NDArray data = manager.create(dataArr);
+                    NDArray result = trainer.forward(new NDList(data)).singletonOrThrow();
+                    NDArray expected = data.dot(manager.create(weightArr).transpose());
+                    Assert.assertEquals(result, expected);
+                    Assert.assertEquals(result, sum);
                 }
             }
         }
