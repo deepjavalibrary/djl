@@ -47,7 +47,7 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
     private boolean useFeatStaticCat;
     private int historyLength;
 
-    private static final String[] PRED_INPUT_FIELDS = {
+    private static final String[] MX_PRED_INPUT_FIELDS = {
         FieldName.FEAT_STATIC_CAT.name(),
         FieldName.FEAT_STATIC_REAL.name(),
         "PAST_" + FieldName.FEAT_TIME.name(),
@@ -58,12 +58,12 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
     };
 
     private static final String[] PT_PRED_INPUT_FIELDS = {
-            FieldName.FEAT_STATIC_CAT.name(),
-            FieldName.FEAT_STATIC_REAL.name(),
-            "PAST_" + FieldName.FEAT_TIME.name(),
-            "PAST_" + FieldName.TARGET.name(),
-            "PAST_" + FieldName.OBSERVED_VALUES.name(),
-            "FUTURE_" + FieldName.FEAT_TIME.name()
+        FieldName.FEAT_STATIC_CAT.name(),
+        FieldName.FEAT_STATIC_REAL.name(),
+        "PAST_" + FieldName.FEAT_TIME.name(),
+        "PAST_" + FieldName.TARGET.name(),
+        "PAST_" + FieldName.OBSERVED_VALUES.name(),
+        "FUTURE_" + FieldName.FEAT_TIME.name()
     };
     private static final FieldName[] TIME_SERIES_FIELDS = {
         FieldName.FEAT_TIME, FieldName.OBSERVED_VALUES
@@ -117,7 +117,8 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
 
         if (!useFeatStaticCat) {
             // TODO: resolve the datatype
-            Field.setField(FieldName.FEAT_STATIC_CAT, manager.zeros(new Shape(1), DataType.INT32), input);
+            Field.setField(
+                    FieldName.FEAT_STATIC_CAT, manager.zeros(new Shape(1), DataType.INT32), input);
         }
 
         if (!useFeatStaticReal) {
@@ -164,7 +165,11 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
                 0,
                 input);
 
-        input = Field.selectField(PT_PRED_INPUT_FIELDS, input);
+        if ("PyTorch".equals(manager.getEngine().getEngineName())) {
+            input = Field.selectField(PT_PRED_INPUT_FIELDS, input);
+        } else {
+            input = Field.selectField(MX_PRED_INPUT_FIELDS, input);
+        }
 
         return input.toNDList();
     }

@@ -18,11 +18,13 @@ import ai.djl.ModelException;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
 import ai.djl.basicdataset.tabular.utils.Feature;
+import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
@@ -33,8 +35,9 @@ import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.SampleForecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
+import ai.djl.timeseries.translator.DeepARTranslator;
+import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.DeferredTranslatorFactory;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 
@@ -78,29 +81,41 @@ public final class M5ForecastingDeepAR {
 
     public static Map<String, Float> predict()
             throws IOException, TranslateException, ModelException {
-        NDManager manager = NDManager.newBaseManager(null, "MXNet");
+        String engineName = Engine.getDefaultEngineName();
+        NDManager manager = NDManager.newBaseManager(null, engineName);
 
         // To use local dataset, users can load data as follows
         // Repository repository = Repository.newInstance("local_dataset",
-        // Paths.get("rootPath/m5-forecasting-accuracy"));
+        // Paths.get("YOUR_Path/m5-forecasting-accuracy"));
         // Then add the setting `.optRepository(repository)` to the builder below
         M5Dataset dataset = M5Dataset.builder().setManager(manager).build();
 
-        // The modelUrl can be replaced by local model path. E.g.,
-        // String modelUrl = "rootPath/deepar.zip";
-        String modelUrl = "djl://ai.djl.mxnet/deepar/0.0.1/m5forecast";
+        // Note that, for a model exported from MXNet, the tensor shape of the `begin_state` may be
+        // problematic, as indicated in this
+        // [issue](https://github.com/deepjavalibrary/djl/issues/2106#issuecomment-1295703321). As
+        // described there, you need to "change every begin_state's shape to (-1, 40)".
+        // Here you can also use local file: modelUrl = "LOCAL_PATH/deepar.pt";
+        String modelUrl =
+                "PyTorch".equals(engineName)
+                        ? "./src/main/resources/deepar.pt"
+                        : "djl://ai.djl.mxnet/deepar/0.0.1/m5forecast";
         int predictionLength = 4;
+        Map<String, Object> arguments = new ConcurrentHashMap<>();
+        arguments.put("prediction_length", predictionLength);
+        arguments.put("freq", "W");
+        arguments.put("use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(), false);
+        arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), false);
+        arguments.put("use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(), false);
+
+        DeepARTranslator.Builder builder = DeepARTranslator.builder(arguments);
+        DeepARTranslator translator = builder.build();
+
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
                         .setTypes(TimeSeriesData.class, Forecast.class)
                         .optModelUrls(modelUrl)
-                        .optEngine("MXNet")
-                        .optTranslatorFactory(new DeferredTranslatorFactory())
-                        .optArgument("prediction_length", predictionLength)
-                        .optArgument("freq", "W")
-                        .optArgument("use_feat_dynamic_real", "false")
-                        .optArgument("use_feat_static_cat", "false")
-                        .optArgument("use_feat_static_real", "false")
+                        .optEngine(engineName)
+                        .optTranslator(translator)
                         .optProgress(new ProgressBar())
                         .build();
 
@@ -319,15 +334,11 @@ public final class M5ForecastingDeepAR {
 
             for (float quantile : quantiles) {
                 NDArray forecastQuantile = forecast.quantile(quantile);
-
                 NDArray quantileLoss =
-                        forecastQuantile
-                                .sub(gtTarget)
-                                .mul(gtTarget.lte(forecastQuantile).sub(quantile))
-                                .abs()
-                                .sum()
-                                .mul(2);
-                NDArray quantileCoverage = gtTarget.lt(forecastQuantile).mean();
+                        Loss.quantileL1Loss(quantile)
+                                .evaluate(new NDList(gtTarget), new NDList(forecastQuantile));
+                NDArray quantileCoverage =
+                        gtTarget.lt(forecastQuantile).toType(DataType.FLOAT32, false).mean();
                 retMetrics.put(
                         String.format("QuantileLoss[%.2f]", quantile), quantileLoss.getFloat());
                 retMetrics.put(
