@@ -55,6 +55,15 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         "FUTURE_" + FieldName.FEAT_TIME.name(),
         "PAST_" + FieldName.IS_PAD.name()
     };
+
+    private static final String[] PT_PRED_INPUT_FIELDS = {
+            FieldName.FEAT_STATIC_CAT.name(),
+            FieldName.FEAT_STATIC_REAL.name(),
+            "PAST_" + FieldName.FEAT_TIME.name(),
+            "PAST_" + FieldName.TARGET.name(),
+            "PAST_" + FieldName.OBSERVED_VALUES.name(),
+            "FUTURE_" + FieldName.FEAT_TIME.name()
+    };
     private static final FieldName[] TIME_SERIES_FIELDS = {
         FieldName.FEAT_TIME, FieldName.OBSERVED_VALUES
     };
@@ -153,7 +162,7 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
                 0,
                 input);
 
-        input = Field.selectField(PRED_INPUT_FIELDS, input);
+        input = Field.selectField(PT_PRED_INPUT_FIELDS, input);
 
         return input.toNDList();
     }
