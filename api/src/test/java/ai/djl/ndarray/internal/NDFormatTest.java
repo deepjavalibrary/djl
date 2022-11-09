@@ -144,6 +144,9 @@ public class NDFormatTest {
             String str = large.toString();
             Assert.assertEquals(
                     str, "ND: (100, 100, 100, 100) cpu() float32\n[ Exceed max print size ]");
+
+            NDArray arr = manager.create(new float[] {1, 0, 0, 0});
+            Assert.assertEquals(arr.mean().toString(), "ND: () cpu() float32\n0.25\n");
         }
     }
 }
