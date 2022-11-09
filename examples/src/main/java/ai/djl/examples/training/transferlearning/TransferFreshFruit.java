@@ -66,13 +66,16 @@ public final class TransferFreshFruit {
     public static TrainingResult runExample(String[] args)
             throws IOException, TranslateException, ModelException, URISyntaxException {
         boolean retrain = args.length == 1 && "-p".equals(args[0]);
+        // The modelUrl can be replaced by local model path:
+        // String modelUrl = "/YOUR_PATH/resnet18_embedding.pt";
+        String modelUrl = "djl://ai.djl.pytorch/resnet18_embedding";
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
-                        .optModelUrls("djl://ai.djl.pytorch/resnet18_embedding")
+                        .optModelUrls(modelUrl)
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
-                        .optOption("retrain", String.valueOf(retrain))
+                        .optOption("trainParam", String.valueOf(retrain))
                         .build();
 
         ZooModel<NDList, NDList> embedding = criteria.loadModel();
@@ -132,8 +135,8 @@ public final class TransferFreshFruit {
         float[] std = {0.229f, 0.224f, 0.225f};
 
         // To use local dataset, users can load it as follows
-        // Repository repository = Repository.newInstance("banana",
-        // Paths.get("local_data_root/banana/train"));
+        // `Repository repository = Repository.newInstance("banana",
+        // Paths.get("local_data_root/banana/train"));`
         // Then add the setting `.optRepository(repository)` to the builder below
         FruitsFreshAndRotten dataset =
                 FruitsFreshAndRotten.builder()

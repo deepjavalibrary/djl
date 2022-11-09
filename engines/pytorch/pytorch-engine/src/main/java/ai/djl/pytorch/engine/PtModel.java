@@ -78,14 +78,14 @@ public class PtModel extends BaseModel {
             String[] extraFileKeys = new String[0];
             String[] extraFileValues = new String[0];
             boolean mapLocation = false;
-            boolean retrain = false;
+            boolean trainParam = false;
             // load jit extra files
             if (options != null) {
                 if (options.containsKey("extraFiles")) {
                     extraFileKeys = ((String) options.get("extraFiles")).split(",");
                     extraFileValues = new String[extraFileKeys.length];
                 }
-                retrain = Boolean.parseBoolean((String) options.get("retrain"));
+                trainParam = Boolean.parseBoolean((String) options.get("trainParam"));
                 mapLocation = Boolean.parseBoolean((String) options.get("mapLocation"));
             }
             block =
@@ -95,15 +95,15 @@ public class PtModel extends BaseModel {
                             mapLocation,
                             extraFileKeys,
                             extraFileValues,
-                            retrain);
+                            trainParam);
             for (int i = 0; i < extraFileKeys.length; i++) {
                 properties.put(extraFileKeys[i], extraFileValues[i]);
             }
-            // By default, the parameters are frozen, since before adding this training feature
-            // `retrain`, it was frozen already by setting `JITCallGuard guard`, which disables
+            // By default, the parameters are frozen, since the previous version before adding this
+            // `trainParam`, they were frozen due to the setting `JITCallGuard guard`, which disables
             // autograd. Also, the pretrained parameters usually should not be updated too much. It
             // is safe to freeze it. Users may unfreeze it and set their learning rate small.
-            block.freezeParameters(!retrain);
+            block.freezeParameters(!trainParam);
         } else {
             boolean hasParameter = true;
             if (options != null) {

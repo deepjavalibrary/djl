@@ -32,7 +32,7 @@ struct JITCallGuard {
 JNIEXPORT jlong JNICALL
 Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljava_lang_String_2_3Ljava_lang_String_2Z(
     JNIEnv* env, jobject jthis, jstring jpath, jintArray jarray, jboolean jmap_location, jobjectArray jefnames,
-    jobjectArray jefvalues, jboolean jretrain) {
+    jobjectArray jefvalues, jboolean jtrainParam) {
   API_BEGIN()
   const std::string path = djl::utils::jni::GetStringFromJString(env, jpath);
   const torch::Device device = utils::GetDeviceFromJDevice(env, jarray);
@@ -44,7 +44,7 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljav
     map[name] = "";
   }
 
-  if (!jretrain) {
+  if (!jtrainParam) {
     JITCallGuard guard;
     torch::jit::Module module;
     if (jmap_location) {

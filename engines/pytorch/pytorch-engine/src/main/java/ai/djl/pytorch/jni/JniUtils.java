@@ -1555,7 +1555,7 @@ public final class JniUtils {
             boolean mapLocation,
             String[] extraFileKeys,
             String[] extraFileValues,
-            boolean retrain) {
+            boolean trainParam) {
         Device device = manager.getDevice();
         // MPS doesn't support mapLocation
         if ("mps".equals(device.getDeviceType())) {
@@ -1570,7 +1570,7 @@ public final class JniUtils {
                         mapLocation,
                         extraFileKeys,
                         extraFileValues,
-                        retrain);
+                        trainParam);
         return new PtSymbolBlock(manager, handle);
     }
 

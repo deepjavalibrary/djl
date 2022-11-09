@@ -123,6 +123,7 @@ public abstract class NDFormat {
             sb.append("[]").append(LF);
         } else if (dimension == 0) {
             // scalar case
+            init(array);
             sb.append(format(array.toArray()[0])).append(LF);
         } else if (size > maxSize) {
             sb.append("[ Exceed max print size ]");
