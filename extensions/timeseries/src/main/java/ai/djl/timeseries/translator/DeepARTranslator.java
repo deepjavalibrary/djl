@@ -15,6 +15,7 @@ package ai.djl.timeseries.translator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.SampleForecast;
@@ -115,7 +116,8 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         Field.removeFields(removeFieldNames, input);
 
         if (!useFeatStaticCat) {
-            Field.setField(FieldName.FEAT_STATIC_CAT, manager.zeros(new Shape(1)), input);
+            // TODO: resolve the datatype
+            Field.setField(FieldName.FEAT_STATIC_CAT, manager.zeros(new Shape(1), DataType.INT32), input);
         }
 
         if (!useFeatStaticReal) {
