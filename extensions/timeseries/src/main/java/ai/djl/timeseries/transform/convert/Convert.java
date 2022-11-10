@@ -16,6 +16,7 @@ package ai.djl.timeseries.transform.convert;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 
@@ -71,5 +72,42 @@ public final class Convert {
     public static void vstackFeatures(
             FieldName outputField, FieldName[] inputFields, TimeSeriesData data) {
         vstackFeatures(outputField, inputFields, true, false, data);
+    }
+
+    /**
+     * Convert the dtype of {@link NDArray} and check its dimension
+     *
+     * @param field Aim field
+     * @param expectedDim Expected number of dimensions
+     * @param dtype {@link DataType} to use
+     * @param data the {@link TimeSeriesData} to operate on
+     */
+    public static void asArray(
+            FieldName field, int expectedDim, DataType dtype, TimeSeriesData data) {
+        NDArray value = data.get(field);
+        if (value == null) {
+            throw new IllegalArgumentException(String.format("%s don't map to any NDArray", field));
+        }
+
+        value = value.toType(dtype, true);
+        if (value.getShape().dimension() != expectedDim) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Input for field \"%s\" does not have the required dimension (field:"
+                                    + " %s, dim: %d, expected: %d)",
+                            field, field, value.getShape().dimension(), expectedDim));
+        }
+        data.setField(field, value);
+    }
+
+    /**
+     * Convert the dtype of {@link NDArray} and check its dimension
+     *
+     * @param field Aim field
+     * @param expectedDim Expected number of dimensions
+     * @param data the {@link TimeSeriesData} to operate on
+     */
+    public static void asArray(FieldName field, int expectedDim, TimeSeriesData data) {
+        asArray(field, expectedDim, DataType.FLOAT32, data);
     }
 }

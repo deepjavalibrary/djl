@@ -17,6 +17,7 @@ import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.TestRequirements;
 import ai.djl.timeseries.TimeSeriesData;
@@ -145,6 +146,25 @@ public class TransformTest {
 
             Assert.assertTrue(input.contains(FieldName.TARGET.name()));
             Assert.assertEquals(input.get(FieldName.TARGET), array);
+        }
+    }
+
+    @Test
+    public void testAsArray() {
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
+            TimeSeriesData input = new TimeSeriesData(10);
+
+            NDArray array = manager.ones(new Shape(2, 3));
+            input.setField(FieldName.FEAT_STATIC_CAT, array);
+
+            Convert.asArray(FieldName.FEAT_STATIC_CAT, 2, input);
+            Assert.assertTrue(input.contains(FieldName.FEAT_STATIC_CAT.name()));
+            Assert.assertEquals(
+                    input.get(FieldName.FEAT_STATIC_CAT).getDataType(), DataType.FLOAT32);
+
+            Convert.asArray(FieldName.FEAT_STATIC_CAT, 2, DataType.INT32, input);
+            Assert.assertTrue(input.contains(FieldName.FEAT_STATIC_CAT.name()));
+            Assert.assertEquals(input.get(FieldName.FEAT_STATIC_CAT).getDataType(), DataType.INT32);
         }
     }
 

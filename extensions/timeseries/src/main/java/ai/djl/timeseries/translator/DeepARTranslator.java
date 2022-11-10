@@ -116,14 +116,15 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         Field.removeFields(removeFieldNames, input);
 
         if (!useFeatStaticCat) {
-            // TODO: resolve the datatype
-            Field.setField(
-                    FieldName.FEAT_STATIC_CAT, manager.zeros(new Shape(1), DataType.INT32), input);
+            Field.setField(FieldName.FEAT_STATIC_CAT, manager.zeros(new Shape(1)), input);
         }
 
         if (!useFeatStaticReal) {
             Field.setField(FieldName.FEAT_STATIC_REAL, manager.zeros(new Shape(1)), input);
         }
+
+        Convert.asArray(FieldName.FEAT_STATIC_CAT, 1, DataType.INT32, input);
+        Convert.asArray(FieldName.FEAT_STATIC_REAL, 1, input);
 
         Feature.addObservedValuesIndicator(
                 manager, FieldName.TARGET, FieldName.OBSERVED_VALUES, input);
