@@ -14,6 +14,7 @@ package ai.djl.integration.tests.ndarray;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
 import org.testng.Assert;
@@ -103,6 +104,21 @@ public class NDArrayReductionOpTest {
             // zero-dim
             // array = manager.create(new Shape(1, 1, 0));
             // Assert.assertEquals(array.sum().getFloat(), 0f);
+        }
+    }
+
+    @Test
+    public void testCumProd() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.create(new int[] {1, 2, 3, 4});
+            NDArray expected = manager.create(new long[] {1, 2, 6, 24});
+            Assert.assertEquals(array.cumProd(0), expected);
+
+            NDArray expectedInt = manager.create(new int[] {1, 2, 6, 24});
+            Assert.assertEquals(array.cumProd(0, array.getDataType()), expectedInt);
+
+            NDArray expectedFloat = manager.create(new float[] {1f, 2f, 6f, 24f});
+            Assert.assertEquals(array.cumProd(0, DataType.FLOAT32), expectedFloat);
         }
     }
 

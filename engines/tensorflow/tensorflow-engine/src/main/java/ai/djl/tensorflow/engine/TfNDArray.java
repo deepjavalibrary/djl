@@ -1011,6 +1011,18 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDArray cumProd(int axis) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumProd(int axis, DataType dataType) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray prod() {
         try (NDArray axes = manager.arange(getShape().dimension())) {
             return manager.opExecutor("Prod").addInput(this).addInput(axes).buildSingletonOrThrow();

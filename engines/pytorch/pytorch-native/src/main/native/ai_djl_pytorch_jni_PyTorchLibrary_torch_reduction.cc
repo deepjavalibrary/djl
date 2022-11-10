@@ -132,6 +132,20 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSum__J_3JZ(
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCumProd
+  (JNIEnv * env, jobject jthis, jlong jhandle, jlong jdim, jint jdtype) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  if (jdtype == -1) {
+      const auto* result_ptr = new torch::Tensor(tensor_ptr->cumprod(jdim));
+      return reinterpret_cast<uintptr_t>(result_ptr);
+  } else {
+      const auto* result_ptr = new torch::Tensor(tensor_ptr->cumprod(jdim, utils::GetScalarTypeFromDType(jdtype)));
+      return reinterpret_cast<uintptr_t>(result_ptr);
+  }
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchProd__J(JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);

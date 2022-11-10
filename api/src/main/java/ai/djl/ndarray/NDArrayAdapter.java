@@ -752,6 +752,18 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray cumProd(int axis) {
+        return getAlternativeArray().cumProd(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumProd(int axis, DataType dataType) {
+        return getAlternativeArray().cumProd(axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray prod() {
         return getAlternativeArray().prod();
     }

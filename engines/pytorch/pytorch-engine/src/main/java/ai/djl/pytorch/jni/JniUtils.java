@@ -851,6 +851,16 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchSum(ndArray.getHandle(), dims, keepDim));
     }
 
+    public static PtNDArray cumProd(PtNDArray ndArray, long dim, DataType dataType) {
+        int dtPosition = -1;
+        if (dataType != null) {
+            dtPosition = dataType.ordinal();
+        }
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchCumProd(ndArray.getHandle(), dim, dtPosition));
+    }
+
     public static PtNDArray prod(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchProd(ndArray.getHandle()));
