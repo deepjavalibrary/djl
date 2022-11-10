@@ -72,9 +72,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         String factoryClass = ArgumentsUtil.stringValue(arguments, "translatorFactory");
         if (factoryClass != null && !factoryClass.isEmpty()) {
             TranslatorFactory factory = loadTranslatorFactory(factoryClass);
-            if (factory != null
-                    && !(factory instanceof ServingTranslatorFactory)
-                    && factory.isSupported(input, output)) {
+            if (factory != null && factory.isSupported(input, output)) {
                 logger.info("Using TranslatorFactory: {}", factory.getClass().getName());
                 return factory.newInstance(input, output, model, arguments);
             }
