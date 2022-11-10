@@ -238,6 +238,8 @@ final class PyTorchLibrary {
 
     native long torchSum(long handle, long[] dim, boolean keepDim);
 
+    native long torchCumProd(long handle, long dim, int dtype);
+
     native long torchProd(long handle);
 
     native long torchProd(long handle, long dim, boolean keepDim);

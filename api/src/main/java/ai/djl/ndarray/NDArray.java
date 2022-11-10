@@ -2587,6 +2587,27 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray sum(int[] axes, boolean keepDims);
 
     /**
+     * Returns the cumulative product of elements of input in the dimension dim. For example, if
+     * input is a vector of size N, the result will also be a vector of size N, with elements. [x1,
+     * x1 * x2, x1 * x2 *x3 ...]
+     *
+     * @param axis the axis along which to operate
+     * @return the cumulative product of this
+     */
+    NDArray cumProd(int axis);
+
+    /**
+     * Returns the cumulative product of elements of input in the dimension dim. For example, if
+     * input is a vector of size N, the result will also be a vector of size N, with elements. [x1,
+     * x1 * x2, x1 * x2 *x3 ...]
+     *
+     * @param axis the axis along which to operate
+     * @param dataType the datatype of the output
+     * @return the cumulative product of this
+     */
+    NDArray cumProd(int axis, DataType dataType);
+
+    /**
      * Returns the product of this {@code NDArray}.
      *
      * <p>Examples

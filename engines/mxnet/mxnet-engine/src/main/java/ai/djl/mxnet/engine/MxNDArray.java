@@ -997,6 +997,18 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray cumProd(int axis) {
+        throw new UnsupportedOperationException("Not supported by MXNet");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumProd(int axis, DataType dataType) {
+        throw new UnsupportedOperationException("Not supported by MXNet");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray prod() {
         return manager.invoke("_np_prod", this, null);
     }

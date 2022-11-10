@@ -926,6 +926,18 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray cumProd(int axis) {
+        return JniUtils.cumProd(this, axis, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray cumProd(int axis, DataType dataType) {
+        return JniUtils.cumProd(this, axis, dataType);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray prod() {
         return JniUtils.prod(this);
     }
