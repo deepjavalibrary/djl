@@ -25,7 +25,9 @@ struct JITCallGuard {
   torch::NoGradGuard no_grad;
 #else
   c10::InferenceMode guard;
+#ifdef __ANDROID__
   torch::jit::GraphOptimizerEnabledGuard no_optimizer_guard{false};
+#endif
 #endif
 };
 
