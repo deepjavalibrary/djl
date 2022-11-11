@@ -14,6 +14,7 @@ package ai.djl.pytorch.zoo;
 
 import ai.djl.Application.CV;
 import ai.djl.Application.NLP;
+import ai.djl.Application.TimeSeries;
 import ai.djl.pytorch.engine.PtEngine;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
@@ -41,6 +42,7 @@ public class PtModelZoo extends ModelZoo {
         addModel(REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "biggan-deep", "0.0.1"));
         addModel(REPOSITORY.model(CV.IMAGE_GENERATION, GROUP_ID, "cyclegan", "0.0.1"));
         addModel(REPOSITORY.model(CV.SEMANTIC_SEGMENTATION, GROUP_ID, "deeplabv3", "0.0.1"));
+        addModel(REPOSITORY.model(TimeSeries.FORECASTING, GROUP_ID, "deepar", "0.0.1"));
     }
 
     /** {@inheritDoc} */

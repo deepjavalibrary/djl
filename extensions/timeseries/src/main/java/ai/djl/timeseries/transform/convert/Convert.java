@@ -20,19 +20,19 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 
-/** this is a class use to convert the shape of {@link NDArray} in {@link TimeSeriesData}. */
+/** A class used to convert the shape of {@link NDArray} in {@link TimeSeriesData}. */
 public final class Convert {
 
     private Convert() {}
 
     /**
-     * Stack fields together using {@link NDArrays#concat(NDList)}. when hStack = false, axis = 0
+     * Stacks fields together using {@link NDArrays#concat(NDList)}. when hStack = false, axis = 0
      * Otherwise axis = 1.
      *
-     * @param outputField Field names to use for the output
-     * @param inputFields Fields to stack together
-     * @param dropInputs If set to true the input fields will be dropped
-     * @param hStack To stack horizontally instead of vertically
+     * @param outputField the field names to use for the output
+     * @param inputFields the fields to stack together
+     * @param dropInputs the input fields will be dropped if set to true
+     * @param hStack to stack horizontally instead of vertically
      * @param data the {@link TimeSeriesData} to operate on
      */
     public static void vstackFeatures(
@@ -61,12 +61,12 @@ public final class Convert {
     }
 
     /**
-     * Stack fields together using {@link NDArrays#concat(NDList)}.
+     * Stacks fields together using {@link NDArrays#concat(NDList)}.
      *
      * <p>set hStack = false, dropInputs = true
      *
-     * @param outputField Field names to use for the output
-     * @param inputFields Fields to stack together
+     * @param outputField the field names to use for the output
+     * @param inputFields the fields to stack together
      * @param data the {@link TimeSeriesData} to operate on
      */
     public static void vstackFeatures(
@@ -75,21 +75,21 @@ public final class Convert {
     }
 
     /**
-     * Convert the dtype of {@link NDArray} and check its dimension
+     * Converts the data type of {@link NDArray} and check its dimension.
      *
-     * @param field Aim field
-     * @param expectedDim Expected number of dimensions
-     * @param dtype {@link DataType} to use
+     * @param field aim field
+     * @param expectedDim expected number of dimensions
+     * @param dataType {@link DataType} to use
      * @param data the {@link TimeSeriesData} to operate on
      */
     public static void asArray(
-            FieldName field, int expectedDim, DataType dtype, TimeSeriesData data) {
+            FieldName field, int expectedDim, DataType dataType, TimeSeriesData data) {
         NDArray value = data.get(field);
         if (value == null) {
             throw new IllegalArgumentException(String.format("%s don't map to any NDArray", field));
         }
 
-        value = value.toType(dtype, true);
+        value = value.toType(dataType, true);
         if (value.getShape().dimension() != expectedDim) {
             throw new IllegalArgumentException(
                     String.format(
@@ -101,10 +101,10 @@ public final class Convert {
     }
 
     /**
-     * Convert the dtype of {@link NDArray} and check its dimension
+     * Converts the data type of {@link NDArray} and check its dimension.
      *
-     * @param field Aim field
-     * @param expectedDim Expected number of dimensions
+     * @param field aim field
+     * @param expectedDim expected number of dimensions
      * @param data the {@link TimeSeriesData} to operate on
      */
     public static void asArray(FieldName field, int expectedDim, TimeSeriesData data) {

@@ -20,39 +20,40 @@ import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
 
-/** Convert the dtype of {@link NDArray} and check its dimension */
+/** Convert the data type of {@link NDArray} and check its dimension. */
 public class AsArray implements TimeSeriesTransform {
 
     private FieldName field;
-    private DataType dtype;
+    private DataType dataType;
     private int expectedDim;
 
     /**
-     * Constructs a {@link AsArray}
+     * Constructs a {@link AsArray}.
      *
-     * @param field output field name
-     * @param expectedDim Expected number of dimensions
-     * @param dtype {@link DataType} to use
+     * @param field the output field name
+     * @param expectedDim expected number of dimensions
+     * @param dataType {@link DataType} to use
      */
-    public AsArray(FieldName field, int expectedDim, DataType dtype) {
+    public AsArray(FieldName field, int expectedDim, DataType dataType) {
         this.field = field;
-        this.dtype = dtype;
+        this.dataType = dataType;
         this.expectedDim = expectedDim;
     }
 
     /**
-     * Constructs a {@link AsArray}
+     * Constructs a {@link AsArray}.
      *
-     * @param field output field name
-     * @param expectedDim Expected number of dimensions
+     * @param field the output field name
+     * @param expectedDim expected number of dimensions
      */
     public AsArray(FieldName field, int expectedDim) {
         this(field, expectedDim, DataType.FLOAT32);
     }
 
+    /** {@inheritDoc} */
     @Override
     public TimeSeriesData transform(NDManager manager, TimeSeriesData data, boolean isTrain) {
-        Convert.asArray(field, expectedDim, dtype, data);
+        Convert.asArray(field, expectedDim, dataType, data);
         return data;
     }
 }

@@ -47,17 +47,7 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
     private boolean useFeatStaticCat;
     private int historyLength;
 
-    private static final String[] MX_PRED_INPUT_FIELDS = {
-        FieldName.FEAT_STATIC_CAT.name(),
-        FieldName.FEAT_STATIC_REAL.name(),
-        "PAST_" + FieldName.FEAT_TIME.name(),
-        "PAST_" + FieldName.TARGET.name(),
-        "PAST_" + FieldName.OBSERVED_VALUES.name(),
-        "FUTURE_" + FieldName.FEAT_TIME.name(),
-        "PAST_" + FieldName.IS_PAD.name()
-    };
-
-    private static final String[] PT_PRED_INPUT_FIELDS = {
+    private static final String[] PRED_INPUT_FIELDS = {
         FieldName.FEAT_STATIC_CAT.name(),
         FieldName.FEAT_STATIC_REAL.name(),
         "PAST_" + FieldName.FEAT_TIME.name(),
@@ -65,12 +55,14 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         "PAST_" + FieldName.OBSERVED_VALUES.name(),
         "FUTURE_" + FieldName.FEAT_TIME.name()
     };
+
     private static final FieldName[] TIME_SERIES_FIELDS = {
         FieldName.FEAT_TIME, FieldName.OBSERVED_VALUES
     };
-    private final List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeatures;
 
-    private final InstanceSampler instanceSampler;
+    private List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeatures;
+    private InstanceSampler instanceSampler;
+    private String[] predictInputFields;
 
     /**
      * Constructs a new {@code DeepARTranslator} instance.
@@ -87,6 +79,14 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         this.timeFeatures = TimeFeature.timeFeaturesFromFreqStr(freq);
         this.historyLength = contextLength + lagsSeq.get(lagsSeq.size() - 1);
         this.instanceSampler = PredictionSplitSampler.newTestSplitSampler();
+        if (builder.useIsPad) {
+            int len = PRED_INPUT_FIELDS.length;
+            predictInputFields = new String[len + 1];
+            System.arraycopy(PRED_INPUT_FIELDS, 0, predictInputFields, 0, len);
+            predictInputFields[len] = "PAST_" + FieldName.IS_PAD.name();
+        } else {
+            predictInputFields = PRED_INPUT_FIELDS;
+        }
     }
 
     /** {@inheritDoc} */
@@ -166,11 +166,7 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
                 0,
                 input);
 
-        if ("PyTorch".equals(manager.getEngine().getEngineName())) {
-            input = Field.selectField(PT_PRED_INPUT_FIELDS, input);
-        } else {
-            input = Field.selectField(MX_PRED_INPUT_FIELDS, input);
-        }
+        input = Field.selectField(predictInputFields, input);
 
         return input.toNDList();
     }
@@ -203,9 +199,10 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
     public static class Builder extends BaseBuilder<Builder> {
 
         // preProcess args
-        private boolean useFeatDynamicReal;
-        private boolean useFeatStaticReal;
-        private boolean useFeatStaticCat;
+        boolean useFeatDynamicReal;
+        boolean useFeatStaticReal;
+        boolean useFeatStaticCat;
+        boolean useIsPad;
 
         Builder() {}
 
@@ -233,6 +230,7 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
                             arguments,
                             "use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(),
                             false);
+            useIsPad = ArgumentsUtil.booleanValue(arguments, "use_is_pad", true);
         }
 
         /**

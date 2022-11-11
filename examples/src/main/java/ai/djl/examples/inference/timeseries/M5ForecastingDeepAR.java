@@ -35,7 +35,7 @@ import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.SampleForecast;
 import ai.djl.timeseries.TimeSeriesData;
 import ai.djl.timeseries.dataset.FieldName;
-import ai.djl.timeseries.translator.DeepARTranslator;
+import ai.djl.timeseries.translator.DeepARTranslatorFactory;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
@@ -63,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -81,8 +82,9 @@ public final class M5ForecastingDeepAR {
 
     public static Map<String, Float> predict()
             throws IOException, TranslateException, ModelException {
-        String engineName = Engine.getDefaultEngineName();
-        NDManager manager = NDManager.newBaseManager(null, engineName);
+        Engine engine = Engine.getInstance();
+        NDManager manager = engine.newBaseManager();
+        String engineName = engine.getEngineName().toLowerCase(Locale.ROOT);
 
         // To use local dataset, users can load data as follows
         // Repository repository = Repository.newInstance("local_dataset",
@@ -95,27 +97,18 @@ public final class M5ForecastingDeepAR {
         // [issue](https://github.com/deepjavalibrary/djl/issues/2106#issuecomment-1295703321). As
         // described there, you need to "change every begin_state's shape to (-1, 40)".
         // Here you can also use local file: modelUrl = "LOCAL_PATH/deepar.pt";
-        String modelUrl =
-                "PyTorch".equals(engineName)
-                        ? "./src/main/resources/deepar.pt"
-                        : "djl://ai.djl.mxnet/deepar/0.0.1/m5forecast";
+        String modelUrl = "djl://ai.djl." + engineName + "/deepar/0.0.1/m5forecast";
         int predictionLength = 4;
-        Map<String, Object> arguments = new ConcurrentHashMap<>();
-        arguments.put("prediction_length", predictionLength);
-        arguments.put("freq", "W");
-        arguments.put("use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(), false);
-        arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), false);
-        arguments.put("use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(), false);
-
-        DeepARTranslator.Builder builder = DeepARTranslator.builder(arguments);
-        DeepARTranslator translator = builder.build();
-
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
                         .setTypes(TimeSeriesData.class, Forecast.class)
                         .optModelUrls(modelUrl)
-                        .optEngine(engineName)
-                        .optTranslator(translator)
+                        .optTranslatorFactory(new DeepARTranslatorFactory())
+                        .optArgument("prediction_length", predictionLength)
+                        .optArgument("freq", "W")
+                        .optArgument("use_feat_dynamic_real", "false")
+                        .optArgument("use_feat_static_cat", "false")
+                        .optArgument("use_feat_static_real", "false")
                         .optProgress(new ProgressBar())
                         .build();
 
