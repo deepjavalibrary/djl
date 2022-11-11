@@ -92,10 +92,15 @@ public final class M5ForecastingDeepAR {
         // Then add the setting `.optRepository(repository)` to the builder below
         M5Dataset dataset = M5Dataset.builder().setManager(manager).build();
 
-        // Note that, for a model exported from MXNet, the tensor shape of the `begin_state` may be
-        // problematic, as indicated in this
+        // Note that, for a DeepAR model directly exported from MXNet, the tensor shape of the
+        // `begin_state` may be problematic, as indicated in this
         // [issue](https://github.com/deepjavalibrary/djl/issues/2106#issuecomment-1295703321). As
         // described there, you need to "change every begin_state's shape to (-1, 40)".
+
+        // For a DeepAR model exported from PyTorch, please take a look at the sample training
+        // code, which yields a model that has compatible inputs with the DJL timeseries package.
+        // https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008#file-m5torch-py
+
         // Here you can also use local file: modelUrl = "LOCAL_PATH/deepar.pt";
         String modelUrl = "djl://ai.djl." + engineName + "/deepar/0.0.1/m5forecast";
         int predictionLength = 4;
