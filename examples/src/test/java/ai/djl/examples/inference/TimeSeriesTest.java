@@ -33,7 +33,7 @@ public class TimeSeriesTest {
 
     @Test
     public void testM5Forecasting() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("MXNet", "PyTorch");
+        TestRequirements.engine("MXNet");
 
         Map<String, Float> result = M5ForecastingDeepAR.predict();
 
