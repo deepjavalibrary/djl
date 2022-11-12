@@ -414,4 +414,48 @@ public class HuggingFaceTokenizerTest {
             }
         }
     }
+
+    @Test
+    public void testBatchProcessing() throws IOException {
+        String[] inputs =
+                new String[] {
+                    "Hello there friend", "How are you today", "Good weather I'd say", "I am Happy!"
+                };
+        String[] outputsWithSpecialTokens =
+                new String[] {
+                    "[CLS] Hello there friend [SEP]",
+                    "[CLS] How are you today [SEP]",
+                    "[CLS] Good weather I ' d say [SEP]",
+                    "[CLS] I am Happy! [SEP]"
+                };
+        String[] outputsWithoutSpecialTokens =
+                new String[] {
+                    "Hello there friend",
+                    "How are you today",
+                    "Good weather I ' d say",
+                    "I am Happy!"
+                };
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.builder().optTokenizerName("bert-base-cased").build()) {
+
+            // default tokenizer with special tokens included
+            Encoding[] encodings = tokenizer.batchEncode(inputs);
+            long[][] batchIds =
+                    Arrays.stream(encodings).map(Encoding::getIds).toArray(long[][]::new);
+            String[] outputs = tokenizer.batchDecode(batchIds);
+            Assert.assertEquals(outputs, outputsWithSpecialTokens);
+
+            // encode with special tokens, decode with special tokens
+            encodings = tokenizer.batchEncode(inputs, true);
+            batchIds = Arrays.stream(encodings).map(Encoding::getIds).toArray(long[][]::new);
+            outputs = tokenizer.batchDecode(batchIds, false);
+            Assert.assertEquals(outputs, outputsWithSpecialTokens);
+
+            // encode without special tokens, decode without special tokens
+            encodings = tokenizer.batchEncode(inputs, false);
+            batchIds = Arrays.stream(encodings).map(Encoding::getIds).toArray(long[][]::new);
+            outputs = tokenizer.batchDecode(batchIds, true);
+            Assert.assertEquals(outputs, outputsWithoutSpecialTokens);
+        }
+    }
 }
