@@ -18,12 +18,13 @@ import ai.djl.ndarray.types.DataType;
 
 /**
  * {@code QuantileL1Loss} calculates the Weighted Quantile Loss between labels and predictions. It
- * is useful for regression problems where you wish to estimate a particular quantile. For example,
- * to target the P90, instantiate {@code new QuantileL1Loss("P90", 0.90)}. Basically, what this loss
- * function does is to focus on a centain persentile of the data. Eg. q=0.5 is the original default
+ * is useful in regression problems to target the best-fit line at a particular quantile. E.g., to
+ * target the P90, instantiate {@code new QuantileL1Loss("P90", 0.90)}. Basically, what this loss
+ * function does is to focus on a certain percentile of the data. E.g. q=0.5 is the original default
  * case of regression, meaning the best-fit line lies in the center. When q=0.9, the best-fit line
- * will lie above the center; and, if \partial forecast / \partial w are the same, then exactly 0.9
- * of total data points will lie below the best-fit line.
+ * will lie above the center. By differentiating the loss function, the optimal solution will yield
+ * the result that, for some special cases like those where \partial forecast / \partial w are
+ * uniform, exactly 0.9 of total data points will lie below the best-fit line.
  *
  * <pre>
  *  def quantile_loss(target, forecast, q):

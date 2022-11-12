@@ -35,6 +35,7 @@ import ai.djl.timeseries.transform.ExpectedNumInstanceSampler;
 import ai.djl.timeseries.transform.InstanceSampler;
 import ai.djl.timeseries.transform.PredictionSplitSampler;
 import ai.djl.timeseries.transform.TimeSeriesTransform;
+import ai.djl.timeseries.transform.convert.AsArray;
 import ai.djl.timeseries.transform.convert.VstackFeatures;
 import ai.djl.timeseries.transform.feature.AddAgeFeature;
 import ai.djl.timeseries.transform.feature.AddObservedValuesIndicator;
@@ -378,6 +379,9 @@ public abstract class DeepARNetwork extends AbstractBlock {
             transformation.add(
                     new SetField(FieldName.FEAT_STATIC_REAL, manager.zeros(new Shape(1))));
         }
+
+        transformation.add(new AsArray(FieldName.FEAT_STATIC_CAT, 1, DataType.INT32));
+        transformation.add(new AsArray(FieldName.FEAT_STATIC_REAL, 1));
 
         transformation.add(
                 new AddObservedValuesIndicator(FieldName.TARGET, FieldName.OBSERVED_VALUES));

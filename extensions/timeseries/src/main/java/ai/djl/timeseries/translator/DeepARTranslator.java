@@ -15,6 +15,7 @@ package ai.djl.timeseries.translator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.timeseries.Forecast;
 import ai.djl.timeseries.SampleForecast;
@@ -52,15 +53,16 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         "PAST_" + FieldName.FEAT_TIME.name(),
         "PAST_" + FieldName.TARGET.name(),
         "PAST_" + FieldName.OBSERVED_VALUES.name(),
-        "FUTURE_" + FieldName.FEAT_TIME.name(),
-        "PAST_" + FieldName.IS_PAD.name()
+        "FUTURE_" + FieldName.FEAT_TIME.name()
     };
+
     private static final FieldName[] TIME_SERIES_FIELDS = {
         FieldName.FEAT_TIME, FieldName.OBSERVED_VALUES
     };
-    private final List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeatures;
 
-    private final InstanceSampler instanceSampler;
+    private List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeatures;
+    private InstanceSampler instanceSampler;
+    private String[] predictInputFields;
 
     /**
      * Constructs a new {@code DeepARTranslator} instance.
@@ -77,6 +79,14 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         this.timeFeatures = TimeFeature.timeFeaturesFromFreqStr(freq);
         this.historyLength = contextLength + lagsSeq.get(lagsSeq.size() - 1);
         this.instanceSampler = PredictionSplitSampler.newTestSplitSampler();
+        if (builder.useIsPad) {
+            int len = PRED_INPUT_FIELDS.length;
+            predictInputFields = new String[len + 1];
+            System.arraycopy(PRED_INPUT_FIELDS, 0, predictInputFields, 0, len);
+            predictInputFields[len] = "PAST_" + FieldName.IS_PAD.name();
+        } else {
+            predictInputFields = PRED_INPUT_FIELDS;
+        }
     }
 
     /** {@inheritDoc} */
@@ -112,6 +122,9 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
         if (!useFeatStaticReal) {
             Field.setField(FieldName.FEAT_STATIC_REAL, manager.zeros(new Shape(1)), input);
         }
+
+        Convert.asArray(FieldName.FEAT_STATIC_CAT, 1, DataType.INT32, input);
+        Convert.asArray(FieldName.FEAT_STATIC_REAL, 1, input);
 
         Feature.addObservedValuesIndicator(
                 manager, FieldName.TARGET, FieldName.OBSERVED_VALUES, input);
@@ -153,7 +166,7 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
                 0,
                 input);
 
-        input = Field.selectField(PRED_INPUT_FIELDS, input);
+        input = Field.selectField(predictInputFields, input);
 
         return input.toNDList();
     }
@@ -186,9 +199,10 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
     public static class Builder extends BaseBuilder<Builder> {
 
         // preProcess args
-        private boolean useFeatDynamicReal;
-        private boolean useFeatStaticReal;
-        private boolean useFeatStaticCat;
+        boolean useFeatDynamicReal;
+        boolean useFeatStaticReal;
+        boolean useFeatStaticCat;
+        boolean useIsPad;
 
         Builder() {}
 
@@ -216,6 +230,7 @@ public class DeepARTranslator extends BaseTimeSeriesTranslator {
                             arguments,
                             "use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(),
                             false);
+            useIsPad = ArgumentsUtil.booleanValue(arguments, "use_is_pad", true);
         }
 
         /**
