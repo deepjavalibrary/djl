@@ -429,6 +429,47 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 }
 
 #[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_batchDecode(
+    env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+    batch_ids: jobjectArray,
+    skip_special_tokens: jboolean,
+) -> jobjectArray {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    let batch_len = env.get_array_length(batch_ids).unwrap();
+    let mut batch_decode_input: Vec<Vec<u32>> = Vec::new();
+    for i in 0..batch_len {
+        let item = env.get_object_array_element(batch_ids, i).unwrap();
+        let sequence_ids = env
+            .get_long_array_elements(*item, ReleaseMode::NoCopyBack)
+            .unwrap();
+        let sequence_ids_ptr = sequence_ids.as_ptr();
+        let sequence_len = sequence_ids.size().unwrap() as usize;
+        let mut decode_ids: Vec<u32> = Vec::new();
+        for i in 0..sequence_len {
+            unsafe {
+                let val = sequence_ids_ptr.add(i);
+                decode_ids.push(*val as u32);
+            }
+        }
+        batch_decode_input.push(decode_ids);
+    }
+    let decoding: Vec<String> = tokenizer
+        .decode_batch(batch_decode_input, skip_special_tokens == JNI_TRUE)
+        .unwrap();
+    let ret: jobjectArray = env
+        .new_object_array(batch_len, "java/lang/String", JObject::null())
+        .unwrap();
+    for (i, decode) in decoding.iter().enumerate() {
+        let item: JString = env.new_string(&decode).unwrap();
+        env.set_object_array_element(ret, i as jsize, item)
+            .unwrap();
+    }
+    ret
+}
+
+#[no_mangle]
 pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getTruncationStrategy(
     env: JNIEnv,
     _: JObject,

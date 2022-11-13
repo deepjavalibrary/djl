@@ -340,6 +340,27 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     /**
+     * Returns the decoded Strings from the input batch ids.
+     *
+     * @param batchIds the batch of id sequences to decode
+     * @param skipSpecialTokens whether to remove special tokens in the decoding
+     * @return the decoded Strings from the input batch ids
+     */
+    public String[] batchDecode(long[][] batchIds, boolean skipSpecialTokens) {
+        return TokenizersLibrary.LIB.batchDecode(getHandle(), batchIds, skipSpecialTokens);
+    }
+
+    /**
+     * Returns the decoded Strings from the input batch ids.
+     *
+     * @param batchIds the batch of id sequences to decode
+     * @return the decoded Strings from the input batch ids
+     */
+    public String[] batchDecode(long[][] batchIds) {
+        return batchDecode(batchIds, !addSpecialTokens);
+    }
+
+    /**
      * Creates a builder to build a {@code HuggingFaceTokenizer}.
      *
      * @return a new builder
