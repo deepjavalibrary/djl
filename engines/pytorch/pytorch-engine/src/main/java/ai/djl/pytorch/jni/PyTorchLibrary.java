@@ -496,7 +496,8 @@ final class PyTorchLibrary {
             boolean mapLocation,
             String[] extraFileNames,
             String[] extraFileValues,
-            boolean trainParam);
+            boolean trainParam,
+            boolean keepGraphOptimize);
 
     native long moduleLoad(
             InputStream is, int[] device, boolean mapLocation, byte[] buffer, long size);
@@ -505,7 +506,8 @@ final class PyTorchLibrary {
 
     native void moduleTrain(long handle);
 
-    native long moduleForward(long moduleHandle, long[] iValueHandles, boolean isTrain);
+    native long moduleForward(
+            long moduleHandle, long[] iValueHandles, boolean isTrain, boolean keepGraphOptimize);
 
     native void setGraphExecutorOptimize(boolean enabled);
 
