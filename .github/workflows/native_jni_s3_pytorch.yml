@@ -85,8 +85,6 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
-          ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu10 -Ppt_version=$PYTORCH_VERSION
-          ./gradlew :engines:pytorch:pytorch-native:cleanJNI
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu11 -Ppt_version=$PYTORCH_VERSION
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1

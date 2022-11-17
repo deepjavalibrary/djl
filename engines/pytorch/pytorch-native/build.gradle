@@ -15,15 +15,15 @@ boolean isPrecxx11 = project.hasProperty("precxx11")
 boolean isAarch64 = project.hasProperty("aarch64") || System.properties["os.arch"] == "aarch64"
 
 String FLAVOR = "cpu"
-if (project.hasProperty("cu10")) {
-    FLAVOR = "cu102"
-} else if (project.hasProperty("cu11")) {
-    if (VERSION.startsWith("1.8.") || VERSION.startsWith("1.9.")) {
-        FLAVOR = "cu111"
-    } else if (VERSION.startsWith("1.10.") || VERSION.startsWith("1.11.")) {
+if (project.hasProperty("cu11")) {
+    if (VERSION.startsWith("1.11.")) {
         FLAVOR = "cu113"
-    } else {
+    } else if (VERSION.startsWith("1.12.")) {
         FLAVOR = "cu116"
+    } else if (VERSION.startsWith("1.13.")) {
+        FLAVOR = "cu117"
+    } else {
+        throw new GradleException("Unsupported PyTorch version: ${VERSION}")
     }
 }
 String BINARY_ROOT = "${project.buildDir}/download"
@@ -85,19 +85,20 @@ def prepareNativeLib(String binaryRoot, String ver) {
     def officialPytorchUrl = "https://download.pytorch.org/libtorch"
     def aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
     String cu11
-    if (ver.startsWith("1.8.") || ver.startsWith("1.9.")) {
-        cu11 = "cu111"
-    } else if (ver.startsWith("1.10.") || ver.startsWith("1.11.")) {
+    if (ver.startsWith("1.11.")) {
         cu11 = "cu113"
-    } else {
+    } else if (ver.startsWith("1.12.")) {
         cu11 = "cu116"
+    } else if (ver.startsWith("1.13.")) {
+        cu11 = "cu117"
+    } else {
+        throw new GradleException("Unsupported PyTorch version: ${ver}")
     }
 
     def files = [
             "cpu/libtorch-cxx11-abi-shared-with-deps-${ver}%2Bcpu.zip"        : "cpu/linux-x86_64",
             "cpu/libtorch-macos-${ver}.zip"                                   : "cpu/osx-x86_64",
             "cpu/libtorch-win-shared-with-deps-${ver}%2Bcpu.zip"              : "cpu/win-x86_64",
-            "cu102/libtorch-cxx11-abi-shared-with-deps-${ver}%2Bcu102.zip"    : "cu102/linux-x86_64",
             "${cu11}/libtorch-cxx11-abi-shared-with-deps-${ver}%2B${cu11}.zip": "${cu11}/linux-x86_64",
             "${cu11}/libtorch-win-shared-with-deps-${ver}%2B${cu11}.zip"      : "${cu11}/win-x86_64",
             "cpu/libtorch-shared-with-deps-${ver}%2Bcpu.zip"                  : "cpu-precxx11/linux-x86_64",
@@ -134,7 +135,7 @@ def copyNativeLibToOutputDir(Map<String, String> fileStoreMap, String binaryRoot
         // CPU dependencies
         copy {
             from("${outputDir}/libtorch/lib/") {
-                include "libc10.*", "c10.dll", "libiomp5*.*", "libgomp*.*", "libtorch.*", "libtorch_cpu.*", "torch.dll", "torch_cpu.dll", "fbgemm.dll", "asmjit.dll", "uv.dll"
+                include "libc10.*", "c10.dll", "libiomp5*.*", "libarm_compute*.*", "libgomp*.*", "libtorch.*", "libtorch_cpu.*", "torch.dll", "torch_cpu.dll", "fbgemm.dll", "asmjit.dll", "uv.dll"
             }
             into("${outputDir}/native/lib")
         }
@@ -267,6 +268,7 @@ task uploadS3 {
         exec {
             commandLine "sh", "-c", "find ${BINARY_ROOT} -type f | xargs gzip"
         }
+
         def f = new File("${BINARY_ROOT}/files.txt")
         def uploadDirs = [
                 "${BINARY_ROOT}/cpu/linux-x86_64/native/lib/",
@@ -275,10 +277,9 @@ task uploadS3 {
                 "${BINARY_ROOT}/cpu/win-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-aarch64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu102/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu116/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu116/win-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu116-precxx11/linux-x86_64/native/lib/"
+                "${BINARY_ROOT}/cu117/linux-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu117/win-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu117-precxx11/linux-x86_64/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {

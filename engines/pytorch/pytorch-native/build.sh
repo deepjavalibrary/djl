@@ -23,7 +23,7 @@ ARCH=$4
 
 if [[ ! -d "libtorch" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
-    if [[ ! "$FLAVOR" =~ ^(cpu|cu102|cu111|cu113|cu116)$ ]]; then
+    if [[ ! "$FLAVOR" =~ ^(cpu|cu113|cu116|cu117)$ ]]; then
       echo "$FLAVOR is not supported."
       exit 1
     fi
@@ -46,16 +46,13 @@ if [[ ! -d "libtorch" ]]; then
   fi
 fi
 
-if [[ "$VERSION" =~ ^1\.10\..*|^1\.9\..* ]]; then
-  PT_OLD_VERSION=1
-fi
 pushd .
 
 rm -rf build
 mkdir build && cd build
 mkdir classes
 javac -sourcepath ../../pytorch-engine/src/main/java/ ../../pytorch-engine/src/main/java/ai/djl/pytorch/jni/PyTorchLibrary.java -h include -d classes
-cmake -DCMAKE_PREFIX_PATH=libtorch -DPT_OLD_VERSION=${PT_OLD_VERSION} ..
+cmake -DCMAKE_PREFIX_PATH=libtorch ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
 
 if [[ $PLATFORM == 'darwin' ]]; then

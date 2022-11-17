@@ -39,8 +39,8 @@ Use the following task to build pytorch JNI library for GPU:
 ### Mac/Linux
 
 ```
-# compile CUDA 10.2 version of JNI
-./gradlew compileJNI -Pcu10
+# compile CUDA 11.X version of JNI
+./gradlew compileJNI -Pcu11
 ```
 
 ## Windows
