@@ -101,9 +101,9 @@ public class PtModel extends BaseModel {
             }
             // By default, the parameters are frozen, since the previous version before adding this
             // `trainParam`, they were frozen due to the setting `JITCallGuard guard`, which
-            // disables
-            // autograd. Also, the pretrained parameters usually should not be updated too much. It
-            // is safe to freeze it. Users may unfreeze it and set their learning rate small.
+            // disables autograd. Also, the pretrained parameters usually should not be updated too
+            // much. It is safe to freeze it. Users may unfreeze it and set their learning rate
+            // small.
             block.freezeParameters(!trainParam);
         } else {
             boolean hasParameter = true;

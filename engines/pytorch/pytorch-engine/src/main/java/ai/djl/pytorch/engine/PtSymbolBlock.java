@@ -122,8 +122,9 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
                 JniUtils.enableInferenceMode(this);
             }
         }
-        // For Android application, graph_optimizer should be disabled. By default it is enabled,
-        // which may require a warm up time in the first inference call.
+        // By default, graph_optimizer is enabled. But it requires a warm-up time in the first
+        // inference call. For Android application, graph_optimizer should be disabled. See
+        // https://github.com/deepjavalibrary/djl/issues/2151
         if (System.getProperty("ai.djl.pytorch.graph_optimizer") != null) {
             boolean setOptimizer = Boolean.getBoolean("ai.djl.pytorch.graph_optimizer");
             JniUtils.setGraphExecutorOptimize(setOptimizer);
