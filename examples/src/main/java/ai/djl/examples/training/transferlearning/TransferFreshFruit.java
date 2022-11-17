@@ -53,6 +53,8 @@ import ai.djl.util.Pair;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class TransferFreshFruit {
 
@@ -65,7 +67,7 @@ public final class TransferFreshFruit {
 
     public static TrainingResult runExample(String[] args)
             throws IOException, TranslateException, ModelException, URISyntaxException {
-        boolean retrain = args.length == 1 && "-p".equals(args[0]);
+        boolean trainParam = args.length == 1 && "-p".equals(args[0]);
         // The modelUrl can be replaced by local model path:
         // String modelUrl = "/YOUR_PATH/resnet18_embedding.pt";
         String modelUrl = "djl://ai.djl.pytorch/resnet18_embedding";
@@ -75,7 +77,7 @@ public final class TransferFreshFruit {
                         .optModelUrls(modelUrl)
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
-                        .optOption("trainParam", String.valueOf(retrain))
+                        .optOption("trainParam", String.valueOf(trainParam))
                         .build();
 
         ZooModel<NDList, NDList> embedding = criteria.loadModel();
@@ -85,7 +87,7 @@ public final class TransferFreshFruit {
                 new SequentialBlock()
                         .add(baseBlock)
                         .addSingleton(nd -> nd.squeeze(new int[] {2, 3}))
-                        .add(Linear.builder().setUnits(2).build()) // linear on which dim?
+                        .add(Linear.builder().setUnits(2).build())
                         .addSingleton(nd -> nd.softmax(1));
 
         Model model = Model.newInstance("TransferFreshFruit");
@@ -120,7 +122,7 @@ public final class TransferFreshFruit {
         EasyTrain.fit(trainer, 10, datasetTrain, datasetTest);
 
         // Save model
-        // model.save("your-model-path");
+        // model.save(Paths.get("SAVE_PATH"), "transferFreshFruit");
 
         model.close();
         embedding.close();
