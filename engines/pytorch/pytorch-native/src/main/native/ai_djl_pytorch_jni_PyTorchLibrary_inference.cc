@@ -19,7 +19,7 @@
 
 // The file is the implementation for PyTorch inference operations
 
-struct JITCallGuardA {
+struct JITCallGuard {
 #ifdef V1_10_X
   torch::autograd::AutoGradMode no_autograd_guard{false};
   torch::NoGradGuard no_grad;
@@ -31,41 +31,10 @@ struct JITCallGuardA {
 #endif
 };
 
-struct JITCallGuardB {
-#ifdef V1_10_X
-  torch::autograd::AutoGradMode no_autograd_guard{false};
-  torch::NoGradGuard no_grad;
-#else
-  c10::InferenceMode guard;
-  torch::jit::GraphOptimizerEnabledGuard no_optimizer_guard{false};
-#endif
-};
-
-inline jlong modelLoadHelpFunc(JNIEnv* env, std::string path, torch::Device device, std::unordered_map<std::string, std::string> map,
-    jboolean jmap_location, jobjectArray jefnames, jobjectArray jefvalues) {
-  torch::jit::Module module;
-  if (jmap_location) {
-    module = torch::jit::load(path, device, map);
-    module.eval();
-  } else {
-    module = torch::jit::load(path, torch::nullopt, map);
-    module.eval();
-    module.to(device);
-  }
-  const auto* module_ptr = new torch::jit::Module(module);
-  size_t len = static_cast<size_t>(env->GetArrayLength(jefnames));
-  for (size_t i = 0; i < len; ++i) {
-    auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
-    auto name = djl::utils::jni::GetStringFromJString(env, jname);
-    env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
-  }
-  return reinterpret_cast<uintptr_t>(module_ptr);
-};
-
 JNIEXPORT jlong JNICALL
-Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljava_lang_String_2_3Ljava_lang_String_2ZZ(
+Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljava_lang_String_2_3Ljava_lang_String_2Z(
     JNIEnv* env, jobject jthis, jstring jpath, jintArray jarray, jboolean jmap_location, jobjectArray jefnames,
-    jobjectArray jefvalues, jboolean jtrainParam, jboolean jkeepGraphOptimize) {
+    jobjectArray jefvalues, jboolean jtrainParam) {
   API_BEGIN()
   const std::string path = djl::utils::jni::GetStringFromJString(env, jpath);
   const torch::Device device = utils::GetDeviceFromJDevice(env, jarray);
@@ -78,15 +47,40 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljav
   }
 
   if (!jtrainParam) {
-    if (jkeepGraphOptimize) {
-      JITCallGuardA guard;
-      return modelLoadHelpFunc(env, path, device, map, jmap_location, jefnames, jefvalues);
+    JITCallGuard guard;
+    torch::jit::Module module;
+    if (jmap_location) {
+      module = torch::jit::load(path, device, map);
+      module.eval();
     } else {
-      JITCallGuardB guard;
-      return modelLoadHelpFunc(env, path, device, map, jmap_location, jefnames, jefvalues);
+      module = torch::jit::load(path, torch::nullopt, map);
+      module.eval();
+      module.to(device);
     }
+    const auto* module_ptr = new torch::jit::Module(module);
+    for (size_t i = 0; i < len; ++i) {
+      auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
+      auto name = djl::utils::jni::GetStringFromJString(env, jname);
+      env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
+    }
+    return reinterpret_cast<uintptr_t>(module_ptr);
   }
-  return modelLoadHelpFunc(env, path, device, map, jmap_location, jefnames, jefvalues);
+  torch::jit::Module module;
+  if (jmap_location) {
+    module = torch::jit::load(path, device, map);
+    module.eval();
+  } else {
+    module = torch::jit::load(path, torch::nullopt, map);
+    module.eval();
+    module.to(device);
+  }
+  const auto* module_ptr = new torch::jit::Module(module);
+  for (size_t i = 0; i < len; ++i) {
+    auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
+    auto name = djl::utils::jni::GetStringFromJString(env, jname);
+    env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
+  }
+  return reinterpret_cast<uintptr_t>(module_ptr);
   API_END_RETURN()
 }
 
@@ -219,8 +213,8 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleTrain(
   API_END()
 }
 
-JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(JNIEnv* env, jobject jthis,
-    jlong module_handle, jlongArray jivalue_ptrs, jboolean jis_train, jboolean jkeepGraphOptimize) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
+    JNIEnv* env, jobject jthis, jlong module_handle, jlongArray jivalue_ptrs, jboolean jis_train) {
   API_BEGIN()
   auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(module_handle);
   size_t len = env->GetArrayLength(jivalue_ptrs);
@@ -233,15 +227,10 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(JNI
   torch::IValue output = [&]() {
     if (jis_train) {
       return module_ptr->forward(inputs);
-    } else {
-      if (jkeepGraphOptimize) {
-        JITCallGuardA guard;
-        return module_ptr->forward(inputs);
-      } else {
-        JITCallGuardB guard;
-        return module_ptr->forward(inputs);
-      }
     }
+    // disable autograd
+    JITCallGuard guard;
+    return module_ptr->forward(inputs);
   }();
   env->ReleaseLongArrayElements(jivalue_ptrs, jptrs, djl::utils::jni::RELEASE_MODE);
   const auto* result_ptr = new torch::IValue(output);

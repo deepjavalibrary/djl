@@ -130,7 +130,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
                     for (NDArray array : inputs) {
                         inputDescriptions.add(array.getName(), array.getShape());
                     }
-                    NDList outputs = IValueUtils.forward(this, inputs, training, true);
+                    NDList outputs = IValueUtils.forward(this, inputs, training);
                     for (NDArray array : outputs) {
                         outputDescriptions.add(array.getName(), array.getShape());
                     }
@@ -139,7 +139,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
                 }
             }
         }
-        return IValueUtils.forward(this, inputs, training, true);
+        return IValueUtils.forward(this, inputs, training);
     }
 
     /** {@inheritDoc} */

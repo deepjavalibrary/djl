@@ -39,17 +39,12 @@ public final class IValueUtils {
      * @param block the block that contains PyTorch module
      * @param inputs the input {@link NDList}
      * @param isTrain if running on training mode
-     * @param keepGraphOptimize whether keep graphOptimization during inference, always false on
-     *     Android, inactive if istrain is true
      * @return the result {@link NDList}
      */
-    public static NDList forward(
-            PtSymbolBlock block, NDList inputs, boolean isTrain, boolean keepGraphOptimize) {
+    public static NDList forward(PtSymbolBlock block, NDList inputs, boolean isTrain) {
         IValue[] iValues = getInputs(inputs);
         long[] iValueHandles = Arrays.stream(iValues).mapToLong(IValue::getHandle).toArray();
-        long result =
-                PyTorchLibrary.LIB.moduleForward(
-                        block.getHandle(), iValueHandles, isTrain, isTrain || keepGraphOptimize);
+        long result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), iValueHandles, isTrain);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
         Arrays.stream(iValues).forEach(IValue::close);
         try (IValue iValue = new IValue(result)) {
@@ -66,8 +61,7 @@ public final class IValueUtils {
      */
     public static IValue forward(PtSymbolBlock block, IValue... inputs) {
         long[] handles = Arrays.stream(inputs).mapToLong(IValue::getHandle).toArray();
-        return new IValue(
-                PyTorchLibrary.LIB.moduleForward(block.getHandle(), handles, false, true));
+        return new IValue(PyTorchLibrary.LIB.moduleForward(block.getHandle(), handles, false));
     }
 
     private static int addToMap(

@@ -1580,8 +1580,7 @@ public final class JniUtils {
                         mapLocation,
                         extraFileKeys,
                         extraFileValues,
-                        trainParam,
-                        true);
+                        trainParam);
         return new PtSymbolBlock(manager, handle);
     }
 
