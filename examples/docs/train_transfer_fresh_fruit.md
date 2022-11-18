@@ -175,7 +175,7 @@ Here, you can monitor the training and validation accuracy and loss descent.
 The complete **source code** of the demo is available [here](../src/main/java/ai/djl/examples/training/transferlearning/TransferFreshFruit.java).
 
 ### Experiment on the reduction of the training data size
-As mentioned in the introduction, the key advantage of transfer learning is that it leverage the pretrained model, and thus it can be trained on a relatively small dataset. This will save the cost in data collection and annotation. In this section, we measure the validation accuracy v.s. training data size on the FreshFruit dataset. The full experiment code is availale [here](https://gist.github.com/KexinFeng/d9c0a244d0597e6c6e161c1c1c2db569).
+As mentioned in the introduction, the key advantage of transfer learning is that it leverage the pretrained model, and thus it can be trained on a relatively small dataset. This will save the cost in data collection and annotation. In this section, we measure the validation accuracy v.s. training data size on the FreshFruit dataset. The full experiment code is availale [here](https://gist.github.com/KexinFeng/d9c0a244d0597e6c6e161c1c1c2db569). The training parameters like learning rate and epochs are also therein.
 
 The minor difference between the experiment code and the demonstration code above is the control over the training data size and randomization of the chosen subdataset. It is implemented below. `cut` is the size of the training data.
 ```java
