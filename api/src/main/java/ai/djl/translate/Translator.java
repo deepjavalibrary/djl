@@ -91,4 +91,13 @@ public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
      */
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     default void prepare(TranslatorContext ctx) throws Exception {}
+
+    /**
+     * Return possible {@link TranslatorOptions} that can be built using this {@link Translator}.
+     *
+     * @return possible options or null if not defined
+     */
+    default TranslatorOptions getExpansions() {
+        return null;
+    }
 }

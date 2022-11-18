@@ -14,6 +14,7 @@ package ai.djl.training.dataset;
 
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.TranslatorOptions;
 import ai.djl.util.Progress;
 
 import java.io.IOException;
@@ -70,6 +71,16 @@ public interface Dataset {
      * @throws TranslateException if there is an error while processing input
      */
     void prepare(Progress progress) throws IOException, TranslateException;
+
+    /**
+     * Returns {@link TranslatorOptions} that match the pre-processing and post-processing of this
+     * dataset.
+     *
+     * @return matching translators or null if none defined
+     */
+    default TranslatorOptions matchingTranslatorOptions() {
+        return null;
+    }
 
     /** An enum that indicates the mode - training, test or validation. */
     enum Usage {

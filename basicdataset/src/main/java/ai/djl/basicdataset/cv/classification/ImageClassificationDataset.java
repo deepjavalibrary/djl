@@ -13,8 +13,6 @@
 package ai.djl.basicdataset.cv.classification;
 
 import ai.djl.basicdataset.cv.ImageDataset;
-import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
@@ -23,7 +21,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.translate.Pipeline;
-import ai.djl.translate.Translator;
+import ai.djl.translate.TranslatorOptions;
 
 import java.io.IOException;
 import java.util.List;
@@ -62,12 +60,9 @@ public abstract class ImageClassificationDataset extends ImageDataset {
         return new Record(data, label);
     }
 
-    /**
-     * Returns the {@link ImageClassificationTranslator} matching the format of this dataset.
-     *
-     * @return the {@link ImageClassificationTranslator} matching the format of this dataset
-     */
-    public Translator<Image, Classifications> makeTranslator() {
+    /** {@inheritDoc} */
+    @Override
+    public TranslatorOptions matchingTranslatorOptions() {
         Pipeline pipeline = new Pipeline();
 
         // Resize the image if the image size is fixed
@@ -81,7 +76,8 @@ public abstract class ImageClassificationDataset extends ImageDataset {
         return ImageClassificationTranslator.builder()
                 .optSynset(getClasses())
                 .setPipeline(pipeline)
-                .build();
+                .build()
+                .getExpansions();
     }
 
     /**

@@ -14,24 +14,15 @@ package ai.djl.paddlepaddle.zoo.cv.imageclassification;
 
 import ai.djl.Model;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.Input;
-import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory;
-import ai.djl.modality.cv.translator.ImageServingTranslator;
-import ai.djl.modality.cv.translator.wrapper.FileTranslator;
-import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
-import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -42,30 +33,15 @@ public class PpImageClassificationTranslatorFactory extends ImageClassificationT
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
-    public <I, O> Translator<I, O> newInstance(
-            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
-        ImageClassificationTranslator translator =
-                ImageClassificationTranslator.builder()
-                        .addTransform(new Resize(128, 128))
-                        .addTransform(new ToTensor())
-                        .addTransform(
-                                new Normalize(
-                                        new float[] {0.5f, 0.5f, 0.5f},
-                                        new float[] {1.0f, 1.0f, 1.0f}))
-                        .addTransform(nd -> nd.flip(0)) // RGB -> GBR
-                        .build();
-        if (input == Image.class && output == Classifications.class) {
-            return (Translator<I, O>) translator;
-        } else if (input == Path.class && output == Classifications.class) {
-            return (Translator<I, O>) new FileTranslator<>(translator);
-        } else if (input == URL.class && output == Classifications.class) {
-            return (Translator<I, O>) new UrlTranslator<>(translator);
-        } else if (input == InputStream.class && output == Classifications.class) {
-            return (Translator<I, O>) new InputStreamTranslator<>(translator);
-        } else if (input == Input.class && output == Output.class) {
-            return (Translator<I, O>) new ImageServingTranslator(translator);
-        }
-        throw new IllegalArgumentException("Unsupported input/output types.");
+    protected Translator<Image, Classifications> buildBaseTranslator(
+            Model model, Map<String, ?> arguments) {
+        return ImageClassificationTranslator.builder()
+                .addTransform(new Resize(128, 128))
+                .addTransform(new ToTensor())
+                .addTransform(
+                        new Normalize(
+                                new float[] {0.5f, 0.5f, 0.5f}, new float[] {1.0f, 1.0f, 1.0f}))
+                .addTransform(nd -> nd.flip(0)) // RGB -> GBR
+                .build();
     }
 }

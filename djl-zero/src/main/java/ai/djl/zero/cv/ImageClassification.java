@@ -158,7 +158,8 @@ public final class ImageClassification {
             EasyTrain.fit(trainer, 35, trainDataset, validateDataset);
         }
 
-        Translator<Image, Classifications> translator = dataset.makeTranslator();
+        Translator<Image, Classifications> translator =
+                dataset.matchingTranslatorOptions().option(Image.class, Classifications.class);
         return new ZooModel<>(model, translator);
     }
 

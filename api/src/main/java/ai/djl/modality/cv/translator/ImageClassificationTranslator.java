@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.translate.TranslatorOptions;
 
 import java.io.IOException;
 import java.util.List;
@@ -60,6 +61,12 @@ public class ImageClassificationTranslator extends BaseImageTranslator<Classific
             probabilitiesNd = probabilitiesNd.softmax(0);
         }
         return new Classifications(classes, probabilitiesNd, topK);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public TranslatorOptions getExpansions() {
+        return new ImageClassificationTranslatorFactory().withTranslator(this);
     }
 
     /**
