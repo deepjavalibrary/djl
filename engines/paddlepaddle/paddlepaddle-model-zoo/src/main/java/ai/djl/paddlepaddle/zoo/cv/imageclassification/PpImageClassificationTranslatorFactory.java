@@ -13,6 +13,8 @@
 package ai.djl.paddlepaddle.zoo.cv.imageclassification;
 
 import ai.djl.Model;
+import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -31,19 +33,15 @@ public class PpImageClassificationTranslatorFactory extends ImageClassificationT
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
-    public <I, O> Translator<I, O> newInstance(
-            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
-        ImageClassificationTranslator translator =
-                ImageClassificationTranslator.builder()
-                        .addTransform(new Resize(128, 128))
-                        .addTransform(new ToTensor())
-                        .addTransform(
-                                new Normalize(
-                                        new float[] {0.5f, 0.5f, 0.5f},
-                                        new float[] {1.0f, 1.0f, 1.0f}))
-                        .addTransform(nd -> nd.flip(0)) // RGB -> GBR
-                        .build();
-        return newInstance(input, output, translator);
+    protected Translator<Image, Classifications> buildBaseTranslator(
+            Model model, Map<String, ?> arguments) {
+        return ImageClassificationTranslator.builder()
+                .addTransform(new Resize(128, 128))
+                .addTransform(new ToTensor())
+                .addTransform(
+                        new Normalize(
+                                new float[] {0.5f, 0.5f, 0.5f}, new float[] {1.0f, 1.0f, 1.0f}))
+                .addTransform(nd -> nd.flip(0)) // RGB -> GBR
+                .build();
     }
 }

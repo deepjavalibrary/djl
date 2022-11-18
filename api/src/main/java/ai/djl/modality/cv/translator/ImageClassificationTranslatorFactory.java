@@ -51,12 +51,14 @@ public class ImageClassificationTranslatorFactory
         EXPANSIONS.put(new Pair<>(Input.class, Output.class), ImageServingTranslator::new);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Translator<Image, Classifications> buildBaseTranslator(
             Model model, Map<String, ?> arguments) {
         return ImageClassificationTranslator.builder(arguments).build();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Map<Pair<Type, Type>, Function<Translator<Image, Classifications>, Translator<?, ?>>>
             getExpansions() {

@@ -43,9 +43,8 @@ public abstract class ExpansionTranslatorFactory<IbaseT, ObaseT> implements Tran
         return newInstance(input, output, baseTranslator);
     }
 
-    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-    public <I, O> Translator<I, O> newInstance(
+    <I, O> Translator<I, O> newInstance(
             Class<I> input, Class<O> output, Translator<IbaseT, ObaseT> translator) {
         Function<Translator<IbaseT, ObaseT>, Translator<?, ?>> expansion =
                 getExpansions().get(new Pair<>(input, output));
@@ -84,17 +83,20 @@ public abstract class ExpansionTranslatorFactory<IbaseT, ObaseT> implements Tran
             getExpansions();
 
     final class ExpandedTranslatorOptions implements TranslatorOptions {
+
         private Translator<IbaseT, ObaseT> translator;
 
         private ExpandedTranslatorOptions(Translator<IbaseT, ObaseT> translator) {
             this.translator = translator;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Set<Pair<Type, Type>> getOptions() {
             return getSupportedTypes();
         }
 
+        /** {@inheritDoc} */
         @Override
         public <I, O> Translator<I, O> option(Class<I> input, Class<O> output) {
             return newInstance(input, output, translator);
