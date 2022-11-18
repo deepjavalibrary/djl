@@ -122,6 +122,17 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
                 JniUtils.enableInferenceMode(this);
             }
         }
+
+        if (System.getProperty("ai.djl.pytorch.graph_optimizer") != null) {
+            /*
+             * By default, graph_optimizer is enabled. But it requires a warm-up time in a few
+             * inference calls. This optimizer setting is thread local, thus has to be disabled per
+             * thread. User must programmatically call JniUtils.setGraphExecutorOptimize(false) if
+             * he wants to disable graph optimizer per model.
+             */
+            boolean setOptimizer = Boolean.getBoolean("ai.djl.pytorch.graph_optimizer");
+            JniUtils.setGraphExecutorOptimize(setOptimizer);
+        }
         if (first) {
             synchronized (PtSymbolBlock.class) {
                 if (first) {
