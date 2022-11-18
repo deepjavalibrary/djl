@@ -38,18 +38,22 @@ Note that MxNet uses thread_local storage: Every thread that performs inference 
 
 ### PyTorch
 
-#### Multithreading Inference
+#### graph optimizer
 
-If you use multithreading inference feature with DJL 0.8.0 and earlier version, we have to disable GC to close the NDArray by
+PyTorch graph executor optimizer (JIT tensorexpr fuser) is enabled by default. This may impact
+the inference latency for a few inference calls. You can disable graph executor optimizer globally
+by setting the following system properties:
 
 ```
-# If you are using DJL 0.5.0
--Dai.djl.pytorch.disable_close_resource_on_finalize=true
-# If you are using DJL 0.6.0
--Dai.djl.disable_close_resource_on_finalize=true
+-Dai.djl.pytorch.graph_optimizer=false
 ```
 
-Please make sure all the NDArrays are attached to the NDManager.
+The graph executor optimizer is per thread configuration. If you want to disable it in a per model
+basis, you have to call the following method in each inference thread:
+
+```java
+JniUtils.setGraphExecutorOptimize(false);
+```
 
 #### oneDNN(MKLDNN) acceleration
 Unlike TensorFlow and Apache MXNet, PyTorch by default doesn't enable MKLDNN which is treated as a device type like CPU and GPU.
