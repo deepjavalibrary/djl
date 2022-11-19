@@ -92,18 +92,7 @@ public final class TransferFreshFruit {
         model.setBlock(blocks);
 
         // Configure trainer
-        DefaultTrainingConfig config = setupTrainingConfig();
-
-        float lr = 0.001f; // Customized learning rate
-        FixedPerVarTracker.Builder learningRateTrackerBuilder =
-                FixedPerVarTracker.builder().setDefaultValue(lr);
-        for (Pair<String, Parameter> paramPair : baseBlock.getParameters()) {
-            learningRateTrackerBuilder.put(paramPair.getValue().getId(), 0.1f * lr);
-        }
-        FixedPerVarTracker learningRateTracker = learningRateTrackerBuilder.build();
-        Optimizer optimizer = Adam.builder().optLearningRateTracker(learningRateTracker).build();
-        config.optOptimizer(optimizer);
-
+        DefaultTrainingConfig config = setupTrainingConfig(baseBlock);
         Trainer trainer = model.newTrainer(config);
         trainer.setMetrics(new Metrics());
 
@@ -136,7 +125,7 @@ public final class TransferFreshFruit {
 
         // To use local dataset, users can load it as follows
         // `Repository repository = Repository.newInstance("banana",
-        // Paths.get("local_data_root/banana/train"));`
+        // Paths.get("LOCAL_PATH/banana/train_or_test"));`
         // Then add the setting `.optRepository(repository)` to the builder below
         FruitsFreshAndRotten dataset =
                 FruitsFreshAndRotten.builder()
@@ -157,7 +146,7 @@ public final class TransferFreshFruit {
         return dataset;
     }
 
-    private static DefaultTrainingConfig setupTrainingConfig() {
+    private static DefaultTrainingConfig setupTrainingConfig(Block baseBlock) {
         String outputDir = "build/fruits";
         SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
         listener.setSaveModelCallback(
@@ -169,11 +158,25 @@ public final class TransferFreshFruit {
                     model.setProperty("Loss", String.format("%.5f", result.getValidateLoss()));
                 });
 
-        return new DefaultTrainingConfig(new SoftmaxCrossEntropy("SoftmaxCrossEntropy"))
-                .addEvaluator(new Accuracy())
-                .optDevices(Engine.getInstance().getDevices(1))
-                .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
-                .addTrainingListeners(listener);
+        DefaultTrainingConfig config =
+                new DefaultTrainingConfig(new SoftmaxCrossEntropy("SoftmaxCrossEntropy"))
+                        .addEvaluator(new Accuracy())
+                        .optDevices(Engine.getInstance().getDevices(1))
+                        .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
+                        .addTrainingListeners(listener);
+
+        // Customized learning rate
+        float lr = 0.001f;
+        FixedPerVarTracker.Builder learningRateTrackerBuilder =
+                FixedPerVarTracker.builder().setDefaultValue(lr);
+        for (Pair<String, Parameter> paramPair : baseBlock.getParameters()) {
+            learningRateTrackerBuilder.put(paramPair.getValue().getId(), 0.1f * lr);
+        }
+        FixedPerVarTracker learningRateTracker = learningRateTrackerBuilder.build();
+        Optimizer optimizer = Adam.builder().optLearningRateTracker(learningRateTracker).build();
+        config.optOptimizer(optimizer);
+
+        return config;
     }
 
     private static class SoftmaxCrossEntropy extends Loss {
