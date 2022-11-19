@@ -91,7 +91,9 @@ jobs:
         if: always()
         with:
           name: reports
-          path: ${{ github.workspace }}/**/build/reports/**/*
+          path: |
+            ${{ github.workspace }}/**/build/reports/**/*
+            !${{ github.workspace }}/**/build/reports/jacoco/*
       - name: upload to codecov
         uses: codecov/codecov-action@v3
         with:
