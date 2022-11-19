@@ -52,7 +52,7 @@ public class HfModelZoo extends ModelZoo {
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 
     HfModelZoo() {
-        Version version = new Version(Engine.class.getPackage().getSpecificationVersion());
+        Version version = new Version(Engine.getDjlVersion());
         addModels(NLP.FILL_MASK, version);
         addModels(NLP.QUESTION_ANSWER, version);
         addModels(NLP.TEXT_CLASSIFICATION, version);

@@ -12,6 +12,18 @@ dependencies {
     testRuntimeOnly project(":engines:pytorch:pytorch-jni")
 }
 
+compileJava.dependsOn(processResources)
+
+processResources {
+    outputs.file file("${project.buildDir}/classes/java/main/ai/djl/engine/api.properties")
+    doFirst {
+        def classesDir = file("${project.buildDir}/classes/java/main/ai/djl/engine/")
+        classesDir.mkdirs()
+        def propFile = new File(classesDir, "api.properties");
+        propFile.text = "djl_version=${project.version}"
+    }
+}
+
 javadoc {
     title "Deep Java Library ${project.version} API specification"
     exclude "ai/djl/util/**"

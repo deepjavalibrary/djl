@@ -26,11 +26,14 @@ import ai.djl.util.cuda.CudaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -332,6 +335,25 @@ public abstract class Engine {
         return seed;
     }
 
+    /**
+     * Returns the DJL API version.
+     *
+     * @return seed the seed to be fixed in Engine
+     */
+    public static String getDjlVersion() {
+        String version = Engine.class.getPackage().getSpecificationVersion();
+        if (version != null) {
+            return version;
+        }
+        try (InputStream is = Engine.class.getResourceAsStream("api.properties")) {
+            Properties prop = new Properties();
+            prop.load(is);
+            return prop.getProperty("djl_version");
+        } catch (IOException e) {
+            throw new AssertionError("Failed to open api.properties", e);
+        }
+    }
+
     /** {@inheritDoc} */
     @Override
     public String toString() {
@@ -385,7 +407,7 @@ public abstract class Engine {
 
         System.out.println();
         System.out.println("----------------- Engines ---------------");
-        System.out.println("DJL version: " + Engine.class.getPackage().getSpecificationVersion());
+        System.out.println("DJL version: " + getDjlVersion());
         System.out.println("Default Engine: " + Engine.getInstance());
         System.out.println("Default Device: " + Engine.getInstance().defaultDevice());
         for (EngineProvider provider : ALL_ENGINES.values()) {
