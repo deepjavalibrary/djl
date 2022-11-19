@@ -1050,7 +1050,7 @@ public class BlockCoreTest {
     private void testEncode(NDManager manager, Block block)
             throws IOException, MalformedModelException {
         PairList<String, Parameter> original = block.getParameters();
-        File temp = File.createTempFile("block", ".param");
+        File temp = Files.createTempFile("block", ".param").toFile();
         DataOutputStream os = new DataOutputStream(Files.newOutputStream(temp.toPath()));
         block.saveParameters(os);
         block.loadParameters(manager, new DataInputStream(Files.newInputStream(temp.toPath())));
