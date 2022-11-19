@@ -35,15 +35,50 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: check disk space
         run: df -h
+      - uses: dorny/paths-filter@v2
+        id: sentencepiece_changes
+        with:
+          filters: |
+            src:
+              - 'extensions/sentencepiece/**'
       - name: Compile Sentencepiece JNI
+        if: steps.sentencepiece_changes.outputs.src == 'true'
         run: ./gradlew :extensions:sentencepiece:compileJNI
+      - uses: dorny/paths-filter@v2
+        id: fasttext_changes
+        with:
+          filters: |
+            src:
+              - 'extensions/fasttext/**'
       - name: Compile fastText JNI
+        if: steps.fasttext_changes.outputs.src == 'true'
         run: ./gradlew :extensions:fasttext:compileJNI
+      - uses: dorny/paths-filter@v2
+        id: tokenizers_changes
+        with:
+          filters: |
+            src:
+              - 'extensions/tokenizers/**'
       - name: Compile tokenizers JNI
+        if: steps.tokenizers_changes.outputs.src == 'true'
         run: ./gradlew :extensions:tokenizers:compileJNI
+      - uses: dorny/paths-filter@v2
+        id: pytorch_changes
+        with:
+          filters: |
+            src:
+              - 'engines/pytorch/pytorch-native/**'
       - name: Compile PyTorch JNI
+        if: steps.pytorch_changes.outputs.src == 'true'
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
+      - uses: dorny/paths-filter@v2
+        id: paddlepaddle_changes
+        with:
+          filters: |
+            src:
+              - 'engines/paddlepaddle/paddlepaddle-native/**'
       - name: Compile PaddlePaddle JNI
+        if: steps.paddlepaddle_changes.outputs.src == 'true'
         run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Test ONNX Runtime
         run: |
@@ -82,13 +117,41 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - uses: dorny/paths-filter@v2
+        id: sentencepiece_changes
+        with:
+          filters: |
+            src:
+              - 'extensions/sentencepiece/**'
       - name: Compile Sentencepiece JNI
+        if: steps.sentencepiece_changes.outputs.src == 'true'
         run: ./gradlew :extensions:sentencepiece:compileJNI
+      - uses: dorny/paths-filter@v2
+        id: pytorch_changes
+        with:
+          filters: |
+            src:
+              - 'engines/pytorch/pytorch-native/**'
       - name: Compile PyTorch JNI
+        if: steps.pytorch_changes.outputs.src == 'true'
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
+      - uses: dorny/paths-filter@v2
+        id: paddlepaddle_changes
+        with:
+          filters: |
+            src:
+              - 'engines/paddlepaddle/paddlepaddle-native/**'
       - name: Compile PaddlePaddle JNI
+        if: steps.paddlepaddle_changes.outputs.src == 'true'
         run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
+      - uses: dorny/paths-filter@v2
+        id: tokenizers_changes
+        with:
+          filters: |
+            src:
+              - 'extensions/tokenizers/**'
       - name: Compile tokenizers JNI
+        if: steps.tokenizers_changes.outputs.src == 'true'
         run: ./gradlew :extensions:tokenizers:compileJNI
       - name: Integration tests
         # MXNet integration test on Github Action fail due to memory limitation on Windows
