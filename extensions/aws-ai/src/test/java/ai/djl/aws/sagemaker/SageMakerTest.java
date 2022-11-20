@@ -59,7 +59,7 @@ public class SageMakerTest {
                             .optBucketName("djl-sm-test")
                             .optModelName("resnet18-jit")
                             .optContainerImage(
-                                    "125045733377.dkr.ecr.us-east-1.amazonaws.com/djl-serving")
+                                    "125045733377.dkr.ecr.us-east-1.amazonaws.com/djl-serving:cpu-nightly")
                             .optExecutionRole(
                                     "arn:aws:iam::125045733377:role/service-role/DJLSageMaker-ExecutionRole-20210213T1027050")
                             .build();

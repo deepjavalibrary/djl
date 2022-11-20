@@ -38,15 +38,18 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * {@code YOLOV3} contains a generic implementation of yolov3 adapted from
- * https://github.com/bubbliiiing/yolo3-pytorch (Original author bubbliiiing). Yolov3 is a fast and
- * accurate model for ObjectDetection tasks.
+ * {@code YOLOV3} contains a generic implementation of <a
+ * href="https://github.com/bubbliiiing/yolo3-pytorch">yolov3</a> (Original author bubbliiiing).
+ *
+ * <p>Yolov3 is a fast and accurate model for ObjectDetection tasks.
  *
  * @see <a href="https://arxiv.org/abs/1804.02767">for more information and knowledge about
  *     yolov3</a>
  */
 public final class YOLOV3 extends AbstractBlock {
+
     private static final byte VERSION = 1;
+
     private SequentialBlock darkNet53; // backBone of YOLOv3
 
     private Block lastLayer0;
@@ -334,7 +337,7 @@ public final class YOLOV3 extends AbstractBlock {
             } else if (!name.contains("Output")) {
                 current = block.getOutputShapes(current);
             } else { // name.contains("Output")
-                Shape[] output = block.getOutputShapes(current);
+                block.getOutputShapes(current);
             }
         }
     }
@@ -467,7 +470,7 @@ public final class YOLOV3 extends AbstractBlock {
          * Sets the number of classes for yolov3.
          *
          * @param numClasses the number of classes
-         * @return @return this {@code Builder}
+         * @return this {@code Builder}
          */
         public Builder setNumClasses(int numClasses) {
             this.numClasses = numClasses;
