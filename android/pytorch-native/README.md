@@ -80,7 +80,7 @@ See: [https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/nativ
 
 ```
 # cd into whatever directory holds your djl directory
-export PYTORCH_VERSION=1.12.1
+export PYTORCH_VERSION=1.13.0
 export ANDROID_NDK=${ANDROID_HOME}/ndk/${NDK_VERSION}
 
 # clone PyTorch to local machine

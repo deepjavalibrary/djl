@@ -10,7 +10,7 @@ jobs:
       matrix:
         format: ["armeabi-v7a", "arm64-v8a", "x86" ,"x86_64"]
     env:
-      PYTORCH_VERSION: "1.12.1"
+      PYTORCH_VERSION: "1.13.0"
       NDK_VERSION: "21.1.6352462"
     steps:
       - uses: actions/checkout@v3
@@ -34,10 +34,6 @@ jobs:
           export ANDROID_ABI=${{ matrix.format }}
           cd android_pytorch_tmp
           BUILD_LITE_INTERPRETER=0 ./scripts/build_android.sh
-          # PyTorch 1.12.1 padding.h include ATen/native/PadNd.h,
-          # but ATen/native/*.h files are excluded for mobile build.
-          # TODO: Remove it once PyTorch fix this problem.
-          cp aten/src/ATen/native/PadNd.h build_android/install/include/ATen/native
           cd build_android
           zip -r ${{ matrix.format }}_native.zip install/include lib
       - name: Configure AWS Credentials
