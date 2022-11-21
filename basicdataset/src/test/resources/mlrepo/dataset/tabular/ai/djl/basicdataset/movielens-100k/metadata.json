@@ -19,9 +19,9 @@
       "snapshot": false,
       "files": {
         "ml-100k": {
-          "uri": "https://files.grouplens.org/datasets/movielens/ml-100k.zip",
-          "sha1Hash": "cd4dcac4241c8a4ad7badc7ca635da8a69dddb83",
-          "size": "4924029"
+          "uri": "1.0/ml-100k.zip",
+          "sha1Hash": "c14dcdbe7e9ae1961f44f58b696ca295c4d3807e",
+          "size": "632294"
         }
       }
     }
