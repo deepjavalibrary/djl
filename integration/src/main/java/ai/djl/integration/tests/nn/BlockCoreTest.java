@@ -60,9 +60,9 @@ import org.testng.annotations.Test;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -1050,11 +1050,14 @@ public class BlockCoreTest {
     private void testEncode(NDManager manager, Block block)
             throws IOException, MalformedModelException {
         PairList<String, Parameter> original = block.getParameters();
-        File temp = Files.createTempFile("block", ".param").toFile();
-        DataOutputStream os = new DataOutputStream(Files.newOutputStream(temp.toPath()));
-        block.saveParameters(os);
-        block.loadParameters(manager, new DataInputStream(Files.newInputStream(temp.toPath())));
-        Files.delete(temp.toPath());
+        Path temp = Files.createTempFile("block", ".param");
+        try (DataOutputStream os = new DataOutputStream(Files.newOutputStream(temp))) {
+            block.saveParameters(os);
+        }
+        try (DataInputStream is = new DataInputStream(Files.newInputStream(temp))) {
+            block.loadParameters(manager, is);
+        }
+        Files.delete(temp);
         PairList<String, Parameter> loaded = block.getParameters();
         int bound = original.size();
         for (int idx = 0; idx < bound; idx++) {
