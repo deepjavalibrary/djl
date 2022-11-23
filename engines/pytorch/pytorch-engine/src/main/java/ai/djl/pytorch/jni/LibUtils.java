@@ -12,6 +12,7 @@
  */
 package ai.djl.pytorch.jni;
 
+import ai.djl.engine.EngineException;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
@@ -174,7 +175,7 @@ public final class LibUtils {
                 }
             }
         } catch (IOException e) {
-            throw new IllegalArgumentException("Folder not exist! " + libDir, e);
+            throw new EngineException("Folder not exist! " + libDir, e);
         }
     }
 
@@ -230,7 +231,7 @@ public final class LibUtils {
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
-            throw new IllegalArgumentException("Unexpected version: " + version);
+            throw new EngineException("Unexpected version: " + version);
         }
         version = matcher.group(1);
 
@@ -269,7 +270,7 @@ public final class LibUtils {
             Utils.moveQuietly(tmp, path);
             return path;
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot copy jni files", e);
+            throw new EngineException("Cannot copy jni files", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
@@ -319,7 +320,7 @@ public final class LibUtils {
 
             Matcher m = VERSION_PATTERN.matcher(version);
             if (!m.matches()) {
-                throw new IllegalArgumentException("Unexpected version: " + version);
+                throw new AssertionError("Unexpected version: " + version);
             }
             String[] versions = m.group(1).split("\\.");
             int minorVersion = Integer.parseInt(versions[1]);
@@ -344,7 +345,7 @@ public final class LibUtils {
             Utils.moveQuietly(tmp, dir);
             return new LibTorch(dir.toAbsolutePath(), platform, flavor);
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to extract PyTorch native library", e);
+            throw new EngineException("Failed to extract PyTorch native library", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
@@ -394,7 +395,7 @@ public final class LibUtils {
 
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.matches()) {
-            throw new IllegalArgumentException("Unexpected version: " + version);
+            throw new AssertionError("Unexpected version: " + version);
         }
         String link = "https://publish.djl.ai/pytorch/" + matcher.group(1);
         Path tmp = null;
@@ -407,7 +408,7 @@ public final class LibUtils {
                 Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
                 Utils.moveQuietly(tempFile, indexFile);
             } catch (IOException e) {
-                throw new IllegalStateException("Failed to save pytorch index file", e);
+                throw new EngineException("Failed to save pytorch index file", e);
             } finally {
                 Utils.deleteQuietly(tempFile);
             }
@@ -470,14 +471,14 @@ public final class LibUtils {
                 }
             }
             if (!found) {
-                throw new IllegalStateException(
+                throw new EngineException(
                         "No PyTorch native library matches your operating system: " + platform);
             }
 
             Utils.moveQuietly(tmp, dir);
             return new LibTorch(dir.toAbsolutePath(), platform, flavor);
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to download PyTorch native library", e);
+            throw new EngineException("Failed to download PyTorch native library", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
@@ -511,7 +512,7 @@ public final class LibUtils {
             Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
             Utils.moveQuietly(tmp, path);
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot download jni files: " + url, e);
+            throw new EngineException("Cannot download jni files: " + url, e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
