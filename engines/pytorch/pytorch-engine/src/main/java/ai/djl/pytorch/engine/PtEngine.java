@@ -48,6 +48,7 @@ public final class PtEngine extends Engine {
 
     private PtEngine() {}
 
+    @SuppressWarnings("PMD.AvoidRethrowingException")
     static Engine newInstance() {
         try {
             LibUtils.loadLibrary();
@@ -78,6 +79,8 @@ public final class PtEngine extends Engine {
                 }
             }
             return new PtEngine();
+        } catch (EngineException e) {
+            throw e;
         } catch (Throwable t) {
             throw new EngineException("Failed to load PyTorch native library", t);
         }
