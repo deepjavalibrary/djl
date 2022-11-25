@@ -10,8 +10,6 @@ dependencies {
     api "org.apache.spark:spark-sql_2.12:${spark_version}"
     api "org.apache.spark:spark-mllib_2.12:${spark_version}"
 
-    runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
-
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"
     }
@@ -29,8 +27,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             pom {
-                name = "Hadoop Spark integration for DJL"
-                description = "Hadoop Spark integration for DJL"
+                name = "Apache Spark integration for DJL"
+                description = "Apache Spark integration for DJL"
                 url = "http://www.djl.ai/extensions/${project.name}"
             }
         }

@@ -75,7 +75,6 @@ class SparkTransformer[T](override val uid: String) extends Transformer {
     val outputDf = dataset.select($(inputCol)).mapPartitions(partition => {
       val predictor = model.newPredictor($(translator))
       partition.map(row => {
-        // image data stored as HWC format
         predictor.predict(row).toString
       })
     })(Encoders.STRING)
