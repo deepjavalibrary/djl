@@ -29,7 +29,7 @@ import java.io.Serializable
 @SerialVersionUID(1L)
 class SparkModel[T](val url: String, val outputClass : Class[T]) extends Serializable {
 
-  @transient var model: ZooModel[Row, T] = null
+  @transient var model: ZooModel[Row, T] = _
 
   /**
    * Creates a new Predictor.
