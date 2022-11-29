@@ -28,6 +28,7 @@ configure([
         project(':extensions:tablesaw'),
         project(':extensions:timeseries'),
         project(':extensions:tokenizers'),
+        project(':extensions:spark'),
         project(':model-zoo')]) {
     apply plugin: "maven-publish"
     apply plugin: "signing"

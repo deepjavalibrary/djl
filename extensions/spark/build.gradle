@@ -1,0 +1,36 @@
+plugins {
+    id 'scala'
+}
+
+group "ai.djl.spark"
+
+dependencies {
+    api project(":api")
+    api "org.apache.spark:spark-core_2.12:${spark_version}"
+    api "org.apache.spark:spark-sql_2.12:${spark_version}"
+    api "org.apache.spark:spark-mllib_2.12:${spark_version}"
+
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+    testImplementation project(":testing")
+    testRuntimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
+
+    testRuntimeOnly project(":engines:pytorch:pytorch-model-zoo")
+}
+
+compileScala {
+    scalaCompileOptions.setAdditionalParameters(["-target:jvm-1.8"])
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "Apache Spark integration for DJL"
+                description = "Apache Spark integration for DJL"
+                url = "http://www.djl.ai/extensions/${project.name}"
+            }
+        }
+    }
+}
