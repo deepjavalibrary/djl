@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ macos-12, ubuntu-18.04 ]
+        operating-system: [ macos-12, ubuntu-latest ]
 
     steps:
       - uses: actions/checkout@v3
@@ -48,7 +48,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ macos-latest, ubuntu-18.04, windows-latest ]
+        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
 
     steps:
       - uses: actions/checkout@v3
@@ -72,7 +72,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ macos-latest, ubuntu-18.04, windows-latest ]
+        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
 
     steps:
       - uses: actions/checkout@v3
@@ -202,7 +202,7 @@ jobs:
 
   publish:
     if: github.repository == 'deepjavalibrary/djl'
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     needs: [ build, test-pytorch, test-tensorflow, test-aarch64, test-cuda-102, test-cuda-113 ]
     steps:
       - uses: actions/checkout@v3
