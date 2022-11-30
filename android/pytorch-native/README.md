@@ -145,7 +145,7 @@ cp -r ../engines/pytorch/pytorch-native/jnilib/0.20.0/android/* pytorch-native/j
 ./gradlew pTML
 ```
 
-`ai.djl.android:pytorch-native:0.19.0-SNAPSHOT` will be published to mavenLocal (your local ~/.m2 folder) if you ran `./gradlew pTML`
+`ai.djl.android:pytorch-native:0.20.0-SNAPSHOT` will be published to mavenLocal (your local ~/.m2 folder) if you ran `./gradlew pTML`
 
 ## Build PyTorch Android demo projects
 
