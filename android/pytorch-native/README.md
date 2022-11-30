@@ -124,13 +124,13 @@ cd ..
 ./gradlew compileAndroidJNI -Ppt_version=${PYTORCH_VERSION}
 ```
 
-`jnilib/0.19.0/android` folder will be created after build, and shared library will be uploaded to S3 in CI build
+`jnilib/0.20.0/android` folder will be created after build, and shared library will be uploaded to S3 in CI build
 
 ## Build PyTorch android library (.aar) and publish to Sonatype snapshot repo
 
 See: [ https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/publish_android_packages.yml]( https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/publish_android_packages.yml)
 
-The final command in this code block `./gradlew pTML` is optional. It stores a local copy of the DJL snapshot in your maven directory. If not done, then the app will pull the snapshot release of DJL from Sonatype. 
+The final command in this code block `./gradlew pTML` is optional. It stores a local copy of the DJL snapshot in your maven directory. If not done, then the app will pull the snapshot release of DJL from Sonatype.
 
 ```
 # move into djl/android directory
@@ -138,14 +138,14 @@ cd ../../../android
 
 # To avoid download jni from S3, manually copy them
 mkdir -p pytorch-native/jnilib
-cp -r ../engines/pytorch/pytorch-native/jnilib/0.19.0/android/* pytorch-native/jnilib
+cp -r ../engines/pytorch/pytorch-native/jnilib/0.20.0/android/* pytorch-native/jnilib
 
 ./gradlew :pytorch-native:assemble
 # publish to local maven repo (~/.m2 folder)
 ./gradlew pTML
 ```
 
-`ai.djl.android:pytorch-native:0.19.0-SNAPSHOT` will be published to mavenLocal (your local ~/.m2 folder) if you ran `./gradlew pTML`
+`ai.djl.android:pytorch-native:0.XX.X-SNAPSHOT` will be published to mavenLocal (your local ~/.m2 folder) if you ran `./gradlew pTML`
 
 ## Build PyTorch Android demo projects
 
