@@ -21,7 +21,6 @@ import ai.djl.basicdataset.tabular.utils.Feature;
 import ai.djl.basicdataset.tabular.utils.Featurizer;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
-import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
@@ -40,6 +39,7 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
+import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.RandomAccessDataset;
@@ -106,7 +106,7 @@ public final class TrainAmazonReviewRanking {
             RandomAccessDataset trainingSet = datasets[0];
             RandomAccessDataset validationSet = datasets[1];
             // create training model
-            model.setBlock(getBlock(embedding.newPredictor()));
+            model.setBlock(getBlock(embedding.getBlock()));
             DefaultTrainingConfig config = setupTrainingConfig(arguments);
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.setMetrics(new Metrics());
@@ -144,24 +144,21 @@ public final class TrainAmazonReviewRanking {
                 .build();
     }
 
-    private static Block addFreezeLayer(Predictor<NDList, NDList> embedder) {
+    private static Block addFreezeLayer(Block embedder) {
         if ("PyTorch".equals(Engine.getDefaultEngineName())) {
             return new LambdaBlock(
                     ndList -> {
                         NDArray data = ndList.singletonOrThrow();
-                        try {
-                            return embedder.predict(
-                                    new NDList(
-                                            data.toType(DataType.INT64, false),
-                                            data.getManager()
-                                                    .full(data.getShape(), 1, DataType.INT64),
-                                            data.getManager()
-                                                    .arange(data.getShape().get(1))
-                                                    .toType(DataType.INT64, false)
-                                                    .broadcast(data.getShape())));
-                        } catch (TranslateException e) {
-                            throw new IllegalArgumentException("embedding error", e);
-                        }
+                        return embedder.forward(
+                                new ParameterStore(),
+                                new NDList(
+                                        data.toType(DataType.INT64, false),
+                                        data.getManager().full(data.getShape(), 1, DataType.INT64),
+                                        data.getManager()
+                                                .arange(data.getShape().get(1))
+                                                .toType(DataType.INT64, false)
+                                                .broadcast(data.getShape())),
+                                true);
                     });
         } else {
             // MXNet
@@ -170,20 +167,17 @@ public final class TrainAmazonReviewRanking {
                         NDArray data = ndList.singletonOrThrow();
                         long batchSize = data.getShape().get(0);
                         float maxLength = data.getShape().get(1);
-                        try {
-                            return embedder.predict(
-                                    new NDList(
-                                            data,
-                                            data.getManager()
-                                                    .full(new Shape(batchSize), maxLength)));
-                        } catch (TranslateException e) {
-                            throw new IllegalArgumentException("embedding error", e);
-                        }
+                        return embedder.forward(
+                                new ParameterStore(),
+                                new NDList(
+                                        data,
+                                        data.getManager().full(new Shape(batchSize), maxLength)),
+                                true);
                     });
         }
     }
 
-    private static Block getBlock(Predictor<NDList, NDList> embedder) {
+    private static Block getBlock(Block embedder) {
         return new SequentialBlock()
                 // text embedding layer
                 .add(addFreezeLayer(embedder))
