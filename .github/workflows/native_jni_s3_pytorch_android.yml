@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-pytorch-jni-android:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       NDK_VERSION: "21.1.6352462"
 
