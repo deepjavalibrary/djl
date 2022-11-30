@@ -36,7 +36,7 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -87,7 +87,7 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu11 -Ppt_version=$PYTORCH_VERSION
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -135,7 +135,7 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu11 -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -186,7 +186,7 @@ jobs:
           set "PATH=%CUDA_PATH%\bin;%CUDA_PATH%\libnvvp;%PATH%"
           gradlew :engines:pytorch:pytorch-native:cleanJNI :engines:pytorch:pytorch-native:compileJNI -Pcu11 -Ppt_version=${{ github.event.inputs.pt_version }}
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -225,7 +225,7 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -278,7 +278,7 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

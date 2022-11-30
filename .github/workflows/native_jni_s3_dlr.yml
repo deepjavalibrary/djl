@@ -24,7 +24,7 @@ jobs:
       - name: Run test
         run: ./gradlew :engines:dlr:dlr-engine:test -Pjni
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -64,7 +64,7 @@ jobs:
           ./gradlew :engines:dlr:dlr-native:compileJNI
           ./gradlew -Pjni :engines:dlr:dlr-engine:test
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
