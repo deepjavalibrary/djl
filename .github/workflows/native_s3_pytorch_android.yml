@@ -20,7 +20,9 @@ jobs:
           distribution: 'corretto'
           java-version: 11
       - name: Set up Python3
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
       - name: clone pytorch
         run: |
           git clone https://github.com/pytorch/pytorch android_pytorch_tmp -b "v${PYTORCH_VERSION}" --recursive
