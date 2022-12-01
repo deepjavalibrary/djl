@@ -167,19 +167,6 @@ public final class TrainAmazonReviewRanking {
             classifier.add(lambda);
             classifier.add(embedder);
         } else {
-            //            LambdaBlock lambda = new LambdaBlock(
-            //            ndList -> {
-            //                NDArray data = ndList.singletonOrThrow();
-            //                long batchSize = data.getShape().get(0);
-            //                float maxLength = data.getShape().get(1);
-            //                NDList inputs = new NDList();
-            //                inputs.add(data);
-            //                inputs.add(data.getManager().full(new Shape(batchSize), maxLength));
-            //                return inputs;
-            //            });
-            //            classifier.add(lambda);
-            //            classifier.add(embedder);
-
             // MXNet
             LambdaBlock lambda =
                     new LambdaBlock(
