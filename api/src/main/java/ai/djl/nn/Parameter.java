@@ -197,12 +197,13 @@ public class Parameter implements AutoCloseable {
      * @param dataType the datatype of the {@code Parameter}
      */
     public void initialize(NDManager manager, DataType dataType) {
+        // Param is attached to an array not null
         if (!isInitialized()) {
             // Params in a PtSymbolBlock is set during model loading and its isInitialized()=true.
             // Shouldn't further initialize it.
             Objects.requireNonNull(initializer, "No initializer has been set");
-            // Params in a PtSymbolBlock can have null shape, but are still initialized (has nonNull
-            // array)
+            // Params in a PtSymbolBlock can have null shape, but are still initialized (i.e. param
+            // is attached to an array not null)
             Objects.requireNonNull(shape, "No parameter shape has been set");
             array = initializer.initialize(manager, shape, dataType);
             array.setName(name);

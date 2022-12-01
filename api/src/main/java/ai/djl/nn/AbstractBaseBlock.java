@@ -46,6 +46,8 @@ public abstract class AbstractBaseBlock implements Block {
     /** The shape of the input for this block, set by the initialization process. */
     protected Shape[] inputShapes;
 
+    protected DataType[] outputDatatypes;
+
     /** List of names for the input, named inputs should be manually set in sub class. */
     protected List<String> inputNames = Collections.emptyList();
 
@@ -173,12 +175,13 @@ public abstract class AbstractBaseBlock implements Block {
     @Override
     public void initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         beforeInitialize(inputShapes);
-        // if parameters are initialized, skip it
+        // block has inputShape and params have arrays not null
         if (!isInitialized()) {
-            // setShape for all params
+            // set the params' shape to be inputShapes
             prepare(inputShapes);
         }
         for (Parameter parameter : getDirectParameters().values()) {
+            // attach arrays to params if params are null; requires gradient
             parameter.initialize(manager, dataType);
         }
         initializeChildBlocks(manager, dataType, inputShapes);
@@ -367,5 +370,11 @@ public abstract class AbstractBaseBlock implements Block {
                     "getInputShapes() can only be called after the initialization process");
         }
         return inputShapes;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public DataType[] getOutputDataTypes() {
+        return outputDatatypes;
     }
 }

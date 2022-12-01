@@ -16,6 +16,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.AbstractSymbolBlock;
 import ai.djl.nn.Parameter;
@@ -220,6 +221,22 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             // TODO: Only tested for float32
             for (Shape shape : inputShapes) {
                 list.add(manager.ones(shape));
+            }
+            NDList result = forwardInternal(new ParameterStore(manager, false), list, false, null);
+            return result.stream().map(NDArray::getShape).toArray(Shape[]::new);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Shape[] getOutputShapes(Shape[] inputShapes, DataType[] dataTypes) {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDList list = new NDList();
+            for (int i = 0; i < inputShapes.length; i++) {
+                list.add(
+                        manager.ones(
+                                inputShapes[i],
+                                dataTypes == null ? DataType.FLOAT32 : dataTypes[i]));
             }
             NDList result = forwardInternal(new ParameterStore(manager, false), list, false, null);
             return result.stream().map(NDArray::getShape).toArray(Shape[]::new);

@@ -116,7 +116,7 @@ public interface Block {
      *
      * @param parameterStore the parameter store
      * @param inputs the input NDList
-     * @param training true for a training forward pass
+     * @param training true for a training forward pass (turn on dropout and layerNorm)
      * @return the output of the forward pass
      */
     default NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
@@ -129,7 +129,7 @@ public interface Block {
      *
      * @param parameterStore the parameter store
      * @param inputs the input NDList
-     * @param training true for a training forward pass
+     * @param training true for a training forward pass (turn on dropout and layerNorm)
      * @param params optional parameters
      * @return the output of the forward pass
      */
@@ -252,12 +252,30 @@ public interface Block {
     Shape[] getOutputShapes(Shape[] inputShapes);
 
     /**
+     * Returns the expected output shapes of the block for the specified input shapes.
+     *
+     * @param inputShapes the shapes of the inputs
+     * @param inputDataTypes the datatypes of the inputs
+     * @return the expected output shapes of the block
+     */
+    default Shape[] getOutputShapes(Shape[] inputShapes, DataType[] inputDataTypes) {
+        return getOutputShapes(inputShapes);
+    }
+
+    /**
      * Returns the input shapes of the block. The input shapes are only available after the block is
      * initialized, otherwise an {@link IllegalStateException} is thrown.
      *
      * @return the input shapes of the block
      */
     Shape[] getInputShapes();
+
+    /**
+     * Returns the input dataTypes of the block.
+     *
+     * @return the input dataTypes of the block
+     */
+    DataType[] getOutputDataTypes();
 
     /**
      * Writes the parameters of the block to the given outputStream.

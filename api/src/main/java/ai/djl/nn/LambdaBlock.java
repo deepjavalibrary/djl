@@ -16,6 +16,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
@@ -116,9 +117,12 @@ public class LambdaBlock extends AbstractBlock {
             }
             NDList output = lambda.apply(input);
             Shape[] outputShapes = new Shape[output.size()];
+            DataType[] dataTypes = new DataType[output.size()];
             for (int i = 0; i < output.size(); ++i) {
                 outputShapes[i] = output.get(i).getShape();
+                dataTypes[i] = output.get(i).getDataType();
             }
+            outputDatatypes = dataTypes;
             return outputShapes;
         }
     }

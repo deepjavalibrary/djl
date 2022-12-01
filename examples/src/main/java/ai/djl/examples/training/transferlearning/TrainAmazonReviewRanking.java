@@ -88,6 +88,7 @@ public final class TrainAmazonReviewRanking {
                         .optModelUrls(modelUrls)
                         .optEngine(Engine.getDefaultEngineName())
                         .optProgress(new ProgressBar())
+                        .optOption("trainParam", "true")
                         .build();
         int maxTokenLength = 64;
         try (Model model = Model.newInstance("AmazonReviewRatingClassification");
@@ -144,49 +145,66 @@ public final class TrainAmazonReviewRanking {
                 .build();
     }
 
-    private static Block addFreezeLayer(Block embedder) {
-        if ("PyTorch".equals(Engine.getDefaultEngineName())) {
-            return new LambdaBlock(
-                    ndList -> {
-                        NDArray data = ndList.singletonOrThrow();
-                        return embedder.forward(
-                                new ParameterStore(),
-                                new NDList(
-                                        data.toType(DataType.INT64, false),
-                                        data.getManager().full(data.getShape(), 1, DataType.INT64),
-                                        data.getManager()
-                                                .arange(data.getShape().get(1))
-                                                .toType(DataType.INT64, false)
-                                                .broadcast(data.getShape())),
-                                true);
-                    });
-        } else {
-            // MXNet
-            return new LambdaBlock(
-                    ndList -> {
-                        NDArray data = ndList.singletonOrThrow();
-                        long batchSize = data.getShape().get(0);
-                        float maxLength = data.getShape().get(1);
-                        return embedder.forward(
-                                new ParameterStore(),
-                                new NDList(
-                                        data,
-                                        data.getManager().full(new Shape(batchSize), maxLength)),
-                                true);
-                    });
-        }
-    }
-
     private static Block getBlock(Block embedder) {
-        return new SequentialBlock()
-                // text embedding layer
-                .add(addFreezeLayer(embedder))
-                // Classification layers
+        SequentialBlock classifier = new SequentialBlock();
+        // text embedding layer
+        if ("PyTorch".equals(Engine.getDefaultEngineName())) {
+            LambdaBlock lambda =
+                    new LambdaBlock(
+                            ndList -> {
+                                NDArray data = ndList.singletonOrThrow();
+                                NDList inputs = new NDList();
+                                inputs.add(data.toType(DataType.INT64, false));
+                                inputs.add(
+                                        data.getManager().full(data.getShape(), 1, DataType.INT64));
+                                inputs.add(
+                                        data.getManager()
+                                                .arange(data.getShape().get(1)) // maxLen
+                                                .toType(DataType.INT64, false)
+                                                .broadcast(data.getShape()));
+                                return inputs;
+                            });
+            classifier.add(lambda);
+            classifier.add(embedder);
+        } else {
+            //            LambdaBlock lambda = new LambdaBlock(
+            //            ndList -> {
+            //                NDArray data = ndList.singletonOrThrow();
+            //                long batchSize = data.getShape().get(0);
+            //                float maxLength = data.getShape().get(1);
+            //                NDList inputs = new NDList();
+            //                inputs.add(data);
+            //                inputs.add(data.getManager().full(new Shape(batchSize), maxLength));
+            //                return inputs;
+            //            });
+            //            classifier.add(lambda);
+            //            classifier.add(embedder);
+
+            // MXNet
+            LambdaBlock lambda =
+                    new LambdaBlock(
+                            ndList -> {
+                                NDArray data = ndList.singletonOrThrow();
+                                long batchSize = data.getShape().get(0);
+                                float maxLength = data.getShape().get(1);
+                                return embedder.forward(
+                                        new ParameterStore(),
+                                        new NDList(
+                                                data,
+                                                data.getManager()
+                                                        .full(new Shape(batchSize), maxLength)),
+                                        true);
+                            });
+            classifier.add(lambda);
+        }
+        // Classification layers
+        classifier
                 .add(Linear.builder().setUnits(768).build()) // pre classifier
                 .add(Activation::relu)
                 .add(Dropout.builder().optRate(0.2f).build())
                 .add(Linear.builder().setUnits(5).build()) // 5 star rating
                 .addSingleton(nd -> nd.get(":,0")); // follow HF classifier
+        return classifier;
     }
 
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
