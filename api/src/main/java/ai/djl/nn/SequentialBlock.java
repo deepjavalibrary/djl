@@ -220,9 +220,11 @@ public class SequentialBlock extends AbstractBlock {
     @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         Shape[] shapes = inputShapes;
+        DataType[] lastDataTypes = null;
         for (Block child : getChildren().values()) {
             child.initialize(manager, dataType, shapes);
-            shapes = child.getOutputShapes(shapes);
+            shapes = child.getOutputShapes(shapes, lastDataTypes);
+            lastDataTypes = child.getOutputDataTypes();
         }
     }
 
