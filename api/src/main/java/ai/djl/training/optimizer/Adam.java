@@ -118,6 +118,15 @@ public class Adam extends Optimizer {
         return new Builder();
     }
 
+    /**
+     * Creates a builder to build a {@code Adam}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder(boolean adamw) {
+        return new Builder(adamw);
+    }
+
     /** The Builder to construct an {@link Adam} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
@@ -128,6 +137,13 @@ public class Adam extends Optimizer {
         private boolean adamw;
 
         Builder() {}
+
+        public Builder(boolean adamw) {
+            this.adamw = adamw;
+            if (adamw) {
+                optWeightDecays(0.01f);
+            }
+        }
 
         /** {@inheritDoc} */
         @Override
