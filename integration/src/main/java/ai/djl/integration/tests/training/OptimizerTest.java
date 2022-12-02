@@ -145,29 +145,37 @@ public class OptimizerTest {
 
     @Test
     public void testAdam() {
-        Optimizer optim = Optimizer.adam().optLearningRateTracker(Tracker.fixed(0.1f)).build();
+        boolean[] useAdamWs = {true, false};
+        for (boolean useAdamW : useAdamWs) {
+            Optimizer optim =
+                    Optimizer.adam()
+                            .optLearningRateTracker(Tracker.fixed(0.1f))
+                            .optAdamW(useAdamW)
+                            .build();
 
-        Device[] devices = Engine.getInstance().getDevices(1);
-        TrainingConfig config =
-                new DefaultTrainingConfig(Loss.l2Loss())
-                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
-                        .optOptimizer(optim)
-                        .optDevices(devices);
-        Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
-            model.setBlock(block);
+            Device[] devices = Engine.getInstance().getDevices(1);
+            TrainingConfig config =
+                    new DefaultTrainingConfig(Loss.l2Loss())
+                            .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
+                            .optOptimizer(optim)
+                            .optDevices(devices);
+            Block block = Linear.builder().setUnits(CHANNELS).build();
+            try (Model model = Model.newInstance("model", devices[0])) {
+                model.setBlock(block);
 
-            try (Trainer trainer = model.newTrainer(config)) {
-                int batchSize = config.getDevices().length * BATCH_SIZE;
-                trainer.initialize(new Shape(batchSize, CHANNELS));
+                try (Trainer trainer = model.newTrainer(config)) {
+                    int batchSize = config.getDevices().length * BATCH_SIZE;
+                    trainer.initialize(new Shape(batchSize, CHANNELS));
 
-                NDManager manager = trainer.getManager();
-                NDArray result = runOptimizer(manager, trainer, block, batchSize);
-                NDArray result2 = runOptimizer(manager, trainer, block, batchSize);
-                Assertions.assertAlmostEquals(
-                        result, manager.create(new float[] {0.8999999761581421f, -0.10000064f}));
-                Assertions.assertAlmostEquals(
-                        result2, manager.create(new float[] {0.80060977f, -0.19939029f}));
+                    NDManager manager = trainer.getManager();
+                    NDArray result = runOptimizer(manager, trainer, block, batchSize);
+                    NDArray result2 = runOptimizer(manager, trainer, block, batchSize);
+                    Assertions.assertAlmostEquals(
+                            result,
+                            manager.create(new float[] {0.8999999761581421f, -0.10000064f}));
+                    Assertions.assertAlmostEquals(
+                            result2, manager.create(new float[] {0.80060977f, -0.19939029f}));
+                }
             }
         }
     }

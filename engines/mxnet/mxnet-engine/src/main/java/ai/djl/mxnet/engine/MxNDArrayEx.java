@@ -430,19 +430,24 @@ class MxNDArrayEx implements NDArrayEx {
             float beta1,
             float beta2,
             float epsilon,
-            boolean lazyUpdate) {
+            boolean lazyUpdate,
+            boolean adamw) {
         MxOpParams params = new MxOpParams();
         params.addParam("lr", learningRate);
         params.addParam("wd", weightDecay);
-        params.addParam("rescale_grad", rescaleGrad);
         params.addParam("clip_gradient", clipGrad);
 
         params.addParam("beta1", beta1);
         params.addParam("beta2", beta2);
         params.addParam("epsilon", epsilon);
-        params.addParam("lazy_update", lazyUpdate);
 
-        getManager().invoke("adam_update", inputs, weights, params);
+        if (!adamw) {
+            params.addParam("rescale_grad", rescaleGrad);
+            params.addParam("lazy_update", lazyUpdate);
+            getManager().invoke("adam_update", inputs, weights, params);
+        } else {
+            throw new UnsupportedOperationException("Not implemented");
+        }
     }
 
     /** {@inheritDoc} */

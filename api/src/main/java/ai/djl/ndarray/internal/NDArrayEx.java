@@ -233,7 +233,8 @@ public interface NDArrayEx {
             float beta1,
             float beta2,
             float epsilon,
-            boolean lazyUpdate);
+            boolean lazyUpdate,
+            boolean adamw);
 
     void nagUpdate(
             NDList inputs,

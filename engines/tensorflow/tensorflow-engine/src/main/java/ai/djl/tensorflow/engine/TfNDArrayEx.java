@@ -292,7 +292,8 @@ public class TfNDArrayEx implements NDArrayEx {
             float beta1,
             float beta2,
             float epsilon,
-            boolean lazyUpdate) {
+            boolean lazyUpdate,
+            boolean adamw) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

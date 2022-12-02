@@ -46,6 +46,7 @@ public class Adam extends Optimizer {
 
     private Map<String, Map<Device, NDArray>> means;
     private Map<String, Map<Device, NDArray>> variances;
+    private boolean adamw;
 
     /**
      * Creates a new instance of {@code Adam} optimizer.
@@ -58,6 +59,7 @@ public class Adam extends Optimizer {
         beta1 = builder.beta1;
         beta2 = builder.beta2;
         epsilon = builder.epsilon;
+        adamw = builder.adamw;
         means = new ConcurrentHashMap<>();
         variances = new ConcurrentHashMap<>();
     }
@@ -103,7 +105,8 @@ public class Adam extends Optimizer {
                 beta1,
                 beta2,
                 epsilon,
-                true);
+                true,
+                adamw);
     }
 
     /**
@@ -122,6 +125,7 @@ public class Adam extends Optimizer {
         private float beta1 = 0.9f;
         private float beta2 = 0.999f;
         private float epsilon = 1e-8f;
+        private boolean adamw;
 
         Builder() {}
 
@@ -172,6 +176,20 @@ public class Adam extends Optimizer {
          */
         public Builder optEpsilon(float epsilon) {
             this.epsilon = epsilon;
+            return this;
+        }
+
+        /**
+         * Whether turn on adamw algorithm.
+         *
+         * @param adamw a switch to turn on adamw algorithm
+         * @return this {@code Builder}
+         */
+        public Builder optAdamW(boolean adamw) {
+            this.adamw = adamw;
+            if (adamw) {
+                optWeightDecays(0.01f);
+            }
             return this;
         }
 

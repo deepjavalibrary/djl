@@ -604,7 +604,8 @@ final class PyTorchLibrary {
             float clipGrad,
             float beta1,
             float beta2,
-            float eps);
+            float eps,
+            boolean adamw);
 
     native void sgdUpdate(
             long weight,

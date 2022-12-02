@@ -19,7 +19,7 @@
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv* env, jobject jthis, jlong jweight,
     jlong jgrad, jlong jmean, jlong jvariance, jfloat learning_rate, jfloat weight_decay, jfloat rescale_grad,
-    jfloat clip_grad, jfloat beta1, jfloat beta2, jfloat eps) {
+    jfloat clip_grad, jfloat beta1, jfloat beta2, jfloat eps, jboolean adamw) {
   API_BEGIN()
   torch::autograd::AutoGradMode no_autograd_guard{false};
   const auto* weight_ptr = reinterpret_cast<torch::Tensor*>(jweight);
@@ -34,7 +34,12 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv*
     // Add clip grad option
     grad.clamp_max_(clip_grad);
   }
-  grad.add_(*weight_ptr, weight_decay);
+  if (!adamw) {
+    // rescaled_grad is obtained here
+    grad.add_(*weight_ptr, weight_decay);
+  } else {
+    weight_ptr->sub_(weight_ptr->mul(learning_rate).mul(weight_decay));
+  }
   mean_ptr->mul_(beta1).add_(grad, 1 - beta1);
   variance_ptr->mul_(beta2).addcmul_(grad, grad, 1 - beta2);
   weight_ptr->sub_(mean_ptr->mul(learning_rate).div(variance_ptr->sqrt().add(eps)));

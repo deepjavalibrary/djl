@@ -1652,7 +1652,8 @@ public final class JniUtils {
             float clipGrad,
             float beta1,
             float beta2,
-            float eps) {
+            float eps,
+            boolean adamw) {
         PyTorchLibrary.LIB.adamUpdate(
                 weight.getHandle(),
                 grad.getHandle(),
@@ -1664,7 +1665,8 @@ public final class JniUtils {
                 clipGrad,
                 beta1,
                 beta2,
-                eps);
+                eps,
+                adamw);
     }
 
     public static void sgdUpdate(
