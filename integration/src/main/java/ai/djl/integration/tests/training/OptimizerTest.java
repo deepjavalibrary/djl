@@ -147,6 +147,9 @@ public class OptimizerTest {
     public void testAdam() {
         boolean[] useAdamWs = {true, false};
         for (boolean useAdamW : useAdamWs) {
+            if (useAdamW && "MXNet".equals(Engine.getDefaultEngineName())) {
+                continue;
+            }
             Optimizer optim =
                     Optimizer.adam()
                             .optLearningRateTracker(Tracker.fixed(0.1f))
