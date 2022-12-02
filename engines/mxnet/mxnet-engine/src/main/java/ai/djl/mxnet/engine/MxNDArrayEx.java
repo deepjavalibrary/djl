@@ -446,7 +446,8 @@ class MxNDArrayEx implements NDArrayEx {
             params.addParam("lazy_update", lazyUpdate);
             getManager().invoke("adam_update", inputs, weights, params);
         } else {
-            throw new UnsupportedOperationException("Not implemented");
+            params.addParam("eta", 1.0f);
+            getManager().invoke("_adamw_update", inputs, weights, params);
         }
     }
 
