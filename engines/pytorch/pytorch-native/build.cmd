@@ -2,7 +2,7 @@
 @rem https://chocolatey.org/docs/installation#install-with-cmdexe
 @rem to install cmake java etc..
 @rem choco install cmake.install --installargs '"ADD_CMAKE_TO_PATH=User"' -y
-@rem choco install jdk8 -y
+@rem choco install zulu11 -y
 
 set FILEPATH="libtorch"
 set VERSION=%1
@@ -20,6 +20,9 @@ if exist %FILEPATH% (
 )
 
 copy /y src\main\patch\cuda.cmake libtorch\share\cmake\Caffe2\public\
+
+@rem workaround VS 17.4.0 issue: https://stackoverflow.com/questions/74366357/updating-to-visual-studio-17-4-0-yields-linker-errors-related-to-tls
+copy /y src\main\patch\%VERSION%\Parallel.h libtorch\include\ATen\
 
 if exist build rd /q /s build
 md build\classes

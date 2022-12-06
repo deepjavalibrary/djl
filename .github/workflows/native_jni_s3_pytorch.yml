@@ -163,26 +163,26 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Install CUDA 11.6
-        shell: cmd
-        run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
-          curl.exe -L https://developer.download.nvidia.com/compute/cuda/11.6.1/local_installers/cuda_11.6.1_511.65_windows.exe -o cuda.exe
-          curl.exe -L https://developer.download.nvidia.com/compute/redist/cudnn/v8.4.1/local_installers/11.6/cudnn-windows-x86_64-8.4.1.50_cuda11.6-archive.zip -o cudnn.zip
-          cuda.exe -s
-          unzip.exe cudnn.zip
-          cp.exe -a cudnn*/include cudnn*/lib cudnn*/bin "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/"
-          rm.exe -Rf cuda.exe cuda.exe cudnn.zip cudnn*
       - name: Release CPU JNI
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
           gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=${{ github.event.inputs.pt_version }}
+      - name: Install CUDA 11.7
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
+          curl.exe -L https://developer.download.nvidia.com/compute/cuda/11.7.1/local_installers/cuda_11.7.1_516.94_windows.exe -o cuda.exe
+          curl.exe -L https://developer.download.nvidia.com/compute/redist/cudnn/v8.5.0/local_installers/11.7/cudnn-windows-x86_64-8.5.0.96_cuda11-archive.zip -o cudnn.zip
+          cuda.exe -s
+          unzip.exe cudnn.zip
+          cp.exe -a cudnn*/include cudnn*/lib cudnn*/bin "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.7/"
+          rm.exe -Rf cuda.exe cuda.exe cudnn.zip cudnn*
       - name: Release cuda11 JNI
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
-          set "CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.6"
+          set "CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.7"
           set "PATH=%CUDA_PATH%\bin;%CUDA_PATH%\libnvvp;%PATH%"
           gradlew :engines:pytorch:pytorch-native:cleanJNI :engines:pytorch:pytorch-native:compileJNI -Pcu11 -Ppt_version=${{ github.event.inputs.pt_version }}
       - name: Configure AWS Credentials
