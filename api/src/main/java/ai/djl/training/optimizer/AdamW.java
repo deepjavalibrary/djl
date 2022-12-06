@@ -28,14 +28,17 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Adam updates the weights using:<br>
  * <br>
+ * \( w *= (1 - learning_rate * weight_decay\)<br>
  * \( m = beta1 * m + (1 - beta1) * grad\)<br>
  * \( v = beta2 * v + (1 - beta2) * grad^2 \)<br>
- * \( w -= learning_rate * m / (sqrt(v) + epsilon) \)<br>
+ * \( learning_rate_bias_correction = learning_rate / beta1**t * sqrt(beta2**t) \)<br>
+ * \( w -= learning_rate_bias_correction * m / (sqrt(v) + epsilon) \)<br>
  * <br>
  * where g represents the gradient, and m/v are 1st and 2nd order moment estimates (mean and
- * variance).
+ * variance), t is the step.
  *
- * @see <a href="https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html">The algorithm of AdamW</a>
+ * @see <a href="https://pytorch.org/docs/stablew/generated/torch.optim.AdamW.html">The algorithm of
+ *     AdamW</a>
  */
 public class AdamW extends Optimizer {
 
