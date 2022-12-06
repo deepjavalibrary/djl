@@ -18,7 +18,7 @@
 // The file is the implementation for PyTorch training operations
 
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv* env, jobject jthis, jlong jweight,
-    jlong jgrad, jlong jmean, jlong jvariance, jfloat learning_rate, jfloat weight_decay, jfloat rescale_grad,
+    jlong jgrad, jlong jmean, jlong jvariance, jfloat learning_rate, jfloat learning_rate_bias_correction, jfloat weight_decay, jfloat rescale_grad,
     jfloat clip_grad, jfloat beta1, jfloat beta2, jfloat eps, jboolean adamw) {
   API_BEGIN()
   torch::autograd::AutoGradMode no_autograd_guard{false};
@@ -42,7 +42,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv*
   }
   mean_ptr->mul_(beta1).add_(grad, 1 - beta1);
   variance_ptr->mul_(beta2).addcmul_(grad, grad, 1 - beta2);
-  weight_ptr->sub_(mean_ptr->mul(learning_rate).div(variance_ptr->sqrt().add(eps)));
+  weight_ptr->sub_(mean_ptr->mul(learning_rate_bias_correction).div(variance_ptr->sqrt().add(eps)));
   API_END()
 }
 

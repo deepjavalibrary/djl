@@ -227,6 +227,7 @@ public interface NDArrayEx {
             NDList inputs,
             NDList weights,
             float learningRate,
+            float learningRateBiasCorrection,
             float weightDecay,
             float rescaleGrad,
             float clipGrad,

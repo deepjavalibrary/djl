@@ -78,13 +78,11 @@ public abstract class Optimizer {
     }
 
     /**
-     * Returns a new instance of {@link ai.djl.training.optimizer.Adam.Builder} that can build an
-     * {@link Adam} optimizer.
-     *
-     * @return the {@link Adam} {@link ai.djl.training.optimizer.Adam.Builder}
+     * Returns a new instance of {@link ai.djl.training.optimizer.AdamW.Builder} that can build an
+     * {@link AdamW} {@link ai.djl.training.optimizer.AdamW.Builder}
      */
-    public static Adam.Builder adam(boolean adamw) {
-        return new Adam.Builder(adamw);
+    public static AdamW.Builder adamW() {
+        return new AdamW.Builder();
     }
 
     /**

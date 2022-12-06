@@ -599,6 +599,7 @@ final class PyTorchLibrary {
             long mean,
             long variance,
             float lr,
+            float learningRateBiasCorrection,
             float wd,
             float rescaleGrad,
             float clipGrad,

@@ -35,9 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * where g represents the gradient, and m/v are 1st and 2nd order moment estimates (mean and
  * variance).
  *
- * @see <a href="https://d2l.djl.ai/chapter_optimization/adam.html">The D2L chapter on Adam</a>
+ * @see <a href="https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html">The algorithm of AdamW</a>
  */
-public class Adam extends Optimizer {
+public class AdamW extends Optimizer {
 
     private ParameterTracker learningRateTracker;
     private float beta1;
@@ -46,14 +46,13 @@ public class Adam extends Optimizer {
 
     private Map<String, Map<Device, NDArray>> means;
     private Map<String, Map<Device, NDArray>> variances;
-    private boolean adamw;
 
     /**
      * Creates a new instance of {@code Adam} optimizer.
      *
      * @param builder the builder to create a new instance of {@code Adam} optimizer
      */
-    protected Adam(Builder builder) {
+    protected AdamW(Builder builder) {
         super(builder);
         learningRateTracker = builder.learningRateTracker;
         beta1 = builder.beta1;
@@ -106,7 +105,7 @@ public class Adam extends Optimizer {
                 beta2,
                 epsilon,
                 true,
-                false);
+                true);
     }
 
     /**
@@ -118,7 +117,7 @@ public class Adam extends Optimizer {
         return new Builder();
     }
 
-    /** The Builder to construct an {@link Adam} object. */
+    /** The Builder to construct an {@link AdamW} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
         private ParameterTracker learningRateTracker = Tracker.fixed(0.001f);
@@ -126,7 +125,9 @@ public class Adam extends Optimizer {
         private float beta2 = 0.999f;
         private float epsilon = 1e-8f;
 
-        Builder() {}
+        Builder() {
+            optWeightDecays(0.01f);
+        }
 
         /** {@inheritDoc} */
         @Override
@@ -179,12 +180,12 @@ public class Adam extends Optimizer {
         }
 
         /**
-         * Builds a {@link Adam} block.
+         * Builds a {@link AdamW} block.
          *
-         * @return the {@link Adam} block
+         * @return the {@link AdamW} block
          */
-        public Adam build() {
-            return new Adam(this);
+        public AdamW build() {
+            return new AdamW(this);
         }
     }
 }
