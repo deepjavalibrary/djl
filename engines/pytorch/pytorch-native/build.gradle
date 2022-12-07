@@ -219,6 +219,10 @@ java {
     withSourcesJar()
 }
 
+formatCpp {
+    exclusions = ["main/patch/**"]
+}
+
 project.tasks.withType(GenerateModuleMetadata) {
     enabled = false
 }

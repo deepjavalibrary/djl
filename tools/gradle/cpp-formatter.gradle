@@ -26,6 +26,8 @@ class CppFormatterPlugin implements Plugin<Project> {
 
     void apply(Project project) {
 
+        project.extensions.create("formatCpp", FormatterConfig)
+
         project.task('formatCpp') {
             doLast {
                 if (!System.properties['os.name'].toLowerCase().contains('mac')) {
@@ -38,6 +40,12 @@ class CppFormatterPlugin implements Plugin<Project> {
                         .include("**/*.cc")
                         .include("**/*.cpp")
                         .include("**/*.h")
+                if (project.extensions.formatCpp.exclusions != null) {
+                    for (String exclusion in project.extensions.formatCpp.exclusions) {
+                        files = files.exclude(exclusion)
+                    }
+                }
+
                 for (File f : files) {
                     if (!f.isFile()) {
                         continue
@@ -72,4 +80,8 @@ class CppFormatterPlugin implements Plugin<Project> {
             }
         }
     }
+}
+
+class FormatterConfig {
+    String[] exclusions
 }
