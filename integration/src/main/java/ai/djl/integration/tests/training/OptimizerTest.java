@@ -24,7 +24,6 @@ import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.nn.core.Linear;
 import ai.djl.testing.Assertions;
-import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
@@ -175,7 +174,6 @@ public class OptimizerTest {
 
     @Test
     public void testAdamW() {
-        TestRequirements.engine("PyTorch");
         Optimizer optim = Optimizer.adamW().optLearningRateTracker(Tracker.fixed(0.1f)).build();
 
         Device[] devices = Engine.getInstance().getDevices(1);
@@ -196,9 +194,9 @@ public class OptimizerTest {
                 NDArray result = runOptimizer(manager, trainer, block, batchSize);
                 NDArray result2 = runOptimizer(manager, trainer, block, batchSize);
                 Assertions.assertAlmostEquals(
-                        result, manager.create(new float[] {0.8999999761581421f, -0.10000064f}));
+                        result, manager.create(new float[] {0.8990001082420349f, -0.10000064f}));
                 Assertions.assertAlmostEquals(
-                        result2, manager.create(new float[] {0.80060977f, -0.19939029f}));
+                        result2, manager.create(new float[] {0.7987207174301147f, -0.19939029f}));
             }
         }
     }

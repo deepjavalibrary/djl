@@ -435,7 +435,6 @@ class MxNDArrayEx implements NDArrayEx {
             boolean adamw) {
         MxOpParams params = new MxOpParams();
         params.addParam("lr", learningRateBiasCorrection);
-        params.addParam("wd", weightDecay);
         params.addParam("clip_gradient", clipGrad);
 
         params.addParam("beta1", beta1);
@@ -443,11 +442,17 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("epsilon", epsilon);
 
         if (!adamw) {
+            params.addParam("wd", weightDecay);
             params.addParam("rescale_grad", rescaleGrad);
             params.addParam("lazy_update", lazyUpdate);
             getManager().invoke("adam_update", inputs, weights, params);
         } else {
-            throw new UnsupportedOperationException("Not implemented");
+            // https://github.com/apache/mxnet/blob/7d602e3b2382eb501fdeb94c4d97e652a723af11/src/operator/contrib/adamw.cc#L80-L121
+            // https://github.com/apache/mxnet/blob/7d602e3b2382eb501fdeb94c4d97e652a723af11/src/operator/contrib/adamw-inl.h#L172-L207
+            inputs.add(inputs.getManager().create(rescaleGrad));
+            params.addParam("eta", 1.0f);
+            params.addParam("wd", weightDecay * learningRate);
+            getManager().invoke("_adamw_update", inputs, weights, params);
         }
     }
 

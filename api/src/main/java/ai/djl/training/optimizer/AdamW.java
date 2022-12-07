@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * where g represents the gradient, and m/v are 1st and 2nd order moment estimates (mean and
  * variance), t is the step.
  *
- * @see <a href="https://pytorch.org/docs/stablew/generated/torch.optim.AdamW.html">The algorithm of
+ * @see <a href="https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html">The algorithm of
  *     AdamW</a>
  */
 public class AdamW extends Optimizer {
