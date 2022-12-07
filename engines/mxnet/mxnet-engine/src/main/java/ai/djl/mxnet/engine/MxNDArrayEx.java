@@ -434,7 +434,7 @@ class MxNDArrayEx implements NDArrayEx {
             boolean lazyUpdate,
             boolean adamw) {
         MxOpParams params = new MxOpParams();
-        params.addParam("lr", learningRate);
+        params.addParam("lr", learningRateBiasCorrection);
         params.addParam("wd", weightDecay);
         params.addParam("clip_gradient", clipGrad);
 
