@@ -17,9 +17,7 @@ import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.translator.wrapper.FileTranslator;
-import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
-import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
+import ai.djl.translate.BasicTranslator;
 import ai.djl.translate.Translator;
 
 import org.testng.Assert;
@@ -51,15 +49,15 @@ public class SingleShotDetectionTranslatorFactoryTest {
 
             Translator<Path, DetectedObjects> translator2 =
                     factory.newInstance(Path.class, DetectedObjects.class, model, arguments);
-            Assert.assertTrue(translator2 instanceof FileTranslator);
+            Assert.assertTrue(translator2 instanceof BasicTranslator);
 
             Translator<URL, DetectedObjects> translator3 =
                     factory.newInstance(URL.class, DetectedObjects.class, model, arguments);
-            Assert.assertTrue(translator3 instanceof UrlTranslator);
+            Assert.assertTrue(translator3 instanceof BasicTranslator);
 
             Translator<InputStream, DetectedObjects> translator4 =
                     factory.newInstance(InputStream.class, DetectedObjects.class, model, arguments);
-            Assert.assertTrue(translator4 instanceof InputStreamTranslator);
+            Assert.assertTrue(translator4 instanceof BasicTranslator);
 
             Translator<Input, Output> translator5 =
                     factory.newInstance(Input.class, Output.class, model, arguments);

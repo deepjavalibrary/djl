@@ -14,20 +14,11 @@ package ai.djl.paddlepaddle.zoo.cv.imageclassification;
 
 import ai.djl.Model;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.Input;
-import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory;
-import ai.djl.modality.cv.translator.ImageServingTranslator;
-import ai.djl.modality.cv.translator.wrapper.FileTranslator;
-import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
-import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.Map;
 
 /** An {@link TranslatorFactory} that creates a {@link PpWordRotateTranslatorFactory} instance. */
@@ -35,20 +26,8 @@ public class PpWordRotateTranslatorFactory extends ImageClassificationTranslator
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
-    public <I, O> Translator<I, O> newInstance(
-            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
-        if (input == Image.class && output == Classifications.class) {
-            return (Translator<I, O>) new PpWordRotateTranslator();
-        } else if (input == Path.class && output == Classifications.class) {
-            return (Translator<I, O>) new FileTranslator<>(new PpWordRotateTranslator());
-        } else if (input == URL.class && output == Classifications.class) {
-            return (Translator<I, O>) new UrlTranslator<>(new PpWordRotateTranslator());
-        } else if (input == InputStream.class && output == Classifications.class) {
-            return (Translator<I, O>) new InputStreamTranslator<>(new PpWordRotateTranslator());
-        } else if (input == Input.class && output == Output.class) {
-            return (Translator<I, O>) new ImageServingTranslator(new PpWordRotateTranslator());
-        }
-        throw new IllegalArgumentException("Unsupported input/output types.");
+    protected Translator<Image, Classifications> buildBaseTranslator(
+            Model model, Map<String, ?> arguments) {
+        return new PpWordRotateTranslator();
     }
 }
