@@ -47,7 +47,6 @@ public class Adam extends Optimizer {
 
     private Map<String, Map<Device, NDArray>> means;
     private Map<String, Map<Device, NDArray>> variances;
-    private boolean adamw;
 
     /**
      * Creates a new instance of {@code Adam} optimizer.
