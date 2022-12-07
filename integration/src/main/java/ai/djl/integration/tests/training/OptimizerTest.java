@@ -174,7 +174,7 @@ public class OptimizerTest {
 
     @Test
     public void testAdamW() {
-        if ("MXNet".equals(Engine.getDefaultEngineName())) return;
+        TestRequirements.engine("PyTorch");
         Optimizer optim = Optimizer.adamW().optLearningRateTracker(Tracker.fixed(0.1f)).build();
 
         Device[] devices = Engine.getInstance().getDevices(1);
