@@ -24,9 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@code Adam} is a generalization of the AdaGrad {@link Optimizer}.
- *
- * <br>
+ * {@code Adam} is a generalization of the AdaGrad {@link Optimizer}. <br>
  * \( grad += weight_decay * w\)<br>
  * \( m = beta1 * m + (1 - beta1) * grad\)<br>
  * \( v = beta2 * v + (1 - beta2) * grad^2 \)<br>

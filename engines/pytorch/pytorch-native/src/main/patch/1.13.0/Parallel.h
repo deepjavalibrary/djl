@@ -1,14 +1,13 @@
 #pragma once
 #include <ATen/Config.h>
 #include <c10/macros/Macros.h>
+
 #include <functional>
 #include <string>
 
 namespace at {
 
-inline int64_t divup(int64_t x, int64_t y) {
-  return (x + y - 1) / y;
-}
+inline int64_t divup(int64_t x, int64_t y) { return (x + y - 1) / y; }
 
 // Called during new thread initialization
 TORCH_API void init_num_threads();
@@ -35,19 +34,15 @@ TORCH_API void set_thread_num(int);
 
 class TORCH_API ThreadIdGuard {
  public:
-  ThreadIdGuard(int new_id) : old_id_(at::get_thread_num()) {
-    set_thread_num(new_id);
-  }
+  ThreadIdGuard(int new_id) : old_id_(at::get_thread_num()) { set_thread_num(new_id); }
 
-  ~ThreadIdGuard() {
-    set_thread_num(old_id_);
-  }
+  ~ThreadIdGuard() { set_thread_num(old_id_); }
 
  private:
   int old_id_;
 };
 
-} // namespace internal
+}  // namespace internal
 
 /*
 parallel_for
@@ -67,11 +62,7 @@ This means for example that Tensor operations CANNOT be used in the
 body of your function, only data pointers.
 */
 template <class F>
-inline void parallel_for(
-    const int64_t begin,
-    const int64_t end,
-    const int64_t grain_size,
-    const F& f);
+inline void parallel_for(const int64_t begin, const int64_t end, const int64_t grain_size, const F& f);
 
 /*
 parallel_reduce
@@ -113,12 +104,7 @@ body of your function, only data pointers.
 */
 template <class scalar_t, class F, class SF>
 inline scalar_t parallel_reduce(
-    const int64_t begin,
-    const int64_t end,
-    const int64_t grain_size,
-    const scalar_t ident,
-    const F& f,
-    const SF& sf);
+    const int64_t begin, const int64_t end, const int64_t grain_size, const scalar_t ident, const F& f, const SF& sf);
 
 // Returns a detailed string describing parallelization settings
 TORCH_API std::string get_parallel_info();
@@ -133,7 +119,7 @@ TORCH_API int get_num_interop_threads();
 TORCH_API void launch(std::function<void()> func);
 namespace internal {
 void launch_no_thread_state(std::function<void()> fn);
-} // namespace internal
+}  // namespace internal
 
 // Launches intra-op parallel task
 TORCH_API void intraop_launch(std::function<void()> func);
@@ -141,14 +127,14 @@ TORCH_API void intraop_launch(std::function<void()> func);
 // Returns number of intra-op threads used by default
 TORCH_API int intraop_default_num_threads();
 
-} // namespace at
+}  // namespace at
 
 #if AT_PARALLEL_OPENMP
-#include <ATen/ParallelOpenMP.h> // IWYU pragma: keep
+#include <ATen/ParallelOpenMP.h>  // IWYU pragma: keep
 #elif AT_PARALLEL_NATIVE
-#include <ATen/ParallelNative.h> // IWYU pragma: keep
+#include <ATen/ParallelNative.h>  // IWYU pragma: keep
 #elif AT_PARALLEL_NATIVE_TBB
-#include <ATen/ParallelNativeTBB.h> // IWYU pragma: keep
+#include <ATen/ParallelNativeTBB.h>  // IWYU pragma: keep
 #endif
 
-#include <ATen/Parallel-inl.h> // IWYU pragma: keep
+#include <ATen/Parallel-inl.h>  // IWYU pragma: keep
