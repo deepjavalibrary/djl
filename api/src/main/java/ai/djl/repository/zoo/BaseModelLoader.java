@@ -28,6 +28,7 @@ import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Pair;
 import ai.djl.util.Progress;
+import ai.djl.util.Utils;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -102,6 +103,7 @@ public class BaseModelLoader implements ModelLoader {
             if (modelDir == null) {
                 throw new AssertionError("Directory should not be null.");
             }
+            modelDir = Utils.getNestedModelDir(modelDir);
 
             loadServingProperties(modelDir, arguments, options);
             Application application = criteria.getApplication();
