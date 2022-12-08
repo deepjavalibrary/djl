@@ -295,10 +295,8 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             dim = dim * dataShape.get(i + 1);
             indexLinear = indexLinear.addi(index.get("{}, ...", i).muli(dim));
         }
-
         NDArray indexLinearFlatten = indexLinear.flatten();
         NDArray dataFlatten = this.flatten(0, indexingDepth - 1);
-
         Shape totalShape = indexShape.slice(1).addAll(dataShape.slice(indexingDepth));
         return dataFlatten.get(indexLinearFlatten).reshape(totalShape);
     }
