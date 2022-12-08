@@ -572,15 +572,33 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
-     * Returns a partial {@code NDArray} pointed by the indexed array. Given NDArray arr, NDArray
-     * idx, and long axis, the output is out_{ijk} = arr_{idx_{ijk}, j, k} if axis=0 or arr_{i,
-     * idx_{ijk}, k} if axis=1 or arr_{i, j, idx_{ijk}} if axis=2
+     * Returns a partial {@code NDArray} pointed by the indexed array. \( Given NDArray arr, NDArray
+     * idx, and long axis, \)<br>
+     * \( out_{ijk} = arr_{idx_{ijk}, j, k} if axis=0 \)<br>
+     * \( arr_{i, idx_{ijk}, k} if axis=1 \)<br>
+     * \( arr_{i, j, idx_{ijk}} if axis=2 \)<br>
      *
      * @param index picks the elements of an NDArray to the same position as index
      * @param axis the entries of index are indices of axis
      * @return the partial {@code NDArray} of the same shape as index
      */
     NDArray gather(NDArray index, int axis);
+
+    /**
+     * Returns a partial {@code NDArray} pointed by the indexed array. Given NDArray arr and NDArray
+     * idx. idx is the following structure: <br>
+     * \( idx = [ idx[0, ...], idx[1, ...],..., idx[indexingRank,...] ] \)<br>
+     * corresponding to x, y, z index, i.e. [idx_x, idx_y, idx_z, ...]. indexingRank <=
+     * data.shape[0] If indexingRank < data.shape[0]. For instance, data.shape[0] = 3, i.e. x, y, z,
+     * but indexingRank = 2, i.e. [idx_x, idx_y]. Then the co-rank=data.shape[0] - indexingRank will
+     * be kept. With that being said, the output shape = idx_x.shape appended by
+     * data.shape[indexingRank:]
+     * https://mxnet.apache.org/versions/1.6/api/r/docs/api/mx.symbol.gather_nd.html?highlight=gather_nd
+     *
+     * @param index picks the elements of an NDArray to the same position as index
+     * @return the partial {@code NDArray} of the same shape as index
+     */
+    NDArray gatherNd(NDArray index);
 
     /**
      * Returns a partial {@code NDArray} pointed by index according to linear indexing, and the of
@@ -3156,6 +3174,24 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return a 1-D {@code NDArray} of equal size
      */
     NDArray flatten();
+
+    /**
+     * Flattens this {@code NDArray} into a partially flatten {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[]{1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f}, new Shape(2, 2, 2));
+     * jshell&gt; array.flatten(0, 1);
+     * ND: (4) cpu() float32
+     * [[1., 2], [3., 4.], [5., 6.], [7., 8.]]
+     * </pre>
+     *
+     * @param startDim the first dim to flatten, inclusive
+     * @param endDim the last dim to flatten, inclusive
+     * @return a partially fallen {@code NDArray}
+     */
+    NDArray flatten(int startDim, int endDim);
 
     /**
      * Reshapes this {@code NDArray} to the given {@link Shape}.

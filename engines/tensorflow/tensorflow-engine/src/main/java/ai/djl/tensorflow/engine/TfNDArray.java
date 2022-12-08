@@ -211,6 +211,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDArray gatherNd(NDArray index) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray take(NDManager manager, NDArray index) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -1126,6 +1132,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     @Override
     public NDArray flatten() {
         return reshape(new Shape(-1));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray flatten(int startDim, int endDim) {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */

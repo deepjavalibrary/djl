@@ -261,9 +261,39 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public NDArray gather(NDArray index, int axis) {
         if (!(index instanceof PtNDArray)) {
-            throw new IllegalArgumentException("Only PtNDArray is supported.");
+            throw new IllegalArgumentException("Only PtNDArray index is supported.");
         }
         return JniUtils.gather(this, (PtNDArray) index, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray gatherNd(NDArray index) {
+        if (!(index instanceof PtNDArray)) {
+            throw new IllegalArgumentException("Only PtNDArray index is supported.");
+        }
+        Shape indexShape = index.getShape();
+        Shape dataShape = getShape();
+        int indexingRank = (int) indexShape.get(0);
+        if (indexingRank > dataShape.dimension()) {
+            throw new IllegalArgumentException(
+                    "Indexing rank "
+                            + indexShape.get(0)
+                            + " exceeds the data rank "
+                            + dataShape.dimension());
+        }
+        // Row-first order, the linear index is accumulated from z->x.
+        NDArray indexLinear = index.get("{}, ...", indexingRank - 1);
+        long dim = 1;
+        for (int i = indexingRank - 2; i > -1; i--) {
+            dim = dim * indexShape.get(i);
+            indexLinear = indexLinear.addi(index.get("{}, ...", i).muli(dim));
+        }
+        NDArray indexLinearFlatten = indexLinear.flatten();
+        NDArray dataFlatten = this.flatten(0, indexingRank - 1);
+
+        Shape totalShape = indexShape.slice(1).addAll(dataShape.slice(indexingRank));
+        return dataFlatten.get(indexLinearFlatten).reshape(totalShape);
     }
 
     /** {@inheritDoc} */
@@ -1014,6 +1044,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public PtNDArray flatten() {
         return JniUtils.flatten(this, 0, -1);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray flatten(int startDim, int endDim) {
+        return JniUtils.flatten(this, startDim, endDim);
     }
 
     /** {@inheritDoc} */

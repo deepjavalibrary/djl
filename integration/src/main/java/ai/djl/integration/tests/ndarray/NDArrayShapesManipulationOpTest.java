@@ -70,6 +70,14 @@ public class NDArrayShapesManipulationOpTest {
             array = manager.create(new Shape(2, 0));
             expected = manager.create(new Shape(0));
             Assert.assertEquals(array.flatten(), expected);
+
+            // partial flatten
+            array =
+                    manager.create(
+                            new float[] {1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f}, new Shape(2, 2, 2));
+            expected =
+                    manager.create(new float[] {1, 2, 3, 4, 5, 6, 7, 8}).reshape(new Shape(4, 2));
+            Assert.assertEquals(array.flatten(0, 1), expected);
         }
     }
 
