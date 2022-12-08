@@ -288,7 +288,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         // indexLinear has shape (3, 3), is from combining the index along 0 axis.
         // Each number in indexLinear is an indexing to an element in data (3, 2, ...).
         // data is flattened to be (3*2, ...) which can be indexed by indexLinear.
-        // Finally, reshape the output to (3, 3, ...), thus
+        // Finally, reshape the output to (3, 3, ...). Thus
         // totalShape = indexShape.slice(1).addAll(dataShape.slice(indexingDepth));
         NDArray indexLinear = index.get("{}, ...", indexingDepth - 1);
         long dim = 1;
