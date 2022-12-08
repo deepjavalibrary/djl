@@ -274,8 +274,8 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         }
         Shape indexShape = index.getShape();
         Shape dataShape = getShape();
-        int indexingRank = (int) indexShape.get(0);
-        if (indexingRank > dataShape.dimension()) {
+        int indexingDepth = (int) indexShape.get(0);
+        if (indexingDepth > dataShape.dimension()) {
             throw new IllegalArgumentException(
                     "Indexing rank "
                             + indexShape.get(0)
@@ -283,16 +283,16 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
                             + dataShape.dimension());
         }
         // Row-first order, the linear index is accumulated from z->x.
-        NDArray indexLinear = index.get("{}, ...", indexingRank - 1);
+        NDArray indexLinear = index.get("{}, ...", indexingDepth - 1);
         long dim = 1;
-        for (int i = indexingRank - 2; i > -1; i--) {
-            dim = dim * indexShape.get(i);
+        for (int i = indexingDepth - 2; i > -1; i--) {
+            dim = dim * dataShape.get(i+1);
             indexLinear = indexLinear.addi(index.get("{}, ...", i).muli(dim));
         }
         NDArray indexLinearFlatten = indexLinear.flatten();
-        NDArray dataFlatten = this.flatten(0, indexingRank - 1);
+        NDArray dataFlatten = this.flatten(0, indexingDepth - 1);
 
-        Shape totalShape = indexShape.slice(1).addAll(dataShape.slice(indexingRank));
+        Shape totalShape = indexShape.slice(1).addAll(dataShape.slice(indexingDepth));
         return dataFlatten.get(indexLinearFlatten).reshape(totalShape);
     }
 

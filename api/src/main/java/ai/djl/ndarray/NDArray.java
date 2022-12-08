@@ -587,14 +587,14 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Returns a partial {@code NDArray} pointed by the indexed array. Given NDArray arr and NDArray
      * idx. idx is the following structure: <br>
-     * \( idx = [ idx[0, ...], idx[1, ...],..., idx[indexingRank,...] ] \)<br>
+     * \( idx = [ idx[0, ...], idx[1, ...],..., idx[indexingDepth,...] ] \)<br>
      * corresponding to x, y, z index, i.e. [idx_x, idx_y, idx_z, ...]. <br>
-     * So indexingRank smaller than or equal to data.shape[0] <br>
-     * If indexingRank is smaller than data.shape[0], for instance, data.shape[0] = 3, i.e. x, y, z,
+     * So indexingDepth smaller than or equal to data.shape[0] <br>
+     * If indexingDepth is smaller than data.shape[0], for instance, data.shape[0] = 3, i.e. x, y, z,
      * <br>
-     * but indexingRank = 2, i.e. [idx_x, idx_y], <br>
-     * then the tail co-rank = data.shape[0] - indexingRank will be kept. <br>
-     * With it, the output shape = idx_y.shape appended by data.shape[indexingRank:]
+     * but indexingDepth = 2, i.e. [idx_x, idx_y], <br>
+     * then the tail co-rank = data.shape[0] - indexingDepth will be kept. <br>
+     * With it, the output shape = idx_y.shape appended by data.shape[indexingDepth:]
      * https://mxnet.apache.org/versions/1.6/api/r/docs/api/mx.symbol.gather_nd.html?highlight=gather_nd
      *
      * @param index picks the elements of an NDArray to the same position as index
