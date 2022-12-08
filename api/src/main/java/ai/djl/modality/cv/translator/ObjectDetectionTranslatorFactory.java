@@ -12,38 +12,18 @@
  */
 package ai.djl.modality.cv.translator;
 
-import ai.djl.modality.Input;
-import ai.djl.modality.Output;
-import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.TranslatorFactory;
-import ai.djl.util.Pair;
-
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * An abstract {@link TranslatorFactory} that creates a {@link ObjectDetectionTranslator} instance.
  */
-public abstract class ObjectDetectionTranslatorFactory implements TranslatorFactory {
-
-    private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();
-
-    static {
-        SUPPORTED_TYPES.add(new Pair<>(Image.class, DetectedObjects.class));
-        SUPPORTED_TYPES.add(new Pair<>(Path.class, DetectedObjects.class));
-        SUPPORTED_TYPES.add(new Pair<>(URL.class, DetectedObjects.class));
-        SUPPORTED_TYPES.add(new Pair<>(InputStream.class, DetectedObjects.class));
-        SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
-    }
+public abstract class ObjectDetectionTranslatorFactory
+        extends BaseImageTranslatorFactory<DetectedObjects> {
 
     /** {@inheritDoc} */
     @Override
-    public Set<Pair<Type, Type>> getSupportedTypes() {
-        return SUPPORTED_TYPES;
+    public Class<DetectedObjects> getBaseOutputType() {
+        return DetectedObjects.class;
     }
 }

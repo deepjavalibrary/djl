@@ -17,9 +17,7 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.translator.wrapper.FileTranslator;
-import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
-import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
+import ai.djl.translate.BasicTranslator;
 import ai.djl.translate.Translator;
 
 import org.testng.Assert;
@@ -56,15 +54,15 @@ public class ImageClassificationTranslatorFactoryTest {
 
             Translator<Path, Classifications> translator2 =
                     factory.newInstance(Path.class, Classifications.class, model, arguments);
-            Assert.assertTrue(translator2 instanceof FileTranslator);
+            Assert.assertTrue(translator2 instanceof BasicTranslator);
 
             Translator<URL, Classifications> translator3 =
                     factory.newInstance(URL.class, Classifications.class, model, arguments);
-            Assert.assertTrue(translator3 instanceof UrlTranslator);
+            Assert.assertTrue(translator3 instanceof BasicTranslator);
 
             Translator<InputStream, Classifications> translator4 =
                     factory.newInstance(InputStream.class, Classifications.class, model, arguments);
-            Assert.assertTrue(translator4 instanceof InputStreamTranslator);
+            Assert.assertTrue(translator4 instanceof BasicTranslator);
 
             Translator<Input, Output> translator5 =
                     factory.newInstance(Input.class, Output.class, model, arguments);

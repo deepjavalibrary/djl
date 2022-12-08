@@ -14,42 +14,15 @@ package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.Input;
-import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.translator.wrapper.FileTranslator;
-import ai.djl.modality.cv.translator.wrapper.InputStreamTranslator;
-import ai.djl.modality.cv.translator.wrapper.UrlTranslator;
-import ai.djl.translate.ExpansionTranslatorFactory;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
-import ai.djl.util.Pair;
 
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 /** A {@link TranslatorFactory} that creates an {@link ImageClassificationTranslator}. */
 public class ImageClassificationTranslatorFactory
-        extends ExpansionTranslatorFactory<Image, Classifications> {
-
-    private static final Map<
-                    Pair<Type, Type>,
-                    Function<Translator<Image, Classifications>, Translator<?, ?>>>
-            EXPANSIONS = new ConcurrentHashMap<>();
-
-    static {
-        EXPANSIONS.put(new Pair<>(Image.class, Classifications.class), t -> t);
-        EXPANSIONS.put(new Pair<>(Path.class, Classifications.class), FileTranslator::new);
-        EXPANSIONS.put(new Pair<>(URL.class, Classifications.class), UrlTranslator::new);
-        EXPANSIONS.put(
-                new Pair<>(InputStream.class, Classifications.class), InputStreamTranslator::new);
-        EXPANSIONS.put(new Pair<>(Input.class, Output.class), ImageServingTranslator::new);
-    }
+        extends BaseImageTranslatorFactory<Classifications> {
 
     /** {@inheritDoc} */
     @Override
@@ -60,8 +33,7 @@ public class ImageClassificationTranslatorFactory
 
     /** {@inheritDoc} */
     @Override
-    protected Map<Pair<Type, Type>, Function<Translator<Image, Classifications>, Translator<?, ?>>>
-            getExpansions() {
-        return EXPANSIONS;
+    public Class<Classifications> getBaseOutputType() {
+        return Classifications.class;
     }
 }

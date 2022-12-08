@@ -15,52 +15,33 @@ package ai.djl.modality.cv.translator.wrapper;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDList;
-import ai.djl.translate.Batchifier;
-import ai.djl.translate.Translator;
+import ai.djl.translate.PreProcessor;
 import ai.djl.translate.TranslatorContext;
 
 import java.net.URL;
 
 /**
- * Built-in {@code Translator} that provides image pre-processing from URL.
+ * Built-in {@code PreProcessor} that provides image pre-processing from URL.
  *
  * @param <T> the output object type
  */
-public class UrlTranslator<T> implements Translator<URL, T> {
+public class UrlImagePreProcessor<T> implements PreProcessor<URL> {
 
-    private Translator<Image, T> translator;
+    private PreProcessor<Image> preProcessor;
 
     /**
-     * Creates a {@code UrlTranslator} instance.
+     * Creates a {@code UrlImagePreProcessor} instance.
      *
-     * @param translator a {@code Translator} that can process image
+     * @param preProcessor a {@code PreProcessor} that can process image
      */
-    public UrlTranslator(Translator<Image, T> translator) {
-        this.translator = translator;
+    public UrlImagePreProcessor(PreProcessor<Image> preProcessor) {
+        this.preProcessor = preProcessor;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, URL input) throws Exception {
         Image image = ImageFactory.getInstance().fromUrl(input);
-        return translator.processInput(ctx, image);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public T processOutput(TranslatorContext ctx, NDList list) throws Exception {
-        return translator.processOutput(ctx, list);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return translator.getBatchifier();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void prepare(TranslatorContext ctx) throws Exception {
-        translator.prepare(ctx);
+        return preProcessor.processInput(ctx, image);
     }
 }
