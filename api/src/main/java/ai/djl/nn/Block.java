@@ -185,7 +185,8 @@ public interface Block {
     void setInitializer(Initializer initializer, Predicate<Parameter> predicate);
 
     /**
-     * Initializes the parameters of the block. This method must be called before calling `forward`.
+     * Initializes the parameters of the block, set require gradient if required and infer the block
+     * inputShape. This method must be called before calling `forward`.
      *
      * @param manager the NDManager to initialize the parameters
      * @param dataType the datatype of the parameters

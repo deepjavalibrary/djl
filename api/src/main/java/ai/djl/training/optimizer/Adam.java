@@ -72,9 +72,9 @@ public class Adam extends Optimizer {
         float weightDecay = getWeightDecay();
 
         Preconditions.checkArgument(
-                !Float.isNaN(newLearningRate)
+                !Float.isNaN(learningRateBiasCorrection)
                         && !Float.isNaN(weightDecay)
-                        && !Float.isInfinite(newLearningRate)
+                        && !Float.isInfinite(learningRateBiasCorrection)
                         && !Float.isInfinite(weightDecay),
                 "learning rate or weight decay is nan or infinite");
         NDList inputs =
