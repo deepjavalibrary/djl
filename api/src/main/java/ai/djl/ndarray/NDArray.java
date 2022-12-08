@@ -593,8 +593,8 @@ public interface NDArray extends NDResource, BytesSupplier {
      * If indexingRank is smaller than data.shape[0], for instance, data.shape[0] = 3, i.e. x, y, z,
      * <br>
      * but indexingRank = 2, i.e. [idx_x, idx_y], <br>
-     * then the co-rank=data.shape[0] - indexingRank will be kept. <br>
-     * With it, the output shape = idx_x.shape[1:] appended by data.shape[indexingRank:]
+     * then the tail co-rank = data.shape[0] - indexingRank will be kept. <br>
+     * With it, the output shape = idx_y.shape appended by data.shape[indexingRank:]
      * https://mxnet.apache.org/versions/1.6/api/r/docs/api/mx.symbol.gather_nd.html?highlight=gather_nd
      *
      * @param index picks the elements of an NDArray to the same position as index
