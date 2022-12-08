@@ -590,8 +590,8 @@ public interface NDArray extends NDResource, BytesSupplier {
      * \( idx = [ idx[0, ...], idx[1, ...],..., idx[indexingDepth,...] ] \)<br>
      * corresponding to x, y, z index, i.e. [idx_x, idx_y, idx_z, ...]. <br>
      * So indexingDepth smaller than or equal to data.shape[0] <br>
-     * If indexingDepth is smaller than data.shape[0], for instance, data.shape[0] = 3, i.e. x, y, z,
-     * <br>
+     * If indexingDepth is smaller than data.shape[0], for instance, data.shape[0] = 3, i.e. x, y,
+     * z, <br>
      * but indexingDepth = 2, i.e. [idx_x, idx_y], <br>
      * then the tail co-rank = data.shape[0] - indexingDepth will be kept. <br>
      * With it, the output shape = idx_y.shape appended by data.shape[indexingDepth:]
