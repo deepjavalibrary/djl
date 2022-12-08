@@ -122,7 +122,7 @@ public class LambdaBlock extends AbstractBlock {
                 outputShapes[i] = output.get(i).getShape();
                 dataTypes[i] = output.get(i).getDataType();
             }
-            outputDatatypes = dataTypes;
+            outputDataTypes = dataTypes;
             return outputShapes;
         }
     }

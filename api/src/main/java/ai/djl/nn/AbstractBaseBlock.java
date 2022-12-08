@@ -46,7 +46,7 @@ public abstract class AbstractBaseBlock implements Block {
     /** The shape of the input for this block, set by the initialization process. */
     protected Shape[] inputShapes;
 
-    protected DataType[] outputDatatypes;
+    protected DataType[] outputDataTypes;
 
     /** List of names for the input, named inputs should be manually set in sub class. */
     protected List<String> inputNames = Collections.emptyList();
@@ -375,6 +375,6 @@ public abstract class AbstractBaseBlock implements Block {
     /** {@inheritDoc} */
     @Override
     public DataType[] getOutputDataTypes() {
-        return outputDatatypes;
+        return outputDataTypes;
     }
 }

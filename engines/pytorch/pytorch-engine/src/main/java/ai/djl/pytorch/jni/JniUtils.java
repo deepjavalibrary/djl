@@ -1647,24 +1647,28 @@ public final class JniUtils {
             PtNDArray mean,
             PtNDArray variance,
             float lr,
+            float learningRateBiasCorrection,
             float wd,
             float rescaleGrad,
             float clipGrad,
             float beta1,
             float beta2,
-            float eps) {
+            float eps,
+            boolean adamw) {
         PyTorchLibrary.LIB.adamUpdate(
                 weight.getHandle(),
                 grad.getHandle(),
                 mean.getHandle(),
                 variance.getHandle(),
                 lr,
+                learningRateBiasCorrection,
                 wd,
                 rescaleGrad,
                 clipGrad,
                 beta1,
                 beta2,
-                eps);
+                eps,
+                adamw);
     }
 
     public static void sgdUpdate(

@@ -266,13 +266,15 @@ public class PtNDArrayEx implements NDArrayEx {
             NDList inputs,
             NDList weights,
             float learningRate,
+            float learningRateBiasCorrection,
             float weightDecay,
             float rescaleGrad,
             float clipGrad,
             float beta1,
             float beta2,
             float epsilon,
-            boolean lazyUpdate) {
+            boolean lazyUpdate,
+            boolean adamw) {
         // TODO: Lazy update not used
         PtNDManager manager = array.getManager();
         JniUtils.adamUpdate(
@@ -281,12 +283,14 @@ public class PtNDArrayEx implements NDArrayEx {
                 manager.from(inputs.get(2)),
                 manager.from(inputs.get(3)),
                 learningRate,
+                learningRateBiasCorrection,
                 weightDecay,
                 rescaleGrad,
                 clipGrad,
                 beta1,
                 beta2,
-                epsilon);
+                epsilon,
+                adamw);
         // call zero-grad
         JniUtils.zeroGrad(manager.from(weights.singletonOrThrow()));
     }

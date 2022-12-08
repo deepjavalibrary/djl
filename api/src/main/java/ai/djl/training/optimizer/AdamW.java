@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -24,8 +24,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@code Adam} is a generalization of the AdaGrad {@link Optimizer}. <br>
- * \( grad += weight_decay * w\)<br>
+ * {@code Adam} is a generalization of the AdaGrad {@link Optimizer}.
+ *
+ * <p>Adam updates the weights using:<br>
+ * <br>
+ * \( w *= (1 - learning_rate * weight_decay\)<br>
  * \( m = beta1 * m + (1 - beta1) * grad\)<br>
  * \( v = beta2 * v + (1 - beta2) * grad^2 \)<br>
  * \( learning_rate_bias_correction = learning_rate / beta1**t * sqrt(beta2**t) \)<br>
@@ -34,9 +37,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * where g represents the gradient, and m/v are 1st and 2nd order moment estimates (mean and
  * variance), t is the step.
  *
- * @see <a href="https://d2l.djl.ai/chapter_optimization/adam.html">The D2L chapter on Adam</a>
+ * @see <a href="https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html">The algorithm of
+ *     AdamW</a>
  */
-public class Adam extends Optimizer {
+public class AdamW extends Optimizer {
 
     private ParameterTracker learningRateTracker;
     private float beta1;
@@ -51,7 +55,7 @@ public class Adam extends Optimizer {
      *
      * @param builder the builder to create a new instance of {@code Adam} optimizer
      */
-    protected Adam(Builder builder) {
+    protected AdamW(Builder builder) {
         super(builder);
         learningRateTracker = builder.learningRateTracker;
         beta1 = builder.beta1;
@@ -104,7 +108,7 @@ public class Adam extends Optimizer {
                 beta2,
                 epsilon,
                 true,
-                false);
+                true);
     }
 
     /**
@@ -116,7 +120,7 @@ public class Adam extends Optimizer {
         return new Builder();
     }
 
-    /** The Builder to construct an {@link Adam} object. */
+    /** The Builder to construct an {@link AdamW} object. */
     public static final class Builder extends OptimizerBuilder<Builder> {
 
         private ParameterTracker learningRateTracker = Tracker.fixed(0.001f);
@@ -124,7 +128,9 @@ public class Adam extends Optimizer {
         private float beta2 = 0.999f;
         private float epsilon = 1e-8f;
 
-        Builder() {}
+        Builder() {
+            optWeightDecays(0.01f);
+        }
 
         /** {@inheritDoc} */
         @Override
@@ -177,12 +183,12 @@ public class Adam extends Optimizer {
         }
 
         /**
-         * Builds a {@link Adam} block.
+         * Builds a {@link AdamW} block.
          *
-         * @return the {@link Adam} block
+         * @return the {@link AdamW} block
          */
-        public Adam build() {
-            return new Adam(this);
+        public AdamW build() {
+            return new AdamW(this);
         }
     }
 }

@@ -78,6 +78,16 @@ public abstract class Optimizer {
     }
 
     /**
+     * Returns a new instance of {@link ai.djl.training.optimizer.AdamW.Builder} that can build an
+     * {@link AdamW} optimizer.
+     *
+     * @return the {@link AdamW} {@link ai.djl.training.optimizer.AdamW.Builder}
+     */
+    public static AdamW.Builder adamW() {
+        return new AdamW.Builder();
+    }
+
+    /**
      * Returns a new instance of {@link RmsProp.Builder} that can build an {@link RmsProp}
      * optimizer.
      *

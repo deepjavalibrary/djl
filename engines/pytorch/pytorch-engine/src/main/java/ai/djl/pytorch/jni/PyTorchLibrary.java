@@ -599,12 +599,14 @@ final class PyTorchLibrary {
             long mean,
             long variance,
             float lr,
+            float learningRateBiasCorrection,
             float wd,
             float rescaleGrad,
             float clipGrad,
             float beta1,
             float beta2,
-            float eps);
+            float eps,
+            boolean adamw);
 
     native void sgdUpdate(
             long weight,
