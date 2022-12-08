@@ -282,13 +282,20 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
                             + " exceeds the data rank "
                             + dataShape.dimension());
         }
-        // Row-first order, the linear index is accumulated from z->x.
+        // Row-first order, the linear index is accumulated from z->y->x.
+        // For example, dataShape = (3, 2, 3), indexShape = (2, 3, 3)
+        // The method is: indexLinear = index[1] + index[0] * dataShape[1], row-first order
+        // indexLinear has shape (3, 3), is from combining the index along 0 axis.
+        // Each number in indexLinear is an indexing to an element in data (3, 2, ...).
+        // data is flattened to be (3*2, ...) which can be indexed by indexLinear.
+        // Finally, reshape the output to (3, 3, ...).
         NDArray indexLinear = index.get("{}, ...", indexingDepth - 1);
         long dim = 1;
         for (int i = indexingDepth - 2; i > -1; i--) {
             dim = dim * dataShape.get(i+1);
             indexLinear = indexLinear.addi(index.get("{}, ...", i).muli(dim));
         }
+
         NDArray indexLinearFlatten = indexLinear.flatten();
         NDArray dataFlatten = this.flatten(0, indexingDepth - 1);
 
