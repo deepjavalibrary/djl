@@ -68,7 +68,7 @@ public final class IdEmbedding extends AbstractBlock {
         // create the embedding Table
         NDArray embeddingTable = ps.getValue(embedding, ids.getDevice(), training);
         // We do not perform a sparse lookup, instead we just project into the table
-        NDArray result = MissingOps.gatherNd(embeddingTable, ids);
+        NDArray result = embeddingTable.gatherNd(ids);
         // we want the original shape of the input + the last dimension of the embedding
         Shape targetShape = input.getShape().addAll(new Shape(embeddingTable.getShape().get(1)));
         return new NDList(result.reshape(targetShape));

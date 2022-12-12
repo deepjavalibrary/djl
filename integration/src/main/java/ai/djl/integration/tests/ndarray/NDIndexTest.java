@@ -74,6 +74,26 @@ public class NDIndexTest {
     }
 
     @Test
+    public void testGatherNd() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray original = manager.arange(1f, 9f).reshape(2, 2, 2);
+            NDArray index = manager.create(new float[] {0, 1, 1, 0}, new Shape(2, 2));
+            NDArray actual = original.gatherNd(index);
+            NDArray expected = manager.create(new float[] {3, 4, 5, 6}, new Shape(2, 2));
+            Assert.assertEquals(actual, expected);
+
+            original = manager.arange(1f, 19f).reshape(3, 2, 3);
+            index = manager.create(new float[] {2, 1, 1, 2, 0, 1, 1, 0}, new Shape(2, 4, 1));
+            actual = original.gatherNd(index);
+            expected =
+                    manager.create(
+                            new float[] {13, 14, 15, 10, 11, 12, 10, 11, 12, 13, 14, 15},
+                            new Shape(4, 1, 3));
+            Assert.assertEquals(actual, expected);
+        }
+    }
+
+    @Test
     public void testTake() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray original = manager.arange(1, 7f).reshape(-1, 3);

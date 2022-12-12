@@ -193,6 +193,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray gatherNd(NDArray index) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray take(NDManager manager, NDArray index) {
         throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
@@ -820,6 +826,12 @@ public abstract class NDArrayAdapter implements NDArray {
     @Override
     public NDArray flatten() {
         return getAlternativeArray().flatten();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray flatten(int startDim, int endDim) {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */

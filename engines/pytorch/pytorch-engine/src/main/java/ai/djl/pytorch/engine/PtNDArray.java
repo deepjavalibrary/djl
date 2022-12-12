@@ -261,9 +261,43 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public NDArray gather(NDArray index, int axis) {
         if (!(index instanceof PtNDArray)) {
-            throw new IllegalArgumentException("Only PtNDArray is supported.");
+            throw new IllegalArgumentException("Only PtNDArray index is supported.");
         }
         return JniUtils.gather(this, (PtNDArray) index, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray gatherNd(NDArray index) {
+        if (!(index instanceof PtNDArray)) {
+            throw new IllegalArgumentException("Only PtNDArray index is supported.");
+        }
+        Shape indexShape = index.getShape();
+        Shape dataShape = getShape();
+        int indexingDepth = (int) indexShape.get(0);
+        if (indexingDepth > dataShape.dimension()) {
+            throw new IllegalArgumentException(
+                    "Indexing rank "
+                            + indexShape.get(0)
+                            + " exceeds the data rank "
+                            + dataShape.dimension());
+        }
+        // Row-first order, the linear index is accumulated from z->y->x.
+        // For example, dataShape = (3, 2, 3), indexShape = (2, 3, 3)
+        // The method is: indexLinear = index[1] + index[0] * dataShape[1], row-first order
+        // indexLinear has shape (3, 3), is from combining the index along 0 axis.
+        // Each number in indexLinear is an indexing to an element in data (3, 2, ...).
+        // data is flattened to be (3*2, ...) which can be indexed by indexLinear.
+        // Finally, reshape the output to (3, 3, ...). Thus
+        // totalShape = indexShape.slice(1).addAll(dataShape.slice(indexingDepth));
+        NDArray indexLinear = index.get("{}, ...", indexingDepth - 1);
+        long dim = 1;
+        for (int i = indexingDepth - 2; i > -1; i--) {
+            dim = dim * dataShape.get(i + 1);
+            indexLinear = indexLinear.addi(index.get("{}, ...", i).muli(dim));
+        }
+        NDArray dataFlatten = this.flatten(0, indexingDepth - 1);
+        return dataFlatten.get(indexLinear);
     }
 
     /** {@inheritDoc} */
@@ -1014,6 +1048,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public PtNDArray flatten() {
         return JniUtils.flatten(this, 0, -1);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray flatten(int startDim, int endDim) {
+        return JniUtils.flatten(this, startDim, endDim);
     }
 
     /** {@inheritDoc} */

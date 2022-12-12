@@ -96,7 +96,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
         // Now we create one long sequence by appending all sequences
         NDArray flattenedSequences = sequences.reshape((long) batchSize * sequenceLength, width);
         // We use the absolute indices to gather the elements of the flattened sequences
-        return MissingOps.gatherNd(flattenedSequences, absoluteIndices);
+        return flattenedSequences.gatherNd(absoluteIndices);
     }
 
     /** {@inheritDoc} */

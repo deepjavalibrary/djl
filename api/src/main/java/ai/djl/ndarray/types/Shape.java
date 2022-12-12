@@ -227,6 +227,9 @@ public class Shape {
      * @return a new {@code Shape} whose content is a slice of this shape
      */
     public Shape slice(int beginIndex, int endIndex) {
+        beginIndex = beginIndex + (beginIndex < 0 ? shape.length : 0);
+        endIndex = endIndex + (endIndex < 0 ? shape.length : 0);
+
         int size = endIndex - beginIndex;
         long[] out = new long[size];
         System.arraycopy(shape, beginIndex, out, 0, size);
