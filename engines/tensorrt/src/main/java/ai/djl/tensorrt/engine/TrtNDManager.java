@@ -56,7 +56,9 @@ public class TrtNDManager extends BaseNDManager {
         if (array == null || array instanceof TrtNDArray) {
             return (TrtNDArray) array;
         }
-        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        TrtNDArray result = create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        result.setName(array.getName());
+        return result;
     }
 
     /** {@inheritDoc} */

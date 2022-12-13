@@ -52,7 +52,9 @@ public class PtNDManager extends BaseNDManager {
         if (array == null || array instanceof PtNDArray) {
             return (PtNDArray) array;
         }
-        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        PtNDArray result = create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        result.setName(array.getName());
+        return result;
     }
 
     /** {@inheritDoc} */

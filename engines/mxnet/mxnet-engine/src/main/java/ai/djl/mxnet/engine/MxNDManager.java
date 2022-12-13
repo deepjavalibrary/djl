@@ -71,6 +71,7 @@ public class MxNDManager extends BaseNDManager {
         }
         MxNDArray ret = create(array.getShape(), array.getDataType());
         ret.set(array.toByteBuffer());
+        ret.setName(array.getName());
         return ret;
     }
 

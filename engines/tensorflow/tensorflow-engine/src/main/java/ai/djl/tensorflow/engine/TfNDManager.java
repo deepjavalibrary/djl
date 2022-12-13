@@ -56,7 +56,9 @@ public class TfNDManager extends BaseNDManager {
         if (array == null || array instanceof TfNDArray) {
             return (TfNDArray) array;
         }
-        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        TfNDArray result = create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        result.setName(array.getName());
+        return result;
     }
 
     /** {@inheritDoc} */
