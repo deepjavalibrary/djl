@@ -51,7 +51,9 @@ public class TfLiteNDManager extends BaseNDManager {
         if (array == null || array instanceof TfLiteNDArray) {
             return (TfLiteNDArray) array;
         }
-        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        TfLiteNDArray result = create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        result.setName(array.getName());
+        return result;
     }
 
     TfLiteNDArray createInternal(Tensor tensor) {

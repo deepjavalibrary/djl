@@ -56,7 +56,10 @@ public class DlrNDManager extends BaseNDManager {
         if (array == null || array instanceof DlrNDArray) {
             return (DlrNDArray) array;
         }
-        return (DlrNDArray) create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        DlrNDArray result =
+                (DlrNDArray) create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        result.setName(array.getName());
+        return result;
     }
 
     /** {@inheritDoc} */

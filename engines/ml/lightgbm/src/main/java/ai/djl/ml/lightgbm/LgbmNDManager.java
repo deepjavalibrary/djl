@@ -53,7 +53,10 @@ public class LgbmNDManager extends BaseNDManager {
         if (array == null || array instanceof LgbmNDArray) {
             return (LgbmNDArray) array;
         }
-        return (LgbmNDArray) create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        LgbmNDArray result =
+                (LgbmNDArray) create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        result.setName(array.getName());
+        return result;
     }
 
     /** {@inheritDoc} */

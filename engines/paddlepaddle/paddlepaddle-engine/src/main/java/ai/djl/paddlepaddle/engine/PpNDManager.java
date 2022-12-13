@@ -70,7 +70,9 @@ public class PpNDManager extends BaseNDManager {
         if (array == null || array instanceof PpNDArray) {
             return (PpNDArray) array;
         }
-        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        PpNDArray result = create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        result.setName(array.getName());
+        return result;
     }
 
     /**

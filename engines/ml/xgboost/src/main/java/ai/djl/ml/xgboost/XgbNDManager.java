@@ -69,7 +69,10 @@ public class XgbNDManager extends BaseNDManager {
         if (array == null || array instanceof XgbNDArray) {
             return (XgbNDArray) array;
         }
-        return (XgbNDArray) create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        XgbNDArray result =
+                (XgbNDArray) create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        result.setName(array.getName());
+        return result;
     }
 
     /** {@inheritDoc} */

@@ -57,7 +57,9 @@ public class OrtNDManager extends BaseNDManager {
         if (array == null || array instanceof OrtNDArray) {
             return (OrtNDArray) array;
         }
-        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        OrtNDArray result = create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        result.setName(array.getName());
+        return result;
     }
 
     OrtNDArray createInternal(OnnxTensor tensor) {
