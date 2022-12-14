@@ -83,7 +83,7 @@ Gradle:
     implementation("ai.djl.onnxruntime:onnxruntime-engine:0.20.0") {
         exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
     }
-    implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.12.1"
+    implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.13.1"
 ```
 
 #### Enable TensorRT execution
