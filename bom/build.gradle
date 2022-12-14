@@ -50,6 +50,7 @@ dependencies {
         api "ai.djl.tflite:tflite-engine:${version}"
         api "ai.djl.timeseries:timeseries:${version}"
         api "ai.djl.spark:spark:${version}"
+        api "com.microsoft.onnxruntime:onnxruntime:${onnxruntime_version}"
     }
 }
 
