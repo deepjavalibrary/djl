@@ -9,6 +9,10 @@ on:
         description: 'staging/snapshot, default is snapshot'
         required: true
         default: 'snapshot'
+      serving-branch:
+        description: 'djl-serving branch, default is master'
+        required: true
+        default: 'master'
       repo-id:
         description: 'staging repository id for djl api packages'
         required: false
@@ -23,6 +27,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: deepjavalibrary/djl-serving
+          ref: ${{ serving-branch }}
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
