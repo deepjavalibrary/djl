@@ -42,6 +42,13 @@ public interface NativeResource<T> extends AutoCloseable {
      */
     String getUid();
 
+    /**
+     * Gets and sets the atomic handle to null.
+     *
+     * @return the previous handle value
+     */
+    T getAndSetHandleNull();
+
     /** {@inheritDoc} */
     @Override
     void close();

@@ -24,7 +24,7 @@ import ai.djl.pytorch.jni.JniUtils;
 
 import java.util.Stack;
 
-/** The {@link NDArrayIndexer} used by the {@link PtNDArrayImpl}. */
+/** The {@link NDArrayIndexer} used by the {@link PtNDArray}. */
 public class PtNDArrayIndexer extends NDArrayIndexer {
 
     private PtNDManager manager;
@@ -70,8 +70,8 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
             index.addAllDim();
         }
 
-        if (array == null || array instanceof PtNDArrayImpl) {
-            return JniUtils.indexAdv((PtNDArrayImpl) array, index, manager);
+        if (array == null || array instanceof PtNDArray) {
+            return JniUtils.indexAdv((PtNDArray) array, index, manager);
         } else {
             PtNDArray arrayNew =
                     manager.create(array.toByteBuffer(), array.getShape(), array.getDataType());
@@ -89,9 +89,9 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
                                 array.toByteBuffer(), array.getShape(), array.getDataType());
 
         if (data instanceof Number) {
-            JniUtils.indexAdvPut(ptArray, index, (PtNDArrayImpl) manager.create((Number) data));
+            JniUtils.indexAdvPut(ptArray, index, (PtNDArray) manager.create((Number) data));
         } else if (data instanceof NDArray) {
-            JniUtils.indexAdvPut(ptArray, index, (PtNDArrayImpl) data);
+            JniUtils.indexAdvPut(ptArray, index, (PtNDArray) data);
         } else {
             throw new IllegalArgumentException(
                     "The type of value to assign cannot be other than NDArray and Number.");

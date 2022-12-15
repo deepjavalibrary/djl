@@ -1191,8 +1191,8 @@ public final class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtN
     /** {@inheritDoc} */
     @Override
     public void intern(NDArray replaced) {
-        PtNDArrayImpl arr = (PtNDArrayImpl) replaced;
-        Long oldHandle = handle.getAndSet(arr.handle.getAndSet(null));
+        PtNDArray arr = (PtNDArray) replaced;
+        Long oldHandle = handle.getAndSet(arr.getAndSetHandleNull());
         JniUtils.deleteNDArray(oldHandle);
         // dereference old ndarray
         arr.close();

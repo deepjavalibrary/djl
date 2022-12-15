@@ -32,6 +32,12 @@ public abstract class NativeResourceImpl<T> implements NativeResource<T> {
 
     /** {@inheritDoc} */
     @Override
+    public T getAndSetHandleNull() {
+        return handle.getAndSet(null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public boolean isReleased() {
         return handle.get() == null;
     }

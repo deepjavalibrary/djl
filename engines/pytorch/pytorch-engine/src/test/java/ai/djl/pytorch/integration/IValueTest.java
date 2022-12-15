@@ -18,7 +18,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.engine.PtNDArray;
-import ai.djl.pytorch.engine.PtNDArrayImpl;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
 import ai.djl.pytorch.jni.IValue;
@@ -39,10 +38,10 @@ public class IValueTest {
     @Test
     public void testIValue() {
         try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
-            PtNDArrayImpl array1 = (PtNDArrayImpl) manager.zeros(new Shape(1));
-            PtNDArrayImpl array2 = (PtNDArrayImpl) manager.ones(new Shape(1));
-            PtNDArrayImpl array3 = (PtNDArrayImpl) manager.create("test");
-            PtNDArrayImpl array4 = (PtNDArrayImpl) manager.create(new String[] {"test1", "test2"});
+            PtNDArray array1 = (PtNDArray) manager.zeros(new Shape(1));
+            PtNDArray array2 = (PtNDArray) manager.ones(new Shape(1));
+            PtNDArray array3 = (PtNDArray) manager.create("test");
+            PtNDArray array4 = (PtNDArray) manager.create(new String[] {"test1", "test2"});
 
             try (IValue ivalue = IValue.from(array1)) {
                 Assert.assertTrue(ivalue.isTensor());

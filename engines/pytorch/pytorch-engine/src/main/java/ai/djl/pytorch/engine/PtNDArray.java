@@ -27,6 +27,7 @@ import java.nio.charset.Charset;
 
 /** {@code PtNDArray} is the interface for the PyTorch implementation of {@link NDArray}. */
 public interface PtNDArray extends NativeResource<Long>, NDArray {
+
     /** {@inheritDoc} */
     @Override
     PtNDManager getManager();
