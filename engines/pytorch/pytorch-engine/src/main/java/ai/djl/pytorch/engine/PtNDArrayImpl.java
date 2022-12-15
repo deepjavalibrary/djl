@@ -34,8 +34,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-/** {@code PtNDArray} is the PyTorch implementation of {@link NDArray}. */
-public class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray {
+/** {@code PtNDArrayImpl} is the PyTorch implementation of {@link NDArray}. */
+public final class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray {
 
     private String name;
     private Device device;
@@ -51,30 +51,6 @@ public class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray
     // keep a reference to direct buffer to avoid GC release the memory
     @SuppressWarnings("PMD.UnusedPrivateField")
     private ByteBuffer dataRef;
-
-    public static PtNDArray newPtNDArray(PtNDManager manager, long handle) {
-        PtNDArray instance = new PtNDArrayImpl(manager, handle);
-        if (manager.isUseProxies()) {
-            instance = manager.getProxyMaker().wrap(instance);
-        }
-        return instance;
-    }
-
-    public static PtNDArray newPtNDArray(PtNDManager manager, long handle, ByteBuffer data) {
-        PtNDArray instance = new PtNDArrayImpl(manager, handle, data);
-        if (manager.isUseProxies()) {
-            instance = manager.getProxyMaker().wrap(instance);
-        }
-        return instance;
-    }
-
-    public static PtNDArray newPtNDArray(PtNDManager manager, String[] strs, Shape shape) {
-        PtNDArray instance = new PtNDArrayImpl(manager, strs, shape);
-        if (manager.isUseProxies()) {
-            instance = manager.getProxyMaker().wrap(instance);
-        }
-        return instance;
-    }
 
     /**
      * Constructs a PyTorch {@code NDArray} from a native handle (internal. Use {@link NDManager}
@@ -1581,5 +1557,59 @@ public class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray
         }
         manager.detachInternal(getUid());
         dataRef = null;
+    }
+
+    /**
+     * Constructs a PyTorch {@code NDArray} from a native handle (internal. Use {@link NDManager}
+     * instead). Depending on the switch {@code useProxies}, the returned {@code NDArray} will be
+     * returned as a proxy or a direct instance.
+     *
+     * @param manager the manager to attach the new array to
+     * @param handle the pointer to the native PyTorch memory
+     * @return the new {@code NDArray}
+     */
+    public static PtNDArray newPtNDArray(PtNDManager manager, long handle) {
+        PtNDArray instance = new PtNDArrayImpl(manager, handle);
+        if (manager.isUseProxies()) {
+            instance = manager.getProxyMaker().wrap(instance);
+        }
+        return instance;
+    }
+
+    /**
+     * Constructs a PyTorch {@code NDArray} from a native handle (internal. Use {@link NDManager}
+     * instead) with the data that is hold on Java side. Depending on the switch {@code useProxies},
+     * the returned {@code NDArray} will be returned as a proxy or a direct instance.
+     *
+     * @param manager the manager to attach the new array to
+     * @param handle the pointer to the native PyTorch memory
+     * @param data the direct buffer of the data
+     * @return the new {@code NDArray}
+     */
+    public static PtNDArray newPtNDArray(PtNDManager manager, long handle, ByteBuffer data) {
+        PtNDArray instance = new PtNDArrayImpl(manager, handle, data);
+        if (manager.isUseProxies()) {
+            instance = manager.getProxyMaker().wrap(instance);
+        }
+        return instance;
+    }
+
+    /**
+     * Constructs a PyTorch {@code NDArray} to hold string array with a dummy native handle
+     * (internal. Use {@link NDManager} instead) with the data that is hold on Java side. Depending
+     * on the switch {@code useProxies}, the returned {@code NDArray} will be returned as a proxy or
+     * a direct instance.
+     *
+     * @param manager the manager to attach the new array to
+     * @param strs the string array
+     * @param shape the {@link Shape} of the {@link NDArray}
+     * @return the new {@code NDArray}
+     */
+    public static PtNDArray newPtNDArray(PtNDManager manager, String[] strs, Shape shape) {
+        PtNDArray instance = new PtNDArrayImpl(manager, strs, shape);
+        if (manager.isUseProxies()) {
+            instance = manager.getProxyMaker().wrap(instance);
+        }
+        return instance;
     }
 }

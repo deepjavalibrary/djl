@@ -12,8 +12,6 @@
  */
 package ai.djl.pytorch.engine;
 
-import static ai.djl.pytorch.engine.PtNDArrayImpl.newPtNDArray;
-
 import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.BaseNDManager;
@@ -44,6 +42,8 @@ public class PtNDManager extends BaseNDManager {
         return SYSTEM_MANAGER;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public PtNDArrayProxyMaker getProxyMaker() {
         return getSystemManager().getProxyMaker();
     }
@@ -89,7 +89,7 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray create(String[] data, Charset charset, Shape shape) {
-        return newPtNDArray(this, data, shape);
+        return PtNDArrayImpl.newPtNDArray(this, data, shape);
     }
 
     /** {@inheritDoc} */
@@ -188,6 +188,7 @@ public class PtNDManager extends BaseNDManager {
         return manager;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager newSubManager(Device device, boolean useProxies) {
         PtNDManager manager = new PtNDManager(this, device, useProxies);

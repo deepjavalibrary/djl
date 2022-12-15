@@ -290,7 +290,9 @@ public abstract class Engine {
      * @param useProxies whether to facade resources with a proxy
      * @return a new top-level {@code NDManager}
      */
-    public abstract NDManager newBaseManager(boolean useProxies);
+    public NDManager newBaseManager(boolean useProxies) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
     /**
      * Creates a new top-level {@link NDManager}.

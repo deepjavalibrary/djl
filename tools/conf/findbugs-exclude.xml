@@ -31,6 +31,6 @@
     </Match>
     <Match>
         <Bug pattern="URF_UNREAD_FIELD"/>
-        <Class name="~ai\.djl\.pytorch\.engine\.PtNDArray"/>
+        <Class name="~ai\.djl\.pytorch\.engine\.PtNDArrayImpl"/>
     </Match>
 </FindBugsFilter>

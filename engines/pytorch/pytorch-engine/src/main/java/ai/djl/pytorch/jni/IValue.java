@@ -12,8 +12,6 @@
  */
 package ai.djl.pytorch.jni;
 
-import static ai.djl.pytorch.engine.PtNDArrayImpl.newPtNDArray;
-
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -395,7 +393,7 @@ public class IValue extends NativeResourceImpl<Long> {
      * @return the NDArray value of this IValue
      */
     public PtNDArray toTensor(PtNDManager manager) {
-        return newPtNDArray(manager, PyTorchLibrary.LIB.iValueToTensor(getHandle()));
+        return PtNDArrayImpl.newPtNDArray(manager, PyTorchLibrary.LIB.iValueToTensor(getHandle()));
     }
 
     /**
@@ -408,7 +406,7 @@ public class IValue extends NativeResourceImpl<Long> {
         long[] handles = PyTorchLibrary.LIB.iValueToTensorList(getHandle());
         PtNDArray[] ret = new PtNDArrayImpl[handles.length];
         for (int i = 0; i < ret.length; ++i) {
-            ret[i] = newPtNDArray(manager, handles[i]);
+            ret[i] = PtNDArrayImpl.newPtNDArray(manager, handles[i]);
         }
         return ret;
     }

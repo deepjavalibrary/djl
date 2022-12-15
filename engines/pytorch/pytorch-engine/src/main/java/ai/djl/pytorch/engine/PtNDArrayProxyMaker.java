@@ -25,11 +25,8 @@ public class PtNDArrayProxyMaker implements NDArrayProxyMaker {
 
     WeakHashMapWrapper<UUID, NDArray> map = new WeakHashMapWrapper<>();
 
-    /**
-     * Returns the size of the map.
-     *
-     * @return the size of the map
-     */
+    /** {@inheritDoc} */
+    @Override
     public int mapSize() {
         return map.size();
     }
@@ -40,6 +37,7 @@ public class PtNDArrayProxyMaker implements NDArrayProxyMaker {
      * @param array the array to wrap
      * @return the wrapped array
      */
+    @Override
     public PtNDArray wrap(NDArray array) {
         UUID uuid = UUID.randomUUID();
         map.put(uuid, array);
