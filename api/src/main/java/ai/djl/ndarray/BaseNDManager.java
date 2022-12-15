@@ -469,6 +469,50 @@ public abstract class BaseNDManager implements NDManager {
         }
     }
 
+    /**
+     * Prints information about this {@link NDManager} and all sub-managers to the console.
+     *
+     * @param level the level of this {@link NDManager} in the hierarchy
+     */
+    public void debugDumpDetailed(int level) {
+        StringBuilder sb = new StringBuilder(100);
+        for (int i = 0; i < level; ++i) {
+            sb.append("    ");
+        }
+        sb.append("\\--- NDManager(")
+                .append(uid.substring(24))
+                .append(", ")
+                .append(device)
+                .append(") resource count: ")
+                .append(resources.size());
+
+        System.out.println(sb); // NOPMD
+        for (AutoCloseable c : resources.values()) {
+            if (c instanceof NDManager) {
+                ((BaseNDManager) c).debugDumpDetailed(level + 1);
+            } else if (c instanceof NDArray) {
+                StringBuilder sb2 = new StringBuilder(100);
+                for (int i = 0; i < level + 1; ++i) {
+                    sb2.append("    ");
+                }
+                sb2.append(
+                        "\\--- NDArray("
+                                + ((NDArray) c).getUid()
+                                + ", Shape"
+                                + ((NDArray) c).getShape()
+                                + ")");
+                System.out.println(sb2); // NOPMD
+            } else if (c instanceof NDResource) {
+                StringBuilder sb2 = new StringBuilder(100);
+                for (int i = 0; i < level + 1; ++i) {
+                    sb2.append("    ");
+                }
+                sb2.append("\\--- other NDResource");
+                System.out.println(sb2); // NOPMD
+            }
+        }
+    }
+
     NDManager getAlternativeManager() {
         return alternativeManager;
     }

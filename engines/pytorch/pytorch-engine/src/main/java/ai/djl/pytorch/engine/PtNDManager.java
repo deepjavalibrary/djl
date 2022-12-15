@@ -186,6 +186,11 @@ public class PtNDManager extends BaseNDManager {
         return Engine.getEngine(PtEngine.ENGINE_NAME);
     }
 
+    /** Dumps debug information about the current {@link PtNDManager} and all its children. */
+    public static void debugDumpFromSystemManager() {
+        ((BaseNDManager) PtNDManager.getSystemManager()).debugDumpDetailed(0);
+    }
+
     /** The SystemManager is the root {@link PtNDManager} of which all others are children. */
     private static final class SystemManager extends PtNDManager implements SystemNDManager {
 
