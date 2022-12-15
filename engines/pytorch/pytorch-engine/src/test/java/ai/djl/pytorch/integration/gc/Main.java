@@ -16,7 +16,6 @@ import static ai.djl.pytorch.engine.PtNDManager.debugDumpFromSystemManager;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.pytorch.engine.PtNDArrayProxyMaker;
 import ai.djl.translate.TranslateException;
 
 import org.slf4j.Logger;
@@ -38,8 +37,8 @@ public final class Main {
         try (NDManager baseManager = NDManager.newBaseManager(true); ) {
             try (NDManager subManager = baseManager.newSubManager()) {
 
-                NDArray a = subManager.create(new float[]{1f});
-                NDArray b = subManager.create(new float[]{2f});
+                NDArray a = subManager.create(new float[] {1f});
+                NDArray b = subManager.create(new float[] {2f});
                 NDArray c = a.add(b);
                 debugDumpFromSystemManager();
 

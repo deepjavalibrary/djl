@@ -23,8 +23,8 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
-
 import ai.djl.util.NativeResourceImpl;
+
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 

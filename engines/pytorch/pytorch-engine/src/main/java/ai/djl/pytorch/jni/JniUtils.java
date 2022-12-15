@@ -12,6 +12,8 @@
  */
 package ai.djl.pytorch.jni;
 
+import static ai.djl.pytorch.engine.PtNDArrayImpl.newPtNDArray;
+
 import ai.djl.Device;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.index.NDIndex;
@@ -30,7 +32,6 @@ import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
-import ai.djl.pytorch.engine.PtNDArrayImpl;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
 
@@ -49,8 +50,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
-
-import static ai.djl.pytorch.engine.PtNDArrayImpl.newPtNDArray;
 
 /**
  * A class containing utilities to interact with the PyTorch Engine's Java Native Interface (JNI)
@@ -237,7 +236,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray zerosLike(
-        PtNDArray array, DataType dType, Device device, SparseFormat fmt) {
+            PtNDArray array, DataType dType, Device device, SparseFormat fmt) {
         int layoutVal = layoutMapper(fmt, device);
         return newPtNDArray(
                 array.getManager(),
@@ -250,7 +249,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray onesLike(
-        PtNDArray array, DataType dType, Device device, SparseFormat fmt) {
+            PtNDArray array, DataType dType, Device device, SparseFormat fmt) {
         int layoutVal = layoutMapper(fmt, device);
         return newPtNDArray(
                 array.getManager(),
@@ -581,8 +580,7 @@ public final class JniUtils {
             return newPtNDArray(
                     manager, PyTorchLibrary.LIB.torchGetItem(ndArray.getHandle(), indices[0]));
         }
-        return newPtNDArray(
-                manager, PyTorchLibrary.LIB.torchGetItem(ndArray.getHandle(), indices));
+        return newPtNDArray(manager, PyTorchLibrary.LIB.torchGetItem(ndArray.getHandle(), indices));
     }
 
     public static PtNDArray clone(PtNDArray ndArray) {
@@ -798,8 +796,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray max(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchMax(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchMax(ndArray.getHandle()));
     }
 
     public static PtNDArray max(PtNDArray ndArray, long dim, boolean keepDim) {
@@ -815,8 +812,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray min(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchMin(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchMin(ndArray.getHandle()));
     }
 
     public static PtNDArray min(PtNDArray ndArray, long dim, boolean keepDim) {
@@ -844,8 +840,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray sum(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchSum(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchSum(ndArray.getHandle()));
     }
 
     public static PtNDArray sum(PtNDArray ndArray, long[] dims, boolean keepDim) {
@@ -928,8 +923,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray abs(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchAbs(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchAbs(ndArray.getHandle()));
     }
 
     public static PtNDArray square(PtNDArray ndArray) {
@@ -967,13 +961,11 @@ public final class JniUtils {
     }
 
     public static PtNDArray exp(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchExp(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchExp(ndArray.getHandle()));
     }
 
     public static PtNDArray log(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchLog(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchLog(ndArray.getHandle()));
     }
 
     public static PtNDArray log10(PtNDArray ndArray) {
@@ -987,18 +979,15 @@ public final class JniUtils {
     }
 
     public static PtNDArray sin(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchSin(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchSin(ndArray.getHandle()));
     }
 
     public static PtNDArray cos(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchCos(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchCos(ndArray.getHandle()));
     }
 
     public static PtNDArray tan(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchTan(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchTan(ndArray.getHandle()));
     }
 
     public static PtNDArray asin(PtNDArray ndArray) {
@@ -1042,13 +1031,11 @@ public final class JniUtils {
     }
 
     public static PtNDArray all(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchAll(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchAll(ndArray.getHandle()));
     }
 
     public static PtNDArray any(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchAny(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchAny(ndArray.getHandle()));
     }
 
     public static PtNDArray none(PtNDArray ndArray) {
@@ -1090,8 +1077,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray neg(PtNDArray ndArray) {
-        return newPtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchNeg(ndArray.getHandle()));
+        return newPtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.torchNeg(ndArray.getHandle()));
     }
 
     public static void negi(PtNDArray ndArray) {
@@ -1201,7 +1187,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray interpolate(
-        PtNDArray ndArray, long[] size, int mode, boolean alignCorners) {
+            PtNDArray ndArray, long[] size, int mode, boolean alignCorners) {
         return newPtNDArray(
                 ndArray.getManager(),
                 PyTorchLibrary.LIB.torchNNInterpolate(
@@ -1302,7 +1288,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray layerNorm(
-        PtNDArray ndArray, Shape normalizedShape, PtNDArray gamma, PtNDArray beta, double eps) {
+            PtNDArray ndArray, Shape normalizedShape, PtNDArray gamma, PtNDArray beta, double eps) {
         return newPtNDArray(
                 ndArray.getManager(),
                 PyTorchLibrary.LIB.torchNNLayerNorm(
@@ -1441,7 +1427,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray maxPool(
-        PtNDArray ndArray, Shape kernelSize, Shape stride, Shape padding, boolean ceilMode) {
+            PtNDArray ndArray, Shape kernelSize, Shape stride, Shape padding, boolean ceilMode) {
         return newPtNDArray(
                 ndArray.getManager(),
                 PyTorchLibrary.LIB.torchNNMaxPool(
@@ -1467,7 +1453,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray lpPool(
-        PtNDArray ndArray, double normType, Shape kernelSize, Shape stride, boolean ceilMode) {
+            PtNDArray ndArray, double normType, Shape kernelSize, Shape stride, boolean ceilMode) {
         if (ndArray.getShape().dimension() - 2 == 3) {
             throw new UnsupportedOperationException("3D lpPool is not supported in PyTorch engine");
         }
@@ -1549,7 +1535,7 @@ public final class JniUtils {
     }
 
     public static void backward(
-        PtNDArray ndArray, PtNDArray gradNd, boolean keepGraph, boolean createGraph) {
+            PtNDArray ndArray, PtNDArray gradNd, boolean keepGraph, boolean createGraph) {
         PyTorchLibrary.LIB.torchBackward(
                 ndArray.getHandle(), gradNd.getHandle(), keepGraph, createGraph);
     }

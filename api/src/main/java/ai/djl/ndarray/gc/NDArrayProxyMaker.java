@@ -14,19 +14,15 @@ package ai.djl.ndarray.gc;
 
 import ai.djl.ndarray.NDArray;
 
-import java.lang.reflect.Proxy;
-import java.util.UUID;
-
 /** {@code PtNDArrayProxyMaker} creates a proxy facade. */
 public interface NDArrayProxyMaker {
-
 
     /**
      * Returns the size of the map.
      *
      * @return the size of the map
      */
-   int mapSize();
+    int mapSize();
 
     /**
      * Wraps the {@link NDArray} in a proxy facade.
@@ -34,5 +30,5 @@ public interface NDArrayProxyMaker {
      * @param array the array to wrap
      * @return the wrapped array
      */
-    NDArray wrap(NDArray array) ;
+    NDArray wrap(NDArray array);
 }

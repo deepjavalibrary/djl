@@ -12,13 +12,11 @@
  */
 package ai.djl.util;
 
-import com.sun.jna.Pointer;
-
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * {@code NativeResource} is an internal class for {@link AutoCloseable} blocks of memory created in
- * the different engines.
+ * {@code NativeResourceImpl} is an internal class for {@link AutoCloseable} blocks of memory
+ * created in the different engines.
  *
  * @param <T> the resource that could map to a native pointer or java object
  */
@@ -32,21 +30,13 @@ public abstract class NativeResourceImpl<T> implements NativeResource<T> {
         uid = handle.toString();
     }
 
-    /**
-     * Gets the boolean that indicates whether this resource has been released.
-     *
-     * @return whether this resource has been released
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean isReleased() {
         return handle.get() == null;
     }
 
-    /**
-     * Gets the {@link Pointer} to this resource.
-     *
-     * @return the {@link Pointer} to this resource
-     */
+    /** {@inheritDoc} */
     @Override
     public T getHandle() {
         T reference = handle.get();
@@ -56,11 +46,7 @@ public abstract class NativeResourceImpl<T> implements NativeResource<T> {
         return reference;
     }
 
-    /**
-     * Gets the unique ID of this resource.
-     *
-     * @return the unique ID of this resource
-     */
+    /** {@inheritDoc} */
     @Override
     public final String getUid() {
         return uid;

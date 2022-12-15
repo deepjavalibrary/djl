@@ -37,7 +37,7 @@ public class DynamicInvocationHandler implements InvocationHandler {
      *
      * @param uuid the uuid
      * @param map the map
-     * @param gcAttacher the ndArrayProxyMaker
+     * @param ndArrayProxyMaker the ndArrayProxyMaker
      */
     public DynamicInvocationHandler(
             UUID uuid, WeakHashMapWrapper<UUID, NDArray> map, NDArrayProxyMaker ndArrayProxyMaker) {

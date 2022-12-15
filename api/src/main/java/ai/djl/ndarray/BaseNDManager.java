@@ -58,6 +58,7 @@ public abstract class BaseNDManager implements NDManager {
     protected BaseNDManager(NDManager parent, Device device) {
         this(parent, device, false);
     }
+
     protected BaseNDManager(NDManager parent, Device device, boolean useProxies) {
         this.parent = parent;
         this.device = device == null ? defaultDevice() : device;
@@ -82,15 +83,16 @@ public abstract class BaseNDManager implements NDManager {
     public NDArray create(String[] data, Charset charset, Shape shape) {
         throw new UnsupportedOperationException("Not supported!");
     }
-
-    public boolean isUseProxies() {
-        return useProxies;
-    }
-
     /** {@inheritDoc} */
     @Override
     public NDArray create(Shape shape, DataType dataType) {
         throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isUseProxies() {
+        return useProxies;
     }
 
     /** {@inheritDoc} */
@@ -310,9 +312,22 @@ public abstract class BaseNDManager implements NDManager {
         return newSubManager(device, useProxies);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDManager newSubManager(boolean useProxies) {
         return newSubManager(device, useProxies);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDManager newSubManager(Device device) {
+        return newSubManager(device, useProxies);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDManager newSubManager(Device device, boolean useProxies) {
+        throw new UnsupportedOperationException("Not supported!");
     }
 
     /** {@inheritDoc} */
@@ -601,8 +616,6 @@ public abstract class BaseNDManager implements NDManager {
         }
         target.rewind();
     }
-
-    public abstract NDManager newSubManager(Device device, boolean useProxies);
 
     protected static final class TempResource {
 

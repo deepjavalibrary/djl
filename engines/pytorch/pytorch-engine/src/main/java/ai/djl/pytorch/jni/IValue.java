@@ -12,6 +12,8 @@
  */
 package ai.djl.pytorch.jni;
 
+import static ai.djl.pytorch.engine.PtNDArrayImpl.newPtNDArray;
+
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -23,8 +25,6 @@ import ai.djl.util.NativeResourceImpl;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static ai.djl.pytorch.engine.PtNDArrayImpl.newPtNDArray;
 
 /**
  * A class represent a PyTorch {@code IValue} data.

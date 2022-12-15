@@ -287,14 +287,18 @@ public abstract class Engine {
      *
      * <p>{@code NDManager} will inherit default {@link Device}.
      *
+     * @param useProxies whether to facade resources with a proxy
      * @return a new top-level {@code NDManager}
      */
+    public abstract NDManager newBaseManager(boolean useProxies);
 
-
-
-
-    public abstract NDManager newBaseManager( boolean useProxies);
-
+    /**
+     * Creates a new top-level {@link NDManager}.
+     *
+     * <p>{@code NDManager} will inherit default {@link Device}.
+     *
+     * @return a new top-level {@code NDManager}
+     */
     public abstract NDManager newBaseManager();
 
     /**

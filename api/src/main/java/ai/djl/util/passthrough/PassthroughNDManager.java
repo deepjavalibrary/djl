@@ -87,6 +87,12 @@ public final class PassthroughNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public boolean isUseProxies() {
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDList load(Path path) {
         throw new UnsupportedOperationException(UNSUPPORTED);
     }
@@ -240,6 +246,18 @@ public final class PassthroughNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDManager newSubManager(Device device) {
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDManager newSubManager(boolean useProxies) {
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDManager newSubManager(Device device, boolean useProxies) {
         return this;
     }
 

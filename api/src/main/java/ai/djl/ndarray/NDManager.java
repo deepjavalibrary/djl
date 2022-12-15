@@ -106,12 +106,12 @@ import java.util.List;
  */
 public interface NDManager extends AutoCloseable {
 
-
     /**
      * Creates a new top-level {@code NDManager}.
      *
      * <p>{@code NDManager} will inherit default {@link Device}.
      *
+     * @param useProxies whether to facade {@link NDArray} behind a proxy
      * @return a new top-level {@code NDManager}
      */
     static NDManager newBaseManager(boolean useProxies) {
@@ -730,10 +730,6 @@ public interface NDManager extends AutoCloseable {
      */
     NDList load(Path path);
 
-    default NDArrayProxyMaker getProxyMaker() {
-        throw new UnsupportedOperationException("Not supported");
-    }
-
     /**
      * Loads the NDArrays saved to a file.
      *
@@ -749,6 +745,15 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Returns the {@link NDArrayProxyMaker}.
+     *
+     * @return the {@link NDArrayProxyMaker}
+     */
+    default NDArrayProxyMaker getProxyMaker() {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    /**
      * Sets the name for the NDManager.
      *
      * @param name the name assigned to the manager
@@ -761,6 +766,13 @@ public interface NDManager extends AutoCloseable {
      * @return name
      */
     String getName();
+
+    /**
+     * Returns useProxies.
+     *
+     * @return useProxies
+     */
+    boolean isUseProxies();
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
@@ -1516,9 +1528,24 @@ public interface NDManager extends AutoCloseable {
      */
     NDManager newSubManager(Device device);
 
-    default NDManager newSubManager(boolean useProxies) {
-        throw new UnsupportedOperationException("useProxies not supported here");
-    }
+    /**
+     * Creates a child {@code NDManager} with specified boolean switch useProxies and will inherit
+     * default {@link Device} from this {@code NDManager}.
+     *
+     * @param useProxies the boolean switch to use proxies
+     * @return a child {@code NDManager}
+     */
+    NDManager newSubManager(boolean useProxies);
+
+    /**
+     * Creates a child {@code NDManager} with specified default {@link Device} and the boolean
+     * switch useProxies.
+     *
+     * @param device the default {@link Device}
+     * @param useProxies the boolean switch to use proxies
+     * @return a child {@code NDManager}
+     */
+    NDManager newSubManager(Device device, boolean useProxies);
 
     /**
      * Returns the default {@link Device} of this {@code NDManager}.

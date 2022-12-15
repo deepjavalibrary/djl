@@ -52,7 +52,6 @@ public class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray
     @SuppressWarnings("PMD.UnusedPrivateField")
     private ByteBuffer dataRef;
 
-
     public static PtNDArray newPtNDArray(PtNDManager manager, long handle) {
         PtNDArray instance = new PtNDArrayImpl(manager, handle);
         if (manager.isUseProxies()) {
@@ -76,7 +75,6 @@ public class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray
         }
         return instance;
     }
-
 
     /**
      * Constructs a PyTorch {@code NDArray} from a native handle (internal. Use {@link NDManager}
@@ -123,9 +121,6 @@ public class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray
         this.shape = shape;
         this.dataType = DataType.STRING;
     }
-
-
-
 
     /** {@inheritDoc} */
     @Override

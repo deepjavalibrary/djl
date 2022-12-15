@@ -20,8 +20,8 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
-
 import ai.djl.util.NativeResourceImpl;
+
 import com.sun.jna.Pointer;
 
 import java.util.Arrays;

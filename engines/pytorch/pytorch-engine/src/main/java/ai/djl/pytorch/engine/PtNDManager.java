@@ -12,6 +12,8 @@
  */
 package ai.djl.pytorch.engine;
 
+import static ai.djl.pytorch.engine.PtNDArrayImpl.newPtNDArray;
+
 import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.BaseNDManager;
@@ -27,10 +29,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
-import static ai.djl.pytorch.engine.PtNDArrayImpl.newPtNDArray;
-
 /** {@code PtNDManager} is the PyTorch implementation of {@link NDManager}. */
-public   class PtNDManager extends BaseNDManager {
+public class PtNDManager extends BaseNDManager {
 
     private static final PtNDManager SYSTEM_MANAGER = new SystemManager();
 
@@ -40,18 +40,13 @@ public   class PtNDManager extends BaseNDManager {
         super(parent, device, useProxies);
     }
 
-
     static PtNDManager getSystemManager() {
         return SYSTEM_MANAGER;
     }
 
-
-
     public PtNDArrayProxyMaker getProxyMaker() {
         return getSystemManager().getProxyMaker();
     }
-
-
 
     /** {@inheritDoc} */
     @Override
@@ -185,7 +180,6 @@ public   class PtNDManager extends BaseNDManager {
         return JniUtils.normal(this, loc, scale, shape, dataType, device);
     }
 
-
     /** {@inheritDoc} */
     @Override
     public PtNDManager newSubManager(Device device) {
@@ -193,7 +187,6 @@ public   class PtNDManager extends BaseNDManager {
         attachUncappedInternal(manager.uid, manager);
         return manager;
     }
-
 
     @Override
     public NDManager newSubManager(Device device, boolean useProxies) {
@@ -220,8 +213,6 @@ public   class PtNDManager extends BaseNDManager {
             super(null, null, false);
             this.proxyMaker = new PtNDArrayProxyMaker();
         }
-
-
 
         @Override
         public PtNDArrayProxyMaker getProxyMaker() {

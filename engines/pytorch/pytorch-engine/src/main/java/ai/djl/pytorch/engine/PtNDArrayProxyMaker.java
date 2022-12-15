@@ -47,7 +47,7 @@ public class PtNDArrayProxyMaker implements NDArrayProxyMaker {
         return (PtNDArray)
                 Proxy.newProxyInstance(
                         Thread.currentThread().getContextClassLoader(),
-                    new Class<?>[] {PtNDArray.class},
+                        new Class<?>[] {PtNDArray.class},
                         handler);
     }
 }
