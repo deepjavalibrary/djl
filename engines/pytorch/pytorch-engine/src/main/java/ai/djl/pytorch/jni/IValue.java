@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static ai.djl.pytorch.engine.PtNDArrayImpl.newPtNDArray;
+
 /**
  * A class represent a PyTorch {@code IValue} data.
  *
@@ -393,7 +395,7 @@ public class IValue extends NativeResourceImpl<Long> {
      * @return the NDArray value of this IValue
      */
     public PtNDArray toTensor(PtNDManager manager) {
-        return new PtNDArrayImpl(manager, PyTorchLibrary.LIB.iValueToTensor(getHandle()));
+        return newPtNDArray(manager, PyTorchLibrary.LIB.iValueToTensor(getHandle()));
     }
 
     /**
@@ -406,7 +408,7 @@ public class IValue extends NativeResourceImpl<Long> {
         long[] handles = PyTorchLibrary.LIB.iValueToTensorList(getHandle());
         PtNDArray[] ret = new PtNDArrayImpl[handles.length];
         for (int i = 0; i < ret.length; ++i) {
-            ret[i] = new PtNDArrayImpl(manager, handles[i]);
+            ret[i] = newPtNDArray(manager, handles[i]);
         }
         return ret;
     }

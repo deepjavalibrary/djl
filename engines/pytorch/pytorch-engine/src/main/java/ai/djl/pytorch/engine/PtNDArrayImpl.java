@@ -52,6 +52,32 @@ public class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray
     @SuppressWarnings("PMD.UnusedPrivateField")
     private ByteBuffer dataRef;
 
+
+    public static PtNDArray newPtNDArray(PtNDManager manager, long handle) {
+        PtNDArray instance = new PtNDArrayImpl(manager, handle);
+        if (manager.isUseProxies()) {
+            instance = manager.getProxyMaker().wrap(instance);
+        }
+        return instance;
+    }
+
+    public static PtNDArray newPtNDArray(PtNDManager manager, long handle, ByteBuffer data) {
+        PtNDArray instance = new PtNDArrayImpl(manager, handle, data);
+        if (manager.isUseProxies()) {
+            instance = manager.getProxyMaker().wrap(instance);
+        }
+        return instance;
+    }
+
+    public static PtNDArray newPtNDArray(PtNDManager manager, String[] strs, Shape shape) {
+        PtNDArray instance = new PtNDArrayImpl(manager, strs, shape);
+        if (manager.isUseProxies()) {
+            instance = manager.getProxyMaker().wrap(instance);
+        }
+        return instance;
+    }
+
+
     /**
      * Constructs a PyTorch {@code NDArray} from a native handle (internal. Use {@link NDManager}
      * instead).
@@ -59,7 +85,7 @@ public class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray
      * @param manager the manager to attach the new array to
      * @param handle the pointer to the native PyTorch memory
      */
-    public PtNDArrayImpl(PtNDManager manager, long handle) {
+    private PtNDArrayImpl(PtNDManager manager, long handle) {
         super(handle);
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
@@ -74,7 +100,7 @@ public class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray
      * @param handle the pointer to the native PyTorch memory
      * @param data the direct buffer of the data
      */
-    public PtNDArrayImpl(PtNDManager manager, long handle, ByteBuffer data) {
+    private PtNDArrayImpl(PtNDManager manager, long handle, ByteBuffer data) {
         super(handle);
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
@@ -90,13 +116,16 @@ public class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtNDArray
      * @param strs the string array
      * @param shape the {@link Shape} of the {@link NDArray}
      */
-    public PtNDArrayImpl(PtNDManager manager, String[] strs, Shape shape) {
+    private PtNDArrayImpl(PtNDManager manager, String[] strs, Shape shape) {
         super(-1L);
         this.manager = manager;
         this.strs = strs;
         this.shape = shape;
         this.dataType = DataType.STRING;
     }
+
+
+
 
     /** {@inheritDoc} */
     @Override

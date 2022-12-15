@@ -128,6 +128,11 @@ public final class PtEngine extends Engine {
         return new PtModel(name, device);
     }
 
+
+    @Override
+    public NDManager newBaseManager(boolean useProxies) {
+        return PtNDManager.getSystemManager().newSubManager(useProxies);
+    }
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager() {

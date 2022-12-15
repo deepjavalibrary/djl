@@ -289,6 +289,12 @@ public abstract class Engine {
      *
      * @return a new top-level {@code NDManager}
      */
+
+
+
+
+    public abstract NDManager newBaseManager( boolean useProxies);
+
     public abstract NDManager newBaseManager();
 
     /**

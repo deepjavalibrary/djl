@@ -27,18 +27,31 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
+import static ai.djl.pytorch.engine.PtNDArrayImpl.newPtNDArray;
+
 /** {@code PtNDManager} is the PyTorch implementation of {@link NDManager}. */
-public class PtNDManager extends BaseNDManager {
+public   class PtNDManager extends BaseNDManager {
 
     private static final PtNDManager SYSTEM_MANAGER = new SystemManager();
 
-    private PtNDManager(NDManager parent, Device device) {
-        super(parent, device);
+    protected PtNDArrayProxyMaker proxyMaker;
+
+    private PtNDManager(NDManager parent, Device device, boolean useProxies) {
+        super(parent, device, useProxies);
     }
+
 
     static PtNDManager getSystemManager() {
         return SYSTEM_MANAGER;
     }
+
+
+
+    public PtNDArrayProxyMaker getProxyMaker() {
+        return getSystemManager().getProxyMaker();
+    }
+
+
 
     /** {@inheritDoc} */
     @Override
@@ -81,7 +94,7 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray create(String[] data, Charset charset, Shape shape) {
-        return new PtNDArrayImpl(this, data, shape);
+        return newPtNDArray(this, data, shape);
     }
 
     /** {@inheritDoc} */
@@ -172,10 +185,19 @@ public class PtNDManager extends BaseNDManager {
         return JniUtils.normal(this, loc, scale, shape, dataType, device);
     }
 
+
     /** {@inheritDoc} */
     @Override
     public PtNDManager newSubManager(Device device) {
-        PtNDManager manager = new PtNDManager(this, device);
+        PtNDManager manager = new PtNDManager(this, device, isUseProxies());
+        attachUncappedInternal(manager.uid, manager);
+        return manager;
+    }
+
+
+    @Override
+    public NDManager newSubManager(Device device, boolean useProxies) {
+        PtNDManager manager = new PtNDManager(this, device, useProxies);
         attachUncappedInternal(manager.uid, manager);
         return manager;
     }
@@ -195,7 +217,15 @@ public class PtNDManager extends BaseNDManager {
     private static final class SystemManager extends PtNDManager implements SystemNDManager {
 
         SystemManager() {
-            super(null, null);
+            super(null, null, false);
+            this.proxyMaker = new PtNDArrayProxyMaker();
+        }
+
+
+
+        @Override
+        public PtNDArrayProxyMaker getProxyMaker() {
+            return this.proxyMaker;
         }
     }
 }

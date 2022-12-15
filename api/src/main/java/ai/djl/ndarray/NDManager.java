@@ -15,6 +15,7 @@ package ai.djl.ndarray;
 import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
+import ai.djl.ndarray.gc.NDArrayProxyMaker;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Translator;
@@ -104,6 +105,18 @@ import java.util.List;
  *     Memory Management Guide</a>
  */
 public interface NDManager extends AutoCloseable {
+
+
+    /**
+     * Creates a new top-level {@code NDManager}.
+     *
+     * <p>{@code NDManager} will inherit default {@link Device}.
+     *
+     * @return a new top-level {@code NDManager}
+     */
+    static NDManager newBaseManager(boolean useProxies) {
+        return Engine.getInstance().newBaseManager(useProxies);
+    }
 
     /**
      * Creates a new top-level {@code NDManager}.
@@ -716,6 +729,10 @@ public interface NDManager extends AutoCloseable {
      * @return the loaded arrays
      */
     NDList load(Path path);
+
+    default NDArrayProxyMaker getProxyMaker() {
+        throw new UnsupportedOperationException("Not supported");
+    }
 
     /**
      * Loads the NDArrays saved to a file.
@@ -1498,6 +1515,10 @@ public interface NDManager extends AutoCloseable {
      * @return a child {@code NDManager}
      */
     NDManager newSubManager(Device device);
+
+    default NDManager newSubManager(boolean useProxies) {
+        throw new UnsupportedOperationException("useProxies not supported here");
+    }
 
     /**
      * Returns the default {@link Device} of this {@code NDManager}.

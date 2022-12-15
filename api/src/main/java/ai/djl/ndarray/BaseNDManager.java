@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 public abstract class BaseNDManager implements NDManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseNDManager.class);
+    private final boolean useProxies;
 
     protected NDManager parent;
     protected NDManager alternativeManager;
@@ -55,8 +56,12 @@ public abstract class BaseNDManager implements NDManager {
     protected AtomicBoolean capped = new AtomicBoolean(false);
 
     protected BaseNDManager(NDManager parent, Device device) {
+        this(parent, device, false);
+    }
+    protected BaseNDManager(NDManager parent, Device device, boolean useProxies) {
         this.parent = parent;
         this.device = device == null ? defaultDevice() : device;
+        this.useProxies = useProxies;
         resources = new ConcurrentHashMap<>();
         tempResources = new ConcurrentHashMap<>();
         uid = UUID.randomUUID().toString();
@@ -76,6 +81,10 @@ public abstract class BaseNDManager implements NDManager {
     @Override
     public NDArray create(String[] data, Charset charset, Shape shape) {
         throw new UnsupportedOperationException("Not supported!");
+    }
+
+    public boolean isUseProxies() {
+        return useProxies;
     }
 
     /** {@inheritDoc} */
@@ -298,7 +307,12 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDManager newSubManager() {
-        return newSubManager(device);
+        return newSubManager(device, useProxies);
+    }
+
+    @Override
+    public NDManager newSubManager(boolean useProxies) {
+        return newSubManager(device, useProxies);
     }
 
     /** {@inheritDoc} */
@@ -587,6 +601,8 @@ public abstract class BaseNDManager implements NDManager {
         }
         target.rewind();
     }
+
+    public abstract NDManager newSubManager(Device device, boolean useProxies);
 
     protected static final class TempResource {
 
