@@ -4,14 +4,11 @@ plugins {
 }
 
 dependencies {
-    api "commons-cli:commons-cli:${commons_cli_version}"
-    api "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
-    api project(":basicdataset")
-    api project(":model-zoo")
-    api project(":testing")
-    api("org.testng:testng:${testng_version}") {
-        exclude group: "junit", module: "junit"
-    }
+    implementation "commons-cli:commons-cli:${commons_cli_version}"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
+    implementation project(":basicdataset")
+    implementation project(":model-zoo")
+    implementation project(":testing")
 
     runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
     runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
@@ -29,6 +26,14 @@ dependencies {
         runtimeOnly project(":engines:dlr:dlr-engine")
     } else if (System.getProperty("ai.djl.default_engine") == "PaddlePaddle") {
         runtimeOnly project(":engines:paddlepaddle:paddlepaddle-model-zoo")
+    }
+}
+
+java {
+    compileJava {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+        options.compilerArgs.removeAll(["--release", "8"])
     }
 }
 

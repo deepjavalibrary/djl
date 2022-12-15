@@ -8,8 +8,8 @@
     <version>0.21.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <djl.version>0.21.0-SNAPSHOT</djl.version>
         <exec.mainClass>ai.djl.examples.inference.ObjectDetection</exec.mainClass>
     </properties>
@@ -72,7 +72,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.5</version>
+            <version>7.7.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

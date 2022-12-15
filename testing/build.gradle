@@ -1,4 +1,14 @@
 dependencies {
     api project(":api")
-    api "org.testng:testng:${testng_version}"
+    api("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+}
+
+java {
+    compileJava {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+        options.compilerArgs.removeAll(["--release", "8"])
+    }
 }
