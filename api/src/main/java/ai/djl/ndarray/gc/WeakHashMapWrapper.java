@@ -14,9 +14,6 @@ package ai.djl.ndarray.gc;
 
 import ai.djl.ndarray.NDArray;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
@@ -33,8 +30,6 @@ import java.util.WeakHashMap;
  */
 public class WeakHashMapWrapper<K, V> implements Map<K, V> {
 
-    private static final Logger logger = LoggerFactory.getLogger(WeakHashMapWrapper.class);
-
     private final WeakHashMap<K, V> map = new WeakHashMap<>();
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
@@ -47,8 +42,6 @@ public class WeakHashMapWrapper<K, V> implements Map<K, V> {
                 WeakReferenceWrapper<K, V> ref2 = (WeakReferenceWrapper<K, V>) ref;
                 V value = ref2.getValue();
                 if (value instanceof NDArray) { // just as one example
-                    logger.info(
-                            "NDArray is closed triggered by a message from the garbage collector");
                     ((NDArray) value).close();
                 }
             }
