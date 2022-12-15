@@ -15,6 +15,7 @@ package ai.djl.engine;
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.Block;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
@@ -305,6 +306,16 @@ public abstract class Engine {
      * @return a new instance of {@link GradientCollector}
      */
     public abstract GradientCollector newGradientCollector();
+
+    /**
+     * Returns a new instance of {@link GradientCollector}.
+     *
+     * @param block the block that the gradient collector attaches
+     * @return a new instance of {@link GradientCollector}
+     */
+    public GradientCollector newGradientCollector(Block block) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 
     /**
      * Returns a new instance of {@link ParameterServer}.

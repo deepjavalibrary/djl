@@ -19,6 +19,7 @@ import ai.djl.engine.EngineException;
 import ai.djl.mxnet.jna.JnaUtils;
 import ai.djl.mxnet.jna.LibUtils;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.Block;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
@@ -141,6 +142,12 @@ public final class MxEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public GradientCollector newGradientCollector() {
+        return new MxGradientCollector();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public GradientCollector newGradientCollector(Block block) {
         return new MxGradientCollector();
     }
 

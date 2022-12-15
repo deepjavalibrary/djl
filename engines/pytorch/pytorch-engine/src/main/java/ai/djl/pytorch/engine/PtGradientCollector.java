@@ -15,6 +15,8 @@ package ai.djl.pytorch.engine;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.Block;
+import ai.djl.nn.Parameter;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.GradientCollector;
 
@@ -37,8 +39,18 @@ public final class PtGradientCollector implements GradientCollector {
                     "A PtGradientCollector is already collecting. Only one can be collecting at a"
                             + " time");
         }
+    }
 
-        zeroGradients();
+    /**
+     * Constructs a new {@code PtGradientCollector} instance.
+     *
+     * @param block the block that the gradient collector belongs. It is seen as a set of trainable
+     *     parameters.
+     */
+    public PtGradientCollector(Block block) {
+        gradModel = JniUtils.isGradMode();
+        JniUtils.setGradMode(true);
+        zeroGradients(block);
     }
 
     /** {@inheritDoc} */
@@ -74,6 +86,20 @@ public final class PtGradientCollector implements GradientCollector {
         for (NDArray array : systemManager.getManagedArrays()) {
             if (array.hasGradient()) {
                 array.getGradient().subi(array.getGradient());
+            }
+        }
+    }
+
+    /**
+     * Sets all the gradients within the block to zero.
+     *
+     * @param block the target block to run zeroGradients on
+     */
+    public void zeroGradients(Block block) {
+        for (Parameter param : block.getParameters().values()) {
+            NDArray array = param.getArray();
+            if (array.hasGradient()) {
+                JniUtils.zeroGrad((PtNDArray) array);
             }
         }
     }

@@ -17,6 +17,7 @@ import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.Block;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
@@ -144,6 +145,12 @@ public final class PtEngine extends Engine {
     @Override
     public GradientCollector newGradientCollector() {
         return new PtGradientCollector();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public GradientCollector newGradientCollector(Block block) {
+        return new PtGradientCollector(block);
     }
 
     /** {@inheritDoc} */

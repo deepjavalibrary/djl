@@ -25,6 +25,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
+import ai.djl.nn.ParameterList;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.testing.Assertions;
@@ -109,17 +110,26 @@ public class GradientCollectorIntegrationTest {
     /** Tests that the gradients do not accumulate when closing the gradient collector. */
     @Test
     public void testClearGradients() {
+        int inputDim = 4;
+        int outputDim = 1;
+        Linear block = Linear.builder().setUnits(outputDim).build();
+        Shape inputShape = new Shape(1, inputDim);
+
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
-            NDArray a = manager.create(0.0f);
-            a.setRequiresGradient(true);
+            NDArray x = manager.ones(inputShape);
+
+            block.initialize(manager, DataType.FLOAT32, inputShape);
+            ParameterList list = block.getParameters();
+            NDArray weight = list.get("weight").getArray();
+            NDArray bias = list.get("bias").getArray();
 
             Engine engine = Engine.getEngine(TestUtils.getEngine());
             for (int i = 0; i < 3; i++) {
                 try (GradientCollector gc = engine.newGradientCollector()) {
-                    NDArray b = a.mul(2);
-                    gc.backward(b);
+                    NDArray loss = Linear.linear(x, weight, bias).singletonOrThrow().sum();
+                    gc.backward(loss);
                 }
-                Assert.assertEquals(a.getGradient().getFloat(), 2.0f);
+                Assert.assertEquals(weight.getGradient().sum().getFloat(), 4.0f);
             }
         }
     }
