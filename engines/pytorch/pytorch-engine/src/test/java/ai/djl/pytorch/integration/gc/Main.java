@@ -16,7 +16,7 @@ import static ai.djl.pytorch.engine.PtNDManager.debugDumpFromSystemManager;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.gc.NDArrayWrapFactory;
+import ai.djl.pytorch.engine.PtNDArrayProxyMaker;
 import ai.djl.translate.TranslateException;
 
 import org.slf4j.Logger;
@@ -34,24 +34,32 @@ public final class Main {
 
     public static void main(String[] args)
             throws IOException, TranslateException, InterruptedException {
-        NDArrayWrapFactory enh = new NDArrayWrapFactory();
-        try (NDManager manager = NDManager.newBaseManager(); ) {
+        PtNDArrayProxyMaker enh = new PtNDArrayProxyMaker();
+        try (NDManager baseManager = NDManager.newBaseManager(); ) {
+            try (NDManager subManager = baseManager.newSubManager()) {
 
-            NDArray a = enh.wrap(manager.create(new float[] {1f}));
-            debugDumpFromSystemManager();
+                NDArray a = enh.wrap(subManager.create(new float[]{1f}));
+                NDArray b = enh.wrap(subManager.create(new float[]{2f}));
+                NDArray c = a.add(b);
+                debugDumpFromSystemManager();
 
-            logger.info("reference exists ...");
-            logger.info("weakHashMap size: {}", enh.mapSize());
-            a = null;
-            logger.info("no reference exists, but likely not yet garbage collected ...");
-            logger.info("weakHashMap size: {}", enh.mapSize());
+                logger.info("reference exists ...");
+                logger.info("weakHashMap size: {}", enh.mapSize());
+                a = null;
+                b = null;
+                c = null;
+                logger.info("no reference exists, but likely not yet garbage collected ...");
+                logger.info("weakHashMap size: {}", enh.mapSize());
 
-            System.gc();
-            TimeUnit.SECONDS.sleep(1);
+                System.gc(); // just for testing - do not use in production
+                TimeUnit.SECONDS.sleep(1);
 
-            logger.info("no reference exists, and likely garbage collected ...");
-            logger.info("weakHashMap size: {}", enh.mapSize());
+                logger.info("no reference exists, and likely garbage collected ...");
+                logger.info("weakHashMap size: {}", enh.mapSize());
+                debugDumpFromSystemManager();
+            }
             debugDumpFromSystemManager();
         }
+        debugDumpFromSystemManager();
     }
 }

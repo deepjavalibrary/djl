@@ -64,7 +64,7 @@ public final class PtGradientCollector implements GradientCollector {
      *     higher order derivative products. Defaults to false.
      */
     private void backward(NDArray target, NDArray grad, boolean keepGraph, boolean createGraph) {
-        JniUtils.backward((PtNDArray) target, (PtNDArray) grad, keepGraph, createGraph);
+        JniUtils.backward((PtNDArrayImpl) target, (PtNDArrayImpl) grad, keepGraph, createGraph);
     }
 
     /** {@inheritDoc} */

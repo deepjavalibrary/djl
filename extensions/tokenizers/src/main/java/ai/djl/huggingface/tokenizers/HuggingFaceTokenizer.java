@@ -18,7 +18,7 @@ import ai.djl.huggingface.tokenizers.jni.TokenizersLibrary;
 import ai.djl.modality.nlp.preprocess.Tokenizer;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.ArgumentsUtil;
-import ai.djl.util.NativeResource;
+import ai.djl.util.NativeResourceImpl;
 import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@code HuggingFaceTokenizer} is a Huggingface tokenizer implementation of the {@link Tokenizer}
  * interface that converts sentences into token.
  */
-public final class HuggingFaceTokenizer extends NativeResource<Long> implements Tokenizer {
+public final class HuggingFaceTokenizer extends NativeResourceImpl<Long> implements Tokenizer {
 
     private static final Logger logger = LoggerFactory.getLogger(HuggingFaceTokenizer.class);
 

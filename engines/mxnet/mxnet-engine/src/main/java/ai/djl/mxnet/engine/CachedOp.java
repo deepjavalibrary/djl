@@ -19,7 +19,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.training.ParameterStore;
-import ai.djl.util.NativeResource;
+import ai.djl.util.NativeResourceImpl;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 
@@ -40,7 +40,7 @@ import java.util.Map;
  * analyzing the input shape. It requires minimum input to do inference because most of the
  * information can be obtained from the model itself.
  */
-public class CachedOp extends NativeResource<Pointer> {
+public class CachedOp extends NativeResourceImpl<Pointer> {
 
     private static final Logger logger = LoggerFactory.getLogger(CachedOp.class);
 

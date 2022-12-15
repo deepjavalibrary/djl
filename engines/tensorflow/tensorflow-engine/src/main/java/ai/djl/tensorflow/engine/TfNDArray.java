@@ -23,7 +23,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
-import ai.djl.util.NativeResource;
+import ai.djl.util.NativeResourceImpl;
 import ai.djl.util.Preconditions;
 
 import org.tensorflow.internal.c_api.TFE_TensorHandle;
@@ -40,7 +40,7 @@ import java.util.stream.LongStream;
 
 /** {@code TfNDArray} is the TensorFlow implementation of {@link NDArray}. */
 @SuppressWarnings("PMD.UseTryWithResources")
-public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArray {
+public class TfNDArray extends NativeResourceImpl<TFE_TensorHandle> implements NDArray {
 
     private Shape shape;
     private Device device;

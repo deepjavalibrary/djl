@@ -81,7 +81,7 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray create(String[] data, Charset charset, Shape shape) {
-        return new PtNDArray(this, data, shape);
+        return new PtNDArrayImpl(this, data, shape);
     }
 
     /** {@inheritDoc} */

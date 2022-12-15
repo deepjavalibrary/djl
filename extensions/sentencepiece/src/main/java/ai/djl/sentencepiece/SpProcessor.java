@@ -14,10 +14,10 @@ package ai.djl.sentencepiece;
 
 import ai.djl.sentencepiece.jni.LibUtils;
 import ai.djl.sentencepiece.jni.SentencePieceLibrary;
-import ai.djl.util.NativeResource;
+import ai.djl.util.NativeResourceImpl;
 
 /** The processor holder for SentencePiece. */
-final class SpProcessor extends NativeResource<Long> {
+final class SpProcessor extends NativeResourceImpl<Long> {
 
     private static RuntimeException libraryStatus;
 

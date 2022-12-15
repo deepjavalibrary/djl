@@ -30,20 +30,20 @@ public class DynamicInvocationHandler implements InvocationHandler {
     WeakHashMapWrapper<UUID, NDArray> map;
     UUID uuid;
 
-    NDArrayWrapFactory gcAttacher;
+    NDArrayProxyMaker ndArrayProxyMaker;
 
     /**
      * Creates a new instance of {@code DynamicInvocationHandler}.
      *
      * @param uuid the uuid
      * @param map the map
-     * @param gcAttacher the gcAttacher
+     * @param gcAttacher the ndArrayProxyMaker
      */
     public DynamicInvocationHandler(
-            UUID uuid, WeakHashMapWrapper<UUID, NDArray> map, NDArrayWrapFactory gcAttacher) {
+            UUID uuid, WeakHashMapWrapper<UUID, NDArray> map, NDArrayProxyMaker ndArrayProxyMaker) {
         this.map = map;
         this.uuid = uuid;
-        this.gcAttacher = gcAttacher;
+        this.ndArrayProxyMaker = ndArrayProxyMaker;
     }
 
     /** {@inheritDoc} */
@@ -59,7 +59,7 @@ public class DynamicInvocationHandler implements InvocationHandler {
         }
 
         if (result instanceof NDArray) {
-            return gcAttacher.wrap((NDArray) result);
+            return ndArrayProxyMaker.wrap((NDArray) result);
         }
 
         return result;

@@ -13,10 +13,10 @@
 package ai.djl.paddlepaddle.engine;
 
 import ai.djl.paddlepaddle.jni.JniUtils;
-import ai.djl.util.NativeResource;
+import ai.djl.util.NativeResourceImpl;
 
 /** PaddlePaddle C++ Predictor. */
-public class PaddlePredictor extends NativeResource<Long> {
+public class PaddlePredictor extends NativeResourceImpl<Long> {
 
     PaddlePredictor(long handle) {
         super(handle);

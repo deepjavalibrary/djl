@@ -10,15 +10,18 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.ndarray.gc;
+package ai.djl.pytorch.engine;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.gc.DynamicInvocationHandler;
+import ai.djl.ndarray.gc.NDArrayProxyMaker;
+import ai.djl.ndarray.gc.WeakHashMapWrapper;
 
 import java.lang.reflect.Proxy;
 import java.util.UUID;
 
-/** {@code NDArrayWrapFactory} creates a proxy facade. */
-public class NDArrayWrapFactory {
+/** {@code PtNDArrayProxyMaker} creates a proxy facade. */
+public class PtNDArrayProxyMaker implements NDArrayProxyMaker {
 
     WeakHashMapWrapper<UUID, NDArray> map = new WeakHashMapWrapper<>();
 
@@ -32,20 +35,19 @@ public class NDArrayWrapFactory {
     }
 
     /**
-     * Wraps the {@link NDArray} in a proxy facade.
+     * Wraps the {@link PtNDArray} in a proxy facade.
      *
      * @param array the array to wrap
      * @return the wrapped array
      */
-    public NDArray wrap(NDArray array) {
+    public PtNDArray wrap(NDArray array) {
         UUID uuid = UUID.randomUUID();
         map.put(uuid, array);
-
         DynamicInvocationHandler handler = new DynamicInvocationHandler(uuid, map, this);
-        return (NDArray)
+        return (PtNDArray)
                 Proxy.newProxyInstance(
                         Thread.currentThread().getContextClassLoader(),
-                        new Class<?>[] {NDArray.class},
+                    new Class<?>[] {PtNDArray.class},
                         handler);
     }
 }

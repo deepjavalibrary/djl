@@ -29,14 +29,14 @@ import java.util.List;
 /** {@code PtNDArrayEx} is the PyTorch implementation of the {@link NDArrayEx}. */
 public class PtNDArrayEx implements NDArrayEx {
 
-    private PtNDArray array;
+    private PtNDArrayImpl array;
 
     /**
      * Constructs an {@code PtNDArrayEx} given a {@link NDArray}.
      *
      * @param parent the {@link NDArray} to extend
      */
-    PtNDArrayEx(PtNDArray parent) {
+    PtNDArrayEx(PtNDArrayImpl parent) {
         this.array = parent;
     }
 

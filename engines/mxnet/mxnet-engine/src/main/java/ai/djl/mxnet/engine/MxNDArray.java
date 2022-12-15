@@ -23,8 +23,8 @@ import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
-import ai.djl.util.NativeResource;
 
+import ai.djl.util.NativeResourceImpl;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
@@ -36,7 +36,7 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 /** {@code MxNDArray} is the MXNet implementation of {@link NDArray}. */
-public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
+public class MxNDArray extends NativeResourceImpl<Pointer> implements LazyNDArray {
 
     private String name;
     private Device device;

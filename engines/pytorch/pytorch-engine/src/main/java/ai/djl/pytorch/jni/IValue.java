@@ -16,8 +16,9 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.engine.PtNDArray;
+import ai.djl.pytorch.engine.PtNDArrayImpl;
 import ai.djl.pytorch.engine.PtNDManager;
-import ai.djl.util.NativeResource;
+import ai.djl.util.NativeResourceImpl;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>DJL doesn't support creating nested IValue.
  */
-public class IValue extends NativeResource<Long> {
+public class IValue extends NativeResourceImpl<Long> {
 
     IValue(long handle) {
         super(handle);
@@ -392,7 +393,7 @@ public class IValue extends NativeResource<Long> {
      * @return the NDArray value of this IValue
      */
     public PtNDArray toTensor(PtNDManager manager) {
-        return new PtNDArray(manager, PyTorchLibrary.LIB.iValueToTensor(getHandle()));
+        return new PtNDArrayImpl(manager, PyTorchLibrary.LIB.iValueToTensor(getHandle()));
     }
 
     /**
@@ -403,9 +404,9 @@ public class IValue extends NativeResource<Long> {
      */
     public PtNDArray[] toTensorArray(PtNDManager manager) {
         long[] handles = PyTorchLibrary.LIB.iValueToTensorList(getHandle());
-        PtNDArray[] ret = new PtNDArray[handles.length];
+        PtNDArray[] ret = new PtNDArrayImpl[handles.length];
         for (int i = 0; i < ret.length; ++i) {
-            ret[i] = new PtNDArray(manager, handles[i]);
+            ret[i] = new PtNDArrayImpl(manager, handles[i]);
         }
         return ret;
     }
