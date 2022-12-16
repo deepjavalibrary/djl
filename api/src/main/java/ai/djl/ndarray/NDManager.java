@@ -768,11 +768,11 @@ public interface NDManager extends AutoCloseable {
     String getName();
 
     /**
-     * Returns useProxies.
+     * Returns garbageCollectionOn.
      *
-     * @return useProxies
+     * @return garbageCollectionOn
      */
-    boolean isUseProxies();
+    boolean isGarbageCollectionOn();
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.

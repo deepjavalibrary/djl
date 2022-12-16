@@ -87,7 +87,7 @@ public final class PassthroughNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isUseProxies() {
+    public boolean isGarbageCollectionOn() {
         return false;
     }
 

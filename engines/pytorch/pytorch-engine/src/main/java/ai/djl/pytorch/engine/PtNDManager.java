@@ -183,7 +183,7 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public PtNDManager newSubManager(Device device) {
-        PtNDManager manager = new PtNDManager(this, device, isUseProxies());
+        PtNDManager manager = new PtNDManager(this, device, isGarbageCollectionOn());
         attachUncappedInternal(manager.uid, manager);
         return manager;
     }

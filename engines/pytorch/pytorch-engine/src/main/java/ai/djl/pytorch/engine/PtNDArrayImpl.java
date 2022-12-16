@@ -1570,7 +1570,7 @@ public final class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtN
      */
     public static PtNDArray newPtNDArray(PtNDManager manager, long handle) {
         PtNDArray instance = new PtNDArrayImpl(manager, handle);
-        if (manager.isUseProxies()) {
+        if (manager.isGarbageCollectionOn()) {
             instance = manager.getProxyMaker().wrap(instance);
         }
         return instance;
@@ -1588,7 +1588,7 @@ public final class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtN
      */
     public static PtNDArray newPtNDArray(PtNDManager manager, long handle, ByteBuffer data) {
         PtNDArray instance = new PtNDArrayImpl(manager, handle, data);
-        if (manager.isUseProxies()) {
+        if (manager.isGarbageCollectionOn()) {
             instance = manager.getProxyMaker().wrap(instance);
         }
         return instance;
@@ -1607,7 +1607,7 @@ public final class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtN
      */
     public static PtNDArray newPtNDArray(PtNDManager manager, String[] strs, Shape shape) {
         PtNDArray instance = new PtNDArrayImpl(manager, strs, shape);
-        if (manager.isUseProxies()) {
+        if (manager.isGarbageCollectionOn()) {
             instance = manager.getProxyMaker().wrap(instance);
         }
         return instance;
