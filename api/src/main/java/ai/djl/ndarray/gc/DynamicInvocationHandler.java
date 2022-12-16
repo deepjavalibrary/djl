@@ -58,10 +58,6 @@ public class DynamicInvocationHandler implements InvocationHandler {
             throw new RuntimeException(e); // NOPMD
         }
 
-        if (result instanceof NDArray) {
-            return ndArrayProxyMaker.wrap((NDArray) result);
-        }
-
         return result;
     }
 }

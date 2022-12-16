@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -89,6 +90,10 @@ public class WeakHashMapWrapper<K, V> implements Map<K, V> {
     /** {@inheritDoc} */
     @Override
     public V put(K key, V value) {
+        if (value instanceof Proxy) {
+            throw new IllegalArgumentException(
+                    "Proxy is not supported to be stored as value here.");
+        }
         weakReferenceWrapperList.add(new WeakReferenceWrapper<K, V>(key, value, queue));
         return map.put(key, value);
     }
