@@ -182,14 +182,6 @@ public final class LibUtils {
     private static LibTorch findOverrideLibrary() {
         String libPath = Utils.getEnvOrSystemProperty("PYTORCH_LIBRARY_PATH");
         if (libPath != null) {
-            LibTorch lib = findLibraryInPath(libPath);
-            if (lib != null) {
-                return lib;
-            }
-        }
-
-        libPath = System.getProperty("java.library.path");
-        if (libPath != null) {
             return findLibraryInPath(libPath);
         }
         return null;
