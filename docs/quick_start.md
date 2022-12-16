@@ -10,7 +10,7 @@ You can also view our 1.5 hour long (in 8 x ~10 minute segments) DJL 101 tutoria
 
 ## Prerequisites
 
-* You need a Java Development Kit (JDK) installed on your system. We recommend using JDK 8, but any later version also works. For more information, see [Setup](development/setup.md).
+* You need a Java Development Kit (JDK) installed on your system. We recommend using JDK 11, but any later version also works. For more information, see [Setup](development/setup.md).
 * You need git installed on your system to clone the DJL repository.
 
 ## Try DJL

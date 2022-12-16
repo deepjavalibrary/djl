@@ -4,9 +4,6 @@ dependencies {
 
     // Add following dependency to your project for COCO dataset
     // runtimeOnly "com.twelvemonkeys.imageio:imageio-jpeg:3.5"
-    testImplementation("org.testng:testng:${testng_version}") {
-        exclude group: "junit", module: "junit"
-    }
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 
     testImplementation project(":testing")

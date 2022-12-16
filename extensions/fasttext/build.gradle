@@ -4,10 +4,6 @@ dependencies {
     api project(":api")
     api project(":basicdataset")
 
-    testImplementation("org.testng:testng:${testng_version}") {
-        exclude group: "junit", module: "junit"
-    }
-
     // ModelZoo requires at least one engine in the class path
     testImplementation project(":engines:pytorch:pytorch-engine")
     testImplementation(project(":testing"))

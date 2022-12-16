@@ -4,9 +4,6 @@ dependencies {
     api project(":api")
     api "com.microsoft.onnxruntime:onnxruntime:${onnxruntime_version}"
 
-    testImplementation("org.testng:testng:${testng_version}") {
-        exclude group: "junit", module: "junit"
-    }
     testImplementation project(":testing")
     testImplementation project(":engines:pytorch:pytorch-engine")
 
