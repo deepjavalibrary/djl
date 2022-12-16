@@ -78,6 +78,23 @@ System.setProperty("PYTORCH_PRECXX11", "true");
 If you don't have network access, you can add a offline native library package based on your platform
 to avoid downloading the native libraries at runtime.
 
+### Load your own PyTorch native library
+
+If you installed PyTorch with python pip wheel, and you want to use your installed PyTorch,
+you can set `PYTORCH_LIBRARY_PATH` environment variable, DJL will load your PyTorch native
+library for the location you pointed to. You might also need set `PYTORCH_VERSION` and
+`PYTORCH_FLAVOR` environment variable so DJL will use matching JNI for your PyTorch.
+
+```shell
+export PYTORCH_LIBRARY_PATH=/usr/lib/python3.10/site-packages/torch/lib
+
+# Use latest PyTorch version that engine supported if PYTORCH_VERSION not set
+export PYTORCH_VERSION=1.XX.X
+
+# Use cpu-precxx11 if PYTORCH_FLAVOR not set
+export PYTORCH_FLAVOR=cpu
+```
+
 ### macOS
 For macOS, you can use the following library:
 
