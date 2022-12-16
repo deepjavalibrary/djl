@@ -60,7 +60,7 @@ converted = torch.jit.trace_module(model,  {'get_text_features': [text_inputs['i
 torch.jit.save(converted, "cliptext.pt")
 ```
 
-You can trace by using the `torch.traceModule` function. 
+You can trace by using the `torch.traceModule` function.
 
 To run inference with such model in DJL, you could provide a placeholder NDArray like below:
 

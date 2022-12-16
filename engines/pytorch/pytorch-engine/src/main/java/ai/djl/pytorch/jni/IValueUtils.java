@@ -31,6 +31,9 @@ import java.util.regex.Pattern;
 /** IValueUtils is utility class to deal with IValue in PyTorch. */
 public final class IValueUtils {
 
+    private static final Pattern PATTERN_LIST = Pattern.compile("\\w+\\[]");
+    private static final Pattern PATTERN_TUPLE = Pattern.compile("\\w+\\(\\)");
+
     private IValueUtils() {}
 
     /**
@@ -43,13 +46,14 @@ public final class IValueUtils {
      */
     public static NDList forward(PtSymbolBlock block, NDList inputs, boolean isTrain) {
         Pair<IValue[], String> inputPair = getInputs(inputs);
-        long[] iValueHandles =
-                Arrays.stream(inputPair.getKey()).mapToLong(IValue::getHandle).toArray();
+        IValue[] ivalues = inputPair.getKey();
+        String method = inputPair.getValue();
+        long[] iValueHandles = Arrays.stream(ivalues).mapToLong(IValue::getHandle).toArray();
         long result =
                 PyTorchLibrary.LIB.moduleRunMethod(
-                        block.getHandle(), inputPair.getValue(), iValueHandles, isTrain);
+                        block.getHandle(), method, iValueHandles, isTrain);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
-        Arrays.stream(inputPair.getKey()).forEach(IValue::close);
+        Arrays.stream(ivalues).forEach(IValue::close);
         try (IValue iValue = new IValue(result)) {
             return iValue.toNDList(manager);
         }
@@ -101,16 +105,16 @@ public final class IValueUtils {
                 int index = addToMap(indexMap, strings[0], outputs);
                 PairList<String, PtNDArray> pl = outputs.get(index);
                 pl.add(strings[1], (PtNDArray) array);
-            } else if (name != null && Pattern.matches("\\w+\\[]", name)) {
+            } else if (name != null && name.startsWith("module_method:")) {
+                methodName = name.substring(14);
+            } else if (name != null && PATTERN_LIST.matcher(name).matches()) {
                 int index = addToMap(indexMap, name, outputs);
                 PairList<String, PtNDArray> pl = outputs.get(index);
                 pl.add("[]", (PtNDArray) array);
-            } else if (name != null && Pattern.matches("\\w+\\(\\)", name)) {
+            } else if (name != null && PATTERN_TUPLE.matcher(name).matches()) {
                 int index = addToMap(indexMap, name, outputs);
                 PairList<String, PtNDArray> pl = outputs.get(index);
                 pl.add("()", (PtNDArray) array);
-            } else if (name != null && name.startsWith("module_method:")) {
-                methodName = name.substring(14);
             } else {
                 PairList<String, PtNDArray> pl = new PairList<>();
                 pl.add(null, (PtNDArray) array);
