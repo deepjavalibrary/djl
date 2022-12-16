@@ -96,4 +96,19 @@ public class TorchScriptTest {
             }
         }
     }
+
+    @Test
+    public void testGetMethodNames() throws ModelException, IOException {
+        Criteria<NDList, NDList> criteria =
+                Criteria.builder()
+                        .setTypes(NDList.class, NDList.class)
+                        .optModelUrls("djl://ai.djl.pytorch/resnet/0.0.1/traced_resnet18")
+                        .optProgress(new ProgressBar())
+                        .build();
+        try (ZooModel<NDList, NDList> model = criteria.loadModel()) {
+            PtSymbolBlock block = (PtSymbolBlock) model.getBlock();
+            String[] result = JniUtils.getMethodNames(block);
+            Assert.assertEquals(result[0], "forward");
+        }
+    }
 }

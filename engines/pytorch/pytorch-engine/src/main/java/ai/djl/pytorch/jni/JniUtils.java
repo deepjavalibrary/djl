@@ -1629,6 +1629,10 @@ public final class JniUtils {
         return list;
     }
 
+    public static String[] getMethodNames(PtSymbolBlock block) {
+        return PyTorchLibrary.LIB.moduleGetMethodNames(block.getHandle());
+    }
+
     public static void enableInferenceMode(PtSymbolBlock block) {
         PyTorchLibrary.LIB.moduleEval(block.getHandle());
     }

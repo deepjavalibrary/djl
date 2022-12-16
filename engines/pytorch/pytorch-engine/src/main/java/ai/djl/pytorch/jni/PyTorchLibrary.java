@@ -505,7 +505,8 @@ final class PyTorchLibrary {
 
     native void moduleTrain(long handle);
 
-    native long moduleForward(long moduleHandle, long[] iValueHandles, boolean isTrain);
+    native long moduleRunMethod(
+            long moduleHandle, String methodName, long[] iValueHandles, boolean isTrain);
 
     native void setGraphExecutorOptimize(boolean enabled);
 
@@ -514,6 +515,8 @@ final class PyTorchLibrary {
     native long[] moduleGetParams(long moduleHandle);
 
     native String[] moduleGetParamNames(long moduleHandle);
+
+    native String[] moduleGetMethodNames(long moduleHandle);
 
     native long iValueFromTensor(long tensorHandle);
 
