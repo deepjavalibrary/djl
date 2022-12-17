@@ -30,16 +30,22 @@ public final class ImageTextComparison {
     private ImageTextComparison() {}
 
     public static void main(String[] args) throws ModelException, IOException, TranslateException {
-        ClipModel model = new ClipModel();
-        Image img =
-                ImageFactory.getInstance()
-                        .fromUrl("http://images.cocodataset.org/val2017/000000039769.jpg");
         String text = "A photo of cats";
         String text2 = "A photo of dogs";
-        float[] logit0 = model.compareTextAndImage(img, text);
-        float[] logit1 = model.compareTextAndImage(img, text2);
-        double total = Arrays.stream(new double[] {logit0[0], logit1[0]}).map(Math::exp).sum();
-        logger.info("{} Probability: {}", text, Math.exp(logit0[0]) / total);
-        logger.info("{} Probability: {}", text2, Math.exp(logit1[0]) / total);
+        double[] probs = compareTextAndImage(text, text2);
+        logger.info("{} Probability: {}", text, probs[0]);
+        logger.info("{} Probability: {}", text2, probs[1]);
+    }
+
+    static double[] compareTextAndImage(String text, String text2)
+            throws ModelException, IOException, TranslateException {
+        try (ClipModel model = new ClipModel()) {
+            String url = "http://images.cocodataset.org/val2017/000000039769.jpg";
+            Image img = ImageFactory.getInstance().fromUrl(url);
+            float[] logit0 = model.compareTextAndImage(img, text);
+            float[] logit1 = model.compareTextAndImage(img, text2);
+            double total = Arrays.stream(new double[] {logit0[0], logit1[0]}).map(Math::exp).sum();
+            return new double[] {Math.exp(logit0[0]) / total, Math.exp(logit1[0]) / total};
+        }
     }
 }

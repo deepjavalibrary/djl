@@ -21,12 +21,14 @@ import ai.djl.translate.TranslatorContext;
 
 public class ImageTranslator implements NoBatchifyTranslator<Image, float[]> {
 
+    /** {@inheritDoc} */
     @Override
     public float[] processOutput(TranslatorContext ctx, NDList list) {
         NDArray array = list.singletonOrThrow();
         return array.toFloatArray();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Image input) {
         NDArray array = input.toNDArray(ctx.getNDManager(), Image.Flag.COLOR);

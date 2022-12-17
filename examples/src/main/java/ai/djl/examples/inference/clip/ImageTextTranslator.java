@@ -29,12 +29,14 @@ public class ImageTextTranslator implements NoBatchifyTranslator<Pair<Image, Str
         this.txtTranslator = new TextTranslator();
     }
 
+    /** {@inheritDoc} */
     @Override
     public float[] processOutput(TranslatorContext ctx, NDList list) throws Exception {
         NDArray logitsPerImage = list.get(0);
         return logitsPerImage.toFloatArray();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Pair<Image, String> input) throws Exception {
         NDList imageInput = imgTranslator.processInput(ctx, input.getKey());

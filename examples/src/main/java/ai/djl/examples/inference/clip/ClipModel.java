@@ -31,8 +31,9 @@ import java.io.IOException;
  * href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/clip_image_text.md">doc</a>
  * for information about this example.
  */
-public class ClipModel {
+public class ClipModel implements AutoCloseable {
 
+    private ZooModel<NDList, NDList> clip;
     private Predictor<Image, float[]> imageFeatureExtractor;
     private Predictor<String, float[]> textFeatureExtractor;
     private Predictor<Pair<Image, String>, float[]> imgTextComparator;
@@ -45,7 +46,7 @@ public class ClipModel {
                         .optTranslator(new NoopTranslator())
                         .optEngine("PyTorch")
                         .build();
-        ZooModel<NDList, NDList> clip = criteria.loadModel();
+        clip = criteria.loadModel();
         imageFeatureExtractor = clip.newPredictor(new ImageTranslator());
         textFeatureExtractor = clip.newPredictor(new TextTranslator());
         imgTextComparator = clip.newPredictor(new ImageTextTranslator());
@@ -61,5 +62,14 @@ public class ClipModel {
 
     public float[] compareTextAndImage(Image image, String text) throws TranslateException {
         return imgTextComparator.predict(new Pair<>(image, text));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        imageFeatureExtractor.close();
+        textFeatureExtractor.close();
+        imgTextComparator.close();
+        clip.close();
     }
 }

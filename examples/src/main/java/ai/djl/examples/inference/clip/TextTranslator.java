@@ -27,11 +27,13 @@ public class TextTranslator implements NoBatchifyTranslator<String, float[]> {
         tokenizer = HuggingFaceTokenizer.newInstance("openai/clip-vit-base-patch32");
     }
 
+    /** {@inheritDoc} */
     @Override
     public float[] processOutput(TranslatorContext ctx, NDList list) {
         return list.singletonOrThrow().toFloatArray();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, String input) {
         Encoding encoding = tokenizer.encode(input);
