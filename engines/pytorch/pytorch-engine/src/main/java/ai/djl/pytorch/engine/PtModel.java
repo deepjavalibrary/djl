@@ -57,6 +57,20 @@ public class PtModel extends BaseModel {
         dataType = DataType.FLOAT32;
     }
 
+    /**
+     * Constructs a new Model on a given device.
+     *
+     * @param name the model name
+     * @param useGarbageCollection whether to use garbage collection
+     * @param device the device the model should be located on
+     */
+    PtModel(String name, Device device, boolean useGarbageCollection) {
+        super(name);
+        manager = PtNDManager.getSystemManager().newSubManager(device, useGarbageCollection);
+        manager.setName("ptModel");
+        dataType = DataType.FLOAT32;
+    }
+
     /** {@inheritDoc} */
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options)

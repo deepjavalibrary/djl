@@ -86,6 +86,12 @@ public final class TfEngine extends Engine implements AutoCloseable {
 
     /** {@inheritDoc} */
     @Override
+    public Model newModel(String name, Device device, boolean useGarbageCollection) {
+        throw new UnsupportedOperationException("Garbage collection not supported");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public SymbolBlock newSymbolBlock(NDManager manager) {
         throw new UnsupportedOperationException("TensorFlow does not support empty SymbolBlock");
     }
