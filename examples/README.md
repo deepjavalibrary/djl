@@ -6,7 +6,8 @@ You can find more examples from our [djl-demo github repo](https://github.com/de
 The following examples are included for training:
 
 - [Train your first model](docs/train_mnist_mlp.md)
-- [Transfer learning example](docs/train_cifar10_resnet.md)
+- [Transfer learning on cifar10](docs/train_cifar10_resnet.md)
+- [Transfer learning on freshfruit](docs/train_transfer_fresh_fruit.md)
 - [Train SSD model example](docs/train_pikachu_ssd.md)
 - [Multi-label dataset training example](docs/train_captcha.md)
 
