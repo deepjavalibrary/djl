@@ -111,11 +111,11 @@ public interface NDManager extends AutoCloseable {
      *
      * <p>{@code NDManager} will inherit default {@link Device}.
      *
-     * @param useProxies whether to facade {@link NDArray} behind a proxy
+     * @param useGarbageCollection whether to facade {@link NDArray} behind a proxy
      * @return a new top-level {@code NDManager}
      */
-    static NDManager newBaseManager(boolean useProxies) {
-        return Engine.getInstance().newBaseManager(useProxies);
+    static NDManager newBaseManager(boolean useGarbageCollection) {
+        return Engine.getInstance().newBaseManager(useGarbageCollection);
     }
 
     /**
@@ -768,11 +768,11 @@ public interface NDManager extends AutoCloseable {
     String getName();
 
     /**
-     * Returns garbageCollectionOn.
+     * Returns useGarbageCollection.
      *
-     * @return garbageCollectionOn
+     * @return useGarbageCollection
      */
-    boolean isGarbageCollectionOn();
+    boolean isUseGarbageCollection();
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
@@ -1529,23 +1529,23 @@ public interface NDManager extends AutoCloseable {
     NDManager newSubManager(Device device);
 
     /**
-     * Creates a child {@code NDManager} with specified boolean switch useProxies and will inherit
-     * default {@link Device} from this {@code NDManager}.
+     * Creates a child {@code NDManager} with specified boolean switch useGarbageCollection and will
+     * inherit default {@link Device} from this {@code NDManager}.
      *
-     * @param useProxies the boolean switch to use proxies
+     * @param useGarbageCollection the boolean switch to use proxies
      * @return a child {@code NDManager}
      */
-    NDManager newSubManager(boolean useProxies);
+    NDManager newSubManager(boolean useGarbageCollection);
 
     /**
      * Creates a child {@code NDManager} with specified default {@link Device} and the boolean
-     * switch useProxies.
+     * switch useGarbageCollection.
      *
      * @param device the default {@link Device}
-     * @param useProxies the boolean switch to use proxies
+     * @param useGarbageCollection the boolean switch to use proxies
      * @return a child {@code NDManager}
      */
-    NDManager newSubManager(Device device, boolean useProxies);
+    NDManager newSubManager(Device device, boolean useGarbageCollection);
 
     /**
      * Returns the default {@link Device} of this {@code NDManager}.

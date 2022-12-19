@@ -296,10 +296,10 @@ public abstract class Engine {
      *
      * <p>{@code NDManager} will inherit default {@link Device}.
      *
-     * @param useProxies whether to facade resources with a proxy
+     * @param useGarbageCollection whether to facade resources with a proxy
      * @return a new top-level {@code NDManager}
      */
-    public NDManager newBaseManager(boolean useProxies) {
+    public NDManager newBaseManager(boolean useGarbageCollection) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

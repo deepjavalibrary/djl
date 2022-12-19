@@ -87,7 +87,7 @@ public final class PassthroughNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isGarbageCollectionOn() {
+    public boolean isUseGarbageCollection() {
         return false;
     }
 
@@ -251,13 +251,13 @@ public final class PassthroughNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager newSubManager(boolean useProxies) {
+    public NDManager newSubManager(boolean useGarbageCollection) {
         return this;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDManager newSubManager(Device device, boolean useProxies) {
+    public NDManager newSubManager(Device device, boolean useGarbageCollection) {
         return this;
     }
 

@@ -136,8 +136,8 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public NDManager newBaseManager(boolean useProxies) {
-        return PtNDManager.getSystemManager().newSubManager(useProxies);
+    public NDManager newBaseManager(boolean useGarbageCollection) {
+        return PtNDManager.getSystemManager().newSubManager(useGarbageCollection);
     }
     /** {@inheritDoc} */
     @Override

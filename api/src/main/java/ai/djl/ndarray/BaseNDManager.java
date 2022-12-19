@@ -43,7 +43,7 @@ import java.util.stream.Stream;
 public abstract class BaseNDManager implements NDManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseNDManager.class);
-    private final boolean garbageCollectionOn;
+    private final boolean useGarbageCollection;
 
     protected NDManager parent;
     protected NDManager alternativeManager;
@@ -59,10 +59,10 @@ public abstract class BaseNDManager implements NDManager {
         this(parent, device, false);
     }
 
-    protected BaseNDManager(NDManager parent, Device device, boolean garbageCollectionOn) {
+    protected BaseNDManager(NDManager parent, Device device, boolean useGarbageCollection) {
         this.parent = parent;
         this.device = device == null ? defaultDevice() : device;
-        this.garbageCollectionOn = garbageCollectionOn;
+        this.useGarbageCollection = useGarbageCollection;
         resources = new ConcurrentHashMap<>();
         tempResources = new ConcurrentHashMap<>();
         uid = UUID.randomUUID().toString();
@@ -110,8 +110,8 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isGarbageCollectionOn() {
-        return garbageCollectionOn;
+    public boolean isUseGarbageCollection() {
+        return useGarbageCollection;
     }
 
     /** {@inheritDoc} */
@@ -328,24 +328,24 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDManager newSubManager() {
-        return newSubManager(device, garbageCollectionOn);
+        return newSubManager(device, useGarbageCollection);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDManager newSubManager(boolean useProxies) {
-        return newSubManager(device, useProxies);
+    public NDManager newSubManager(boolean useGarbageCollection) {
+        return newSubManager(device, useGarbageCollection);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDManager newSubManager(Device device) {
-        return newSubManager(device, garbageCollectionOn);
+        return newSubManager(device, useGarbageCollection);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDManager newSubManager(Device device, boolean useProxies) {
+    public NDManager newSubManager(Device device, boolean useGarbageCollection) {
         throw new UnsupportedOperationException("Not supported!");
     }
 
