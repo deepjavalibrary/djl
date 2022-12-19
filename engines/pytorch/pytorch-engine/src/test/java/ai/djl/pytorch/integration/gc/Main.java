@@ -40,7 +40,7 @@ public final class Main {
                 NDArray a = subManager.create(new float[] {1f});
                 NDArray b = subManager.create(new float[] {2f});
                 NDArray c = a.add(b);
-                debugDumpFromSystemManager();
+                debugDumpFromSystemManager(true);
 
                 logger.info("reference exists ...");
                 logger.info("weakHashMap size: {}", baseManager.getProxyMaker().mapSize());
@@ -55,10 +55,10 @@ public final class Main {
 
                 logger.info("no reference exists, and likely garbage collected ...");
                 logger.info("weakHashMap size: {}", baseManager.getProxyMaker().mapSize());
-                debugDumpFromSystemManager();
+                debugDumpFromSystemManager(true);
             }
-            debugDumpFromSystemManager();
+            debugDumpFromSystemManager(true);
         }
-        debugDumpFromSystemManager();
+        debugDumpFromSystemManager(true);
     }
 }
