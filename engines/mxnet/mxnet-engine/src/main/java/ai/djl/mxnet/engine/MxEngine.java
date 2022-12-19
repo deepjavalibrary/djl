@@ -42,7 +42,7 @@ import java.nio.file.Paths;
 public final class MxEngine extends Engine {
 
     public static final String ENGINE_NAME = "MXNet";
-    static final int RANK = 1;
+    static final int RANK = 0;
     private static final String MXNET_EXTRA_LIBRARY_VERBOSE = "MXNET_EXTRA_LIBRARY_VERBOSE";
 
     /** Constructs an MXNet Engine. */
