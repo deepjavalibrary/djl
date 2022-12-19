@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.RuntimeException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -51,6 +52,8 @@ public abstract class ImageFactory {
                         Class.forName(FACTORIES[i]).asSubclass(ImageFactory.class);
                 return clazz.getConstructor().newInstance();
             } catch (ReflectiveOperationException e) {
+                logger.trace("", e);
+            } catch (RuntimeException e) {
                 logger.trace("", e);
             }
         }
