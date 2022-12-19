@@ -29,7 +29,7 @@ public class MxEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public int getEngineRank() {
-        return 0;
+        return MxEngine.RANK;
     }
 
     /** {@inheritDoc} */

@@ -29,7 +29,7 @@ public class OrtEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public int getEngineRank() {
-        return 10;
+        return OrtEngine.RANK;
     }
 
     /** {@inheritDoc} */
