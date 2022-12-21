@@ -73,7 +73,7 @@ Maven:
 <dependency>
     <groupId>com.microsoft.onnxruntime</groupId>
     <artifactId>onnxruntime_gpu</artifactId>
-    <version>1.12.1</version>
+    <version>1.13.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
