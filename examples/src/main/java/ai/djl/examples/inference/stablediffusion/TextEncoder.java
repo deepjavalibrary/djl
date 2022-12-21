@@ -24,9 +24,12 @@ import java.io.IOException;
 public class TextEncoder implements NoBatchifyTranslator<String, NDList> {
 
     private static final int MAX_LENGTH = 77;
+
     HuggingFaceTokenizer tokenizer;
 
-    public TextEncoder() throws IOException {
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(TranslatorContext ctx) throws IOException {
         tokenizer =
                 HuggingFaceTokenizer.builder()
                         .optPadding(true)
@@ -37,17 +40,18 @@ public class TextEncoder implements NoBatchifyTranslator<String, NDList> {
                         .build();
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDList processOutput(TranslatorContext ctx, NDList list) throws Exception {
+    public NDList processOutput(TranslatorContext ctx, NDList list) {
         list.detach();
         return list;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public NDList processInput(TranslatorContext ctx, String input) throws Exception {
+    public NDList processInput(TranslatorContext ctx, String input) {
         Encoding encoding = tokenizer.encode(input);
-        return new NDList(
-                ctx.getNDManager()
-                        .create(encoding.getIds(), new Shape(1, encoding.getIds().length)));
+        Shape shape = new Shape(1, encoding.getIds().length);
+        return new NDList(ctx.getNDManager().create(encoding.getIds(), shape));
     }
 }

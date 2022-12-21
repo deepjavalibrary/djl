@@ -29,11 +29,13 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class StableDiffusionModel {
+
     private static final int HEIGHT = 512;
     private static final int WIDTH = 512;
     private static final int OFFSET = 1;
     private static final float GUIDANCE_SCALE = 7.5f;
     private static final float STRENGTH = 0.75f;
+
     private Predictor<Image, NDArray> vaeEncoder;
     private Predictor<NDArray, Image> vaeDecoder;
     private Predictor<String, NDList> textEncoder;

@@ -19,9 +19,11 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 
 public class PndmScheduler {
+
     private static final int TRAIN_TIMESTEPS = 1000;
     private static final float BETA_START = 0.00085f;
     private static final float BETA_END = 0.012f;
+
     private NDManager manager;
     private NDArray alphasCumProd;
     private float finalAlphaCumProd;
@@ -31,8 +33,8 @@ public class PndmScheduler {
     private int stepSize;
     private int[] timesteps;
 
-    public PndmScheduler(NDManager mgr) {
-        manager = mgr;
+    public PndmScheduler(NDManager manager) {
+        this.manager = manager;
         NDArray betas =
                 manager.linspace(
                                 (float) Math.sqrt(BETA_START),

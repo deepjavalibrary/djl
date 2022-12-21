@@ -22,12 +22,14 @@ import ai.djl.translate.TranslatorContext;
 
 public class ImageDecoder implements NoBatchifyTranslator<NDArray, Image> {
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, NDArray input) throws Exception {
         input = input.div(0.18215);
         return new NDList(input);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Image processOutput(TranslatorContext ctx, NDList output) throws Exception {
         NDArray scaled = output.get(0).div(2).add(0.5).clip(0, 1);

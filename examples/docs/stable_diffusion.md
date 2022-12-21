@@ -38,7 +38,7 @@ Photograph of an astronaut riding a horse in desert
 
 Output:
 
-![](img/sd_generated.jpg)
+![](https://resources.djl.ai/images/stablediffusion/sd_generated.jpg)
 
 ## Conversion script
 

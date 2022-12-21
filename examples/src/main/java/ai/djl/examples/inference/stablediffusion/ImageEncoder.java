@@ -21,14 +21,15 @@ import ai.djl.translate.TranslatorContext;
 
 public class ImageEncoder implements NoBatchifyTranslator<Image, NDArray> {
 
-    private final int height;
-    private final int width;
+    private int height;
+    private int width;
 
     public ImageEncoder(int height, int width) {
         this.height = height;
         this.width = width;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray processOutput(TranslatorContext ctx, NDList list) throws Exception {
         NDArray result = list.singletonOrThrow();
@@ -37,6 +38,7 @@ public class ImageEncoder implements NoBatchifyTranslator<Image, NDArray> {
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Image input) throws Exception {
         NDArray array = input.toNDArray(ctx.getNDManager(), Image.Flag.COLOR);
