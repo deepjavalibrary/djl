@@ -78,6 +78,7 @@ jobs:
           pip3 install awscli cmake
           ln -s /usr/local/bin/cmake /usr/bin/cmake
       - name: Release JNI prep
+        shell: bash
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
           export PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
@@ -86,6 +87,9 @@ jobs:
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu11 -Ppt_version=$PYTORCH_VERSION
+          ./gradlew :engines:pytorch:pytorch-native:cleanJNI
+          if [[ "$PYTORCH_VERSION" == "1.12.1" ]]; then ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu10 -Ppt_version=$PYTORCH_VERSION; fi
+          if [[ "$PYTORCH_VERSION" == "1.11.0" ]]; then ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu10 -Ppt_version=$PYTORCH_VERSION; fi
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
