@@ -17,9 +17,8 @@ import ai.djl.ndarray.NDArray;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -34,7 +33,7 @@ public class WeakHashMapWrapper<K, V> implements Map<K, V> {
     private final WeakHashMap<K, V> map = new WeakHashMap<>();
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
-    private final List<WeakReferenceWrapper<K, V>> weakReferenceWrapperList = new ArrayList<>();
+    private final Set<WeakReferenceWrapper<K, V>> weakReferenceWrapperSet = new HashSet<>();
 
     private void checkQueue() {
         for (Reference<?> ref; (ref = queue.poll()) != null; ) {
@@ -44,6 +43,7 @@ public class WeakHashMapWrapper<K, V> implements Map<K, V> {
                 V value = ref2.getValue();
                 if (value instanceof NDArray) { // just as one example
                     ((NDArray) value).close();
+                    weakReferenceWrapperSet.remove(ref2);
                 }
             }
         }
@@ -94,7 +94,7 @@ public class WeakHashMapWrapper<K, V> implements Map<K, V> {
             throw new IllegalArgumentException(
                     "Proxy is not supported to be stored as value here.");
         }
-        weakReferenceWrapperList.add(new WeakReferenceWrapper<K, V>(key, value, queue));
+        weakReferenceWrapperSet.add(new WeakReferenceWrapper<K, V>(key, value, queue));
         return map.put(key, value);
     }
 
