@@ -62,18 +62,19 @@ public final class LibUtils {
     private static void loadNative(String resourcePath, String name) throws IOException {
         Path cacheFolder = Utils.getEngineCacheDir("lightgbm");
         Path libFile = cacheFolder.resolve(name);
-        if (!libFile.toFile().exists()) {
-
-            if (!cacheFolder.toFile().exists()) {
-                Files.createDirectories(cacheFolder);
-            }
+        if (!Files.exists(libFile)) {
+            Files.createDirectories(cacheFolder);
 
             resourcePath = "com/microsoft/ml/lightgbm/" + resourcePath;
-            Path tmp = Files.createTempDirectory("lightgbm-" + name).resolve(name);
-            try (InputStream is = ClassLoaderUtils.getResourceAsStream(resourcePath)) {
-                Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
+            Path tmp = Files.createTempFile(cacheFolder, "lightgbm-", "tmp");
+            try {
+                try (InputStream is = ClassLoaderUtils.getResourceAsStream(resourcePath)) {
+                    Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
+                }
+                Utils.moveQuietly(tmp, libFile);
+            } finally {
+                Utils.deleteQuietly(tmp);
             }
-            Utils.moveQuietly(tmp, libFile);
         }
         try {
             System.load(libFile.toString());
