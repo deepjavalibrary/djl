@@ -159,3 +159,14 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSparseCoo(
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN();
 }
+
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchHannWindow(
+        JNIEnv* env, jobject jthis, jlong jn_fft, jintArray jdevice) {
+    API_BEGIN()
+        const auto device = utils::GetDeviceFromJDevice(env, jdevice);
+        auto options = torch::TensorOptions().device(device);
+        const auto* result_ptr = new torch::Tensor(torch::hann_window(jn_fft, options));
+        return reinterpret_cast<uintptr_t>(result_ptr);
+    API_END_RETURN()
+}

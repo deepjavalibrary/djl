@@ -924,6 +924,42 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchFlatten(ndArray.getHandle(), startDim, endDim));
     }
 
+    public static PtNDArray fft(PtNDArray ndArray, long length, long axis) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchFft(ndArray.getHandle(), length, axis));
+    }
+
+    public static PtNDArray stft(
+            PtNDArray ndArray,
+            long nFft,
+            long hopLength,
+            PtNDArray window,
+            boolean center,
+            boolean normalize,
+            boolean returnComplex) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchStft(
+                        ndArray.getHandle(),
+                        nFft,
+                        hopLength,
+                        window.getHandle(),
+                        center,
+                        normalize,
+                        returnComplex));
+    }
+
+    public static PtNDArray real(PtNDArray ndArray) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchViewAsReal(ndArray.getHandle()));
+    }
+
+    public static PtNDArray complex(PtNDArray ndArray) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchViewAsComplex(ndArray.getHandle()));
+    }
+
     public static PtNDArray abs(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchAbs(ndArray.getHandle()));
@@ -1185,6 +1221,14 @@ public final class JniUtils {
                         layoutMapper(fmt, device),
                         new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
                         false));
+    }
+
+    public static PtNDArray hannWindow(PtNDManager manager, long numPoints, Device device) {
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchHannWindow(
+                        numPoints,
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()}));
     }
 
     public static PtNDArray erfinv(PtNDArray ndArray) {

@@ -984,4 +984,65 @@ public class NDArrayOtherOpTest {
             }
         }
     }
+
+    @Test
+    public void testFft() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray ele = manager.create(new float[] {1, 2, 3, 4, 5});
+            NDArray result = ele.fft(5);
+            result = result.real();
+            float[] expected =
+                    new float[] {
+                        15.0f,
+                        0.0f,
+                        -2.5f,
+                        3.440955f,
+                        -2.4999998f,
+                        0.8122992f,
+                        -2.4999998f,
+                        -0.8122992f,
+                        -2.5f,
+                        -3.440955f
+                    };
+            Assert.assertEquals(result.toFloatArray(), expected);
+        }
+    }
+
+    @Test
+    public void testStft() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray audio = manager.ones(new Shape(20));
+            NDArray window = manager.hanningWindow(20);
+            int nfft = 20;
+            int hopLength = 16;
+            NDArray result = audio.stft(nfft, hopLength, false, window, true);
+            NDArray expected =
+                    manager.create(
+                            new float[] {
+                                10.0f,
+                                0.0f,
+                                -5.0000005f,
+                                -4.7683716E-7f,
+                                1.6598708E-8f,
+                                -6.70266E-8f,
+                                1.830015E-7f,
+                                -3.239836E-7f,
+                                4.651681E-7f,
+                                7.3675395E-8f,
+                                0.0f,
+                                -0.0f,
+                                1.166903E-8f,
+                                7.3675395E-8f,
+                                1.65798E-7f,
+                                -8.896347E-8f,
+                                -1.35808E-7f,
+                                1.5145238E-7f,
+                                3.5762787E-7f,
+                                0.0f,
+                                0.0f,
+                                0.0f
+                            });
+            Assertions.assertAlmostEquals(result.real().flatten(), expected);
+        }
+    }
 }

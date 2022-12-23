@@ -248,6 +248,21 @@ final class PyTorchLibrary {
 
     native long torchFlatten(long handle, long startDim, long endDim);
 
+    native long torchFft(long handle, long length, long axis);
+
+    native long torchStft(
+            long handle,
+            long nFft,
+            long hopLength,
+            long windowHandle,
+            boolean center,
+            boolean normalize,
+            boolean returnComplex);
+
+    native long torchViewAsReal(long handle);
+
+    native long torchViewAsComplex(long handle);
+
     native long[] torchSplit(long handle, long size, long dim);
 
     native long[] torchSplit(long handle, long[] indices, long dim);
@@ -368,6 +383,8 @@ final class PyTorchLibrary {
             boolean requiredGrad);
 
     native long torchEye(int n, int m, int dType, int layout, int[] device, boolean requiredGrad);
+
+    native long torchHannWindow(long nfft, int[] device);
 
     native long torchErfinv(long handle);
 

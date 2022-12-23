@@ -3196,6 +3196,65 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray flatten(int startDim, int endDim);
 
     /**
+     * Compute the one-dimensional discrete Fourier Transform.
+     *
+     * @param length Length of the transformed axis of the output.
+     * @return The truncated or zero-padded input, transformed along the axis indicated by axis, or
+     *     the last one if axis is not specified.
+     */
+    default NDArray fft(long length) {
+        return fft(length, -1);
+    }
+
+    /**
+     * Compute the one-dimensional discrete Fourier Transform.
+     *
+     * @param length Length of the transformed axis of the output.
+     * @param axis Axis over which to compute the FFT.
+     * @return The truncated or zero-padded input, transformed along the axis indicated by axis, or
+     *     the last one if axis is not specified.
+     */
+    NDArray fft(long length, long axis);
+
+    /**
+     * Compute the Short Time Fourier Transform (STFT).
+     *
+     * @param nFft size of Fourier transform
+     * @param hopLength the distance between neighboring sliding window frames. Default can be:
+     *     floor(n_fft / 4)
+     * @param center whether to pad input on both sides.
+     * @param window Desired window to use. Recommend for HanningWindow
+     * @param returnComplex whether to return a complex tensor, or a real tensor with an extra last
+     *     dimension for the real and imaginary components.
+     * @return A NDArray containing the STFT result with shape described above
+     */
+    default NDArray stft(
+            long nFft, long hopLength, boolean center, NDArray window, boolean returnComplex) {
+        return stft(nFft, hopLength, center, window, false, returnComplex);
+    }
+
+    /**
+     * Compute the Short Time Fourier Transform (STFT).
+     *
+     * @param nFft size of Fourier transform
+     * @param hopLength the distance between neighboring sliding window frames. Default can be:
+     *     floor(n_fft / 4)
+     * @param center whether to pad input on both sides.
+     * @param window Desired window to use. Recommend for HanningWindow
+     * @param normalize controls whether to return the normalized STFT results
+     * @param returnComplex whether to return a complex tensor, or a real tensor with an extra last
+     *     dimension for the real and imaginary components.
+     * @return A NDArray containing the STFT result with shape described above
+     */
+    NDArray stft(
+            long nFft,
+            long hopLength,
+            boolean center,
+            NDArray window,
+            boolean normalize,
+            boolean returnComplex);
+
+    /**
      * Reshapes this {@code NDArray} to the given {@link Shape}.
      *
      * <p>Examples
@@ -4978,4 +5037,21 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return the result {@code NDArray}
      */
     NDArray batchDot(NDArray other);
+
+    /**
+     * Convert a general NDArray to its complex math format.
+     *
+     * <p>example: [10f, 12f] float32 -> [10+12j] in complex64
+     *
+     * @return the complex NDArray
+     */
+    NDArray complex();
+
+    /**
+     * Convert a complex NDArray to its real math format. example: [10+12j] in complex64 -> [10f,
+     * 12f] float32
+     *
+     * @return tje real NDArray
+     */
+    NDArray real();
 }

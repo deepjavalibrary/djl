@@ -33,6 +33,7 @@ public enum DataType {
     INT8(Format.INT, 1),
     INT64(Format.INT, 8),
     BOOLEAN(Format.BOOLEAN, 1),
+    COMPLEX64(Format.FLOATING, 4),
     UNKNOWN(Format.UNKNOWN, 0),
     STRING(Format.STRING, -1);
 
@@ -185,6 +186,7 @@ public enum DataType {
                 return data.asLongBuffer();
             case UINT8:
             case INT8:
+            case COMPLEX64:
             case UNKNOWN:
             default:
                 return data;
@@ -217,6 +219,7 @@ public enum DataType {
                 return "|b1";
             case STRING:
                 return "|S1";
+            case COMPLEX64:
             case UNKNOWN:
             default:
                 throw new IllegalArgumentException("Unsupported dataType: " + this);
