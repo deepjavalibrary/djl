@@ -3196,7 +3196,7 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray flatten(int startDim, int endDim);
 
     /**
-     * Compute the one-dimensional discrete Fourier Transform.
+     * Computes the one-dimensional discrete Fourier Transform.
      *
      * @param length Length of the transformed axis of the output.
      * @return The truncated or zero-padded input, transformed along the axis indicated by axis, or
@@ -3207,7 +3207,7 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
-     * Compute the one-dimensional discrete Fourier Transform.
+     * Computes the one-dimensional discrete Fourier Transform.
      *
      * @param length Length of the transformed axis of the output.
      * @param axis Axis over which to compute the FFT.
@@ -3217,7 +3217,7 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray fft(long length, long axis);
 
     /**
-     * Compute the Short Time Fourier Transform (STFT).
+     * Computes the Short Time Fourier Transform (STFT).
      *
      * @param nFft size of Fourier transform
      * @param hopLength the distance between neighboring sliding window frames. Default can be:
@@ -3234,7 +3234,7 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
-     * Compute the Short Time Fourier Transform (STFT).
+     * Computes the Short Time Fourier Transform (STFT).
      *
      * @param nFft size of Fourier transform
      * @param hopLength the distance between neighboring sliding window frames. Default can be:
@@ -5041,14 +5041,14 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Convert a general NDArray to its complex math format.
      *
-     * <p>example: [10f, 12f] float32 -> [10+12j] in complex64
+     * <p>example: [10f, 12f] float32 -&gt; [10+12j] in complex64
      *
      * @return the complex NDArray
      */
     NDArray complex();
 
     /**
-     * Convert a complex NDArray to its real math format. example: [10+12j] in complex64 -> [10f,
+     * Convert a complex NDArray to its real math format. example: [10+12j] in complex64 -&gt; [10f,
      * 12f] float32
      *
      * @return tje real NDArray
