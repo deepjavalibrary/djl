@@ -1223,11 +1223,13 @@ public final class JniUtils {
                         false));
     }
 
-    public static PtNDArray hannWindow(PtNDManager manager, long numPoints, Device device) {
+    public static PtNDArray hannWindow(
+            PtNDManager manager, long numPoints, boolean periodic, Device device) {
         return new PtNDArray(
                 manager,
                 PyTorchLibrary.LIB.torchHannWindow(
                         numPoints,
+                        periodic,
                         new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()}));
     }
 

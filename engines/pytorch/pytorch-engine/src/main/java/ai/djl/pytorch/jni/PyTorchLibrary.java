@@ -384,7 +384,7 @@ final class PyTorchLibrary {
 
     native long torchEye(int n, int m, int dType, int layout, int[] device, boolean requiredGrad);
 
-    native long torchHannWindow(long nfft, int[] device);
+    native long torchHannWindow(long nfft, boolean periodic, int[] device);
 
     native long torchErfinv(long handle);
 

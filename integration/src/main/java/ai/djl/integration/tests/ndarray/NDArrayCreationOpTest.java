@@ -529,10 +529,9 @@ public class NDArrayCreationOpTest {
     @Test
     public void testHanningWindow() {
         try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray result = manager.hanningWindow(5);
-            float[] expected = {0f, 0.5f, 1f, 0.5f, 0f};
-            float[] array = result.toFloatArray();
-            Assert.assertEquals(array, expected);
+            NDArray result = manager.hanningWindow(6);
+            NDArray expected = manager.create(new float[] {0.0f, 0.25f, 0.75f, 1.0f, 0.75f, 0.25f});
+            Assertions.assertAlmostEquals(result, expected);
         }
     }
 }

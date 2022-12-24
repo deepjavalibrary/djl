@@ -175,7 +175,7 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray hanningWindow(long numPoints) {
-        return JniUtils.hannWindow(this, numPoints, device);
+        return JniUtils.hannWindow(this, numPoints, true, device);
     }
 
     /** {@inheritDoc} */

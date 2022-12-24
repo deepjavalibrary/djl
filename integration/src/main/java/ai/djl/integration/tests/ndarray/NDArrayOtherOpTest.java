@@ -990,20 +990,22 @@ public class NDArrayOtherOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray ele = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray result = ele.fft(5);
-            result = result.real();
-            float[] expected = {
-                15.0f,
-                0.0f,
-                -2.5f,
-                3.440955f,
-                -2.4999998f,
-                0.8122992f,
-                -2.4999998f,
-                -0.8122992f,
-                -2.5f,
-                -3.440955f
-            };
-            Assert.assertEquals(result.toFloatArray(), expected);
+            result = result.real().flatten();
+            NDArray expected =
+                    manager.create(
+                            new float[] {
+                                15.0f,
+                                0.0f,
+                                -2.5f,
+                                3.440955f,
+                                -2.4999998f,
+                                0.8122992f,
+                                -2.4999998f,
+                                -0.8122992f,
+                                -2.5f,
+                                -3.440955f
+                            });
+            Assertions.assertAlmostEquals(result, expected);
         }
     }
 
