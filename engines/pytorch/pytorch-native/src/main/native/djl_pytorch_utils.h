@@ -81,6 +81,8 @@ inline torch::ScalarType GetScalarTypeFromDType(jint dtype) {
       return torch::kInt64;
     case 7:
       return torch::kBool;
+    case 8:
+      return torch::kComplexFloat;
     default:
       // TODO improve the error handling
       throw;

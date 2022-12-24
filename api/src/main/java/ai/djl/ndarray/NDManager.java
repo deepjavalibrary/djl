@@ -1462,6 +1462,25 @@ public interface NDManager extends AutoCloseable {
     NDArray sampleGamma(NDArray alpha, NDArray beta, Shape shape);
 
     /**
+     * Builds the Hanning Window.
+     *
+     * <p>The Hanning was named for Julius von Hann, an Austrian meteorologist. It is also known as
+     * the Cosine Bell. Some authors prefer that it be called a Hann window, to help avoid confusion
+     * with the very similar Hamming window.
+     *
+     * @param numPoints Number of points in the output window.
+     * @return the window
+     */
+    default NDArray hanningWindow(long numPoints) {
+        float[] data = new float[(int) numPoints];
+        // shift from N -1 to N to trims off the last duplicate value from the symmetric window
+        for (int i = 1; i < data.length; i++) {
+            data[i] = (float) (0.5 * (1 - Math.cos((2 * Math.PI * i) / numPoints)));
+        }
+        return create(data);
+    }
+
+    /**
      * Check if the manager is still valid.
      *
      * @return the current status

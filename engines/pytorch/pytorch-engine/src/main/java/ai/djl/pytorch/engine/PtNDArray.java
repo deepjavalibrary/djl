@@ -1058,6 +1058,25 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray fft(long length, long axis) {
+        return JniUtils.fft(this, length, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stft(
+            long nFft,
+            long hopLength,
+            boolean center,
+            NDArray window,
+            boolean normalize,
+            boolean returnComplex) {
+        return JniUtils.stft(
+                this, nFft, hopLength, (PtNDArray) window, center, normalize, returnComplex);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray reshape(Shape shape) {
         return JniUtils.reshape(this, shape.getShape());
     }
@@ -1510,6 +1529,18 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public NDArray batchDot(NDArray other) {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray complex() {
+        return JniUtils.complex(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray real() {
+        return JniUtils.real(this);
     }
 
     /** {@inheritDoc} */

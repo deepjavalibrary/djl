@@ -525,4 +525,13 @@ public class NDArrayCreationOpTest {
             Assertions.assertAlmostEquals(std.toFloatArray()[1], 13.69f, 2e-2f, 2e-2f);
         }
     }
+
+    @Test
+    public void testHanningWindow() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray result = manager.hanningWindow(6);
+            NDArray expected = manager.create(new float[] {0.0f, 0.25f, 0.75f, 1.0f, 0.75f, 0.25f});
+            Assertions.assertAlmostEquals(result, expected);
+        }
+    }
 }

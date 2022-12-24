@@ -64,6 +64,6 @@ public class AudioProcessorTest {
         testData.setAudioPaths(Collections.singletonList("build/test/test_01.wav"));
         NDArray samples = testData.getPreprocessedData(manager, 0);
         Assert.assertEquals(new Shape(161, 838), samples.getShape());
-        Assert.assertEquals(samples.get("0,0").toFloatArray()[0], -15.4571f, 1e-3f);
+        Assert.assertEquals(samples.get("0,0").toFloatArray()[0], -15.4531f, 1e-3f);
     }
 }
