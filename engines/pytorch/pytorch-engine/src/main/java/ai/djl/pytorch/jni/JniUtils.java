@@ -938,8 +938,7 @@ public final class JniUtils {
             boolean center,
             boolean normalize,
             boolean returnComplex) {
-        return new PtNDArray(
-                ndArray.getManager(),
+        long handle =
                 PyTorchLibrary.LIB.torchStft(
                         ndArray.getHandle(),
                         nFft,
@@ -947,17 +946,27 @@ public final class JniUtils {
                         window.getHandle(),
                         center,
                         normalize,
-                        returnComplex));
+                        returnComplex);
+        if (handle == -1) {
+            throw new UnsupportedOperationException("real() is not supported.");
+        }
+        return new PtNDArray(ndArray.getManager(), handle);
     }
 
     public static PtNDArray real(PtNDArray ndArray) {
-        return new PtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchViewAsReal(ndArray.getHandle()));
+        long handle = PyTorchLibrary.LIB.torchViewAsReal(ndArray.getHandle());
+        if (handle == -1) {
+            throw new UnsupportedOperationException("real() is not supported.");
+        }
+        return new PtNDArray(ndArray.getManager(), handle);
     }
 
     public static PtNDArray complex(PtNDArray ndArray) {
-        return new PtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchViewAsComplex(ndArray.getHandle()));
+        long handle = PyTorchLibrary.LIB.torchViewAsComplex(ndArray.getHandle());
+        if (handle == -1) {
+            throw new UnsupportedOperationException("complex() is not supported.");
+        }
+        return new PtNDArray(ndArray.getManager(), handle);
     }
 
     public static PtNDArray abs(PtNDArray ndArray) {

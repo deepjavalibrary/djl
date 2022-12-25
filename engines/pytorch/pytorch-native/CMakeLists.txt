@@ -51,8 +51,8 @@ set(SOURCE_FILES
     "src/main/native/ai_djl_pytorch_jni_cache.h"
     "src/main/native/ai_djl_pytorch_jni_cache.cc")
 
-if(PT_OLD_VERSION)
-    add_compile_definitions(V1_10_X)
+if(PT_VERSION)
+    add_compile_definitions(${PT_VERSION})
 endif()
 
 add_library(djl_torch SHARED ${SOURCE_FILES})

@@ -19,6 +19,10 @@ if exist %FILEPATH% (
     echo Finished downloading libtorch
 )
 
+if "%VERSION%" == "1.11.0" (
+    set PT_VERSION=V1_11_X
+)
+
 copy /y src\main\patch\cuda.cmake libtorch\share\cmake\Caffe2\public\
 
 @rem workaround VS 17.4.0 issue: https://stackoverflow.com/questions/74366357/updating-to-visual-studio-17-4-0-yields-linker-errors-related-to-tls
@@ -28,5 +32,5 @@ if exist build rd /q /s build
 md build\classes
 cd build
 javac -sourcepath ..\..\pytorch-engine\src\main\java\ ..\..\pytorch-engine\src\main\java\ai\djl\pytorch\jni\PyTorchLibrary.java -h include -d classes
-cmake -DCMAKE_PREFIX_PATH=libtorch ..
+cmake -DCMAKE_PREFIX_PATH=libtorch -DPT_VERSION=%PT_VERSION% ..
 cmake --build . --config Release
