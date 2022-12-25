@@ -36,6 +36,9 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFft(
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStft(JNIEnv* env, jobject jthis, jlong jhandle,
     jlong jn_fft, jlong jhop_length, jlong jwindow, jboolean jcenter, jboolean jnormalize, jboolean jreturn_complex) {
+#ifdef V1_11_X
+  return -1;
+#else
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   if (jwindow == -1L) {
@@ -49,22 +52,31 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStft(JNIEnv*
     return reinterpret_cast<uintptr_t>(result_ptr);
   }
   API_END_RETURN()
+#endif
 }
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchViewAsReal(
     JNIEnv* env, jobject jthis, jlong jhandle) {
+#ifdef V1_11_X
+  return -1;
+#else
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto* result_ptr = new torch::Tensor(torch::view_as_real_copy(*tensor_ptr));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
+#endif
 }
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchViewAsComplex(
     JNIEnv* env, jobject jthis, jlong jhandle) {
+#ifdef V1_11_X
+  return -1;
+#else
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   const auto* result_ptr = new torch::Tensor(torch::view_as_complex_copy(*tensor_ptr));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
+#endif
 }
