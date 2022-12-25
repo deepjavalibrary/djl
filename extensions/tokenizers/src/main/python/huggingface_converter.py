@@ -131,7 +131,7 @@ class HuggingfaceConverter:
 
         # Save serving.properties
         serving_file = os.path.join(temp_dir, "serving.properties")
-        arguments = self.get_extra_arguments(hf_pipeline)
+        arguments = self.get_extra_arguments(hf_pipeline, model_id)
         with open(serving_file, 'w') as f:
             f.write(f"engine=PyTorch\n"
                     f"option.modelName={model_name}\n"
@@ -194,7 +194,7 @@ class HuggingfaceConverter:
 
         return self.verify_jit_output(hf_pipeline, encoding, out)
 
-    def get_extra_arguments(self, hf_pipeline) -> dict:
+    def get_extra_arguments(self, hf_pipeline, model_id: str) -> dict:
         return {}
 
     def verify_jit_output(self, hf_pipeline, encoding, out):

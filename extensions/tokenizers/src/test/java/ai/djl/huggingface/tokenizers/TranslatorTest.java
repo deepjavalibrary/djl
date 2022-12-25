@@ -357,6 +357,26 @@ public class TranslatorTest {
             Assertions.assertAlmostEquals(res[0], 0.05103);
         }
 
+        // pooling_mode_max_token
+        criteria =
+                Criteria.builder()
+                        .setTypes(String.class, float[].class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("pooling", "max_tokens")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String, float[]> model = criteria.loadModel();
+                Predictor<String, float[]> predictor = model.newPredictor()) {
+            float[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 384);
+            Assertions.assertAlmostEquals(res[0], 1.0);
+        }
+
         Criteria<Input, Output> criteria2 =
                 Criteria.builder()
                         .setTypes(Input.class, Output.class)
@@ -364,6 +384,7 @@ public class TranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("pooling", "cls_token")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .build();
