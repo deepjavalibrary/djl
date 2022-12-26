@@ -27,7 +27,7 @@ public class TrainTicTacToeTest {
     public void testTrainTicTacToe() throws IOException {
         TestRequirements.engine("MXNet", "PyTorch");
 
-        if (Boolean.getBoolean("nightly")) {
+        if (Boolean.getBoolean("nightly") && Engine.getInstance().getGpuCount() > 0) {
             String[] args = new String[] {"-g", "1", "-e", "6"};
             Engine.getInstance().setRandomSeed(1234);
 

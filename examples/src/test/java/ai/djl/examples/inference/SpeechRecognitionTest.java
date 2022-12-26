@@ -13,6 +13,7 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
+import ai.djl.engine.EngineException;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
@@ -31,10 +32,17 @@ public class SpeechRecognitionTest {
         TestRequirements.nightly();
         TestRequirements.engine("PyTorch");
 
-        String result = SpeechRecognition.predict();
-        Assert.assertEquals(
-                result,
-                "THE NEAREST SAID THE DISTRICT DOCTOR IS A GOOD ITALIAN ABBE WHO LIVES NEXT DOOR TO"
-                        + " YOU SHALL I CALL ON HIM AS I PASS ");
+        try {
+            String result = SpeechRecognition.predict();
+            Assert.assertEquals(
+                    result,
+                    "THE NEAREST SAID THE DISTRICT DOCTOR IS A GOOD ITALIAN ABBE WHO LIVES NEXT"
+                            + " DOOR TO YOU SHALL I CALL ON HIM AS I PASS ");
+        } catch (EngineException e) {
+            // wav2vec2.ptl model requires avx2
+            if (!"Unknown qengine".equals(e.getMessage())) {
+                throw e;
+            }
+        }
     }
 }
