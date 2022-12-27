@@ -37,6 +37,8 @@ public class ClipModelTest {
             Image img = ImageFactory.getInstance().fromUrl(url);
             float[] imgVector = model.extractImageFeatures(img);
             Assert.assertEquals(textVector.length, imgVector.length);
+            assertAlmostEquals(textVector[0], 0.09463542);
+            assertAlmostEquals(imgVector[0], -0.18694691);
         }
     }
 
@@ -48,6 +50,11 @@ public class ClipModelTest {
         String text = "A photo of cats";
         String text2 = "A photo of dogs";
         double[] probs = ImageTextComparison.compareTextAndImage(text, text2);
-        Assert.assertTrue(probs[0] > probs[0]);
+        Assert.assertTrue(probs[0] > 0.9);
+        Assert.assertTrue(probs[1] < 0.1);
+    }
+
+    public static void assertAlmostEquals(double actual, double expected) {
+        Assert.assertTrue(Math.abs(actual - expected) < 1e-3 + 1e-5 * Math.abs(expected));
     }
 }
