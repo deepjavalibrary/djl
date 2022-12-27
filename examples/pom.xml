@@ -73,6 +73,11 @@
             <groupId>ai.djl.pytorch</groupId>
             <artifactId>pytorch-model-zoo</artifactId>
         </dependency>
+        <!-- TensorFlow -->
+        <dependency>
+            <groupId>ai.djl.tensorflow</groupId>
+            <artifactId>tensorflow-model-zoo</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
