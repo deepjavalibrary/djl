@@ -17,6 +17,7 @@ import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.gc.SwitchGarbageCollection;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -1570,7 +1571,7 @@ public final class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtN
      */
     public static PtNDArray newPtNDArray(PtNDManager manager, long handle) {
         PtNDArray instance = new PtNDArrayImpl(manager, handle);
-        if (manager.isUseGarbageCollection()) {
+        if (SwitchGarbageCollection.isUseGarbageCollection()) {
             instance = manager.getProxyMaker().wrap(instance);
         }
         return instance;
@@ -1589,7 +1590,7 @@ public final class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtN
      */
     public static PtNDArray newPtNDArray(PtNDManager manager, long handle, ByteBuffer data) {
         PtNDArray instance = new PtNDArrayImpl(manager, handle, data);
-        if (manager.isUseGarbageCollection()) {
+        if (SwitchGarbageCollection.isUseGarbageCollection()) {
             instance = manager.getProxyMaker().wrap(instance);
         }
         return instance;
@@ -1608,7 +1609,7 @@ public final class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtN
      */
     public static PtNDArray newPtNDArray(PtNDManager manager, String[] strs, Shape shape) {
         PtNDArray instance = new PtNDArrayImpl(manager, strs, shape);
-        if (manager.isUseGarbageCollection()) {
+        if (SwitchGarbageCollection.isUseGarbageCollection()) {
             instance = manager.getProxyMaker().wrap(instance);
         }
         return instance;

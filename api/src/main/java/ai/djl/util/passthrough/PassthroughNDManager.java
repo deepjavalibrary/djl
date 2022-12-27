@@ -87,12 +87,6 @@ public final class PassthroughNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isUseGarbageCollection() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDList load(Path path) {
         throw new UnsupportedOperationException(UNSUPPORTED);
     }
@@ -246,18 +240,6 @@ public final class PassthroughNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDManager newSubManager(Device device) {
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager newSubManager(boolean useGarbageCollection) {
-        return this;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager newSubManager(Device device, boolean useGarbageCollection) {
         return this;
     }
 

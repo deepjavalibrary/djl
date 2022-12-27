@@ -16,6 +16,7 @@ import static ai.djl.pytorch.engine.PtNDManager.debugDumpFromSystemManager;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.gc.SwitchGarbageCollection;
 import ai.djl.translate.TranslateException;
 
 import org.slf4j.Logger;
@@ -33,8 +34,8 @@ public final class Main {
 
     public static void main(String[] args)
             throws IOException, TranslateException, InterruptedException {
-
-        try (NDManager baseManager = NDManager.newBaseManager(true); ) {
+        SwitchGarbageCollection.on();
+        try (NDManager baseManager = NDManager.newBaseManager(); ) {
             try (NDManager subManager = baseManager.newSubManager()) {
 
                 NDArray a = subManager.create(new float[] {1f});

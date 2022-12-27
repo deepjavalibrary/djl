@@ -130,17 +130,6 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(String name, Device device, boolean useGarbageCollection) {
-        return new PtModel(name, device, useGarbageCollection);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager newBaseManager(boolean useGarbageCollection) {
-        return PtNDManager.getSystemManager().newSubManager(useGarbageCollection);
-    }
-    /** {@inheritDoc} */
-    @Override
     public NDManager newBaseManager() {
         return PtNDManager.getSystemManager().newSubManager();
     }

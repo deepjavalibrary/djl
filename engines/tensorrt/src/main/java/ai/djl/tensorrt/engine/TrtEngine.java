@@ -120,12 +120,6 @@ public final class TrtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(String name, Device device, boolean useGarbageCollection) {
-        throw new UnsupportedOperationException("Garbage collection not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public TrtNDManager newBaseManager() {
         return newBaseManager(null);
     }

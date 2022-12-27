@@ -115,12 +115,6 @@ public final class XgbEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(String name, Device device, boolean useGarbageCollection) {
-        throw new UnsupportedOperationException("Garbage collection not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDManager newBaseManager() {
         return newBaseManager(null);
     }

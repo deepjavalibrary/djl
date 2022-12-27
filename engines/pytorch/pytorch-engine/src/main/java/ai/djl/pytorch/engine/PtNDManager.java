@@ -34,8 +34,8 @@ public class PtNDManager extends BaseNDManager {
 
     protected PtNDArrayProxyMaker proxyMaker;
 
-    private PtNDManager(NDManager parent, Device device, boolean useGarbageCollection) {
-        super(parent, device, useGarbageCollection);
+    private PtNDManager(NDManager parent, Device device) {
+        super(parent, device);
     }
 
     static PtNDManager getSystemManager() {
@@ -183,15 +183,7 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public PtNDManager newSubManager(Device device) {
-        PtNDManager manager = new PtNDManager(this, device, isUseGarbageCollection());
-        attachUncappedInternal(manager.uid, manager);
-        return manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDManager newSubManager(Device device, boolean useGarbageCollection) {
-        PtNDManager manager = new PtNDManager(this, device, useGarbageCollection);
+        PtNDManager manager = new PtNDManager(this, device);
         attachUncappedInternal(manager.uid, manager);
         return manager;
     }
@@ -219,7 +211,7 @@ public class PtNDManager extends BaseNDManager {
     private static final class SystemManager extends PtNDManager implements SystemNDManager {
 
         SystemManager() {
-            super(null, null, false);
+            super(null, null);
             this.proxyMaker = new PtNDArrayProxyMaker();
         }
 

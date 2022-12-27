@@ -100,12 +100,6 @@ public final class PpEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public Model newModel(String name, Device device, boolean useGarbageCollection) {
-        throw new UnsupportedOperationException("Garbage collection not supported");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public SymbolBlock newSymbolBlock(NDManager manager) {
         throw new UnsupportedOperationException("PaddlePaddle does not support empty SymbolBlock");
     }

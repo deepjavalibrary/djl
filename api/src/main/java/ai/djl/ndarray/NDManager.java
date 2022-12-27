@@ -111,18 +111,6 @@ public interface NDManager extends AutoCloseable {
      *
      * <p>{@code NDManager} will inherit default {@link Device}.
      *
-     * @param useGarbageCollection whether to facade {@link NDArray} behind a proxy
-     * @return a new top-level {@code NDManager}
-     */
-    static NDManager newBaseManager(boolean useGarbageCollection) {
-        return Engine.getInstance().newBaseManager(useGarbageCollection);
-    }
-
-    /**
-     * Creates a new top-level {@code NDManager}.
-     *
-     * <p>{@code NDManager} will inherit default {@link Device}.
-     *
      * @return a new top-level {@code NDManager}
      */
     static NDManager newBaseManager() {
@@ -766,13 +754,6 @@ public interface NDManager extends AutoCloseable {
      * @return name
      */
     String getName();
-
-    /**
-     * Returns useGarbageCollection.
-     *
-     * @return useGarbageCollection
-     */
-    boolean isUseGarbageCollection();
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with zeros.
@@ -1527,25 +1508,6 @@ public interface NDManager extends AutoCloseable {
      * @return a child {@code NDManager}
      */
     NDManager newSubManager(Device device);
-
-    /**
-     * Creates a child {@code NDManager} with specified boolean switch useGarbageCollection and will
-     * inherit default {@link Device} from this {@code NDManager}.
-     *
-     * @param useGarbageCollection the boolean switch to use proxies
-     * @return a child {@code NDManager}
-     */
-    NDManager newSubManager(boolean useGarbageCollection);
-
-    /**
-     * Creates a child {@code NDManager} with specified default {@link Device} and the boolean
-     * switch useGarbageCollection.
-     *
-     * @param device the default {@link Device}
-     * @param useGarbageCollection the boolean switch to use proxies
-     * @return a child {@code NDManager}
-     */
-    NDManager newSubManager(Device device, boolean useGarbageCollection);
 
     /**
      * Returns the default {@link Device} of this {@code NDManager}.

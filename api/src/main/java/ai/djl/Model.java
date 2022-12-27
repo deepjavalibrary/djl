@@ -100,59 +100,6 @@ public interface Model extends AutoCloseable {
     }
 
     /**
-     * Creates an empty model instance.
-     *
-     * @param name the model name
-     * @param useGarbageCollection whether to use garbage collection
-     * @return a new Model instance
-     */
-    static Model newInstance(String name, boolean useGarbageCollection) {
-        return newInstance(name, (Device) null, useGarbageCollection);
-    }
-
-    /**
-     * Creates an empty model instance on the specified {@link Device}.
-     *
-     * @param name the model name
-     * @param useGarbageCollection whether to use garbage collection
-     * @param device the device to load the model onto
-     * @return a new model instance
-     */
-    static Model newInstance(String name, Device device, boolean useGarbageCollection) {
-        return Engine.getInstance().newModel(name, device, useGarbageCollection);
-    }
-
-    /**
-     * Creates an empty model instance on the specified {@link Device} and engine.
-     *
-     * @param name the model name
-     * @param useGarbageCollection whether to use garbage collection
-     * @param engineName the name of the engine
-     * @return a new model instance
-     */
-    static Model newInstance(String name, String engineName, boolean useGarbageCollection) {
-        Engine engine = Engine.getEngine(engineName);
-        return engine.newModel(name, null, useGarbageCollection);
-    }
-
-    /**
-     * Creates an empty model instance on the specified {@link Device} and engine.
-     *
-     * @param name the model name
-     * @param useGarbageCollection whether to use garbage collection
-     * @param device the device to load the model onto
-     * @param engineName the name of the engine
-     * @return a new model instance
-     */
-    static Model newInstance(
-            String name, Device device, String engineName, boolean useGarbageCollection) {
-        if (engineName == null || engineName.isEmpty()) {
-            return newInstance(name, device);
-        }
-        return Engine.getEngine(engineName).newModel(name, device, useGarbageCollection);
-    }
-
-    /**
      * Loads the model from the {@code modelPath}.
      *
      * @param modelPath the directory or file path of the model location
