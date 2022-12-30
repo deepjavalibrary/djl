@@ -530,9 +530,7 @@ public interface PtNDArray extends NativeResource<Long>, NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray fft(long length, long axis) {
-        return JniUtils.fft(this, length, axis);
-    }
+    public NDArray fft(long length, long axis);
 
     /** {@inheritDoc} */
     @Override
@@ -542,10 +540,7 @@ public interface PtNDArray extends NativeResource<Long>, NDArray {
             boolean center,
             NDArray window,
             boolean normalize,
-            boolean returnComplex) {
-        return JniUtils.stft(
-                this, nFft, hopLength, (PtNDArray) window, center, normalize, returnComplex);
-    }
+            boolean returnComplex);
 
     /** {@inheritDoc} */
     @Override
@@ -765,15 +760,11 @@ public interface PtNDArray extends NativeResource<Long>, NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray complex() {
-        return JniUtils.complex(this);
-    }
+    public NDArray complex();
 
     /** {@inheritDoc} */
     @Override
-    public NDArray real() {
-        return JniUtils.real(this);
-    }
+    public NDArray real();
 
     /** {@inheritDoc} */
     @Override

@@ -928,7 +928,7 @@ public final class JniUtils {
     }
 
     public static PtNDArray fft(PtNDArray ndArray, long length, long axis) {
-        return new PtNDArray(
+        return PtNDArrayImpl.newPtNDArray(
                 ndArray.getManager(),
                 PyTorchLibrary.LIB.torchFft(ndArray.getHandle(), length, axis));
     }
@@ -953,7 +953,7 @@ public final class JniUtils {
         if (handle == -1) {
             throw new UnsupportedOperationException("real() is not supported.");
         }
-        return new PtNDArray(ndArray.getManager(), handle);
+        return PtNDArrayImpl.newPtNDArray(ndArray.getManager(), handle);
     }
 
     public static PtNDArray real(PtNDArray ndArray) {
@@ -961,7 +961,7 @@ public final class JniUtils {
         if (handle == -1) {
             throw new UnsupportedOperationException("real() is not supported.");
         }
-        return new PtNDArray(ndArray.getManager(), handle);
+        return PtNDArrayImpl.newPtNDArray(ndArray.getManager(), handle);
     }
 
     public static PtNDArray complex(PtNDArray ndArray) {
@@ -969,7 +969,7 @@ public final class JniUtils {
         if (handle == -1) {
             throw new UnsupportedOperationException("complex() is not supported.");
         }
-        return new PtNDArray(ndArray.getManager(), handle);
+        return PtNDArrayImpl.newPtNDArray(ndArray.getManager(), handle);
     }
 
     public static PtNDArray abs(PtNDArray ndArray) {
@@ -1237,7 +1237,7 @@ public final class JniUtils {
 
     public static PtNDArray hannWindow(
             PtNDManager manager, long numPoints, boolean periodic, Device device) {
-        return new PtNDArray(
+        return PtNDArrayImpl.newPtNDArray(
                 manager,
                 PyTorchLibrary.LIB.torchHannWindow(
                         numPoints,
