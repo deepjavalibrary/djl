@@ -197,7 +197,7 @@ public abstract class TextDataset extends RandomAccessDataset {
         protected Usage usage;
 
         /** Constructs a new builder. */
-        Builder() {
+        protected Builder() {
             repository = BasicDatasets.REPOSITORY;
             groupId = BasicDatasets.GROUP_ID;
             usage = Usage.TRAIN;
