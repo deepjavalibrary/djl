@@ -77,10 +77,16 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         NDArray inputAttentionMask = manager.create(attentionMask).toType(DataType.FLOAT32, true);
         switch (pooling) {
             case "mean_tokens":
-                embeddings = meanPool(embeddings, inputAttentionMask);
+                embeddings = meanPool(embeddings, inputAttentionMask, false);
+                break;
+            case "mean_sqrt_len_tokens":
+                embeddings = meanPool(embeddings, inputAttentionMask, true);
                 break;
             case "max_tokens":
                 embeddings = maxPool(embeddings, inputAttentionMask);
+                break;
+            case "weightedmean_tokens":
+                embeddings = weightedMeanPool(embeddings, inputAttentionMask);
                 break;
             case "cls_token":
                 embeddings = embeddings.get(0);
@@ -95,13 +101,16 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         return embeddings.toFloatArray();
     }
 
-    private NDArray meanPool(NDArray embeddings, NDArray attentionMask) {
+    private NDArray meanPool(NDArray embeddings, NDArray attentionMask, boolean sqrt) {
         long[] shape = embeddings.getShape().getShape();
         attentionMask = attentionMask.expandDims(-1).broadcast(shape);
         NDArray inputAttentionMaskSum = attentionMask.sum(AXIS);
         NDArray clamp = inputAttentionMaskSum.clip(1e-9, 1e12);
         NDArray prod = embeddings.mul(attentionMask);
         NDArray sum = prod.sum(AXIS);
+        if (sqrt) {
+            return sum.div(clamp.sqrt());
+        }
         return sum.div(clamp);
     }
 
@@ -113,6 +122,17 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         embeddings.set(inputAttentionMask, -1e9); // Set padding tokens to large negative value
 
         return embeddings.max(AXIS, true);
+    }
+
+    private NDArray weightedMeanPool(NDArray embeddings, NDArray attentionMask) {
+        long[] shape = embeddings.getShape().getShape();
+        NDArray weight = embeddings.getManager().arange(1, shape[0] + 1);
+        weight = weight.expandDims(-1).broadcast(shape);
+
+        attentionMask = attentionMask.expandDims(-1).broadcast(shape).mul(weight);
+        NDArray maskSum = attentionMask.sum(AXIS);
+        NDArray embeddingSum = embeddings.mul(attentionMask).sum(AXIS);
+        return embeddingSum.div(maskSum);
     }
 
     /**
@@ -180,18 +200,14 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
          * @return this builder
          */
         public Builder optPoolingMode(String poolingMode) {
-            if ("weightedmean_tokens".equals(poolingMode)
-                    || "lasttoken".equals(poolingMode)
-                    || "mean_sqrt_len_tokens".equals(poolingMode)) {
-                throw new UnsupportedOperationException(
-                        "Unsupported pooling model: " + poolingMode);
-            }
             if (!"mean_tokens".equals(poolingMode)
                     && !"max_tokens".equals(poolingMode)
-                    && !"cls_token".equals(poolingMode)) {
+                    && !"cls_token".equals(poolingMode)
+                    && !"mean_sqrt_len_tokens".equals(poolingMode)
+                    && !"weightedmean_tokens".equals(poolingMode)) {
                 throw new IllegalArgumentException(
                         "Invalid pooling model, must be one of [mean_tokens, max_tokens,"
-                                + " cls_token].");
+                                + " cls_token, mean_sqrt_len_tokens, weightedmean_tokens].");
             }
             this.pooling = poolingMode;
             return this;

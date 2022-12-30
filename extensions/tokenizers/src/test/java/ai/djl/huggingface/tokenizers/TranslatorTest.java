@@ -357,7 +357,7 @@ public class TranslatorTest {
             Assertions.assertAlmostEquals(res[0], 0.05103);
         }
 
-        // pooling_mode_max_token
+        // pooling_mode_max_tokens
         criteria =
                 Criteria.builder()
                         .setTypes(String.class, float[].class)
@@ -375,6 +375,46 @@ public class TranslatorTest {
             float[] res = predictor.predict(text);
             Assert.assertEquals(res.length, 384);
             Assertions.assertAlmostEquals(res[0], 1.0);
+        }
+
+        // pooling_mean_sqrt_len_tokens
+        criteria =
+                Criteria.builder()
+                        .setTypes(String.class, float[].class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("pooling", "mean_sqrt_len_tokens")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String, float[]> model = criteria.loadModel();
+                Predictor<String, float[]> predictor = model.newPredictor()) {
+            float[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 384);
+            Assertions.assertAlmostEquals(res[0], 0.05103104);
+        }
+
+        // pooling_weightedmean_tokens
+        criteria =
+                Criteria.builder()
+                        .setTypes(String.class, float[].class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("pooling", "weightedmean_tokens")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String, float[]> model = criteria.loadModel();
+                Predictor<String, float[]> predictor = model.newPredictor()) {
+            float[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 384);
+            Assertions.assertAlmostEquals(res[0], 0.05103104);
         }
 
         Criteria<Input, Output> criteria2 =
