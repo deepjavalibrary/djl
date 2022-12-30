@@ -139,14 +139,15 @@ public class NDFormatTest {
 
     @Test
     public void testLargeArray() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
             NDArray large = manager.arange(0f, 100000000f).reshape(100, 100, 100, 100);
             String str = large.toString();
             Assert.assertEquals(
-                    str, "ND: (100, 100, 100, 100) cpu() float32\n[ Exceed max print size ]");
+                    str,
+                    "ND: (100, 100, 100, 100) cpu() float32" + LF + "[ Exceed max print size ]");
 
             NDArray arr = manager.create(new float[] {1, 0, 0, 0});
-            Assert.assertEquals(arr.mean().toString(), "ND: () cpu() float32\n0.25\n");
+            Assert.assertEquals(arr.mean().toString(), "ND: () cpu() float32" + LF + "0.25" + LF);
         }
     }
 }

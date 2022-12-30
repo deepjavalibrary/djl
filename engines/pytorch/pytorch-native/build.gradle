@@ -25,6 +25,8 @@ if (project.hasProperty("cu11")) {
     } else {
         throw new GradleException("Unsupported PyTorch version: ${VERSION}")
     }
+} else if (project.hasProperty("cu10")) {
+    FLAVOR = "cu102"
 }
 String BINARY_ROOT = "${project.buildDir}/download"
 

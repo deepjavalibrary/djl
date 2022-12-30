@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.Pair;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -35,10 +36,12 @@ public class IValueUtilsTest {
             // the NDList is mapped to (input1: Tuple(Tensor))
             input.attach(manager);
 
-            IValue[] iValues = IValueUtils.getInputs(input);
+            Pair<IValue[], String> result = IValueUtils.getInputs(input);
+            IValue[] iValues = result.getKey();
             Assert.assertEquals(iValues.length, 1);
             Assert.assertTrue(iValues[0].isTuple());
             Assert.assertEquals(iValues[0].toIValueTuple().length, 2);
+            Assert.assertEquals(result.getValue(), "forward");
 
             Arrays.stream(iValues).forEach(IValue::close);
         }
@@ -63,7 +66,7 @@ public class IValueUtilsTest {
             // the 2nd part is the key of each value in the dict
             input.attach(manager);
 
-            IValue[] iValues = IValueUtils.getInputs(input);
+            IValue[] iValues = IValueUtils.getInputs(input).getKey();
             Assert.assertEquals(iValues.length, 2);
             Assert.assertTrue(iValues[0].isMap());
             Assert.assertEquals(iValues[1].toIValueMap().size(), 3);
@@ -81,14 +84,18 @@ public class IValueUtilsTest {
             array2.setName("input1[]");
             NDArray array3 = manager.ones(new Shape(1));
             array3.setName("input2");
-            NDList input = new NDList(array1, array2, array3);
+            NDArray array4 = manager.create("Hello World");
+            array4.setName("module_method:get_text_feature");
+            NDList input = new NDList(array1, array2, array3, array4);
             // the NDList is mapped to (input1: list(Tensor), input2: Tensor)
             input.attach(manager);
 
-            IValue[] iValues = IValueUtils.getInputs(input);
+            Pair<IValue[], String> result = IValueUtils.getInputs(input);
+            IValue[] iValues = result.getKey();
             Assert.assertEquals(iValues.length, 2);
             Assert.assertTrue(iValues[0].isList());
             Assert.assertEquals(iValues[0].toIValueArray().length, 2);
+            Assert.assertEquals(result.getValue(), "get_text_feature");
 
             Arrays.stream(iValues).forEach(IValue::close);
         }

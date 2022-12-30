@@ -31,6 +31,9 @@ import java.util.regex.Pattern;
 /** IValueUtils is utility class to deal with IValue in PyTorch. */
 public final class IValueUtils {
 
+    private static final Pattern PATTERN_LIST = Pattern.compile("\\w+\\[]");
+    private static final Pattern PATTERN_TUPLE = Pattern.compile("\\w+\\(\\)");
+
     private IValueUtils() {}
 
     /**
@@ -42,11 +45,15 @@ public final class IValueUtils {
      * @return the result {@link NDList}
      */
     public static NDList forward(PtSymbolBlock block, NDList inputs, boolean isTrain) {
-        IValue[] iValues = getInputs(inputs);
-        long[] iValueHandles = Arrays.stream(iValues).mapToLong(IValue::getHandle).toArray();
-        long result = PyTorchLibrary.LIB.moduleForward(block.getHandle(), iValueHandles, isTrain);
+        Pair<IValue[], String> inputPair = getInputs(inputs);
+        IValue[] ivalues = inputPair.getKey();
+        String method = inputPair.getValue();
+        long[] iValueHandles = Arrays.stream(ivalues).mapToLong(IValue::getHandle).toArray();
+        long result =
+                PyTorchLibrary.LIB.moduleRunMethod(
+                        block.getHandle(), method, iValueHandles, isTrain);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
-        Arrays.stream(iValues).forEach(IValue::close);
+        Arrays.stream(ivalues).forEach(IValue::close);
         try (IValue iValue = new IValue(result)) {
             return iValue.toNDList(manager);
         }
@@ -60,8 +67,21 @@ public final class IValueUtils {
      * @return the result {@link IValue}
      */
     public static IValue forward(PtSymbolBlock block, IValue... inputs) {
+        return runMethod(block, "forward", inputs);
+    }
+
+    /**
+     * Runs the method of PyTorch module.
+     *
+     * @param block the block that contains PyTorch module
+     * @param methodName the name of method for calling
+     * @param inputs the input {@link IValue}
+     * @return the result {@link IValue}
+     */
+    public static IValue runMethod(PtSymbolBlock block, String methodName, IValue... inputs) {
         long[] handles = Arrays.stream(inputs).mapToLong(IValue::getHandle).toArray();
-        return new IValue(PyTorchLibrary.LIB.moduleForward(block.getHandle(), handles, false));
+        return new IValue(
+                PyTorchLibrary.LIB.moduleRunMethod(block.getHandle(), methodName, handles, false));
     }
 
     private static int addToMap(
@@ -74,9 +94,10 @@ public final class IValueUtils {
                 });
     }
 
-    static IValue[] getInputs(NDList ndList) {
+    static Pair<IValue[], String> getInputs(NDList ndList) {
         List<PairList<String, PtNDArray>> outputs = new ArrayList<>();
         Map<String, Integer> indexMap = new ConcurrentHashMap<>();
+        String methodName = "forward";
         for (NDArray array : ndList) {
             String name = array.getName();
             if (name != null && name.contains(".")) {
@@ -84,11 +105,13 @@ public final class IValueUtils {
                 int index = addToMap(indexMap, strings[0], outputs);
                 PairList<String, PtNDArray> pl = outputs.get(index);
                 pl.add(strings[1], (PtNDArray) array);
-            } else if (name != null && Pattern.matches("\\w+\\[]", name)) {
+            } else if (name != null && name.startsWith("module_method:")) {
+                methodName = name.substring(14);
+            } else if (name != null && PATTERN_LIST.matcher(name).matches()) {
                 int index = addToMap(indexMap, name, outputs);
                 PairList<String, PtNDArray> pl = outputs.get(index);
                 pl.add("[]", (PtNDArray) array);
-            } else if (name != null && Pattern.matches("\\w+\\(\\)", name)) {
+            } else if (name != null && PATTERN_TUPLE.matcher(name).matches()) {
                 int index = addToMap(indexMap, name, outputs);
                 PairList<String, PtNDArray> pl = outputs.get(index);
                 pl.add("()", (PtNDArray) array);
@@ -121,6 +144,6 @@ public final class IValueUtils {
                 ret[i] = IValue.stringMapFrom(map);
             }
         }
-        return ret;
+        return new Pair<>(ret, methodName);
     }
 }

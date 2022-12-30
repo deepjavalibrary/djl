@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -530,6 +530,25 @@ public interface PtNDArray extends NativeResource<Long>, NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray fft(long length, long axis) {
+        return JniUtils.fft(this, length, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stft(
+            long nFft,
+            long hopLength,
+            boolean center,
+            NDArray window,
+            boolean normalize,
+            boolean returnComplex) {
+        return JniUtils.stft(
+                this, nFft, hopLength, (PtNDArray) window, center, normalize, returnComplex);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     PtNDArray reshape(Shape shape);
 
     /** {@inheritDoc} */
@@ -743,6 +762,18 @@ public interface PtNDArray extends NativeResource<Long>, NDArray {
     /** {@inheritDoc} */
     @Override
     NDArray batchDot(NDArray other);
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray complex() {
+        return JniUtils.complex(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray real() {
+        return JniUtils.real(this);
+    }
 
     /** {@inheritDoc} */
     @Override

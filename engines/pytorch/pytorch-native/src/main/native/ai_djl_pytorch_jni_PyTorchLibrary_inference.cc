@@ -210,11 +210,12 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleTrain(
   API_END()
 }
 
-JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
-    JNIEnv* env, jobject jthis, jlong module_handle, jlongArray jivalue_ptrs, jboolean jis_train) {
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleRunMethod(JNIEnv* env, jobject jthis,
+    jlong module_handle, jstring jmethod_name, jlongArray jivalue_ptrs, jboolean jis_train) {
   API_BEGIN()
   auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(module_handle);
   size_t len = env->GetArrayLength(jivalue_ptrs);
+  auto method_name = djl::utils::jni::GetStringFromJString(env, jmethod_name);
   jlong* jptrs = env->GetLongArrayElements(jivalue_ptrs, JNI_FALSE);
   std::vector<torch::IValue> inputs;
   inputs.reserve(len);
@@ -223,11 +224,11 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleForward(
   }
   torch::IValue output = [&]() {
     if (jis_train) {
-      return module_ptr->forward(inputs);
+      return module_ptr->get_method(method_name)(std::move(inputs));
     }
     // disable autograd
     JITCallGuard guard;
-    return module_ptr->forward(inputs);
+    return module_ptr->get_method(method_name)(std::move(inputs));
   }();
   env->ReleaseLongArrayElements(jivalue_ptrs, jptrs, djl::utils::jni::RELEASE_MODE);
   const auto* result_ptr = new torch::IValue(output);
@@ -277,6 +278,18 @@ JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleGetP
   std::vector<std::string> jptrs;
   for (const auto& named_tensor : module_ptr->named_parameters()) {
     jptrs.push_back(named_tensor.name);
+  }
+  return djl::utils::jni::GetStringArrayFromVec(env, jptrs);
+  API_END_RETURN()
+}
+
+JNIEXPORT jobjectArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleGetMethodNames(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(jhandle);
+  std::vector<std::string> jptrs;
+  for (const auto& method : module_ptr->get_methods()) {
+    jptrs.push_back(method.name());
   }
   return djl::utils::jni::GetStringArrayFromVec(env, jptrs);
   API_END_RETURN()

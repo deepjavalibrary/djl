@@ -63,7 +63,7 @@ public class LinearSpecgram implements AudioProcessor {
         }
         samples = NDArrays.stack(windowList);
 
-        NDArray weighting = hanningWindow(windowSize, manager);
+        NDArray weighting = manager.hanningWindow(windowSize);
         samples.muli(weighting);
         NDList fftList = new NDList();
         for (int row = 0; row < rows; row++) {
@@ -139,13 +139,5 @@ public class LinearSpecgram implements AudioProcessor {
             abs[i] = (float) Math.hypot(re[i], im[i]);
         }
         return in.getManager().create(abs);
-    }
-
-    private NDArray hanningWindow(int size, NDManager manager) {
-        float[] data = new float[size];
-        for (int i = 1; i < size; i++) {
-            data[i] = (float) (0.5 * (1 - Math.cos((2 * Math.PI * i) / (size - 1))));
-        }
-        return manager.create(data);
     }
 }

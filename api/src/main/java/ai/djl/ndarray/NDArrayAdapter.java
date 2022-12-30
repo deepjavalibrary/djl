@@ -836,6 +836,24 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray fft(long length, long axis) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stft(
+            long nFft,
+            long hopLength,
+            boolean center,
+            NDArray window,
+            boolean normalize,
+            boolean returnComplex) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray reshape(Shape shape) {
         return getAlternativeArray().reshape(shape);
     }
@@ -1120,6 +1138,18 @@ public abstract class NDArrayAdapter implements NDArray {
     @Override
     public NDArray batchDot(NDArray other) {
         return getAlternativeArray().batchDot(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray complex() {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray real() {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */

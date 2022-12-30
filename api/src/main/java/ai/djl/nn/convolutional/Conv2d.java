@@ -61,7 +61,7 @@ public class Conv2d extends Convolution {
     private static final String STRING_LAYOUT = "NCHW";
     private static final int NUM_DIMENSIONS = 4;
 
-    Conv2d(Builder builder) {
+    protected Conv2d(Builder builder) {
         super(builder);
     }
 
@@ -201,10 +201,10 @@ public class Conv2d extends Convolution {
     }
 
     /** The Builder to construct a {@link Conv2d} type of {@link Block}. */
-    public static final class Builder extends ConvolutionBuilder<Builder> {
+    public static class Builder extends ConvolutionBuilder<Builder> {
 
         /** Creates a builder that can build a {@link Conv2d} block. */
-        Builder() {
+        protected Builder() {
             stride = new Shape(1, 1);
             padding = new Shape(0, 0);
             dilation = new Shape(1, 1);

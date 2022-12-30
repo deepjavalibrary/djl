@@ -3,7 +3,7 @@ group 'ai.djl.audio'
 dependencies {
     api project(":api")
     api project(":basicdataset")
-    api ("org.bytedeco:javacv:1.5.7") {
+    api ("org.bytedeco:javacv:1.5.8") {
         exclude group: "org.bytedeco", module: "opencv"
         exclude group: "org.bytedeco", module: "openblas"
         exclude group: "org.bytedeco", module: "flycapture"
@@ -21,13 +21,12 @@ dependencies {
     }
     api "com.github.wendykierp:JTransforms:3.1"
 
-    runtimeOnly "org.bytedeco:ffmpeg:5.0-1.5.7:macosx-x86_64"
-    runtimeOnly "org.bytedeco:ffmpeg:5.0-1.5.7:linux-x86_64"
-    runtimeOnly "org.bytedeco:ffmpeg:5.0-1.5.7:windows-x86_64"
+    runtimeOnly "org.bytedeco:ffmpeg:5.1.2-1.5.8:macosx-x86_64"
+    runtimeOnly "org.bytedeco:ffmpeg:5.1.2-1.5.8:linux-x86_64"
+    runtimeOnly "org.bytedeco:ffmpeg:5.1.2-1.5.8:windows-x86_64"
+    runtimeOnly "org.bytedeco:ffmpeg:5.1.2-1.5.8:macosx-arm64"
+    runtimeOnly "org.bytedeco:ffmpeg:5.1.2-1.5.8:linux-arm64"
 
-    testImplementation("org.testng:testng:${testng_version}") {
-        exclude group: "junit", module: "junit"
-    }
     testImplementation project(":testing")
     testRuntimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
     testRuntimeOnly project(":engines:pytorch:pytorch-engine")

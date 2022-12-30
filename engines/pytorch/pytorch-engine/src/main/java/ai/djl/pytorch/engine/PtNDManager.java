@@ -182,6 +182,12 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray hanningWindow(long numPoints) {
+        return JniUtils.hannWindow(this, numPoints, true, device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDManager newSubManager(Device device) {
         PtNDManager manager = new PtNDManager(this, device);
         attachUncappedInternal(manager.uid, manager);

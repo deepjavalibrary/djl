@@ -13,6 +13,7 @@
 package ai.djl.examples.training;
 
 import ai.djl.ModelException;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.transferlearning.TransferFreshFruit;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
@@ -32,6 +33,7 @@ public class TransferFreshFruitTest {
         TestRequirements.engine("PyTorch");
 
         String[][] args = {{}, {"-p"}};
+        Engine.getInstance().setRandomSeed(1234);
         TrainingResult result;
         for (String[] arg : args) {
             result = TransferFreshFruit.runExample(arg);

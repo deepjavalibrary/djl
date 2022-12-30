@@ -927,6 +927,51 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchFlatten(ndArray.getHandle(), startDim, endDim));
     }
 
+    public static PtNDArray fft(PtNDArray ndArray, long length, long axis) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchFft(ndArray.getHandle(), length, axis));
+    }
+
+    public static PtNDArray stft(
+            PtNDArray ndArray,
+            long nFft,
+            long hopLength,
+            PtNDArray window,
+            boolean center,
+            boolean normalize,
+            boolean returnComplex) {
+        long handle =
+                PyTorchLibrary.LIB.torchStft(
+                        ndArray.getHandle(),
+                        nFft,
+                        hopLength,
+                        window.getHandle(),
+                        center,
+                        normalize,
+                        returnComplex);
+        if (handle == -1) {
+            throw new UnsupportedOperationException("real() is not supported.");
+        }
+        return new PtNDArray(ndArray.getManager(), handle);
+    }
+
+    public static PtNDArray real(PtNDArray ndArray) {
+        long handle = PyTorchLibrary.LIB.torchViewAsReal(ndArray.getHandle());
+        if (handle == -1) {
+            throw new UnsupportedOperationException("real() is not supported.");
+        }
+        return new PtNDArray(ndArray.getManager(), handle);
+    }
+
+    public static PtNDArray complex(PtNDArray ndArray) {
+        long handle = PyTorchLibrary.LIB.torchViewAsComplex(ndArray.getHandle());
+        if (handle == -1) {
+            throw new UnsupportedOperationException("complex() is not supported.");
+        }
+        return new PtNDArray(ndArray.getManager(), handle);
+    }
+
     public static PtNDArray abs(PtNDArray ndArray) {
         return PtNDArrayImpl.newPtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchAbs(ndArray.getHandle()));
@@ -1188,6 +1233,16 @@ public final class JniUtils {
                         layoutMapper(fmt, device),
                         new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()},
                         false));
+    }
+
+    public static PtNDArray hannWindow(
+            PtNDManager manager, long numPoints, boolean periodic, Device device) {
+        return new PtNDArray(
+                manager,
+                PyTorchLibrary.LIB.torchHannWindow(
+                        numPoints,
+                        periodic,
+                        new int[] {PtDeviceType.toDeviceType(device), device.getDeviceId()}));
     }
 
     public static PtNDArray erfinv(PtNDArray ndArray) {
@@ -1630,6 +1685,10 @@ public final class JniUtils {
             list.add(array);
         }
         return list;
+    }
+
+    public static String[] getMethodNames(PtSymbolBlock block) {
+        return PyTorchLibrary.LIB.moduleGetMethodNames(block.getHandle());
     }
 
     public static void enableInferenceMode(PtSymbolBlock block) {

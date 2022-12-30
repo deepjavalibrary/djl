@@ -526,6 +526,18 @@ public class TfNDArray extends NativeResourceImpl<TFE_TensorHandle> implements N
 
     /** {@inheritDoc} */
     @Override
+    public NDArray complex() {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray real() {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray add(Number n) {
         try (NDArray number = manager.create(n).toType(getDataType(), false)) {
             return add(number);
@@ -1137,6 +1149,24 @@ public class TfNDArray extends NativeResourceImpl<TFE_TensorHandle> implements N
     /** {@inheritDoc} */
     @Override
     public NDArray flatten(int startDim, int endDim) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray fft(long length, long axis) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray stft(
+            long nFft,
+            long hopLength,
+            boolean center,
+            NDArray window,
+            boolean normalize,
+            boolean returnComplex) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 

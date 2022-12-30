@@ -50,7 +50,7 @@ public abstract class ImageFactory {
                 Class<? extends ImageFactory> clazz =
                         Class.forName(FACTORIES[i]).asSubclass(ImageFactory.class);
                 return clazz.getConstructor().newInstance();
-            } catch (ReflectiveOperationException e) {
+            } catch (ReflectiveOperationException | ExceptionInInitializerError e) {
                 logger.trace("", e);
             }
         }

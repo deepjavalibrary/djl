@@ -19,7 +19,6 @@ import ai.djl.audio.util.AudioUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 
 import org.testng.Assert;
@@ -36,7 +35,6 @@ public class AudioProcessorTest {
 
     @BeforeClass
     public void setUp() throws IOException {
-        TestRequirements.notArm();
         DownloadUtils.download(URL, "build/test/test_01.wav");
     }
 
@@ -66,6 +64,6 @@ public class AudioProcessorTest {
         testData.setAudioPaths(Collections.singletonList("build/test/test_01.wav"));
         NDArray samples = testData.getPreprocessedData(manager, 0);
         Assert.assertEquals(new Shape(161, 838), samples.getShape());
-        Assert.assertEquals(samples.get("0,0").toFloatArray()[0], -15.4571f, 1e-3f);
+        Assert.assertEquals(samples.get("0,0").toFloatArray()[0], -15.4531f, 1e-3f);
     }
 }

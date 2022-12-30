@@ -12,7 +12,6 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${mockito_version}"
     testImplementation(project(":testing"))
 
-    testImplementation "org.testng:testng:${testng_version}"
     testRuntimeOnly "junit:junit:${junit_version}" // hadoop-client test depends on junit
 }
 
