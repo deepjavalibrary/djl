@@ -31,7 +31,7 @@ public class JniUtilsTest {
 
     @Test
     public void createNDArray() {
-        try (NDManager manager = NDManager.newBaseManager(null, "PaddlePaddle")) {
+        try (NDManager manager = NDManager.newBaseManager("PaddlePaddle")) {
             NDArray array = manager.zeros(new Shape(1, 2));
             float[] expected = new float[] {0, 0};
             Assert.assertEquals(array.toFloatArray(), expected);
@@ -46,7 +46,7 @@ public class JniUtilsTest {
 
     @Test
     public void testLoD() {
-        try (NDManager manager = NDManager.newBaseManager(null, "PaddlePaddle")) {
+        try (NDManager manager = NDManager.newBaseManager("PaddlePaddle")) {
             PpNDArray array = (PpNDArray) manager.zeros(new Shape(1, 4));
             long[][] lodInfo = new long[][] {new long[] {1, 3}};
             array.setLoD(lodInfo);
