@@ -28,6 +28,7 @@ import org.testng.annotations.Test;
 
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.sagemaker.model.SageMakerException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,7 +83,7 @@ public class SageMakerTest {
                 sageMaker.deleteEndpointConfig(true);
                 sageMaker.deleteSageMakerModel(true);
             }
-        } catch (SdkClientException e) {
+        } catch (SdkClientException | SageMakerException e) {
             throw new SkipException("Skip tests that requires permission.", e);
         }
     }
