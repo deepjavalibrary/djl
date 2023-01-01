@@ -127,6 +127,16 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Creates a new top-level {@code NDManager} with specified engine.
+     *
+     * @param engineName the name of the engine
+     * @return a new top-level {@code NDManager}
+     */
+    static NDManager newBaseManager(String engineName) {
+        return Engine.getEngine(engineName).newBaseManager();
+    }
+
+    /**
      * Creates a new top-level {@code NDManager} with specified {@link Device} and engine.
      *
      * @param device the default {@link Device}
