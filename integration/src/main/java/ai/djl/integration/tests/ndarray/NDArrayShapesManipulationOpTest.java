@@ -180,6 +180,8 @@ public class NDArrayShapesManipulationOpTest {
     @Test
     public void testStack() {
         try (NDManager manager = NDManager.newBaseManager()) {
+            Assert.assertThrows(() -> NDArrays.stack(new NDList()));
+
             NDArray array1 = manager.create(new float[] {1f, 2f});
             NDArray array2 = manager.create(new float[] {3f, 4f});
 
@@ -239,15 +241,14 @@ public class NDArrayShapesManipulationOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.create(new float[] {1f});
             NDArray array2 = manager.create(new float[] {2f});
+
             NDArray expected = manager.create(new float[] {1f, 2f});
-            Assert.assertEquals(NDArrays.concat(new NDList(array1, array2), 0), expected);
-            Assert.assertEquals(array1.concat(array2), expected);
+            Assert.assertEquals(NDArrays.concat(new NDList(array1, array2)), expected);
 
             array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             array2 = manager.create(new float[] {5f, 6f, 7f, 8f}, new Shape(2, 2));
             expected = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f, 7, 8f}, new Shape(4, 2));
             Assert.assertEquals(NDArrays.concat(new NDList(array1, array2)), expected);
-            Assert.assertEquals(array1.concat(array2), expected);
             expected =
                     manager.create(new float[] {1f, 2f, 5f, 6f, 3f, 4f, 7f, 8f}, new Shape(2, 4));
             Assert.assertEquals(NDArrays.concat(new NDList(array1, array2), 1), expected);
@@ -258,10 +259,8 @@ public class NDArrayShapesManipulationOpTest {
             // zero-dim
             array1 = manager.create(new Shape(0, 1));
             expected = manager.create(new Shape(0, 1));
-            Assert.assertEquals(array1.concat(array1), expected);
             Assert.assertEquals(NDArrays.concat(new NDList(array1, array1)), expected);
             expected = manager.create(new Shape(0, 2));
-            Assert.assertEquals(array1.concat(array1, 1), expected);
             Assert.assertEquals(NDArrays.concat(new NDList(array1, array1), 1), expected);
 
             // scalar
@@ -271,8 +270,12 @@ public class NDArrayShapesManipulationOpTest {
 
             // one array
             array1 = manager.ones(new Shape(2, 2));
-            expected = manager.ones(new Shape(2, 2));
-            Assert.assertEquals(NDArrays.concat(new NDList(array1)), expected);
+            Assert.assertEquals(NDArrays.concat(new NDList(array1)), array1);
+
+            Assert.assertThrows(() -> NDArrays.concat(new NDList()));
+
+            NDList list = new NDList(manager.ones(new Shape(2)), manager.ones(new Shape(3, 1)));
+            Assert.assertThrows(() -> NDArrays.concat(list));
         }
     }
 

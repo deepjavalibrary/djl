@@ -122,15 +122,8 @@ public class OpenCVImageFactoryTest {
             }
 
             Assert.assertThrows(
-                    IOException.class,
-                    () -> {
-                        factory.fromFile(Paths.get("nonexist.jpg"));
-                    });
-            Assert.assertThrows(
-                    IOException.class,
-                    () -> {
-                        factory.fromUrl("file:build.gradle");
-                    });
+                    IOException.class, () -> factory.fromFile(Paths.get("nonexist.jpg")));
+            Assert.assertThrows(IOException.class, () -> factory.fromUrl("file:build.gradle"));
         }
     }
 
