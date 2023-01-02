@@ -58,6 +58,9 @@ public class OrtNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
+        if (isClosed) {
+            throw new IllegalStateException("Native resource has been release already.");
+        }
         if (dataType == null) {
             dataType = OrtUtils.toDataType(tensor.get().getInfo().type);
         }
@@ -67,6 +70,9 @@ public class OrtNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public Shape getShape() {
+        if (isClosed) {
+            throw new IllegalStateException("Native resource has been release already.");
+        }
         if (shape == null) {
             shape = new Shape(tensor.get().getInfo().getShape());
         }
@@ -94,6 +100,9 @@ public class OrtNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public String[] toStringArray(Charset charset) {
+        if (isClosed) {
+            throw new IllegalStateException("Native resource has been release already.");
+        }
         try {
             Object obj = tensor.get().getValue();
             if (obj instanceof String) {

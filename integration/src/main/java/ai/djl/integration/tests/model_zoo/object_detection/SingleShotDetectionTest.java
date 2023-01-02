@@ -14,11 +14,11 @@
 package ai.djl.integration.tests.model_zoo.object_detection;
 
 import ai.djl.Application;
-import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
 import ai.djl.basicdataset.cv.PikachuDetection;
 import ai.djl.basicmodelzoo.BasicModelZoo;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.MultiBoxDetection;
@@ -31,9 +31,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
@@ -56,9 +54,7 @@ import java.nio.file.Paths;
 public class SingleShotDetectionTest {
 
     @Test
-    public void testLoadPredict()
-            throws IOException, ModelNotFoundException, TranslateException,
-                    MalformedModelException {
+    public void testLoadPredict() throws IOException, ModelException, TranslateException {
         try (ZooModel<Image, DetectedObjects> model = getModel()) {
             model.setBlock(getPredictBlock(model.getBlock()));
             try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
@@ -73,9 +69,7 @@ public class SingleShotDetectionTest {
     }
 
     @Test
-    public void testLoadTrain()
-            throws IOException, ModelNotFoundException, MalformedModelException,
-                    TranslateException {
+    public void testLoadTrain() throws IOException, ModelException, TranslateException {
         try (ZooModel<Image, DetectedObjects> model = getModel()) {
             TrainingConfig config = setupTrainingConfig();
             try (Trainer trainer = model.newTrainer(config)) {
@@ -125,12 +119,13 @@ public class SingleShotDetectionTest {
         return new DefaultTrainingConfig(new SingleShotDetectionLoss())
                 .addEvaluator(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addEvaluator(new BoundingBoxError("boundingBoxError"))
-                .optDevices(Engine.getInstance().getDevices(1));
+                .optDevices(TestUtils.getDevices(1));
     }
 
-    private ZooModel<Image, DetectedObjects> getModel()
-            throws IOException, ModelNotFoundException, MalformedModelException {
-        TestRequirements.engine("MXNet"); // SSD-pikachu model only available in MXNet
+    private ZooModel<Image, DetectedObjects> getModel() throws IOException, ModelException {
+        // SSD-pikachu model only available in MXNet
+        // TODO: Add PyTorch model to model zoo
+        TestUtils.requiresEngine("MXNet");
 
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
@@ -138,6 +133,7 @@ public class SingleShotDetectionTest {
                         .setTypes(Image.class, DetectedObjects.class)
                         .optGroupId(BasicModelZoo.GROUP_ID)
                         .optArtifactId("ssd")
+                        .optEngine(TestUtils.getEngine())
                         .optFilter("flavor", "tiny")
                         .optFilter("dataset", "pikachu")
                         .build();

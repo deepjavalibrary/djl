@@ -13,6 +13,7 @@
 package ai.djl.integration.tests.ndarray;
 
 import ai.djl.engine.Engine;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -21,7 +22,6 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.testing.Assertions;
-import ai.djl.testing.TestRequirements;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 
@@ -35,7 +35,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testCreation() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // regular case
             NDArray array = manager.create(new float[] {0, 1, 2, 3}, new Shape(2, 2));
             Assert.assertEquals(array.toFloatArray(), new float[] {0, 1, 2, 3});
@@ -70,7 +70,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testCreateCSRMatrix() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             float[] expected = {7, 8, 9};
             FloatBuffer buf = FloatBuffer.wrap(expected);
             long[] indptr = {0, 2, 2, 3};
@@ -86,7 +86,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testCreateRowSparseMatrix() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             float[] expected = {1, 2, 3, 4, 5, 6};
             FloatBuffer buf = FloatBuffer.wrap(expected);
             long[] indices = {0, 1, 3};
@@ -104,7 +104,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testCreateCooMatrix() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             long[][] indices = {{0, 1, 1}, {2, 0, 2}};
             float[] values = {3, 4, 5};
             FloatBuffer buf = FloatBuffer.wrap(values);
@@ -118,7 +118,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testCreateNDArrayAndConvertToSparse() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray nd = manager.ones(new Shape(3, 5));
             try {
                 // Only MXNet support CSR
@@ -139,7 +139,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testDuplicate() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.zeros(new Shape(5));
             NDArray expected = manager.create(new float[] {0f, 0f, 0f, 0f, 0f});
             NDArray duplicate = array.duplicate();
@@ -172,7 +172,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testZeros() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.zeros(new Shape(5));
             NDArray expected = manager.create(new float[] {0f, 0f, 0f, 0f, 0f});
             Assertions.assertAlmostEquals(array, expected);
@@ -196,7 +196,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testOnes() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.ones(new Shape(5));
             NDArray expected = manager.create(new float[] {1f, 1f, 1f, 1f, 1f});
             Assertions.assertAlmostEquals(array, expected);
@@ -220,7 +220,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testFull() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.full(new Shape(5), 3);
             NDArray expected = manager.create(new int[] {3, 3, 3, 3, 3});
             Assert.assertEquals(array, expected);
@@ -254,7 +254,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testZerosLike() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new Shape(5));
             NDArray expected = manager.create(new float[] {0f, 0f, 0f, 0f, 0f});
             Assert.assertEquals(array.zerosLike(), expected);
@@ -277,7 +277,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testOnesLike() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new Shape(5));
             NDArray expected = manager.create(new float[] {1f, 1f, 1f, 1f, 1f});
             Assert.assertEquals(array.onesLike(), expected);
@@ -300,7 +300,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testArange() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.arange(0, 10, 1);
             NDArray expected = manager.create(new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
             Assert.assertEquals(array, expected);
@@ -334,7 +334,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testEye() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray expected = manager.eye(2);
             NDArray array = manager.create(new float[] {1f, 0f, 0f, 1f}, new Shape(2, 2));
             Assert.assertEquals(array, expected);
@@ -352,7 +352,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testLinspace() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.linspace(0.0f, 9.0f, 10, true, manager.getDevice());
             NDArray expected = manager.arange(10.0f);
             Assert.assertEquals(array, expected);
@@ -378,7 +378,7 @@ public class NDArrayCreationOpTest {
         testCases.add(0L, 2L);
         testCases.add(1000000L, 2000000L);
         testCases.add(-1234567L, 1234567L);
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             for (Pair<Long, Long> testCase : testCases) {
                 long low = testCase.getKey();
                 long high = testCase.getValue();
@@ -396,7 +396,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testRandomPermutation() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             long size = 3;
             NDArray array = manager.randomPermutation(size);
             Assert.assertTrue(
@@ -411,7 +411,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testRandomUniform() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray uniform = manager.randomUniform(0, 10, new Shape(1000, 1000));
             Assert.assertTrue(uniform.min().getFloat() >= 0f);
             Assert.assertTrue(uniform.max().getFloat() < 10f);
@@ -421,7 +421,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testRandomNormal() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray normal = manager.randomNormal(new Shape(1000, 1000));
             NDArray mean = normal.mean();
             NDArray std = normal.sub(mean).pow(2).mean();
@@ -432,7 +432,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testTruncatedNormal() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray normal = manager.truncatedNormal(new Shape(1000, 1000));
             Assertions.assertAlmostEquals(normal.mean().getFloat(), 0f, 2e-2f, 2e-2f);
             Assert.assertTrue(normal.gte(-2).all().getBoolean());
@@ -442,21 +442,21 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testFixedSeed() {
-        TestRequirements.notEngine(
-                "TensorFlow"); // TensorFlow fixed random seed requires restart process.
+        // TensorFlow fixed random seed requires restart process.
+        TestUtils.requiresEngine("MXNet", "PyTorch");
 
-        try (NDManager manager = NDManager.newBaseManager()) {
-
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             int fixedSeed = 1234;
-            Engine.getInstance().setRandomSeed(fixedSeed);
+            Engine engine = Engine.getEngine(TestUtils.getEngine());
+            engine.setRandomSeed(fixedSeed);
             NDArray expectedUniform = manager.randomUniform(-10, 10, new Shape(10, 10));
-            Engine.getInstance().setRandomSeed(fixedSeed);
+            engine.setRandomSeed(fixedSeed);
             NDArray actualUniform = manager.randomUniform(-10, 10, new Shape(10, 10));
             Assertions.assertAlmostEquals(expectedUniform, actualUniform, 1e-2f, 1e-2f);
 
-            Engine.getInstance().setRandomSeed(fixedSeed);
+            engine.setRandomSeed(fixedSeed);
             NDArray expectedNormal = manager.randomNormal(new Shape(100, 100));
-            Engine.getInstance().setRandomSeed(fixedSeed);
+            engine.setRandomSeed(fixedSeed);
             NDArray actualNormal = manager.randomNormal(new Shape(100, 100));
             Assertions.assertAlmostEquals(expectedNormal, actualNormal, 1e-2f, 1e-2f);
         }
@@ -464,7 +464,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testSamplePoisson() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray lam = manager.create(new double[] {1., 8.5});
 
             NDArray poisson = manager.samplePoisson(lam);
@@ -485,7 +485,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testSampleGamma() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray alpha = manager.create(new double[] {0., 2.5});
             NDArray beta = manager.create(new double[] {1., 0.7});
 
@@ -507,7 +507,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testSampleNormal() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray mu = manager.create(new double[] {0., 2.5});
             NDArray sigma = manager.create(new double[] {1., 3.7});
             NDArray normal = manager.sampleNormal(mu, sigma);
@@ -528,7 +528,7 @@ public class NDArrayCreationOpTest {
 
     @Test
     public void testHanningWindow() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray result = manager.hanningWindow(6);
             NDArray expected = manager.create(new float[] {0.0f, 0.25f, 0.75f, 1.0f, 0.75f, 0.25f});
             Assertions.assertAlmostEquals(result, expected);

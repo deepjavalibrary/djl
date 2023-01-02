@@ -14,6 +14,7 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.ParameterList;
@@ -35,8 +36,8 @@ public class ModelTest {
         SequentialBlock block = new SequentialBlock();
         block.add(Conv2d.builder().setKernelShape(new Shape(1, 1)).setFilters(10).build());
         block.add(BatchNorm.builder().build());
-        try (Model saveModel = Model.newInstance("saveModel");
-                Model loadModel = Model.newInstance("loadModel")) {
+        try (Model saveModel = Model.newInstance("saveModel", TestUtils.getEngine());
+                Model loadModel = Model.newInstance("loadModel", TestUtils.getEngine())) {
             block.initialize(saveModel.getNDManager(), DataType.FLOAT32, new Shape(1, 3, 32, 32));
             ParameterList savedParameters = block.getParameters();
             saveModel.setBlock(block);

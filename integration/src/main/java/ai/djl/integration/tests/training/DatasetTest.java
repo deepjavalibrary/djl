@@ -14,6 +14,7 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.Cifar10;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -52,7 +53,7 @@ public class DatasetTest {
 
     @Test
     public void testSequenceSampler() throws IOException, TranslateException {
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
@@ -81,7 +82,7 @@ public class DatasetTest {
 
     @Test
     public void testRandomSampler() throws IOException, TranslateException {
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
@@ -108,7 +109,7 @@ public class DatasetTest {
 
     @Test
     public void testBatchSampler() throws IOException, TranslateException {
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
@@ -191,7 +192,7 @@ public class DatasetTest {
 
     @Test
     public void testArrayDataset() throws IOException, TranslateException {
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(Blocks.identityBlock());
 
             NDManager manager = model.getNDManager();
@@ -269,7 +270,7 @@ public class DatasetTest {
 
     @Test
     public void testMultithreading() throws IOException, InterruptedException, TranslateException {
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(Blocks.identityBlock());
             NDManager manager = model.getNDManager();
 
@@ -300,14 +301,15 @@ public class DatasetTest {
 
     @Test
     public void testDatasetToArray() throws IOException, TranslateException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             RandomAccessDataset dataset =
                     new ArrayDataset.Builder()
                             .setData(manager.ones(new Shape(5, 4)))
                             .setSampling(32, false)
                             .optLabels(manager.zeros(new Shape(5, 2)))
                             .build();
-            Pair<Number[][], Number[][]> converted = dataset.toArray();
+            Pair<Number[][], Number[][]> converted = dataset.toArray(manager);
             Number[][] data = converted.getKey();
             Number[][] labels = converted.getValue();
 

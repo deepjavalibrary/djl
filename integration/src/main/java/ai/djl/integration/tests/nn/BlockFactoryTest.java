@@ -15,8 +15,9 @@ package ai.djl.integration.tests.nn;
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.engine.Engine;
+import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDList;
@@ -49,8 +50,7 @@ public class BlockFactoryTest {
 
     @Test
     public void testBlockFactoryLoadingFromZip()
-            throws MalformedModelException, ModelNotFoundException, IOException,
-                    TranslateException {
+            throws ModelException, IOException, TranslateException {
         Path savedDir = Paths.get("build/testBlockFactory");
         Utils.deleteQuietly(savedDir);
         Path zipPath;
@@ -58,7 +58,7 @@ public class BlockFactoryTest {
             zipPath = prepareModel(savedDir);
         } catch (ModelNotFoundException e) {
             throw new UnsupportedOperationException(
-                    "No test model for engine: " + Engine.getDefaultEngineName(), e);
+                    "No test model for engine: " + TestUtils.getEngine(), e);
         }
         // load model from here
         Criteria<NDList, NDList> criteria =
@@ -66,6 +66,7 @@ public class BlockFactoryTest {
                         .setTypes(NDList.class, NDList.class)
                         .optModelPath(zipPath)
                         .optModelName("exported")
+                        .optEngine(TestUtils.getEngine())
                         .build();
         try (ZooModel<NDList, NDList> model = criteria.loadModel();
                 Predictor<NDList, NDList> pred = model.newPredictor()) {
@@ -75,11 +76,10 @@ public class BlockFactoryTest {
         }
     }
 
-    private Path prepareModel(Path savedDir)
-            throws IOException, ModelNotFoundException, MalformedModelException {
+    private Path prepareModel(Path savedDir) throws IOException, ModelException {
         TestBlockFactory factory = new TestBlockFactory();
         try (Model model = factory.getRemoveLastBlockModel();
-                NDManager manager = NDManager.newBaseManager()) {
+                NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             Block block = model.getBlock();
             block.forward(
                     new ParameterStore(manager, true),
@@ -93,7 +93,7 @@ public class BlockFactoryTest {
                 Paths.get(
                         "build/classes/java/main/ai/djl/integration/tests/nn/BlockFactoryTest$TestBlockFactory.class"),
                 classDir.resolve("BlockFactoryTest$TestBlockFactory.class"));
-        Path zipPath = Paths.get("build/testBlockFactory" + Engine.getDefaultEngineName() + ".zip");
+        Path zipPath = Paths.get("build/testBlockFactory" + TestUtils.getEngine() + ".zip");
         Files.deleteIfExists(zipPath);
         ZipUtils.zip(savedDir, zipPath, false);
         return zipPath;
@@ -113,7 +113,7 @@ public class BlockFactoryTest {
 
         public Model getRemoveLastBlockModel()
                 throws MalformedModelException, ModelNotFoundException, IOException {
-            String name = Engine.getDefaultEngineName();
+            String name = TestUtils.getEngine();
             Criteria.Builder<Image, Classifications> builder =
                     Criteria.builder()
                             .optApplication(Application.CV.IMAGE_CLASSIFICATION)

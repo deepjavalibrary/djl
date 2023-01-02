@@ -16,11 +16,9 @@ dependencies {
     runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
     runtimeOnly project(":engines:ml:xgboost")
     runtimeOnly project(":engines:ml:lightgbm")
+    runtimeOnly project(":engines:onnxruntime:onnxruntime-engine")
 
-    if (System.getProperty("ai.djl.default_engine") == "OnnxRuntime") {
-        // onnxruntime requires user install libgomp.so.1 manually, exclude from default dependency
-        runtimeOnly project(":engines:onnxruntime:onnxruntime-engine")
-    } else if (System.getProperty("ai.djl.default_engine") == "TFLite") {
+    if (System.getProperty("ai.djl.default_engine") == "TFLite") {
         runtimeOnly project(":engines:tflite:tflite-engine")
     } else if (System.getProperty("ai.djl.default_engine") == "DLR") {
         runtimeOnly project(":engines:dlr:dlr-engine")

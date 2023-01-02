@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.modality.cv;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.cv.MultiBoxTarget;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -23,9 +24,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class MultiBoxTargetTest {
+
     @Test
     public void testTargets() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray anchorBoxes = manager.arange(22840.0f * 4.0f).reshape(new Shape(1, 22840, 4));
             NDArray label = manager.arange(160.0f).reshape(new Shape(32, 1, 5));
             NDArray classPreds =
@@ -42,7 +44,8 @@ public class MultiBoxTargetTest {
 
     @Test
     public void testMultiBoxTargetValues() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray groundTruth =
                     manager.create(
                                     new float[] {

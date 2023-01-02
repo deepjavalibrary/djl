@@ -13,6 +13,7 @@
 package ai.djl.integration.tests.nn;
 
 import ai.djl.engine.Engine;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -720,7 +721,7 @@ public class ScaledDotProductAttentionBlockTest {
         Shape fromShape = new Shape(batchSize, fromSeqLength, embeddingSize);
         Shape toShape = new Shape(batchSize, toSeqLength, embeddingSize);
 
-        NDManager manager = NDManager.newBaseManager();
+        NDManager manager = NDManager.newBaseManager(TestUtils.getEngine());
         NDArray keySequence =
                 manager.create(keySequenceInitialization)
                         .toType(DataType.FLOAT32, false)
@@ -763,7 +764,8 @@ public class ScaledDotProductAttentionBlockTest {
         ParameterStore ps = new ParameterStore(manager, false);
         NDArray result;
         // the unused GradientCollector is for Dropout to know it is on training mode
-        try (GradientCollector collector = Engine.getInstance().newGradientCollector()) {
+        Engine engine = Engine.getEngine(TestUtils.getEngine());
+        try (GradientCollector collector = engine.newGradientCollector()) {
             result =
                     block.forward(
                                     ps,
@@ -777,6 +779,7 @@ public class ScaledDotProductAttentionBlockTest {
         }
         boolean allClose = NDArrays.allClose(result, expectedResult, 1e-04, 1e-07, true);
         Assert.assertTrue(allClose);
+        manager.close();
     }
 
     public static class TestConstantInitializer implements Initializer {

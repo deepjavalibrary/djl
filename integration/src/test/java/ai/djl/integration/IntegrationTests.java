@@ -12,6 +12,7 @@
  */
 package ai.djl.integration;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.util.cuda.CudaUtils;
 
 import org.slf4j.Logger;
@@ -37,14 +38,17 @@ public class IntegrationTests {
             } else if ("aarch64".equals(System.getProperty("os.arch"))) {
                 engines = new String[] {"PyTorch"};
             } else {
-                engines = new String[] {"MXNet", "PyTorch", "TensorFlow", "XGBoost", "LightGBM"};
+                engines =
+                        new String[] {
+                            "MXNet", "PyTorch", "TensorFlow", "OnnxRuntime", "XGBoost", "LightGBM"
+                        };
             }
         } else {
             engines = new String[] {defaultEngine};
         }
 
         for (String engine : engines) {
-            System.setProperty("ai.djl.default_engine", engine);
+            TestUtils.setEngine(engine);
             logger.info("Testing engine: {} ...", engine);
             Assert.assertTrue(new IntegrationTest(IntegrationTest.class).runTests(args));
             // currently each engine will reserve a certain amount of memory and hold it until

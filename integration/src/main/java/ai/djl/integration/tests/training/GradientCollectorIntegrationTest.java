@@ -15,6 +15,7 @@ package ai.djl.integration.tests.training;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.engine.Engine;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -52,7 +53,7 @@ public class GradientCollectorIntegrationTest {
 
     @Test
     public void testAutograd() {
-        try (Model model = Model.newInstance("model");
+        try (Model model = Model.newInstance("model", TestUtils.getEngine());
                 NDManager manager = model.getNDManager()) {
             model.setBlock(Blocks.identityBlock());
             try (Trainer trainer =
@@ -83,11 +84,12 @@ public class GradientCollectorIntegrationTest {
 
     @Test
     public void testZeroGradients() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray a = manager.create(0.0f);
             a.setRequiresGradient(true);
 
-            try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+            Engine engine = Engine.getEngine(TestUtils.getEngine());
+            try (GradientCollector gc = engine.newGradientCollector()) {
                 NDArray b = a.mul(2);
 
                 // Gradients are initially zero
@@ -107,12 +109,13 @@ public class GradientCollectorIntegrationTest {
     /** Tests that the gradients do not accumulate when closing the gradient collector. */
     @Test
     public void testClearGradients() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray a = manager.create(0.0f);
             a.setRequiresGradient(true);
 
+            Engine engine = Engine.getEngine(TestUtils.getEngine());
             for (int i = 0; i < 3; i++) {
-                try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+                try (GradientCollector gc = engine.newGradientCollector()) {
                     NDArray b = a.mul(2);
                     gc.backward(b);
                 }
@@ -126,11 +129,12 @@ public class GradientCollectorIntegrationTest {
     public void testAccumulateGradients() {
         // TODO: MXNet support for accumulating gradients does not currently work
         TestRequirements.notEngine("MXNet");
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray a = manager.create(0.0f);
             a.setRequiresGradient(true);
 
-            try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+            Engine engine = Engine.getEngine(TestUtils.getEngine());
+            try (GradientCollector gc = engine.newGradientCollector()) {
                 for (int i = 1; i <= 3; i++) {
                     NDArray b = a.mul(2);
                     gc.backward(b);
@@ -150,8 +154,9 @@ public class GradientCollectorIntegrationTest {
         Assert.assertThrows(
                 () -> {
                     GradientCollector gc2 = null;
-                    try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
-                        gc2 = Engine.getInstance().newGradientCollector();
+                    Engine engine = Engine.getEngine(TestUtils.getEngine());
+                    try (GradientCollector gc = engine.newGradientCollector()) {
+                        gc2 = engine.newGradientCollector();
                         gc2.close();
                     } finally {
                         if (gc2 != null) {
@@ -163,7 +168,7 @@ public class GradientCollectorIntegrationTest {
 
     @Test
     public void testFreezeParameters() {
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             Block blockFrozen = new Mlp(10, 10, new int[] {10});
             Block blockNormal = new Mlp(10, 10, new int[] {10});
             Block combined = new SequentialBlock().add(blockFrozen).add(blockNormal);
@@ -239,7 +244,7 @@ public class GradientCollectorIntegrationTest {
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optimizer);
 
-        try (Model model = Model.newInstance("linear")) {
+        try (Model model = Model.newInstance("linear", TestUtils.getEngine())) {
             Linear block = Linear.builder().setUnits(1).build();
             model.setBlock(block);
 

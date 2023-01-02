@@ -101,7 +101,7 @@ public abstract class RandomAccessDataset implements Dataset {
     /**
      * Fetches an iterator that can iterate through the {@link Dataset} with a custom sampler.
      *
-     * @param manager the dataset to iterate through
+     * @param manager the manager to create the arrays
      * @param sampler the sampler to use to iterate through the dataset
      * @return an {@link Iterable} of {@link Batch} that contains batches of data from the dataset
      * @throws IOException for various exceptions depending on the dataset
@@ -116,7 +116,7 @@ public abstract class RandomAccessDataset implements Dataset {
      * Fetches an iterator that can iterate through the {@link Dataset} with a custom sampler
      * multi-threaded.
      *
-     * @param manager the dataset to iterate through
+     * @param manager the manager to create the arrays
      * @param sampler the sampler to use to iterate through the dataset
      * @param executorService the executorService to multi-thread with
      * @return an {@link Iterable} of {@link Batch} that contains batches of data from the dataset
@@ -294,25 +294,25 @@ public abstract class RandomAccessDataset implements Dataset {
      * <p>Each Number[] is a flattened dataset record and the Number[][] is the array of all
      * records.
      *
+     * @param manager the manager to create the arrays
      * @return the dataset contents as a Java array
      * @throws IOException for various exceptions depending on the dataset
      * @throws TranslateException if there is an error while processing input
      */
-    public Pair<Number[][], Number[][]> toArray() throws IOException, TranslateException {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            Sampler sampl = new BatchSampler(new SequenceSampler(), 1, false);
-            int size = Math.toIntExact(size());
-            Number[][] data = new Number[size][];
-            Number[][] labels = new Number[size][];
-            int index = 0;
-            for (Batch batch : this.getData(manager, sampl)) {
-                data[index] = flattenRecord(batch.getData());
-                labels[index] = flattenRecord(batch.getLabels());
-                batch.close();
-                index++;
-            }
-            return new Pair<>(data, labels);
+    public Pair<Number[][], Number[][]> toArray(NDManager manager)
+            throws IOException, TranslateException {
+        Sampler sampl = new BatchSampler(new SequenceSampler(), 1, false);
+        int size = Math.toIntExact(size());
+        Number[][] data = new Number[size][];
+        Number[][] labels = new Number[size][];
+        int index = 0;
+        for (Batch batch : getData(manager, sampl)) {
+            data[index] = flattenRecord(batch.getData());
+            labels[index] = flattenRecord(batch.getLabels());
+            batch.close();
+            index++;
         }
+        return new Pair<>(data, labels);
     }
 
     private Number[] flattenRecord(NDList data) {

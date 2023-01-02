@@ -1103,11 +1103,11 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public PtNDArray squeeze(int[] axes) {
         if (isScalar()) {
-            if (axes.length > 1 || axes[0] != 0) {
-                throw new IllegalArgumentException(
-                        "axis " + axes[0] + "is out of bounds for array of dimension 0");
+            if (axes.length == 0 || (axes.length == 1 && axes[0] == 0)) {
+                return (PtNDArray) duplicate();
             }
-            return (PtNDArray) duplicate();
+            throw new IllegalArgumentException(
+                    "axis " + axes[0] + " is out of bounds for array of dimension 0");
         }
         long[] shapeArr = getShape().getShape();
         List<Long> newShape = new ArrayList<>();
@@ -1567,8 +1567,8 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof PtNDArray) {
-            return contentEquals((PtNDArray) obj);
+        if (obj instanceof NDArray) {
+            return contentEquals((NDArray) obj);
         }
         return false;
     }

@@ -13,6 +13,7 @@
 
 package ai.djl.integration.tests.training;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -29,7 +30,7 @@ public class EvaluatorTest {
 
     @Test
     public void testAccuracy() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
 
             NDArray predictions =
                     manager.create(new float[] {0.3f, 0.7f, 0, 1, 0.4f, 0.6f}, new Shape(3, 2));
@@ -61,7 +62,7 @@ public class EvaluatorTest {
 
     @Test
     public void testCoverage() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
 
             NDArray predictions = manager.create(new float[] {0.3f, 0.7f, 0.0f}, new Shape(3));
             NDArray labels = manager.create(new float[] {0.5f, 0.5f, 0.5f}, new Shape(3));
@@ -80,7 +81,7 @@ public class EvaluatorTest {
 
     @Test
     public void testTopKAccuracy() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray predictions =
                     manager.create(
                             new float[] {

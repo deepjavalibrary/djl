@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.modality.cv;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
@@ -20,7 +21,6 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
-import ai.djl.testing.TestRequirements;
 import ai.djl.util.cuda.CudaUtils;
 
 import org.testng.Assert;
@@ -30,9 +30,10 @@ public class NDImageUtilsTest {
 
     @Test
     public void testNormalize() {
-        TestRequirements.notEngine("TensorFlow"); // TensorFlow use channels last by default
+        // TensorFlow use channels last by default
+        TestUtils.requiresEngine("MXNet", "PyTorch");
 
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test 3D C, H, W
             NDArray image = manager.ones(new Shape(3, 4, 2));
             float[] mean = {0.3f, 0.4f, 0.5f};
@@ -67,9 +68,10 @@ public class NDImageUtilsTest {
 
     @Test
     public void testToTensor() {
-        TestRequirements.notEngine("TensorFlow"); // TensorFlow use channels last by default
+        // TensorFlow use channels last by default
+        TestUtils.requiresEngine("MXNet", "PyTorch");
 
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test 3D C, H, W
             NDArray image = manager.randomUniform(0, 255, new Shape(4, 2, 3));
             NDArray toTensor = NDImageUtils.toTensor(image);
@@ -96,7 +98,9 @@ public class NDImageUtilsTest {
 
     @Test
     public void testResize() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             Image.Interpolation[] interpolations = {
                 Image.Interpolation.NEAREST,
                 Image.Interpolation.BILINEAR,
@@ -147,7 +151,7 @@ public class NDImageUtilsTest {
 
     @Test
     public void testCrop() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test 3D H, W, C
             NDArray image = manager.randomUniform(0, 255, new Shape(100, 50, 3));
             NDArray result = NDImageUtils.crop(image, 10, 20, 30, 40);
@@ -170,7 +174,7 @@ public class NDImageUtilsTest {
 
     @Test
     public void testRandomCrop() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // make sure runnable
             NDArray image = manager.randomUniform(0, 255, new Shape(100, 50, 3));
             NDImageUtils.randomResizedCrop(image, 10, 10, 0.3, 0.7, 0.5, 2);
@@ -179,7 +183,7 @@ public class NDImageUtilsTest {
 
     @Test
     public void testRandomFlip() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             manager.getEngine().setRandomSeed(1234);
             // flip lr
             NDArray image = manager.randomUniform(0, 255, new Shape(10, 10, 3));
@@ -193,7 +197,7 @@ public class NDImageUtilsTest {
 
     @Test
     public void testRandomColor() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // make sure runnable
             NDArray image = manager.randomUniform(0, 255, new Shape(10, 10, 3));
             NDImageUtils.randomBrightness(image, 0.6f);

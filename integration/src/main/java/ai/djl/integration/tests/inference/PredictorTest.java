@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.inference.Predictor;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -49,18 +50,18 @@ public class PredictorTest {
         predictWithDeviceHelper(Device.gpu(), Device.cpu());
     }
 
-    public void predictWithDeviceHelper(Device modelDevice, Device predictorDevice)
+    public void predictWithDeviceHelper(Device device, Device predictorDevice)
             throws TranslateException {
         // Create simple model on modelDevice
-        try (NDManager manager = NDManager.newBaseManager(modelDevice)) {
+        try (NDManager manager = NDManager.newBaseManager(device, TestUtils.getEngine());
+                Model model = Model.newInstance("mlp", device, TestUtils.getEngine())) {
             Block block = new Mlp(10, 10, new int[] {10});
-            Model model = Model.newInstance("mlp");
             model.setBlock(block);
 
             // Use trainer for initialization
             TrainingConfig config =
                     new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                            .optDevices(new Device[] {modelDevice});
+                            .optDevices(new Device[] {device});
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(1, 10));
             }

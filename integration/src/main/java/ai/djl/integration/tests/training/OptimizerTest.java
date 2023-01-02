@@ -14,7 +14,7 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.Device;
 import ai.djl.Model;
-import ai.djl.engine.Engine;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -46,14 +46,14 @@ public class OptimizerTest {
     public void testSgd() {
         Optimizer sgd = Optimizer.sgd().setLearningRateTracker(Tracker.fixed(0.1f)).build();
 
-        Device[] devices = Engine.getInstance().getDevices(1);
+        Device[] devices = TestUtils.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(sgd)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -78,14 +78,14 @@ public class OptimizerTest {
                         .optMomentum(0.9f)
                         .build();
 
-        Device[] devices = Engine.getInstance().getDevices(1);
+        Device[] devices = TestUtils.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -118,14 +118,14 @@ public class OptimizerTest {
                         .build();
 
         // Limit to 1 GPU for consist result.
-        Device[] devices = Engine.getInstance().getDevices(1);
+        Device[] devices = TestUtils.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             int batchSize = config.getDevices().length * BATCH_SIZE;
@@ -147,14 +147,14 @@ public class OptimizerTest {
     public void testAdam() {
         Optimizer optim = Optimizer.adam().optLearningRateTracker(Tracker.fixed(0.1f)).build();
 
-        Device[] devices = Engine.getInstance().getDevices(1);
+        Device[] devices = TestUtils.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -176,14 +176,14 @@ public class OptimizerTest {
     public void testAdamW() {
         Optimizer optim = Optimizer.adamW().optLearningRateTracker(Tracker.fixed(0.1f)).build();
 
-        Device[] devices = Engine.getInstance().getDevices(1);
+        Device[] devices = TestUtils.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -205,14 +205,14 @@ public class OptimizerTest {
     public void testAdagrad() {
         Optimizer optim = Optimizer.adagrad().optLearningRateTracker(Tracker.fixed(0.1f)).build();
 
-        Device[] devices = Engine.getInstance().getDevices(1);
+        Device[] devices = TestUtils.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -238,14 +238,14 @@ public class OptimizerTest {
                         .optCentered(false)
                         .build();
 
-        Device[] devices = Engine.getInstance().getDevices(1);
+        Device[] devices = TestUtils.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -272,14 +272,14 @@ public class OptimizerTest {
                         .optCentered(true)
                         .build();
 
-        Device[] devices = Engine.getInstance().getDevices(1);
+        Device[] devices = TestUtils.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optim)
                         .optDevices(devices);
         Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -302,7 +302,7 @@ public class OptimizerTest {
     public void testAdadelta() {
         Optimizer optim = Optimizer.adadelta().build();
 
-        Device[] devices = Engine.getInstance().getDevices(1);
+        Device[] devices = TestUtils.getDevices(1);
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
@@ -310,7 +310,7 @@ public class OptimizerTest {
                         .optDevices(devices);
 
         Block block = Linear.builder().setUnits(CHANNELS).build();
-        try (Model model = Model.newInstance("model", devices[0])) {
+        try (Model model = Model.newInstance("model", devices[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {

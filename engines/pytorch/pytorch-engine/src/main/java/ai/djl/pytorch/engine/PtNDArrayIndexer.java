@@ -91,7 +91,7 @@ public class PtNDArrayIndexer extends NDArrayIndexer {
         if (data instanceof Number) {
             JniUtils.indexAdvPut(ptArray, index, (PtNDArray) manager.create((Number) data));
         } else if (data instanceof NDArray) {
-            JniUtils.indexAdvPut(ptArray, index, (PtNDArray) data);
+            JniUtils.indexAdvPut(ptArray, index, manager.from((NDArray) data));
         } else {
             throw new IllegalArgumentException(
                     "The type of value to assign cannot be other than NDArray and Number.");

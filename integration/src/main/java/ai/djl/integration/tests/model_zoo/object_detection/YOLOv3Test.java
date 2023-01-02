@@ -14,7 +14,7 @@ package ai.djl.integration.tests.model_zoo.object_detection;
 
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.object_detection.yolo.YOLOV3;
-import ai.djl.engine.Engine;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -22,7 +22,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Parameter;
 import ai.djl.testing.Assertions;
-import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
@@ -38,14 +37,15 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class YOLOv3Test {
+
     @Test
     public void testDarkNet() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Engine.getInstance().getDevices(2))
+                        .optDevices(TestUtils.getDevices(2))
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         Block darkNet = YOLOV3.builder().buildDarkNet();
-        try (Model model = Model.newInstance("darkNet")) {
+        try (Model model = Model.newInstance("darkNet", TestUtils.getEngine())) {
             model.setBlock(darkNet);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = 1;
@@ -96,7 +96,7 @@ public class YOLOv3Test {
 
     @Test
     public void testYoloV3() {
-        TestRequirements.engine("PyTorch");
+        TestUtils.requiresEngine("PyTorch");
 
         float[] anchorsArray = YOLOv3Loss.getPresetAnchors();
         for (int i = 0; i < anchorsArray.length; i++) {
@@ -109,11 +109,11 @@ public class YOLOv3Test {
                                         .setInputShape(new Shape(256, 256))
                                         .setAnchorsArray(anchorsArray)
                                         .build())
-                        .optDevices(Engine.getInstance().getDevices(2))
+                        .optDevices(TestUtils.getDevices(2))
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block yolov3 = YOLOV3.builder().setNumClasses(1).build();
-        try (Model model = Model.newInstance("yolov3")) {
+        try (Model model = Model.newInstance("yolov3", TestUtils.getEngine())) {
             model.setBlock(yolov3);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = 4;

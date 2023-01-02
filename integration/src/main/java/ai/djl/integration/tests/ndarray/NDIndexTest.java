@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
@@ -25,7 +26,7 @@ public class NDIndexTest {
 
     @Test
     public void testEmptyIndex() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             Assert.assertEquals(original.get(new NDIndex()), original);
         }
@@ -33,7 +34,7 @@ public class NDIndexTest {
 
     @Test
     public void testFixedNegativeIndex() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(4));
             NDArray expected = manager.create(4f);
             NDArray actual = original.get("-1");
@@ -43,7 +44,7 @@ public class NDIndexTest {
 
     @Test
     public void testPick() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             NDArray expected = manager.create(new float[] {1f, 4f}, new Shape(2, 1));
             NDArray actual =
@@ -64,7 +65,7 @@ public class NDIndexTest {
 
     @Test
     public void testGather() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.arange(20f).reshape(-1, 4);
             NDArray index = manager.create(new float[] {0, 0, 2, 1, 1, 2}, new Shape(3, 2));
             NDArray actual = original.gather(index, 1);
@@ -75,7 +76,7 @@ public class NDIndexTest {
 
     @Test
     public void testGatherNd() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.arange(1f, 9f).reshape(2, 2, 2);
             NDArray index = manager.create(new float[] {0, 1, 1, 0}, new Shape(2, 2));
             NDArray actual = original.gatherNd(index);
@@ -95,7 +96,7 @@ public class NDIndexTest {
 
     @Test
     public void testTake() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.arange(1, 7f).reshape(-1, 3);
             NDArray index = manager.create(new float[] {0, 4, 1, 2}, new Shape(2, 2));
             NDArray actual = original.take(index);
@@ -106,7 +107,7 @@ public class NDIndexTest {
 
     @Test
     public void testGet() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             Assert.assertEquals(original.get(new NDIndex()), original);
 
@@ -181,7 +182,7 @@ public class NDIndexTest {
     public void testEmptyArrayClosing() {
         // This is to check the resource closing issue in MXNet engine is circumvented.
         // MXNetError: Check failed: delay_alloc:
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             manager.create(new Shape(2, 2)).get(":4, 3:4");
             manager.create(new Shape(2)).get("3:3");
             manager.create(new Shape(2)).get("2:3");
@@ -190,7 +191,7 @@ public class NDIndexTest {
 
     @Test
     public void testSetArray() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             NDArray expected = manager.create(new float[] {9, 10, 3, 4}, new Shape(2, 2));
             NDArray value = manager.create(new float[] {9, 10});
@@ -214,7 +215,7 @@ public class NDIndexTest {
 
     @Test
     public void testSetArrayBroadcast() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2, 1));
             NDArray expected = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2, 1));
             NDArray value = manager.create(new float[] {9});
@@ -225,7 +226,7 @@ public class NDIndexTest {
 
     @Test
     public void testSetNumber() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             NDArray expected = manager.create(new float[] {9, 9, 3, 4}, new Shape(2, 2));
             original.set(new NDIndex(0), 9);
@@ -260,7 +261,7 @@ public class NDIndexTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testSetScalar() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             NDArray expected = manager.create(new float[] {0, 2, 3, 4}, new Shape(2, 2));
             original.setScalar(new NDIndex(0, 0), 0);
@@ -271,7 +272,7 @@ public class NDIndexTest {
 
     @Test
     public void testSetByFunction() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.arange(1, 10).reshape(3, 3);
             NDArray expected = manager.create(new int[] {4, 10, 16});
             NDIndex index = new NDIndex(":, 1");
@@ -288,7 +289,7 @@ public class NDIndexTest {
 
     @Test
     public void testSetByFunctionIncrements() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.ones(new Shape(1, 5));
             original.set(new NDIndex(":, 0::2"), array -> array.mul(-1).add(1));
             NDArray expected = manager.create(new float[][] {{0, 1, 0, 1, 0}});
@@ -298,7 +299,7 @@ public class NDIndexTest {
 
     @Test
     public void testPut() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             NDArray expected = manager.create(new float[] {1, 8, 666, 77}, new Shape(2, 2));
             NDArray idx = manager.create(new float[] {2, 3, 1}, new Shape(3));

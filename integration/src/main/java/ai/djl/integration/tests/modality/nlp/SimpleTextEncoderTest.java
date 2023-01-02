@@ -50,7 +50,7 @@ public class SimpleTextEncoderTest {
                                 .optBatchFirst(true)
                                 .optReturnState(true)
                                 .build());
-        try (NDManager manager = NDManager.newBaseManager(TestUtils.getDevices()[0])) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getDevices(1)[0])) {
             encoder.initialize(manager, DataType.FLOAT32, new Shape(4, 7));
             NDList output =
                     encoder.forward(

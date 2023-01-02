@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.training;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -26,7 +27,8 @@ public class LossTest {
 
     @Test
     public void l1LossTest() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
             Assert.assertEquals(
@@ -36,7 +38,8 @@ public class LossTest {
 
     @Test
     public void quantileL1LossTest() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
             Assert.assertEquals(
@@ -49,7 +52,8 @@ public class LossTest {
 
     @Test
     public void l2LossTest() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
             Assert.assertEquals(
@@ -59,7 +63,8 @@ public class LossTest {
 
     @Test
     public void softmaxCrossEntropyTest() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test fromLogits=true, sparseLabel=true
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(1));
@@ -90,7 +95,8 @@ public class LossTest {
 
     @Test
     public void hingeLossTest() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5)).neg();
             Assert.assertEquals(
@@ -101,7 +107,8 @@ public class LossTest {
 
     @Test
     public void sigmoidBinaryCrossEntropyLossTest() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray pred = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray label = manager.ones(new Shape(5));
             Assertions.assertAlmostEquals(
@@ -114,7 +121,8 @@ public class LossTest {
 
     @Test
     public void maskedSoftmaxCrossEntropyLossTest() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray pred = manager.ones(new Shape(3, 4, 10));
             NDArray label = manager.ones(new Shape(3, 4));
             NDArray validLengths = manager.create(new int[] {4, 2, 0});

@@ -17,6 +17,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.AlexNet;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
@@ -24,7 +25,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.loss.SoftmaxCrossEntropyLoss;
@@ -39,7 +39,7 @@ public class ImperativeModelZooTest {
     @Test
     public void testImperativeModelInputOutput()
             throws MalformedModelException, ModelNotFoundException, IOException {
-        TestRequirements.engine("MXNet"); // Resnet50-cifar10 model only available in MXNet
+        TestUtils.requiresEngine("MXNet"); // Resnet50-cifar10 model only available in MXNet
 
         // from model zoo
         Criteria<Image, Classifications> criteria =
@@ -48,6 +48,7 @@ public class ImperativeModelZooTest {
                         .setTypes(Image.class, Classifications.class)
                         .optGroupId(BasicModelZoo.GROUP_ID)
                         .optArtifactId("resnet")
+                        .optEngine(TestUtils.getEngine())
                         .optFilter("layers", "50")
                         .optFilter("dataset", "cifar10")
                         .build();
@@ -60,6 +61,7 @@ public class ImperativeModelZooTest {
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
+                        .optEngine(TestUtils.getEngine())
                         .optGroupId(BasicModelZoo.GROUP_ID)
                         .build();
         try (Model model = ssdCriteria.loadModel()) {
@@ -71,7 +73,7 @@ public class ImperativeModelZooTest {
 
         // from builder
         Block alexNet = AlexNet.builder().build();
-        try (Model model = Model.newInstance("alexnet")) {
+        try (Model model = Model.newInstance("alexnet", TestUtils.getEngine())) {
             model.setBlock(alexNet);
             try (Trainer trainer =
                     model.newTrainer(new DefaultTrainingConfig(new SoftmaxCrossEntropyLoss()))) {

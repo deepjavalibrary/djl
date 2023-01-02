@@ -121,12 +121,18 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
+        if (isClosed) {
+            throw new IllegalStateException("Native resource has been release already.");
+        }
         return dataType;
     }
 
     /** {@inheritDoc} */
     @Override
     public Shape getShape() {
+        if (isClosed) {
+            throw new IllegalStateException("Native resource has been release already.");
+        }
         return shape;
     }
 
@@ -188,13 +194,13 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gather(NDArray index, int axis) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+        return getAlternativeArray().gather(alternativeManager.from(index), axis);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray gatherNd(NDArray index) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        return getAlternativeArray().gatherNd(alternativeManager.from(index));
     }
 
     /** {@inheritDoc} */
@@ -267,13 +273,13 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray booleanMask(NDArray index, int axis) {
-        return getAlternativeArray().booleanMask(index, axis);
+        return getAlternativeArray().booleanMask(alternativeManager.from(index), axis);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sequenceMask(NDArray sequenceLength, float value) {
-        return getAlternativeArray().sequenceMask(sequenceLength, value);
+        return getAlternativeArray().sequenceMask(alternativeManager.from(sequenceLength), value);
     }
 
     /** {@inheritDoc} */
@@ -291,7 +297,10 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(NDArray other) {
-        return Arrays.equals(toByteArray(), other.toByteArray());
+        if (other instanceof NDArrayAdapter) {
+            return Arrays.equals(toByteArray(), other.toByteArray());
+        }
+        return other.contentEquals(this);
     }
 
     /** {@inheritDoc} */
@@ -303,7 +312,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
-        return getAlternativeArray().eq(other);
+        return getAlternativeArray().eq(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -315,7 +324,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
-        return getAlternativeArray().neq(other);
+        return getAlternativeArray().neq(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -327,7 +336,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gt(NDArray other) {
-        return getAlternativeArray().gt(other);
+        return getAlternativeArray().gt(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -339,7 +348,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gte(NDArray other) {
-        return getAlternativeArray().gte(other);
+        return getAlternativeArray().gte(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -351,7 +360,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lt(NDArray other) {
-        return getAlternativeArray().lt(other);
+        return getAlternativeArray().lt(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -363,7 +372,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lte(NDArray other) {
-        return getAlternativeArray().lte(other);
+        return getAlternativeArray().lte(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -375,7 +384,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray add(NDArray other) {
-        return getAlternativeArray().add(other);
+        return getAlternativeArray().add(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -387,7 +396,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sub(NDArray other) {
-        return getAlternativeArray().sub(other);
+        return getAlternativeArray().sub(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -399,7 +408,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mul(NDArray other) {
-        return getAlternativeArray().mul(other);
+        return getAlternativeArray().mul(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -411,7 +420,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray div(NDArray other) {
-        return getAlternativeArray().div(other);
+        return getAlternativeArray().div(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -423,7 +432,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mod(NDArray other) {
-        return getAlternativeArray().mod(other);
+        return getAlternativeArray().mod(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -435,79 +444,79 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray pow(NDArray other) {
-        return getAlternativeArray().pow(other);
+        return getAlternativeArray().pow(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray addi(Number n) {
-        return getAlternativeArray().addi(n);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray addi(NDArray other) {
-        return getAlternativeArray().addi(other);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray subi(Number n) {
-        return getAlternativeArray().subi(n);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray subi(NDArray other) {
-        return getAlternativeArray().subi(other);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray muli(Number n) {
-        return getAlternativeArray().muli(n);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray muli(NDArray other) {
-        return getAlternativeArray().muli(other);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray divi(Number n) {
-        return getAlternativeArray().divi(n);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray divi(NDArray other) {
-        return getAlternativeArray().divi(other);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray modi(Number n) {
-        return getAlternativeArray().modi(n);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray modi(NDArray other) {
-        return getAlternativeArray().modi(other);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray powi(Number n) {
-        return getAlternativeArray().powi(n);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray powi(NDArray other) {
-        return getAlternativeArray().powi(other);
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
@@ -519,7 +528,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray signi() {
-        return getAlternativeArray().signi();
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
@@ -531,7 +540,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray maximum(NDArray other) {
-        return getAlternativeArray().maximum(other);
+        return getAlternativeArray().maximum(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -543,7 +552,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray minimum(NDArray other) {
-        return getAlternativeArray().minimum(other);
+        return getAlternativeArray().minimum(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -555,7 +564,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray negi() {
-        return getAlternativeArray().negi();
+        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
     }
 
     /** {@inheritDoc} */
@@ -765,7 +774,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray cumProd(int axis, DataType dataType) {
-        return getAlternativeArray().cumProd(axis);
+        return getAlternativeArray().cumProd(axis, dataType);
     }
 
     /** {@inheritDoc} */
@@ -873,19 +882,19 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray logicalAnd(NDArray other) {
-        return getAlternativeArray().logicalAnd(other);
+        return getAlternativeArray().logicalAnd(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logicalOr(NDArray other) {
-        return getAlternativeArray().logicalOr(other);
+        return getAlternativeArray().logicalOr(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray logicalXor(NDArray other) {
-        return getAlternativeArray().logicalXor(other);
+        return getAlternativeArray().logicalXor(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -1113,7 +1122,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray inverse() {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        return getAlternativeArray().inverse();
     }
 
     /** {@inheritDoc} */
@@ -1137,7 +1146,7 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray batchDot(NDArray other) {
-        return getAlternativeArray().batchDot(other);
+        return getAlternativeArray().batchDot(alternativeManager.from(other));
     }
 
     /** {@inheritDoc} */
@@ -1173,6 +1182,21 @@ public abstract class NDArrayAdapter implements NDArray {
                 alternativeArray = null;
             }
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof NDArray) {
+            return contentEquals((NDArray) obj);
+        }
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return 0;
     }
 
     /** {@inheritDoc} */
