@@ -85,7 +85,7 @@ jobs:
           ./gradlew -Dai.djl.default_engine=OnnxRuntime :integration:test
           ./gradlew :integration:clean
       - name: Build with Gradle
-        run: ./gradlew build jRR jRV
+        run: ./gradlew build :jacoco:testCodeCoverageReport
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -97,7 +97,7 @@ jobs:
       - name: upload to codecov
         uses: codecov/codecov-action@v3
         with:
-          files: ./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
+          files: ./jacoco/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
           fail_ci_if_error: false
           path_to_write_report: ./codecov_report.txt
 

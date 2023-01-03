@@ -35,7 +35,7 @@ jobs:
       - name: check disk space
         run: df -h
       - name: Build with Gradle
-        run: ./gradlew -Dnightly=true build jRR jRV
+        run: ./gradlew -Dnightly=true build :jacoco:testCodeCoverageReport
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
