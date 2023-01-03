@@ -401,7 +401,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
-        return JniUtils.contentEqual(this, (PtNDArray) manager.create(number));
+        return contentEquals(manager.create(number));
     }
 
     /** {@inheritDoc} */

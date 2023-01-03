@@ -51,7 +51,6 @@ public class NDArrayElementArithmeticOpTest {
         } else {
             // other cases only apply to non inplace test
             // test NDArray with scalar
-            x1 = 10f;
             x2 = 5f;
             float y = arithmeticOp.apply(x1, x2);
             array1 = manager.create(new float[] {x1, x1});
@@ -168,6 +167,10 @@ public class NDArrayElementArithmeticOpTest {
             result = NDArrays.addi(lhs, 2);
             NDArray expected = manager.create(new float[] {3f, 4f, 5f, 6f});
             Assertions.assertInPlaceEquals(result, expected, lhs);
+            lhs = manager.create(new float[] {1f, 2f, 3f, 4f});
+            result = NDArrays.addi(2, lhs);
+            Assertions.assertInPlaceEquals(result, expected, lhs);
+
             testScalarCornerCase(manager, NDArrays::add, Float::sum, false);
             testScalarCornerCase(manager, NDArrays::addi, Float::sum, true);
         }
@@ -182,6 +185,9 @@ public class NDArrayElementArithmeticOpTest {
             Assert.assertNotEquals(
                     result, addend, "None in-place operation returned in-place result");
 
+            result = NDArrays.add(1, addend);
+            Assert.assertEquals(result, addendum);
+
             result = NDArrays.addi(addend, addendum);
             NDArray expected = manager.create(new float[] {3f, 5f, 7f, 9f});
             Assertions.assertInPlaceEquals(result, expected, addend);
@@ -191,6 +197,15 @@ public class NDArrayElementArithmeticOpTest {
                 manager.create(new float[] {4, 3, 2, 1}, new Shape(2, 2)),
                 manager.create(new float[] {2, 2, 2, 2}, new Shape(2, 2))
             };
+
+            Assert.assertThrows(() -> NDArrays.add(addend));
+
+            Assert.assertThrows(
+                    () ->
+                            NDArrays.add(
+                                    addend,
+                                    manager.ones(new Shape(2)),
+                                    manager.ones(new Shape(3))));
 
             NDArray addAll = NDArrays.add(toAddAll);
             Assert.assertNotEquals(
@@ -307,11 +322,17 @@ public class NDArrayElementArithmeticOpTest {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray multiplicand = manager.create(new float[] {6, 9, -12, 15, 0});
             NDArray result = NDArrays.mul(multiplicand, 3);
-            NDArray inPlaceResult = NDArrays.muli(multiplicand, 3);
             NDArray expected = manager.create(new float[] {18, 27, -36, 45, 0});
-            Assert.assertEquals(
-                    result, expected, "Scalar multiplication: Incorrect value in result ndarray");
+            Assert.assertEquals(result, expected);
+            result = NDArrays.mul(3, multiplicand);
+            Assert.assertEquals(result, expected);
+
+            NDArray inPlaceResult = NDArrays.muli(multiplicand, 3);
             Assertions.assertInPlaceEquals(inPlaceResult, expected, multiplicand);
+            multiplicand = manager.create(new float[] {6, 9, -12, 15, 0});
+            inPlaceResult = NDArrays.muli(3, multiplicand);
+            Assertions.assertInPlaceEquals(inPlaceResult, expected, multiplicand);
+
             testScalarCornerCase(manager, NDArrays::mul, (x, y) -> x * y, false);
             testScalarCornerCase(manager, NDArrays::muli, (x, y) -> x * y, true);
         }
@@ -430,7 +451,7 @@ public class NDArrayElementArithmeticOpTest {
             NDArray lhs = manager.create(new float[] {5, 10, -3, 4, 2, 7}, new Shape(2, 3));
             NDArray rhs = manager.create(new float[] {2, 9, 3}, new Shape(3, 1));
             NDArray expected = manager.create(new float[] {91, 47}, new Shape(2, 1));
-            Assert.assertEquals(lhs.matMul(rhs), expected);
+            Assert.assertEquals(NDArrays.matMul(lhs, rhs), expected);
             // 3D * 2D
             lhs = manager.arange(24f).reshape(2, 3, 4);
             rhs = manager.arange(12f).reshape(4, 3);
@@ -627,8 +648,8 @@ public class NDArrayElementArithmeticOpTest {
     public void testPowScalar() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create(new float[] {6, 0, -1, 5, 2}, new Shape(1, 5));
-            NDArray result = array.pow(2);
-            NDArray inPlaceResult = array.powi(2);
+            NDArray result = NDArrays.pow(array, 2);
+            NDArray inPlaceResult = NDArrays.powi(array, 2);
             NDArray expected = manager.create(new float[] {36, 0, 1, 25, 4}, new Shape(1, 5));
             Assertions.assertAlmostEquals(result, expected);
             Assertions.assertInPlaceAlmostEquals(inPlaceResult, expected, array);

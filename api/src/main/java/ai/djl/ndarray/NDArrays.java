@@ -199,7 +199,7 @@ public final class NDArrays {
      * @return the boolean {@link NDArray} for element-wise "Equals" comparison
      */
     public static NDArray eq(Number n, NDArray a) {
-        return a.eq(n);
+        return eq(a, n);
     }
 
     /**
@@ -264,7 +264,7 @@ public final class NDArrays {
      * @return the boolean {@link NDArray} for element-wise "Not equals" comparison
      */
     public static NDArray neq(Number n, NDArray a) {
-        return a.neq(n);
+        return neq(a, n);
     }
 
     /**

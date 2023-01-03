@@ -316,8 +316,12 @@ public class NDArrayOtherOpTest {
             NDArray array = manager.create(new float[][] {{1, 2, 3}, {4, 5, 6}});
             NDArray sequenceLength = manager.create(new float[] {1, 2});
             NDArray expected = manager.create(new float[][] {{1, 0, 0}, {4, 5, 0}});
-            Assert.assertEquals(array.sequenceMask(sequenceLength), expected);
-            Assert.assertEquals(NDArrays.sequenceMask(array, sequenceLength), expected);
+            NDArray result = NDArrays.sequenceMask(array, sequenceLength);
+            Assert.assertEquals(result, expected);
+
+            result = NDArrays.sequenceMask(array, sequenceLength, -1f);
+            expected = manager.create(new float[][] {{1, -1, -1}, {4, 5, -1}});
+            Assert.assertEquals(result, expected);
 
             // test zero dimension
             array = manager.create(new Shape(1, 0, 0));
@@ -841,7 +845,7 @@ public class NDArrayOtherOpTest {
             // test 1-D
             NDArray array = manager.create(new float[] {0f, 0.5f, -1f});
             NDArray expected = manager.create(new float[] {0f, 0.4769f, Float.NEGATIVE_INFINITY});
-            Assertions.assertAlmostEquals(array.erfinv(), expected);
+            Assertions.assertAlmostEquals(NDArrays.erfinv(array), expected);
             // test 3-D
             array = manager.linspace(-1.0f, 1.0f, 9).reshape(3, 1, 3);
             expected =

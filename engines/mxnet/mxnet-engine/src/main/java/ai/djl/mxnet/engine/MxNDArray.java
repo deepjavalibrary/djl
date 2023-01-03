@@ -412,9 +412,10 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
-        if (number == null) {
+        if (number == null || getDataType().isBoolean()) {
             return false;
         }
+
         try (NDArray result = eq(number)) {
             return result.all().getBoolean();
         }
