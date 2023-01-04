@@ -313,7 +313,7 @@ public abstract class AbstractBaseBlock implements Block {
      * Overwrite this to load additional metadata with the parameter values.
      *
      * <p>If you overwrite {@link AbstractBlock#saveMetadata(DataOutputStream)} or need to provide
-     * backward compatibility to older binary formats, you prabably need to overwrite this. This
+     * backward compatibility to older binary formats, you probably need to overwrite this. This
      * default implementation checks if the version number fits, if not it throws an {@link
      * MalformedModelException}. After that it restores the input shapes.
      *
