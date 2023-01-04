@@ -397,7 +397,7 @@ public final class JniUtils {
                 PtNDArray indexArr = (PtNDArray) ((NDIndexBooleans) elem).getIndex();
                 PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, indexArr.getHandle());
             } else if (elem instanceof NDIndexTake) {
-                PtNDArray indexArr = (PtNDArray) ((NDIndexTake) elem).getIndex();
+                PtNDArray indexArr = manager.from(((NDIndexTake) elem).getIndex());
                 if (indexArr.getDataType() != DataType.INT64) {
                     indexArr = indexArr.toType(DataType.INT64, true);
                 }

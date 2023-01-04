@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.modality.cv;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.ndarray.NDArray;
@@ -26,9 +27,10 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 
 public class BufferedImageFactoryTest {
+
     @Test
     public void testLoadImage() throws IOException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             ImageFactory factory = ImageFactory.getInstance();
             Image img =
                     factory.fromUrl(
@@ -40,7 +42,7 @@ public class BufferedImageFactoryTest {
 
     @Test
     public void testFormNDArray() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.arange(0.0f, 12.0f).reshape(3, 2, 2);
             ImageFactory factory = ImageFactory.getInstance();
             Image image = factory.fromNDArray(array);

@@ -80,12 +80,12 @@ public class LgbmNDManager extends BaseNDManager {
             // output only NDArray
             return new LgbmNDArray(this, alternativeManager, (ByteBuffer) data, shape, dataType);
         } else if (data instanceof FloatBuffer && dataType == DataType.FLOAT32) {
-            ByteBuffer bb = ByteBuffer.allocateDirect(data.capacity() * 4);
+            ByteBuffer bb = allocateDirect(data.capacity() * 4);
             bb.asFloatBuffer().put((FloatBuffer) data);
             bb.rewind();
             return new LgbmNDArray(this, alternativeManager, bb, shape, dataType);
         } else if (data instanceof DoubleBuffer && dataType == DataType.FLOAT64) {
-            ByteBuffer bb = ByteBuffer.allocateDirect(data.capacity() * 8);
+            ByteBuffer bb = allocateDirect(data.capacity() * 8);
             bb.asDoubleBuffer().put((DoubleBuffer) data);
             bb.rewind();
             return new LgbmNDArray(this, alternativeManager, bb, shape, dataType);

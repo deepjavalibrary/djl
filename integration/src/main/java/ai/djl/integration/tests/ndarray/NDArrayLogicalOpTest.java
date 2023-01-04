@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDManager;
@@ -26,7 +27,7 @@ public class NDArrayLogicalOpTest {
 
     @Test
     public void testLogicalAnd() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array1 = manager.create(new boolean[] {true, false});
             NDArray array2 = manager.create(new boolean[] {false, false});
             NDArray expected = manager.create(new boolean[] {false, false});
@@ -80,7 +81,7 @@ public class NDArrayLogicalOpTest {
 
     @Test
     public void testLogicalOr() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array1 = manager.create(new boolean[] {true, false, true, false});
             NDArray array2 = manager.create(new boolean[] {false, true, false, true});
             NDArray expected = manager.create(new boolean[] {true, true, true, true});
@@ -128,7 +129,7 @@ public class NDArrayLogicalOpTest {
 
     @Test
     public void testLogicalXor() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array1 = manager.create(new boolean[] {true, false, true, false});
             NDArray array2 = manager.create(new boolean[] {true, true, false, false});
             NDArray expected = manager.create(new boolean[] {false, true, true, false});
@@ -168,7 +169,7 @@ public class NDArrayLogicalOpTest {
 
     @Test
     public void testLogicalNot() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {-2f, 0f, 1f});
             NDArray expected = manager.create(new boolean[] {false, true, false});
             Assertions.assertAlmostEquals(array.logicalNot(), expected);

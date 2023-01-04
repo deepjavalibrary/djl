@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.translate;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -26,7 +27,7 @@ public class PaddingStackBatchifierTest {
 
     @Test
     public void testBatchify() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDList[] input = new NDList[5];
             for (int i = 0; i < 5; i++) {
                 NDArray array1 = manager.zeros(new Shape(10, i + 1));
@@ -53,7 +54,7 @@ public class PaddingStackBatchifierTest {
 
     @Test
     public void testBatchifyWithValidLength() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDList[] input = new NDList[5];
             long[] validLengths = new long[5];
             for (int i = 0; i < 5; i++) {
@@ -80,7 +81,7 @@ public class PaddingStackBatchifierTest {
 
     @Test
     public void testBatchifyWithPaddingSize() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDList[] input = new NDList[5];
             for (int i = 0; i < 5; i++) {
                 input[i] =
@@ -101,7 +102,7 @@ public class PaddingStackBatchifierTest {
 
     @Test
     public void testUnbatchify() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDList input =
                     new NDList(manager.zeros(new Shape(10, 11)), manager.zeros(new Shape(10)));
             Batchifier batchifier =
@@ -122,7 +123,7 @@ public class PaddingStackBatchifierTest {
 
     @Test
     public void testUnbatchifyWithValidLengths() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDList input = new NDList(manager.zeros(new Shape(4, 11)), manager.zeros(new Shape(4)));
             long[] validLengths = {3, 1, 7, 11};
             input.add(manager.create(validLengths));
@@ -146,7 +147,7 @@ public class PaddingStackBatchifierTest {
 
     @Test
     public void testSplit() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDList input =
                     new NDList(manager.zeros(new Shape(10, 11)), manager.zeros(new Shape(10)));
             Batchifier batchifier =
@@ -173,7 +174,7 @@ public class PaddingStackBatchifierTest {
 
     @Test
     public void testSplitWithValidLengths() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDList input = new NDList(manager.zeros(new Shape(3, 11)), manager.zeros(new Shape(3)));
             long[] validLengths = {3, 1, 11};
             input.add(manager.create(validLengths));

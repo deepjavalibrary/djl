@@ -1,0 +1,69 @@
+plugins {
+    id "base"
+    id "jacoco-report-aggregation"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    jacocoAggregation project(":api")
+    jacocoAggregation project(":basicdataset")
+    jacocoAggregation project(":engines:dlr:dlr-engine")
+    jacocoAggregation project(":engines:dlr:dlr-native")
+    jacocoAggregation project(":engines:ml:xgboost")
+    jacocoAggregation project(":engines:ml:lightgbm")
+    jacocoAggregation project(":engines:mxnet:mxnet-engine")
+    jacocoAggregation project(":engines:mxnet:mxnet-model-zoo")
+    jacocoAggregation project(":engines:mxnet:native")
+    jacocoAggregation project(":engines:onnxruntime:onnxruntime-android")
+    jacocoAggregation project(":engines:onnxruntime:onnxruntime-engine")
+    jacocoAggregation project(":engines:paddlepaddle:paddlepaddle-engine")
+    jacocoAggregation project(":engines:paddlepaddle:paddlepaddle-model-zoo")
+    jacocoAggregation project(":engines:paddlepaddle:paddlepaddle-native")
+    jacocoAggregation project(":engines:pytorch:pytorch-engine")
+    jacocoAggregation project(":engines:pytorch:pytorch-jni")
+    jacocoAggregation project(":engines:pytorch:pytorch-model-zoo")
+    jacocoAggregation project(":engines:pytorch:pytorch-native")
+    jacocoAggregation project(":engines:tensorflow:tensorflow-api")
+    jacocoAggregation project(":engines:tensorflow:tensorflow-engine")
+    jacocoAggregation project(":engines:tensorflow:tensorflow-model-zoo")
+    jacocoAggregation project(":engines:tensorflow:tensorflow-native")
+    jacocoAggregation project(":engines:tflite:tflite-engine")
+    jacocoAggregation project(":engines:tflite:tflite-native")
+    jacocoAggregation project(":examples")
+    jacocoAggregation project(":extensions:audio")
+    jacocoAggregation project(":extensions:fasttext")
+    jacocoAggregation project(":extensions:hadoop")
+    jacocoAggregation project(":extensions:opencv")
+    jacocoAggregation project(":extensions:sentencepiece")
+    jacocoAggregation project(":extensions:tokenizers")
+    jacocoAggregation project(":extensions:tablesaw")
+    jacocoAggregation project(":extensions:timeseries")
+    jacocoAggregation project(":extensions:spark")
+    jacocoAggregation project(":integration")
+    jacocoAggregation project(":model-zoo")
+}
+
+reporting {
+    reports {
+        testCodeCoverageReport(JacocoCoverageReport) {
+            testType = TestSuiteType.UNIT_TEST
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn tasks.named("testCodeCoverageReport", JacocoReport)
+}
+
+testCodeCoverageReport {
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: [
+                "org/tensorflow/lite/**",
+                "ai/djl/integration/**",
+                "ai/djl/examples/**"
+        ])
+    }))
+}

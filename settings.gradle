@@ -40,5 +40,6 @@ include ':extensions:spark'
 include ':integration'
 include ':model-zoo'
 include ':testing'
+include ':jacoco'
 
 

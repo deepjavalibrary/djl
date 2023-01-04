@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.ndarray;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -27,7 +28,7 @@ public class NDArrayShapesManipulationOpTest {
     @Test
     public void testSplit() {
         // TODO add more test cases once MXNet split op bug is fixed
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.arange(18f);
             NDList result = array.split(18);
             Assert.assertEquals(result.get(0), manager.create(new float[] {0f}));
@@ -51,7 +52,7 @@ public class NDArrayShapesManipulationOpTest {
 
     @Test
     public void testFlatten() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray expected = manager.create(new float[] {1f, 2f, 3f, 4f});
             Assert.assertEquals(array.flatten(), expected);
@@ -83,7 +84,7 @@ public class NDArrayShapesManipulationOpTest {
 
     @Test
     public void testReshape() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f});
             NDArray expected =
                     manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f}, new Shape(2, 1, 1, 3));
@@ -127,7 +128,7 @@ public class NDArrayShapesManipulationOpTest {
 
     @Test
     public void testExpandDim() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {1f, 2f});
             NDArray expected = manager.create(new float[] {1f, 2f}, new Shape(1, 2));
             Assert.assertEquals(array.expandDims(0), expected);
@@ -151,7 +152,7 @@ public class NDArrayShapesManipulationOpTest {
 
     @Test
     public void testSqueeze() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.ones(new Shape(1, 2, 1, 3, 1));
             NDArray expected = manager.ones(new Shape(2, 3));
             Assert.assertEquals(array.squeeze(), expected);
@@ -179,7 +180,9 @@ public class NDArrayShapesManipulationOpTest {
 
     @Test
     public void testStack() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            Assert.assertThrows(() -> NDArrays.stack(new NDList()));
+
             NDArray array1 = manager.create(new float[] {1f, 2f});
             NDArray array2 = manager.create(new float[] {3f, 4f});
 
@@ -236,18 +239,17 @@ public class NDArrayShapesManipulationOpTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConcat() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array1 = manager.create(new float[] {1f});
             NDArray array2 = manager.create(new float[] {2f});
+
             NDArray expected = manager.create(new float[] {1f, 2f});
-            Assert.assertEquals(NDArrays.concat(new NDList(array1, array2), 0), expected);
-            Assert.assertEquals(array1.concat(array2), expected);
+            Assert.assertEquals(NDArrays.concat(new NDList(array1, array2)), expected);
 
             array1 = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             array2 = manager.create(new float[] {5f, 6f, 7f, 8f}, new Shape(2, 2));
             expected = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f, 7, 8f}, new Shape(4, 2));
             Assert.assertEquals(NDArrays.concat(new NDList(array1, array2)), expected);
-            Assert.assertEquals(array1.concat(array2), expected);
             expected =
                     manager.create(new float[] {1f, 2f, 5f, 6f, 3f, 4f, 7f, 8f}, new Shape(2, 4));
             Assert.assertEquals(NDArrays.concat(new NDList(array1, array2), 1), expected);
@@ -258,10 +260,8 @@ public class NDArrayShapesManipulationOpTest {
             // zero-dim
             array1 = manager.create(new Shape(0, 1));
             expected = manager.create(new Shape(0, 1));
-            Assert.assertEquals(array1.concat(array1), expected);
             Assert.assertEquals(NDArrays.concat(new NDList(array1, array1)), expected);
             expected = manager.create(new Shape(0, 2));
-            Assert.assertEquals(array1.concat(array1, 1), expected);
             Assert.assertEquals(NDArrays.concat(new NDList(array1, array1), 1), expected);
 
             // scalar
@@ -271,14 +271,18 @@ public class NDArrayShapesManipulationOpTest {
 
             // one array
             array1 = manager.ones(new Shape(2, 2));
-            expected = manager.ones(new Shape(2, 2));
-            Assert.assertEquals(NDArrays.concat(new NDList(array1)), expected);
+            Assert.assertEquals(NDArrays.concat(new NDList(array1)), array1);
+
+            Assert.assertThrows(() -> NDArrays.concat(new NDList()));
+
+            NDList list = new NDList(manager.ones(new Shape(2)), manager.ones(new Shape(3, 1)));
+            Assert.assertThrows(() -> NDArrays.concat(list));
         }
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConcatNDlist() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array1 = manager.create(1f);
             NDArray array2 = manager.create(2f);
             NDArrays.concat(new NDList(array1, array2));

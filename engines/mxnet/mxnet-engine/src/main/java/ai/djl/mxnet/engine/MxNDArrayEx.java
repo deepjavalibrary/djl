@@ -105,6 +105,7 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rdivi(NDArray b) {
+        b = getManager().from(b);
         getManager().invoke("elemwise_div", new NDArray[] {b, array}, new NDArray[] {array}, null);
         return array;
     }
@@ -160,6 +161,7 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray rmodi(NDArray b) {
+        b = getManager().from(b);
         getManager().invoke("_npi_mod", new NDArray[] {b, array}, new NDArray[] {array}, null);
         return array;
     }
@@ -1060,7 +1062,11 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("axis", axis);
         NDArray[] srcArray = new NDArray[arrays.size() + 1];
         srcArray[0] = array;
-        System.arraycopy(arrays.toArray(new NDArray[0]), 0, srcArray, 1, arrays.size());
+        NDManager manager = array.getManager();
+        int i = 1;
+        for (NDArray arr : arrays) {
+            srcArray[i++] = manager.from(arr);
+        }
         return getManager().invoke("_npi_stack", srcArray, params);
     }
 
@@ -1074,7 +1080,11 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("axis", axis);
         NDArray[] srcArray = new NDArray[list.size() + 1];
         srcArray[0] = array;
-        System.arraycopy(list.toArray(new NDArray[0]), 0, srcArray, 1, list.size());
+        NDManager manager = array.getManager();
+        int i = 1;
+        for (NDArray arr : list) {
+            srcArray[i++] = manager.from(arr);
+        }
         return getManager().invoke("_npi_concatenate", srcArray, params);
     }
 

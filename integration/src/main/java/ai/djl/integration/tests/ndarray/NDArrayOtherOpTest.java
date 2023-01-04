@@ -14,6 +14,7 @@ package ai.djl.integration.tests.ndarray;
 
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -34,7 +35,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testCopyTo() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array1 = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray array2 = manager.create(new Shape(4));
             array1.copyTo(array2);
@@ -59,7 +60,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testNonZero() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.ones(new Shape(3, 3));
             NDArray expected =
                     manager.create(
@@ -84,7 +85,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testAll() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.arange(10);
             Assert.assertFalse(array.all().getBoolean());
             Assert.assertTrue(array.add(1f).all().getBoolean());
@@ -114,7 +115,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testAny() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.arange(10);
             Assert.assertTrue(array.any().getBoolean());
             array = manager.zeros(new Shape(10));
@@ -144,7 +145,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testNone() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.arange(10);
             Assert.assertFalse(array.none().getBoolean());
             array = manager.zeros(new Shape(10));
@@ -175,7 +176,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testCountNonzero() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.arange(4);
             Assert.assertEquals(array.countNonzero().getLong(), 3);
 
@@ -194,7 +195,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testIsNaN() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {Float.NaN, 0f});
             NDArray expected = manager.create(new boolean[] {true, false});
             Assert.assertEquals(array.isNaN(), expected);
@@ -222,18 +223,19 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testIntern() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.ones(new Shape(3, 2));
             NDArray replaced = manager.zeros(new Shape(5, 5));
             original.intern(replaced);
             Assert.assertEquals(original, manager.zeros(new Shape(5, 5)));
+            // replace is closed
             Assert.assertThrows(IllegalStateException.class, replaced::toFloatArray);
         }
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testBooleanMask() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.arange(4.0f);
             NDArray index = manager.create(new boolean[] {true, false, true, false});
             NDArray expected = manager.create(new float[] {0f, 2f});
@@ -263,7 +265,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testSet() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test float
             NDArray array = manager.create(1f);
             float[] data = {-1};
@@ -300,7 +302,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testSetBoolean() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.arange(0f, 6f).reshape(2, 3);
             array.set(array.gte(2), 10f);
             NDArray expected = manager.create(new float[] {0, 1, 10, 10, 10, 10}, new Shape(2, 3));
@@ -312,12 +314,16 @@ public class NDArrayOtherOpTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testSequenceMask() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[][] {{1, 2, 3}, {4, 5, 6}});
             NDArray sequenceLength = manager.create(new float[] {1, 2});
             NDArray expected = manager.create(new float[][] {{1, 0, 0}, {4, 5, 0}});
-            Assert.assertEquals(array.sequenceMask(sequenceLength), expected);
-            Assert.assertEquals(NDArrays.sequenceMask(array, sequenceLength), expected);
+            NDArray result = NDArrays.sequenceMask(array, sequenceLength);
+            Assert.assertEquals(result, expected);
+
+            result = NDArrays.sequenceMask(array, sequenceLength, -1f);
+            expected = manager.create(new float[][] {{1, -1, -1}, {4, 5, -1}});
+            Assert.assertEquals(result, expected);
 
             // test zero dimension
             array = manager.create(new Shape(1, 0, 0));
@@ -328,7 +334,7 @@ public class NDArrayOtherOpTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testSequenceMaskWithScalarInput() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new Shape());
             NDArray sequenceLength = manager.create(new float[] {1});
             array.sequenceMask(sequenceLength);
@@ -337,7 +343,7 @@ public class NDArrayOtherOpTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testSequenceMaskWithScalarSequenceLength() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new Shape(1, 1, 1));
             NDArray sequenceLength = manager.create(new float[] {});
             array.sequenceMask(sequenceLength);
@@ -347,7 +353,7 @@ public class NDArrayOtherOpTest {
     @Test
     public void testArgSort() {
         // TODO switch to numpy argsort
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {-1f, 2f, 0f, 999f, -998f});
             NDArray expected = manager.create(new long[] {4, 0, 2, 1, 3});
             Assert.assertEquals(array.argSort(), expected);
@@ -373,7 +379,7 @@ public class NDArrayOtherOpTest {
 
     @Test(expectedExceptions = EngineException.class)
     public void testSort() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {2f, 1f, 4f, 3f});
             NDArray expected = manager.create(new float[] {1f, 2f, 3f, 4f});
             Assert.assertEquals(array.sort(), expected);
@@ -423,7 +429,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testSoftmax() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.ones(new Shape(10));
             NDArray expected = manager.zeros(new Shape(10)).add(0.1f);
             Assertions.assertAlmostEquals(array.softmax(0), expected);
@@ -448,7 +454,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testLogSoftmax() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.ones(new Shape(10));
             NDArray expected = manager.zeros(new Shape(10)).add(-2.3025851f);
             Assertions.assertAlmostEquals(array.logSoftmax(0), expected);
@@ -469,7 +475,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testCumsum() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.arange(10.0f);
             NDArray expected =
                     manager.create(new float[] {0f, 1f, 3f, 6f, 10f, 15f, 21f, 28f, 36f, 45f});
@@ -522,7 +528,7 @@ public class NDArrayOtherOpTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testTile() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
 
             NDArray tileAll = array.tile(2);
@@ -566,7 +572,7 @@ public class NDArrayOtherOpTest {
     @Test
     public void testRepeat() {
         // TODO add scalar and zero-dim test cases after fix the bug in MXNet np.repeat
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
 
             NDArray repeatAll = array.repeat(2);
@@ -593,7 +599,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testClip() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f});
             NDArray expected = manager.create(new float[] {2f, 2f, 3f, 3f});
             Assert.assertEquals(original.clip(2.0, 3.0), expected);
@@ -623,7 +629,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testSwapAxes() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array =
                     manager.create(new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f})
                             .reshape(new Shape(2, 5));
@@ -645,7 +651,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testFlip() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test single dim
             NDArray original = manager.create(new float[] {1, 2, 3, 4});
             NDArray expected = manager.create(new float[] {4, 3, 2, 1});
@@ -662,7 +668,7 @@ public class NDArrayOtherOpTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testTranspose() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(1, 2, 2));
 
             NDArray transposeAll = original.transpose();
@@ -691,7 +697,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testRot90() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray original = manager.create(new float[] {1, 2, 3, 4}, new Shape(2, 2));
             NDArray rotated = original.rotate90(1, new int[] {0, 1});
             NDArray expected = manager.create(new float[] {2, 4, 1, 3}, new Shape(2, 2));
@@ -713,7 +719,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testBroadcast() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {1, 2});
             NDArray broadcasted = array.broadcast(2, 2);
             NDArray expected = manager.create(new float[] {1, 2, 1, 2}, new Shape(2, 2));
@@ -739,7 +745,7 @@ public class NDArrayOtherOpTest {
 
     @Test(expectedExceptions = {IllegalArgumentException.class, EngineException.class})
     public void testArgMax() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array =
                     manager.create(
                             new float[] {
@@ -777,7 +783,7 @@ public class NDArrayOtherOpTest {
 
     @Test(expectedExceptions = {IllegalArgumentException.class, EngineException.class})
     public void testArgMin() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array =
                     manager.create(
                             new float[] {
@@ -815,7 +821,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testEncodeDecode() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new byte[] {0, 3}, new Shape(2));
             byte[] bytes = array.encode();
             NDArray recovered = NDArray.decode(manager, bytes);
@@ -837,11 +843,11 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testErfinv() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test 1-D
             NDArray array = manager.create(new float[] {0f, 0.5f, -1f});
             NDArray expected = manager.create(new float[] {0f, 0.4769f, Float.NEGATIVE_INFINITY});
-            Assertions.assertAlmostEquals(array.erfinv(), expected);
+            Assertions.assertAlmostEquals(NDArrays.erfinv(array), expected);
             // test 3-D
             array = manager.linspace(-1.0f, 1.0f, 9).reshape(3, 1, 3);
             expected =
@@ -871,7 +877,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testInverse() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array =
                     manager.create(
                                     new float[] {
@@ -891,7 +897,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testNorm() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test 1-D
             NDArray array = manager.create(new float[] {1f, 0.5f, -1f});
             Assert.assertEquals(array.norm(), manager.create(1.5f));
@@ -921,7 +927,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testOneHot() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test basic
             NDArray array = manager.create(new int[] {1, 0, 2, 0});
             NDArray expected =
@@ -948,7 +954,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testNormalize() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             float[][] buf = {
                 {0.2673f, 0.5345f, 0.8018f},
                 {0.4558f, 0.5698f, 0.6838f}
@@ -963,11 +969,12 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testStopGradient() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // normal gradient
             NDArray x = manager.create(new float[] {1.0f}, new Shape(1));
             x.setRequiresGradient(true);
-            try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+            Engine engine = Engine.getEngine(TestUtils.getEngine());
+            try (GradientCollector gc = engine.newGradientCollector()) {
                 NDArray y = x.mul(x);
                 gc.backward(y);
                 NDArray grad = x.getGradient();
@@ -976,7 +983,7 @@ public class NDArrayOtherOpTest {
             // stop gradient
             x = manager.create(new float[] {1.0f}, new Shape(1));
             x.setRequiresGradient(true);
-            try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+            try (GradientCollector gc = engine.newGradientCollector()) {
                 NDArray z = x.mul(x.stopGradient());
                 gc.backward(z);
                 NDArray grad = x.getGradient();
@@ -987,7 +994,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testFft() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray ele = manager.create(new float[] {1, 2, 3, 4, 5});
             NDArray result = ele.fft(5);
             result = result.real().flatten();
@@ -1011,7 +1018,7 @@ public class NDArrayOtherOpTest {
 
     @Test
     public void testStft() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray audio = manager.ones(new Shape(20));
             NDArray window = manager.hanningWindow(20);
             int nfft = 20;

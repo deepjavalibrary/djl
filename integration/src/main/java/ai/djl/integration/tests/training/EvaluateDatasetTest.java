@@ -15,6 +15,7 @@ package ai.djl.integration.tests.training;
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.Mnist;
 import ai.djl.basicmodelzoo.basic.Mlp;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
@@ -39,7 +40,7 @@ public class EvaluateDatasetTest {
 
     @Test
     public void testDatasetEvaluation() throws IOException, TranslateException {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             Mnist testMnistDataset =
                     Mnist.builder()
                             .optManager(manager)
@@ -51,7 +52,7 @@ public class EvaluateDatasetTest {
 
             Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
 
-            try (Model model = Model.newInstance("lin-reg")) {
+            try (Model model = Model.newInstance("lin-reg", TestUtils.getEngine())) {
                 model.setBlock(mlpModel);
 
                 Loss l2loss = Loss.l2Loss();

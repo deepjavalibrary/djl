@@ -23,7 +23,7 @@ public final class NDUtils {
     private NDUtils() {}
 
     /**
-     * Get {@link Shape} of the empty {@link NDArray} after applying reduction operations.
+     * Returns {@link Shape} of the empty {@link NDArray} after applying reduction operations.
      *
      * @param shape input shape
      * @param axis axis to apply reduction

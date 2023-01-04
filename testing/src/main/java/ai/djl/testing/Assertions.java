@@ -13,11 +13,13 @@
 package ai.djl.testing;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrayAdapter;
 import ai.djl.ndarray.NDList;
 
 import org.testng.Assert;
 
 public final class Assertions {
+
     private static final double RTOL = 1e-5;
     private static final double ATOL = 1e-3;
 
@@ -96,6 +98,10 @@ public final class Assertions {
     public static void assertInPlaceEquals(NDArray actual, NDArray expected, NDArray original) {
         Assert.assertEquals(
                 actual, expected, getDefaultErrorMessage(actual, expected, "Assert Equal failed!"));
+        if (actual instanceof NDArrayAdapter || original instanceof NDArrayAdapter) {
+            // NDArrayAdapter doesn't support inplace operation
+            return;
+        }
         Assert.assertSame(
                 original,
                 actual,

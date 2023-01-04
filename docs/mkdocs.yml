@@ -70,7 +70,6 @@ nav:
           - BERT with MXNet: 'jupyter/mxnet/load_your_own_mxnet_bert.ipynb'
           - BERT with PyTorch: 'jupyter/pytorch/load_your_own_pytorch_bert.ipynb'
   - Guides:
-      - 'docs/engine.md'
       - Models:
           - 'docs/load_model.md'
           - 'docs/model-zoo.md'
@@ -78,12 +77,12 @@ nav:
           - 'docs/dataset.md'
           - 'docs/development/how_to_use_dataset.md'
       - Inference and Production:
-        - 'docs/create_serving_ready_model.md'
-        - 'docs/development/configure_logging.md'
-        - 'docs/how_to_collect_metrics.md'
-        - 'docs/development/inference_performance_optimization.md'
-        - 'docs/serving/benchmark/README.md'
-        - 'docs/development/profiler.md'
+          - 'docs/create_serving_ready_model.md'
+          - 'docs/development/configure_logging.md'
+          - 'docs/how_to_collect_metrics.md'
+          - 'docs/development/inference_performance_optimization.md'
+          - 'docs/serving/benchmark/README.md'
+          - 'docs/development/profiler.md'
       - 'docs/development/cache_management.md'
       - 'docs/development/memory_management.md'
       - 'docs/cv_utils.md'
@@ -91,57 +90,61 @@ nav:
       - 'docs/forums.md'
       - 'leaders.md'
   - Supported Engines:
-    - PyTorch:
-        - Overview: 'engines/pytorch/README.md'
-        - PyTorch Engine: 'engines/pytorch/pytorch-engine/README.md'
-        - PyTorch Model Zoo: 'engines/pytorch/pytorch-model-zoo/README.md'
-        - Import PyTorch Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
-        - Load a PyTorch Model: 'jupyter/load_pytorch_model.ipynb'
-    - TensorFlow:
-        - Overview: 'engines/tensorflow/README.md'
-        - TensorFlow Engine: 'engines/tensorflow/tensorflow-engine/README.md'
-        - TensorFlow Model Zoo: 'engines/tensorflow/tensorflow-model-zoo/README.md'
-        - Import TensorFlow Model: 'docs/tensorflow/how_to_import_tensorflow_models_in_DJL.md'
-        - Load a TensorFlow Model: 'jupyter/tensorflow/pneumonia_detection.ipynb'
-    - Apache MXNet:
-        - Overview: 'engines/mxnet/README.md'
-        - MXNet Engine: 'engines/mxnet/mxnet-engine/README.md'
-        - MXNet Model Zoo: 'engines/mxnet/mxnet-model-zoo/README.md'
-        - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
-        - Load a MXNet Model: 'jupyter/load_mxnet_model.ipynb'
-        - Backend Optimizer for MXNet: 'docs/mxnet/mxnet_backend_optimizer.md'
-    - Hybrid engines:
-        - Hybrid engine overview: 'docs/hybrid_engine.md'
-        - ONNX Runtime:
-            - Overview: 'engines/onnxruntime/onnxruntime-engine/README.md'
-            - Load a ONNX Model: 'jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
-        - PaddlePaddle:
-            - Overview: 'engines/paddlepaddle/README.md'
-            - PaddlePaddle Engine: 'engines/paddlepaddle/paddlepaddle-engine/README.md'
-            - PaddlePaddle Model Zoo: 'engines/paddlepaddle/paddlepaddle-model-zoo/README.md'
-            - Import Paddle model:
-                - English: 'docs/paddlepaddle/how_to_create_paddlepaddle_model.md'
-                - 中文: 'docs/paddlepaddle/how_to_create_paddlepaddle_model_zh.md'
-            - Facemask detection using PaddlePaddle:
-                - English: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
-                - 中文: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle_zh.ipynb'
-            - PaddleOCR example:
-                - English: 'jupyter/paddlepaddle/paddle_ocr_java.ipynb'
-                - 中文: 'jupyter/paddlepaddle/paddle_ocr_java_zh.ipynb'
-        - XGBoost: 'engines/ml/xgboost/README.md'
-        - LightGBM: 'engines/ml/lightgbm/README.md'
-        - TensorRT: 'engines/tensorrt/README.md'
-        - TensorFlow Lite: 'engines/tflite/tflite-engine/README.md'
-        - Neo DLR: 'engines/dlr/dlr-engine/README.md'
+      - Overview: 'docs/engine.md'
+      - PyTorch:
+          - Overview: 'engines/pytorch/README.md'
+          - PyTorch Engine: 'engines/pytorch/pytorch-engine/README.md'
+          - PyTorch Model Zoo: 'engines/pytorch/pytorch-model-zoo/README.md'
+          - Import PyTorch Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
+          - Load a PyTorch Model: 'jupyter/load_pytorch_model.ipynb'
+      - TensorFlow:
+          - Overview: 'engines/tensorflow/README.md'
+          - TensorFlow Engine: 'engines/tensorflow/tensorflow-engine/README.md'
+          - TensorFlow Model Zoo: 'engines/tensorflow/tensorflow-model-zoo/README.md'
+          - Import TensorFlow Model: 'docs/tensorflow/how_to_import_tensorflow_models_in_DJL.md'
+          - Load a TensorFlow Model: 'jupyter/tensorflow/pneumonia_detection.ipynb'
+      - Apache MXNet:
+          - Overview: 'engines/mxnet/README.md'
+          - MXNet Engine: 'engines/mxnet/mxnet-engine/README.md'
+          - MXNet Model Zoo: 'engines/mxnet/mxnet-model-zoo/README.md'
+          - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
+          - Load a MXNet Model: 'jupyter/load_mxnet_model.ipynb'
+          - Backend Optimizer for MXNet: 'docs/mxnet/mxnet_backend_optimizer.md'
+      - Hybrid engines:
+          - Hybrid engine overview: 'docs/hybrid_engine.md'
+          - ONNX Runtime:
+              - Overview: 'engines/onnxruntime/onnxruntime-engine/README.md'
+              - Load a ONNX Model: 'jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
+          - PaddlePaddle:
+              - Overview: 'engines/paddlepaddle/README.md'
+              - PaddlePaddle Engine: 'engines/paddlepaddle/paddlepaddle-engine/README.md'
+              - PaddlePaddle Model Zoo: 'engines/paddlepaddle/paddlepaddle-model-zoo/README.md'
+              - Import Paddle model:
+                  - English: 'docs/paddlepaddle/how_to_create_paddlepaddle_model.md'
+                  - 中文: 'docs/paddlepaddle/how_to_create_paddlepaddle_model_zh.md'
+              - Facemask detection using PaddlePaddle:
+                  - English: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
+                  - 中文: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle_zh.ipynb'
+              - PaddleOCR example:
+                  - English: 'jupyter/paddlepaddle/paddle_ocr_java.ipynb'
+                  - 中文: 'jupyter/paddlepaddle/paddle_ocr_java_zh.ipynb'
+          - XGBoost: 'engines/ml/xgboost/README.md'
+          - LightGBM: 'engines/ml/lightgbm/README.md'
+          - TensorRT: 'engines/tensorrt/README.md'
+          - TensorFlow Lite: 'engines/tflite/tflite-engine/README.md'
+          - Neo DLR: 'engines/dlr/dlr-engine/README.md'
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
+      - Audio: 'extensions/audio/README.md'
       - fastText: 'extensions/fasttext/README.md'
       - Hadoop support: 'extensions/hadoop/README.md'
       - Huggingface Tokenizers: 'extensions/tokenizers/README.md'
       - OpenCV: 'extensions/opencv/README.md'
       - SentencePiece: 'extensions/sentencepiece/README.md'
+      - Spark support: 'extensions/spark/README.md'
       - Tablesaw: 'extensions/tablesaw/README.md'
+      - TimeSeries: 'extensions/timeseries/README.md'
       - DJL Zero: 'djl-zero/README.md'
       - DJL Benchmark: 'docs/serving/benchmark/README.md'
   - DJL Serving:

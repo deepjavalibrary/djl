@@ -17,8 +17,8 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDArray;
@@ -31,7 +31,6 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
-import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
@@ -57,7 +56,7 @@ public class ResnetTest {
     public void testTrain() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Engine.getInstance().getDevices(2))
+                        .optDevices(TestUtils.getDevices(2))
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block resNet50 =
@@ -66,7 +65,7 @@ public class ResnetTest {
                         .setNumLayers(50)
                         .setOutSize(10)
                         .build();
-        try (Model model = Model.newInstance("resnet")) {
+        try (Model model = Model.newInstance("resnet", TestUtils.getEngine())) {
             model.setBlock(resNet50);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = 1;
@@ -107,7 +106,7 @@ public class ResnetTest {
     public void testWithIntermediate() throws TranslateException {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Engine.getInstance().getDevices(2))
+                        .optDevices(TestUtils.getDevices(2))
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block resNet50 =
@@ -118,7 +117,7 @@ public class ResnetTest {
                         .build()
                         .setReturnIntermediate(true);
 
-        try (Model model = Model.newInstance("resnet")) {
+        try (Model model = Model.newInstance("resnet", TestUtils.getEngine())) {
             model.setBlock(resNet50);
             int batchSize = 1;
             Shape inputShape = new Shape(batchSize, 1, 28, 28);
@@ -157,7 +156,7 @@ public class ResnetTest {
         try (ZooModel<Image, Classifications> model = getModel()) {
             TrainingConfig config =
                     new DefaultTrainingConfig(Loss.l1Loss())
-                            .optDevices(Engine.getInstance().getDevices(2))
+                            .optDevices(TestUtils.getDevices(2))
                             .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = 2;
@@ -187,7 +186,7 @@ public class ResnetTest {
 
     private ZooModel<Image, Classifications> getModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        TestRequirements.engine("MXNet"); // Resnet50-cifar10 model only available in MXNet
+        TestUtils.requiresEngine("MXNet"); // Resnet50-cifar10 model only available in MXNet
 
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()

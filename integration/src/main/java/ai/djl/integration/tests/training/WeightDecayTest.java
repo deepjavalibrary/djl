@@ -12,6 +12,7 @@
  */
 package ai.djl.integration.tests.training;
 
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -27,7 +28,7 @@ public class WeightDecayTest {
 
     @Test
     public void l1DecayTest() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray parameters1 = manager.create(new float[] {-1, -2, 3, 4, 5}); // 15
             NDArray parameters2 = manager.create(new float[] {-1, -1, -1, -1, -1}); // 5
             // Not used
@@ -43,7 +44,7 @@ public class WeightDecayTest {
 
     @Test
     public void l2DecayTest() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray parameters1 = manager.create(new float[] {-1, -2, 3, 4, 5}); // 55
             NDArray parameters2 = manager.create(new float[] {-1, -1, -1, -1, -1}); // 5
             // Not used
@@ -59,7 +60,7 @@ public class WeightDecayTest {
 
     @Test
     public void elasticNetDecayTest() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray parameters1 = manager.create(new float[] {-1, -2, 3, 4, 5});
             NDArray parameters2 = manager.create(new float[] {-1, -1, -1, -1, -1});
             // Not used

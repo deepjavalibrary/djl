@@ -15,8 +15,8 @@ package ai.djl.integration.tests.model_zoo;
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.Classifications.Classification;
 import ai.djl.modality.Input;
@@ -31,7 +31,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.util.JsonUtils;
@@ -66,7 +65,7 @@ public class CustomTranslatorTest {
 
     @BeforeClass
     public void setup() throws IOException, ModelNotFoundException, MalformedModelException {
-        if (!"MXNet".equals(Engine.getDefaultEngineName())) {
+        if (!"MXNet".equals(TestUtils.getEngine())) {
             return; // do not throw exception here
         }
 
@@ -76,6 +75,7 @@ public class CustomTranslatorTest {
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
                         .optArtifactId("ai.djl.mxnet:mlp")
+                        .optEngine(TestUtils.getEngine())
                         .build();
 
         try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
@@ -109,7 +109,7 @@ public class CustomTranslatorTest {
     @Test
     public void testImageClassificationTranslator()
             throws IOException, ModelException, TranslateException {
-        TestRequirements.engine("MXNet");
+        TestUtils.requiresEngine("MXNet");
 
         // load RawTranslator
         runRawTranslator();
@@ -159,12 +159,13 @@ public class CustomTranslatorTest {
 
     @Test
     public void testSsdTranslator() throws IOException, ModelException, TranslateException {
-        TestRequirements.engine("MXNet");
+        TestUtils.requiresEngine("MXNet");
 
         Criteria<Image, DetectedObjects> c =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)
                         .optArtifactId("ai.djl.mxnet:ssd")
+                        .optEngine(TestUtils.getEngine())
                         .build();
         String modelUrl;
         try (ZooModel<Image, DetectedObjects> model = c.loadModel()) {
@@ -184,6 +185,7 @@ public class CustomTranslatorTest {
                                 "translatorFactory",
                                 "ai.djl.modality.cv.translator.SingleShotDetectionTranslatorFactory")
                         .optModelName("ssd_512_resnet50_v1_voc")
+                        .optEngine(TestUtils.getEngine())
                         .build();
 
         Path imageFile = Paths.get("../examples/src/test/resources/dog_bike_car.jpg");
@@ -214,6 +216,7 @@ public class CustomTranslatorTest {
                         .optApplication(application)
                         .optArguments(arguments)
                         .optModelPath(modelDir)
+                        .optEngine(TestUtils.getEngine())
                         .build();
 
         try (ZooModel<Input, Output> model = criteria.loadModel();
@@ -232,11 +235,12 @@ public class CustomTranslatorTest {
         }
     }
 
-    public void runRawTranslator() throws IOException, ModelException, TranslateException {
+    private void runRawTranslator() throws IOException, ModelException, TranslateException {
         Criteria<Input, Output> criteria =
                 Criteria.builder()
                         .setTypes(Input.class, Output.class)
                         .optModelPath(modelDir)
+                        .optEngine(TestUtils.getEngine())
                         .build();
 
         try (ZooModel<Input, Output> model = criteria.loadModel();

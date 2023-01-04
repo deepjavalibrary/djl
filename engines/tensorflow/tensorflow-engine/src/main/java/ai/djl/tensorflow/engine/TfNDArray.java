@@ -311,7 +311,7 @@ public class TfNDArray extends NativeResourceImpl<TFE_TensorHandle> implements N
     /** {@inheritDoc} */
     @Override
     public boolean contentEquals(Number number) {
-        if (number == null) {
+        if (number == null || getDataType().isBoolean()) {
             return false;
         }
         try (NDArray result = eq(number)) {

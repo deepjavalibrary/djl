@@ -82,6 +82,9 @@ public class PpNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public DataType getDataType() {
+        if (isClosed) {
+            throw new IllegalStateException("Native resource has been release already.");
+        }
         if (dataType == null) {
             dataType = JniUtils.getDTypeFromNd(this);
         }

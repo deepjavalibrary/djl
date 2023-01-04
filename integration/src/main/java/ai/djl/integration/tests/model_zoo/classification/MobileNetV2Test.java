@@ -15,7 +15,7 @@ package ai.djl.integration.tests.model_zoo.classification;
 
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.classification.MobileNetV2;
-import ai.djl.engine.Engine;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -36,14 +36,15 @@ import ai.djl.util.PairList;
 import org.testng.annotations.Test;
 
 public class MobileNetV2Test {
+
     @Test
     public void testTrain() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Engine.getInstance().getDevices(2))
+                        .optDevices(TestUtils.getDevices(2))
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
         Block mobilenet = MobileNetV2.builder().setOutSize(10).build();
-        try (Model model = Model.newInstance("mobilenet")) {
+        try (Model model = Model.newInstance("mobilenet", TestUtils.getEngine())) {
             model.setBlock(mobilenet);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = 1;

@@ -118,22 +118,14 @@ public class SpTokenizerTest {
     }
 
     @Test
-    public void testModelNotFound() throws IOException {
+    public void testModelNotFound() {
         TestRequirements.notWindows();
 
-        Assert.assertThrows(
-                () -> {
-                    new SpTokenizer(Paths.get("build/test/non-exists"));
-                });
+        Assert.assertThrows(() -> new SpTokenizer(Paths.get("build/test/non-exists")));
 
         Assert.assertThrows(
-                () -> {
-                    new SpTokenizer(Paths.get("build/test/sp_model"), "non-exists.model");
-                });
+                () -> new SpTokenizer(Paths.get("build/test/sp_model"), "non-exists.model"));
 
-        Assert.assertThrows(
-                () -> {
-                    new SpTokenizer(Paths.get("build/test/sp_model"), "non-exists");
-                });
+        Assert.assertThrows(() -> new SpTokenizer(Paths.get("build/test/sp_model"), "non-exists"));
     }
 }
