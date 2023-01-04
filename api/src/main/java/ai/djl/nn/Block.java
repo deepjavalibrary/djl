@@ -95,9 +95,9 @@ import java.util.function.Predicate;
  * ai.djl.ndarray.NDArray} that are initialized according to the {@link Initializer} set. At this
  * stage, the block is expecting a specific type of input, and is ready to be trained.
  *
- * <p>Training is when we are starting feeding the training data as input to the block, get the output,
- * and try to update parameters to learn. For more information about training, please refer the
- * javadoc at {@link ai.djl.training.Trainer}. At the end of training, a block represents a
+ * <p>Training is when we are starting feeding the training data as input to the block, get the
+ * output, and try to update parameters to learn. For more information about training, please refer
+ * the javadoc at {@link ai.djl.training.Trainer}. At the end of training, a block represents a
  * fully-trained model.
  *
  * @see <a
