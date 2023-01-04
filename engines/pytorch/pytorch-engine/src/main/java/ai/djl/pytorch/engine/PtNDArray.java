@@ -785,4 +785,27 @@ public interface PtNDArray extends NativeResource<Long>, NDArray {
     /** {@inheritDoc} */
     @Override
     void close();
+
+    /**
+     * Returns the number of {@code NDArray} in the map used for garbage collection triggered
+     * closing.
+     *
+     * @return number of {@code NDArray} in the map used for garbage collection triggered closing
+     */
+    int getNumOfNDArraysInGCMap();
+
+    /**
+     * Returns the number of {@code NDArray} in the hierarchy of {@code NDManager}.
+     *
+     * @return number of {@code NDArray} in the hierarchy of {@code NDManager}
+     */
+    int getNumOfNDArraysInNDManagerHierarchy();
+
+    /**
+     * Returns the raw implementation of this interface. This could be useful for debugging if the
+     * interface is implemented by a proxy.
+     *
+     * @return the raw implementation of this interface
+     */
+    PtNDArrayImpl getImplementation();
 }

@@ -18,12 +18,14 @@ import ai.djl.ndarray.gc.NDArrayProxyMaker;
 import ai.djl.ndarray.gc.WeakHashMapWrapper;
 
 import java.lang.reflect.Proxy;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 /** {@code PtNDArrayProxyMaker} creates a proxy facade. */
 public class PtNDArrayProxyMaker implements NDArrayProxyMaker {
 
-    WeakHashMapWrapper<UUID, NDArray> map = new WeakHashMapWrapper<>();
+    WeakHashMapWrapper<String, NDArray> map = new WeakHashMapWrapper<>();
+
+    AtomicLong counter = new AtomicLong(0);
 
     /** {@inheritDoc} */
     @Override
@@ -39,9 +41,9 @@ public class PtNDArrayProxyMaker implements NDArrayProxyMaker {
      */
     @Override
     public PtNDArray wrap(NDArray array) {
-        UUID uuid = UUID.randomUUID();
-        map.put(uuid, array);
-        DynamicInvocationHandler handler = new DynamicInvocationHandler(uuid, map, this);
+        String uid = array.getUid() + "-" + counter.incrementAndGet();
+        map.put(uid, array);
+        DynamicInvocationHandler handler = new DynamicInvocationHandler(uid, map, this);
         return (PtNDArray)
                 Proxy.newProxyInstance(
                         Thread.currentThread().getContextClassLoader(),

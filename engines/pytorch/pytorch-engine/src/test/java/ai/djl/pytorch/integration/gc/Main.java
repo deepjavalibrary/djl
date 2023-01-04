@@ -17,6 +17,7 @@ import static ai.djl.pytorch.engine.PtNDManager.debugDumpFromSystemManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.gc.SwitchGarbageCollection;
+import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.translate.TranslateException;
 
 import org.slf4j.Logger;
@@ -40,7 +41,14 @@ public final class Main {
 
                 NDArray a = subManager.create(new float[] {1f});
                 NDArray b = subManager.create(new float[] {2f});
-                NDArray c = a.add(b);
+                PtNDArray c = (PtNDArray) a.add(b);
+                logger.info(
+                        "number of NDArrays in NDManager hierarchy {}",
+                        c.getNumOfNDArraysInNDManagerHierarchy());
+                logger.info(
+                        "number of NDArrays in map used of gc triggered NDArray closing {}",
+                        c.getNumOfNDArraysInGCMap());
+
                 debugDumpFromSystemManager(true);
 
                 logger.info("reference exists ...");

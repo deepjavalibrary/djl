@@ -1591,6 +1591,24 @@ public final class PtNDArrayImpl extends NativeResourceImpl<Long> implements PtN
         dataRef = null;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public int getNumOfNDArraysInGCMap() {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getNumOfNDArraysInNDManagerHierarchy() {
+        return PtNDManager.debugCountNDArraysFromSystemManager();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PtNDArrayImpl getImplementation() {
+        return this;
+    }
+
     /**
      * Constructs a PyTorch {@code NDArray} from a native handle (internal. Use {@link NDManager}
      * instead). Depending on the switch {@code useGarbageCollection}, the returned {@code NDArray}

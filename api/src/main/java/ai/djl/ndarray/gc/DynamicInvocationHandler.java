@@ -20,29 +20,30 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.UUID;
 
 /** {@code DynamicInvocationHandler} implements the {@link InvocationHandler}. */
 public class DynamicInvocationHandler implements InvocationHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicInvocationHandler.class);
 
-    WeakHashMapWrapper<UUID, NDArray> map;
-    UUID uuid;
+    WeakHashMapWrapper<String, NDArray> map;
+    String uid;
 
     NDArrayProxyMaker ndArrayProxyMaker;
 
     /**
      * Creates a new instance of {@code DynamicInvocationHandler}.
      *
-     * @param uuid the uuid
+     * @param uid the uid
      * @param map the map
      * @param ndArrayProxyMaker the ndArrayProxyMaker
      */
     public DynamicInvocationHandler(
-            UUID uuid, WeakHashMapWrapper<UUID, NDArray> map, NDArrayProxyMaker ndArrayProxyMaker) {
+            String uid,
+            WeakHashMapWrapper<String, NDArray> map,
+            NDArrayProxyMaker ndArrayProxyMaker) {
         this.map = map;
-        this.uuid = uuid;
+        this.uid = uid;
         this.ndArrayProxyMaker = ndArrayProxyMaker;
     }
 
@@ -50,9 +51,15 @@ public class DynamicInvocationHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
 
+        if ("getNumOfNDArraysInGCMap".equals(method.getName())) {
+            return this.map.size();
+        }
+        if ("getImplementation".equals(method.getName())) {
+            return map.get(uid);
+        }
         Object result;
         try {
-            result = method.invoke(map.get(uuid), args);
+            result = method.invoke(map.get(uid), args);
         } catch (IllegalAccessException | InvocationTargetException e) {
             logger.error("Error invoking method", e);
             throw new RuntimeException(e); // NOPMD

@@ -33,4 +33,8 @@
         <Bug pattern="URF_UNREAD_FIELD"/>
         <Class name="~ai\.djl\.pytorch\.engine\.PtNDArrayImpl"/>
     </Match>
+    <Match>
+        <Bug pattern="DM_STRING_CTOR"/>
+        <Class name="~ai\.djl\.pytorch\.engine\.PtNDArrayProxyMaker"/>
+    </Match>
 </FindBugsFilter>

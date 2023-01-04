@@ -213,6 +213,15 @@ public class PtNDManager extends BaseNDManager {
         }
     }
 
+    /**
+     * Returns the number of {@link NDArray} in the hierarchy of the {@link SystemNDManager}.
+     *
+     * @return return the number of {@link NDArray} in the hierarchy of the {@link SystemNDManager}
+     */
+    public static int debugCountNDArraysFromSystemManager() {
+        return ((BaseNDManager) PtNDManager.getSystemManager()).debugCountNDArrays();
+    }
+
     /** The SystemManager is the root {@link PtNDManager} of which all others are children. */
     private static final class SystemManager extends PtNDManager implements SystemNDManager {
 

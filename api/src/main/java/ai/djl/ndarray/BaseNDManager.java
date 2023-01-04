@@ -532,6 +532,25 @@ public abstract class BaseNDManager implements NDManager {
         }
     }
 
+    /**
+     * Returns the number of {@link NDArray} in the hierarchy of this {@link NDManager}.
+     *
+     * @return return the number of {@link NDArray} in the hierarchy of this {@link NDManager}
+     */
+    public int debugCountNDArrays() {
+        int count = 0;
+        for (AutoCloseable c : resources.values()) {
+            if (c instanceof BaseNDManager) {
+                count += ((BaseNDManager) c).debugCountNDArrays();
+            } else if (c instanceof NDArray) {
+                count++;
+            } else if (c instanceof NDList) {
+                count += ((NDList) c).size();
+            }
+        }
+        return count;
+    }
+
     NDManager getAlternativeManager() {
         return alternativeManager;
     }
