@@ -61,7 +61,7 @@ import java.util.function.Predicate;
  * <p>We provide helpers for creating two common structures of blocks. For blocks that call children
  * in a chain, use {@link SequentialBlock}. If a blocks calls all of the children in parallel and
  * then combines their results, use {@link ParallelBlock}. For blocks that do not fit these
- * strcutures, you should directly extend the {@link AbstractBlock} class.
+ * structures, you should directly extend the {@link AbstractBlock} class.
  *
  * <p>A block does not necessarily have to have children and parameters. For example, {@link
  * SequentialBlock}, and {@link ParallelBlock} don't have any parameters, but do have child blocks.
@@ -95,7 +95,7 @@ import java.util.function.Predicate;
  * ai.djl.ndarray.NDArray} that are initialized according to the {@link Initializer} set. At this
  * stage, the block is expecting a specific type of input, and is ready to be trained.
  *
- * <p>Training is when we starting feeding the training data as input to the block, get the output,
+ * <p>Training is when we are starting feeding the training data as input to the block, get the output,
  * and try to update parameters to learn. For more information about training, please refer the
  * javadoc at {@link ai.djl.training.Trainer}. At the end of training, a block represents a
  * fully-trained model.

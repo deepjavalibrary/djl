@@ -131,7 +131,7 @@ public abstract class AbstractBlock extends AbstractBaseBlock {
     }
 
     /**
-     * Adds a parameter to this block. If parameters are added with this method, intialization of
+     * Adds a parameter to this block. If parameters are added with this method, initialization of
      * the parameter works out of the box
      *
      * @param <P> the specific parameter subclass
