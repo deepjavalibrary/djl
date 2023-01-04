@@ -70,7 +70,6 @@ nav:
           - BERT with MXNet: 'jupyter/mxnet/load_your_own_mxnet_bert.ipynb'
           - BERT with PyTorch: 'jupyter/pytorch/load_your_own_pytorch_bert.ipynb'
   - Guides:
-      - 'docs/engine.md'
       - Models:
           - 'docs/load_model.md'
           - 'docs/model-zoo.md'
@@ -137,12 +136,15 @@ nav:
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'
+      - Audio: 'extensions/audio/README.md'
       - fastText: 'extensions/fasttext/README.md'
       - Hadoop support: 'extensions/hadoop/README.md'
       - Huggingface Tokenizers: 'extensions/tokenizers/README.md'
       - OpenCV: 'extensions/opencv/README.md'
       - SentencePiece: 'extensions/sentencepiece/README.md'
+      - Spark support: 'extensions/spark/README.md'
       - Tablesaw: 'extensions/tablesaw/README.md'
+      - TimeSeries: 'extensions/timeseries/README.md'
       - DJL Zero: 'djl-zero/README.md'
       - DJL Benchmark: 'docs/serving/benchmark/README.md'
   - DJL Serving:
