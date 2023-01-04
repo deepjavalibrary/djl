@@ -39,8 +39,8 @@ public class MxNDArrayIndexer extends NDArrayIndexer {
         params.addParam("axis", fullPick.getAxis());
         params.addParam("keepdims", true);
         params.add("mode", "wrap");
-        return manager.invoke("pick", new NDList(array, fullPick.getIndices()), params)
-                .singletonOrThrow();
+        NDList pick = new NDList(array, manager.from(fullPick.getIndices()));
+        return manager.invoke("pick", pick, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */
@@ -50,8 +50,8 @@ public class MxNDArrayIndexer extends NDArrayIndexer {
         MxOpParams params = new MxOpParams();
         params.addParam("axis", fullTake.getAxis());
         params.add("mode", "wrap");
-        return manager.invoke("take", new NDList(array, fullTake.getIndices()), params)
-                .singletonOrThrow();
+        NDList pick = new NDList(array, manager.from(fullTake.getIndices()));
+        return manager.invoke("take", pick, params).singletonOrThrow();
     }
 
     /** {@inheritDoc} */

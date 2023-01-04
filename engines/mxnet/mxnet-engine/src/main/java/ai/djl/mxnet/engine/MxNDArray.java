@@ -399,8 +399,8 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         params.add("value", value);
         params.add("use_sequence_length", true);
         params.add("axis", 1);
-        return manager.invoke("_npx_sequence_mask", new NDList(this, sequenceLength), params)
-                .head();
+        NDList mask = new NDList(this, manager.from(sequenceLength));
+        return manager.invoke("_npx_sequence_mask", mask, params).head();
     }
 
     /** {@inheritDoc} */
@@ -430,6 +430,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         if (getDataType() != other.getDataType()) {
             return false;
         }
+        other = manager.from(other);
         try (NDArray result = eq(other).toType(DataType.INT32, false)) {
             return result.all().getBoolean();
         }
@@ -446,6 +447,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray eq(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_equal", new NDArray[] {this, other}, null);
     }
 
@@ -460,6 +462,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray neq(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_not_equal", new NDArray[] {this, other}, null);
     }
 
@@ -474,6 +477,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gt(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_greater", new NDArray[] {this, other}, null);
     }
 
@@ -488,6 +492,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray gte(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_greater_equal", new NDArray[] {this, other}, null);
     }
 
@@ -502,6 +507,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lt(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_less", new NDArray[] {this, other}, null);
     }
 
@@ -516,6 +522,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray lte(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_less_equal", new NDArray[] {this, other}, null);
     }
 
@@ -530,6 +537,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray add(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_add", new NDArray[] {this, other}, null);
     }
 
@@ -544,6 +552,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray sub(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_subtract", new NDArray[] {this, other}, null);
     }
 
@@ -558,6 +567,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mul(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_multiply", new NDArray[] {this, other}, null);
     }
 
@@ -592,6 +602,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray div(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_true_divide", new NDArray[] {this, other}, null);
     }
 
@@ -606,6 +617,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray mod(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_mod", new NDArray[] {this, other}, null);
     }
 
@@ -620,6 +632,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray pow(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_power", new NDArray[] {this, other}, null);
     }
 
@@ -635,6 +648,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray addi(NDArray other) {
+        other = manager.from(other);
         manager.invoke("_npi_add", new NDArray[] {this, other}, new NDArray[] {this}, null);
         return this;
     }
@@ -651,6 +665,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray subi(NDArray other) {
+        other = manager.from(other);
         manager.invoke("_npi_subtract", new NDArray[] {this, other}, new NDArray[] {this}, null);
         return this;
     }
@@ -667,6 +682,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray muli(NDArray other) {
+        other = manager.from(other);
         manager.invoke("_npi_multiply", new NDArray[] {this, other}, new NDArray[] {this}, null);
         return this;
     }
@@ -684,6 +700,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray divi(NDArray other) {
+        other = manager.from(other);
         manager.invoke("_npi_true_divide", new NDArray[] {this, other}, new NDArray[] {this}, null);
         return this;
     }
@@ -700,6 +717,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray modi(NDArray other) {
+        other = manager.from(other);
         manager.invoke("_npi_mod", new NDArray[] {this, other}, new NDArray[] {this}, null);
         return this;
     }
@@ -716,6 +734,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray powi(NDArray other) {
+        other = manager.from(other);
         manager.invoke("_npi_power", new NDArray[] {this, other}, new NDArray[] {this}, null);
         return this;
     }
@@ -919,6 +938,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray maximum(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_maximum", new NDArray[] {this, other}, null);
     }
 
@@ -933,6 +953,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray minimum(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npi_minimum", new NDArray[] {this, other}, null);
     }
 
@@ -1148,6 +1169,9 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray squeeze(int[] axes) {
+        if (axes.length == 0) {
+            return squeeze();
+        }
         MxOpParams params = new MxOpParams();
         params.addTupleParam("axis", axes);
         return manager.invoke("_np_squeeze", this, params);
@@ -1163,6 +1187,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
                 (other.getDataType() == DataType.BOOLEAN)
                         ? other.toType(DataType.INT32, false)
                         : other;
+        other = manager.from(other);
         return manager.invoke("broadcast_logical_and", new NDArray[] {thisArr, other}, null)
                 .toType(DataType.BOOLEAN, false);
     }
@@ -1177,6 +1202,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
                 (other.getDataType() == DataType.BOOLEAN)
                         ? other.toType(DataType.INT32, false)
                         : other;
+        other = manager.from(other);
         return manager.invoke("broadcast_logical_or", new NDArray[] {thisArr, other}, null)
                 .toType(DataType.BOOLEAN, false);
     }
@@ -1191,6 +1217,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
                 (other.getDataType() == DataType.BOOLEAN)
                         ? other.toType(DataType.INT32, false)
                         : other;
+        other = manager.from(other);
         return manager.invoke("broadcast_logical_xor", new NDArray[] {thisArr, other}, null)
                 .toType(DataType.BOOLEAN, false);
     }
@@ -1396,6 +1423,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray dot(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_np_dot", new NDArray[] {this, other}, null);
     }
 
@@ -1405,6 +1433,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         if (isScalar() || other.isScalar()) {
             throw new IllegalArgumentException("scalar is not allowed for matMul()");
         }
+        other = manager.from(other);
         return manager.invoke("_npi_matmul", new NDArray[] {this, other}, null);
     }
 
@@ -1572,6 +1601,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray batchDot(NDArray other) {
+        other = manager.from(other);
         return manager.invoke("_npx_batch_dot", new NDArray[] {this, other}, null);
     }
 
@@ -1639,8 +1669,8 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MxNDArray) {
-            return contentEquals((MxNDArray) obj);
+        if (obj instanceof NDArray) {
+            return contentEquals((NDArray) obj);
         }
         return false;
     }

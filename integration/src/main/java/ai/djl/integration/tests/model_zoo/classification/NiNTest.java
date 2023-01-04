@@ -14,7 +14,7 @@ package ai.djl.integration.tests.model_zoo.classification;
 
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.cv.classification.NiN;
-import ai.djl.engine.Engine;
+import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -45,9 +45,9 @@ public class NiNTest {
     public void testTrainWithDefaultChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Engine.getInstance().getDevices(2));
+                        .optDevices(TestUtils.getDevices(2));
         Block nin = NiN.builder().build();
-        try (Model model = Model.newInstance("nin")) {
+        try (Model model = Model.newInstance("nin", TestUtils.getEngine())) {
             model.setBlock(nin);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = 1;
@@ -97,13 +97,13 @@ public class NiNTest {
     public void testTrainWithCustomChannels() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
-                        .optDevices(Engine.getInstance().getDevices(2));
+                        .optDevices(TestUtils.getDevices(2));
         Block nin =
                 NiN.builder()
                         .setDropOutRate(0.8f)
                         .setNumChannels(new int[] {48, 128, 384, 10})
                         .build();
-        try (Model model = Model.newInstance("nin")) {
+        try (Model model = Model.newInstance("nin", TestUtils.getEngine())) {
             model.setBlock(nin);
             try (Trainer trainer = model.newTrainer(config)) {
                 int batchSize = 1;
@@ -148,7 +148,7 @@ public class NiNTest {
 
     @Test
     public void testOutputShapes() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             int batchSize = 1;
             NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));
             Shape currentShape = x.getShape();
@@ -180,7 +180,7 @@ public class NiNTest {
 
     @Test
     public void testForwardMethod() {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             Block nin = NiN.builder().build();
             int batchSize = 1;
             NDArray x = manager.ones(new Shape(batchSize, 1, 224, 224));

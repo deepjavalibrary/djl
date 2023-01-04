@@ -45,7 +45,6 @@ import ai.djl.nn.recurrent.GRU;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.testing.Assertions;
-import ai.djl.testing.TestRequirements;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.Trainer;
@@ -76,7 +75,7 @@ public class BlockCoreTest {
 
         long outSize = 3;
         Block block = Linear.builder().setUnits(outSize).build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -96,7 +95,7 @@ public class BlockCoreTest {
         }
 
         block = Linear.builder().setUnits(outSize).optBias(false).build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -115,7 +114,7 @@ public class BlockCoreTest {
 
         outSize = 10;
         block = Linear.builder().setUnits(outSize).build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -139,7 +138,7 @@ public class BlockCoreTest {
 
         long outSize = 3;
         Block block = Linear.builder().setUnits(outSize).build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -162,7 +161,7 @@ public class BlockCoreTest {
         }
 
         block = Linear.builder().setUnits(outSize).optBias(false).build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -206,10 +205,10 @@ public class BlockCoreTest {
         NDArray expectedLabelsForLinearCollection;
         NDArray dataForLinearCollection;
 
-        try (NDManager sharedManager = NDManager.newBaseManager()) {
+        try (NDManager sharedManager = NDManager.newBaseManager(TestUtils.getEngine())) {
 
             // test expected output when using LinearCollection
-            try (Model model = Model.newInstance("model")) {
+            try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
                 Block block = LinearCollection.builder().setUnits(outSize).build();
                 model.setBlock(block);
 
@@ -248,7 +247,7 @@ public class BlockCoreTest {
 
             // test expected output can be reproduced by using splitSize-many Linear blocks
             for (int splitIndex : IntStream.range(0, splitSize).toArray()) {
-                try (Model model = Model.newInstance("model")) {
+                try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
                     Block block = Linear.builder().setUnits(outSize).build();
                     model.setBlock(block);
 
@@ -292,7 +291,7 @@ public class BlockCoreTest {
             }
 
             // test expected output when using multiple split axis
-            try (Model model = Model.newInstance("model")) {
+            try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
                 Block block = LinearCollection.builder().setUnits(outSize).build();
                 model.setBlock(block);
 
@@ -346,12 +345,12 @@ public class BlockCoreTest {
         // store sum on Multiplication block's result
         NDArray sum;
 
-        try (NDManager sharedManager = NDManager.newBaseManager()) {
+        try (NDManager sharedManager = NDManager.newBaseManager(TestUtils.getEngine())) {
 
             // test algebraic expectation of Multiplication block
             long outSize = 2;
             Block block = Multiplication.builder().setUnits(outSize).build();
-            try (Model model = Model.newInstance("model")) {
+            try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
                 model.setBlock(block);
 
                 TrainingConfig config =
@@ -378,7 +377,7 @@ public class BlockCoreTest {
 
             // test "sum" is equal to linear transformation without bias
             block = Linear.builder().setUnits(outSize).optBias(false).build();
-            try (Model model = Model.newInstance("model")) {
+            try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
                 model.setBlock(block);
 
                 TrainingConfig config =
@@ -408,7 +407,7 @@ public class BlockCoreTest {
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = BatchNorm.builder().build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -436,7 +435,7 @@ public class BlockCoreTest {
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = GhostBatchNorm.builder().build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -466,14 +465,14 @@ public class BlockCoreTest {
     @SuppressWarnings("try")
     @Test
     public void testLayerNorm() throws IOException, MalformedModelException {
-        TestRequirements.engine("PyTorch", "MXNet");
+        TestUtils.requiresEngine("PyTorch", "MXNet");
 
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = LayerNorm.builder().build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -495,14 +494,14 @@ public class BlockCoreTest {
     @SuppressWarnings("try")
     @Test
     public void test2LayerNorm() throws IOException, MalformedModelException {
-        TestRequirements.engine("PyTorch", "MXNet");
+        TestUtils.requiresEngine("PyTorch", "MXNet");
 
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = LayerNorm.builder().axis(2, 3).build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -529,7 +528,7 @@ public class BlockCoreTest {
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = Dropout.builder().optRate(.5f).build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -564,7 +563,7 @@ public class BlockCoreTest {
                                         .build())
                         .setEmbeddingSize(2)
                         .build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -596,7 +595,7 @@ public class BlockCoreTest {
         Block block =
                 Conv1d.builder().setKernelShape(new Shape(2)).setFilters(1).optBias(false).build();
 
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -633,7 +632,7 @@ public class BlockCoreTest {
                         .optBias(false)
                         .build();
 
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -662,7 +661,7 @@ public class BlockCoreTest {
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = Conv2d.builder().setKernelShape(new Shape(2, 2)).setFilters(1).build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -695,7 +694,7 @@ public class BlockCoreTest {
 
         Block block =
                 Conv2dTranspose.builder().setKernelShape(new Shape(2, 2)).setFilters(1).build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -732,7 +731,7 @@ public class BlockCoreTest {
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
         Block block = Conv3d.builder().setKernelShape(new Shape(2, 2, 2)).setFilters(1).build();
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -770,7 +769,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
-                        .optDevices(TestUtils.getDevices());
+                        .optDevices(TestUtils.getDevices(Integer.MAX_VALUE));
         Block block =
                 RNN.builder()
                         .setStateSize(4)
@@ -779,14 +778,15 @@ public class BlockCoreTest {
                         .optBatchFirst(true)
                         .optReturnState(true)
                         .build();
-        try (Model model = Model.newInstance("model", config.getDevices()[0])) {
+        try (Model model =
+                Model.newInstance("model", config.getDevices()[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 // the unused GradientCollector is for BatchNorm to know it is on training mode
                 try (GradientCollector collector = trainer.newGradientCollector()) {
                     Shape inputShape = new Shape(1, 2, 4);
-                    Engine.getInstance().setRandomSeed(1234);
+                    Engine.getEngine(TestUtils.getEngine()).setRandomSeed(1234);
                     trainer.initialize(inputShape);
                     NDManager manager = trainer.getManager();
                     NDArray data =
@@ -817,7 +817,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
-                        .optDevices(TestUtils.getDevices());
+                        .optDevices(TestUtils.getDevices(Integer.MAX_VALUE));
         Block block =
                 RNN.builder()
                         .setStateSize(4)
@@ -826,14 +826,15 @@ public class BlockCoreTest {
                         .optBatchFirst(true)
                         .optReturnState(true)
                         .build();
-        try (Model model = Model.newInstance("model", config.getDevices()[0])) {
+        try (Model model =
+                Model.newInstance("model", config.getDevices()[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 // the unused GradientCollector is for BatchNorm to know it is on training mode
                 try (GradientCollector collector = trainer.newGradientCollector()) {
                     Shape inputShape = new Shape(1, 2, 4);
-                    Engine.getInstance().setRandomSeed(1234);
+                    Engine.getEngine(TestUtils.getEngine()).setRandomSeed(1234);
                     trainer.initialize(inputShape);
                     NDManager manager = trainer.getManager();
                     NDArray data =
@@ -867,7 +868,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
-                        .optDevices(TestUtils.getDevices());
+                        .optDevices(TestUtils.getDevices(Integer.MAX_VALUE));
         Block block =
                 LSTM.builder()
                         .setStateSize(4)
@@ -875,14 +876,15 @@ public class BlockCoreTest {
                         .optBatchFirst(true)
                         .optReturnState(true)
                         .build();
-        try (Model model = Model.newInstance("model", config.getDevices()[0])) {
+        try (Model model =
+                Model.newInstance("model", config.getDevices()[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 // the unused GradientCollector is for BatchNorm to know it is on training mode
                 try (GradientCollector collector = trainer.newGradientCollector()) {
                     Shape inputShape = new Shape(1, 2, 4);
-                    Engine.getInstance().setRandomSeed(1234);
+                    Engine.getEngine(TestUtils.getEngine()).setRandomSeed(1234);
                     trainer.initialize(inputShape);
                     NDManager manager = trainer.getManager();
                     NDArray data =
@@ -917,7 +919,7 @@ public class BlockCoreTest {
         TrainingConfig config =
                 new DefaultTrainingConfig(loss)
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
-                        .optDevices(TestUtils.getDevices());
+                        .optDevices(TestUtils.getDevices(Integer.MAX_VALUE));
         GRU block =
                 GRU.builder()
                         .setStateSize(4)
@@ -925,14 +927,15 @@ public class BlockCoreTest {
                         .optBatchFirst(true)
                         .optReturnState(false)
                         .build();
-        try (Model model = Model.newInstance("model", config.getDevices()[0])) {
+        try (Model model =
+                Model.newInstance("model", config.getDevices()[0], TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
                 // the unused GradientCollector is for BatchNorm to know it is on training mode
                 try (GradientCollector collector = trainer.newGradientCollector()) {
                     Shape inputShape = new Shape(1, 2, 4);
-                    Engine.getInstance().setRandomSeed(1234);
+                    Engine.getEngine(TestUtils.getEngine()).setRandomSeed(1234);
                     trainer.initialize(inputShape);
                     NDManager manager = trainer.getManager();
                     NDArray data =
@@ -990,7 +993,7 @@ public class BlockCoreTest {
         block.removeLastBlock();
         Assert.assertEquals(block.getChildren().size(), 4);
 
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -1027,7 +1030,7 @@ public class BlockCoreTest {
         Assert.assertEquals(block.getDirectParameters().size(), 0);
         Assert.assertEquals(block.getParameters().size(), 4);
 
-        try (Model model = Model.newInstance("model")) {
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
