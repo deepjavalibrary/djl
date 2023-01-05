@@ -26,16 +26,18 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 
 public class AudioProcessorTest {
 
-    private static final String URL = "https://resources.djl.ai/audios/test_01.wav";
+    private static final String URL = "https://resources.djl.ai/audios/";
 
     @BeforeClass
     public void setUp() throws IOException {
-        DownloadUtils.download(URL, "build/test/test_01.wav");
+        DownloadUtils.download(URL + "test_01.wav", "build/test/test_01.wav");
+        DownloadUtils.download(URL + "mel_80_filters.npz", "build/test/mel_80_filters.npz");
     }
 
     @Test
@@ -48,6 +50,30 @@ public class AudioProcessorTest {
         testData.setAudioPaths(Collections.singletonList("build/test/test_01.wav"));
         NDArray samples = testData.getPreprocessedData(manager, 0);
         Assert.assertEquals(AudioUtils.rmsDb(samples), -20.0f, 1e-3);
+    }
+
+    @Test
+    public void testPadOrTrim() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            AudioProcessor processor = new PadOrTrim(100);
+            NDArray test = manager.ones(new Shape(10));
+            NDArray result = processor.extractFeatures(manager, test);
+            Assert.assertEquals(result.getShape(), new Shape(100));
+            test = manager.ones(new Shape(1000));
+            result = processor.extractFeatures(manager, test);
+            Assert.assertEquals(result.getShape(), new Shape(100));
+        }
+    }
+
+    @Test
+    void testLogMelSpectrogram() throws IOException {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            AudioProcessor processor =
+                    new LogMelSpectrogram(Paths.get("build/test/mel_80_filters.npz"), 80, manager);
+            NDArray samples = manager.zeros(new Shape(480000));
+            NDArray result = processor.extractFeatures(manager, samples);
+            Assert.assertEquals(result.getShape(), new Shape(80, 3000));
+        }
     }
 
     @Test

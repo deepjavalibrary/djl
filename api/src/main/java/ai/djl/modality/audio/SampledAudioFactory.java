@@ -37,6 +37,19 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public class SampledAudioFactory extends AudioFactory {
 
+    /**
+     * Simple Audio Factory implementation.
+     *
+     * @param configuration configuration to pass
+     */
+    public SampledAudioFactory(Configuration configuration) {
+        super(configuration);
+        if (configuration != null) {
+            throw new UnsupportedOperationException(
+                    "Configuration not supported for default Audio Factory");
+        }
+    }
+
     /** {@inheritDoc} */
     @Override
     public Audio fromFile(Path path) throws IOException {

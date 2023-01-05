@@ -33,10 +33,20 @@ import java.util.List;
  */
 public class FFmpegAudioFactory extends AudioFactory {
 
+    /**
+     * FFMpeg implementation of the Audio Factory.
+     *
+     * @param configuration configuration to set
+     */
+    public FFmpegAudioFactory(Configuration configuration) {
+        super(configuration);
+    }
+
     /** {@inheritDoc} */
     @Override
     public Audio fromFile(Path path) throws IOException {
         try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(path.toFile())) {
+            applyConfig(grabber);
             grabber.start();
             float[] floats = grab(grabber);
             return new Audio(floats, grabber.getSampleRate(), grabber.getAudioChannels());
@@ -49,6 +59,7 @@ public class FFmpegAudioFactory extends AudioFactory {
     @Override
     public Audio fromInputStream(InputStream is) throws IOException {
         try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(is)) {
+            applyConfig(grabber);
             grabber.start();
             float[] floats = grab(grabber);
             return new Audio(floats, grabber.getSampleRate(), grabber.getAudioChannels());
@@ -69,8 +80,25 @@ public class FFmpegAudioFactory extends AudioFactory {
         throw new UnsupportedOperationException("Not supported!");
     }
 
+    private void applyConfig(FFmpegFrameGrabber grabber) {
+        if (configuration == null) {
+            return;
+        }
+        if (configuration.getSampleRate() != null) {
+            grabber.setSampleRate(configuration.getSampleRate());
+        }
+        if (configuration.getFormat() != null) {
+            grabber.setFormat(configuration.getFormat());
+        }
+        if (configuration.getAudioCodec() != null) {
+            grabber.setAudioCodecName(configuration.getAudioCodec());
+        }
+    }
+
     /**
      * Grab frames from the audio using {@link FFmpegFrameGrabber}.
+     *
+     * <p>The default channel to grab is 0.
      *
      * @param grabber the {@link FFmpegFrameGrabber}.
      * @return the float array read from the audio.
@@ -80,6 +108,7 @@ public class FFmpegAudioFactory extends AudioFactory {
         List<Float> list = new ArrayList<>();
         Frame frame;
         while ((frame = grabber.grab()) != null) {
+            // TODO: remove hard-coded channel 0
             ShortBuffer buffer = (ShortBuffer) frame.samples[0];
             for (int i = 0; i < buffer.limit(); i++) {
                 list.add(buffer.get() / (float) Short.MAX_VALUE);

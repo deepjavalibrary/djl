@@ -16,7 +16,7 @@ package ai.djl.examples.inference;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.audio.Audio;
-import ai.djl.modality.audio.AudioFactory;
+import ai.djl.modality.audio.SampledAudioFactory;
 import ai.djl.modality.audio.translator.SpeechRecognitionTranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
@@ -64,7 +64,7 @@ public final class SpeechRecognition {
 
         // Read in audio file
         String wave = "https://resources.djl.ai/audios/speech.wav";
-        Audio audio = AudioFactory.getInstance().fromUrl(wave);
+        Audio audio = new SampledAudioFactory(null).fromUrl(wave);
         try (ZooModel<Audio, String> model = criteria.loadModel();
                 Predictor<Audio, String> predictor = model.newPredictor()) {
             return predictor.predict(audio);

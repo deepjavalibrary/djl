@@ -14,9 +14,6 @@ package ai.djl.modality.audio;
 
 import ai.djl.ndarray.NDArray;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -30,34 +27,15 @@ import java.nio.file.Paths;
  */
 public abstract class AudioFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(AudioFactory.class);
-
-    private static final String[] FACTORIES = {
-        "ai.djl.audio.FFmpegAudioFactory", "ai.djl.modality.audio.SampledAudioFactory"
-    };
-
-    private static AudioFactory factory = newInstance();
-
-    private static AudioFactory newInstance() {
-        for (String f : FACTORIES) {
-            try {
-                Class<? extends AudioFactory> clazz =
-                        Class.forName(f).asSubclass(AudioFactory.class);
-                return clazz.getDeclaredConstructor().newInstance();
-            } catch (ReflectiveOperationException e) {
-                logger.trace("", e);
-            }
-        }
-        throw new IllegalStateException("Failed to create AudioFactory!");
-    }
+    protected Configuration configuration;
 
     /**
-     * Gets new instance of Audio factory from the provided factory implementation.
+     * Audio Factory implementation.
      *
-     * @return {@link AudioFactory}
+     * @param configuration configuration to pass
      */
-    public static AudioFactory getInstance() {
-        return factory;
+    public AudioFactory(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     /**
@@ -121,4 +99,72 @@ public abstract class AudioFactory {
      * @return {@link Audio}
      */
     public abstract Audio fromNDArray(NDArray array);
+
+    /** The configuration to set for the factory. */
+    public static class Configuration {
+
+        private Integer sampleRate;
+        private String format;
+        private String audioCodec;
+
+        /**
+         * Set the sampleRate for {@link AudioFactory} to use.
+         *
+         * @param sampleRate The sampleRate for {@link AudioFactory} to use.
+         * @return this configuration.
+         */
+        public Configuration setSampleRate(int sampleRate) {
+            this.sampleRate = sampleRate;
+            return this;
+        }
+
+        /**
+         * Get the sample rate.
+         *
+         * @return Sample rate in integer
+         */
+        public Integer getSampleRate() {
+            return sampleRate;
+        }
+
+        /**
+         * Set the audio format for {@link AudioFactory} to use.
+         *
+         * @param format The audio format for {@link AudioFactory} to use.
+         * @return this configuration.
+         */
+        public Configuration setFormat(String format) {
+            this.format = format;
+            return this;
+        }
+
+        /**
+         * Get the format name of the audio.
+         *
+         * @return format
+         */
+        public String getFormat() {
+            return format;
+        }
+
+        /**
+         * Set the codec for the audio source.
+         *
+         * @param audioCodec the codec name
+         * @return this configuration.
+         */
+        public Configuration setAudioCodec(String audioCodec) {
+            this.audioCodec = audioCodec;
+            return this;
+        }
+
+        /**
+         * Get the codec name of the audio source.
+         *
+         * @return codec name
+         */
+        public String getAudioCodec() {
+            return this.audioCodec;
+        }
+    }
 }

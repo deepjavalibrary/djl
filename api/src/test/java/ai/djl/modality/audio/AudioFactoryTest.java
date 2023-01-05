@@ -37,18 +37,18 @@ public class AudioFactoryTest {
 
     @Test
     public void testFromFile() throws IOException {
-        Audio audio = AudioFactory.getInstance().fromFile(Paths.get("build/test/test_01.wav"));
+        Audio audio = new SampledAudioFactory(null).fromFile(Paths.get("build/test/test_01.wav"));
         Assert.assertEquals(audio.getSampleRate(), 16000f);
         Assert.assertEquals(audio.getChannels(), 1);
     }
 
     @Test
     public void testFromUrl() throws IOException {
-        Audio audio = AudioFactory.getInstance().fromUrl("build/test/test_01.wav");
+        Audio audio = new SampledAudioFactory(null).fromUrl("build/test/test_01.wav");
         Assert.assertEquals(audio.getSampleRate(), 16000f);
         Assert.assertEquals(audio.getChannels(), 1);
 
-        audio = AudioFactory.getInstance().fromUrl(URL);
+        audio = new SampledAudioFactory(null).fromUrl(URL);
         Assert.assertEquals(audio.getSampleRate(), 16000f);
         Assert.assertEquals(audio.getChannels(), 1);
     }
@@ -56,7 +56,7 @@ public class AudioFactoryTest {
     @Test
     public void testFromInputStream() throws IOException {
         try (InputStream is = Files.newInputStream(Paths.get("build/test/test_01.wav"))) {
-            Audio audio = AudioFactory.getInstance().fromInputStream(is);
+            Audio audio = new SampledAudioFactory(null).fromInputStream(is);
             Assert.assertEquals(audio.getSampleRate(), 16000f);
             Assert.assertEquals(audio.getChannels(), 1);
         }
@@ -65,7 +65,7 @@ public class AudioFactoryTest {
     @Test
     public void testFromData() {
         float[] data = {0.001f, 0.002f, 0.003f};
-        Audio audio = AudioFactory.getInstance().fromData(data);
+        Audio audio = new SampledAudioFactory(null).fromData(data);
         Assert.assertEquals(audio.getData(), data);
         Assert.assertEquals(audio.getSampleRate(), 0);
         Assert.assertEquals(audio.getChannels(), 0);
@@ -75,7 +75,7 @@ public class AudioFactoryTest {
     public void testFromNDArray() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.zeros(new Shape(1));
-            AudioFactory.getInstance().fromNDArray(array);
+            new SampledAudioFactory(null).fromNDArray(array);
         }
     }
 }

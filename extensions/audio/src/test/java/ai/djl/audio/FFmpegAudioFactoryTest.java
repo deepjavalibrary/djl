@@ -37,20 +37,22 @@ public class FFmpegAudioFactoryTest {
 
     @Test
     public void testFactory() throws IOException {
-        Audio audio = AudioFactory.getInstance().fromFile(Paths.get("build/test/test_01.wav"));
+        Audio audio = new FFmpegAudioFactory(null).fromFile(Paths.get("build/test/test_01.wav"));
         Assert.assertEquals(audio.getSampleRate(), 16000f);
         Assert.assertEquals(audio.getChannels(), 1);
 
-        audio = AudioFactory.getInstance().fromUrl("build/test/test_01.wav");
-        Assert.assertEquals(audio.getSampleRate(), 16000f);
+        audio =
+                new FFmpegAudioFactory(new AudioFactory.Configuration().setSampleRate(10000))
+                        .fromUrl("build/test/test_01.wav");
+        Assert.assertEquals(audio.getSampleRate(), 10000f);
         Assert.assertEquals(audio.getChannels(), 1);
 
-        audio = AudioFactory.getInstance().fromUrl(URL);
+        audio = new FFmpegAudioFactory(null).fromUrl(URL);
         Assert.assertEquals(audio.getSampleRate(), 16000f);
         Assert.assertEquals(audio.getChannels(), 1);
 
         float[] data = {0.001f, 0.002f, 0.003f};
-        audio = AudioFactory.getInstance().fromData(data);
+        audio = new FFmpegAudioFactory(null).fromData(data);
         Assert.assertEquals(audio.getData(), data);
         Assert.assertEquals(audio.getSampleRate(), 0);
         Assert.assertEquals(audio.getChannels(), 0);
@@ -60,7 +62,7 @@ public class FFmpegAudioFactoryTest {
     public void testFromNDArray() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.zeros(new Shape(1));
-            AudioFactory.getInstance().fromNDArray(array);
+            new FFmpegAudioFactory(null).fromNDArray(array);
         }
     }
 }
