@@ -188,7 +188,7 @@ public class Input {
      */
     public NDList getDataAsNDList(NDManager manager) {
         if (content.isEmpty()) {
-            return null;
+            return null; // NOPMD
         }
 
         int index = content.indexOf("data");
@@ -227,7 +227,7 @@ public class Input {
     public byte[] getAsBytes(String key) {
         BytesSupplier data = content.get(key);
         if (data == null) {
-            return null;
+            return null; // NOPMD
         }
         return data.getAsBytes();
     }
@@ -306,7 +306,7 @@ public class Input {
     public NDList getAsNDList(NDManager manager, String key) {
         int index = content.indexOf(key);
         if (index < 0) {
-            return null;
+            return null; // NOPMD
         }
         return getAsNDList(manager, index);
     }
