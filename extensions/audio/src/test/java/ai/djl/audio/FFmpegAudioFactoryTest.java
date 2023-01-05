@@ -14,55 +14,56 @@ package ai.djl.audio;
 
 import ai.djl.modality.audio.Audio;
 import ai.djl.modality.audio.AudioFactory;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.training.util.DownloadUtils;
 
+import org.bytedeco.ffmpeg.global.avutil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Paths;
 
 public class FFmpegAudioFactoryTest {
 
-    private static final String URL = "https://resources.djl.ai/audios/test_01.wav";
-
     @BeforeClass
     public void setUp() throws IOException {
-        DownloadUtils.download(URL, "build/test/test_01.wav");
+        DownloadUtils.download(
+                "https://resources.djl.ai/audios/test_01.wav", "build/test/test_01.wav");
     }
 
     @Test
     public void testFactory() throws IOException {
-        Audio audio = new FFmpegAudioFactory(null).fromFile(Paths.get("build/test/test_01.wav"));
-        Assert.assertEquals(audio.getSampleRate(), 16000f);
-        Assert.assertEquals(audio.getChannels(), 1);
+        AudioFactory factory =
+                AudioFactory.newInstance()
+                        .setChannels(1)
+                        .setSampleRate(10000)
+                        .setSampleFormat(avutil.AV_SAMPLE_FMT_S16);
 
-        audio =
-                new FFmpegAudioFactory(new AudioFactory.Configuration().setSampleRate(10000))
-                        .fromUrl("build/test/test_01.wav");
+        Assert.assertEquals(factory.getChannels(), 1);
+        Assert.assertEquals(factory.getSampleRate(), 10000);
+        Assert.assertEquals(factory.getSampleFormat(), avutil.AV_SAMPLE_FMT_S16);
+
+        Audio audio = factory.fromUrl("build/test/test_01.wav");
         Assert.assertEquals(audio.getSampleRate(), 10000f);
         Assert.assertEquals(audio.getChannels(), 1);
 
-        audio = new FFmpegAudioFactory(null).fromUrl(URL);
-        Assert.assertEquals(audio.getSampleRate(), 16000f);
+        URL url = Paths.get("build/test/test_01.wav").toAbsolutePath().toUri().toURL();
+
+        audio =
+                AudioFactory.newInstance()
+                        .setSampleRate(8000)
+                        .setSampleFormat(avutil.AV_SAMPLE_FMT_S32)
+                        .fromUrl(url);
+        Assert.assertEquals(audio.getSampleRate(), 8000f);
         Assert.assertEquals(audio.getChannels(), 1);
 
-        float[] data = {0.001f, 0.002f, 0.003f};
-        audio = new FFmpegAudioFactory(null).fromData(data);
-        Assert.assertEquals(audio.getData(), data);
-        Assert.assertEquals(audio.getSampleRate(), 0);
-        Assert.assertEquals(audio.getChannels(), 0);
-    }
-
-    @Test(expectedExceptions = UnsupportedOperationException.class)
-    public void testFromNDArray() {
-        try (NDManager manager = NDManager.newBaseManager()) {
-            NDArray array = manager.zeros(new Shape(1));
-            new FFmpegAudioFactory(null).fromNDArray(array);
-        }
+        Assert.assertThrows(
+                () -> {
+                    AudioFactory.newInstance()
+                            .setSampleFormat(avutil.AV_SAMPLE_FMT_DBL)
+                            .fromUrl(url);
+                });
     }
 }

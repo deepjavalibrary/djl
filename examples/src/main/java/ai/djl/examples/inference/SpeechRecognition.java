@@ -16,7 +16,7 @@ package ai.djl.examples.inference;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.audio.Audio;
-import ai.djl.modality.audio.SampledAudioFactory;
+import ai.djl.modality.audio.AudioFactory;
 import ai.djl.modality.audio.translator.SpeechRecognitionTranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
@@ -47,8 +47,7 @@ public final class SpeechRecognition {
         logger.info("Result: {}", predict());
     }
 
-    public static String predict()
-            throws UnsupportedAudioFileException, IOException, ModelException, TranslateException {
+    public static String predict() throws IOException, ModelException, TranslateException {
         // Load model.
         // Wav2Vec2 model is a speech model that accepts a float array corresponding to the raw
         // waveform of the speech signal.
@@ -64,7 +63,7 @@ public final class SpeechRecognition {
 
         // Read in audio file
         String wave = "https://resources.djl.ai/audios/speech.wav";
-        Audio audio = new SampledAudioFactory(null).fromUrl(wave);
+        Audio audio = AudioFactory.newInstance().fromUrl(wave);
         try (ZooModel<Audio, String> model = criteria.loadModel();
                 Predictor<Audio, String> predictor = model.newPredictor()) {
             return predictor.predict(audio);

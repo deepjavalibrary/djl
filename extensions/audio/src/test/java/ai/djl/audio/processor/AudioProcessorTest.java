@@ -32,12 +32,13 @@ import java.util.Collections;
 
 public class AudioProcessorTest {
 
-    private static final String URL = "https://resources.djl.ai/audios/";
+    private static final String URL = "https://resources.djl.ai/";
 
     @BeforeClass
     public void setUp() throws IOException {
-        DownloadUtils.download(URL + "test_01.wav", "build/test/test_01.wav");
-        DownloadUtils.download(URL + "mel_80_filters.npz", "build/test/mel_80_filters.npz");
+        DownloadUtils.download(URL + "audios/test_01.wav", "build/test/test_01.wav");
+        DownloadUtils.download(
+                URL + "demo/pytorch/whisper/mel_80_filters.npz", "build/test/mel_80_filters.npz");
     }
 
     @Test
@@ -69,7 +70,8 @@ public class AudioProcessorTest {
     void testLogMelSpectrogram() throws IOException {
         try (NDManager manager = NDManager.newBaseManager()) {
             AudioProcessor processor =
-                    new LogMelSpectrogram(Paths.get("build/test/mel_80_filters.npz"), 80, manager);
+                    LogMelSpectrogram.newInstance(
+                            Paths.get("build/test/mel_80_filters.npz"), 80, manager);
             NDArray samples = manager.zeros(new Shape(480000));
             NDArray result = processor.extractFeatures(manager, samples);
             Assert.assertEquals(result.getShape(), new Shape(80, 3000));

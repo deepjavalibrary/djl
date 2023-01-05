@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -16,15 +16,15 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 
-/** Pad or Trim the samples to the desired numbers. */
+/** Pad or trim the samples to the desired numbers. */
 public class PadOrTrim implements AudioProcessor {
 
-    private final int desiredSamples;
+    private int desiredSamples;
 
     /**
      * Pad or trim the samples to the fixed length.
      *
-     * @param desiredSamples desired sample points
+     * @param desiredSamples the desired sample points
      */
     public PadOrTrim(int desiredSamples) {
         this.desiredSamples = desiredSamples;
@@ -34,7 +34,7 @@ public class PadOrTrim implements AudioProcessor {
     @Override
     public NDArray extractFeatures(NDManager manager, NDArray samples) {
         if (samples.getShape().dimension() != 1) {
-            throw new UnsupportedOperationException("Batch samples not supported");
+            throw new UnsupportedOperationException("Batch samples not supported.");
         }
         long sampleLength = samples.getShape().get(0);
         if (sampleLength > desiredSamples) {

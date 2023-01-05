@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -27,22 +27,48 @@ public class LogMelSpectrogram implements AudioProcessor {
     private static final int N_FFT = 400;
     private static final int HOP_LENGTH = 160;
 
-    NDArray melFilters;
+    private NDArray melFilters;
 
     /**
-     * load the mel filterbank matrix for projecting STFT into a Mel spectrogram. Allows decoupling
-     * librosa dependency; saved using: np.savez_compressed( "mel_filters.npz",
+     * Constructs a new instance of {@code LogMelSpectrogram}.
+     *
+     * @param melFilter the mel filter
+     */
+    public LogMelSpectrogram(NDArray melFilter) {
+        this.melFilters = melFilter;
+    }
+
+    /**
+     * Loads the mel filterbank matrix for projecting STFT into a Mel spectrogram.
+     *
+     * <p>Allows decoupling librosa dependency; saved using: np.savez_compressed( "mel_filters.npz",
      * mel_80=librosa.filters.mel(sr=16000, n_fft=400, n_mels=80), )
      *
-     * @param melFile the mdel file saved from python
+     * @param melFile the mdel file saved in .npz format
      * @param numMel number of mel
      * @param manager manager to set for the content
+     * @return a new instance of {@code LogMelSpectrogram}
      * @throws IOException file not loadable
      */
-    public LogMelSpectrogram(Path melFile, int numMel, NDManager manager) throws IOException {
+    public static LogMelSpectrogram newInstance(Path melFile, int numMel, NDManager manager)
+            throws IOException {
         try (InputStream is = Files.newInputStream(melFile)) {
-            this.melFilters = NDList.decode(manager, is).get("mel_" + numMel);
+            return newInstance(is, numMel, manager);
         }
+    }
+
+    /**
+     * Loads the mel filterbank matrix for projecting STFT into a Mel spectrogram.
+     *
+     * @param is the input stream
+     * @param numMel number of mel
+     * @param manager manager to set for the content
+     * @return a new instance of {@code LogMelSpectrogram}
+     * @throws IOException file not loadable
+     */
+    public static LogMelSpectrogram newInstance(InputStream is, int numMel, NDManager manager)
+            throws IOException {
+        return new LogMelSpectrogram(NDList.decode(manager, is).get("mel_" + numMel));
     }
 
     /** {@inheritDoc} */
