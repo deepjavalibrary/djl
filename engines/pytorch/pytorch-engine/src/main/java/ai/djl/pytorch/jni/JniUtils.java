@@ -362,7 +362,6 @@ public final class JniUtils {
         if (ndArray == null) {
             return ndArray;
         }
-        PtNDArray result;
         List<NDIndexElement> indices = index.getIndices();
         long torchIndexHandle = PyTorchLibrary.LIB.torchIndexInit(indices.size());
         try {
@@ -417,15 +416,11 @@ public final class JniUtils {
             if (indices.size() == index.getEllipsisIndex()) {
                 PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, true);
             }
-            result =
-                    new PtNDArray(
-                            manager,
-                            PyTorchLibrary.LIB.torchIndexAdvGet(
-                                    ndArray.getHandle(), torchIndexHandle));
+            long ret = PyTorchLibrary.LIB.torchIndexAdvGet(ndArray.getHandle(), torchIndexHandle);
+            return new PtNDArray(manager, ret);
         } finally {
             PyTorchLibrary.LIB.torchDeleteIndex(torchIndexHandle);
         }
-        return result;
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
