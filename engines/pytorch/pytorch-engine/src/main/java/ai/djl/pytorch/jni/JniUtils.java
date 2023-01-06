@@ -379,7 +379,7 @@ public final class JniUtils {
                 Long max = ((NDIndexSlice) elem).getMax();
                 Long step = ((NDIndexSlice) elem).getStep();
                 int nullSliceBin = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
-                // nullSliceBin encodes whether the slice ends {min, max} is null:
+                // nullSliceBin encodes whether the slice end {min, max} is null:
                 // is_null == 1, ! is_null == 0;
                 // 0b11 == 3, 0b10 = 2, ...
                 // If {min, max} is null, then its value is ineffective, thus set to -1.
