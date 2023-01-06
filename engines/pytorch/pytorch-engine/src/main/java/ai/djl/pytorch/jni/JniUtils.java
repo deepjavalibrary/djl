@@ -362,63 +362,70 @@ public final class JniUtils {
         if (ndArray == null) {
             return ndArray;
         }
+        PtNDArray result;
         List<NDIndexElement> indices = index.getIndices();
         long torchIndexHandle = PyTorchLibrary.LIB.torchIndexInit(indices.size());
-        ListIterator<NDIndexElement> it = indices.listIterator();
-        while (it.hasNext()) {
-            if (it.nextIndex() == index.getEllipsisIndex()) {
+        try {
+            // Index aggregation
+            ListIterator<NDIndexElement> it = indices.listIterator();
+            while (it.hasNext()) {
+                if (it.nextIndex() == index.getEllipsisIndex()) {
+                    PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, true);
+                }
+
+                NDIndexElement elem = it.next();
+                if (elem instanceof NDIndexNull) {
+                    PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, false);
+                } else if (elem instanceof NDIndexSlice) {
+                    Long min = ((NDIndexSlice) elem).getMin();
+                    Long max = ((NDIndexSlice) elem).getMax();
+                    Long step = ((NDIndexSlice) elem).getStep();
+                    int nullSliceBinary = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
+                    // nullSliceBinary encodes whether the slice end {min, max} is null:
+                    // is_null == 1, ! is_null == 0;
+                    // 0b11 == 3, 0b10 = 2, ...
+                    // If {min, max} is null, then its value is ineffective, thus set to -1.
+                    PyTorchLibrary.LIB.torchIndexAppendSlice(
+                            torchIndexHandle,
+                            min == null ? -1 : min,
+                            max == null ? -1 : max,
+                            step == null ? 1 : step,
+                            nullSliceBinary);
+                } else if (elem instanceof NDIndexAll) {
+                    PyTorchLibrary.LIB.torchIndexAppendSlice(torchIndexHandle, -1, -1, 1, 3);
+                } else if (elem instanceof NDIndexFixed) {
+                    PyTorchLibrary.LIB.torchIndexAppendFixed(
+                            torchIndexHandle, ((NDIndexFixed) elem).getIndex());
+                } else if (elem instanceof NDIndexBooleans) {
+                    PtNDArray indexArr = (PtNDArray) ((NDIndexBooleans) elem).getIndex();
+                    PyTorchLibrary.LIB.torchIndexAppendArray(
+                            torchIndexHandle, indexArr.getHandle());
+                } else if (elem instanceof NDIndexTake) {
+                    PtNDArray indexArr = manager.from(((NDIndexTake) elem).getIndex());
+                    if (indexArr.getDataType() != DataType.INT64) {
+                        indexArr = indexArr.toType(DataType.INT64, true);
+                    }
+                    PyTorchLibrary.LIB.torchIndexAppendArray(
+                            torchIndexHandle, indexArr.getHandle());
+                } else if (elem instanceof NDIndexPick) {
+                    // Backward compatible
+                    NDIndexFullPick fullPick =
+                            NDIndexFullPick.fromIndex(index, ndArray.getShape()).get();
+                    return pick(ndArray, manager.from(fullPick.getIndices()), fullPick.getAxis());
+                }
+            }
+            if (indices.size() == index.getEllipsisIndex()) {
                 PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, true);
             }
-
-            NDIndexElement elem = it.next();
-            if (elem instanceof NDIndexNull) {
-                PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, false);
-            } else if (elem instanceof NDIndexSlice) {
-                Long min = ((NDIndexSlice) elem).getMin();
-                Long max = ((NDIndexSlice) elem).getMax();
-                Long step = ((NDIndexSlice) elem).getStep();
-                int nullSliceBinary = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
-                // nullSliceBinary encodes whether the slice end {min, max} is null:
-                // is_null == 1, ! is_null == 0;
-                // 0b11 == 3, 0b10 = 2, ...
-                // If {min, max} is null, then its value is ineffective, thus set to -1.
-                PyTorchLibrary.LIB.torchIndexAppendSlice(
-                        torchIndexHandle,
-                        min == null ? -1 : min,
-                        max == null ? -1 : max,
-                        step == null ? 1 : step,
-                        nullSliceBinary);
-            } else if (elem instanceof NDIndexAll) {
-                PyTorchLibrary.LIB.torchIndexAppendSlice(torchIndexHandle, -1, -1, 1, 3);
-            } else if (elem instanceof NDIndexFixed) {
-                PyTorchLibrary.LIB.torchIndexAppendFixed(
-                        torchIndexHandle, ((NDIndexFixed) elem).getIndex());
-            } else if (elem instanceof NDIndexBooleans) {
-                PtNDArray indexArr = (PtNDArray) ((NDIndexBooleans) elem).getIndex();
-                PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, indexArr.getHandle());
-            } else if (elem instanceof NDIndexTake) {
-                PtNDArray indexArr = manager.from(((NDIndexTake) elem).getIndex());
-                if (indexArr.getDataType() != DataType.INT64) {
-                    indexArr = indexArr.toType(DataType.INT64, true);
-                }
-                PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, indexArr.getHandle());
-            } else if (elem instanceof NDIndexPick) {
-                // Backward compatible
-                NDIndexFullPick fullPick =
-                        NDIndexFullPick.fromIndex(index, ndArray.getShape()).get();
-                return pick(ndArray, manager.from(fullPick.getIndices()), fullPick.getAxis());
-            }
+            result =
+                    new PtNDArray(
+                            manager,
+                            PyTorchLibrary.LIB.torchIndexAdvGet(
+                                    ndArray.getHandle(), torchIndexHandle));
+        } finally {
+            PyTorchLibrary.LIB.torchDeleteIndex(torchIndexHandle);
         }
-        if (indices.size() == index.getEllipsisIndex()) {
-            PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, true);
-        }
-
-        PtNDArray ret =
-                new PtNDArray(
-                        manager,
-                        PyTorchLibrary.LIB.torchIndexAdvGet(ndArray.getHandle(), torchIndexHandle));
-        PyTorchLibrary.LIB.torchDeleteIndex(torchIndexHandle);
-        return ret;
+        return result;
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -426,63 +433,70 @@ public final class JniUtils {
         if (ndArray == null) {
             return;
         }
-        // Index aggregation
         List<NDIndexElement> indices = index.getIndices();
         long torchIndexHandle = PyTorchLibrary.LIB.torchIndexInit(indices.size());
-        ListIterator<NDIndexElement> it = indices.listIterator();
-        while (it.hasNext()) {
-            if (it.nextIndex() == index.getEllipsisIndex()) {
+        try {
+            // Index aggregation
+            ListIterator<NDIndexElement> it = indices.listIterator();
+            while (it.hasNext()) {
+                if (it.nextIndex() == index.getEllipsisIndex()) {
+                    PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, true);
+                }
+
+                NDIndexElement elem = it.next();
+                if (elem instanceof NDIndexNull) {
+                    PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, false);
+                } else if (elem instanceof NDIndexSlice) {
+                    Long min = ((NDIndexSlice) elem).getMin();
+                    Long max = ((NDIndexSlice) elem).getMax();
+                    Long step = ((NDIndexSlice) elem).getStep();
+                    int nullSliceBinary = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
+                    // nullSliceBinary encodes whether the slice end {min, max} is null:
+                    // is_null == 1, ! is_null == 0;
+                    // 0b11 == 3, 0b10 = 2, ...
+                    // If {min, max} is null, then its value is ineffective, thus set to -1.
+                    PyTorchLibrary.LIB.torchIndexAppendSlice(
+                            torchIndexHandle,
+                            min == null ? -1 : min,
+                            max == null ? -1 : max,
+                            step == null ? 1 : step,
+                            nullSliceBinary);
+                } else if (elem instanceof NDIndexAll) {
+                    PyTorchLibrary.LIB.torchIndexAppendSlice(torchIndexHandle, -1, -1, 1, 3);
+                } else if (elem instanceof NDIndexFixed) {
+                    PyTorchLibrary.LIB.torchIndexAppendFixed(
+                            torchIndexHandle, ((NDIndexFixed) elem).getIndex());
+                } else if (elem instanceof NDIndexBooleans) {
+                    PtNDArray indexArr = (PtNDArray) ((NDIndexBooleans) elem).getIndex();
+                    PyTorchLibrary.LIB.torchIndexAppendArray(
+                            torchIndexHandle, indexArr.getHandle());
+                } else if (elem instanceof NDIndexTake) {
+                    PtNDArray indexArr = (PtNDArray) ((NDIndexTake) elem).getIndex();
+                    if (indexArr.getDataType() != DataType.INT64) {
+                        indexArr = indexArr.toType(DataType.INT64, true);
+                    }
+                    PyTorchLibrary.LIB.torchIndexAppendArray(
+                            torchIndexHandle, indexArr.getHandle());
+                } else if (elem instanceof NDIndexPick) {
+                    // Backward compatible
+                    NDIndexFullPick fullPick =
+                            NDIndexFullPick.fromIndex(index, ndArray.getShape()).get();
+                    pick(
+                            ndArray,
+                            ndArray.getManager().from(fullPick.getIndices()),
+                            fullPick.getAxis());
+                    return;
+                }
+            }
+            if (indices.size() == index.getEllipsisIndex()) {
                 PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, true);
             }
 
-            NDIndexElement elem = it.next();
-            if (elem instanceof NDIndexNull) {
-                PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, false);
-            } else if (elem instanceof NDIndexSlice) {
-                Long min = ((NDIndexSlice) elem).getMin();
-                Long max = ((NDIndexSlice) elem).getMax();
-                Long step = ((NDIndexSlice) elem).getStep();
-                int nullSliceBinary = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
-                // nullSliceBinary encodes whether the slice end {min, max} is null:
-                // is_null == 1, ! is_null == 0;
-                // 0b11 == 3, 0b10 = 2, ...
-                // If {min, max} is null, then its value is ineffective, thus set to -1.
-                PyTorchLibrary.LIB.torchIndexAppendSlice(
-                        torchIndexHandle,
-                        min == null ? -1 : min,
-                        max == null ? -1 : max,
-                        step == null ? 1 : step,
-                        nullSliceBinary);
-            } else if (elem instanceof NDIndexAll) {
-                PyTorchLibrary.LIB.torchIndexAppendSlice(torchIndexHandle, -1, -1, 1, 3);
-            } else if (elem instanceof NDIndexFixed) {
-                PyTorchLibrary.LIB.torchIndexAppendFixed(
-                        torchIndexHandle, ((NDIndexFixed) elem).getIndex());
-            } else if (elem instanceof NDIndexBooleans) {
-                PtNDArray indexArr = (PtNDArray) ((NDIndexBooleans) elem).getIndex();
-                PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, indexArr.getHandle());
-            } else if (elem instanceof NDIndexTake) {
-                PtNDArray indexArr = (PtNDArray) ((NDIndexTake) elem).getIndex();
-                if (indexArr.getDataType() != DataType.INT64) {
-                    indexArr = indexArr.toType(DataType.INT64, true);
-                }
-                PyTorchLibrary.LIB.torchIndexAppendArray(torchIndexHandle, indexArr.getHandle());
-            } else if (elem instanceof NDIndexPick) {
-                // Backward compatible
-                NDIndexFullPick fullPick =
-                        NDIndexFullPick.fromIndex(index, ndArray.getShape()).get();
-                pick(ndArray, ndArray.getManager().from(fullPick.getIndices()), fullPick.getAxis());
-                return;
-            }
+            PyTorchLibrary.LIB.torchIndexAdvPut(
+                    ndArray.getHandle(), torchIndexHandle, data.getHandle());
+        } finally {
+            PyTorchLibrary.LIB.torchDeleteIndex(torchIndexHandle);
         }
-        if (indices.size() == index.getEllipsisIndex()) {
-            PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, true);
-        }
-
-        PyTorchLibrary.LIB.torchIndexAdvPut(
-                ndArray.getHandle(), torchIndexHandle, data.getHandle());
-
-        PyTorchLibrary.LIB.torchDeleteIndex(torchIndexHandle);
     }
 
     public static void indexSet(
