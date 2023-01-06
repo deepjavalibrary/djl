@@ -214,6 +214,8 @@ final class PyTorchLibrary {
 
     native void torchDeleteTensor(long handle);
 
+    native void torchDeleteIndex(long handle);
+
     native void torchDeleteModule(long handle);
 
     native void torchDeleteIValue(long handle);
