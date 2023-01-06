@@ -135,6 +135,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIndexAdvGet(
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex>*>(jtorch_index_handle);
   torch::Tensor* ret_ptr = new torch::Tensor(tensor_ptr->index(*index_ptr));
+  delete index_ptr;
   return reinterpret_cast<uintptr_t>(ret_ptr);
   API_END_RETURN()
 }
