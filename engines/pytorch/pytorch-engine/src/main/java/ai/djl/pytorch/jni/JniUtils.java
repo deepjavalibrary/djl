@@ -363,7 +363,6 @@ public final class JniUtils {
             return ndArray;
         }
         List<NDIndexElement> indices = index.getIndices();
-        // Native resources allocated here will be closed inside torchIndexAdvGet
         long torchIndexHandle = PyTorchLibrary.LIB.torchIndexInit(indices.size());
         ListIterator<NDIndexElement> it = indices.listIterator();
         while (it.hasNext()) {
@@ -378,8 +377,8 @@ public final class JniUtils {
                 Long min = ((NDIndexSlice) elem).getMin();
                 Long max = ((NDIndexSlice) elem).getMax();
                 Long step = ((NDIndexSlice) elem).getStep();
-                int nullSliceBin = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
-                // nullSliceBin encodes whether the slice end {min, max} is null:
+                int nullSliceBinary = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
+                // nullSliceBinary encodes whether the slice end {min, max} is null:
                 // is_null == 1, ! is_null == 0;
                 // 0b11 == 3, 0b10 = 2, ...
                 // If {min, max} is null, then its value is ineffective, thus set to -1.
@@ -388,7 +387,7 @@ public final class JniUtils {
                         min == null ? -1 : min,
                         max == null ? -1 : max,
                         step == null ? 1 : step,
-                        nullSliceBin);
+                        nullSliceBinary);
             } else if (elem instanceof NDIndexAll) {
                 PyTorchLibrary.LIB.torchIndexAppendSlice(torchIndexHandle, -1, -1, 1, 3);
             } else if (elem instanceof NDIndexFixed) {
@@ -414,9 +413,12 @@ public final class JniUtils {
             PyTorchLibrary.LIB.torchIndexAppendNoneEllipsis(torchIndexHandle, true);
         }
 
-        return new PtNDArray(
-                manager,
-                PyTorchLibrary.LIB.torchIndexAdvGet(ndArray.getHandle(), torchIndexHandle));
+        PtNDArray ret =
+                new PtNDArray(
+                        manager,
+                        PyTorchLibrary.LIB.torchIndexAdvGet(ndArray.getHandle(), torchIndexHandle));
+        PyTorchLibrary.LIB.torchDeleteIndex(torchIndexHandle);
+        return ret;
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -424,7 +426,6 @@ public final class JniUtils {
         if (ndArray == null) {
             return;
         }
-
         // Index aggregation
         List<NDIndexElement> indices = index.getIndices();
         long torchIndexHandle = PyTorchLibrary.LIB.torchIndexInit(indices.size());
@@ -441,18 +442,19 @@ public final class JniUtils {
                 Long min = ((NDIndexSlice) elem).getMin();
                 Long max = ((NDIndexSlice) elem).getMax();
                 Long step = ((NDIndexSlice) elem).getStep();
-                int nullSliceBin = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
-                // nullSliceBin encodes whether the slice (min, max) is null:
+                int nullSliceBinary = (min == null ? 1 : 0) * 2 + (max == null ? 1 : 0);
+                // nullSliceBinary encodes whether the slice end {min, max} is null:
                 // is_null == 1, ! is_null == 0;
                 // 0b11 == 3, 0b10 = 2, ...
+                // If {min, max} is null, then its value is ineffective, thus set to -1.
                 PyTorchLibrary.LIB.torchIndexAppendSlice(
                         torchIndexHandle,
-                        min == null ? 0 : min,
-                        max == null ? 0 : max,
+                        min == null ? -1 : min,
+                        max == null ? -1 : max,
                         step == null ? 1 : step,
-                        nullSliceBin);
+                        nullSliceBinary);
             } else if (elem instanceof NDIndexAll) {
-                PyTorchLibrary.LIB.torchIndexAppendSlice(torchIndexHandle, 0, 0, 1, 3);
+                PyTorchLibrary.LIB.torchIndexAppendSlice(torchIndexHandle, -1, -1, 1, 3);
             } else if (elem instanceof NDIndexFixed) {
                 PyTorchLibrary.LIB.torchIndexAppendFixed(
                         torchIndexHandle, ((NDIndexFixed) elem).getIndex());
@@ -479,6 +481,8 @@ public final class JniUtils {
 
         PyTorchLibrary.LIB.torchIndexAdvPut(
                 ndArray.getHandle(), torchIndexHandle, data.getHandle());
+
+        PyTorchLibrary.LIB.torchDeleteIndex(torchIndexHandle);
     }
 
     public static void indexSet(
