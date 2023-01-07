@@ -72,12 +72,8 @@ public final class PtGradientCollector implements GradientCollector {
     public void zeroGradients() {
         NDManager systemManager = PtNDManager.getSystemManager();
         for (NDArray array : systemManager.getManagedArrays()) {
-            try {
-                if (array.hasGradient()) {
-                    JniUtils.zeroGrad((PtNDArray) array);
-                }
-            } catch (IllegalStateException e) {
-                // ignore if the array is already closed
+            if (array.hasGradient()) {
+                array.getGradient().subi(array.getGradient());
             }
         }
     }
