@@ -14,6 +14,7 @@ package ai.djl.integration.tests.training;
 
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.basic.Mlp;
+import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -76,6 +77,26 @@ public class GradientCollectorIntegrationTest {
                     NDArray grad2 = lhs.getGradient();
                     Assertions.assertAlmostEquals(grad2, expected);
                 }
+            }
+        }
+    }
+
+    /** Tests that the gradients do not accumulate when closing the gradient collector. */
+    @Test
+    public void testClearGradients() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray variable = manager.create(0.0f);
+            variable.setRequiresGradient(true);
+
+            for (int i = 0; i < 3; i++) {
+                if (variable.hasGradient()) {
+                    variable.getGradient().subi(variable.getGradient());
+                }
+                try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
+                    NDArray loss = variable.mul(2);
+                    gc.backward(loss);
+                }
+                Assert.assertEquals(variable.getGradient().getFloat(), 2.0f);
             }
         }
     }
