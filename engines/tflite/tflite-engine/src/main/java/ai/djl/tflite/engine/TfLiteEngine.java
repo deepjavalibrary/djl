@@ -17,8 +17,6 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
-import ai.djl.nn.SymbolBlock;
-import ai.djl.training.GradientCollector;
 
 /**
  * The {@code TfLiteEngine} is an implementation of the {@link Engine} based on the <a
@@ -91,12 +89,6 @@ public final class TfLiteEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public SymbolBlock newSymbolBlock(NDManager manager) {
-        throw new UnsupportedOperationException("TFLite does not support empty SymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDManager newBaseManager() {
         return newBaseManager(null);
     }
@@ -105,17 +97,5 @@ public final class TfLiteEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return TfLiteNDManager.getSystemManager().newSubManager(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public GradientCollector newGradientCollector() {
-        throw new UnsupportedOperationException("Not supported for TFLite");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRandomSeed(int seed) {
-        throw new UnsupportedOperationException("Not supported for TFLite");
     }
 }

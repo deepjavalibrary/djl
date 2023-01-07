@@ -21,8 +21,6 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import ai.djl.tensorflow.engine.javacpp.LibUtils;
-import ai.djl.training.GradientCollector;
-import ai.djl.util.RandomUtils;
 
 import org.bytedeco.javacpp.PointerScope;
 import org.tensorflow.TensorFlow;
@@ -159,19 +157,6 @@ public final class TfEngine extends Engine implements AutoCloseable {
     @Override
     public NDManager newBaseManager(Device device) {
         return TfNDManager.getSystemManager().newSubManager(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public GradientCollector newGradientCollector() {
-        throw new UnsupportedOperationException("TensorFlow does not support training yet");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRandomSeed(int seed) {
-        super.setRandomSeed(seed);
-        RandomUtils.RANDOM.setSeed(seed);
     }
 
     TFE_Context getEagerSession() {
