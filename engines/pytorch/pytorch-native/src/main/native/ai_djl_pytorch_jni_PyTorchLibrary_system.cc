@@ -327,3 +327,11 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStopProfile(
   WriteProfilerEventsToStream(file, event_ptr_lists);
   API_END()
 }
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCudaEmptyCache(){
+  API_BEGIN()
+  if (torch::cuda::is_available()) {
+    c10::cuda::CUDACachingAllocator::emptyCache();
+  }
+  API_END()
+}

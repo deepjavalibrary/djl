@@ -68,6 +68,8 @@ final class PyTorchLibrary {
 
     native long tensorClone(long handle);
 
+    native void torchCudaEmptyCache();
+
     native long torchEmpty(long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
 
     native long torchZeros(long[] shape, int dType, int layout, int[] device, boolean requiredGrad);
