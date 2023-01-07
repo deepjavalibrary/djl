@@ -19,7 +19,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.training.GradientCollector;
 
 /** {@code MxGradientCollector} is the MXNet implementation of {@link GradientCollector}. */
-public final class MxGradientCollector implements GradientCollector {
+public class MxGradientCollector implements GradientCollector {
 
     /**
      * Constructs an {@code MxGradientCollector} and enables training data collection for
@@ -115,16 +115,5 @@ public final class MxGradientCollector implements GradientCollector {
      */
     private void backward(NDArray array, boolean retainGraph) {
         JnaUtils.autogradBackward(new NDList(array), retainGraph ? 1 : 0);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void zeroGradients() {
-        NDManager systemManager = MxNDManager.getSystemManager();
-        for (NDArray array : systemManager.getManagedArrays()) {
-            if (array.hasGradient()) {
-                array.getGradient().subi(array.getGradient());
-            }
-        }
     }
 }

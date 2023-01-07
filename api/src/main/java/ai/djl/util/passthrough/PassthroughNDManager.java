@@ -26,8 +26,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 
 /** An {@link NDManager} that does nothing, for use in extensions and hybrid engines. */
 public final class PassthroughNDManager implements NDManager {
@@ -247,12 +245,6 @@ public final class PassthroughNDManager implements NDManager {
     @Override
     public Device getDevice() {
         return Device.cpu();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<NDArray> getManagedArrays() {
-        return Collections.emptyList();
     }
 
     /** {@inheritDoc} */

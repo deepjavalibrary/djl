@@ -14,12 +14,11 @@
 package ai.djl.pytorch.engine;
 
 import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDManager;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.GradientCollector;
 
 /** {@code PtGradientCollector} is the PyTorch implementation of {@link GradientCollector}. */
-public final class PtGradientCollector implements GradientCollector {
+public class PtGradientCollector implements GradientCollector {
 
     private boolean gradModel;
 
@@ -27,7 +26,6 @@ public final class PtGradientCollector implements GradientCollector {
     public PtGradientCollector() {
         gradModel = JniUtils.isGradMode();
         JniUtils.setGradMode(true);
-        zeroGradients();
     }
 
     /** {@inheritDoc} */
@@ -54,17 +52,6 @@ public final class PtGradientCollector implements GradientCollector {
      */
     private void backward(NDArray target, NDArray grad, boolean keepGraph, boolean createGraph) {
         JniUtils.backward((PtNDArray) target, (PtNDArray) grad, keepGraph, createGraph);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void zeroGradients() {
-        NDManager systemManager = PtNDManager.getSystemManager();
-        for (NDArray array : systemManager.getManagedArrays()) {
-            if (array.hasGradient()) {
-                array.getGradient().subi(array.getGradient());
-            }
-        }
     }
 
     /** {@inheritDoc} */
