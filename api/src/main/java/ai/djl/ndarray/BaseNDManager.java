@@ -404,6 +404,21 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public void zeroGradients() {
+        for (AutoCloseable res : resources.values()) {
+            if (res instanceof NDManager) {
+                ((NDManager) res).zeroGradients();
+            } else if (res instanceof NDArray) {
+                NDArray array = (NDArray) res;
+                if (array.hasGradient()) {
+                    array.getGradient().subi(array.getGradient());
+                }
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void close() {
         if (this instanceof SystemNDManager) {
             return;

@@ -1668,6 +1668,9 @@ public interface NDManager extends AutoCloseable {
      */
     Engine getEngine();
 
+    /** Sets all the gradients within the NDManager to zero. */
+    void zeroGradients();
+
     /** {@inheritDoc} */
     @Override
     void close();
