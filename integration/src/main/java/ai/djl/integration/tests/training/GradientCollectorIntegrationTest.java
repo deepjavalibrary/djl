@@ -15,7 +15,6 @@ package ai.djl.integration.tests.training;
 import ai.djl.Model;
 import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.engine.Engine;
-import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
@@ -53,7 +52,7 @@ public class GradientCollectorIntegrationTest {
 
     @Test
     public void testAutograd() {
-        try (Model model = Model.newInstance("model", TestUtils.getEngine());
+        try (Model model = Model.newInstance("model");
                 NDManager manager = model.getNDManager()) {
             model.setBlock(Blocks.identityBlock());
             try (Trainer trainer =
@@ -84,12 +83,11 @@ public class GradientCollectorIntegrationTest {
 
     @Test
     public void testZeroGradients() {
-        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+        try (NDManager manager = NDManager.newBaseManager()) {
             NDArray a = manager.create(0.0f);
             a.setRequiresGradient(true);
 
-            Engine engine = Engine.getEngine(TestUtils.getEngine());
-            try (GradientCollector gc = engine.newGradientCollector()) {
+            try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
                 NDArray b = a.mul(2);
 
                 // Gradients are initially zero
@@ -109,13 +107,12 @@ public class GradientCollectorIntegrationTest {
     /** Tests that the gradients do not accumulate when closing the gradient collector. */
     @Test
     public void testClearGradients() {
-        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+        try (NDManager manager = NDManager.newBaseManager()) {
             NDArray a = manager.create(0.0f);
             a.setRequiresGradient(true);
 
-            Engine engine = Engine.getEngine(TestUtils.getEngine());
             for (int i = 0; i < 3; i++) {
-                try (GradientCollector gc = engine.newGradientCollector()) {
+                try (GradientCollector gc = Engine.getInstance().newGradientCollector()) {
                     NDArray b = a.mul(2);
                     gc.backward(b);
                 }
@@ -124,51 +121,9 @@ public class GradientCollectorIntegrationTest {
         }
     }
 
-    /** Tests that the gradients do accumulate within the same gradient collector. */
-    @Test
-    public void testAccumulateGradients() {
-        // TODO: MXNet support for accumulating gradients does not currently work
-        TestRequirements.notEngine("MXNet");
-        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
-            NDArray a = manager.create(0.0f);
-            a.setRequiresGradient(true);
-
-            Engine engine = Engine.getEngine(TestUtils.getEngine());
-            try (GradientCollector gc = engine.newGradientCollector()) {
-                for (int i = 1; i <= 3; i++) {
-                    NDArray b = a.mul(2);
-                    gc.backward(b);
-                    Assert.assertEquals(a.getGradient().getFloat(), 2.0f * i);
-                }
-            }
-        }
-    }
-
-    /**
-     * Ensures that a gradient collector does not start when one is already created because they are
-     * global.
-     */
-    @Test
-    @SuppressWarnings({"try", "PMD.UseTryWithResources"})
-    public void testMultipleGradientCollectors() {
-        Assert.assertThrows(
-                () -> {
-                    GradientCollector gc2 = null;
-                    Engine engine = Engine.getEngine(TestUtils.getEngine());
-                    try (GradientCollector gc = engine.newGradientCollector()) {
-                        gc2 = engine.newGradientCollector();
-                        gc2.close();
-                    } finally {
-                        if (gc2 != null) {
-                            gc2.close();
-                        }
-                    }
-                });
-    }
-
     @Test
     public void testFreezeParameters() {
-        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
+        try (Model model = Model.newInstance("model")) {
             Block blockFrozen = new Mlp(10, 10, new int[] {10});
             Block blockNormal = new Mlp(10, 10, new int[] {10});
             Block combined = new SequentialBlock().add(blockFrozen).add(blockNormal);
@@ -244,7 +199,7 @@ public class GradientCollectorIntegrationTest {
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT)
                         .optOptimizer(optimizer);
 
-        try (Model model = Model.newInstance("linear", TestUtils.getEngine())) {
+        try (Model model = Model.newInstance("linear")) {
             Linear block = Linear.builder().setUnits(1).build();
             model.setBlock(block);
 

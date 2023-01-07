@@ -18,26 +18,15 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.GradientCollector;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /** {@code PtGradientCollector} is the PyTorch implementation of {@link GradientCollector}. */
 public final class PtGradientCollector implements GradientCollector {
 
     private boolean gradModel;
-    private static AtomicBoolean isCollecting = new AtomicBoolean();
 
     /** Constructs a new {@code PtGradientCollector} instance. */
     public PtGradientCollector() {
         gradModel = JniUtils.isGradMode();
         JniUtils.setGradMode(true);
-
-        boolean wasCollecting = isCollecting.getAndSet(true);
-        if (wasCollecting) {
-            throw new IllegalStateException(
-                    "A PtGradientCollector is already collecting. Only one can be collecting at a"
-                            + " time");
-        }
-
         zeroGradients();
     }
 
@@ -84,7 +73,6 @@ public final class PtGradientCollector implements GradientCollector {
         if (!gradModel) {
             JniUtils.setGradMode(false);
         }
-        isCollecting.set(false);
         // TODO: do some clean up if necessary
     }
 }
