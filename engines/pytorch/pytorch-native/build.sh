@@ -50,13 +50,17 @@ if [[ "$VERSION" == "1.11.0" ]]; then
   PT_VERSION=V1_11_X
 fi
 
+if [[ "$FLAVOR" = cu* ]]; then
+  USE_CUDA=1
+fi
+
 pushd .
 
 rm -rf build
 mkdir build && cd build
 mkdir classes
 javac -sourcepath ../../pytorch-engine/src/main/java/ ../../pytorch-engine/src/main/java/ai/djl/pytorch/jni/PyTorchLibrary.java -h include -d classes
-cmake -DCMAKE_PREFIX_PATH=libtorch -DPT_VERSION=${PT_VERSION} ..
+cmake -DCMAKE_PREFIX_PATH=libtorch -DPT_VERSION=${PT_VERSION} -DUSE_CUDA=$USE_CUDA ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
 
 if [[ $PLATFORM == 'darwin' ]]; then

@@ -175,6 +175,10 @@ public final class JniUtils {
         return new PtNDArray(manager, handle, data);
     }
 
+    public static void emptyCudaCache() {
+        PyTorchLibrary.LIB.torchCudaEmptyCache();
+    }
+
     public static PtNDArray createEmptyNdArray(
             PtNDManager manager, Shape shape, DataType dType, Device device, SparseFormat fmt) {
         int layoutVal = layoutMapper(fmt, device);

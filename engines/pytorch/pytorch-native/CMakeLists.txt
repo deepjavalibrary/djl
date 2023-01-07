@@ -55,6 +55,10 @@ if(PT_VERSION)
     add_compile_definitions(${PT_VERSION})
 endif()
 
+if(USE_CUDA)
+    add_compile_definitions(USE_CUDA)
+endif()
+
 add_library(djl_torch SHARED ${SOURCE_FILES})
 # build host
 if(NOT BUILD_ANDROID)
