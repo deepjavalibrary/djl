@@ -311,6 +311,14 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteTensor(
   API_END()
 }
 
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteIndex(
+    JNIEnv* env, jobject jthis, jlong jtorch_index_handle) {
+  API_BEGIN()
+  auto* index_ptr = reinterpret_cast<std::vector<torch::indexing::TensorIndex>*>(jtorch_index_handle);
+  delete index_ptr;
+  API_END()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchToSparse(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()

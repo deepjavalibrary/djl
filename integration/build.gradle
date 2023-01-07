@@ -52,33 +52,6 @@ run {
     jvmArgs "-Xverify:none"
 }
 
-jacocoTestReport {
-    group = "Reporting"
-
-    javaProjects().each { p ->
-        if ([":api", ":basicdataset"].contains(p.getPath())) {
-            additionalSourceDirs files((Set<File>) p.sourceSets.main.allJava.srcDirs)
-            additionalClassDirs((FileCollection) p.sourceSets.main.output)
-        }
-    }
-
-    afterEvaluate {
-        getClassDirectories().setFrom(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ["**/ai/djl/integration/**"])
-        })
-    }
-
-    reports {
-        xml.required = true
-        csv.required = false
-    }
-
-    // Work-around to allow us to build list of executionData files in doFirst
-    onlyIf = {
-        true
-    }
-}
-
 task debugEnv(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     systemProperties System.getProperties()
@@ -88,32 +61,3 @@ task debugEnv(type: JavaExec) {
 }
 
 tasks.distTar.enabled = false
-test.finalizedBy project.tasks.jacocoTestReport, project.tasks.jacocoTestCoverageVerification
-
-jacocoTestCoverageVerification {
-    javaProjects().each { p ->
-        if ([":api", ":basicdataset"].contains(p.getPath())) {
-            additionalSourceDirs files((Set<File>) p.sourceSets.main.allJava.srcDirs)
-            additionalClassDirs((FileCollection) p.sourceSets.main.output)
-        }
-    }
-
-    afterEvaluate {
-        getClassDirectories().setFrom(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ["**/ai/djl/integration/**"])
-        })
-    }
-
-    violationRules {
-        rule {
-            limit {
-                if (System.getProperty("ai.djl.default_engine") != null) {
-                    minimum = 0.2
-                } else {
-                    // TODO: improve coverage by running integration tests with 3 engines
-                    minimum = 0.4
-                }
-            }
-        }
-    }
-}

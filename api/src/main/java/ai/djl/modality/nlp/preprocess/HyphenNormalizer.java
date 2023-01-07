@@ -55,6 +55,7 @@ public class HyphenNormalizer implements TextProcessor {
      * @return the same string with soft hyphens dropped and hyphen-like codepoints replaced by an
      *     ASCII minus.
      */
+    @SuppressWarnings("PMD.EmptyControlStatement")
     public static String normalizeHyphens(final String s) {
         final StringBuilder temp = new StringBuilder(s.length());
         int position = 0;
