@@ -422,10 +422,6 @@ public final class JniUtils {
         } finally {
             PyTorchLibrary.LIB.torchDeleteIndex(torchIndexHandle);
         }
-
-        return PtNDArrayImpl.newPtNDArray(
-                manager,
-                PyTorchLibrary.LIB.torchIndexAdvGet(ndArray.getHandle(), torchIndexHandle));
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
