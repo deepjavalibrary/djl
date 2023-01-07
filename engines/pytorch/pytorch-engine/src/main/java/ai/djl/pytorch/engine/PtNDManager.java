@@ -199,12 +199,4 @@ public class PtNDManager extends BaseNDManager {
             super(null, null);
         }
     }
-
-    public void torchCudaEmptyCache(){
-        if (!this.device.isGpu()) {
-            return;
-        }
-
-        JniUtils.torchCudaEmptyCache();
-    }
 }

@@ -175,7 +175,7 @@ public final class JniUtils {
         return new PtNDArray(manager, handle, data);
     }
 
-    public static void torchCudaEmptyCache(){
+    public static void emptyCudaCache() {
         PyTorchLibrary.LIB.torchCudaEmptyCache();
     }
 

@@ -15,7 +15,6 @@
 
 #include <c10/util/typeid.h>
 #include <c10/util/variant.h>
-#include <c10/cuda/CUDACachingAllocator.h>
 #include <djl/utils.h>
 #include <jni.h>
 #include <torch/csrc/api/include/torch/enum.h>
