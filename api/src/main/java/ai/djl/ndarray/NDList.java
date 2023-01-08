@@ -27,7 +27,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -268,12 +267,6 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
     @Override
     public NDManager getManager() {
         return head().getManager();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<NDArray> getResourceNDArrays() {
-        return this;
     }
 
     /** {@inheritDoc} */

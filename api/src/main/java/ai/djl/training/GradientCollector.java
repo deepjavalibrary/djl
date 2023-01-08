@@ -21,14 +21,6 @@ import ai.djl.ndarray.NDArray;
  * performed within the try-with-resources are recorded and the variables marked. When {@link
  * #backward(NDArray) backward function} is called, gradients are collected w.r.t previously marked
  * variables.
- *
- * <p>The typical behavior is to open up a gradient collector during each batch and close it during
- * the end of the batch. In this way, the gradient is reset between batches. If the gradient
- * collector is left open for multiple calls to backwards, the gradients collected are accumulated
- * and added together.
- *
- * <p>Due to limitations in most engines, the gradient collectors are global. This means that only
- * one can be used at a time. If multiple are opened, an error will be thrown.
  */
 public interface GradientCollector extends AutoCloseable {
 
@@ -38,9 +30,6 @@ public interface GradientCollector extends AutoCloseable {
      * @param target the target NDArray to calculate the gradient w.r.t head
      */
     void backward(NDArray target);
-
-    /** Sets all the gradients within the engine to zero. */
-    void zeroGradients();
 
     /** {@inheritDoc} */
     @Override

@@ -28,6 +28,10 @@
 #include "djl_pytorch_utils.h"
 #include "ai_djl_pytorch_jni_cache.h"
 
+#ifdef USE_CUDA
+#include <c10/cuda/CUDACachingAllocator.h>
+#endif
+
 #if defined(__ANDROID__)
 #ifndef USE_PTHREADPOOL
 #define USE_PTHREADPOOL
@@ -325,5 +329,15 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStopProfile(
     event_ptr_lists.emplace_back(events);
   }
   WriteProfilerEventsToStream(file, event_ptr_lists);
+  API_END()
+}
+
+JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchCudaEmptyCache(JNIEnv* env, jobject jthis) {
+  API_BEGIN()
+#ifdef USE_CUDA
+  if (torch::cuda::is_available()) {
+    c10::cuda::CUDACachingAllocator::emptyCache();
+  }
+#endif
   API_END()
 }
