@@ -21,6 +21,7 @@ import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.Ec2Utils;
+import ai.djl.util.RandomUtils;
 import ai.djl.util.Utils;
 import ai.djl.util.cuda.CudaUtils;
 
@@ -271,7 +272,9 @@ public abstract class Engine {
      * @param manager the manager to manage parameters
      * @return Empty {@link SymbolBlock} for static graph
      */
-    public abstract SymbolBlock newSymbolBlock(NDManager manager);
+    public SymbolBlock newSymbolBlock(NDManager manager) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 
     /**
      * Constructs a new model.
@@ -304,7 +307,9 @@ public abstract class Engine {
      *
      * @return a new instance of {@link GradientCollector}
      */
-    public abstract GradientCollector newGradientCollector();
+    public GradientCollector newGradientCollector() {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 
     /**
      * Returns a new instance of {@link ParameterServer}.
@@ -326,6 +331,7 @@ public abstract class Engine {
      */
     public void setRandomSeed(int seed) {
         this.seed = seed;
+        RandomUtils.RANDOM.setSeed(seed);
     }
 
     /**

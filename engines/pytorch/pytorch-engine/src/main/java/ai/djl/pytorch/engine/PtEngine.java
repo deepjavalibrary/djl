@@ -21,7 +21,6 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
 import ai.djl.training.GradientCollector;
-import ai.djl.util.RandomUtils;
 import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
@@ -151,7 +150,6 @@ public final class PtEngine extends Engine {
     public void setRandomSeed(int seed) {
         super.setRandomSeed(seed);
         JniUtils.setSeed(seed);
-        RandomUtils.RANDOM.setSeed(seed);
     }
 
     /** {@inheritDoc} */

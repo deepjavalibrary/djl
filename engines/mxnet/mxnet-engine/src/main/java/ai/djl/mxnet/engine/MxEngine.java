@@ -24,7 +24,6 @@ import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
-import ai.djl.util.RandomUtils;
 import ai.djl.util.Utils;
 
 import java.io.FileNotFoundException;
@@ -157,7 +156,6 @@ public final class MxEngine extends Engine {
     public void setRandomSeed(int seed) {
         super.setRandomSeed(seed);
         JnaUtils.randomSeed(seed);
-        RandomUtils.RANDOM.setSeed(seed);
     }
 
     /** {@inheritDoc} */

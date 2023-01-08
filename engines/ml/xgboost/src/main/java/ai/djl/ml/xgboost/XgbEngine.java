@@ -17,8 +17,6 @@ import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
-import ai.djl.nn.SymbolBlock;
-import ai.djl.training.GradientCollector;
 
 import ml.dmlc.xgboost4j.java.JniUtils;
 
@@ -103,12 +101,6 @@ public final class XgbEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public SymbolBlock newSymbolBlock(NDManager manager) {
-        throw new UnsupportedOperationException("XGBoost does not support empty symbol block");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Model newModel(String name, Device device) {
         return new XgbModel(name, newBaseManager(device));
     }
@@ -123,18 +115,6 @@ public final class XgbEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return XgbNDManager.getSystemManager().newSubManager(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public GradientCollector newGradientCollector() {
-        throw new UnsupportedOperationException("Not supported for XGBoost");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRandomSeed(int seed) {
-        throw new UnsupportedOperationException("Not supported for XGBoost");
     }
 
     /** {@inheritDoc} */

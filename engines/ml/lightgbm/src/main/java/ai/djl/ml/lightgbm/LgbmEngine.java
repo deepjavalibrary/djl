@@ -18,8 +18,6 @@ import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.ml.lightgbm.jni.LibUtils;
 import ai.djl.ndarray.NDManager;
-import ai.djl.nn.SymbolBlock;
-import ai.djl.training.GradientCollector;
 
 import java.io.IOException;
 
@@ -91,12 +89,6 @@ public final class LgbmEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public SymbolBlock newSymbolBlock(NDManager manager) {
-        throw new UnsupportedOperationException("LightGBM does not support empty symbol block");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Model newModel(String name, Device device) {
         return new LgbmModel(name, newBaseManager(device));
     }
@@ -111,17 +103,5 @@ public final class LgbmEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return LgbmNDManager.getSystemManager().newSubManager(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public GradientCollector newGradientCollector() {
-        throw new UnsupportedOperationException("Not supported for LightGBM");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRandomSeed(int seed) {
-        throw new UnsupportedOperationException("Not supported for LightGBM");
     }
 }
