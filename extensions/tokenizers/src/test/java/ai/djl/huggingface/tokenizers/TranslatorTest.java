@@ -461,6 +461,66 @@ public class TranslatorTest {
     }
 
     @Test
+    public void testTextEmbeddingBatchTranslator()
+            throws ModelException, IOException, TranslateException {
+        String[] text = {"This is an example sentence", "This is the second sentence"};
+
+        Block block =
+                new LambdaBlock(
+                        a -> {
+                            NDManager manager = a.getManager();
+                            NDArray arr = manager.ones(new Shape(2, 7, 384));
+                            arr.setName("last_hidden_state");
+                            return new NDList(arr);
+                        },
+                        "model");
+        Path modelDir = Paths.get("build/model");
+        Files.createDirectories(modelDir);
+
+        Criteria<String[], float[][]> criteria =
+                Criteria.builder()
+                        .setTypes(String[].class, float[][].class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("padding", "true")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String[], float[][]> model = criteria.loadModel();
+                Predictor<String[], float[][]> predictor = model.newPredictor()) {
+            float[][] res = predictor.predict(text);
+            Assert.assertEquals(res[0].length, 384);
+            Assertions.assertAlmostEquals(res[0][0], 0.05103);
+        }
+
+        Criteria<Input, Output> criteria2 =
+                Criteria.builder()
+                        .setTypes(Input.class, Output.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("padding", "true")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<Input, Output> model = criteria2.loadModel();
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            Input input = new Input();
+            input.add(JsonUtils.GSON.toJson(text));
+            input.addProperty("Content-Type", "application/json");
+            Output out = predictor.predict(input);
+            float[][] res = JsonUtils.GSON.fromJson(out.getAsString(0), float[][].class);
+            Assert.assertEquals(res[0].length, 384);
+            Assertions.assertAlmostEquals(res[0][0], 0.05103);
+        }
+    }
+
+    @Test
     public void testTextClassificationTranslator()
             throws ModelException, IOException, TranslateException {
         String text = "DJL is the best.";

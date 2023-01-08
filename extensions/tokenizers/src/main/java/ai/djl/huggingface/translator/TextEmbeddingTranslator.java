@@ -72,28 +72,8 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     public float[] processOutput(TranslatorContext ctx, NDList list) {
         NDArray embeddings = list.get("last_hidden_state");
         Encoding encoding = (Encoding) ctx.getAttachment("encoding");
-        long[] attentionMask = encoding.getAttentionMask();
         NDManager manager = ctx.getNDManager();
-        NDArray inputAttentionMask = manager.create(attentionMask).toType(DataType.FLOAT32, true);
-        switch (pooling) {
-            case "mean_tokens":
-                embeddings = meanPool(embeddings, inputAttentionMask, false);
-                break;
-            case "mean_sqrt_len_tokens":
-                embeddings = meanPool(embeddings, inputAttentionMask, true);
-                break;
-            case "max_tokens":
-                embeddings = maxPool(embeddings, inputAttentionMask);
-                break;
-            case "weightedmean_tokens":
-                embeddings = weightedMeanPool(embeddings, inputAttentionMask);
-                break;
-            case "cls_token":
-                embeddings = embeddings.get(0);
-                break;
-            default:
-                throw new AssertionError("Unexpected pooling model: " + pooling);
-        }
+        embeddings = processEmbedding(manager, embeddings, encoding, pooling);
         if (normalize) {
             embeddings = embeddings.normalize(2, 0);
         }
@@ -101,7 +81,33 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         return embeddings.toFloatArray();
     }
 
-    private NDArray meanPool(NDArray embeddings, NDArray attentionMask, boolean sqrt) {
+    /** {@inheritDoc} */
+    @Override
+    public TextEmbeddingBatchTranslator toBatchTranslator(Batchifier batchifier) {
+        return new TextEmbeddingBatchTranslator(tokenizer, batchifier, pooling, normalize);
+    }
+
+    static NDArray processEmbedding(
+            NDManager manager, NDArray embeddings, Encoding encoding, String pooling) {
+        long[] attentionMask = encoding.getAttentionMask();
+        NDArray inputAttentionMask = manager.create(attentionMask).toType(DataType.FLOAT32, true);
+        switch (pooling) {
+            case "mean_tokens":
+                return meanPool(embeddings, inputAttentionMask, false);
+            case "mean_sqrt_len_tokens":
+                return meanPool(embeddings, inputAttentionMask, true);
+            case "max_tokens":
+                return maxPool(embeddings, inputAttentionMask);
+            case "weightedmean_tokens":
+                return weightedMeanPool(embeddings, inputAttentionMask);
+            case "cls_token":
+                return embeddings.get(0);
+            default:
+                throw new AssertionError("Unexpected pooling model: " + pooling);
+        }
+    }
+
+    private static NDArray meanPool(NDArray embeddings, NDArray attentionMask, boolean sqrt) {
         long[] shape = embeddings.getShape().getShape();
         attentionMask = attentionMask.expandDims(-1).broadcast(shape);
         NDArray inputAttentionMaskSum = attentionMask.sum(AXIS);
@@ -114,7 +120,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         return sum.div(clamp);
     }
 
-    private NDArray maxPool(NDArray embeddings, NDArray inputAttentionMask) {
+    private static NDArray maxPool(NDArray embeddings, NDArray inputAttentionMask) {
         long[] shape = embeddings.getShape().getShape();
         inputAttentionMask = inputAttentionMask.expandDims(-1).broadcast(shape);
         inputAttentionMask = inputAttentionMask.eq(0);
@@ -124,7 +130,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         return embeddings.max(AXIS, true);
     }
 
-    private NDArray weightedMeanPool(NDArray embeddings, NDArray attentionMask) {
+    private static NDArray weightedMeanPool(NDArray embeddings, NDArray attentionMask) {
         long[] shape = embeddings.getShape().getShape();
         NDArray weight = embeddings.getManager().arange(1, shape[0] + 1);
         weight = weight.expandDims(-1).broadcast(shape);
