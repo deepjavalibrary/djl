@@ -178,7 +178,7 @@ public class LayerNorm extends AbstractBlock {
     }
 
     /** The Builder to construct a {@link LayerNorm}. */
-    public static final class Builder {
+    public static class Builder {
 
         private float epsilon = 1E-5f;
         // private Shape normalizedShape;
