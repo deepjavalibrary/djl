@@ -57,16 +57,16 @@ import java.util.Arrays;
  */
 public class LayerNorm extends AbstractBlock {
 
-    protected float epsilon;
-    protected Shape normalizedShape;
+    private float epsilon;
+    private Shape normalizedShape;
 
-    protected boolean center;
-    protected boolean scale;
-    protected int[] axis;
-    protected Parameter gamma;
-    protected Parameter beta;
+    private boolean center;
+    private boolean scale;
+    private int[] axis;
+    private Parameter gamma;
+    private Parameter beta;
 
-    protected LayerNorm(Builder builder) {
+    LayerNorm(Builder builder) {
         epsilon = builder.epsilon;
         scale = builder.scale;
         center = builder.center;
@@ -186,7 +186,7 @@ public class LayerNorm extends AbstractBlock {
         private boolean center = true;
         private int[] axis;
 
-        protected Builder() {}
+        Builder() {}
 
         /**
          * List the axis over which the mean and variance will be calculated (alternative to

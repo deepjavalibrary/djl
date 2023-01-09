@@ -64,7 +64,7 @@ public class Linear extends AbstractBlock {
     private Parameter weight;
     private Parameter bias;
 
-    protected Linear(Builder builder) {
+    Linear(Builder builder) {
         super(VERSION);
         units = builder.units;
         weight =
@@ -202,12 +202,12 @@ public class Linear extends AbstractBlock {
     }
 
     /** The Builder to construct a {@link Linear} type of {@link Block}. */
-    public static class Builder {
+    public static final class Builder {
 
-        protected long units;
+        private long units;
         private boolean bias = true;
 
-        protected Builder() {}
+        Builder() {}
 
         /**
          * Sets the number of output channels.
