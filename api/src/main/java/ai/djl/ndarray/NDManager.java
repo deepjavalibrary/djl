@@ -35,6 +35,7 @@ import java.nio.LongBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * NDArray managers are used to create <I>NDArrays</I> (n-dimensional array on native engine).
@@ -1545,6 +1546,13 @@ public interface NDManager extends AutoCloseable {
     Device getDevice();
 
     /**
+     * Returns all {@link NDArray}s managed by this manager (including recursively).
+     *
+     * @return all {@link NDArray}s managed by this manager (including recursively)
+     */
+    List<NDArray> getManagedArrays();
+
+    /**
      * Attaches a resource to this {@code NDManager}.
      *
      * <p>The attached resource will be closed when this {@code NDManager} is closed.
@@ -1677,9 +1685,6 @@ public interface NDManager extends AutoCloseable {
      * @return the {@link Engine} associated with this manager
      */
     Engine getEngine();
-
-    /** Sets all the gradients within the NDManager to zero. */
-    void zeroGradients();
 
     /** {@inheritDoc} */
     @Override

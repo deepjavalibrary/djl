@@ -82,23 +82,88 @@ public class GradientCollectorIntegrationTest {
         }
     }
 
+    @Test
+    public void testZeroGradients() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray a = manager.create(0.0f);
+            a.setRequiresGradient(true);
+
+            Engine engine = Engine.getEngine(TestUtils.getEngine());
+            try (GradientCollector gc = engine.newGradientCollector()) {
+                NDArray b = a.mul(2);
+
+                // Gradients are initially zero
+                Assert.assertEquals(a.getGradient().getFloat(), 0.0f);
+
+                // Gradients are updated by backwards
+                gc.backward(b);
+                Assert.assertEquals(a.getGradient().getFloat(), 2.0f);
+
+                // Gradients are cleared by zeroGradients
+                gc.zeroGradients();
+                Assert.assertEquals(a.getGradient().getFloat(), 0.0f);
+            }
+        }
+    }
+
     /** Tests that the gradients do not accumulate when closing the gradient collector. */
     @Test
     public void testClearGradients() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
-            NDArray variable = manager.create(0.0f);
-            variable.setRequiresGradient(true);
+            NDArray a = manager.create(0.0f);
+            a.setRequiresGradient(true);
 
-            Engine engine = manager.getEngine();
+            Engine engine = Engine.getEngine(TestUtils.getEngine());
             for (int i = 0; i < 3; i++) {
-                manager.zeroGradients();
                 try (GradientCollector gc = engine.newGradientCollector()) {
-                    NDArray loss = variable.mul(2);
-                    gc.backward(loss);
+                    NDArray b = a.mul(2);
+                    gc.backward(b);
                 }
-                Assert.assertEquals(variable.getGradient().getFloat(), 2.0f);
+                Assert.assertEquals(a.getGradient().getFloat(), 2.0f);
             }
         }
+    }
+
+    /** Tests that the gradients do accumulate within the same gradient collector. */
+    @Test
+    public void testAccumulateGradients() {
+        // TODO: MXNet support for accumulating gradients does not currently work
+        TestRequirements.notEngine("MXNet");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray a = manager.create(0.0f);
+            a.setRequiresGradient(true);
+
+            Engine engine = Engine.getEngine(TestUtils.getEngine());
+            try (GradientCollector gc = engine.newGradientCollector()) {
+                for (int i = 1; i <= 3; i++) {
+                    NDArray b = a.mul(2);
+                    gc.backward(b);
+                    Assert.assertEquals(a.getGradient().getFloat(), 2.0f * i);
+                }
+            }
+        }
+    }
+
+    /**
+     * Ensures that a gradient collector does not start when one is already created because they are
+     * global.
+     */
+    @Test
+    @SuppressWarnings({"try", "PMD.UseTryWithResources"})
+    public void testMultipleGradientCollectors() {
+        Assert.assertThrows(
+                () -> {
+                    GradientCollector gc2 = null;
+                    Engine engine = Engine.getEngine(TestUtils.getEngine());
+                    try (GradientCollector gc = engine.newGradientCollector()) {
+                        gc2 = engine.newGradientCollector();
+                        gc2.close();
+                    } finally {
+                        if (gc2 != null) {
+                            gc2.close();
+                        }
+                    }
+                });
     }
 
     @Test
