@@ -19,8 +19,6 @@ import ai.djl.dlr.jni.LibUtils;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDManager;
-import ai.djl.nn.SymbolBlock;
-import ai.djl.training.GradientCollector;
 
 /**
  * The {@code DlrEngine} is an implementation of the {@link Engine} based on the <a
@@ -88,12 +86,6 @@ public final class DlrEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public SymbolBlock newSymbolBlock(NDManager manager) {
-        throw new UnsupportedOperationException("DLR does not support empty SymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Model newModel(String name, Device device) {
         // Only support CPU for now
         if (device != null && device != Device.cpu()) {
@@ -112,17 +104,5 @@ public final class DlrEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return DlrNDManager.getSystemManager().newSubManager(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public GradientCollector newGradientCollector() {
-        throw new UnsupportedOperationException("Not supported for DLR");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRandomSeed(int seed) {
-        throw new UnsupportedOperationException("Not supported for DLR");
     }
 }

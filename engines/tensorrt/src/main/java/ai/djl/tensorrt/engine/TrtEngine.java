@@ -17,11 +17,8 @@ import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
 import ai.djl.engine.StandardCapabilities;
-import ai.djl.ndarray.NDManager;
-import ai.djl.nn.SymbolBlock;
 import ai.djl.tensorrt.jni.JniUtils;
 import ai.djl.tensorrt.jni.LibUtils;
-import ai.djl.training.GradientCollector;
 import ai.djl.util.Utils;
 
 import java.io.FileNotFoundException;
@@ -108,12 +105,6 @@ public final class TrtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public SymbolBlock newSymbolBlock(NDManager manager) {
-        throw new UnsupportedOperationException("TensorRT does not support empty SymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Model newModel(String name, Device device) {
         return new TrtModel(name, newBaseManager(device));
     }
@@ -133,18 +124,6 @@ public final class TrtEngine extends Engine {
             throw new IllegalArgumentException("TensorRT only support GPU");
         }
         return TrtNDManager.getSystemManager().newSubManager(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public GradientCollector newGradientCollector() {
-        throw new UnsupportedOperationException("Not supported for TensorRT");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRandomSeed(int seed) {
-        throw new UnsupportedOperationException("Not supported for TensorRT");
     }
 
     /** {@inheritDoc} */

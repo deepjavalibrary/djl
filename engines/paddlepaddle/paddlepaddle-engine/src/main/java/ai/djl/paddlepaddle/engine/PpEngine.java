@@ -16,9 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
-import ai.djl.nn.SymbolBlock;
 import ai.djl.paddlepaddle.jni.LibUtils;
-import ai.djl.training.GradientCollector;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -100,12 +98,6 @@ public final class PpEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public SymbolBlock newSymbolBlock(NDManager manager) {
-        throw new UnsupportedOperationException("PaddlePaddle does not support empty SymbolBlock");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDManager newBaseManager() {
         return newBaseManager(null);
     }
@@ -114,17 +106,5 @@ public final class PpEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return PpNDManager.getSystemManager().newSubManager(device);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public GradientCollector newGradientCollector() {
-        throw new UnsupportedOperationException("Not supported for PaddlePaddle");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRandomSeed(int seed) {
-        throw new UnsupportedOperationException("Not supported for PaddlePaddle");
     }
 }
