@@ -302,16 +302,4 @@ public final class PassthroughNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public void close() {}
-
-    /** {@inheritDoc} */
-    @Override
-    public void closeSubManagersWithoutResources() {
-        throw new UnsupportedOperationException(UNSUPPORTED);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void closeIfWithoutResources() {
-        throw new UnsupportedOperationException(UNSUPPORTED);
-    }
 }

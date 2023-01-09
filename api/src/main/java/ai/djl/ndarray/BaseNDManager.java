@@ -74,25 +74,6 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public void closeSubManagersWithoutResources() {
-        for (AutoCloseable resource : resources.values()) {
-            if (resource instanceof NDManager) {
-                NDManager subManager = (NDManager) resource;
-                subManager.closeIfWithoutResources();
-            }
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void closeIfWithoutResources() {
-        if (resources.isEmpty()) {
-            close();
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray create(String[] data, Charset charset, Shape shape) {
         throw new UnsupportedOperationException("Not supported!");
     }

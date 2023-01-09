@@ -1690,12 +1690,6 @@ public interface NDManager extends AutoCloseable {
     @Override
     void close();
 
-    /** Closes all subManagers that do not have any resources attached to them. */
-    void closeSubManagersWithoutResources();
-
-    /** Closes if it does not have any resources attached. */
-    void closeIfWithoutResources();
-
     /**
      * A {@link SystemNDManager} is a marker class for a base NDManager.
      *
