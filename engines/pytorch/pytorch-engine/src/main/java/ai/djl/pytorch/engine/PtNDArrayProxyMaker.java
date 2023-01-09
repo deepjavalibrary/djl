@@ -23,14 +23,17 @@ import java.util.concurrent.atomic.AtomicLong;
 /** {@code PtNDArrayProxyMaker} creates a proxy facade. */
 public class PtNDArrayProxyMaker implements NDArrayProxyMaker {
 
-    WeakHashMapWrapper<String, NDArray> map = new WeakHashMapWrapper<>();
+    ThreadLocal<WeakHashMapWrapper<String, NDArray>> tLocalMap = new ThreadLocal<>();
 
     AtomicLong counter = new AtomicLong(0);
 
     /** {@inheritDoc} */
     @Override
     public int mapSize() {
-        return map.size();
+        if (tLocalMap.get() == null) {
+            tLocalMap.set(new WeakHashMapWrapper<>());
+        }
+        return tLocalMap.get().size();
     }
 
     /**
@@ -41,6 +44,12 @@ public class PtNDArrayProxyMaker implements NDArrayProxyMaker {
      */
     @Override
     public PtNDArray wrap(NDArray array) {
+
+        if (tLocalMap.get() == null) {
+            tLocalMap.set(new WeakHashMapWrapper<>());
+        }
+        WeakHashMapWrapper<String, NDArray> map = tLocalMap.get();
+
         String uid = array.getUid() + "-" + counter.incrementAndGet();
         map.put(uid, array);
         DynamicInvocationHandler handler = new DynamicInvocationHandler(uid, map, this);

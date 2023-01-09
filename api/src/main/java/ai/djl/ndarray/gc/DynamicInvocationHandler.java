@@ -59,10 +59,19 @@ public class DynamicInvocationHandler implements InvocationHandler {
         }
         Object result;
         try {
-            result = method.invoke(map.get(uid), args);
+            NDArray ndArray = map.get(uid);
+            if (ndArray == null) {
+                logger.error("no nDArray found for uid: {}", uid);
+                throw new GCRuntimeException(
+                        "no nDArray could be found for uid: "
+                                + uid
+                                + ". Consider calling the methods of a particular nDArray only from"
+                                + " one thread or do not switch on garbage collection.");
+            }
+            result = method.invoke(ndArray, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
             logger.error("Error invoking method", e);
-            throw new RuntimeException(e); // NOPMD
+            throw new GCRuntimeException(e);
         }
 
         return result;
