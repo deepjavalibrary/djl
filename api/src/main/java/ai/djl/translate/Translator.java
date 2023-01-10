@@ -13,6 +13,11 @@
 package ai.djl.translate;
 
 import ai.djl.inference.Predictor;
+import ai.djl.ndarray.NDList;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The {@code Translator} interface provides model pre-processing and postprocessing functionality.
@@ -75,7 +80,7 @@ import ai.djl.inference.Predictor;
 public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
 
     /**
-     * Gets the {@link Batchifier}.
+     * Returns the {@link Batchifier}.
      *
      * @return the {@link Batchifier}
      */
@@ -93,11 +98,66 @@ public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
     default void prepare(TranslatorContext ctx) throws Exception {}
 
     /**
-     * Return possible {@link TranslatorOptions} that can be built using this {@link Translator}.
+     * Returns possible {@link TranslatorOptions} that can be built using this {@link Translator}.
      *
      * @return possible options or null if not defined
      */
     default TranslatorOptions getExpansions() {
         return null;
+    }
+
+    /**
+     * Returns a batch translator.
+     *
+     * @return a batch translator
+     */
+    default Translator<I[], O[]> toBatchTranslator() {
+        return toBatchTranslator(getBatchifier());
+    }
+
+    /**
+     * Returns a batch translator.
+     *
+     * @param batchifier the {@link Batchifier} to use
+     * @return a batch translator
+     */
+    default Translator<I[], O[]> toBatchTranslator(Batchifier batchifier) {
+        if (batchifier == null) {
+            return null;
+        }
+
+        return new NoBatchifyTranslator<I[], O[]>() {
+
+            /** {@inheritDoc} */
+            @Override
+            @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+            public void prepare(TranslatorContext ctx) throws Exception {
+                Translator.this.prepare(ctx);
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+            public NDList processInput(TranslatorContext ctx, I[] inputs) throws Exception {
+                NDList[] preprocessed = new NDList[inputs.length];
+                for (int i = 0; i < inputs.length; ++i) {
+                    preprocessed[i] = Translator.this.processInput(ctx, inputs[i]);
+                }
+                return batchifier.batchify(preprocessed);
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "unchecked"})
+            public O[] processOutput(TranslatorContext ctx, NDList list) throws Exception {
+                NDList[] unbatched = batchifier.unbatchify(list);
+                List<O> outputs = new ArrayList<>(unbatched.length);
+                for (NDList output : unbatched) {
+                    outputs.add(Translator.this.processOutput(ctx, output));
+                }
+                O[] type = (O[]) Array.newInstance(outputs.get(0).getClass(), 0);
+                return outputs.toArray(type);
+            }
+        };
     }
 }

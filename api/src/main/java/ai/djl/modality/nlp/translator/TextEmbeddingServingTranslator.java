@@ -16,14 +16,16 @@ import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 
 /** A {@link Translator} that can handle generic text embedding {@link Input} and {@link Output}. */
-public class TextEmbeddingServingTranslator implements Translator<Input, Output> {
+public class TextEmbeddingServingTranslator implements NoBatchifyTranslator<Input, Output> {
 
     private Translator<String, float[]> translator;
+    private Translator<String[], float[][]> batchTranslator;
 
     /**
      * Constructs a {@code TextEmbeddingServingTranslator} instance.
@@ -32,12 +34,7 @@ public class TextEmbeddingServingTranslator implements Translator<Input, Output>
      */
     public TextEmbeddingServingTranslator(Translator<String, float[]> translator) {
         this.translator = translator;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return translator.getBatchifier();
+        this.batchTranslator = translator.toBatchTranslator();
     }
 
     /** {@inheritDoc} */
@@ -49,16 +46,35 @@ public class TextEmbeddingServingTranslator implements Translator<Input, Output>
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Input input) throws Exception {
+        String contentType = input.getProperty("Content-Type", null);
         String text = input.getData().getAsString();
-        return translator.processInput(ctx, text);
+        if ("application/json".equals(contentType)) {
+            ctx.setAttachment("batch", Boolean.TRUE);
+            String[] inputs = JsonUtils.GSON.fromJson(text, String[].class);
+            return batchTranslator.processInput(ctx, inputs);
+        }
+        NDList ret = translator.processInput(ctx, text);
+        Batchifier batchifier = translator.getBatchifier();
+        if (batchifier != null) {
+            NDList[] batch = {ret};
+            return batchifier.batchify(batch);
+        }
+        return ret;
     }
 
     /** {@inheritDoc} */
     @Override
     public Output processOutput(TranslatorContext ctx, NDList list) throws Exception {
-        float[] ret = translator.processOutput(ctx, list);
         Output output = new Output();
-        output.add(JsonUtils.GSON_PRETTY.toJson(ret));
+        if (ctx.getAttachment("batch") != null) {
+            output.add(JsonUtils.GSON_PRETTY.toJson(batchTranslator.processOutput(ctx, list)));
+        } else {
+            Batchifier batchifier = translator.getBatchifier();
+            if (batchifier != null) {
+                list = batchifier.unbatchify(list)[0];
+            }
+            output.add(JsonUtils.GSON_PRETTY.toJson(translator.processOutput(ctx, list)));
+        }
         return output;
     }
 }
