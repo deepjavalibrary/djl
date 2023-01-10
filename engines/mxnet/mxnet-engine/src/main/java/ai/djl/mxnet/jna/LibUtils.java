@@ -296,6 +296,7 @@ public final class LibUtils {
     private static boolean supported(Platform platform) {
         // mxnet-native-cu102mkl:1.8.0: 3.0, 5.0, 6.0, 7.0, 7.5
         // mxnet-native-cu110mkl:1.8.0: 5.0, 6.0, 7.0, 8.0
+        // mxnet-native-cu112mkl:1.9.1: 5.0, 6.0, 7.0, 7.5, 8.0, 8.6
         String version = platform.getVersion();
         if (version.startsWith("1.8.") || version.startsWith("1.9.")) {
             String flavor = platform.getFlavor();
@@ -304,7 +305,7 @@ public final class LibUtils {
                 if (version.startsWith("1.8.")) {
                     return Arrays.asList("50", "60", "70", "80").contains(cudaArch);
                 }
-                return Arrays.asList("50", "60", "70", "75", "80").contains(cudaArch);
+                return Arrays.asList("50", "60", "70", "75", "80", "86").contains(cudaArch);
             } else if (flavor.startsWith("cu10")) {
                 return Arrays.asList("30", "50", "60", "70", "75").contains(cudaArch);
             }
