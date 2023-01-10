@@ -63,9 +63,9 @@ public class Audio {
     }
 
     /**
-     * Get the number of channels of an audio file.
+     * Returns the number of channels of an audio file.
      *
-     * @return The number of channels of an audio file.
+     * @return the number of channels of an audio file
      */
     public int getChannels() {
         return channels;

@@ -36,9 +36,16 @@ public abstract class AudioFactory {
         "ai.djl.audio.FFmpegAudioFactory", "ai.djl.modality.audio.SampledAudioFactory"
     };
 
-    private static AudioFactory factory = newInstance();
+    protected int channels;
+    protected int sampleRate;
+    protected int sampleFormat;
 
-    private static AudioFactory newInstance() {
+    /**
+     * Constructs a new instance of {@code AudioFactory}.
+     *
+     * @return a new instance of {@code AudioFactory}
+     */
+    public static AudioFactory newInstance() {
         for (String f : FACTORIES) {
             try {
                 Class<? extends AudioFactory> clazz =
@@ -49,15 +56,6 @@ public abstract class AudioFactory {
             }
         }
         throw new IllegalStateException("Failed to create AudioFactory!");
-    }
-
-    /**
-     * Gets new instance of Audio factory from the provided factory implementation.
-     *
-     * @return {@link AudioFactory}
-     */
-    public static AudioFactory getInstance() {
-        return factory;
     }
 
     /**
@@ -112,7 +110,9 @@ public abstract class AudioFactory {
      * @param data the raw data in float array form.
      * @return {@link Audio}
      */
-    public abstract Audio fromData(float[] data);
+    public Audio fromData(float[] data) {
+        return new Audio(data);
+    }
 
     /**
      * Returns {@link Audio} from {@link NDArray}.
@@ -120,5 +120,67 @@ public abstract class AudioFactory {
      * @param array the NDArray with CHW format
      * @return {@link Audio}
      */
-    public abstract Audio fromNDArray(NDArray array);
+    public Audio fromNDArray(NDArray array) {
+        throw new UnsupportedOperationException("Not supported!");
+    }
+
+    /**
+     * Sets the number of channels for {@link AudioFactory} to use.
+     *
+     * @param channels the number of channels for {@link AudioFactory} to use
+     * @return this factory
+     */
+    public AudioFactory setChannels(int channels) {
+        this.channels = channels;
+        return this;
+    }
+
+    /**
+     * Returns the channels of this factory.
+     *
+     * @return the channels of this factory
+     */
+    public int getChannels() {
+        return channels;
+    }
+
+    /**
+     * Sets the sampleRate for {@link AudioFactory} to use.
+     *
+     * @param sampleRate the sampleRate for {@link AudioFactory} to use
+     * @return this factory
+     */
+    public AudioFactory setSampleRate(int sampleRate) {
+        this.sampleRate = sampleRate;
+        return this;
+    }
+
+    /**
+     * Returns the sample rate.
+     *
+     * @return the sample rate in integer
+     */
+    public int getSampleRate() {
+        return sampleRate;
+    }
+
+    /**
+     * Sets the audio sample format for {@link AudioFactory} to use.
+     *
+     * @param sampleFormat the sample format
+     * @return this factory.
+     */
+    public AudioFactory setSampleFormat(int sampleFormat) {
+        this.sampleFormat = sampleFormat;
+        return this;
+    }
+
+    /**
+     * Returns the sample format name of the audio.
+     *
+     * @return the format name of the audio
+     */
+    public int getSampleFormat() {
+        return sampleFormat;
+    }
 }

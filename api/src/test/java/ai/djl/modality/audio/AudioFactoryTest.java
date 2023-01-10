@@ -22,8 +22,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class AudioFactoryTest {
@@ -37,37 +35,36 @@ public class AudioFactoryTest {
 
     @Test
     public void testFromFile() throws IOException {
-        Audio audio = AudioFactory.getInstance().fromFile(Paths.get("build/test/test_01.wav"));
+        Audio audio = AudioFactory.newInstance().fromFile(Paths.get("build/test/test_01.wav"));
         Assert.assertEquals(audio.getSampleRate(), 16000f);
         Assert.assertEquals(audio.getChannels(), 1);
+
+        AudioFactory factory = AudioFactory.newInstance().setChannels(0);
+        Assert.assertEquals(factory.getChannels(), 0);
+        Assert.assertEquals(factory.getSampleFormat(), 0);
+        Assert.assertEquals(factory.getSampleRate(), 0);
+        Assert.assertThrows(() -> factory.setChannels(1));
+        Assert.assertThrows(() -> factory.setSampleRate(1000));
+        Assert.assertThrows(() -> factory.setSampleFormat(1)); // AV_SAMPLE_FMT_S16
     }
 
     @Test
     public void testFromUrl() throws IOException {
-        Audio audio = AudioFactory.getInstance().fromUrl("build/test/test_01.wav");
+        Audio audio = AudioFactory.newInstance().fromUrl("build/test/test_01.wav");
         Assert.assertEquals(audio.getSampleRate(), 16000f);
         Assert.assertEquals(audio.getChannels(), 1);
 
-        audio = AudioFactory.getInstance().fromUrl(URL);
+        audio = AudioFactory.newInstance().fromUrl(URL);
         Assert.assertEquals(audio.getSampleRate(), 16000f);
         Assert.assertEquals(audio.getChannels(), 1);
-    }
-
-    @Test
-    public void testFromInputStream() throws IOException {
-        try (InputStream is = Files.newInputStream(Paths.get("build/test/test_01.wav"))) {
-            Audio audio = AudioFactory.getInstance().fromInputStream(is);
-            Assert.assertEquals(audio.getSampleRate(), 16000f);
-            Assert.assertEquals(audio.getChannels(), 1);
-        }
     }
 
     @Test
     public void testFromData() {
         float[] data = {0.001f, 0.002f, 0.003f};
-        Audio audio = AudioFactory.getInstance().fromData(data);
+        Audio audio = AudioFactory.newInstance().fromData(data);
         Assert.assertEquals(audio.getData(), data);
-        Assert.assertEquals(audio.getSampleRate(), 0);
+        Assert.assertEquals(audio.getSampleRate(), 0f);
         Assert.assertEquals(audio.getChannels(), 0);
     }
 
@@ -75,7 +72,7 @@ public class AudioFactoryTest {
     public void testFromNDArray() {
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.zeros(new Shape(1));
-            AudioFactory.getInstance().fromNDArray(array);
+            AudioFactory.newInstance().fromNDArray(array);
         }
     }
 }

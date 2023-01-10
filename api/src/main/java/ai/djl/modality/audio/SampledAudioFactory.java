@@ -13,7 +13,6 @@
 package ai.djl.modality.audio;
 
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.ndarray.NDArray;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -39,14 +38,32 @@ public class SampledAudioFactory extends AudioFactory {
 
     /** {@inheritDoc} */
     @Override
+    public AudioFactory setChannels(int channel) {
+        if (channel != 0) {
+            throw new UnsupportedOperationException("SampledAudioFactory only support 1 channel.");
+        }
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public AudioFactory setSampleRate(int sampleRate) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public AudioFactory setSampleFormat(int sampleFormat) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Audio fromFile(Path path) throws IOException {
         try (AudioInputStream ais = AudioSystem.getAudioInputStream(path.toFile())) {
             AudioFormat format = ais.getFormat();
             byte[] bytes = read(ais);
-            float[] floats =
-                    bytesToFloats(
-                            bytes,
-                            format.isBigEndian() ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
+            float[] floats = bytesToFloats(bytes, format.isBigEndian());
             return new Audio(floats, format.getSampleRate(), format.getChannels());
         } catch (UnsupportedAudioFileException e) {
             throw new IOException("Unsupported Audio file", e);
@@ -59,26 +76,11 @@ public class SampledAudioFactory extends AudioFactory {
         try (AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is))) {
             AudioFormat format = ais.getFormat();
             byte[] bytes = read(ais);
-            float[] floats =
-                    bytesToFloats(
-                            bytes,
-                            format.isBigEndian() ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
+            float[] floats = bytesToFloats(bytes, format.isBigEndian());
             return new Audio(floats, format.getSampleRate(), format.getChannels());
         } catch (UnsupportedAudioFileException e) {
             throw new IOException("Unsupported Audio file", e);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Audio fromData(float[] data) {
-        return new Audio(data);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Audio fromNDArray(NDArray array) {
-        throw new UnsupportedOperationException("Not supported!");
     }
 
     private byte[] read(AudioInputStream ais) throws IOException {
@@ -102,7 +104,8 @@ public class SampledAudioFactory extends AudioFactory {
         return ret;
     }
 
-    private float[] bytesToFloats(byte[] bytes, ByteOrder order) {
+    private float[] bytesToFloats(byte[] bytes, boolean isBigEndian) {
+        ByteOrder order = isBigEndian ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
         ShortBuffer buffer = ByteBuffer.wrap(bytes).order(order).asShortBuffer();
         short[] shorts = new short[buffer.capacity()];
         buffer.get(shorts);

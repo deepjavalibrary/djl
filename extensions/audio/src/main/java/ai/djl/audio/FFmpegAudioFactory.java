@@ -14,7 +14,6 @@ package ai.djl.audio;
 
 import ai.djl.modality.audio.Audio;
 import ai.djl.modality.audio.AudioFactory;
-import ai.djl.ndarray.NDArray;
 
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
@@ -22,6 +21,8 @@ import org.bytedeco.javacv.FrameGrabber;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.Buffer;
+import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class FFmpegAudioFactory extends AudioFactory {
     @Override
     public Audio fromFile(Path path) throws IOException {
         try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(path.toFile())) {
+            applyConfig(grabber);
             grabber.start();
             float[] floats = grab(grabber);
             return new Audio(floats, grabber.getSampleRate(), grabber.getAudioChannels());
@@ -49,6 +51,7 @@ public class FFmpegAudioFactory extends AudioFactory {
     @Override
     public Audio fromInputStream(InputStream is) throws IOException {
         try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(is)) {
+            applyConfig(grabber);
             grabber.start();
             float[] floats = grab(grabber);
             return new Audio(floats, grabber.getSampleRate(), grabber.getAudioChannels());
@@ -57,20 +60,22 @@ public class FFmpegAudioFactory extends AudioFactory {
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Audio fromData(float[] data) {
-        return new Audio(data);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Audio fromNDArray(NDArray array) {
-        throw new UnsupportedOperationException("Not supported!");
+    private void applyConfig(FFmpegFrameGrabber grabber) {
+        if (channels > 0) {
+            grabber.setAudioChannels(channels);
+        }
+        if (sampleRate > 0) {
+            grabber.setSampleRate(sampleRate);
+        }
+        if (sampleFormat > 0) {
+            grabber.setSampleFormat(sampleFormat);
+        }
     }
 
     /**
-     * Grab frames from the audio using {@link FFmpegFrameGrabber}.
+     * Grabs frames from the audio using {@link FFmpegFrameGrabber}.
+     *
+     * <p>The default channel to grab is 0.
      *
      * @param grabber the {@link FFmpegFrameGrabber}.
      * @return the float array read from the audio.
@@ -79,10 +84,21 @@ public class FFmpegAudioFactory extends AudioFactory {
     private float[] grab(FFmpegFrameGrabber grabber) throws FFmpegFrameGrabber.Exception {
         List<Float> list = new ArrayList<>();
         Frame frame;
-        while ((frame = grabber.grab()) != null) {
-            ShortBuffer buffer = (ShortBuffer) frame.samples[0];
-            for (int i = 0; i < buffer.limit(); i++) {
-                list.add(buffer.get() / (float) Short.MAX_VALUE);
+        while ((frame = grabber.grabFrame(true, false, true, false, false)) != null) {
+            Buffer buf = frame.samples[0];
+            if (buf instanceof ShortBuffer) {
+                ShortBuffer buffer = (ShortBuffer) buf;
+                for (int i = 0; i < buffer.limit(); i++) {
+                    list.add(buffer.get() / (float) Short.MAX_VALUE);
+                }
+            } else if (buf instanceof IntBuffer) {
+                IntBuffer buffer = (IntBuffer) buf;
+                for (int i = 0; i < buffer.limit(); i++) {
+                    list.add(buffer.get() / (float) Integer.MAX_VALUE);
+                }
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported sample format: " + sampleFormat);
             }
         }
         float[] ret = new float[list.size()];

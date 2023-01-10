@@ -9,6 +9,7 @@ dependencies {
     implementation project(":model-zoo")
     implementation project(":extensions:timeseries")
     implementation project(":extensions:tokenizers")
+    implementation project(":extensions:audio")
 
     runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
     runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
