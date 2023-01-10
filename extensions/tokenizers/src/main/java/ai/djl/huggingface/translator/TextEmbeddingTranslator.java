@@ -92,18 +92,18 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         long[] attentionMask = encoding.getAttentionMask();
         NDArray inputAttentionMask = manager.create(attentionMask).toType(DataType.FLOAT32, true);
         switch (pooling) {
-            case "mean_tokens":
+            case "mean":
                 return meanPool(embeddings, inputAttentionMask, false);
-            case "mean_sqrt_len_tokens":
+            case "mean_sqrt_len":
                 return meanPool(embeddings, inputAttentionMask, true);
-            case "max_tokens":
+            case "max":
                 return maxPool(embeddings, inputAttentionMask);
-            case "weightedmean_tokens":
+            case "weightedmean":
                 return weightedMeanPool(embeddings, inputAttentionMask);
-            case "cls_token":
+            case "cls":
                 return embeddings.get(0);
             default:
-                throw new AssertionError("Unexpected pooling model: " + pooling);
+                throw new AssertionError("Unexpected pooling mode: " + pooling);
         }
     }
 
@@ -171,7 +171,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         private HuggingFaceTokenizer tokenizer;
         private Batchifier batchifier = Batchifier.STACK;
         private boolean normalize = true;
-        private String pooling = "mean_tokens";
+        private String pooling = "mean";
 
         Builder(HuggingFaceTokenizer tokenizer) {
             this.tokenizer = tokenizer;
@@ -189,7 +189,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         }
 
         /**
-         * Sets the normalize for the {@link Translator}.
+         * Sets the {@code normalize} for the {@link Translator}.
          *
          * @param normalize true to normalize the embeddings
          * @return this builder
@@ -206,14 +206,14 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
          * @return this builder
          */
         public Builder optPoolingMode(String poolingMode) {
-            if (!"mean_tokens".equals(poolingMode)
-                    && !"max_tokens".equals(poolingMode)
-                    && !"cls_token".equals(poolingMode)
-                    && !"mean_sqrt_len_tokens".equals(poolingMode)
-                    && !"weightedmean_tokens".equals(poolingMode)) {
+            if (!"mean".equals(poolingMode)
+                    && !"max".equals(poolingMode)
+                    && !"cls".equals(poolingMode)
+                    && !"mean_sqrt_len".equals(poolingMode)
+                    && !"weightedmean".equals(poolingMode)) {
                 throw new IllegalArgumentException(
-                        "Invalid pooling model, must be one of [mean_tokens, max_tokens,"
-                                + " cls_token, mean_sqrt_len_tokens, weightedmean_tokens].");
+                        "Invalid pooling model, must be one of [mean, max, cls, mean_sqrt_len,"
+                                + " weightedmean].");
             }
             this.pooling = poolingMode;
             return this;
@@ -228,7 +228,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
             optBatchifier(Batchifier.fromString(batchifierStr));
             optNormalize(ArgumentsUtil.booleanValue(arguments, "normalize", true));
-            optPoolingMode(ArgumentsUtil.stringValue(arguments, "pooling", "mean_tokens"));
+            optPoolingMode(ArgumentsUtil.stringValue(arguments, "pooling", "mean"));
         }
 
         /**
