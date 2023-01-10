@@ -66,13 +66,13 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
                 with open(file, "r") as f:
                     pooling = json.load(f)
                     if pooling.get("pooling_mode_cls_token"):
-                        args["pooling"] = "cls_token"
+                        args["pooling"] = "cls"
                     elif pooling.get("pooling_mode_max_tokens"):
-                        args["pooling"] = "max_tokens"
+                        args["pooling"] = "max"
                     elif pooling.get("pooling_mode_mean_sqrt_len_tokens"):
-                        args["pooling"] = "mean_sqrt_len_tokens"
+                        args["pooling"] = "mean_sqrt_len"
                     elif pooling.get("pooling_mode_weightedmean_tokens"):
-                        args["pooling"] = "weightedmean_tokens"
+                        args["pooling"] = "weightedmean"
                     elif pooling.get("pooling_mode_lasttoken"):
                         args["pooling"] = "lasttoken"
         except requests.exceptions.HTTPError:

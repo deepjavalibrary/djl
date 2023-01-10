@@ -365,7 +365,7 @@ public class TranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
-                        .optArgument("pooling", "max_tokens")
+                        .optArgument("pooling", "max")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .build();
@@ -385,7 +385,7 @@ public class TranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
-                        .optArgument("pooling", "mean_sqrt_len_tokens")
+                        .optArgument("pooling", "mean_sqrt_len")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .build();
@@ -405,7 +405,7 @@ public class TranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
-                        .optArgument("pooling", "weightedmean_tokens")
+                        .optArgument("pooling", "weightedmean")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .build();
@@ -424,7 +424,7 @@ public class TranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
-                        .optArgument("pooling", "cls_token")
+                        .optArgument("pooling", "cls")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .build();
