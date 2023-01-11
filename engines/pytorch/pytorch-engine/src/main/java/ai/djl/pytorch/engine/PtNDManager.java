@@ -50,6 +50,12 @@ public class PtNDManager extends BaseNDManager {
 
     /** {@inheritDoc} */
     @Override
+    public void gc() {
+        getSystemManager().getProxyMaker().gc();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer allocateDirect(int capacity) {
         return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }

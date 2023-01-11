@@ -35,7 +35,10 @@ public class WeakHashMapWrapper<K, V> implements Map<K, V> {
 
     private final Set<WeakReferenceWrapper<K, V>> weakReferenceWrapperSet = new HashSet<>();
 
-    private void checkQueue() {
+    /**
+     * Checks the referenceQueue for NDArrays that are garbage collected by Java GC and closes them.
+     */
+    public void checkQueue() {
         for (Reference<?> ref; (ref = queue.poll()) != null; ) {
             synchronized (queue) {
                 @SuppressWarnings("unchecked")

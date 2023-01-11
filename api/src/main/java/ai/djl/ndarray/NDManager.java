@@ -752,6 +752,13 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Checks the referenceQueue for NDArrays that are garbage collected by Java GC and closes them.
+     */
+    default void gc() {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    /**
      * Sets the name for the NDManager.
      *
      * @param name the name assigned to the manager

@@ -30,10 +30,20 @@ public class PtNDArrayProxyMaker implements NDArrayProxyMaker {
     /** {@inheritDoc} */
     @Override
     public int mapSize() {
+        return getLocalWeakHashMapWrapper().size();
+    }
+
+    private WeakHashMapWrapper<String, NDArray> getLocalWeakHashMapWrapper() {
         if (tLocalMap.get() == null) {
             tLocalMap.set(new WeakHashMapWrapper<>());
         }
-        return tLocalMap.get().size();
+        return tLocalMap.get();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void gc() {
+        getLocalWeakHashMapWrapper().checkQueue();
     }
 
     /**
@@ -45,10 +55,7 @@ public class PtNDArrayProxyMaker implements NDArrayProxyMaker {
     @Override
     public PtNDArray wrap(NDArray array) {
 
-        if (tLocalMap.get() == null) {
-            tLocalMap.set(new WeakHashMapWrapper<>());
-        }
-        WeakHashMapWrapper<String, NDArray> map = tLocalMap.get();
+        WeakHashMapWrapper<String, NDArray> map = getLocalWeakHashMapWrapper();
 
         String uid = array.getUid() + "-" + counter.incrementAndGet();
         map.put(uid, array);

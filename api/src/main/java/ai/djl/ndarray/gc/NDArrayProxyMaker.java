@@ -25,6 +25,11 @@ public interface NDArrayProxyMaker {
     int mapSize();
 
     /**
+     * Checks the referenceQueue for NDArrays that are garbage collected by Java GC and closes them.
+     */
+    public void gc();
+
+    /**
      * Wraps the {@link NDArray} in a proxy facade.
      *
      * @param array the array to wrap
