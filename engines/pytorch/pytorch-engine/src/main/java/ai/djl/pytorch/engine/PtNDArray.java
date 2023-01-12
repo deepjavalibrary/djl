@@ -17,6 +17,8 @@ import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.refcount.RCConfig;
+import ai.djl.ndarray.refcount.RCObject;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -64,6 +66,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
         manager.attachInternal(getUid(), this);
+        deallocator(new PtNDArrayDeallocator(this));
     }
 
     /**
@@ -76,6 +79,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
      */
     public PtNDArray(PtNDManager manager, long handle, ByteBuffer data) {
         super(handle);
+        deallocator(new PtNDArrayDeallocator(this));
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
         manager.attachInternal(getUid(), this);
@@ -92,10 +96,20 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
      */
     public PtNDArray(PtNDManager manager, String[] strs, Shape shape) {
         super(-1L);
+        deallocator(new PtNDArrayDeallocator(this));
         this.manager = manager;
         this.strs = strs;
         this.shape = shape;
         this.dataType = DataType.STRING;
+    }
+
+    /**
+     * Deallocates the native memory associated with the specified {@link RCObject}.
+     *
+     * @param rco the reference count object
+     */
+    public static void deallocate(RCObject rco) {
+        ((PtNDArray) rco).close();
     }
 
     /** {@inheritDoc} */
@@ -1591,11 +1605,16 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void close() {
+        if (RCConfig.isVerboseIfResourceAlreadyClosed()) {
+            setClosingStackTraceAsString(stackTraceAsString());
+        }
         Long pointer = handle.getAndSet(null);
         if (pointer != null && pointer != -1) {
             JniUtils.deleteNDArray(pointer);
         }
-        manager.detachInternal(getUid());
+        if (manager != null) {
+            manager.detachInternal(getUid());
+        }
         dataRef = null;
     }
 }
