@@ -25,6 +25,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.RandomUtils;
 
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -138,7 +139,6 @@ class OpenCVImage implements Image {
         }
         byte[] buf = new byte[mat.height() * mat.width() * mat.channels()];
         mat.get(0, 0, buf);
-
         Shape shape = new Shape(mat.height(), mat.width(), mat.channels());
         return manager.create(ByteBuffer.wrap(buf), shape, DataType.UINT8);
     }
@@ -279,6 +279,65 @@ class OpenCVImage implements Image {
                                     rect.height * 1.0 / image.height());
                         })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Converting from bgr mapping to rgb.
+     *
+     * @return rgb format image
+     */
+    public OpenCVImage bgr2rgb() {
+        Mat converted = new Mat();
+        Imgproc.cvtColor(image, converted, Imgproc.COLOR_BGR2RGB);
+        return new OpenCVImage(converted);
+    }
+
+    /**
+     * Converting from channel-first to channel-last format.
+     *
+     * @return channel last image
+     */
+    public OpenCVImage chw2hwc() {
+        int c = image.channels();
+        int h = image.height();
+        int w = image.width();
+
+        Mat cHW = image.reshape(0, new int[] {c, h * w});
+        Mat result = new Mat();
+        result.create(h, w, CvType.makeType(image.depth(), c));
+        result = result.reshape(c, new int[] {h, w});
+        Core.transpose(cHW, result);
+        return new OpenCVImage(result);
+    }
+
+    /**
+     * Converting from channel-las tto channel-first format.
+     *
+     * @return channel first image
+     */
+    public OpenCVImage hwc2chw() {
+        int c = image.channels();
+        int h = image.height();
+        int w = image.width();
+        Mat hWC = image.reshape(1, h * w);
+        Mat result = new Mat();
+        Core.transpose(hWC, result);
+        result = result.reshape(1, new int[] {c, h, w});
+        return new OpenCVImage(result);
+    }
+
+    /**
+     * Apply normalization on the image.
+     *
+     * @param mean mean value apply on each color channel
+     * @param std standard div apply on each color channel
+     * @return converted image
+     */
+    public OpenCVImage normalize(float[] mean, float[] std) {
+        Mat result = new Mat();
+        Core.subtract(image, new Scalar(mean[0], mean[1], mean[2]), result);
+        Core.divide(result, new Scalar(std[0], std[1], std[2]), result);
+        return new OpenCVImage(result);
     }
 
     private void drawLandmarks(BoundingBox box) {
