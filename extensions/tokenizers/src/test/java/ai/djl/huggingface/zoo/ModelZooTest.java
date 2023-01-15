@@ -31,7 +31,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ModelZooTest {
@@ -62,6 +64,7 @@ public class ModelZooTest {
     public void testFutureVersion() throws IOException {
         System.setProperty("DJL_CACHE_DIR", "build/cache");
         try {
+            Utils.deleteQuietly(Paths.get("build/cache"));
             Map<String, Map<String, Object>> map = new ConcurrentHashMap<>();
             Map<String, Object> model = new ConcurrentHashMap<>();
             model.put("result", "failed");
@@ -94,6 +97,27 @@ public class ModelZooTest {
             Assert.assertNotNull(zoo.getModelLoader("model4"));
         } finally {
             System.clearProperty("DJL_CACHE_DIR");
+        }
+    }
+
+    @Test
+    public void testOffLine() throws IOException {
+        System.setProperty("DJL_CACHE_DIR", "build/cache");
+        System.setProperty("offline", "true");
+        try {
+            Utils.deleteQuietly(Paths.get("build/cache"));
+            // static variables cannot not be initialized properly if directly use new HfModelZoo()
+            ModelZoo.getModelZoo("ai.djl.huggingface.pytorch");
+
+            ModelZoo zoo = new HfModelZoo();
+            Assert.assertTrue(zoo.getModelLoaders().size() > 0);
+
+            Set<String> engines = zoo.getSupportedEngines();
+            Assert.assertEquals(engines.size(), 1);
+            Assert.assertEquals(engines.iterator().next(), "PyTorch");
+        } finally {
+            System.clearProperty("DJL_CACHE_DIR");
+            System.clearProperty("offline");
         }
     }
 }

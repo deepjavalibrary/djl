@@ -19,6 +19,7 @@ import ai.djl.repository.Repository;
 import ai.djl.repository.Version;
 import ai.djl.repository.VersionRange;
 import ai.djl.repository.zoo.ModelZoo;
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
 
@@ -28,10 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -117,13 +118,30 @@ public class HfModelZoo extends ModelZoo {
 
             String url = REPO + path + "models.json.gz";
             Path tmp = Files.createTempFile(dir, "models", ".tmp");
-            try (GZIPInputStream gis = new GZIPInputStream(new URL(url).openStream())) {
+            try (GZIPInputStream gis = new GZIPInputStream(Utils.openUrl(url))) {
                 String json = Utils.toString(gis);
                 try (Writer writer = Files.newBufferedWriter(tmp)) {
                     writer.write(json);
                 }
                 Utils.moveQuietly(tmp, file);
                 return JsonUtils.GSON.fromJson(json, type);
+            } catch (IOException e) {
+                logger.warn("Failed to download Huggingface model zoo index: {}", app);
+                if (Files.exists(file)) {
+                    try (Reader reader = Files.newBufferedReader(file)) {
+                        return JsonUtils.GSON.fromJson(reader, type);
+                    }
+                }
+
+                String resource = app.getPath() + "/" + GROUP_ID + ".json";
+                try (InputStream is = ClassLoaderUtils.getResourceAsStream(resource)) {
+                    String json = Utils.toString(is);
+                    try (Writer writer = Files.newBufferedWriter(tmp)) {
+                        writer.write(json);
+                    }
+                    Utils.moveQuietly(tmp, file);
+                    return JsonUtils.GSON.fromJson(json, type);
+                }
             } finally {
                 Utils.deleteQuietly(tmp);
             }

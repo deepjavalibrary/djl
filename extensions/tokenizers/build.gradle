@@ -1,3 +1,5 @@
+import java.util.zip.GZIPInputStream
+
 group "ai.djl.huggingface"
 
 dependencies {
@@ -44,6 +46,27 @@ processResources {
         // write properties
         def propFile = file("${project.buildDir}/classes/java/main/native/lib/tokenizers.properties")
         propFile.text = "version=${tokenizers_version}-${version}\n"
+
+        url = "https://mlrepo.djl.ai/model/nlp"
+        def tasks = [
+                "fill_mask",
+                "question_answer",
+                "text_classification",
+                "text_embedding",
+                "token_classification",
+        ]
+        def prefix = "${project.buildDir}/classes/java/main/nlp"
+        for (String task : tasks) {
+            def file = new File("${prefix}/${task}/ai.djl.huggingface.pytorch.json")
+            if (file.exists()) {
+                project.logger.lifecycle("model zoo metadata alrady exists: ${task}")
+            } else {
+                project.logger.lifecycle("Downloading model zoo metadata: ${task}")
+                file.getParentFile().mkdirs()
+                def downloadPath = new URL("${url}/${task}/ai/djl/huggingface/pytorch/models.json.gz")
+                downloadPath.withInputStream { i -> file.withOutputStream { it << new GZIPInputStream(i) } }
+            }
+        }
     }
 }
 
