@@ -112,7 +112,7 @@ class HuggingfaceConverter:
             logging.info(f"Saving torchscript model: {model_name}.pt ...")
             model_file = os.path.join(temp_dir, f"{model_name}.pt")
             script_module.save(model_file)
-        except RuntimeError as e:
+        except (RuntimeError, ValueError) as e:
             logging.warning(f"Failed to trace model: {model_id}.")
             logging.warning(e, exc_info=True)
             return None
