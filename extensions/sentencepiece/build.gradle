@@ -64,8 +64,9 @@ task compileJNI {
             }
         } else if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
                 || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            def arch = System.properties["os.arch"] == "amd64" ? "x86_64" : System.properties["os.arch"]
             exec {
-                commandLine "bash", "build.sh", "v${sentencepiece_version}"
+                commandLine "bash", "build.sh", "v${sentencepiece_version}", arch
             }
         } else {
             throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
