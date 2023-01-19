@@ -15,9 +15,11 @@ processResources {
     doLast {
         def url = "https://publish.djl.ai/sentencepiece-${sentencepiece_version}/jnilib/${djl_version}"
         def files = [
-                "win-x86_64"  : "sentencepiece_native.dll",
-                "linux-x86_64": "libsentencepiece_native.so",
-                "osx-x86_64"  : "libsentencepiece_native.dylib"
+                "win-x86_64"   : "sentencepiece_native.dll",
+                "linux-x86_64" : "libsentencepiece_native.so",
+                "linux-aarch64": "libsentencepiece_native.so",
+                "osx-x86_64"   : "libsentencepiece_native.dylib",
+                "osx-aarch64"  : "libsentencepiece_native.dylib",
         ]
         def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
