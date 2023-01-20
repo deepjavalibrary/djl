@@ -16,6 +16,7 @@ import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
 import org.testng.Assert;
@@ -305,6 +306,17 @@ public class NDIndexTest {
             NDArray idx = manager.create(new float[] {2, 3, 1}, new Shape(3));
             NDArray data = manager.create(new float[] {666, 77, 8}, new Shape(3));
             Assert.assertEquals(original.put(idx, data), expected);
+        }
+    }
+
+    @Test
+    public void testScatter() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray original = manager.zeros(new Shape (3, 5), DataType.FLOAT32);
+            NDArray data = manager.arange(1f, 11f).reshape(2, 5);
+            NDArray index = manager.create(new float[] {0, 1, 2, 0}, new Shape(1, 4));
+            NDArray expected = manager.create(new float[] {1, 0, 0, 4, 0, 0, 2, 0, 0, 0, 0, 0, 3, 0, 0}, new Shape(3, 5));
+            Assert.assertEquals(original.scatter(index, data, 0), expected);
         }
     }
 }

@@ -570,11 +570,10 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
-     * Returns a partial {@code NDArray} pointed by the indexed array. \( Given NDArray arr, NDArray
-     * idx, and long axis, \)<br>
-     * \( out_{ijk} = arr_{idx_{ijk}, j, k} if axis=0 \)<br>
-     * \( arr_{i, idx_{ijk}, k} if axis=1 \)<br>
-     * \( arr_{i, j, idx_{ijk}} if axis=2 \)<br>
+     * Returns a partial {@code NDArray} pointed by the indexed array. <br>
+     * out[i][j][k] = input[index[i][j][k]][j][k]  # if axis == 0 <br>
+     * out[i][j][k] = input[i][index[i][j][k]][k]  # if axis == 1 <br>
+     * out[i][j][k] = input[i][j][index[i][j][k]]  # if axis == 2 <br>
      *
      * @param index picks the elements of an NDArray to the same position as index
      * @param axis the entries of index are indices of axis
@@ -588,12 +587,12 @@ public interface NDArray extends NDResource, BytesSupplier {
      * \( idx = [ idx[0, ...], idx[1, ...],..., idx[indexingDepth,...] ] \)<br>
      * corresponding to x, y, z index, i.e. [idx_x, idx_y, idx_z, ...]. <br>
      * So indexingDepth smaller than or equal to data.shape[0] <br>
-     * If indexingDepth is smaller than data.shape[0], for instance, data.shape[0] = 3, i.e. x, y,
-     * z, <br>
+     * If indexingDepth is smaller than data.shape[0], for instance, data.shape[0]=3, i.e. x,y,z
+     * <br>
      * but indexingDepth = 2, i.e. [idx_x, idx_y], <br>
      * then the tail co-rank = data.shape[0] - indexingDepth will be kept. <br>
-     * With it, the output shape = idx_y.shape appended by data.shape[indexingDepth:]
-     * https://mxnet.apache.org/versions/1.6/api/r/docs/api/mx.symbol.gather_nd.html?highlight=gather_nd
+     * With it, the output shape = idx_y.shape appended by data.shape[indexingDepth:] <a
+     * href="https://mxnet.apache.org/versions/1.6/api/r/docs/api/mx.symbol.gather_nd.html?highlight=gather_nd">...</a>
      *
      * @param index picks the elements of an NDArray to the same position as index
      * @return the partial {@code NDArray} of the same shape as index
@@ -622,14 +621,28 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray take(NDManager manager, NDArray index);
 
     /**
-     * Set the entries of {@code NDArray} pointed by index according to linear indexing, to be the
-     * numbers in data, which is of the same shape as index.
+     * Set the entries of {@code NDArray} pointed by index, according to linear indexing, to be the
+     * numbers in value. Value has to be of the same shape as index.
      *
      * @param index select the entries of an {@code NDArray}
-     * @param data numbers to assign to the indexed entries
+     * @param value numbers to assign to the indexed entries
      * @return the NDArray with updated values
      */
-    NDArray put(NDArray index, NDArray data);
+    NDArray put(NDArray index, NDArray value);
+
+    /**
+     * Writes all values from the tensor value into self at the indices specified in the index tensor. This is the reverse operation of the manner described in gather(). <br>
+     * self[index[i][j][k]][j][k] = value[i][j][k]  # if axis == 0 <br>
+     * self[i][index[i][j][k]][k] = value[i][j][k]  # if axis == 1 <br>
+     * self[i][j][index[i][j][k]] = value[i][j][k]  # if axis == 2 <br>
+     * <a href="https://pytorch.org/docs/1.13/generated/torch.Tensor.scatter_.html#torch.Tensor.scatter">...</a>
+     *
+     * @param axis the axis along which to index
+     * @param index the indices of elements to scatter, can be either empty or of the same dimensionality as value. When empty, the operation returns self unchanged
+     * @param value the source element(s) to scatter
+     * @return the NDArray with updated values
+     */
+    NDArray scatter(NDArray index, NDArray value, int axis);
 
     /**
      * Returns a scalar {@code NDArray} corresponding to a single element.

@@ -530,14 +530,24 @@ public final class JniUtils {
                 manager, PyTorchLibrary.LIB.torchTake(ndArray.getHandle(), index.getHandle()));
     }
 
-    public static PtNDArray put(PtNDArray ndArray, PtNDArray index, PtNDArray data) {
+    public static PtNDArray put(PtNDArray ndArray, PtNDArray index, PtNDArray value) {
         if (index.getDataType() != DataType.INT64) {
             index = index.toType(DataType.INT64, true);
         }
         return new PtNDArray(
                 ndArray.getManager(),
                 PyTorchLibrary.LIB.torchPut(
-                        ndArray.getHandle(), index.getHandle(), data.getHandle()));
+                        ndArray.getHandle(), index.getHandle(), value.getHandle()));
+    }
+
+    public static PtNDArray scatter(PtNDArray ndArray, PtNDArray index, PtNDArray value, int axis) {
+        if (index.getDataType() != DataType.INT64) {
+            index = index.toType(DataType.INT64, true);
+        }
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchScatter(
+                        ndArray.getHandle(), index.getHandle(), value.getHandle(), axis));
     }
 
     public static PtNDArray pick(PtNDArray ndArray, PtNDArray index, long dim) {
