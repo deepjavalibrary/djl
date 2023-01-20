@@ -4,7 +4,7 @@ dependencies {
     api project(":api")
     api project(":basicdataset")
     api "tech.tablesaw:tablesaw-core:${tablesaw_version}"
-    api "tech.tablesaw:tablesaw-jsplot:${tablesaw_version}"
+    // api "tech.tablesaw:tablesaw-jsplot:${tablesaw_version}"
 
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
     testImplementation project(":testing")
