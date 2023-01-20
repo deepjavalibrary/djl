@@ -571,9 +571,9 @@ public interface NDArray extends NDResource, BytesSupplier {
 
     /**
      * Returns a partial {@code NDArray} pointed by the indexed array. <br>
-     * out[i][j][k] = input[index[i][j][k]][j][k]  # if axis == 0 <br>
-     * out[i][j][k] = input[i][index[i][j][k]][k]  # if axis == 1 <br>
-     * out[i][j][k] = input[i][j][index[i][j][k]]  # if axis == 2 <br>
+     * out[i][j][k] = input[index[i][j][k]][j][k] # if axis == 0 <br>
+     * out[i][j][k] = input[i][index[i][j][k]][k] # if axis == 1 <br>
+     * out[i][j][k] = input[i][j][index[i][j][k]] # if axis == 2 <br>
      *
      * @param index picks the elements of an NDArray to the same position as index
      * @param axis the entries of index are indices of axis
@@ -631,14 +631,17 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray put(NDArray index, NDArray value);
 
     /**
-     * Writes all values from the tensor value into self at the indices specified in the index tensor. This is the reverse operation of the manner described in gather(). <br>
-     * self[index[i][j][k]][j][k] = value[i][j][k]  # if axis == 0 <br>
-     * self[i][index[i][j][k]][k] = value[i][j][k]  # if axis == 1 <br>
-     * self[i][j][index[i][j][k]] = value[i][j][k]  # if axis == 2 <br>
-     * <a href="https://pytorch.org/docs/1.13/generated/torch.Tensor.scatter_.html#torch.Tensor.scatter">...</a>
+     * Writes all values from the tensor value into self at the indices specified in the index
+     * tensor. This is the reverse operation of the manner described in gather(). <br>
+     * self[index[i][j][k]][j][k] = value[i][j][k] # if axis == 0 <br>
+     * self[i][index[i][j][k]][k] = value[i][j][k] # if axis == 1 <br>
+     * self[i][j][index[i][j][k]] = value[i][j][k] # if axis == 2 <br>
+     * <a
+     * href="https://pytorch.org/docs/1.13/generated/torch.Tensor.scatter_.html#torch.Tensor.scatter">...</a>
      *
      * @param axis the axis along which to index
-     * @param index the indices of elements to scatter, can be either empty or of the same dimensionality as value. When empty, the operation returns self unchanged
+     * @param index the indices of elements to scatter, can be either empty or of the same
+     *     dimensionality as value. When empty, the operation returns self unchanged
      * @param value the source element(s) to scatter
      * @return the NDArray with updated values
      */

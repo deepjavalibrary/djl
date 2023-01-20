@@ -312,10 +312,13 @@ public class NDIndexTest {
     @Test
     public void testScatter() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
-            NDArray original = manager.zeros(new Shape (3, 5), DataType.FLOAT32);
+            NDArray original = manager.zeros(new Shape(3, 5), DataType.FLOAT32);
             NDArray data = manager.arange(1f, 11f).reshape(2, 5);
             NDArray index = manager.create(new float[] {0, 1, 2, 0}, new Shape(1, 4));
-            NDArray expected = manager.create(new float[] {1, 0, 0, 4, 0, 0, 2, 0, 0, 0, 0, 0, 3, 0, 0}, new Shape(3, 5));
+            NDArray expected =
+                    manager.create(
+                            new float[] {1, 0, 0, 4, 0, 0, 2, 0, 0, 0, 0, 0, 3, 0, 0},
+                            new Shape(3, 5));
             Assert.assertEquals(original.scatter(index, data, 0), expected);
         }
     }

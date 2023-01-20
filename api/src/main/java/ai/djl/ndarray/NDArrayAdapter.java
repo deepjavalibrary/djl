@@ -215,9 +215,7 @@ public abstract class NDArrayAdapter implements NDArray {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public NDArray scatter(NDArray index, NDArray value, int axis) {
         throw new UnsupportedOperationException("Not implemented yet.");
