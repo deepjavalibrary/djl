@@ -10,17 +10,26 @@
 - Allows developers to write code once and run it on any deep learning engine
 - Allows developers to use engine specific features
 
-### 2. Which DL engines can I run with DJL?
-While DJL is designed to be engine-agnostic and to run with the any engine, we currently
-support the following engines:
+### 2. Which models can I run with DJL?
+While DJL is designed to be engine-agnostic and can easily integrated with any engines, we currently
+support the following models:
 
-- Apache MXNet
-- PyTorch (Currently only support inference)
-- TensorFlow (Experimental - inference only)
-- fastText
+- PyTorch TorchScript model
+- TensorFlow SavedModel bundle
+- Apache MXNet model
+- ONNX model
+- TensorRT model
+- Python script model
+- PaddlePaddle model
+- TFLite model
+- Neo DLR (TVM) model
+- XGBoost model
+- LightGBM model
+- Sentencepiece model
+- fastText/BlazingText model
 
 ### 3. Does DJL support inference on GPU?
-Yes. DJL does support inference on GPU. If GPUs are available, DJL automatically detects the GPU, and runs inference on a single GPU by default. 
+Yes. DJL does support inference on GPU. If GPUs are available, DJL automatically detects the GPU, and runs inference on a single GPU by default.
 
 ### 4. Does DJL support training on GPU?
 Yes. DJL offers multi-GPU support. DJL can automatically detect if GPUs are available. If GPUs are available, it will
@@ -47,24 +56,9 @@ specify the 'MXNET_ENGINE_TYPE' environment variable to 'NaiveEngine'. For more 
 ### 6. Does DJL support distributed training?
 DJL does not currently support distributed training.
 
-### 7. Can I run DJL on other versions of MxNet?
-This is not officially supported by DJL, but you can follow the steps outlined in the [troubleshooting document](development/troubleshooting.md#4-how-to-run-djl-using-other-versions-of-apache-mxnet)
-to use other versions of MXNet or built your own customized version.
+### 7. Can I run DJL on other versions of PyTorch?
+Yes. [Each DJL release has a range of PyTorch version](../engines/pytorch/pytorch-engine/README.md#installation).
+You can set set `PYTORCH_VERSION` environment vairable or Java System properties to choose
+a different version of PyTorch.
 
-### 8. I have a model trained and saved by another DL engine. Can I load that model on to DJL?
-While DJL is designed to be engine-agnostic, here is a list of the DJL engines and the formats they support:
-
-- MXNet
-    - MXNet symbolic model
-    - MXNet Gluon model - The model must be hybridized and exported to symbolic model before loading in DJL
-- PyTorch
-    - TorchScript model - You can find more details at (https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html) 
-- TensorFlow
-    - .pb format
-    - Keras model - DJL only supports the [SavedModel API](https://www.tensorflow.org/guide/keras/save_and_serialize). The .h5 format is currently not supported
-- ONNX Model
-    - .onnx format
-- fastText
-    - .bin format
-    - .ftz format
-    - [SageMaker BlazingText](https://docs.aws.amazon.com/sagemaker/latest/dg/blazingtext.html)
+If you want to load your custom build PyTorch you can follow [this instruction](../engines/pytorch/pytorch-engine/README.md#load-your-own-pytorch-native-library).
