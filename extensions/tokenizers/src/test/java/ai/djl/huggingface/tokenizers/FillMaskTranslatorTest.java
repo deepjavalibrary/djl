@@ -26,7 +26,9 @@ import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.JsonUtils;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -123,6 +125,69 @@ public class FillMaskTranslatorTest {
             Assert.assertThrows(
                     IllegalArgumentException.class,
                     () -> factory.newInstance(String.class, Integer.class, model, arguments));
+        }
+    }
+
+    @Test
+    public void testFillMaskBatchTranslator()
+            throws ModelException, IOException, TranslateException {
+        String[] text = {"Hello I'm a [MASK] model.", "This is a [MASK] box."};
+
+        Block block =
+                new LambdaBlock(
+                        a -> {
+                            NDManager manager = a.getManager();
+                            float[][] logits = new float[10][4828];
+                            logits[6][4827] = 5;
+                            logits[6][2535] = 4;
+                            logits[6][2047] = 3;
+                            logits[6][3565] = 2;
+                            logits[6][2986] = 1;
+                            NDArray arr1 = manager.create(logits);
+                            NDArray arr2 = manager.create(logits);
+                            NDList[] list = {new NDList(arr1), new NDList(arr2)};
+                            return Batchifier.STACK.batchify(list);
+                        },
+                        "model");
+        Path modelDir = Paths.get("build/model");
+        Files.createDirectories(modelDir);
+
+        Criteria<String[], Classifications[]> criteria =
+                Criteria.builder()
+                        .setTypes(String[].class, Classifications[].class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new FillMaskTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String[], Classifications[]> model = criteria.loadModel();
+                Predictor<String[], Classifications[]> predictor = model.newPredictor()) {
+            Classifications[] res = predictor.predict(text);
+            Assert.assertEquals(res[0].best().getClassName(), "fashion");
+        }
+
+        Criteria<Input, Output> criteria2 =
+                Criteria.builder()
+                        .setTypes(Input.class, Output.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new FillMaskTranslatorFactory())
+                        .build();
+
+        try (ZooModel<Input, Output> model = criteria2.loadModel();
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            Input input = new Input();
+            input.add(JsonUtils.GSON.toJson(text));
+            input.addProperty("Content-Type", "application/json");
+            Output out = predictor.predict(input);
+            Classifications[] res = (Classifications[]) out.getData().getAsObject();
+            Assert.assertEquals(res[0].best().getClassName(), "fashion");
         }
     }
 }

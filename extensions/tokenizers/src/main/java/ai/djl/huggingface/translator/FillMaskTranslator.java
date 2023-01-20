@@ -59,6 +59,27 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
     public NDList processInput(TranslatorContext ctx, String input) throws TranslateException {
         Encoding encoding = tokenizer.encode(input);
         long[] indices = encoding.getIds();
+        int maskIndex = getMaskIndex(indices, maskToken, maskTokenId);
+        ctx.setAttachment("maskIndex", maskIndex);
+        return encoding.toNDList(ctx.getNDManager(), false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Classifications processOutput(TranslatorContext ctx, NDList list) {
+        int maskIndex = (int) ctx.getAttachment("maskIndex");
+        return toClassifications(tokenizer, list, maskIndex, topK);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public FillMaskBatchTranslator toBatchTranslator(Batchifier batchifier) {
+        tokenizer.enableBatch();
+        return new FillMaskBatchTranslator(tokenizer, maskToken, topK, batchifier);
+    }
+
+    static int getMaskIndex(long[] indices, String maskToken, long maskTokenId)
+            throws TranslateException {
         int maskIndex = -1;
         for (int i = 0; i < indices.length; ++i) {
             if (indices[i] == maskTokenId) {
@@ -71,15 +92,12 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
         if (maskIndex == -1) {
             throw new TranslateException("Mask token " + maskToken + " not found.");
         }
-        ctx.setAttachment("maskIndex", maskIndex);
-        return encoding.toNDList(ctx.getNDManager(), false);
+        return maskIndex;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Classifications processOutput(TranslatorContext ctx, NDList list) {
-        int maskIndex = (int) ctx.getAttachment("maskIndex");
-        NDArray prob = list.get(0).get(maskIndex).softmax(0);
+    static Classifications toClassifications(
+            HuggingFaceTokenizer tokenizer, NDList output, int maskIndex, int topK) {
+        NDArray prob = output.get(0).get(maskIndex).softmax(0);
         NDArray array = prob.argSort(0, false);
         long[] classIds = new long[topK];
         List<Double> probabilities = new ArrayList<>(topK);
