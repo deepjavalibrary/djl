@@ -15,18 +15,23 @@ package ai.djl.modality.nlp.translator;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.ndarray.BytesSupplier;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoBatchifyTranslator;
+import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.JsonUtils;
 
 /**
  * A {@link Translator} that can handle generic text classification {@link Input} and {@link
  * Output}.
  */
-public class TextClassificationServingTranslator implements Translator<Input, Output> {
+public class TextClassificationServingTranslator implements NoBatchifyTranslator<Input, Output> {
 
     private Translator<String, Classifications> translator;
+    private Translator<String[], Classifications[]> batchTranslator;
 
     /**
      * Constructs a {@code TextClassificationServingTranslator} instance.
@@ -35,33 +40,53 @@ public class TextClassificationServingTranslator implements Translator<Input, Ou
      */
     public TextClassificationServingTranslator(Translator<String, Classifications> translator) {
         this.translator = translator;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return translator.getBatchifier();
+        batchTranslator = translator.toBatchTranslator();
     }
 
     /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws Exception {
         translator.prepare(ctx);
+        batchTranslator.prepare(ctx);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Input input) throws Exception {
+        if (input.getContent().isEmpty()) {
+            throw new TranslateException("Input data is empty.");
+        }
+
+        String contentType = input.getProperty("Content-Type", null);
         String text = input.getData().getAsString();
-        return translator.processInput(ctx, text);
+        if ("application/json".equals(contentType)) {
+            ctx.setAttachment("batch", Boolean.TRUE);
+            String[] inputs = JsonUtils.GSON.fromJson(text, String[].class);
+            return batchTranslator.processInput(ctx, inputs);
+        }
+        NDList ret = translator.processInput(ctx, text);
+        Batchifier batchifier = translator.getBatchifier();
+        if (batchifier != null) {
+            NDList[] batch = {ret};
+            return batchifier.batchify(batch);
+        }
+        return ret;
     }
 
     /** {@inheritDoc} */
     @Override
     public Output processOutput(TranslatorContext ctx, NDList list) throws Exception {
-        Classifications ret = translator.processOutput(ctx, list);
         Output output = new Output();
-        output.add(ret);
+        output.addProperty("Content-Type", "application/json");
+        if (ctx.getAttachment("batch") != null) {
+            output.add(BytesSupplier.wrapAsJson(batchTranslator.processOutput(ctx, list)));
+        } else {
+            Batchifier batchifier = translator.getBatchifier();
+            if (batchifier != null) {
+                list = batchifier.unbatchify(list)[0];
+            }
+            output.add(translator.processOutput(ctx, list));
+        }
         return output;
     }
 }

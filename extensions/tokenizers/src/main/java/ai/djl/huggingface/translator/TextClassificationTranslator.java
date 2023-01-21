@@ -63,13 +63,23 @@ public class TextClassificationTranslator implements Translator<String, Classifi
     @Override
     public NDList processInput(TranslatorContext ctx, String input) {
         Encoding encoding = tokenizer.encode(input);
-        ctx.setAttachment("encoding", encoding);
         return encoding.toNDList(ctx.getNDManager(), false);
     }
 
     /** {@inheritDoc} */
     @Override
     public Classifications processOutput(TranslatorContext ctx, NDList list) {
+        return toClassifications(config, list);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public TextClassificationBatchTranslator toBatchTranslator(Batchifier batchifier) {
+        tokenizer.enableBatch();
+        return new TextClassificationBatchTranslator(tokenizer, batchifier);
+    }
+
+    static Classifications toClassifications(PretrainedConfig config, NDList list) {
         NDArray logits = list.get(0);
         int size = config.id2label.size();
         if ("multi_label_classification".equals(config.problemType) || size == 1) {
@@ -86,7 +96,6 @@ public class TextClassificationTranslator implements Translator<String, Classifi
             classes.add(config.id2label.get(String.valueOf(index)));
             probabilities.add((double) buf[index]);
         }
-
         return new Classifications(classes, probabilities);
     }
 

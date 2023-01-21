@@ -37,6 +37,7 @@ public class TextClassificationTranslatorFactory implements TranslatorFactory {
 
     static {
         SUPPORTED_TYPES.add(new Pair<>(String.class, Classifications.class));
+        SUPPORTED_TYPES.add(new Pair<>(String[].class, Classifications[].class));
         SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
 
@@ -63,6 +64,8 @@ public class TextClassificationTranslatorFactory implements TranslatorFactory {
                     TextClassificationTranslator.builder(tokenizer, arguments).build();
             if (input == String.class && output == Classifications.class) {
                 return (Translator<I, O>) translator;
+            } else if (input == String[].class && output == Classifications[].class) {
+                return (Translator<I, O>) translator.toBatchTranslator();
             } else if (input == Input.class && output == Output.class) {
                 return (Translator<I, O>) new TextClassificationServingTranslator(translator);
             }

@@ -14,38 +14,46 @@ package ai.djl.huggingface.translator;
 
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
-import ai.djl.ndarray.NDArray;
+import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.JsonUtils;
 
-/** The translator for Huggingface text embedding model. */
-public class TextEmbeddingBatchTranslator implements NoBatchifyTranslator<String[], float[][]> {
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+/** The translator for Huggingface text classification model. */
+public class TextClassificationBatchTranslator
+        implements NoBatchifyTranslator<String[], Classifications[]> {
 
     private HuggingFaceTokenizer tokenizer;
     private Batchifier batchifier;
-    private boolean normalize;
-    private String pooling;
+    private PretrainedConfig config;
 
-    TextEmbeddingBatchTranslator(
-            HuggingFaceTokenizer tokenizer,
-            Batchifier batchifier,
-            String pooling,
-            boolean normalize) {
+    TextClassificationBatchTranslator(HuggingFaceTokenizer tokenizer, Batchifier batchifier) {
         this.tokenizer = tokenizer;
         this.batchifier = batchifier;
-        this.pooling = pooling;
-        this.normalize = normalize;
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDList processInput(TranslatorContext ctx, String[] input) {
+    public void prepare(TranslatorContext ctx) throws IOException {
+        Path path = ctx.getModel().getModelPath();
+        Path file = path.resolve("config.json");
+        try (Reader reader = Files.newBufferedReader(file)) {
+            config = JsonUtils.GSON.fromJson(reader, PretrainedConfig.class);
+        }
+    }
+    /** {@inheritDoc} */
+    @Override
+    public NDList processInput(TranslatorContext ctx, String[] inputs) {
         NDManager manager = ctx.getNDManager();
-        Encoding[] encodings = tokenizer.batchEncode(input);
-        ctx.setAttachment("encodings", encodings);
+        Encoding[] encodings = tokenizer.batchEncode(inputs);
         NDList[] batch = new NDList[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
             batch[i] = encodings[i].toNDList(manager, false);
@@ -55,21 +63,12 @@ public class TextEmbeddingBatchTranslator implements NoBatchifyTranslator<String
 
     /** {@inheritDoc} */
     @Override
-    public float[][] processOutput(TranslatorContext ctx, NDList list) {
+    public Classifications[] processOutput(TranslatorContext ctx, NDList list) {
         NDList[] batch = batchifier.unbatchify(list);
-        Encoding[] encoding = (Encoding[]) ctx.getAttachment("encodings");
-        NDManager manager = ctx.getNDManager();
-        float[][] ret = new float[batch.length][];
+        Classifications[] ret = new Classifications[batch.length];
         for (int i = 0; i < batch.length; ++i) {
-            NDArray array =
-                    TextEmbeddingTranslator.processEmbedding(
-                            manager, batch[i], encoding[i], pooling);
-            if (normalize) {
-                array = array.normalize(2, 0);
-            }
-            ret[i] = array.toFloatArray();
+            ret[i] = TextClassificationTranslator.toClassifications(config, batch[i]);
         }
-
         return ret;
     }
 }
