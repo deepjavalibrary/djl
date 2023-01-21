@@ -311,11 +311,20 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray put(NDArray index, NDArray data) {
-        if (!(index instanceof PtNDArray) || !(data instanceof PtNDArray)) {
+    public NDArray put(NDArray index, NDArray value) {
+        if (!(index instanceof PtNDArray) || !(value instanceof PtNDArray)) {
             throw new IllegalArgumentException("Only PtNDArray is supported.");
         }
-        return JniUtils.put(this, (PtNDArray) index, (PtNDArray) data);
+        return JniUtils.put(this, (PtNDArray) index, (PtNDArray) value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray scatter(NDArray index, NDArray value, int axis) {
+        if (!(index instanceof PtNDArray) || !(value instanceof PtNDArray)) {
+            throw new IllegalArgumentException("Only PtNDArray is supported.");
+        }
+        return JniUtils.scatter(this, (PtNDArray) index, (PtNDArray) value, axis);
     }
 
     /** {@inheritDoc} */

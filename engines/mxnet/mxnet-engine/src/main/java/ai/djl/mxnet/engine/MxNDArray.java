@@ -339,7 +339,13 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray put(NDArray index, NDArray data) {
+    public NDArray put(NDArray index, NDArray value) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray scatter(NDArray index, NDArray value, int axis) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
