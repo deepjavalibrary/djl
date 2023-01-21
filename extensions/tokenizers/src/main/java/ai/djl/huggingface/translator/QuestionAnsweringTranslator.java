@@ -17,7 +17,6 @@ import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
@@ -50,19 +49,9 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, QAInput input) {
-        NDManager manager = ctx.getNDManager();
         Encoding encoding = tokenizer.encode(input.getQuestion(), input.getParagraph());
         ctx.setAttachment("encoding", encoding);
-        long[] indices = encoding.getIds();
-        long[] attentionMask = encoding.getAttentionMask();
-        NDList ndList = new NDList(3);
-        ndList.add(manager.create(indices));
-        ndList.add(manager.create(attentionMask));
-        if (includeTokenTypes) {
-            long[] typeIds = encoding.getTypeIds();
-            ndList.add(manager.create(typeIds));
-        }
-        return ndList;
+        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes);
     }
 
     /** {@inheritDoc} */

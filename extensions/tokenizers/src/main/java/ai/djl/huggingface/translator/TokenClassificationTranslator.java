@@ -18,7 +18,6 @@ import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.djl.modality.nlp.translator.NamedEntity;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
@@ -64,15 +63,9 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, String input) {
-        NDManager manager = ctx.getNDManager();
         Encoding encoding = tokenizer.encode(input);
         ctx.setAttachment("encoding", encoding);
-        long[] indices = encoding.getIds();
-        long[] attentionMask = encoding.getAttentionMask();
-        NDList ndList = new NDList(2);
-        ndList.add(manager.create(indices));
-        ndList.add(manager.create(attentionMask));
-        return ndList;
+        return encoding.toNDList(ctx.getNDManager(), false);
     }
 
     /** {@inheritDoc} */

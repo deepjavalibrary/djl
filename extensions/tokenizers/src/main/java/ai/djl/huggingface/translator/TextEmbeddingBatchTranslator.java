@@ -48,11 +48,7 @@ public class TextEmbeddingBatchTranslator implements NoBatchifyTranslator<String
         ctx.setAttachment("encoding", encodings);
         NDList[] batch = new NDList[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
-            long[] indices = encodings[i].getIds();
-            long[] attentionMask = encodings[i].getAttentionMask();
-            batch[i] = new NDList(2);
-            batch[i].add(manager.create(indices));
-            batch[i].add(manager.create(attentionMask));
+            batch[i] = encodings[i].toNDList(manager, false);
         }
         return batchifier.batchify(batch);
     }

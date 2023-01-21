@@ -13,6 +13,8 @@
 package ai.djl.huggingface.tokenizers;
 
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 
 /** A class holds token encoding information. */
 public class Encoding {
@@ -43,6 +45,23 @@ public class Encoding {
         this.specialTokenMask = specialTokenMask;
         this.charTokenSpans = charTokenSpans;
         this.overflowing = overflowing;
+    }
+
+    /**
+     * Returns the {@link NDList} representation of the encoding.
+     *
+     * @param manager the {@link NDManager} to create the NDList
+     * @param withTokenType true to include the token type id
+     * @return the {@link NDList}
+     */
+    public NDList toNDList(NDManager manager, boolean withTokenType) {
+        NDList list = new NDList(withTokenType ? 3 : 2);
+        list.add(manager.create(ids));
+        list.add(manager.create(attentionMask));
+        if (withTokenType) {
+            list.add(manager.create(typeIds));
+        }
+        return list;
     }
 
     /**
