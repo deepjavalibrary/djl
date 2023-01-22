@@ -21,6 +21,7 @@ import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.util.PairList;
+import ai.djl.util.Utils;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -367,7 +368,7 @@ public class FtTrainingConfig implements TrainingConfig {
             cmd.add("-loss");
             cmd.add(loss);
         }
-        return cmd.toArray(new String[0]);
+        return cmd.toArray(Utils.EMPTY_ARRAY);
     }
 
     /**

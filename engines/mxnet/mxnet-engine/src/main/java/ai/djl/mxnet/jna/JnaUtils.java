@@ -27,6 +27,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.Parameter;
 import ai.djl.util.PairList;
+import ai.djl.util.Utils;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -53,7 +54,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("MissingJavadocMethod")
 public final class JnaUtils {
 
-    public static final String[] EMPTY_ARRAY = new String[0];
     public static final ObjectPool<PointerByReference> REFS =
             new ObjectPool<>(PointerByReference::new, r -> r.setValue(null));
 
@@ -502,10 +502,10 @@ public final class JnaUtils {
         String[] keys;
         String[] values;
         if (params == null) {
-            keys = EMPTY_ARRAY;
-            values = EMPTY_ARRAY;
+            keys = Utils.EMPTY_ARRAY;
+            values = Utils.EMPTY_ARRAY;
         } else {
-            keys = params.keyArray(EMPTY_ARRAY);
+            keys = params.keyArray(Utils.EMPTY_ARRAY);
             values = params.values().stream().map(Object::toString).toArray(String[]::new);
         }
         StringArray keyArray = StringArray.of(keys);
@@ -1213,7 +1213,7 @@ public final class JnaUtils {
     public static List<List<Shape>> inferShape(Symbol symbol, PairList<String, Shape> args) {
         Pointer handler = symbol.getHandle();
         int numArgs = args.size();
-        String[] keys = args.keys().toArray(new String[0]);
+        String[] keys = args.keys().toArray(Utils.EMPTY_ARRAY);
         // the following two is also the representation of
         // CSR NDArray
         long[] indPtr = new long[numArgs + 1];
@@ -1291,8 +1291,8 @@ public final class JnaUtils {
                         0,
                         placeHolders[1],
                         0,
-                        new String[0],
-                        new String[0],
+                        Utils.EMPTY_ARRAY,
+                        Utils.EMPTY_ARRAY,
                         IntBuffer.allocate(1),
                         placeHolders[2],
                         placeHolders[3],
@@ -1975,7 +1975,7 @@ public final class JnaUtils {
 
     private static String[] toStringArray(PointerByReference ref, int size) {
         if (size == 0) {
-            return new String[0];
+            return Utils.EMPTY_ARRAY;
         }
 
         Pointer[] pointers = ref.getValue().getPointerArray(0, size);

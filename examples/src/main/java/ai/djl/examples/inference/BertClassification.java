@@ -29,6 +29,7 @@ import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +85,7 @@ public final class BertClassification {
 
         try (ZooModel<String[], Classifications[]> model = criteria.loadModel();
                 Predictor<String[], Classifications[]> predictor = model.newPredictor()) {
-            return predictor.predict(inputs.toArray(new String[0]));
+            return predictor.predict(inputs.toArray(Utils.EMPTY_ARRAY));
         }
     }
 

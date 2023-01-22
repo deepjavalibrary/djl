@@ -114,7 +114,7 @@ public final class Platform {
             String flavorPrefixedClassifier = prop.getProperty("classifier", "");
             String libraryList = prop.getProperty("libraries", "");
             if (libraryList.isEmpty()) {
-                platform.libraries = new String[0];
+                platform.libraries = Utils.EMPTY_ARRAY;
             } else {
                 platform.libraries = libraryList.split(",");
             }

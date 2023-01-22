@@ -206,6 +206,50 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 }
 
 #[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_batchEncodePair(
+    env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+    text: jobjectArray,
+    text_pair: jobjectArray,
+    add_special_tokens: jboolean,
+) -> jlongArray {
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+    let len = env.get_array_length(text).unwrap();
+    let mut array: Vec<EncodeInput> = Vec::new();
+    for i in 0..len {
+        let item1 = env.get_object_array_element(text, i).unwrap().into();
+        let item2 = env.get_object_array_element(text_pair, i).unwrap().into();
+        let sequence1: String = env
+            .get_string(item1)
+            .expect("Couldn't get text string!")
+            .into();
+        let sequence2: String = env
+            .get_string(item2)
+            .expect("Couldn't get text_pair string!")
+            .into();
+
+        let input_sequence1 = tk::InputSequence::from(sequence1);
+        let input_sequence2 = tk::InputSequence::from(sequence2);
+        let encoded_input = EncodeInput::Dual(input_sequence1, input_sequence2);
+        array.push(encoded_input);
+    }
+
+    let encodings = tokenizer
+        .encode_batch_char_offsets(array, add_special_tokens == JNI_TRUE)
+        .unwrap();
+    let handles = encodings
+        .into_iter()
+        .map(|c| to_handle(c))
+        .collect::<Vec<_>>();
+
+    let size = handles.len() as jsize;
+    let ret = env.new_long_array(size).unwrap();
+    env.set_long_array_region(ret, 0, &handles).unwrap();
+    ret
+}
+
+#[no_mangle]
 pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_deleteEncoding(
     _env: JNIEnv,
     _: JObject,

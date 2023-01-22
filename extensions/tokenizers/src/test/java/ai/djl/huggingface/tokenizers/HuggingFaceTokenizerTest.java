@@ -15,6 +15,8 @@ package ai.djl.huggingface.tokenizers;
 
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.djl.training.util.DownloadUtils;
+import ai.djl.util.PairList;
+import ai.djl.util.Utils;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -40,7 +42,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
             List<String> ret = tokenizer.tokenize(input);
-            Assert.assertEquals(ret.toArray(new String[0]), expected);
+            Assert.assertEquals(ret.toArray(Utils.EMPTY_ARRAY), expected);
             Encoding encoding = tokenizer.encode(input);
 
             long[] ids = {101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 1128, 100, 136, 102};
@@ -82,9 +84,6 @@ public class HuggingFaceTokenizerTest {
                 Assert.assertEquals(charSpansExpected[i].getStart(), charSpansResult[i].getStart());
                 Assert.assertEquals(charSpansExpected[i].getEnd(), charSpansResult[i].getEnd());
             }
-
-            Encoding[] encodings = tokenizer.batchEncode(Arrays.asList(inputs));
-            Assert.assertEquals(encodings.length, 2);
         }
 
         Map<String, String> options = new ConcurrentHashMap<>();
@@ -108,6 +107,13 @@ public class HuggingFaceTokenizerTest {
             long[] ids = {101, 8667, 102, 1731, 1132, 1128, 102};
             Encoding encoding = tokenizer.encode("Hello", "How are you");
             Assert.assertEquals(encoding.getIds(), ids);
+
+            PairList<String, String> batch = new PairList<>(2);
+            batch.add("Hello", "How are you");
+            batch.add("Hi, you all", "I'm fine.");
+            Encoding[] encodings = tokenizer.batchEncode(batch);
+            Assert.assertEquals(encodings.length, 2);
+            Assert.assertEquals(encodings[0].getIds(), ids);
         }
     }
 

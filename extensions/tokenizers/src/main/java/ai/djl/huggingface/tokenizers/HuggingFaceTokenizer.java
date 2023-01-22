@@ -19,6 +19,7 @@ import ai.djl.modality.nlp.preprocess.Tokenizer;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.util.NativeResource;
+import ai.djl.util.PairList;
 import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
@@ -231,7 +232,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentences
      */
     public Encoding encode(List<String> inputs, boolean addSpecialTokens) {
-        String[] array = inputs.toArray(new String[0]);
+        String[] array = inputs.toArray(Utils.EMPTY_ARRAY);
         return encode(array, addSpecialTokens);
     }
 
@@ -277,7 +278,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentence in batch
      */
     public Encoding[] batchEncode(List<String> inputs, boolean addSpecialTokens) {
-        String[] array = inputs.toArray(new String[0]);
+        String[] array = inputs.toArray(Utils.EMPTY_ARRAY);
         return batchEncode(array, addSpecialTokens);
     }
 
@@ -315,6 +316,37 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentence in batch
      */
     public Encoding[] batchEncode(String[] inputs) {
+        return batchEncode(inputs, addSpecialTokens);
+    }
+
+    /**
+     * Returns the {@code Encoding} of the input text pair in batch.
+     *
+     * @param inputs the batch of input text pair
+     * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
+     *     model
+     * @return the {@code Encoding} of the input text pair in batch
+     */
+    public Encoding[] batchEncode(PairList<String, String> inputs, boolean addSpecialTokens) {
+        String[] text = inputs.keyArray(Utils.EMPTY_ARRAY);
+        String[] textPair = inputs.valueArray(Utils.EMPTY_ARRAY);
+        long[] encodings =
+                TokenizersLibrary.LIB.batchEncodePair(
+                        getHandle(), text, textPair, addSpecialTokens);
+        Encoding[] ret = new Encoding[encodings.length];
+        for (int i = 0; i < encodings.length; ++i) {
+            ret[i] = toEncoding(encodings[i]);
+        }
+        return ret;
+    }
+
+    /**
+     * Returns the {@code Encoding} of the input text pair in batch.
+     *
+     * @param inputs the batch of input text pair
+     * @return the {@code Encoding} of the input text pair in batch
+     */
+    public Encoding[] batchEncode(PairList<String, String> inputs) {
         return batchEncode(inputs, addSpecialTokens);
     }
 
