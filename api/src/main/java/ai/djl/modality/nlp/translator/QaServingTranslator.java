@@ -18,20 +18,23 @@ import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.ndarray.BytesSupplier;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Batchifier;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.PairList;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
 /**
  * A {@link Translator} that can handle generic question answering {@link Input} and {@link Output}.
  */
-public class QaServingTranslator implements Translator<Input, Output> {
+public class QaServingTranslator implements NoBatchifyTranslator<Input, Output> {
 
     private Translator<QAInput, String> translator;
+    private Translator<QAInput[], String[]> batchTranslator;
 
     /**
      * Constructs a {@code QaServingTranslator} instance.
@@ -40,17 +43,13 @@ public class QaServingTranslator implements Translator<Input, Output> {
      */
     public QaServingTranslator(Translator<QAInput, String> translator) {
         this.translator = translator;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Batchifier getBatchifier() {
-        return translator.getBatchifier();
+        this.batchTranslator = translator.toBatchTranslator();
     }
 
     /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws Exception {
+        translator.prepare(ctx);
         translator.prepare(ctx);
     }
 
@@ -58,31 +57,57 @@ public class QaServingTranslator implements Translator<Input, Output> {
     @Override
     public NDList processInput(TranslatorContext ctx, Input input) throws Exception {
         PairList<String, BytesSupplier> content = input.getContent();
+        if (content.isEmpty()) {
+            throw new TranslateException("Input data is empty.");
+        }
+
+        String contentType = input.getProperty("Content-Type", null);
         QAInput qa;
-        if (content.contains("question") && content.contains("paragraph")) {
+        if ("application/json".equals(contentType)) {
+            String json = input.getData().getAsString();
+            try {
+                JsonElement element = JsonUtils.GSON.fromJson(json, JsonElement.class);
+                if (element.isJsonArray()) {
+                    ctx.setAttachment("batch", Boolean.TRUE);
+                    QAInput[] inputs = JsonUtils.GSON.fromJson(json, QAInput[].class);
+                    return batchTranslator.processInput(ctx, inputs);
+                }
+
+                qa = JsonUtils.GSON.fromJson(json, QAInput.class);
+            } catch (JsonParseException e) {
+                throw new TranslateException("Input is not a valid json.", e);
+            }
+        } else if (content.contains("question") && content.contains("paragraph")) {
             String question = input.getAsString("question");
             String paragraph = input.getAsString("paragraph");
             qa = new QAInput(question, paragraph);
         } else {
-            BytesSupplier data = input.getData();
-            if (data == null) {
-                throw new TranslateException("Input data is empty.");
-            }
-            try {
-                qa = JsonUtils.GSON.fromJson(data.getAsString(), QAInput.class);
-            } catch (JsonParseException e) {
-                throw new TranslateException("Input is not a valid json.", e);
-            }
+            throw new TranslateException("Not a QuestionAnswering input.");
         }
-        return translator.processInput(ctx, qa);
+
+        NDList ret = translator.processInput(ctx, qa);
+        Batchifier batchifier = translator.getBatchifier();
+        if (batchifier != null) {
+            NDList[] batch = {ret};
+            return batchifier.batchify(batch);
+        }
+        return ret;
     }
 
     /** {@inheritDoc} */
     @Override
     public Output processOutput(TranslatorContext ctx, NDList list) throws Exception {
-        String ret = translator.processOutput(ctx, list);
         Output output = new Output();
-        output.add(ret);
+        output.addProperty("Content-Type", "application/json");
+        if (ctx.getAttachment("batch") != null) {
+            output.add(BytesSupplier.wrapAsJson(batchTranslator.processOutput(ctx, list)));
+        } else {
+            Batchifier batchifier = translator.getBatchifier();
+            if (batchifier != null) {
+                list = batchifier.unbatchify(list)[0];
+            }
+            output.add(translator.processOutput(ctx, list));
+        }
         return output;
     }
 }

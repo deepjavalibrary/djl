@@ -57,10 +57,21 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
     /** {@inheritDoc} */
     @Override
     public String processOutput(TranslatorContext ctx, NDList list) {
+        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
+        return decode(list, encoding, tokenizer);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public QuestionAnsweringBatchTranslator toBatchTranslator(Batchifier batchifier) {
+        tokenizer.enableBatch();
+        return new QuestionAnsweringBatchTranslator(tokenizer, includeTokenTypes, batchifier);
+    }
+
+    static String decode(NDList list, Encoding encoding, HuggingFaceTokenizer tokenizer) {
         // PyTorch InferenceMode tensor is read only, must clone it
         NDArray startLogits = list.get(0).duplicate();
         NDArray endLogits = list.get(1).duplicate();
-
         // exclude <CLS>, TODO: exclude impossible ids properly and handle max answer length
         startLogits.set(new NDIndex(0), -100000);
         endLogits.set(new NDIndex(0), -100000);
@@ -71,7 +82,6 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
             startIdx = endIdx;
             endIdx = tmp;
         }
-        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
         long[] indices = encoding.getIds();
         int len = endIdx - startIdx + 1;
         long[] ids = new long[len];
