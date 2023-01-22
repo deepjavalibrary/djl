@@ -71,8 +71,43 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
     /** {@inheritDoc} */
     @Override
     public NamedEntity[] processOutput(TranslatorContext ctx, NDList list) {
-        NDArray logits = list.get(0);
         Encoding encoding = (Encoding) ctx.getAttachment("encoding");
+        return toNamedEntities(encoding, list, config);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public TokenClassificationBatchTranslator toBatchTranslator(Batchifier batchifier) {
+        tokenizer.enableBatch();
+        return new TokenClassificationBatchTranslator(tokenizer, batchifier);
+    }
+
+    /**
+     * Creates a builder to build a {@code TokenClassificationTranslator}.
+     *
+     * @param tokenizer the tokenizer
+     * @return a new builder
+     */
+    public static Builder builder(HuggingFaceTokenizer tokenizer) {
+        return new Builder(tokenizer);
+    }
+
+    /**
+     * Creates a builder to build a {@code TokenClassificationTranslator}.
+     *
+     * @param tokenizer the tokenizer
+     * @param arguments the models' arguments
+     * @return a new builder
+     */
+    public static Builder builder(HuggingFaceTokenizer tokenizer, Map<String, ?> arguments) {
+        Builder builder = builder(tokenizer);
+        builder.configure(arguments);
+
+        return builder;
+    }
+
+    static NamedEntity[] toNamedEntities(Encoding encoding, NDList list, PretrainedConfig config) {
+        NDArray logits = list.get(0);
         long[] inputIds = encoding.getIds();
         CharSpan[] offsetMapping = encoding.getCharTokenSpans();
         long[] specialTokenMasks = encoding.getSpecialTokenMask();
@@ -98,30 +133,6 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
             }
         }
         return entities.toArray(new NamedEntity[0]);
-    }
-
-    /**
-     * Creates a builder to build a {@code TokenClassificationTranslator}.
-     *
-     * @param tokenizer the tokenizer
-     * @return a new builder
-     */
-    public static Builder builder(HuggingFaceTokenizer tokenizer) {
-        return new Builder(tokenizer);
-    }
-
-    /**
-     * Creates a builder to build a {@code TokenClassificationTranslator}.
-     *
-     * @param tokenizer the tokenizer
-     * @param arguments the models' arguments
-     * @return a new builder
-     */
-    public static Builder builder(HuggingFaceTokenizer tokenizer, Map<String, ?> arguments) {
-        Builder builder = builder(tokenizer);
-        builder.configure(arguments);
-
-        return builder;
     }
 
     /** The builder for token classification translator. */
