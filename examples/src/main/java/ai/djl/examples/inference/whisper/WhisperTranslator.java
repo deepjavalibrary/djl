@@ -49,12 +49,13 @@ public class WhisperTranslator implements NoBatchifyTranslator<Audio, String> {
     /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws IOException {
-        NDManager manager = ctx.getNDManager();
         Path path = ctx.getModel().getModelPath();
         Path melFile = path.resolve("mel_80_filters.npz");
 
         processors.add(new PadOrTrim(480000));
-        processors.add(LogMelSpectrogram.newInstance(melFile, 80, manager));
+        // Use model's NDManager
+        NDManager modelManager = ctx.getModel().getNDManager();
+        processors.add(LogMelSpectrogram.newInstance(melFile, 80, modelManager));
 
         Map<String, Integer> vocab;
         Map<String, Integer> added;
