@@ -35,6 +35,9 @@ public final class TokenizersLibrary {
 
     public native long[] batchEncode(long tokenizer, String[] inputs, boolean addSpecialTokens);
 
+    public native long[] batchEncodePair(
+            long tokenizer, String[] text, String[] textPair, boolean addSpecialTokens);
+
     public native String[] batchDecode(long tokenizer, long[][] batchIds, boolean addSpecialTokens);
 
     public native void deleteEncoding(long encoding);

@@ -83,7 +83,7 @@ public class SpTokenizer implements Tokenizer, AutoCloseable {
     /** {@inheritDoc} */
     @Override
     public String buildSentence(List<String> tokens) {
-        return processor.buildSentence(tokens.toArray(new String[0]));
+        return processor.buildSentence(tokens.toArray(Utils.EMPTY_ARRAY));
     }
 
     /** {@inheritDoc} */

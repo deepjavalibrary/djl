@@ -24,6 +24,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
+import ai.djl.util.Utils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -75,8 +76,8 @@ public class PtModel extends BaseModel {
                     throw new FileNotFoundException(fileName + " file not found in: " + modelDir);
                 }
             }
-            String[] extraFileKeys = new String[0];
-            String[] extraFileValues = new String[0];
+            String[] extraFileKeys = Utils.EMPTY_ARRAY;
+            String[] extraFileValues = Utils.EMPTY_ARRAY;
             boolean mapLocation = false;
             boolean trainParam = false;
             // load jit extra files
@@ -210,7 +211,7 @@ public class PtModel extends BaseModel {
                 Path relative = modelDir.relativize(path);
                 ret.add(relative.toString());
             }
-            return ret.toArray(new String[0]);
+            return ret.toArray(Utils.EMPTY_ARRAY);
         } catch (IOException e) {
             throw new AssertionError("Failed list files", e);
         }

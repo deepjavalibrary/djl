@@ -21,6 +21,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.paddlepaddle.jni.JniUtils;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Translator;
+import ai.djl.util.Utils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -126,7 +127,7 @@ public class PpModel extends BaseModel {
                 return paths;
             }
         }
-        return new String[0];
+        return Utils.EMPTY_ARRAY;
     }
 
     /** {@inheritDoc} */

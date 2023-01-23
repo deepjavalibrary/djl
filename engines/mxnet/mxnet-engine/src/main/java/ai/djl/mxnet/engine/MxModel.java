@@ -26,6 +26,7 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
+import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,7 +172,7 @@ public class MxModel extends BaseModel {
                 Path relative = modelDir.relativize(path);
                 ret.add(relative.toString());
             }
-            return ret.toArray(new String[0]);
+            return ret.toArray(Utils.EMPTY_ARRAY);
         } catch (IOException e) {
             throw new AssertionError("Failed list files", e);
         }

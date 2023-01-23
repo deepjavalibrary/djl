@@ -27,6 +27,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.translate.Translator;
 import ai.djl.util.PairList;
+import ai.djl.util.Utils;
 import ai.djl.util.passthrough.PassthroughNDManager;
 
 import java.io.FileNotFoundException;
@@ -215,7 +216,7 @@ public class FtModel implements Model {
     /** {@inheritDoc} */
     @Override
     public String[] getArtifactNames() {
-        return new String[0];
+        return Utils.EMPTY_ARRAY;
     }
 
     /** {@inheritDoc} */

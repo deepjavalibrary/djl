@@ -19,6 +19,7 @@ import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Block;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
+import ai.djl.util.Utils;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -79,7 +80,7 @@ public class TfModel extends BaseModel {
                 tags = (String[]) tagOption;
             } else if (tagOption instanceof String) {
                 if (((String) tagOption).isEmpty()) {
-                    tags = new String[0];
+                    tags = Utils.EMPTY_ARRAY;
                 } else {
                     tags = ((String) tagOption).split(",");
                 }
@@ -180,7 +181,7 @@ public class TfModel extends BaseModel {
                 Path relative = modelDir.relativize(path);
                 ret.add(relative.toString());
             }
-            return ret.toArray(new String[0]);
+            return ret.toArray(Utils.EMPTY_ARRAY);
         } catch (IOException e) {
             throw new AssertionError("Failed list files", e);
         }
