@@ -33,6 +33,7 @@ import ai.djl.util.Utils;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -44,6 +45,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TextClassificationTranslatorTest {
+
+    @BeforeClass
+    public void setUp() throws IOException {
+        Path modelDir = Paths.get("build/text_classification");
+        Files.createDirectories(modelDir);
+
+        Path path = modelDir.resolve("config.json");
+        Map<String, Map<String, String>> map = new HashMap<>();
+        Map<String, String> id2label = new HashMap<>();
+        id2label.put("0", "LABEL_0");
+        id2label.put("1", "LABEL_1");
+        id2label.put("2", "LABEL_2");
+        map.put("id2label", id2label);
+        try (Writer writer = Files.newBufferedWriter(path)) {
+            writer.write(JsonUtils.GSON.toJson(map));
+        }
+    }
 
     @AfterClass
     public void tierDown() {
@@ -65,20 +83,8 @@ public class TextClassificationTranslatorTest {
                             return new NDList(arr);
                         },
                         "model");
+
         Path modelDir = Paths.get("build/text_classification");
-        Files.createDirectories(modelDir);
-
-        Path path = modelDir.resolve("config.json");
-        Map<String, Map<String, String>> map = new HashMap<>();
-        Map<String, String> id2label = new HashMap<>();
-        id2label.put("0", "LABEL_0");
-        id2label.put("1", "LABEL_1");
-        id2label.put("2", "LABEL_2");
-        map.put("id2label", id2label);
-        try (Writer writer = Files.newBufferedWriter(path)) {
-            writer.write(JsonUtils.GSON.toJson(map));
-        }
-
         Criteria<String, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(String.class, Classifications.class)
@@ -134,6 +140,62 @@ public class TextClassificationTranslatorTest {
             Assert.assertThrows(
                     IllegalArgumentException.class,
                     () -> factory.newInstance(String.class, Integer.class, model, arguments));
+        }
+    }
+
+    @Test
+    public void testTextClassificationBatchTranslator()
+            throws ModelException, IOException, TranslateException {
+        String[] text = {"DJL is the best.", "DJL is awesome"};
+
+        Block block =
+                new LambdaBlock(
+                        a -> {
+                            NDManager manager = a.getManager();
+                            float[] logits = new float[] {0.02f, 0.2f, 0.97f, 0.03f, 0.95f, 0.4f};
+                            NDArray arr = manager.create(logits, new Shape(2, 3));
+                            arr.setName("logits");
+                            return new NDList(arr);
+                        },
+                        "model");
+
+        Path modelDir = Paths.get("build/text_classification");
+        Criteria<String[], Classifications[]> criteria =
+                Criteria.builder()
+                        .setTypes(String[].class, Classifications[].class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextClassificationTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String[], Classifications[]> model = criteria.loadModel();
+                Predictor<String[], Classifications[]> predictor = model.newPredictor()) {
+            Classifications[] res = predictor.predict(text);
+            Assert.assertEquals(res[1].best().getClassName(), "LABEL_1");
+        }
+
+        Criteria<Input, Output> criteria2 =
+                Criteria.builder()
+                        .setTypes(Input.class, Output.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextClassificationTranslatorFactory())
+                        .build();
+
+        try (ZooModel<Input, Output> model = criteria2.loadModel();
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            Input input = new Input();
+            input.add(JsonUtils.GSON.toJson(text));
+            input.addProperty("Content-Type", "application/json");
+            String out = predictor.predict(input).getAsString(0);
+            Classifications[] res = JsonUtils.GSON.fromJson(out, Classifications[].class);
+            Assert.assertEquals(res[0].best().getClassName(), "LABEL_2");
         }
     }
 }

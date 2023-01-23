@@ -234,7 +234,7 @@ public class TextEmbeddingTranslatorTest {
             input.add(JsonUtils.GSON.toJson(text));
             input.addProperty("Content-Type", "application/json");
             Output out = predictor.predict(input);
-            float[][] res = JsonUtils.GSON.fromJson(out.getAsString(0), float[][].class);
+            float[][] res = (float[][]) out.getData().getAsObject();
             Assert.assertEquals(res[0].length, 384);
             Assertions.assertAlmostEquals(res[0][0], 0.05103);
         }

@@ -14,9 +14,11 @@ package ai.djl.modality.nlp.translator;
 
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.ndarray.BytesSupplier;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.NoBatchifyTranslator;
+import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
@@ -41,11 +43,16 @@ public class TextEmbeddingServingTranslator implements NoBatchifyTranslator<Inpu
     @Override
     public void prepare(TranslatorContext ctx) throws Exception {
         translator.prepare(ctx);
+        batchTranslator.prepare(ctx);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Input input) throws Exception {
+        if (input.getContent().isEmpty()) {
+            throw new TranslateException("Input data is empty.");
+        }
+
         String contentType = input.getProperty("Content-Type", null);
         String text = input.getData().getAsString();
         if ("application/json".equals(contentType)) {
@@ -66,14 +73,15 @@ public class TextEmbeddingServingTranslator implements NoBatchifyTranslator<Inpu
     @Override
     public Output processOutput(TranslatorContext ctx, NDList list) throws Exception {
         Output output = new Output();
+        output.addProperty("Content-Type", "application/json");
         if (ctx.getAttachment("batch") != null) {
-            output.add(JsonUtils.GSON_PRETTY.toJson(batchTranslator.processOutput(ctx, list)));
+            output.add(BytesSupplier.wrapAsJson(batchTranslator.processOutput(ctx, list)));
         } else {
             Batchifier batchifier = translator.getBatchifier();
             if (batchifier != null) {
                 list = batchifier.unbatchify(list)[0];
             }
-            output.add(JsonUtils.GSON_PRETTY.toJson(translator.processOutput(ctx, list)));
+            output.add(BytesSupplier.wrapAsJson(translator.processOutput(ctx, list)));
         }
         return output;
     }

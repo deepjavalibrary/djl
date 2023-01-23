@@ -64,10 +64,9 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     /** {@inheritDoc} */
     @Override
     public float[] processOutput(TranslatorContext ctx, NDList list) {
-        NDArray embeddings = list.get("last_hidden_state");
         Encoding encoding = (Encoding) ctx.getAttachment("encoding");
         NDManager manager = ctx.getNDManager();
-        embeddings = processEmbedding(manager, embeddings, encoding, pooling);
+        NDArray embeddings = processEmbedding(manager, list, encoding, pooling);
         if (normalize) {
             embeddings = embeddings.normalize(2, 0);
         }
@@ -83,20 +82,21 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     }
 
     static NDArray processEmbedding(
-            NDManager manager, NDArray embeddings, Encoding encoding, String pooling) {
+            NDManager manager, NDList list, Encoding encoding, String pooling) {
+        NDArray embedding = list.get("last_hidden_state");
         long[] attentionMask = encoding.getAttentionMask();
         NDArray inputAttentionMask = manager.create(attentionMask).toType(DataType.FLOAT32, true);
         switch (pooling) {
             case "mean":
-                return meanPool(embeddings, inputAttentionMask, false);
+                return meanPool(embedding, inputAttentionMask, false);
             case "mean_sqrt_len":
-                return meanPool(embeddings, inputAttentionMask, true);
+                return meanPool(embedding, inputAttentionMask, true);
             case "max":
-                return maxPool(embeddings, inputAttentionMask);
+                return maxPool(embedding, inputAttentionMask);
             case "weightedmean":
-                return weightedMeanPool(embeddings, inputAttentionMask);
+                return weightedMeanPool(embedding, inputAttentionMask);
             case "cls":
-                return embeddings.get(0);
+                return embedding.get(0);
             default:
                 throw new AssertionError("Unexpected pooling mode: " + pooling);
         }
