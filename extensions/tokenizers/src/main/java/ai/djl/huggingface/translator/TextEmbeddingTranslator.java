@@ -56,15 +56,9 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, String input) {
-        NDManager manager = ctx.getNDManager();
         Encoding encoding = tokenizer.encode(input);
         ctx.setAttachment("encoding", encoding);
-        long[] indices = encoding.getIds();
-        long[] attentionMask = encoding.getAttentionMask();
-        NDList ndList = new NDList(2);
-        ndList.add(manager.create(indices));
-        ndList.add(manager.create(attentionMask));
-        return ndList;
+        return encoding.toNDList(ctx.getNDManager(), false);
     }
 
     /** {@inheritDoc} */
@@ -84,6 +78,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     /** {@inheritDoc} */
     @Override
     public TextEmbeddingBatchTranslator toBatchTranslator(Batchifier batchifier) {
+        tokenizer.enableBatch();
         return new TextEmbeddingBatchTranslator(tokenizer, batchifier, pooling, normalize);
     }
 

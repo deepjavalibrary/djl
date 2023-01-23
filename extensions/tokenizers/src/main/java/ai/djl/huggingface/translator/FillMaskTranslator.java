@@ -17,7 +17,6 @@ import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
@@ -58,7 +57,6 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, String input) throws TranslateException {
-        NDManager manager = ctx.getNDManager();
         Encoding encoding = tokenizer.encode(input);
         long[] indices = encoding.getIds();
         int maskIndex = -1;
@@ -74,11 +72,7 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
             throw new TranslateException("Mask token " + maskToken + " not found.");
         }
         ctx.setAttachment("maskIndex", maskIndex);
-        long[] attentionMask = encoding.getAttentionMask();
-        NDList ndList = new NDList(2);
-        ndList.add(manager.create(indices));
-        ndList.add(manager.create(attentionMask));
-        return ndList;
+        return encoding.toNDList(ctx.getNDManager(), false);
     }
 
     /** {@inheritDoc} */

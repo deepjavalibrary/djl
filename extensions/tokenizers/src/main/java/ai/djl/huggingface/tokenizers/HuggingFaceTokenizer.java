@@ -392,6 +392,22 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         return batchDecode(batchIds, !addSpecialTokens);
     }
 
+    /** Sets padding and truncation to true for batching. */
+    public void enableBatch() {
+        boolean changed = false;
+        if (padding == PaddingStrategy.DO_NOT_PAD) {
+            changed = true;
+            padding = PaddingStrategy.LONGEST;
+        }
+        if (truncation == TruncationStrategy.DO_NOT_TRUNCATE) {
+            changed = true;
+            truncation = TruncationStrategy.LONGEST_FIRST;
+        }
+        if (changed) {
+            updateTruncationAndPadding();
+        }
+    }
+
     /**
      * Creates a builder to build a {@code HuggingFaceTokenizer}.
      *
