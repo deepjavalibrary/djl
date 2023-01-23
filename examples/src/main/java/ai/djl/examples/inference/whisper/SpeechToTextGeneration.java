@@ -34,7 +34,14 @@ public final class SpeechToTextGeneration {
                 "https://resources.djl.ai/audios/jfk.flac", "build/example/jfk.flac");
 
         try (WhisperModel model = new WhisperModel()) {
+            /*
+             * For this particular model, graph optimization takes long time for the first
+             *  a couple of inference, and it doesn't improve for the following inference.
+             */
+            System.setProperty("ai.djl.pytorch.graph_optimizer", "false");
             logger.info(model.speechToText(Paths.get("build/example/jfk.flac")));
+        } finally {
+            System.clearProperty("ai.djl.pytorch.graph_optimizer");
         }
     }
 }
