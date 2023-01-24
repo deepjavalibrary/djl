@@ -35,7 +35,7 @@ public class TablesawDataset extends TabularDataset {
 
     /** {@inheritDoc} */
     @Override
-    protected String getCell(long rowIndex, String featureName) {
+    public String getCell(long rowIndex, String featureName) {
         Row row = table.row(Math.toIntExact(rowIndex));
         return row.getString(featureName);
     }

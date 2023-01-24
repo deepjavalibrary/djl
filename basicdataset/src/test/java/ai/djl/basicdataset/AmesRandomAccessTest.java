@@ -14,6 +14,8 @@ package ai.djl.basicdataset;
 
 import ai.djl.Model;
 import ai.djl.basicdataset.tabular.AmesRandomAccess;
+import ai.djl.basicdataset.tabular.ListFeatures;
+import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
@@ -27,11 +29,13 @@ import ai.djl.training.dataset.Record;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /*
  * 80 features
@@ -84,6 +88,15 @@ public class AmesRandomAccessTest {
                 Assert.assertEquals(batch.getData().size(), 1);
                 Assert.assertEquals(batch.getLabels().size(), 1);
                 batch.close();
+            }
+
+            Translator<ListFeatures, Float> translator =
+                    amesRandomAccess
+                            .matchingTranslatorOptions()
+                            .option(ListFeatures.class, Float.class);
+            try (Predictor<ListFeatures, Float> predictor = model.newPredictor(translator)) {
+                Float result = predictor.predict(new ListFeatures(Arrays.asList("0", "1", "NA")));
+                Assert.assertEquals(result, 0.0f);
             }
         }
     }

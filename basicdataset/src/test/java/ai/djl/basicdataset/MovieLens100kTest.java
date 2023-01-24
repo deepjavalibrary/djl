@@ -13,7 +13,11 @@
 package ai.djl.basicdataset;
 
 import ai.djl.Model;
+import ai.djl.basicdataset.tabular.MapFeatures;
 import ai.djl.basicdataset.tabular.MovieLens100k;
+import ai.djl.basicdataset.tabular.utils.Feature;
+import ai.djl.inference.Predictor;
+import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
@@ -27,11 +31,13 @@ import ai.djl.training.dataset.Record;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MovieLens100kTest {
 
@@ -81,6 +87,22 @@ public class MovieLens100kTest {
                 Assert.assertEquals(batch.getData().size(), 1);
                 Assert.assertEquals(batch.getLabels().size(), 1);
                 batch.close();
+            }
+
+            Translator<MapFeatures, Classifications> translator =
+                    movieLens100k
+                            .matchingTranslatorOptions()
+                            .option(MapFeatures.class, Classifications.class);
+            try (Predictor<MapFeatures, Classifications> predictor =
+                    model.newPredictor(translator)) {
+                List<Feature> features = movieLens100k.getFeatures();
+                MapFeatures inputs = new MapFeatures(features.size());
+                for (Feature feature : features) {
+                    String featureName = feature.getName();
+                    inputs.put(featureName, movieLens100k.getCell(0, featureName));
+                }
+                Classifications result = predictor.predict(new MapFeatures(inputs));
+                Assert.assertEquals(result.best().getClassName(), "1");
             }
         }
     }

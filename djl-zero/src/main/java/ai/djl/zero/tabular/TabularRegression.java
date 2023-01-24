@@ -13,9 +13,9 @@
 package ai.djl.zero.tabular;
 
 import ai.djl.Model;
+import ai.djl.basicdataset.tabular.ListFeatures;
 import ai.djl.basicdataset.tabular.TabularDataset;
 import ai.djl.basicmodelzoo.tabular.TabNet;
-import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.repository.zoo.ZooModel;
@@ -26,8 +26,8 @@ import ai.djl.training.TrainingConfig;
 import ai.djl.training.dataset.Dataset;
 import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.TabNetRegressionLoss;
-import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
 import ai.djl.zero.Performance;
 
 import java.io.IOException;
@@ -49,7 +49,8 @@ public final class TabularRegression {
      * @throws IOException if the dataset could not be loaded
      * @throws TranslateException if the translator has errors
      */
-    public static ZooModel<NDList, NDList> train(TabularDataset dataset, Performance performance)
+    public static ZooModel<ListFeatures, Float> train(
+            TabularDataset dataset, Performance performance)
             throws IOException, TranslateException {
         Dataset[] splitDataset = dataset.randomSplit(8, 2);
         Dataset trainDataset = splitDataset[0];
@@ -92,6 +93,8 @@ public final class TabularRegression {
             EasyTrain.fit(trainer, 20, trainDataset, validateDataset);
         }
 
-        return new ZooModel<>(model, new NoopTranslator());
+        Translator<ListFeatures, Float> translator =
+                dataset.matchingTranslatorOptions().option(ListFeatures.class, Float.class);
+        return new ZooModel<>(model, translator);
     }
 }
