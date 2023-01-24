@@ -37,6 +37,7 @@ public class TokenClassificationTranslatorFactory implements TranslatorFactory {
 
     static {
         SUPPORTED_TYPES.add(new Pair<>(String.class, NamedEntity[].class));
+        SUPPORTED_TYPES.add(new Pair<>(String[].class, NamedEntity[][].class));
         SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
 
@@ -63,6 +64,8 @@ public class TokenClassificationTranslatorFactory implements TranslatorFactory {
                     TokenClassificationTranslator.builder(tokenizer, arguments).build();
             if (input == String.class && output == NamedEntity[].class) {
                 return (Translator<I, O>) translator;
+            } else if (input == String[].class && output == NamedEntity[][].class) {
+                return (Translator<I, O>) translator.toBatchTranslator();
             } else if (input == Input.class && output == Output.class) {
                 return (Translator<I, O>) new TokenClassificationServingTranslator(translator);
             }
