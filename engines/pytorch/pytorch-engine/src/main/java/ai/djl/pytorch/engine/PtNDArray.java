@@ -99,6 +99,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         this.strs = strs;
         this.shape = shape;
         this.dataType = DataType.STRING;
+        NDScope.register(this);
     }
 
     /** {@inheritDoc} */
