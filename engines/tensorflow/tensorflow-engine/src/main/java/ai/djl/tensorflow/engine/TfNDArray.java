@@ -265,7 +265,6 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     public void detach() {
         manager.detachInternal(getUid());
         manager = TfNDManager.getSystemManager();
-        NDScope.unregister(this);
     }
 
     /** {@inheritDoc} */

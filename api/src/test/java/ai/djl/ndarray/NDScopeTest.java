@@ -35,7 +35,8 @@ public class NDScopeTest {
                 }
 
                 detached = manager.create(new int[] {1});
-                detached.detach(); // detached from NDManager and NDScope
+                detached.detach(); // detached from NDManager
+                NDScope.unregister(detached); // and unregistered from NDScope
             }
 
             Assert.assertFalse(inside.isReleased());

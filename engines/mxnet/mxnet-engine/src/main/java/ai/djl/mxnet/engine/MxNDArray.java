@@ -189,7 +189,6 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     public void detach() {
         manager.detachInternal(getUid());
         manager = MxNDManager.getSystemManager();
-        NDScope.unregister(this);
     }
 
     private NDArray duplicate(

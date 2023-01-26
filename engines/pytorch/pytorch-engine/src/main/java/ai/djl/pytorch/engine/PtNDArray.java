@@ -367,7 +367,6 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     public void detach() {
         manager.detachInternal(getUid());
         manager = PtNDManager.getSystemManager();
-        NDScope.unregister(this);
     }
 
     /** {@inheritDoc} */
