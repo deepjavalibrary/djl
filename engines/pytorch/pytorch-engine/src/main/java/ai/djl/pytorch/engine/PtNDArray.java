@@ -17,6 +17,7 @@ import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.NDScope;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
@@ -64,6 +65,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         this.manager = manager;
         this.ptNDArrayEx = new PtNDArrayEx(this);
         manager.attachInternal(getUid(), this);
+        NDScope.register(this);
     }
 
     /**
@@ -80,6 +82,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         this.ptNDArrayEx = new PtNDArrayEx(this);
         manager.attachInternal(getUid(), this);
         dataRef = data;
+        NDScope.register(this);
     }
 
     /**
@@ -96,6 +99,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         this.strs = strs;
         this.shape = shape;
         this.dataType = DataType.STRING;
+        NDScope.register(this);
     }
 
     /** {@inheritDoc} */
