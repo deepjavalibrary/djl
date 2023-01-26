@@ -63,77 +63,6 @@ public abstract class BaseNDManager implements NDManager {
         }
     }
 
-    /**
-     * Checks if the input buffer size is match expected data type.
-     *
-     * @param buffer the input buffer
-     * @param dataType the desired {@code DataType}
-     * @param expected the expected size
-     * @throws IllegalArgumentException if buffer size is invalid
-     */
-    public static void validateBuffer(Buffer buffer, DataType dataType, int expected) {
-        boolean isByteBuffer = buffer instanceof ByteBuffer;
-        DataType type = DataType.fromBuffer(buffer);
-        if (type != dataType && !isByteBuffer) {
-            // It's ok if type != datatype and buffer is ByteBuffer,
-            // since buffer will be copied into ByteBuffer
-            throw new IllegalArgumentException(
-                    "The input data type: "
-                            + type
-                            + " does not match target array data type: "
-                            + dataType);
-        }
-
-        int remaining = buffer.remaining();
-        int expectedSize = isByteBuffer ? dataType.getNumOfBytes() * expected : expected;
-        if (remaining < expectedSize) {
-            throw new IllegalArgumentException(
-                    "The NDArray size is: " + expected + ", but buffer size is: " + remaining);
-        }
-        if (remaining > expectedSize) {
-            logger.warn(
-                    "Input buffer size is greater than the NDArray size, please set limit"
-                            + " explicitly.");
-            buffer.limit(expectedSize);
-        }
-    }
-
-    /**
-     * Copies data from the source {@code Buffer} to the target {@code ByteBuffer}.
-     *
-     * @param src the source {@code Buffer}
-     * @param target the target {@code ByteBuffer}
-     */
-    public static void copyBuffer(Buffer src, ByteBuffer target) {
-        target.rewind();
-        DataType inputType = DataType.fromBuffer(src);
-        switch (inputType) {
-            case FLOAT16:
-                target.asShortBuffer().put((ShortBuffer) src);
-                break;
-            case FLOAT32:
-                target.asFloatBuffer().put((FloatBuffer) src);
-                break;
-            case FLOAT64:
-                target.asDoubleBuffer().put((DoubleBuffer) src);
-                break;
-            case UINT8:
-            case INT8:
-            case BOOLEAN:
-                target.put((ByteBuffer) src);
-                break;
-            case INT32:
-                target.asIntBuffer().put((IntBuffer) src);
-                break;
-            case INT64:
-                target.asLongBuffer().put((LongBuffer) src);
-                break;
-            default:
-                throw new AssertionError("Unsupported datatype: " + inputType);
-        }
-        target.rewind();
-    }
-
     /** {@inheritDoc} */
     @Override
     public final Device defaultDevice() {
@@ -178,14 +107,14 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public String getName() {
-        return this.name == null ? uid : this.name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return this.name == null ? uid : this.name;
     }
 
     /** {@inheritDoc} */
@@ -539,23 +468,74 @@ public abstract class BaseNDManager implements NDManager {
     }
 
     /**
-     * Returns true if the resource is a resource of this manager.
+     * Checks if the input buffer size is match expected data type.
      *
-     * @param resource the resource to check
-     * @return true if the resource is a resource of this manager
+     * @param buffer the input buffer
+     * @param dataType the desired {@code DataType}
+     * @param expected the expected size
+     * @throws IllegalArgumentException if buffer size is invalid
      */
-    public boolean hasResource(AutoCloseable resource) {
-        return this.resources.values().contains(resource);
+    public static void validateBuffer(Buffer buffer, DataType dataType, int expected) {
+        boolean isByteBuffer = buffer instanceof ByteBuffer;
+        DataType type = DataType.fromBuffer(buffer);
+        if (type != dataType && !isByteBuffer) {
+            // It's ok if type != datatype and buffer is ByteBuffer,
+            // since buffer will be copied into ByteBuffer
+            throw new IllegalArgumentException(
+                    "The input data type: "
+                            + type
+                            + " does not match target array data type: "
+                            + dataType);
+        }
+
+        int remaining = buffer.remaining();
+        int expectedSize = isByteBuffer ? dataType.getNumOfBytes() * expected : expected;
+        if (remaining < expectedSize) {
+            throw new IllegalArgumentException(
+                    "The NDArray size is: " + expected + ", but buffer size is: " + remaining);
+        }
+        if (remaining > expectedSize) {
+            logger.warn(
+                    "Input buffer size is greater than the NDArray size, please set limit"
+                            + " explicitly.");
+            buffer.limit(expectedSize);
+        }
     }
 
     /**
-     * Returns true if the resource is a temporary resource.
+     * Copies data from the source {@code Buffer} to the target {@code ByteBuffer}.
      *
-     * @param resource the resource to check
-     * @return true if the resource is a temporary resource
+     * @param src the source {@code Buffer}
+     * @param target the target {@code ByteBuffer}
      */
-    public boolean hasTempResource(AutoCloseable resource) {
-        return this.resources.values().contains(resource);
+    public static void copyBuffer(Buffer src, ByteBuffer target) {
+        target.rewind();
+        DataType inputType = DataType.fromBuffer(src);
+        switch (inputType) {
+            case FLOAT16:
+                target.asShortBuffer().put((ShortBuffer) src);
+                break;
+            case FLOAT32:
+                target.asFloatBuffer().put((FloatBuffer) src);
+                break;
+            case FLOAT64:
+                target.asDoubleBuffer().put((DoubleBuffer) src);
+                break;
+            case UINT8:
+            case INT8:
+            case BOOLEAN:
+                target.put((ByteBuffer) src);
+                break;
+            case INT32:
+                target.asIntBuffer().put((IntBuffer) src);
+                break;
+            case INT64:
+                target.asLongBuffer().put((LongBuffer) src);
+                break;
+            default:
+                throw new AssertionError("Unsupported datatype: " + inputType);
+        }
+        target.rewind();
     }
 
     protected static final class TempResource {

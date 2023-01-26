@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.NDScope;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -55,6 +56,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
         this.manager = manager;
         manager.attachInternal(getUid(), this);
         tfNDArrayEx = new TfNDArrayEx(this);
+        NDScope.register(this);
     }
 
     TfNDArray(TfNDManager manager, TFE_TensorHandle handle, TF_Tensor tensor) {
@@ -263,6 +265,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     public void detach() {
         manager.detachInternal(getUid());
         manager = TfNDManager.getSystemManager();
+        NDScope.unregister(this);
     }
 
     /** {@inheritDoc} */

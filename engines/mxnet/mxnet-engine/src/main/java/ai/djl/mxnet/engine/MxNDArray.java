@@ -19,6 +19,7 @@ import ai.djl.ndarray.LazyNDArray;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.NDScope;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -89,6 +90,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
         this.manager = manager;
         mxNDArrayEx = new MxNDArrayEx(this);
         manager.attachInternal(getUid(), this);
+        NDScope.register(this);
     }
 
     /**
@@ -187,6 +189,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     public void detach() {
         manager.detachInternal(getUid());
         manager = MxNDManager.getSystemManager();
+        NDScope.unregister(this);
     }
 
     private NDArray duplicate(

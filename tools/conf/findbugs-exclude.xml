@@ -33,16 +33,4 @@
         <Bug pattern="URF_UNREAD_FIELD"/>
         <Class name="~ai\.djl\.pytorch\.engine\.PtNDArray"/>
     </Match>
-    <Match>
-        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
-        <Class name="~ai\.djl\.ndarray\.refcount\.DeallocatorReference"/>
-    </Match>
-    <Match>
-        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
-        <Class name="~ai\.djl\.pytorch\.refcount\.SomeRCObject"/>
-    </Match>
-
-
-
-
 </FindBugsFilter>

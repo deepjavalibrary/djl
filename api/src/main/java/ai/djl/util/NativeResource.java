@@ -12,15 +12,8 @@
  */
 package ai.djl.util;
 
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.refcount.RCConfig;
-import ai.djl.ndarray.refcount.RCObject;
-
 import com.sun.jna.Pointer;
 
-import java.text.MessageFormat;
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -29,74 +22,14 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @param <T> the resource that could map to a native pointer or java object
  */
-@SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-public abstract class NativeResource<T> extends RCObject implements AutoCloseable {
+public abstract class NativeResource<T> implements AutoCloseable {
 
     protected final AtomicReference<T> handle;
-    protected Instant creationTime;
-
-    protected String uid;
-    private String creationStackTraceAsString;
-    private String closingStackTraceAsString;
-
-    /** Constructs a new {@code NativeResource}. */
-    public NativeResource() {
-        //  super();
-        handle = new AtomicReference<>();
-        this.creationTime = Instant.now();
-        if (RCConfig.isVerboseIfResourceAlreadyClosed()) {
-            creationStackTraceAsString = stackTraceAsString();
-        }
-    }
+    private String uid;
 
     protected NativeResource(T handle) {
         this.handle = new AtomicReference<>(handle);
         uid = handle.toString();
-        this.creationTime = Instant.now();
-        if (RCConfig.isVerboseIfResourceAlreadyClosed()) {
-            creationStackTraceAsString = stackTraceAsString();
-        }
-    }
-
-    private String fingerPrintOfNativeResourceWithStackTraceFromCreation() {
-        String name = "NO_NAME";
-        if (this instanceof NDArray) {
-            name = ((NDArray) this).getName();
-        }
-        return MessageFormat.format(
-                "NDArray named \"{0}\" identified by (uid:{1};createdAt:{2}) \n"
-                        + "call stack at creation...{3}\n"
-                        + "######### \n"
-                        + "call stack at closing...{4}\n"
-                        + "#########",
-                name,
-                getUid(),
-                creationTime,
-                creationStackTraceAsString,
-                closingStackTraceAsString);
-    }
-
-    /**
-     * Returns the current stack trace as a string.
-     *
-     * @return the current stack trace as a string
-     */
-    public static String stackTraceAsString() {
-        StringBuilder buf = new StringBuilder();
-        Arrays.stream(Thread.currentThread().getStackTrace())
-                .forEach(
-                        s ->
-                                buf.append(
-                                        "\nat "
-                                                + s.getClassName()
-                                                + "."
-                                                + s.getMethodName()
-                                                + "("
-                                                + s.getFileName()
-                                                + ":"
-                                                + s.getLineNumber()
-                                                + ")"));
-        return buf.toString();
     }
 
     /**
@@ -116,11 +49,7 @@ public abstract class NativeResource<T> extends RCObject implements AutoCloseabl
     public T getHandle() {
         T reference = handle.get();
         if (reference == null) {
-            String message = "Native resource has been released already. ";
-            if (RCConfig.isVerboseIfResourceAlreadyClosed()) {
-                message += fingerPrintOfNativeResourceWithStackTraceFromCreation();
-            }
-            throw new IllegalStateException(message);
+            throw new IllegalStateException("Native resource has been release already.");
         }
         return reference;
     }
@@ -132,21 +61,6 @@ public abstract class NativeResource<T> extends RCObject implements AutoCloseabl
      */
     public final String getUid() {
         return uid;
-    }
-
-    /**
-     * Sets the closingStackTraceAsString.
-     *
-     * @param closingStackTraceAsString the closingStackTraceAsString to set
-     */
-    protected void setClosingStackTraceAsString(String closingStackTraceAsString) {
-        this.closingStackTraceAsString = closingStackTraceAsString;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isNull() {
-        return handle.get() == null;
     }
 
     /** {@inheritDoc} */
