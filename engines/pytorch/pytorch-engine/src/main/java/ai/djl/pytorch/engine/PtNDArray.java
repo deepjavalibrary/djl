@@ -1586,6 +1586,9 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             if (((NDArray) obj).isReleased()) {
                 return this == obj;
             }
+            if (((NDArray) obj).getManager() != manager) {
+                return false;
+            }
             return contentEquals((NDArray) obj);
         }
         return false;
