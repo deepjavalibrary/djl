@@ -50,7 +50,7 @@ public class QaServingTranslator implements NoBatchifyTranslator<Input, Output> 
     @Override
     public void prepare(TranslatorContext ctx) throws Exception {
         translator.prepare(ctx);
-        translator.prepare(ctx);
+        batchTranslator.prepare(ctx);
     }
 
     /** {@inheritDoc} */
@@ -74,15 +74,22 @@ public class QaServingTranslator implements NoBatchifyTranslator<Input, Output> 
                 }
 
                 qa = JsonUtils.GSON.fromJson(json, QAInput.class);
+                if (qa.getQuestion() == null || qa.getParagraph() == null) {
+                    throw new TranslateException("Missing question or context in json.");
+                }
             } catch (JsonParseException e) {
                 throw new TranslateException("Input is not a valid json.", e);
             }
-        } else if (content.contains("question") && content.contains("paragraph")) {
-            String question = input.getAsString("question");
-            String paragraph = input.getAsString("paragraph");
-            qa = new QAInput(question, paragraph);
         } else {
-            throw new TranslateException("Not a QuestionAnswering input.");
+            String question = input.getAsString("question");
+            String context = input.getAsString("context");
+            if (context == null) {
+                context = input.getAsString("paragraph");
+            }
+            if (question == null || context == null) {
+                throw new TranslateException("Missing question or context in input.");
+            }
+            qa = new QAInput(question, context);
         }
 
         NDList ret = translator.processInput(ctx, qa);

@@ -17,6 +17,7 @@ public class QAInput {
 
     private String question;
     private String paragraph;
+    private String context;
 
     /**
      * Creates the BERT QA model.
@@ -30,7 +31,7 @@ public class QAInput {
     }
 
     /**
-     * Gets the question for the model.
+     * Returns the question for the model.
      *
      * @return the question for the model
      */
@@ -39,11 +40,11 @@ public class QAInput {
     }
 
     /**
-     * Gets the resource document that contains the answer.
+     * Returns the resource document that contains the answer.
      *
      * @return the resource document that contains the answer
      */
     public String getParagraph() {
-        return paragraph;
+        return paragraph == null ? context : paragraph;
     }
 }

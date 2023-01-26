@@ -103,6 +103,40 @@ public class QuestionAnsweringTranslatorTest {
             input.add("paragraph", paragraph);
             Output res = predictor.predict(input);
             Assert.assertEquals(res.getAsString(0), "December 2004");
+
+            Assert.assertThrows(
+                    "Input data is empty.",
+                    TranslateException.class,
+                    () -> predictor.predict(new Input()));
+
+            Assert.assertThrows(
+                    "Missing question or context in input.",
+                    TranslateException.class,
+                    () -> {
+                        Input req = new Input();
+                        req.add("something", "false");
+                        predictor.predict(req);
+                    });
+
+            Assert.assertThrows(
+                    "Input is not a valid json.",
+                    TranslateException.class,
+                    () -> {
+                        Input req = new Input();
+                        req.addProperty("Content-Type", "application/json");
+                        req.add("Invalid json");
+                        predictor.predict(req);
+                    });
+
+            Assert.assertThrows(
+                    "Missing question or context in json.",
+                    TranslateException.class,
+                    () -> {
+                        Input req = new Input();
+                        req.addProperty("Content-Type", "application/json");
+                        req.add(JsonUtils.GSON.toJson(new QAInput(question, null)));
+                        predictor.predict(req);
+                    });
         }
 
         try (Model model = Model.newInstance("test")) {
