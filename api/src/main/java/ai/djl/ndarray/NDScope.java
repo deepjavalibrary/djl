@@ -28,7 +28,7 @@ public class NDScope implements AutoCloseable {
     private static final ThreadLocal<Deque<NDScope>> SCOPE_STACK =
             ThreadLocal.withInitial(ArrayDeque::new);
 
-    private List<NDArrayWrapper> resources;
+    private IdentityHashMap<NDArray, NDArray> resources;
 
     /** Constructs a new {@code NDScope} instance. */
     public NDScope() {
