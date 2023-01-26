@@ -28,7 +28,7 @@ public class NDScope implements AutoCloseable {
     private static final ThreadLocal<Deque<NDScope>> SCOPE_STACK =
             ThreadLocal.withInitial(ArrayDeque::new);
 
-    private List<NDArray> resources;
+    private List<NDArrayWrapper> resources;
 
     /** Constructs a new {@code NDScope} instance. */
     public NDScope() {
@@ -46,7 +46,7 @@ public class NDScope implements AutoCloseable {
         if (queue.isEmpty()) {
             return;
         }
-        queue.getLast().resources.add(array);
+        queue.getLast().resources.add(new NDArrayWrapper(array));
     }
 
     /**
@@ -59,14 +59,14 @@ public class NDScope implements AutoCloseable {
         if (queue.isEmpty()) {
             return;
         }
-        queue.getLast().resources.remove(array);
+        queue.getLast().resources.remove(new NDArrayWrapper(array));
     }
 
     /** {@inheritDoc} */
     @Override
     public void close() {
-        for (NDArray array : resources) {
-            array.close();
+        for (NDArrayWrapper arrayWrapper : resources) {
+            arrayWrapper.array.close();
         }
         SCOPE_STACK.get().remove(this);
     }
@@ -79,5 +79,26 @@ public class NDScope implements AutoCloseable {
      */
     public void suppressNotUsedWarning() {
         // do nothing
+    }
+
+    private static class NDArrayWrapper {
+        NDArray array;
+
+        public NDArrayWrapper(NDArray array) {
+            this.array = array;
+        }
+
+        @Override
+        public int hashCode() {
+            return 1;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof NDArrayWrapper)) {
+                return false;
+            }
+            return ((NDArrayWrapper) o).array == array;
+        }
     }
 }
