@@ -13,9 +13,8 @@
 package ai.djl.ndarray;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.List;
+import java.util.IdentityHashMap;
 
 /**
  * A class that tracks {@link NDResource} objects created in the try-with-resource block and close
@@ -32,7 +31,7 @@ public class NDScope implements AutoCloseable {
 
     /** Constructs a new {@code NDScope} instance. */
     public NDScope() {
-        resources = new ArrayList<>();
+        resources = new IdentityHashMap<>();
         SCOPE_STACK.get().addLast(this);
     }
 
@@ -46,7 +45,7 @@ public class NDScope implements AutoCloseable {
         if (queue.isEmpty()) {
             return;
         }
-        queue.getLast().resources.add(new NDArrayWrapper(array));
+        queue.getLast().resources.put(array, array);
     }
 
     /**
@@ -59,14 +58,14 @@ public class NDScope implements AutoCloseable {
         if (queue.isEmpty()) {
             return;
         }
-        queue.getLast().resources.remove(new NDArrayWrapper(array));
+        queue.getLast().resources.remove(array);
     }
 
     /** {@inheritDoc} */
     @Override
     public void close() {
-        for (NDArrayWrapper arrayWrapper : resources) {
-            arrayWrapper.array.close();
+        for (NDArray array : resources.keySet()) {
+            array.close();
         }
         SCOPE_STACK.get().remove(this);
     }
@@ -79,26 +78,5 @@ public class NDScope implements AutoCloseable {
      */
     public void suppressNotUsedWarning() {
         // do nothing
-    }
-
-    private static class NDArrayWrapper {
-        NDArray array;
-
-        public NDArrayWrapper(NDArray array) {
-            this.array = array;
-        }
-
-        @Override
-        public int hashCode() {
-            return 1;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof NDArrayWrapper)) {
-                return false;
-            }
-            return ((NDArrayWrapper) o).array == array;
-        }
     }
 }
