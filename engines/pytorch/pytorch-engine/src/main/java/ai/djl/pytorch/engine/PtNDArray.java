@@ -1582,6 +1582,10 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof NDArray) {
+            // do no compare content if obj is released
+            if (((NDArray) obj).isReleased()) {
+                return this == obj;
+            }
             return contentEquals((NDArray) obj);
         }
         return false;

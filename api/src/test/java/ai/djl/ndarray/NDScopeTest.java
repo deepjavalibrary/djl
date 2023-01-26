@@ -22,10 +22,13 @@ public class NDScopeTest {
     public void testNDScope() {
         NDArray detached;
         NDArray inside;
+        NDArray uninvolved;
         try (NDManager manager = NDManager.newBaseManager()) {
             try (NDScope scope = new NDScope()) {
                 scope.suppressNotUsedWarning();
                 try (NDScope ignore = new NDScope()) {
+                    uninvolved = manager.create(new int[] {1});
+                    uninvolved.close();
                     inside = manager.create(new int[] {1});
                     // not tracked by any NDScope, but still managed by NDManager
                     NDScope.unregister(inside);
