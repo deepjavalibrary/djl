@@ -1179,6 +1179,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public boolean isReleased() {
+        return isClosed;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void close() {
         if (!isClosed) {
             manager.detachInternal(getUid());

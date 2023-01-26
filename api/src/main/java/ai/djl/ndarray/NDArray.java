@@ -4725,6 +4725,13 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArrayEx getNDArrayInternal();
 
     /**
+     * Returns {@code true} if this NDArray has been released.
+     *
+     * @return {@code true} if this NDArray has been released
+     */
+    boolean isReleased();
+
+    /**
      * Runs the debug string representation of this {@code NDArray}.
      *
      * @return the debug string representation of this {@code NDArray}
@@ -4755,6 +4762,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      */
     default String toDebugString(
             int maxSize, int maxDepth, int maxRows, int maxColumns, boolean withContent) {
+        if (isReleased()) {
+            return "This array is already closed";
+        }
         return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns, withContent);
     }
 
