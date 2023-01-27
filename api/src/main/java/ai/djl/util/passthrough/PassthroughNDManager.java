@@ -14,6 +14,7 @@ package ai.djl.util.passthrough;
 
 import ai.djl.Device;
 import ai.djl.engine.Engine;
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -24,6 +25,7 @@ import ai.djl.util.PairList;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
@@ -50,7 +52,24 @@ public final class PassthroughNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray from(NDArray array) {
-        throw new UnsupportedOperationException(UNSUPPORTED);
+        if (array == null || array instanceof PassthroughNDArray) {
+            return array;
+        }
+        return create(array.toByteBuffer(), array.getShape(), array.getDataType());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(Buffer data, Shape shape, DataType dataType) {
+        int size = Math.toIntExact(shape.size());
+        BaseNDManager.validateBuffer(data, dataType, size);
+        if (data instanceof ByteBuffer) {
+            return new PassthroughNDArray(data, shape, dataType);
+        }
+        ByteBuffer bb = ByteBuffer.allocate(size * dataType.getNumOfBytes());
+        bb.order(ByteOrder.nativeOrder());
+        BaseNDManager.copyBuffer(data, bb);
+        return new PassthroughNDArray(bb, shape, dataType);
     }
 
     /** {@inheritDoc} */

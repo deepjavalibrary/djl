@@ -112,7 +112,7 @@ public class CookingStackExchangeTest {
                         .optArtifactId("ai.djl.fasttext:cooking_stackexchange")
                         .build();
         try (ZooModel<String, Classifications> model = criteria.loadModel();
-                NDManager manager = NDManager.newBaseManager()) {
+                NDManager manager = model.getNDManager()) {
 
             FtWord2VecWordEmbedding fasttextWord2VecWordEmbedding =
                     new FtWord2VecWordEmbedding(

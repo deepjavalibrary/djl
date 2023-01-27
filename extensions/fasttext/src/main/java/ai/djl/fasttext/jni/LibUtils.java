@@ -13,6 +13,7 @@
 package ai.djl.fasttext.jni;
 
 import ai.djl.util.ClassLoaderUtils;
+import ai.djl.util.Ec2Utils;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
 
@@ -46,6 +47,7 @@ public final class LibUtils {
     private LibUtils() {}
 
     public static void loadLibrary() {
+        Ec2Utils.callHome("fastText");
         if (System.getProperty("os.name").startsWith("Win")) {
             throw new UnsupportedOperationException("Windows is not supported.");
         }

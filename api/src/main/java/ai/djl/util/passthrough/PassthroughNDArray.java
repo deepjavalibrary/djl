@@ -14,6 +14,8 @@ package ai.djl.util.passthrough;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrayAdapter;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 
 import java.nio.ByteBuffer;
 
@@ -39,6 +41,18 @@ public class PassthroughNDArray extends NDArrayAdapter {
     }
 
     /**
+     * Constructs a {@link PassthroughNDArray} storing an object.
+     *
+     * @param object the object to store
+     * @param shape the {@link Shape} of the {@link NDArray}
+     * @param dataType the {@link DataType} of the {@link NDArray}
+     */
+    public PassthroughNDArray(Object object, Shape shape, DataType dataType) {
+        super(null, null, shape, dataType, null);
+        this.object = object;
+    }
+
+    /**
      * Returns the object stored.
      *
      * @return the object stored
@@ -50,6 +64,9 @@ public class PassthroughNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
+        if (object instanceof ByteBuffer) {
+            return (ByteBuffer) object;
+        }
         throw new UnsupportedOperationException("Operation not supported for FastText");
     }
 
