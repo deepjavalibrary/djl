@@ -1719,6 +1719,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     /** {@inheritDoc} */
     @Override
     public void close() {
+        onClose();
         TFE_TensorHandle tensorHandle = handle.getAndSet(null);
         if (tensorHandle != null && !tensorHandle.isNull()) {
             tensorHandle.close();

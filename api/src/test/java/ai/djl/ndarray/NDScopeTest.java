@@ -45,4 +45,39 @@ public class NDScopeTest {
         Assert.assertFalse(detached.isReleased());
         detached.close();
     }
+
+    @Test(
+            expectedExceptions = java.lang.IllegalStateException.class,
+            expectedExceptionsMessageRegExp = "Native resource has been released already. ")
+    @SuppressWarnings("try")
+    public void testNDScopeNotVerboseIfResourceAlreadyClosed() {
+        NDArray ndArray;
+        try (NDManager manager = NDManager.newBaseManager()) {
+            try (NDScope scope = new NDScope()) {
+                scope.suppressNotUsedWarning();
+                ndArray = manager.create(new int[] {1});
+            }
+            ndArray.addi(1);
+        }
+    }
+
+    @Test(
+            expectedExceptions = IllegalStateException.class,
+            expectedExceptionsMessageRegExp =
+                    "Native resource has been released already. .*call stack at creation...\n"
+                            + ".*.*call stack at closing...\n"
+                            + ".*")
+    @SuppressWarnings("try")
+    public void testNDScopeVerboseIfResourceAlreadyClosed() {
+        NDScope.setVerboseIfResourceAlreadyClosed(true);
+        NDArray ndArray;
+        try (NDManager manager = NDManager.newBaseManager()) {
+            try (NDScope scope = new NDScope()) {
+                scope.suppressNotUsedWarning();
+                ndArray = manager.create(new int[] {1});
+                ndArray.setName("myArray");
+            }
+            ndArray.addi(1);
+        }
+    }
 }
