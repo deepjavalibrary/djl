@@ -18,7 +18,8 @@ from pyspark.sql import DataFrame
 
 class SparkTransformer:
 
-    def __init__(self, input_cols, output_cols, engine, model_url, output_class, translator):
+    def __init__(self, input_cols, output_cols, engine, model_url,
+                 output_class, translator):
         self.input_cols = input_cols
         self.output_cols = output_cols
         self.engine = engine
@@ -33,16 +34,18 @@ class SparkTransformer:
         # Convert the input_cols to Java array
         input_cols_arr = None
         if self.input_cols is not None:
-            input_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String, len(self.input_cols))
+            input_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String,
+                                                   len(self.input_cols))
             for i in range(len(self.input_cols)):
-                input_cols_arr[i]=self.input_cols[i]
+                input_cols_arr[i] = self.input_cols[i]
 
         # Convert the output_cols to Java array
         output_cols_arr = None
         if self.output_cols is not None:
-            output_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String, len(self.output_cols))
+            output_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String,
+                                                    len(self.output_cols))
             for i in range(len(self.output_cols)):
-                output_cols_arr[i]=self.output_cols[i]
+                output_cols_arr[i] = self.output_cols[i]
 
         output_clazz = sc._jvm.java.lang.Class.forName(self.output_class)
         transformer = sc._jvm.ai.djl.spark.SparkTransformer()
@@ -54,4 +57,5 @@ class SparkTransformer:
             .setModelUrl(self.model_url) \
             .setOutputClass(output_clazz) \
             .setTranslator(self.translator)
-        return DataFrame(transformer .transform(dataset._jdf), sqlContext._ssql_ctx)
+        return DataFrame(transformer.transform(dataset._jdf),
+                         sqlContext._ssql_ctx)
