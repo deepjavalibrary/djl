@@ -19,7 +19,9 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.Float16Utils;
 import ai.djl.util.PairList;
+import ai.djl.util.passthrough.PassthroughNDManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -112,6 +114,9 @@ public interface NDManager extends AutoCloseable {
      * @return a new top-level {@code NDManager}
      */
     static NDManager newBaseManager() {
+        if (Engine.getAllEngines().isEmpty()) {
+            return PassthroughNDManager.INSTANCE;
+        }
         return Engine.getInstance().newBaseManager();
     }
 
@@ -773,7 +778,11 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      * @see #zeros(Shape, DataType, Device)
      */
-    NDArray zeros(Shape shape, DataType dataType);
+    default NDArray zeros(Shape shape, DataType dataType) {
+        int size = (int) shape.size();
+        ByteBuffer bb = allocateDirect(size * dataType.getNumOfBytes());
+        return create(bb, shape, dataType);
+    }
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Device}, {@link Shape}, and
@@ -798,7 +807,38 @@ public interface NDManager extends AutoCloseable {
      * @param dataType the {@link DataType} of the {@link NDArray}
      * @return a new instance of {@link NDArray}
      */
-    NDArray ones(Shape shape, DataType dataType);
+    default NDArray ones(Shape shape, DataType dataType) {
+        int size = (int) shape.size();
+        ByteBuffer bb = allocateDirect(size * dataType.getNumOfBytes());
+        for (int i = 0; i < size; ++i) {
+            switch (dataType) {
+                case FLOAT16:
+                    bb.putShort(Float16Utils.ONE);
+                    break;
+                case FLOAT32:
+                    bb.putFloat(1f);
+                    break;
+                case FLOAT64:
+                    bb.putDouble(1d);
+                    break;
+                case INT32:
+                    bb.putInt(1);
+                    break;
+                case INT64:
+                    bb.putLong(1);
+                    break;
+                case UINT8:
+                case INT8:
+                    bb.put((byte) 1);
+                    break;
+                case UNKNOWN:
+                default:
+                    break;
+            }
+        }
+        bb.rewind();
+        return create(bb, shape, dataType);
+    }
 
     /**
      * Creates an instance of {@link NDArray} with specified {@link Shape} filled with ones.
