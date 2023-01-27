@@ -27,7 +27,7 @@ import java.io.Serializable
  * @param outputClass The output class
  */
 @SerialVersionUID(1L)
-class SparkModel[T](val url: String, val outputClass : Class[T]) extends Serializable {
+class SparkModel[T](val engine: String, val url: String, val outputClass : Class[T]) extends Serializable {
 
   @transient var model: ZooModel[Row, T] = _
 
@@ -41,6 +41,7 @@ class SparkModel[T](val url: String, val outputClass : Class[T]) extends Seriali
     if (model == null) {
       val criteria = Criteria.builder
         .setTypes(classOf[Row], outputClass)
+        .optEngine(engine)
         .optModelUrls(url)
         .optTranslator(translator)
         .optProgress(new ProgressBar)
