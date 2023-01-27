@@ -18,4 +18,5 @@ class SparkImageClassificationTranslator:
 
     def __new__(cls, *args, **kwargs):
         sc = SparkContext._active_spark_context
-        return sc._jvm.ai.djl.spark.translator.SparkImageClassificationTranslator()
+        return sc._jvm.ai.djl.spark.translator.SparkImageClassificationTranslator(
+        )
