@@ -155,7 +155,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
                 // in MXNet models
                 logger.warn(
                         "Input shapes are unknown, please run predict or forward once"
-                                + "and call describeInput again.");
+                                + " and call describeInput again.");
                 inputDescriptions.add(name, new Shape());
             }
         }
@@ -174,7 +174,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
         if (outputDescriptions == null) {
             logger.warn(
                     "Output shapes are unknown, please run predict or forward once"
-                            + "and call describeOutput again.");
+                            + " and call describeOutput again.");
         }
         return outputDescriptions;
     }
