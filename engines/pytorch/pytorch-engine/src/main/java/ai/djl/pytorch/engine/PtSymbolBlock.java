@@ -160,7 +160,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         if (inputDescriptions == null) {
             logger.warn(
                     "Input shapes are unknown, please run predict or forward once"
-                            + "and call describeInput again.");
+                            + " and call describeInput again.");
         }
         return inputDescriptions;
     }
@@ -208,7 +208,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         if (outputDescriptions == null) {
             logger.warn(
                     "Output shapes are unknown, please run predict or forward once"
-                            + "and call describeOutput again.");
+                            + " and call describeOutput again.");
         }
         return outputDescriptions;
     }
