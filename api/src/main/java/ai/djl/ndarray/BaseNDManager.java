@@ -16,7 +16,6 @@ import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.util.Float16Utils;
 import ai.djl.util.PairList;
 import ai.djl.util.RandomUtils;
 
@@ -115,49 +114,6 @@ public abstract class BaseNDManager implements NDManager {
     @Override
     public String getName() {
         return this.name == null ? uid : this.name;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray zeros(Shape shape, DataType dataType) {
-        int size = (int) shape.size();
-        ByteBuffer bb = allocateDirect(size * dataType.getNumOfBytes());
-        return create(bb, shape, dataType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ones(Shape shape, DataType dataType) {
-        int size = (int) shape.size();
-        ByteBuffer bb = allocateDirect(size * dataType.getNumOfBytes());
-        for (int i = 0; i < size; ++i) {
-            switch (dataType) {
-                case FLOAT16:
-                    bb.putShort(Float16Utils.ONE);
-                    break;
-                case FLOAT32:
-                    bb.putFloat(1f);
-                    break;
-                case FLOAT64:
-                    bb.putDouble(1d);
-                    break;
-                case INT32:
-                    bb.putInt(1);
-                    break;
-                case INT64:
-                    bb.putLong(1);
-                    break;
-                case UINT8:
-                case INT8:
-                    bb.put((byte) 1);
-                    break;
-                case UNKNOWN:
-                default:
-                    break;
-            }
-        }
-        bb.rewind();
-        return create(bb, shape, dataType);
     }
 
     /** {@inheritDoc} */

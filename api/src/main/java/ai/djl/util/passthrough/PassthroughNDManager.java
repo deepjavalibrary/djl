@@ -46,7 +46,7 @@ public final class PassthroughNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer allocateDirect(int capacity) {
-        throw new UnsupportedOperationException(UNSUPPORTED);
+        return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
     /** {@inheritDoc} */
@@ -116,18 +116,6 @@ public final class PassthroughNDManager implements NDManager {
     @Override
     public String getName() {
         return "PassthroughNDManager";
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray zeros(Shape shape, DataType dataType) {
-        throw new UnsupportedOperationException(UNSUPPORTED);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray ones(Shape shape, DataType dataType) {
-        throw new UnsupportedOperationException(UNSUPPORTED);
     }
 
     /** {@inheritDoc} */
