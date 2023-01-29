@@ -58,7 +58,7 @@ public abstract class NativeResource<T> implements AutoCloseable {
         T reference = handle.get();
         if (reference == null) {
             if (TRACK_RESOURCE) {
-                logger.error("Native resource is released. Closed at:", exception);
+                logger.error("Native resource " + uid + " is released. Closed at:", exception);
             }
             String message = "Native resource has been released already.";
             throw new IllegalStateException(message);
