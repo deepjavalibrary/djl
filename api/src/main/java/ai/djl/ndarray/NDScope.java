@@ -26,31 +26,13 @@ public class NDScope implements AutoCloseable {
 
     private static final ThreadLocal<Deque<NDScope>> SCOPE_STACK =
             ThreadLocal.withInitial(ArrayDeque::new);
-    private static boolean verboseIfResourceAlreadyClosed;
+
     private IdentityHashMap<NDArray, NDArray> resources;
 
     /** Constructs a new {@code NDScope} instance. */
     public NDScope() {
         resources = new IdentityHashMap<>();
         SCOPE_STACK.get().addLast(this);
-    }
-
-    /**
-     * If true, a verbose message is printed if a resource is already closed.
-     *
-     * @return true if the verboseIfResourceAlreadyClosed is set
-     */
-    public static boolean isVerboseIfResourceAlreadyClosed() {
-        return verboseIfResourceAlreadyClosed;
-    }
-
-    /**
-     * If true, a verbose message is printed if a resource is already closed.
-     *
-     * @param verboseIfResourceAlreadyClosed parameter to set
-     */
-    public static void setVerboseIfResourceAlreadyClosed(boolean verboseIfResourceAlreadyClosed) {
-        NDScope.verboseIfResourceAlreadyClosed = verboseIfResourceAlreadyClosed;
     }
 
     /**

@@ -1595,7 +1595,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        this.onClose();
+        onClose();
         Long pointer = handle.getAndSet(null);
         if (pointer != null && pointer != -1) {
             JniUtils.deleteNDArray(pointer);

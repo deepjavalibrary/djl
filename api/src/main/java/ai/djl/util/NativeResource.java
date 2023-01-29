@@ -12,14 +12,11 @@
  */
 package ai.djl.util;
 
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDScope;
-
 import com.sun.jna.Pointer;
 
-import java.text.MessageFormat;
-import java.time.Instant;
-import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -30,71 +27,17 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public abstract class NativeResource<T> implements AutoCloseable {
 
+    private static final Logger logger = LoggerFactory.getLogger(NativeResource.class);
+
+    private static final boolean TRACK_RESOURCE = Boolean.getBoolean("ai.djl.track_resource");
+
     protected final AtomicReference<T> handle;
-    protected Instant creationTime;
-
-    protected String uid;
-    private String creationStackTraceAsString;
-    private String closingStackTraceAsString;
-
-    /** Constructs a new {@code NativeResource}. */
-    public NativeResource() {
-        //  super();
-        handle = new AtomicReference<>();
-        this.creationTime = Instant.now();
-        if (NDScope.isVerboseIfResourceAlreadyClosed()) {
-            creationStackTraceAsString = stackTraceAsString();
-        }
-    }
+    private String uid;
+    private Exception exception;
 
     protected NativeResource(T handle) {
         this.handle = new AtomicReference<>(handle);
-        uid = handle.toString();
-        this.creationTime = Instant.now();
-        if (NDScope.isVerboseIfResourceAlreadyClosed()) {
-            creationStackTraceAsString = stackTraceAsString();
-        }
-    }
-
-    private String fingerPrintOfNDArrayWithStackTraces() {
-        String name = "NO_NAME";
-        if (this instanceof NDArray) {
-            name = ((NDArray) this).getName();
-        }
-        return MessageFormat.format(
-                "NDArray named \"{0}\" identified by (uid:{1};createdAt:{2}) \n"
-                        + "call stack at creation...{3}\n"
-                        + "######### \n"
-                        + "call stack at closing...{4}\n"
-                        + "#########",
-                name,
-                getUid(),
-                creationTime,
-                creationStackTraceAsString,
-                closingStackTraceAsString);
-    }
-
-    /**
-     * Returns the current stack trace as a string.
-     *
-     * @return the current stack trace as a string
-     */
-    public static String stackTraceAsString() {
-        StringBuilder buf = new StringBuilder();
-        Arrays.stream(Thread.currentThread().getStackTrace())
-                .forEach(
-                        s ->
-                                buf.append(
-                                        "\nat "
-                                                + s.getClassName()
-                                                + "."
-                                                + s.getMethodName()
-                                                + "("
-                                                + s.getFileName()
-                                                + ":"
-                                                + s.getLineNumber()
-                                                + ")"));
-        return buf.toString();
+        uid = handle.toString() + System.nanoTime();
     }
 
     /**
@@ -114,10 +57,10 @@ public abstract class NativeResource<T> implements AutoCloseable {
     public T getHandle() {
         T reference = handle.get();
         if (reference == null) {
-            String message = "Native resource has been released already. ";
-            if (NDScope.isVerboseIfResourceAlreadyClosed() && this instanceof NDArray) {
-                message += fingerPrintOfNDArrayWithStackTraces();
+            if (TRACK_RESOURCE) {
+                logger.error("Native resource is released. Closed at:", exception);
             }
+            String message = "Native resource has been released already.";
             throw new IllegalStateException(message);
         }
         return reference;
@@ -132,13 +75,10 @@ public abstract class NativeResource<T> implements AutoCloseable {
         return uid;
     }
 
-    /**
-     * Remembers the stack trace on closing an NDArray if {@link
-     * NDScope#isVerboseIfResourceAlreadyClosed()} is set.
-     */
+    /** Remembers the stack trace on closing. */
     public void onClose() {
-        if (NDScope.isVerboseIfResourceAlreadyClosed()) {
-            this.closingStackTraceAsString = stackTraceAsString();
+        if (TRACK_RESOURCE) {
+            exception = new Exception();
         }
     }
 
