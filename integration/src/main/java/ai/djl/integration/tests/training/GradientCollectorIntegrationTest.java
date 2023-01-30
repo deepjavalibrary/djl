@@ -101,6 +101,45 @@ public class GradientCollectorIntegrationTest {
         }
     }
 
+    /**
+     * Tests that an optimizer written in Java can work, specifically in-place updates on gradients.
+     */
+    @Test
+    public void testJavaOptimizer() {
+        Engine engine = Engine.getEngine(TestUtils.getEngine());
+        try (Model model = Model.newInstance("model", engine.getEngineName())) {
+            Block block = new Mlp(1, 1, new int[] {});
+            model.setBlock(block);
+
+            TrainingConfig config =
+                    new DefaultTrainingConfig(Loss.l2Loss())
+                            .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                NDManager manager = trainer.getManager();
+                trainer.initialize(new Shape(1, 1));
+                NDArray data = manager.create(1.0f);
+                NDArray labels = manager.create(3.0f);
+
+                // Run forward and backward pass
+                try (GradientCollector gc = trainer.newGradientCollector()) {
+                    NDList preds = trainer.forward(new NDList(data));
+                    NDArray loss = trainer.getLoss().evaluate(new NDList(labels), preds);
+                    gc.backward(loss);
+                }
+
+                // Simple Java SGD
+                for (Parameter parameter : block.getParameters().values()) {
+                    NDArray p = parameter.getArray();
+                    p.subi(p.getGradient().mul(0.1f));
+                }
+            }
+
+            Assert.assertEquals(
+                    block.getParameters().get("02Linear_weight").getArray().getFloat(), 1.2f);
+        }
+    }
+
     @Test
     public void testFreezeParameters() {
         try (Model model = Model.newInstance("model", TestUtils.getEngine())) {

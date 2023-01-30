@@ -22,7 +22,6 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_adamUpdate(JNIEnv*
     jfloat weight_decay, jfloat rescale_grad, jfloat clip_grad, jfloat beta1, jfloat beta2, jfloat eps,
     jboolean adamw) {
   API_BEGIN()
-  torch::autograd::AutoGradMode no_autograd_guard{false};
   const auto* weight_ptr = reinterpret_cast<torch::Tensor*>(jweight);
   const auto grad = reinterpret_cast<torch::Tensor*>(jgrad)->clone();
   const auto* mean_ptr = reinterpret_cast<torch::Tensor*>(jmean);
@@ -52,7 +51,6 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_sgdUpdate(JNIEnv* 
     jfloat momentum) {
   API_BEGIN()
   // disable gradient calculation
-  torch::autograd::AutoGradMode no_autograd_guard{false};
   const auto* weight_ptr = reinterpret_cast<torch::Tensor*>(jweight);
   // use clone to avoid input grad change
   auto grad = reinterpret_cast<torch::Tensor*>(jgrad)->clone();

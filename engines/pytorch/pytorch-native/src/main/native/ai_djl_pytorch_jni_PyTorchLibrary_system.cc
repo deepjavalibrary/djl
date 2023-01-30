@@ -58,6 +58,9 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSetGradMode(
   API_BEGIN()
 #if !defined(__ANDROID__)
   c10::GradMode::set_enabled(enable);
+  if (!enable) {
+    torch::autograd::AutoGradMode no_autograd_guard{false};
+  }
 #endif
   API_END()
 }
