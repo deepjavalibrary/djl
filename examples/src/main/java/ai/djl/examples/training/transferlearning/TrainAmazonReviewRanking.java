@@ -18,7 +18,7 @@ import ai.djl.ModelException;
 import ai.djl.basicdataset.tabular.CsvDataset;
 import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
 import ai.djl.basicdataset.tabular.utils.Feature;
-import ai.djl.basicdataset.tabular.utils.Featurizer;
+import ai.djl.basicdataset.tabular.utils.Featurizer.DataFeaturizer;
 import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
@@ -212,7 +212,7 @@ public final class TrainAmazonReviewRanking {
                 .addTrainingListeners(listener);
     }
 
-    private static final class BertFeaturizer implements Featurizer {
+    private static final class BertFeaturizer implements DataFeaturizer {
 
         private final BertFullTokenizer tokenizer;
         private final int maxLength;

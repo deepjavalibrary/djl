@@ -12,8 +12,12 @@
  */
 package ai.djl.basicdataset.tabular.utils;
 
+import ai.djl.modality.Classifications;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +110,18 @@ public final class Featurizers {
         public void featurize(DynamicBuffer buf, String input) {
             buf.put(Float.parseFloat(input));
         }
+
+        /** {@inheritDoc} */
+        @Override
+        public int dataRequired() {
+            return 1;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Object deFeaturize(float[] data) {
+            return data[0];
+        }
     }
 
     private static final class NormalizedNumericFeaturizer implements PreparedFeaturizer {
@@ -142,13 +158,60 @@ public final class Featurizers {
             }
             std = (float) Math.sqrt(sum / inputs.size());
         }
+
+        /** {@inheritDoc} */
+        @Override
+        public int dataRequired() {
+            return 1;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Object deFeaturize(float[] data) {
+            return data[0];
+        }
     }
 
-    private static class OneHotStringFeaturizer implements Featurizer {
+    private abstract static class BaseStringFeaturizer implements Featurizer {
+
         protected Map<String, Integer> map;
+        protected List<String> classNames;
+
+        public BaseStringFeaturizer(Map<String, Integer> map) {
+            this.map = map;
+            if (map != null) {
+                buildClassNames();
+            }
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public int dataRequired() {
+            return map.size();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Object deFeaturize(float[] data) {
+            List<Double> probabilities = new ArrayList<>(data.length);
+            for (Float d : data) {
+                probabilities.add((double) d);
+            }
+            return new Classifications(classNames, probabilities);
+        }
+
+        protected final void buildClassNames() {
+            classNames = Arrays.asList(new String[map.size()]);
+            for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                classNames.set(entry.getValue(), entry.getKey());
+            }
+        }
+    }
+
+    private static class OneHotStringFeaturizer extends BaseStringFeaturizer {
 
         public OneHotStringFeaturizer(Map<String, Integer> map) {
-            this.map = map;
+            super(map);
         }
 
         /** {@inheritDoc} */
@@ -177,21 +240,21 @@ public final class Featurizers {
                     map.put(input, map.size());
                 }
             }
+            buildClassNames();
         }
     }
 
-    private static final class StringFeaturizer implements Featurizer {
+    private static final class StringFeaturizer extends BaseStringFeaturizer {
 
-        private Map<String, Integer> map;
         private boolean autoMap;
 
         StringFeaturizer() {
-            this.map = new HashMap<>();
+            super(new HashMap<>());
             this.autoMap = true;
         }
 
         StringFeaturizer(Map<String, Integer> map) {
-            this.map = map;
+            super(map);
         }
 
         /** {@inheritDoc} */
@@ -210,6 +273,17 @@ public final class Featurizers {
             map.put(input, value);
             buf.put(value);
         }
+
+        /** {@inheritDoc} */
+        @Override
+        public Object deFeaturize(float[] data) {
+            if (classNames.size() != map.size()) {
+                // May have to rebuild class names first if new ones were added
+                buildClassNames();
+            }
+
+            return super.deFeaturize(data);
+        }
     }
 
     /**
@@ -221,7 +295,7 @@ public final class Featurizers {
         String datePattern;
 
         /**
-         * Constructs a {@link EpochDayFeaturizer}.
+         * Constructs a {@code EpochDayFeaturizer}.
          *
          * @param datePattern the pattern that dates are found in the data table column
          */
@@ -242,6 +316,18 @@ public final class Featurizers {
             LocalDate ld = LocalDate.parse(input, DateTimeFormatter.ofPattern(datePattern));
             long day = ld.toEpochDay();
             buf.put(day);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public int dataRequired() {
+            return 1;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Object deFeaturize(float[] data) {
+            return LocalDate.ofEpochDay(Math.round(data[0]));
         }
     }
 }

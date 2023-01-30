@@ -22,4 +22,40 @@ public interface Featurizer {
      * @param input the string input
      */
     void featurize(DynamicBuffer buf, String input);
+
+    /**
+     * Returns the length of the data array required by {@link #deFeaturize(float[])}.
+     *
+     * @return the length of the data array required by {@link #deFeaturize(float[])}
+     */
+    int dataRequired();
+
+    /**
+     * Converts the output data for a label back into the Java type.
+     *
+     * @param data the data vector correspondign to the feature
+     * @return a Java type (depending on the {@link Featurizer}) representing the data.
+     */
+    Object deFeaturize(float[] data);
+
+    /**
+     * A {@link Featurizer} that only supports the data featurize operations, but not the full
+     * deFeaturize operations used by labels.
+     */
+    interface DataFeaturizer extends Featurizer {
+
+        /** {@inheritDoc} */
+        @Override
+        default int dataRequired() {
+            throw new IllegalStateException(
+                    "DataFeaturizers only support featurize, not deFeaturize");
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        default Object deFeaturize(float[] data) {
+            throw new IllegalStateException(
+                    "DataFeaturizers only support featurize, not deFeaturize");
+        }
+    }
 }

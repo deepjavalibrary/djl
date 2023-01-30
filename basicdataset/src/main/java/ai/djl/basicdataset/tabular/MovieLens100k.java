@@ -93,7 +93,7 @@ public final class MovieLens100k extends CsvDataset {
 
     /** {@inheritDoc} */
     @Override
-    protected String getCell(long rowIndex, String featureName) {
+    public String getCell(long rowIndex, String featureName) {
         CSVRecord record = csvRecords.get(Math.toIntExact(rowIndex));
         if (HeaderEnum.rating.toString().equals(featureName)) {
             return record.get(HeaderEnum.rating);

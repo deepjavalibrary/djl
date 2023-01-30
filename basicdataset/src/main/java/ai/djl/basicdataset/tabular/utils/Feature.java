@@ -12,6 +12,8 @@
  */
 package ai.djl.basicdataset.tabular.utils;
 
+import ai.djl.basicdataset.tabular.utils.Featurizer.DataFeaturizer;
+
 import java.util.Map;
 
 /** A class contains feature name and its {@code Featurizer}. */
@@ -27,6 +29,17 @@ public final class Feature {
      * @param featurizer the {@code Featurizer}
      */
     public Feature(String name, Featurizer featurizer) {
+        this.name = name;
+        this.featurizer = featurizer;
+    }
+
+    /**
+     * Constructs a {@code Feature} instance.
+     *
+     * @param name the feature name
+     * @param featurizer the {@code Featurizer}
+     */
+    public Feature(String name, DataFeaturizer featurizer) {
         this.name = name;
         this.featurizer = featurizer;
     }

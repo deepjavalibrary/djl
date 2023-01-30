@@ -21,6 +21,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.dataset.RandomAccessDataset;
 import ai.djl.training.dataset.Record;
+import ai.djl.translate.TranslatorOptions;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -69,6 +70,24 @@ public abstract class TabularDataset extends RandomAccessDataset {
      */
     public int getLabelSize() {
         return labels.size();
+    }
+
+    /**
+     * Returns the dataset features.
+     *
+     * @return the dataset features
+     */
+    public List<Feature> getFeatures() {
+        return features;
+    }
+
+    /**
+     * Returns the dataset labels.
+     *
+     * @return the dataset labels
+     */
+    public List<Feature> getLabels() {
+        return labels;
     }
 
     /** {@inheritDoc} */
@@ -130,7 +149,13 @@ public abstract class TabularDataset extends RandomAccessDataset {
      * @param featureName the feature or column of the cell
      * @return the value of the cell at that row and column
      */
-    protected abstract String getCell(long rowIndex, String featureName);
+    public abstract String getCell(long rowIndex, String featureName);
+
+    /** {@inheritDoc} */
+    @Override
+    public TranslatorOptions matchingTranslatorOptions() {
+        return new TabularTranslator(features, labels).getExpansions();
+    }
 
     /**
      * Used to build a {@link TabularDataset}.

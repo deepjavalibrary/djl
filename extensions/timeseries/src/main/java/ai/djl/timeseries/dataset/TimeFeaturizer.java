@@ -17,6 +17,7 @@ import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
 import ai.djl.basicdataset.tabular.utils.Featurizer;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 /**
  * An interface that convert String to {@link LocalDateTime} as the start field of {@link
@@ -38,4 +39,16 @@ public interface TimeFeaturizer extends Featurizer {
      * @return the parsed {@link LocalDateTime}
      */
     LocalDateTime featurize(String input);
+
+    /** {@inheritDoc} */
+    @Override
+    default int dataRequired() {
+        return 2;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    default Object deFeaturize(float[] data) {
+        return LocalDateTime.ofEpochSecond((long) data[0], (int) data[1], ZoneOffset.UTC);
+    }
 }

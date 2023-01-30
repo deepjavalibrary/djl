@@ -46,7 +46,7 @@ public class CsvDataset extends TabularDataset {
 
     /** {@inheritDoc} */
     @Override
-    protected String getCell(long rowIndex, String featureName) {
+    public String getCell(long rowIndex, String featureName) {
         CSVRecord record = csvRecords.get(Math.toIntExact(rowIndex));
         return record.get(featureName);
     }

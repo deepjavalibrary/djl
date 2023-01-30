@@ -14,10 +14,13 @@ package ai.djl.basicdataset;
 
 import ai.djl.Model;
 import ai.djl.basicdataset.tabular.AirfoilRandomAccess;
+import ai.djl.basicdataset.tabular.ListFeatures;
+import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
+import ai.djl.testing.Assertions;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -27,11 +30,13 @@ import ai.djl.training.dataset.Record;
 import ai.djl.training.initializer.Initializer;
 import ai.djl.training.loss.Loss;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /*
  * 80 features
@@ -79,6 +84,18 @@ public class AirfoilRandomAccessTest {
 
             Assert.assertEquals(data.head().toFloatArray(), new float[] {0.3048f, 800f}, epsilon);
             Assert.assertEquals(labels.head().toFloatArray(), new float[] {126.201f}, epsilon);
+
+            Translator<ListFeatures, Float> translator =
+                    airfoil.matchingTranslatorOptions().option(ListFeatures.class, Float.class);
+            try (Predictor<ListFeatures, Float> predictor = model.newPredictor(translator)) {
+                ListFeatures input =
+                        new ListFeatures(
+                                Arrays.asList(
+                                        airfoil.getCell(0, "chordlen"),
+                                        airfoil.getCell(0, "freq")));
+                float predicted = predictor.predict(input);
+                Assertions.assertAlmostEquals(predicted, 0.3048);
+            }
         }
     }
 
