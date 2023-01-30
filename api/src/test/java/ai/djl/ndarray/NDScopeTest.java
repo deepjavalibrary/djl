@@ -23,6 +23,7 @@ public class NDScopeTest {
         NDArray detached;
         NDArray inside;
         NDArray uninvolved;
+        NDArray released;
         try (NDManager manager = NDManager.newBaseManager()) {
             try (NDScope scope = new NDScope()) {
                 scope.suppressNotUsedWarning();
@@ -37,9 +38,12 @@ public class NDScopeTest {
                 detached = manager.create(new int[] {1});
                 detached.detach(); // detached from NDManager
                 NDScope.unregister(detached); // and unregistered from NDScope
+
+                released = manager.create(new int[] {1});
             }
 
             Assert.assertFalse(inside.isReleased());
+            Assert.assertThrows(IllegalStateException.class, () -> released.addi(1));
         }
         Assert.assertTrue(inside.isReleased());
         Assert.assertFalse(detached.isReleased());

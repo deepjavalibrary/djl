@@ -1701,6 +1701,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     /** {@inheritDoc} */
     @Override
     public void close() {
+        onClose();
         Pointer pointer = handle.getAndSet(null);
         if (pointer != null) {
             JnaUtils.waitToRead(pointer);
