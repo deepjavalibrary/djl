@@ -36,7 +36,7 @@ public class TabularTranslator implements Translator<ListFeatures, TabularResult
     private List<Feature> labels;
 
     /**
-     * Constructs a {@link TabularTranslator} with the given features and labels.
+     * Constructs a {@code TabularTranslator} with the given features and labels.
      *
      * @param features the features for inputs
      * @param labels the labels for outputs

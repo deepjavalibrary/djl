@@ -21,16 +21,14 @@ public class MapFeatures extends ConcurrentHashMap<String, String> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructs a {@link MapFeatures}.
+     * Constructs a {@code MapFeatures} instance.
      *
      * @see ConcurrentHashMap#ConcurrentHashMap()
      */
-    public MapFeatures() {
-        super();
-    }
+    public MapFeatures() {}
 
     /**
-     * Constructs a {@link MapFeatures}.
+     * Constructs a {@code MapFeatures} instance.
      *
      * @param initialCapacity The implementation performs internal sizing to accommodate this many
      *     elements.
@@ -42,7 +40,7 @@ public class MapFeatures extends ConcurrentHashMap<String, String> {
     }
 
     /**
-     * Constructs a {@link MapFeatures}.
+     * Constructs a {@code MapFeatures} instance.
      *
      * @param m the map
      * @see ConcurrentHashMap#ConcurrentHashMap(Map)
@@ -52,7 +50,7 @@ public class MapFeatures extends ConcurrentHashMap<String, String> {
     }
 
     /**
-     * Constructs a {@link MapFeatures}.
+     * Constructs a {@code MapFeatures} instance.
      *
      * @param initialCapacity the initial capacity. The implementation performs internal sizing to
      *     accommodate this many elements, given the specified load factor.

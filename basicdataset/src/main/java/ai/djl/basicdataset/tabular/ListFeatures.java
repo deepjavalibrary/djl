@@ -22,17 +22,14 @@ public class ListFeatures extends ArrayList<String> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructs a {@link ListFeatures} from a source list.
+     * Constructs a {@code ListFeatures} instance.
      *
-     * @param source the source list
+     * @see ArrayList#ArrayList()
      */
-    public ListFeatures(List<String> source) {
-        super(source.size());
-        addAll(source);
-    }
+    public ListFeatures() {}
 
     /**
-     * Constructs a {@link ListFeatures}.
+     * Constructs a {@code ListFeatures} instance.
      *
      * @param initialCapacity the initial capacity of the list
      * @throws IllegalArgumentException if the specified initial capacity is negative
@@ -43,16 +40,17 @@ public class ListFeatures extends ArrayList<String> {
     }
 
     /**
-     * Constructs a {@link ListFeatures}.
+     * Constructs a {@code ListFeatures} instance from a source list.
      *
-     * @see ArrayList#ArrayList()
+     * @param source the source list
      */
-    public ListFeatures() {
-        super();
+    public ListFeatures(List<String> source) {
+        super(source.size());
+        addAll(source);
     }
 
     /**
-     * Constructs a {@link ListFeatures}.
+     * Constructs a {@code ListFeatures} instance.
      *
      * @param c the collection whose elements are to be placed into this list
      * @throws NullPointerException if the specified collection is null

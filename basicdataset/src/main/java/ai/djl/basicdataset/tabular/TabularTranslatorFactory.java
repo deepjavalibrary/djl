@@ -71,7 +71,7 @@ public class TabularTranslatorFactory
         return expansions;
     }
 
-    static class MapPreProcessor implements PreProcessor<MapFeatures> {
+    static final class MapPreProcessor implements PreProcessor<MapFeatures> {
 
         private TabularTranslator preProcessor;
 
@@ -102,7 +102,8 @@ public class TabularTranslatorFactory
         }
     }
 
-    static class ClassificationsTabularPostProcessor implements PostProcessor<Classifications> {
+    static final class ClassificationsTabularPostProcessor
+            implements PostProcessor<Classifications> {
 
         private PostProcessor<TabularResults> postProcessor;
 
@@ -133,7 +134,7 @@ public class TabularTranslatorFactory
         }
     }
 
-    static class RegressionTabularPostProcessor implements PostProcessor<Float> {
+    static final class RegressionTabularPostProcessor implements PostProcessor<Float> {
 
         private PostProcessor<TabularResults> postProcessor;
 

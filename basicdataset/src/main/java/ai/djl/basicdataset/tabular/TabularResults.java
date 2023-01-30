@@ -73,7 +73,8 @@ public class TabularResults {
     }
 
     /** A single result corresponding to a single feature. */
-    public static class TabularResult {
+    public static final class TabularResult {
+
         private String name;
         private Object result;
 

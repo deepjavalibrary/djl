@@ -173,10 +173,10 @@ public final class Featurizers {
     }
 
     private abstract static class BaseStringFeaturizer implements Featurizer {
+
         protected Map<String, Integer> map;
         protected List<String> classNames;
 
-        @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
         public BaseStringFeaturizer(Map<String, Integer> map) {
             this.map = map;
             if (map != null) {
@@ -184,11 +184,13 @@ public final class Featurizers {
             }
         }
 
+        /** {@inheritDoc} */
         @Override
         public int dataRequired() {
             return map.size();
         }
 
+        /** {@inheritDoc} */
         @Override
         public Object deFeaturize(float[] data) {
             List<Double> probabilities = new ArrayList<>(data.length);
@@ -198,7 +200,7 @@ public final class Featurizers {
             return new Classifications(classNames, probabilities);
         }
 
-        protected void buildClassNames() {
+        protected final void buildClassNames() {
             classNames = Arrays.asList(new String[map.size()]);
             for (Map.Entry<String, Integer> entry : map.entrySet()) {
                 classNames.set(entry.getValue(), entry.getKey());
@@ -272,6 +274,7 @@ public final class Featurizers {
             buf.put(value);
         }
 
+        /** {@inheritDoc} */
         @Override
         public Object deFeaturize(float[] data) {
             if (classNames.size() != map.size()) {
@@ -292,7 +295,7 @@ public final class Featurizers {
         String datePattern;
 
         /**
-         * Constructs a {@link EpochDayFeaturizer}.
+         * Constructs a {@code EpochDayFeaturizer}.
          *
          * @param datePattern the pattern that dates are found in the data table column
          */
@@ -315,11 +318,13 @@ public final class Featurizers {
             buf.put(day);
         }
 
+        /** {@inheritDoc} */
         @Override
         public int dataRequired() {
             return 1;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Object deFeaturize(float[] data) {
             return LocalDate.ofEpochDay(Math.round(data[0]));
