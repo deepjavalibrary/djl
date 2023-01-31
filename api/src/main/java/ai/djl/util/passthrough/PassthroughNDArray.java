@@ -36,7 +36,7 @@ public class PassthroughNDArray extends NDArrayAdapter {
      * @param object the object to store
      */
     public PassthroughNDArray(Object object) {
-        super(null, null, null, null, null);
+        super(PassthroughNDManager.INSTANCE, null, null, null, null);
         this.object = object;
     }
 
@@ -48,7 +48,7 @@ public class PassthroughNDArray extends NDArrayAdapter {
      * @param dataType the {@link DataType} of the {@link NDArray}
      */
     public PassthroughNDArray(Object object, Shape shape, DataType dataType) {
-        super(null, null, shape, dataType, null);
+        super(PassthroughNDManager.INSTANCE, null, shape, dataType, null);
         this.object = object;
     }
 
