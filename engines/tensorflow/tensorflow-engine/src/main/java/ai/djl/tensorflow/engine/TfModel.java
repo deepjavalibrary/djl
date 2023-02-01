@@ -60,6 +60,7 @@ public class TfModel extends BaseModel {
     public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws FileNotFoundException, MalformedModelException {
         setModelDir(modelPath);
+        wasLoaded = true;
         if (prefix == null) {
             prefix = modelName;
         }

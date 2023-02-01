@@ -61,6 +61,7 @@ public abstract class BaseModel implements Model {
     protected String modelName;
     protected NDManager manager;
     protected DataType dataType;
+    protected boolean wasLoaded;
     protected PairList<String, Shape> inputData;
     protected Map<String, Object> artifacts = new ConcurrentHashMap<>();
     protected Map<String, String> properties = new ConcurrentHashMap<>();
@@ -78,6 +79,7 @@ public abstract class BaseModel implements Model {
     /** {@inheritDoc} */
     @Override
     public void setBlock(Block block) {
+        wasLoaded = false;
         this.block = block;
     }
 

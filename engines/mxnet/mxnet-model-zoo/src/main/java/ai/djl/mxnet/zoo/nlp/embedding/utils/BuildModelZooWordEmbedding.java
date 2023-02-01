@@ -48,7 +48,8 @@ public final class BuildModelZooWordEmbedding {
         NDArray idxToVec =
                 model.getNDManager().load(path.resolve("idx_to_vec.mx")).singletonOrThrow();
         List<String> idxToToken = Utils.readLines(path.resolve("idx_to_token.txt"));
-        TrainableWordEmbedding embedding = new TrainableWordEmbedding(idxToVec, idxToToken);
+        TrainableWordEmbedding embedding =
+                TrainableWordEmbedding.fromPretrained(idxToVec, idxToToken);
         model.setBlock(embedding);
         model.save(path, name);
     }

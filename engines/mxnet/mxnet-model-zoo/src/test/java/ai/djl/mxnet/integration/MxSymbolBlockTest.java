@@ -186,6 +186,7 @@ public class MxSymbolBlockTest {
             SymbolBlock mlp = (SymbolBlock) model.getBlock();
             SequentialBlock newMlp = new SequentialBlock();
             mlp.removeLastBlock();
+            mlp.freezeParameters(false);
             newMlp.add(mlp);
             Linear linear = Linear.builder().setUnits(10).build();
 

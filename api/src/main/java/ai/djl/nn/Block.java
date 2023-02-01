@@ -100,6 +100,10 @@ import java.util.function.Predicate;
  * the javadoc at {@link ai.djl.training.Trainer}. At the end of training, a block represents a
  * fully-trained model.
  *
+ * <p>It is also possible to freeze parameters and blocks to avoid them being trained. When loading
+ * models or building blocks with preTrained data, they default to being frozen. If you wish to
+ * further refine these elements, use {@link Block#freezeParameters(boolean)} to unfreeze them.
+ *
  * @see <a
  *     href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/tutorial/01_create_your_first_network.ipynb">this
  *     tutorial on creating your first network</a>

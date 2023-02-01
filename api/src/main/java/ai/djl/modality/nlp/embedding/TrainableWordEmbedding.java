@@ -16,6 +16,7 @@ import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.modality.nlp.Vocabulary;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.nn.Block;
 import ai.djl.nn.core.Embedding;
 
 import java.nio.charset.StandardCharsets;
@@ -59,14 +60,15 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
                         .optUseDefault(false));
     }
 
-    /**
-     * Constructs a pretrained embedding.
-     *
-     * @param embedding the embedding array
-     * @param items the items in the embedding (in matching order to the embedding array)
-     */
-    public TrainableWordEmbedding(NDArray embedding, List<String> items) {
+    private TrainableWordEmbedding(NDArray embedding, List<String> items) {
         super(embedding);
+        this.fallthroughEmbedding = new DefaultItem(DEFAULT_UNKNOWN_TOKEN);
+        this.vocabulary = new DefaultVocabulary(items);
+    }
+
+    private TrainableWordEmbedding(
+            NDArray embedding, List<String> items, SparseFormat sparseFormat) {
+        super(embedding, sparseFormat);
         this.fallthroughEmbedding = new DefaultItem(DEFAULT_UNKNOWN_TOKEN);
         this.vocabulary = new DefaultVocabulary(items);
     }
@@ -74,15 +76,31 @@ public class TrainableWordEmbedding extends Embedding<String> implements WordEmb
     /**
      * Constructs a pretrained embedding.
      *
+     * <p>Because it is created with preTrained data, it is created as a frozen block. If you with
+     * to update it, call {@link Block#freezeParameters(boolean)}.
+     *
+     * @param embedding the embedding array
+     * @param items the items in the embedding (in matching order to the embedding array)
+     * @return the created embedding
+     */
+    public static TrainableWordEmbedding fromPretrained(NDArray embedding, List<String> items) {
+        return new TrainableWordEmbedding(embedding, items);
+    }
+
+    /**
+     * Constructs a pretrained embedding.
+     *
+     * <p>Because it is created with preTrained data, it is created as a frozen block. If you with
+     * to update it, call {@link Block#freezeParameters(boolean)}.
+     *
      * @param embedding the embedding array
      * @param items the items in the embedding (in matching order to the embedding array)
      * @param sparseFormat whether to compute row sparse gradient in the backward calculation
+     * @return the created embedding
      */
-    public TrainableWordEmbedding(
+    public static TrainableWordEmbedding fromPretrained(
             NDArray embedding, List<String> items, SparseFormat sparseFormat) {
-        super(embedding, sparseFormat);
-        this.fallthroughEmbedding = new DefaultItem(DEFAULT_UNKNOWN_TOKEN);
-        this.vocabulary = new DefaultVocabulary(items);
+        return new TrainableWordEmbedding(embedding, items, sparseFormat);
     }
 
     /** {@inheritDoc} */

@@ -33,10 +33,14 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
     /**
      * Constructs a constant embedding with the given constant.
      *
+     * <p>The constant is assumed to be a fixed value, and starts out as frozen. To unfreeze, use
+     * {@link ai.djl.nn.Block#freezeParameters(boolean)}.
+     *
      * @param embedding the value to return for all embeddings
      */
     public ConstantEmbedding(NDArray embedding) {
         this.embedding = embedding;
+        freezeParameters(true);
     }
 
     /** {@inheritDoc} */
