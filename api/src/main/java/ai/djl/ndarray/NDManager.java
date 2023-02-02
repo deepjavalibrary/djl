@@ -23,7 +23,6 @@ import ai.djl.util.Float16Utils;
 import ai.djl.util.PairList;
 import ai.djl.util.passthrough.PassthroughNDManager;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -705,11 +704,7 @@ public interface NDManager extends AutoCloseable {
      * @return {@link NDArray}
      */
     default NDArray decode(byte[] bytes) {
-        try (DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes))) {
-            return decode(dis);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("NDArray decoding failed", e);
-        }
+        return NDSerializer.decode(this, ByteBuffer.wrap(bytes));
     }
 
     /**

@@ -482,6 +482,30 @@ public class Shape {
     }
 
     /**
+     * Decodes the data in the given {@link ByteBuffer} and converts it into the corresponding
+     * {@link Shape} object.
+     *
+     * @param bb the ByteBuffer to read from
+     * @return the corresponding {@link Shape} object
+     */
+    public static Shape decode(ByteBuffer bb) {
+        // Shape
+        int length = bb.getInt();
+        long[] shapeValue = new long[length];
+        for (int i = 0; i < length; ++i) {
+            shapeValue[i] = bb.getLong();
+        }
+
+        // Layout
+        length = bb.getInt();
+        char[] layout = new char[length];
+        for (int i = 0; i < length; ++i) {
+            layout[i] = bb.getChar();
+        }
+        return new Shape(shapeValue, new String(layout));
+    }
+
+    /**
      * Returns if the array is rank-1 which is inferred from the shape.
      *
      * <p>For example, an array with shape [1, 10, 1] returns true. Array with indeterminate size -1

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,7 +83,34 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
      * @return {@code NDList}
      */
     public static NDList decode(NDManager manager, byte[] byteArray) {
-        return decode(manager, new ByteArrayInputStream(byteArray));
+        if (byteArray.length < 4) {
+            throw new IllegalArgumentException("Invalid input length: " + byteArray.length);
+        }
+        try {
+            if (byteArray[0] == 'P' && byteArray[1] == 'K') {
+                return decodeNumpy(manager, new ByteArrayInputStream(byteArray));
+            } else if (byteArray[0] == (byte) 0x39
+                    && byteArray[1] == 'N'
+                    && byteArray[2] == 'U'
+                    && byteArray[3] == 'M') {
+                return new NDList(
+                        NDSerializer.decode(manager, new ByteArrayInputStream(byteArray)));
+            }
+
+            ByteBuffer bb = ByteBuffer.wrap(byteArray);
+
+            int size = bb.getInt();
+            if (size < 0) {
+                throw new IllegalArgumentException("Invalid NDList size: " + size);
+            }
+            NDList list = new NDList();
+            for (int i = 0; i < size; i++) {
+                list.add(i, NDSerializer.decode(manager, bb));
+            }
+            return list;
+        } catch (IOException | BufferUnderflowException e) {
+            throw new IllegalArgumentException("Invalid NDArray input", e);
+        }
     }
 
     /**
@@ -350,7 +378,7 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
         DataOutputStream dos = new DataOutputStream(os);
         dos.writeInt(size());
         for (NDArray nd : this) {
-            dos.write(nd.encode());
+            NDSerializer.encode(nd, dos);
         }
         dos.flush();
     }

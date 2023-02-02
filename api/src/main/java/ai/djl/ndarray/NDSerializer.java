@@ -51,7 +51,8 @@ final class NDSerializer {
      * @return byte array
      */
     static byte[] encode(NDArray array) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFFER_SIZE)) {
+        int total = Math.toIntExact(array.size()) * array.getDataType().getNumOfBytes() + 100;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(total)) {
             encode(array, baos);
             return baos.toByteArray();
         } catch (IOException e) {
@@ -60,7 +61,12 @@ final class NDSerializer {
     }
 
     static void encode(NDArray array, OutputStream os) throws IOException {
-        DataOutputStream dos = new DataOutputStream(os);
+        DataOutputStream dos;
+        if (os instanceof DataOutputStream) {
+            dos = (DataOutputStream) os;
+        } else {
+            dos = new DataOutputStream(os);
+        }
         // magic string for version identification
         dos.writeUTF(MAGIC_NUMBER);
         dos.writeInt(VERSION);
@@ -83,18 +89,22 @@ final class NDSerializer {
         dos.writeInt(length);
 
         if (length > 0) {
-            if (length > BUFFER_SIZE) {
-                byte[] buf = new byte[BUFFER_SIZE];
-                while (length > BUFFER_SIZE) {
-                    bb.get(buf);
-                    dos.write(buf);
-                    length = bb.remaining();
+            if (bb.hasArray()) {
+                dos.write(bb.array(), bb.position(), length);
+            } else {
+                if (length > BUFFER_SIZE) {
+                    byte[] buf = new byte[BUFFER_SIZE];
+                    while (length > BUFFER_SIZE) {
+                        bb.get(buf);
+                        dos.write(buf);
+                        length = bb.remaining();
+                    }
                 }
-            }
 
-            byte[] buf = new byte[length];
-            bb.get(buf);
-            dos.write(buf);
+                byte[] buf = new byte[length];
+                bb.get(buf);
+                dos.write(buf);
+            }
         }
         dos.flush();
     }
@@ -128,6 +138,51 @@ final class NDSerializer {
         }
         os.write('\n');
         os.write(array.toByteArray());
+    }
+
+    static NDArray decode(NDManager manager, ByteBuffer bb) {
+        if (!"NDAR".equals(readUTF(bb))) {
+            throw new IllegalArgumentException("Malformed NDArray data");
+        }
+
+        // NDArray encode version
+        int version = bb.getInt();
+        if (version < 1 || version > VERSION) {
+            throw new IllegalArgumentException("Unexpected NDArray encode version " + version);
+        }
+
+        String name = null;
+        if (version > 1) {
+            byte flag = bb.get();
+            if (flag == 1) {
+                name = readUTF(bb);
+            }
+        }
+
+        readUTF(bb); // ignore SparseFormat
+
+        // DataType
+        DataType dataType = DataType.valueOf(readUTF(bb));
+
+        // Shape
+        Shape shape = Shape.decode(bb);
+
+        // Data
+        ByteOrder order;
+        if (version > 2) {
+            order = bb.get() == '>' ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+        } else {
+            order = ByteOrder.nativeOrder();
+        }
+        int length = bb.getInt();
+        ByteBuffer data = bb.slice();
+        data.limit(length);
+        data.order(order);
+
+        NDArray array = manager.create(data, shape, dataType);
+        array.setName(name);
+        bb.position(bb.position() + length);
+        return array;
     }
 
     /**
@@ -184,7 +239,7 @@ final class NDSerializer {
         data.order(order);
         readData(dis, data, length);
 
-        NDArray array = manager.create(dataType.asDataType(data), shape, dataType);
+        NDArray array = manager.create(data, shape, dataType);
         array.setName(name);
         return array;
     }
@@ -244,7 +299,7 @@ final class NDSerializer {
         }
         readData(dis, data, len);
 
-        return manager.create(dataType.asDataType(data), shape, dataType);
+        return manager.create(data, shape, dataType);
     }
 
     private static void readData(DataInputStream dis, ByteBuffer data, int len) throws IOException {
@@ -260,5 +315,72 @@ final class NDSerializer {
             data.put(buf, 0, len);
             data.rewind();
         }
+    }
+
+    private static String readUTF(ByteBuffer bb) {
+        int len = (bb.get() & 0xFF << 8) + (bb.get() & 0xFF);
+        byte[] buf = new byte[len];
+        char[] chars = new char[len];
+        bb.get(buf);
+
+        int chararrCount = 0;
+        int count = 0;
+        while (count < len) {
+            int c = (int) buf[count] & 0xff;
+            if (c > 127) {
+                break;
+            }
+            count++;
+            chars[chararrCount++] = (char) c;
+        }
+
+        while (count < len) {
+            int c = (int) buf[count] & 0xff;
+            switch (c >> 4) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    /* 0xxxxxxx */
+                    count++;
+                    chars[chararrCount++] = (char) c;
+                    break;
+                case 12:
+                case 13:
+                    // 110x xxxx 10xx xxxx
+                    count += 2;
+                    if (count > len) {
+                        throw new IllegalArgumentException("malformed UTF-8 input");
+                    }
+                    int char2 = buf[count - 1];
+                    if ((char2 & 0xC0) != 0x80) {
+                        throw new IllegalArgumentException("malformed input around byte " + count);
+                    }
+                    chars[chararrCount++] = (char) (((c & 0x1F) << 6) | (char2 & 0x3F));
+                    break;
+                case 14:
+                    // 1110 xxxx 10xx xxxx 10xx xxxx
+                    count += 3;
+                    if (count > len) {
+                        throw new IllegalArgumentException("malformed UTF-8 input");
+                    }
+                    char2 = (int) buf[count - 2];
+                    int char3 = (int) buf[count - 1];
+                    if (((char2 & 0xC0) != 0x80) || ((char3 & 0xC0) != 0x80)) {
+                        throw new IllegalArgumentException("malformed UTF-8 input");
+                    }
+                    chars[chararrCount++] =
+                            (char) (((c & 0x0F) << 12) | ((char2 & 0x3F) << 6) | (char3 & 0x3F));
+                    break;
+                default:
+                    // 10xx xxxx, 1111 xxxx
+                    throw new IllegalArgumentException("malformed input around byte " + count);
+            }
+        }
+        return new String(chars, 0, chararrCount);
     }
 }
