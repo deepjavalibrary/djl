@@ -56,6 +56,14 @@ public class MetricsTest {
         Assert.assertTrue(metricNames.contains("m2"));
         Assert.assertTrue(metricNames.contains("m3"));
         Assert.assertFalse(metricNames.contains("m4"));
+
+        metrics.setLimit(3);
+        metrics.setOnLimit(
+                (m, n) -> {
+                    Assert.assertEquals(m.getMetric(n).size(), 3);
+                });
+        metrics.addMetric("m1", 1L);
+        Assert.assertEquals(metrics.getMetric("m1").size(), 1);
     }
 
     @Test
