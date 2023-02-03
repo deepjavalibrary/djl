@@ -90,6 +90,7 @@ public class MxModel extends BaseModel {
     public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws IOException, MalformedModelException {
         setModelDir(modelPath);
+        wasLoaded = true;
         if (prefix == null) {
             prefix = modelName;
         }
@@ -137,6 +138,13 @@ public class MxModel extends BaseModel {
         if (optimization != null) {
             ((MxSymbolBlock) block).optimizeFor(optimization);
         }
+
+        // Freeze parameters to match Block spec for preTrained data
+        boolean trainParam =
+                options != null && Boolean.parseBoolean((String) options.get("trainParam"));
+        if (!trainParam) {
+            block.freezeParameters(true);
+        }
     }
 
     /** {@inheritDoc} */
@@ -146,6 +154,10 @@ public class MxModel extends BaseModel {
         if (block == null) {
             throw new IllegalStateException(
                     "You must set a block for the model before creating a new trainer");
+        }
+        if (wasLoaded) {
+            // Unfreeze parameters if training directly
+            block.freezeParameters(false);
         }
         for (Pair<Initializer, Predicate<Parameter>> pair : initializer) {
             if (pair.getKey() != null && pair.getValue() != null) {

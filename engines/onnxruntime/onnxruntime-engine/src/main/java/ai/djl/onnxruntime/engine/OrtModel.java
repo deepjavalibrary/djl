@@ -65,6 +65,7 @@ public class OrtModel extends BaseModel {
     public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws IOException, MalformedModelException {
         setModelDir(modelPath);
+        wasLoaded = true;
         if (block != null) {
             throw new UnsupportedOperationException("ONNX Runtime does not support dynamic blocks");
         }

@@ -42,7 +42,7 @@ public class FtWord2VecWordEmbedding implements WordEmbedding {
             throw new IllegalArgumentException("The FtWord2VecWordEmbedding requires an FtModel");
         }
 
-        this.embedding = (FtAbstractBlock) model.getBlock();
+        this.embedding = ((FtModel) model).getBlock();
         this.vocabulary = vocabulary;
     }
 

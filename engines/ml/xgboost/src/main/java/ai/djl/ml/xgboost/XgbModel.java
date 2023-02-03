@@ -46,6 +46,7 @@ public class XgbModel extends BaseModel {
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options) throws IOException {
         setModelDir(modelPath);
+        wasLoaded = true;
         if (block != null) {
             throw new UnsupportedOperationException("XGBoost does not support dynamic blocks");
         }

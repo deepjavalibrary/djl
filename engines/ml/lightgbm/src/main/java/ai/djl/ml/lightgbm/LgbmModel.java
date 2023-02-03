@@ -44,6 +44,7 @@ public class LgbmModel extends BaseModel {
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options) throws IOException {
         setModelDir(modelPath);
+        wasLoaded = true;
         if (block != null) {
             throw new UnsupportedOperationException("LightGBM does not support dynamic blocks");
         }
