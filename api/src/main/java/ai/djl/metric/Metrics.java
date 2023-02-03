@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -41,10 +42,30 @@ import java.util.stream.Collectors;
 public class Metrics {
 
     private Map<String, List<Metric>> metrics;
+    private int limit;
+    private BiConsumer<Metrics, String> onLimit;
 
     /** Constructs an empty {@code Metrics} instance. */
     public Metrics() {
         metrics = new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Sets the max size for each metric.
+     *
+     * @param limit the max size for each metric
+     */
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    /**
+     * Sets the callback function when hit the limit.
+     *
+     * @param onLimit the callback function
+     */
+    public void setOnLimit(BiConsumer<Metrics, String> onLimit) {
+        this.onLimit = onLimit;
     }
 
     /**
@@ -57,6 +78,12 @@ public class Metrics {
                 metrics.computeIfAbsent(
                         metric.getMetricName(),
                         v -> Collections.synchronizedList(new ArrayList<>()));
+        if (limit > 0 && list.size() >= limit) {
+            if (onLimit != null) {
+                onLimit.accept(this, metric.getMetricName());
+            }
+            list.clear();
+        }
         list.add(metric);
     }
 
