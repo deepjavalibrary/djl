@@ -69,12 +69,15 @@ public class OrtModel extends BaseModel {
         if (block != null) {
             throw new UnsupportedOperationException("ONNX Runtime does not support dynamic blocks");
         }
-        Path modelFile = findModelFile(prefix);
+
+        if (prefix == null) {
+            prefix = modelName;
+        }
+
+        // search for .onnx file with prefix, folder name or "model.onnx"
+        Path modelFile = findModelFile(prefix, modelDir.toFile().getName(), "model.onnx");
         if (modelFile == null) {
-            modelFile = findModelFile(modelDir.toFile().getName());
-            if (modelFile == null) {
-                throw new FileNotFoundException(".onnx file not found in: " + modelPath);
-            }
+            throw new FileNotFoundException(".onnx file not found in: " + modelPath);
         }
 
         try {
@@ -105,7 +108,7 @@ public class OrtModel extends BaseModel {
         }
     }
 
-    private Path findModelFile(String prefix) {
+    private Path findModelFile(String... prefixes) {
         if (Files.isRegularFile(modelDir)) {
             Path file = modelDir;
             modelDir = modelDir.getParent();
@@ -117,20 +120,19 @@ public class OrtModel extends BaseModel {
             }
             return file;
         }
-        if (prefix == null) {
-            prefix = modelName;
-        }
-        Path modelFile = modelDir.resolve(prefix);
-        if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
-            if (prefix.endsWith(".onnx")) {
-                return null;
+        for (String prefix : prefixes) {
+            Path modelFile = modelDir.resolve(prefix);
+            if (Files.isRegularFile(modelFile)) {
+                return modelFile;
             }
-            modelFile = modelDir.resolve(prefix + ".onnx");
-            if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
-                return null;
+            if (!prefix.endsWith(".onnx")) {
+                modelFile = modelDir.resolve(prefix + ".onnx");
+                if (Files.isRegularFile(modelFile)) {
+                    return modelFile;
+                }
             }
         }
-        return modelFile;
+        return null;
     }
 
     /** {@inheritDoc} */
