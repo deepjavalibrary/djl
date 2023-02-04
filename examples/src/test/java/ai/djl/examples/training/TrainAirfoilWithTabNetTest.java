@@ -22,13 +22,19 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 
 public class TrainAirfoilWithTabNetTest {
+
     @Test
     public void testTrainAirfoilWithTabNet() throws TranslateException, IOException {
         TestRequirements.engine("MXNet", "PyTorch");
-        String[] args = new String[] {"-g", "1", "-e", "20", "-b", "32"};
+        String[] args = {"-g", "1", "-e", "20", "-b", "32"};
+        if (!Boolean.getBoolean("nightly")) {
+            args[3] = "2";
+        }
         TrainingResult result = TrainAirfoilWithTabNet.runExample(args);
         Assert.assertNotNull(result);
         float loss = result.getValidateLoss();
-        Assert.assertTrue(loss < 50f, "Loss: " + loss);
+        if (Boolean.getBoolean("nightly")) {
+            Assert.assertTrue(loss < 50f, "Loss: " + loss);
+        }
     }
 }

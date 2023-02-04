@@ -19,7 +19,6 @@ import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.pytorch.engine.PtModel;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
@@ -46,7 +45,7 @@ public class PtModelTest {
         try (ZooModel<NDList, NDList> zooModel = criteria.loadModel()) {
             Path modelFile = zooModel.getModelPath().resolve("traced_resnet18.pt");
             // This model only support CPU
-            try (PtModel model = (PtModel) Model.newInstance("test model", Device.cpu())) {
+            try (Model model = Model.newInstance("test model", Device.cpu())) {
                 model.load(Files.newInputStream(modelFile));
                 try (Predictor<NDList, NDList> predictor =
                         model.newPredictor(new NoopTranslator())) {
@@ -55,6 +54,11 @@ public class PtModelTest {
                     Assert.assertEquals(result.getShape(), new Shape(1, 1000));
                 }
             }
+
+            String softMax = zooModel.getProperty("applySoftmax");
+            Assert.assertEquals(softMax, "true");
+            String value = zooModel.getProperty("something", "N/A");
+            Assert.assertEquals(value, "N/A");
         }
     }
 }
