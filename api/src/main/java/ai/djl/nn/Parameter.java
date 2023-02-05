@@ -157,7 +157,10 @@ public class Parameter implements AutoCloseable {
      */
     public void freeze(boolean freeze) {
         requiresGrad = !freeze;
-        array.setRequiresGradient(requiresGrad);
+        if (array != null) {
+            // array can be null if block is loaded and then cleared
+            array.setRequiresGradient(requiresGrad);
+        }
     }
 
     /**
