@@ -14,9 +14,11 @@
 from pyspark import SparkContext
 
 
-class SparkImageClassificationTranslator:
+class ImageClassificationTranslator:
+    """A translator for Spark Image Classification tasks.
+    """
 
     def __new__(cls, *args, **kwargs):
         sc = SparkContext._active_spark_context
-        return sc._jvm.ai.djl.spark.translator.SparkImageClassificationTranslator(
+        return sc._jvm.ai.djl.spark.translator.vision.ImageClassificationTranslator(
         )

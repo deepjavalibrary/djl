@@ -17,17 +17,6 @@ from setuptools import setup, find_packages
 pkgs = find_packages(exclude='src')
 
 
-def detect_version():
-    with open("../../../gradle.properties", "r") as f:
-        for line in f:
-            if not line.startswith('#'):
-                prop = line.split('=')
-                if prop[0] == "djl_version":
-                    return prop[1].strip()
-
-    return None
-
-
 class BuildPy(setuptools.command.build_py.build_py):
 
     def run(self):
@@ -35,7 +24,7 @@ class BuildPy(setuptools.command.build_py.build_py):
 
 
 if __name__ == '__main__':
-    version = detect_version()
+    version = '0.20.0'
 
     requirements = ['packaging', 'wheel']
 
