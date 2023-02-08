@@ -38,20 +38,31 @@ Note that MxNet uses thread_local storage: Every thread that performs inference 
 
 ### PyTorch
 
-#### graph optimizer
+#### Graph Executor Optimization
 
-PyTorch graph executor optimizer (JIT tensorexpr fuser) is enabled by default. This may impact
-the inference latency for a few inference calls. You can disable graph executor optimizer globally
-by setting the following system properties:
+PyTorch graph executor optimizer (JIT tensorexpr fuser) is enabled by default. When the first
+a few inferences is made on a **new batch size**, torchscript generates an optimized execution graph for
+the model.
+
+Disabling Graph Executor Optimization causes a maximum throughput and performance loss that
+can depend on the model and hardware. Use [djl-bench](https://github.com/deepjavalibrary/djl-serving/tree/master/benchmark)
+to check the impact of this optimization on your hardware.
+This should only be disabled when you do not have the time to "warmup" a model with your
+given batch sizes, or you want to use dynamic batch sizes.
+
+You can disable graph executor optimizer globally by setting the following system properties:
 
 ```
 -Dai.djl.pytorch.graph_optimizer=false
 ```
 
-The graph executor optimizer is per thread configuration. If you want to disable it in a per model
-basis, you have to call the following method in each inference thread:
+The graph executor optimizer is per thread configuration. It is important to note that it must
+be disabled for each thread that you are using the model from.
+If you forget to disable it on a thread, it will cause the optimization to be performed and delay
+any running/pending executions.
 
 ```java
+Engine.getEngine("PyTorch"); // Make sure PyTorch engine is loaded
 JniUtils.setGraphExecutorOptimize(false);
 ```
 
@@ -92,23 +103,6 @@ It configures the number of the operations JIT interpreter fork to execute in pa
 It configures the number of the threads within the operation. It is set to number of CPU cores by default.
  
 You can find more detail in [PyTorch](https://pytorch.org/docs/stable/notes/cpu_threading_torchscript_inference.html).
-
-#### GPU (Disabling Graph Executor Optimization)
-
-When the first inference is made on a new batch size, torchscript generates an optimized execution graph for the model. 
-This optimization can take some time and is done for each batch size you use. To disable this feature, you can use the following code:
-
-```
-Engine.getEngine("PyTorch"); // Make sure PyTorch engine is loaded
-JniUtils.setGraphExecutorOptimize(false);
-```
-
-By default, Graph Executor Optimization is on. 
-It is important to note that it must be disabled for each thread that you are using the model from.
-If you forget to disable it on a thread, it will cause the optimization to be performed and delay any running/pending executions.
-
-Disabling Graph Executor Optimization causes a maximum throughput and performance loss that can depend on the model and hardware.
-This should only be disabled when you do not have the time to "warmup" a model with your given batch sizes, or you want to use dynamic batch sizes. 
 
 ### TensorFlow
 
