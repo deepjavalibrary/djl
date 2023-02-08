@@ -12,7 +12,6 @@
  */
 package ai.djl.fasttext.zoo.nlp.textclassification;
 
-import ai.djl.basicdataset.RawDataset;
 import ai.djl.fasttext.FtAbstractBlock;
 import ai.djl.fasttext.FtTrainingConfig;
 import ai.djl.fasttext.jni.FtWrapper;
@@ -21,6 +20,7 @@ import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.TrainingResult;
+import ai.djl.training.dataset.RawDataset;
 import ai.djl.util.PairList;
 import ai.djl.util.passthrough.PassthroughNDArray;
 

@@ -13,7 +13,6 @@
 package ai.djl.basicdataset.nlp;
 
 import ai.djl.Application.NLP;
-import ai.djl.basicdataset.RawDataset;
 import ai.djl.basicdataset.utils.TextData;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
 import ai.djl.ndarray.NDArray;
@@ -21,6 +20,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
+import ai.djl.training.dataset.RawDataset;
 import ai.djl.training.dataset.Record;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
