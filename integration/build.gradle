@@ -20,8 +20,6 @@ dependencies {
 
     if (System.getProperty("ai.djl.default_engine") == "TFLite") {
         runtimeOnly project(":engines:tflite:tflite-engine")
-    } else if (System.getProperty("ai.djl.default_engine") == "DLR") {
-        runtimeOnly project(":engines:dlr:dlr-engine")
     } else if (System.getProperty("ai.djl.default_engine") == "PaddlePaddle") {
         runtimeOnly project(":engines:paddlepaddle:paddlepaddle-model-zoo")
     }

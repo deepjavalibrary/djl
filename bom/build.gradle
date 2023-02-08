@@ -24,7 +24,6 @@ dependencies {
         api "ai.djl.android:pytorch-native:${version}"
         api "ai.djl.aws:aws-ai:${version}"
         api "ai.djl.audio:audio:${version}"
-        api "ai.djl.dlr:dlr-engine:${version}"
         api "ai.djl.fasttext:fasttext-engine:${version}"
         api "ai.djl.hadoop:hadoop:${version}"
         api "ai.djl.huggingface:tokenizers:${version}"
@@ -130,8 +129,6 @@ publishing {
                     addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cu102", "linux-x86_64", "${paddlepaddle_version}")
                     addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cu112", "linux-x86_64", "${paddlepaddle_version}")
                     addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cu110", "win-x86_64", "${paddlepaddle_version}")
-                    addDependency(dependencies, "ai.djl.dlr", "dlr-native-cpu", "osx-x86_64", "${dlr_version}")
-                    addDependency(dependencies, "ai.djl.dlr", "dlr-native-cpu", "linux-x86_64", "${dlr_version}")
                     addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "osx-x86_64", "${tflite_version}")
                     addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "linux-x86_64", "${tflite_version}")
                 }

@@ -34,7 +34,6 @@ Currently, the engines that are supported by DJL are:
 - [TensorRT](../engines/tensorrt/README.md) - supports basic inference
 - [XGBoost](../engines/ml/xgboost/README.md) - supports basic inference
 - [LightGBM](../engines/ml/lightgbm/README.md) - supports basic inference
-- [DLR](../engines/dlr/README.md) - supports basic inference
 
 ## Setup
 

@@ -7,7 +7,6 @@ By default, cache directories are located at current user's home directory:
 - `.djl.ai/mxnet` is the default cache directory stores Apache MXNet engine native libraries
 - `.djl.ai/pytorch` is the default cache directory stores Pytorch engine native libraries
 - `.djl.ai/tensorflow` is the default cache directory stores TensorFlow engine native libraries
-- `.djl.ai/dlr` is the default cache directory stores Neo DLR engine native libraries
 - `.djl.ai/fasttext` is the default cache directory stores fastText native libraries
 - `.djl.ai/sentencepiece` is the default cache directory stores Sentencepiece native libraries
 

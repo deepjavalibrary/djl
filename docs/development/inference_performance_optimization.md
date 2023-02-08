@@ -136,18 +136,6 @@ export TF_NUM_INTEROP_THREADS=1
 export TF_NUM_INTRAOP_THREADS=1
 ```
 
-### DLR(Experimental)
-
-#### Multithreading Inference(Experimental)
-DLR(TVM) itself doesn't support multithreading. The most obvious reason is that in the implementation of forward(), it is require to setInputs, runInference followed by getOutputs.
-As a result, we create a new TVM model when we call newPredictor() and free the model when you call Predictor.close().
-Please make sure to create a new Predictor in each thread.
-
-TVM internally leverages full hardware resource. Based on our experiment, setting TVM_NUM_THREADS to 1 get best throughput as it avoids resource contention.
-```bash
-export TVM_NUM_THREADS=1
-```
-
 ### ONNXRuntime
 
 #### Thread configuration

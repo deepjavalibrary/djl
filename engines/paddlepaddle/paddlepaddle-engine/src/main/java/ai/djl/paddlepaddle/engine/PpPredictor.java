@@ -20,7 +20,7 @@ import ai.djl.translate.Translator;
 /**
  * {@code PpPredictor} is special implementation of {@link Predictor} for PaddlePaddle.
  *
- * <p>When creating a new DlrPredictor, we clone Paddle predictor handle to workaround the issue.
+ * <p>When creating a new PpPredictor, we clone Paddle predictor handle to workaround the issue.
  */
 public class PpPredictor<I, O> extends Predictor<I, O> {
 
