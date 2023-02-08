@@ -18,6 +18,7 @@ import ai.djl.huggingface.tokenizers.jni.TokenizersLibrary;
 import ai.djl.modality.nlp.preprocess.Tokenizer;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.ArgumentsUtil;
+import ai.djl.util.Ec2Utils;
 import ai.djl.util.NativeResource;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
@@ -99,6 +100,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return a {@code HuggingFaceTokenizer} instance
      */
     public static HuggingFaceTokenizer newInstance(String identifier, Map<String, String> options) {
+        Ec2Utils.callHome("Huggingface");
         LibUtils.checkStatus();
 
         long handle = TokenizersLibrary.LIB.createTokenizer(identifier);
@@ -144,6 +146,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      */
     public static HuggingFaceTokenizer newInstance(InputStream is, Map<String, String> options)
             throws IOException {
+        Ec2Utils.callHome("Huggingface");
         LibUtils.checkStatus();
         String json = Utils.toString(is);
 

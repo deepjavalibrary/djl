@@ -14,6 +14,7 @@ package ai.djl.sentencepiece;
 
 import ai.djl.sentencepiece.jni.LibUtils;
 import ai.djl.sentencepiece.jni.SentencePieceLibrary;
+import ai.djl.util.Ec2Utils;
 import ai.djl.util.NativeResource;
 
 /** The processor holder for SentencePiece. */
@@ -37,6 +38,7 @@ final class SpProcessor extends NativeResource<Long> {
         if (libraryStatus != null) {
             throw libraryStatus;
         }
+        Ec2Utils.callHome("SentencePiece");
         return new SpProcessor();
     }
 
