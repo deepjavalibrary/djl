@@ -2,15 +2,27 @@ group "ai.djl.hadoop"
 
 dependencies {
     api project(":api")
-    api ("org.apache.hadoop:hadoop-client:${hadoop_version}") {
-        exclude group: "log4j", module: "log4j"
-        exclude group: "org.slf4j", module: "slf4j-log4j12"
+    api("org.apache.hadoop:hadoop-client:${hadoop_version}") {
+        exclude group: "ch.qos.reload4j", module: "reload4j"
+        exclude group: "org.slf4j", module: "slf4j-reload4j"
+        exclude group: "org.apache.hadoop", module: "hadoop-yarn-api"
+        exclude group: "org.apache.hadoop", module: "hadoop-yarn-client"
+        exclude group: "org.apache.hadoop", module: "hadoop-mapreduce-client-core"
+        exclude group: "org.apache.hadoop", module: "hadoop-mapreduce-client-jobclient"
+        exclude group: "org.apache.avro", module: "avro"
+        exclude group: "org.eclipse.jetty", module: "jetty-servlet"
+        exclude group: "org.eclipse.jetty", module: "jetty-webapp"
+        exclude group: "javax.servlet.jsp", module: "jsp-api"
+        exclude group: "com.sun.jersey", module: "jetty-servlet"
+        exclude group: "com.sun.jersey", module: "jersey-servlet"
     }
 
-    testImplementation project(":engines:mxnet:mxnet-engine")
+    // manually upgrade jackson to latest version for CVEs
+    api "com.fasterxml.jackson.core:jackson-databind:2.12.7.1"
+
     testImplementation "org.apache.hadoop:hadoop-minicluster:${hadoop_version}"
     testImplementation "org.mockito:mockito-core:${mockito_version}"
-    testImplementation(project(":testing"))
+    testImplementation project(":testing")
 
     testRuntimeOnly "junit:junit:${junit_version}" // hadoop-client test depends on junit
 }
