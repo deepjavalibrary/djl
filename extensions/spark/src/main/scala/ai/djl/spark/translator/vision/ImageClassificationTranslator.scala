@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.spark.translator
+package ai.djl.spark.translator.vision
 
 import ai.djl.modality.Classifications
 import ai.djl.modality.cv.transform.{Resize, ToTensor}
@@ -25,7 +25,7 @@ import java.util
 
 /** A [[ai.djl.translate.Translator]] for Spark Image Classification tasks. */
 @SerialVersionUID(1L)
-class SparkImageClassificationTranslator extends Translator[Row, Classifications] with Serializable {
+class ImageClassificationTranslator extends Translator[Row, Classifications] with Serializable {
 
   private var classes: util.List[String] = new util.ArrayList[String]()
   @transient private lazy val pipeline = new Pipeline()
@@ -38,11 +38,13 @@ class SparkImageClassificationTranslator extends Translator[Row, Classifications
   }
 
   /** @inheritdoc */
-  override def processInput(ctx: TranslatorContext, row: Row): NDList = {
-    val height = ImageSchema.getHeight(row)
-    val width = ImageSchema.getWidth(row)
-    val channel = ImageSchema.getNChannels(row)
-    var image = ctx.getNDManager.create(ImageSchema.getData(row), new Shape(height, width, channel)).toType(DataType.UINT8, true)
+  override def processInput(ctx: TranslatorContext, input: Row): NDList = {
+    val height = ImageSchema.getHeight(input)
+    val width = ImageSchema.getWidth(input)
+    val channel = ImageSchema.getNChannels(input)
+    var image = ctx.getNDManager
+      .create(ImageSchema.getData(input), new Shape(height, width, channel))
+      .toType(DataType.UINT8, true)
     // BGR to RGB
     image = image.flip(2)
     pipeline.transform(new NDList(image))

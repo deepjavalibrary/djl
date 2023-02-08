@@ -16,20 +16,20 @@ import ai.djl.inference.Predictor
 import ai.djl.repository.zoo.{Criteria, ZooModel}
 import ai.djl.training.util.ProgressBar
 import ai.djl.translate.Translator
-import org.apache.spark.sql.Row
 
 import java.io.Serializable
 
 /**
- * `SparkModel` is the implementation of [[ai.djl.Model]] for Spark support.
+ * `ModelLoader` load [[ai.djl.repository.zoo.ZooModel]] for Spark support.
 
  * @param url The url of the model
  * @param outputClass The output class
  */
 @SerialVersionUID(1L)
-class SparkModel[T](val engine: String, val url: String, val outputClass : Class[T]) extends Serializable {
+class ModelLoader[A, B](val engine: String, val url: String, val inputClass : Class[A], val outputClass : Class[B])
+  extends Serializable {
 
-  @transient var model: ZooModel[Row, T] = _
+  @transient var model: ZooModel[A, B] = _
 
   /**
    * Creates a new Predictor.
@@ -37,10 +37,10 @@ class SparkModel[T](val engine: String, val url: String, val outputClass : Class
    * @param translator The translator to use for inference
    * @return an instance of `Predictor`
    */
-  def newPredictor(translator: Translator[Row, T]): Predictor[Row, T] = {
+  def newPredictor(translator: Translator[A, B]): Predictor[A, B] = {
     if (model == null) {
       val criteria = Criteria.builder
-        .setTypes(classOf[Row], outputClass)
+        .setTypes(inputClass, outputClass)
         .optEngine(engine)
         .optModelUrls(url)
         .optTranslator(translator)

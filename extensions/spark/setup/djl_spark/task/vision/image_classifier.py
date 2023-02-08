@@ -16,10 +16,22 @@ from pyspark.sql import SQLContext
 from pyspark.sql import DataFrame
 
 
-class SparkTransformer:
+class ImageClassifier:
+    """ImageClassifier performs image classification on images.
+    """
 
     def __init__(self, input_cols, output_cols, engine, model_url,
-                 output_class, translator):
+                 output_class=None, translator=None):
+        """
+        Initializes the ImageClassifier.
+
+        :param input_cols: The input columns
+        :param output_cols: The output columns
+        :param engine: The engine
+        :param model_url: The model URL
+        :param output_class: The input class (optional)
+        :param translator: The translator (optional)
+        """
         self.input_cols = input_cols
         self.output_cols = output_cols
         self.engine = engine
@@ -27,7 +39,13 @@ class SparkTransformer:
         self.output_class = output_class
         self.translator = translator
 
-    def transform(self, dataset):
+    def classify(self, dataset):
+        """
+        Performs image classification on the provided dataset.
+
+        :param dataset: input dataset
+        :return: output dataset
+        """
         sc = SparkContext._active_spark_context
         sqlContext = SQLContext(sc)
 
@@ -47,15 +65,18 @@ class SparkTransformer:
             for i in range(len(self.output_cols)):
                 output_cols_arr[i] = self.output_cols[i]
 
-        output_clazz = sc._jvm.java.lang.Class.forName(self.output_class)
-        transformer = sc._jvm.ai.djl.spark.SparkTransformer()
+        classifier = sc._jvm.ai.djl.spark.task.vision.ImageClassifier()
         if input_cols_arr is not None:
-            transformer = transformer.setInputCols(input_cols_arr)
+            classifier = classifier.setInputCols(input_cols_arr)
         if output_cols_arr is not None:
-            transformer = transformer.setOutputCols(output_cols_arr)
-        transformer = transformer.setEngine(self.engine) \
+            classifier = classifier.setOutputCols(output_cols_arr)
+        if self.output_class is None:
+            self.output_class = sc._jvm.ai.djl.modality.Classifications._java_lang_class
+        if self.translator is None:
+            self.translator = sc._jvm.ai.djl.spark.translator.vision.ImageClassificationTranslator()
+        classifier = classifier.setEngine(self.engine) \
             .setModelUrl(self.model_url) \
-            .setOutputClass(output_clazz) \
+            .setOutputClass(self.output_class) \
             .setTranslator(self.translator)
-        return DataFrame(transformer.transform(dataset._jdf),
+        return DataFrame(classifier.classify(dataset._jdf),
                          sqlContext._ssql_ctx)
