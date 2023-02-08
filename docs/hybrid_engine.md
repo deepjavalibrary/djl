@@ -8,7 +8,6 @@ Many of DJL engines only has limited support for NDArray operations. Here is a l
 - [PaddlePaddle](../engines/paddlepaddle/README.md)
 - [TFLite](../engines/tflite/tflite-engine/README.md)
 - [TensorRT](../engines/tensorrt/README.md)
-- [DLR](../engines/dlr/README.md)
 
 Currently, those engines only covers the basic NDArray creation methods. To better support the
 necessary preprocessing and postprocessing, you can use one of the full Engines along with it
@@ -55,9 +54,6 @@ System.setProperty("ai.djl.tflite.disable_alternative", "true");
 
 # disable hybrid engine for TensorRT
 System.setProperty("ai.djl.tensorrt.disable_alternative", "true");
-
-# disable hybrid engine for Neo DLR
-System.setProperty("ai.djl.dlr.disable_alternative", "false");
 ```
 
 

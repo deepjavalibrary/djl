@@ -22,7 +22,6 @@ support the following models:
 - Python script model
 - PaddlePaddle model
 - TFLite model
-- Neo DLR (TVM) model
 - XGBoost model
 - LightGBM model
 - Sentencepiece model

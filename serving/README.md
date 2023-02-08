@@ -14,7 +14,7 @@ You can install extra extensions to enable the following models:
 - ONNX model
 - PaddlePaddle model
 - TFLite model
-- Neo DLR (TVM) model
 - XGBoost model
+- LightGBM model
 - Sentencepiece model
 - fastText/BlazingText model

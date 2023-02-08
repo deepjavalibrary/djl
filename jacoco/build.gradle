@@ -10,8 +10,6 @@ repositories {
 dependencies {
     jacocoAggregation project(":api")
     jacocoAggregation project(":basicdataset")
-    jacocoAggregation project(":engines:dlr:dlr-engine")
-    jacocoAggregation project(":engines:dlr:dlr-native")
     jacocoAggregation project(":engines:ml:xgboost")
     jacocoAggregation project(":engines:ml:lightgbm")
     jacocoAggregation project(":engines:mxnet:mxnet-engine")
