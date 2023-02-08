@@ -3,10 +3,6 @@ group "ai.djl.aws"
 dependencies {
     api platform("software.amazon.awssdk:bom:${awssdk_version}")
     api "software.amazon.awssdk:s3"
-    api "software.amazon.awssdk:sagemaker"
-    api "software.amazon.awssdk:sagemakerruntime"
-    api "software.amazon.awssdk:iam"
-    api "software.amazon.awssdk:sts"
     api project(":api")
 
     testImplementation project(":engines:pytorch:pytorch-model-zoo")
