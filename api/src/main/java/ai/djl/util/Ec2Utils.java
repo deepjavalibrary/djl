@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
+import java.time.Duration;
 
 /** A utility class to retrieve EC2 metadata. */
 public final class Ec2Utils {
@@ -30,6 +31,9 @@ public final class Ec2Utils {
 
     private static final String TOKEN_URL = "http://169.254.169.254/latest/api/token";
     private static final String EC2_METADATA = "http://169.254.169.254/latest/meta-data/";
+    private static final long ONE_DAY = Duration.ofDays(1).toMillis();
+
+    private static long lastCheckIn;
 
     private Ec2Utils() {}
 
@@ -72,9 +76,12 @@ public final class Ec2Utils {
      */
     public static void callHome(String engine) {
         if (Boolean.getBoolean("offline")
-                || Boolean.parseBoolean(Utils.getenv("OPT_OUT_TRACKING"))) {
+                || Boolean.parseBoolean(Utils.getenv("OPT_OUT_TRACKING"))
+                || System.currentTimeMillis() - lastCheckIn < ONE_DAY) {
             return;
         }
+        lastCheckIn = System.currentTimeMillis();
+
         String instanceId = Ec2Utils.readMetadata("instance-id");
         if (instanceId == null) {
             return;
