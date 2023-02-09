@@ -4737,6 +4737,12 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return the debug string representation of this {@code NDArray}
      */
     default String toDebugString() {
+        if (isReleased()) {
+            return "This array is already closed";
+        }
+        if (getDataType() == DataType.STRING) {
+            return Arrays.toString(toStringArray(StandardCharsets.UTF_8));
+        }
         return NDFormat.format(this, 100, 10, 10, 20);
     }
 
@@ -4764,6 +4770,9 @@ public interface NDArray extends NDResource, BytesSupplier {
             int maxSize, int maxDepth, int maxRows, int maxColumns, boolean withContent) {
         if (isReleased()) {
             return "This array is already closed";
+        }
+        if (getDataType() == DataType.STRING) {
+            return Arrays.toString(toStringArray(StandardCharsets.UTF_8));
         }
         return NDFormat.format(this, maxSize, maxDepth, maxRows, maxColumns, withContent);
     }
