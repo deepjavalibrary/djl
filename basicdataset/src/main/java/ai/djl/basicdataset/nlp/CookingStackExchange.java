@@ -14,13 +14,13 @@ package ai.djl.basicdataset.nlp;
 
 import ai.djl.Application.NLP;
 import ai.djl.basicdataset.BasicDatasets;
-import ai.djl.basicdataset.RawDataset;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.training.dataset.Batch;
 import ai.djl.training.dataset.Dataset;
+import ai.djl.training.dataset.RawDataset;
 import ai.djl.util.Progress;
 
 import java.io.IOException;

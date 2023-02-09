@@ -10,9 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.basicdataset;
-
-import ai.djl.training.dataset.Dataset;
+package ai.djl.training.dataset;
 
 import java.io.IOException;
 

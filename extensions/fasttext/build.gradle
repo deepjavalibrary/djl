@@ -2,9 +2,9 @@ group "ai.djl.fasttext"
 
 dependencies {
     api project(":api")
-    api project(":basicdataset")
 
-    testImplementation(project(":testing"))
+    testImplementation project(":basicdataset")
+    testImplementation project(":testing")
     testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
 }
 
