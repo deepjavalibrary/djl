@@ -16,7 +16,6 @@ import ai.djl.engine.Engine;
 
 import org.testng.SkipException;
 
-import java.util.Arrays;
 import java.util.Calendar;
 
 /**
@@ -26,6 +25,7 @@ import java.util.Calendar;
  * SkipException}.
  */
 public final class TestRequirements {
+
     private TestRequirements() {}
 
     /** Requires a test runs as part of the nightly suite, but not standard local or CI builds. */
@@ -46,37 +46,6 @@ public final class TestRequirements {
     public static void notOffline() {
         if (Boolean.getBoolean("offline")) {
             throw new SkipException("This test can not run while offline");
-        }
-    }
-
-    /**
-     * Requires a test only with the allowed engine(s).
-     *
-     * @param engines the engine(s) to run the test with
-     */
-    public static void engine(String... engines) {
-        String engineName = Engine.getDefaultEngineName();
-        for (String e : engines) {
-            if (engineName.equals(e)) {
-                return;
-            }
-        }
-        throw new SkipException(
-                "This test requires one of the engines: " + Arrays.toString(engines));
-    }
-
-    /**
-     * Requires a test have any engines except for those listed.
-     *
-     * @param engines the engine(s) to not run the test on
-     */
-    public static void notEngine(String... engines) {
-        String engineName = Engine.getDefaultEngineName();
-        for (String e : engines) {
-            if (engineName.equals(e)) {
-                throw new SkipException(
-                        "This test requires not using the engines: " + Arrays.toString(engines));
-            }
         }
     }
 

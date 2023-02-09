@@ -25,6 +25,7 @@ public class TrainAirfoilWithTabNetTest {
 
     @Test
     public void testTrainAirfoilWithTabNet() throws TranslateException, IOException {
+        TestRequirements.nightly();
         TestRequirements.engine("MXNet", "PyTorch");
         String[] args = {"-g", "1", "-e", "20", "-b", "32"};
         if (!Boolean.getBoolean("nightly")) {

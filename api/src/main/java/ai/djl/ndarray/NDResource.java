@@ -12,6 +12,8 @@
  */
 package ai.djl.ndarray;
 
+import java.util.List;
+
 /** An object which is managed by an {@link NDManager} and tracks the manager it is attached to. */
 public interface NDResource extends AutoCloseable {
 
@@ -21,6 +23,13 @@ public interface NDResource extends AutoCloseable {
      * @return the {@link NDManager} that manages this.
      */
     NDManager getManager();
+
+    /**
+     * Returns the {@link NDArray} or {@link NDArray}s contained within this resource.
+     *
+     * @return the {@link NDArray} or {@link NDArray}s contained within this resource
+     */
+    List<NDArray> getResourceNDArrays();
 
     /**
      * Attaches this {@link NDResource} to the specified {@link NDManager}.
