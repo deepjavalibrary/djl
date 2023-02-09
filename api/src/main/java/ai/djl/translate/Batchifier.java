@@ -41,6 +41,8 @@ public interface Batchifier {
         switch (name) {
             case "stack":
                 return STACK;
+            case "padding":
+                return new SimplePaddingStackBatchifier();
             case "none":
                 return null;
             default:
