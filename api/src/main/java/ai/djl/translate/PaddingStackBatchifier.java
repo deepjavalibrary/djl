@@ -47,37 +47,17 @@ public final class PaddingStackBatchifier implements Batchifier {
         NDList validLengths = new NDList(inputs.length);
         NDManager manager = inputs[0].get(0).getManager();
         for (int i = 0; i < arraysToPad.size(); i++) {
-            long[] arrayValidLengths = new long[inputs.length];
             int arrayIndex = arraysToPad.get(i);
             int dimIndex = dimsToPad.get(i);
             NDArray padding = paddingSuppliers.get(i).get(manager);
             long paddingSize = paddingSizes.get(i);
-            long maxSize = -1;
-            for (NDList input : inputs) {
-                NDArray array = input.get(arrayIndex);
-                maxSize = Math.max(maxSize, array.getShape().get(dimIndex));
-            }
+            long maxSize = findMaxSize(inputs, arrayIndex, dimIndex);
             if (paddingSize != -1 && maxSize > paddingSize) {
                 throw new IllegalArgumentException(
                         "The batchifier padding size is too small " + maxSize + " " + paddingSize);
             }
             maxSize = Math.max(maxSize, paddingSize);
-            for (int j = 0; j < inputs.length; j++) {
-                NDArray array = inputs[j].get(arrayIndex);
-                String arrayName = array.getName();
-                long validLength = array.getShape().get(dimIndex);
-                if (validLength < maxSize) {
-                    NDArray paddingArray =
-                            padding.repeat(
-                                    Shape.update(
-                                            array.getShape(), dimIndex, maxSize - validLength));
-                    array = array.concat(paddingArray.toType(array.getDataType(), false), dimIndex);
-                }
-                arrayValidLengths[j] = validLength;
-                // keep input name
-                array.setName(arrayName);
-                inputs[j].set(arrayIndex, array);
-            }
+            long[] arrayValidLengths = padArrays(inputs, arrayIndex, dimIndex, padding, maxSize);
             validLengths.add(manager.create(arrayValidLengths));
         }
         NDList result = Batchifier.STACK.batchify(inputs);
@@ -135,6 +115,88 @@ public final class PaddingStackBatchifier implements Batchifier {
             }
         }
         return split;
+    }
+
+    /**
+     * Finds the maximum size for a particular array/dimension in a batch of inputs (which can be
+     * padded to equalize their sizes).
+     *
+     * @param inputs the batch of inputs
+     * @param arrayIndex the array (for each NDList in the batch)
+     * @param dimIndex for the array in each NDList in the batch
+     * @return the maximum size
+     */
+    public static long findMaxSize(NDList[] inputs, int arrayIndex, int dimIndex) {
+        long maxSize = -1;
+        for (NDList input : inputs) {
+            NDArray array = input.get(arrayIndex);
+            maxSize = Math.max(maxSize, array.getShape().get(dimIndex));
+        }
+        return maxSize;
+    }
+
+    /**
+     * Pads the arrays at a particular dimension to all have the same size (updating inputs in
+     * place).
+     *
+     * @param inputs the batch of inputs
+     * @param arrayIndex the array (for each NDList in the batch)
+     * @param dimIndex for the array in each NDList in the batch
+     * @param padding the padding to use. Say you have a batch of arrays of Shape(10, ?, 3) and you
+     *     are padding the "?" dimension. There are two padding modes:
+     *     <ul>
+     *       <li>If you give padding of Shape(1, 3) (same dimensionality as required), it will be
+     *           repeated with {@link NDArray#repeat(long)} as necessary
+     *       <li>If you give padding of Shape(3) or Shape(0) (smaller dimensionality as required),
+     *           it will be broadcasted with {@link NDArray#broadcast(Shape)} to reach the full
+     *           required Shape(?, 3)
+     *     </ul>
+     *
+     * @param maxSize the size that each array will be padded to in that dimension. In the example
+     *     above, the padding to be applied to the "?" dimension.
+     * @return the original valid length for each dimension in the batch (same length as
+     *     inputs.length). The inputs will be updated in place.
+     */
+    public static long[] padArrays(
+            NDList[] inputs, int arrayIndex, int dimIndex, NDArray padding, long maxSize) {
+        long[] arrayValidLengths = new long[inputs.length];
+        for (int i = 0; i < inputs.length; i++) {
+            NDArray array = inputs[i].get(arrayIndex);
+            String arrayName = array.getName();
+            long validLength = array.getShape().get(dimIndex);
+            if (validLength < maxSize) {
+
+                // Number of dimensions the padding must be
+                int dimensionsRequired =
+                        array.getShape().dimension() - padding.getShape().dimension();
+
+                NDArray paddingArray;
+                if (dimensionsRequired == 0) {
+                    paddingArray =
+                            padding.repeat(
+                                    Shape.update(
+                                            array.getShape(), dimIndex, maxSize - validLength));
+                } else if (dimensionsRequired > 0) {
+                    paddingArray =
+                            padding.broadcast(
+                                    Shape.update(
+                                            array.getShape(), dimIndex, maxSize - validLength));
+                } else {
+                    throw new IllegalArgumentException(
+                            "The padding must be <="
+                                    + dimensionsRequired
+                                    + " dimensions, but found "
+                                    + padding.getShape().dimension());
+                }
+                array = array.concat(paddingArray.toType(array.getDataType(), false), dimIndex);
+            }
+            // keep input name
+            array.setName(arrayName);
+            inputs[i].set(arrayIndex, array);
+
+            arrayValidLengths[i] = validLength;
+        }
+        return arrayValidLengths;
     }
 
     /**
