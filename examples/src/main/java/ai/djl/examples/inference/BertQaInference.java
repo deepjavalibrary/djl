@@ -54,8 +54,6 @@ public final class BertQaInference {
     }
 
     public static String predict() throws IOException, TranslateException, ModelException {
-        //        String question = "How is the weather";
-        //        String paragraph = "The weather is nice, it is beautiful day";
         String question = "When did BBC Japan start broadcasting?";
         String paragraph =
                 "BBC Japan was a general entertainment Channel. "

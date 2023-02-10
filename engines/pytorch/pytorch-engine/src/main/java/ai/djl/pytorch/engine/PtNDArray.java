@@ -1559,6 +1559,10 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArrayEx getNDArrayInternal() {
+        if (ptNDArrayEx == null) {
+            throw new UnsupportedOperationException(
+                    "NDArray operation is not supported for String tensor");
+        }
         return ptNDArrayEx;
     }
 
@@ -1568,6 +1572,10 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         if (isReleased()) {
             return "This array is already closed";
         }
+        if (getDataType() == DataType.STRING) {
+            return Arrays.toString(strs);
+        }
+
         // index operator in toDebugString is not supported for MKLDNN & Sparse layout
         if (JniUtils.getLayout(this) != 0) {
             try (NDArray tmp = toDense()) {
