@@ -23,7 +23,7 @@ import org.apache.spark.sql.Row
 
 import java.util
 
-/** A [[ai.djl.translate.Translator]] for Spark Image Classification tasks. */
+/** A [[ai.djl.translate.Translator]] for Image Classification tasks in Spark. */
 @SerialVersionUID(1L)
 class ImageClassificationTranslator extends Translator[Row, Classifications] with Serializable {
 

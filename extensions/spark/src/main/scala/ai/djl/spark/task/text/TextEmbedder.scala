@@ -12,36 +12,40 @@
  */
 package ai.djl.spark.task.text
 
-import ai.djl.spark.ModelLoader
 import ai.djl.spark.translator.text.TextEmbeddingTranslator
+import org.apache.spark.ml.param.shared.{HasInputCol, HasOutputCol}
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.{DataFrame, Dataset, Encoders, Row}
-
-import java.util
+import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
+import org.apache.spark.sql.types.{ArrayType, FloatType, StructField, StructType}
+import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 /**
  * TextEmbedder performs text embedding on text.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class TextEmbedder(override val uid: String) extends TextPredictor[Array[Float]] {
+abstract class TextEmbedder(override val uid: String) extends TextPredictor[String, Array[Float]]
+  with HasInputCol with HasOutputCol {
 
   def this() = this(Identifiable.randomUID("TextEmbedder"))
 
+  /**
+   * Sets the inputCol parameter.
+   *
+   * @param value the value of the parameter
+   */
+  def setInputCol(value: String): this.type = set(inputCol, value)
+
+  /**
+   * Sets the outputCol parameter.
+   *
+   * @param value the value of the parameter
+   */
+  def setOutputCol(value: String): this.type = set(outputCol, value)
+
+  setDefault(inputClass, classOf[String])
   setDefault(outputClass, classOf[Array[Float]])
   setDefault(translator, new TextEmbeddingTranslator())
-
-  /** @inheritdoc */
-  override def transform(dataset: Dataset[_]): DataFrame = {
-    val model = new ModelLoader[Row, Array[Float]]($(engine), $(modelUrl), $(inputClass), $(outputClass))
-    val outputDf = dataset.selectExpr($(inputCols):_*).mapPartitions(partition => {
-      val predictor = model.newPredictor($(translator))
-      partition.map(row => {
-        util.Arrays.toString(predictor.predict(row))
-      })
-    })(Encoders.STRING)
-    outputDf.selectExpr($(outputCols):_*)
-  }
 
   /**
    * Performs text embedding on the provided dataset.
@@ -51,5 +55,22 @@ class TextEmbedder(override val uid: String) extends TextPredictor[Array[Float]]
    */
   def embed(dataset: Dataset[_]): DataFrame = {
     transform(dataset)
+  }
+
+  /** @inheritdoc */
+  override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
+    val predictor = model.newPredictor($(translator))
+    iter.map(row => {
+      new GenericRowWithSchema(row.toSeq.toArray
+        ++ Array[Any](Row(predictor.predict(row.getAs[String]($(inputCol))))), outputSchema)
+    })
+  }
+
+  /** @inheritdoc */
+  override def transformSchema(schema: StructType): StructType = {
+    validateInputType(schema($(inputCol)))
+    val outputSchema = StructType(schema.fields ++
+      Array(StructField($(outputCol), ArrayType(FloatType))))
+    outputSchema
   }
 }
