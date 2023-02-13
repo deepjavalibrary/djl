@@ -12,39 +12,27 @@
  */
 package ai.djl.spark.task.vision
 
-import ai.djl.spark.ModelLoader
 import ai.djl.spark.task.BasePredictor
-import org.apache.spark.ml.param.ParamMap
+import org.apache.spark.ml.param.shared.HasInputCols
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, Dataset, Encoders, Row}
+import org.apache.spark.sql.Row
 
 /**
- * ImagePredictor performs prediction on images.
+ * ImagePredictor is the base class for image predictors.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class ImagePredictor[B](override val uid: String) extends BasePredictor[Row, B] {
+abstract class ImagePredictor[B](override val uid: String) extends BasePredictor[Row, B]
+  with HasInputCols {
 
   def this() = this(Identifiable.randomUID("ImagePredictor"))
 
+  /**
+   * Sets the inputCols parameter.
+   *
+   * @param value the value of the parameter
+   */
+  def setInputCols(value: Array[String]): this.type = set(inputCols, value)
+
   setDefault(inputClass, classOf[Row])
-
-  /** @inheritdoc */
-  override def transform(dataset: Dataset[_]): DataFrame = {
-    val model = new ModelLoader[Row, B]($(engine), $(modelUrl), $(inputClass), $(outputClass))
-    val outputDf = dataset.selectExpr($(inputCols):_*).mapPartitions(partition => {
-      val predictor = model.newPredictor($(translator))
-      partition.map(row => {
-        predictor.predict(row).toString
-      })
-    })(Encoders.STRING)
-    outputDf.selectExpr($(outputCols):_*)
-  }
-
-  /** @inheritdoc */
-  override def transformSchema(schema: StructType) = schema
-
-  /** @inheritdoc */
-  override def copy(paramMap: ParamMap) = this
 }

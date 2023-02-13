@@ -14,16 +14,19 @@ package ai.djl.spark.task.text
 
 import ai.djl.spark.task.BasePredictor
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.types.{StringType, StructField}
 
 /**
- * TextPredictor performs prediction on text.
+ * TextPredictor is the base class for text predictors.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-abstract class TextPredictor[B](override val uid: String) extends BasePredictor[Row, B] {
+abstract class TextPredictor[A, B](override val uid: String) extends BasePredictor[A, B] {
 
   def this() = this(Identifiable.randomUID("TextPredictor"))
 
-  setDefault(inputClass, classOf[Row])
+  def validateInputType(input: StructField): Unit = {
+    require(input.dataType == StringType,
+      s"Input column ${input.name} type must be StringType but got ${input.dataType}.")
+  }
 }

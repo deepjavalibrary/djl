@@ -14,19 +14,20 @@ package ai.djl.spark.translator.text
 
 import ai.djl.ndarray.NDList
 import ai.djl.translate.{Batchifier, Translator, TranslatorContext}
-import org.apache.spark.sql.Row
 
-/** A [[ai.djl.translate.Translator]] for Spark Text Embedding tasks. */
+/** A [[ai.djl.translate.Translator]] for Text Embedding tasks in Spark. */
 @SerialVersionUID(1L)
-class TextEmbeddingTranslator extends Translator[Row, Array[Float]] with Serializable {
+class TextEmbeddingTranslator extends Translator[String, Array[Float]] with Serializable {
 
   /** @inheritdoc */
-  override def processInput(ctx: TranslatorContext, input: Row): NDList = {
-    new NDList(ctx.getNDManager.create(input.getString(0)).expandDims(0))
+  override def processInput(ctx: TranslatorContext, input: String): NDList = {
+    new NDList(ctx.getNDManager.create(input).expandDims(0))
   }
 
   /** @inheritdoc */
-  override def processOutput(ctx: TranslatorContext, list: NDList): Array[Float] = list.singletonOrThrow.get(0).toFloatArray
+  override def processOutput(ctx: TranslatorContext, list: NDList): Array[Float] = {
+    list.singletonOrThrow.get(0).toFloatArray
+  }
 
   /** @inheritdoc */
   override def getBatchifier: Batchifier = null
