@@ -48,6 +48,20 @@ public final class TestUtils {
                 "This test requires one of the engines: " + Arrays.toString(engines));
     }
 
+    /**
+     * Requires a test have any engines except for those listed.
+     *
+     * @param engines the engine(s) to not run the test on
+     */
+    public static void requiresNotEngine(String... engines) {
+        for (String e : engines) {
+            if (engineName.equals(e)) {
+                throw new SkipException(
+                        "This test requires not using the engines: " + Arrays.toString(engines));
+            }
+        }
+    }
+
     public static Device[] getDevices(int maxGpus) {
         Engine engine = Engine.getEngine(engineName);
         if (!engine.hasCapability(StandardCapabilities.CUDNN) && "MXNet".equals(engineName)) {

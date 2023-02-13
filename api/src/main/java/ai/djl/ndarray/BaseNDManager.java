@@ -31,9 +31,12 @@ import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** {@code BaseNDManager} is the default implementation of {@link NDManager}. */
 public abstract class BaseNDManager implements NDManager {
@@ -262,6 +265,30 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public List<NDArray> getManagedArrays() {
+        return Stream.concat(
+                        // Main resources
+                        resources.values().stream()
+                                .flatMap(
+                                        r -> {
+                                            if (r instanceof NDResource) {
+                                                return ((NDResource) r)
+                                                        .getResourceNDArrays().stream();
+                                            } else if (r instanceof NDManager) {
+                                                return ((NDManager) r).getManagedArrays().stream();
+                                            } else {
+                                                return Stream.empty();
+                                            }
+                                        }),
+
+                        // Temp resouces
+                        tempResources.values().stream()
+                                .flatMap(tr -> tr.resource.getResourceNDArrays().stream()))
+                .collect(Collectors.toList());
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String toString() {
         String parentName = parent == null ? "No Parent" : parent.getName();
         return "Name: "
@@ -277,9 +304,6 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public synchronized void attachInternal(String resourceId, AutoCloseable resource) {
-        if (this instanceof SystemNDManager) {
-            return;
-        }
         if (capped.get()) {
             throw new IllegalStateException("NDManager is capped for addition of resources.");
         }
@@ -289,9 +313,6 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public synchronized void attachUncappedInternal(String resourceId, AutoCloseable resource) {
-        if (this instanceof SystemNDManager) {
-            return;
-        }
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
         }
@@ -318,7 +339,8 @@ public abstract class BaseNDManager implements NDManager {
     public void tempAttachInternal(
             NDManager originalManager, String resourceId, NDResource resource) {
         if (this instanceof SystemNDManager) {
-            return;
+            throw new IllegalStateException(
+                    "System manager cannot be temp attached because it can't be closed..");
         }
         if (closed.get()) {
             throw new IllegalStateException("NDManager has been closed already.");
@@ -329,9 +351,6 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public synchronized void detachInternal(String resourceId) {
-        if (this instanceof SystemNDManager) {
-            return;
-        }
         if (closed.get()) {
             // This may happen in the middle of BaseNDManager.close()
             return;
@@ -360,24 +379,11 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public void zeroGradients() {
-        for (AutoCloseable res : resources.values()) {
-            if (res instanceof NDManager) {
-                ((NDManager) res).zeroGradients();
-            } else if (res instanceof NDArray) {
-                NDArray array = (NDArray) res;
-                if (array.hasGradient()) {
-                    array.getGradient().subi(array.getGradient());
-                }
-            }
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void close() {
         if (this instanceof SystemNDManager) {
-            return;
+            throw new IllegalStateException(
+                    "The SystemNDManager can not be closed. It is global and lives for the duration"
+                            + " of the process");
         }
         if (!closed.getAndSet(true)) {
             for (AutoCloseable closeable : resources.values()) {

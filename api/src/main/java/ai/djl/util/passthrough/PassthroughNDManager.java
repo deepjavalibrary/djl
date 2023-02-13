@@ -28,6 +28,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
 /** An {@link NDManager} that does nothing, for use in extensions and hybrid engines. */
 public final class PassthroughNDManager implements NDManager {
@@ -256,6 +258,12 @@ public final class PassthroughNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
+    public List<NDArray> getManagedArrays() {
+        return Collections.emptyList();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void attachInternal(String resourceId, AutoCloseable resource) {
         throw new UnsupportedOperationException(UNSUPPORTED);
     }
@@ -296,12 +304,6 @@ public final class PassthroughNDManager implements NDManager {
     @Override
     public Engine getEngine() {
         return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void zeroGradients() {
-        throw new UnsupportedOperationException(UNSUPPORTED);
     }
 
     /** {@inheritDoc} */

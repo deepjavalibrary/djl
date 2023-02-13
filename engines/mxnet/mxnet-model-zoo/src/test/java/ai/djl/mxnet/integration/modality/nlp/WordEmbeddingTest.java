@@ -32,7 +32,6 @@ public class WordEmbeddingTest {
     @Test
     public void testGlove() throws IOException, ModelException, EmbeddingException {
         TestRequirements.notArm();
-        TestRequirements.engine("MXNet");
 
         Criteria<String, NDList> criteria =
                 Criteria.builder()
