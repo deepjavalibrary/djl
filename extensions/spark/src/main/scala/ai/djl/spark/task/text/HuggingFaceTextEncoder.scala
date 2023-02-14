@@ -12,21 +12,24 @@
  */
 package ai.djl.spark.task.text
 
-import ai.djl.spark.translator.text.TextEmbeddingTranslator
+import ai.djl.huggingface.tokenizers.{Encoding, HuggingFaceTokenizer}
+import org.apache.spark.ml.param.Param
 import org.apache.spark.ml.param.shared.{HasInputCol, HasOutputCol}
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types.{ArrayType, FloatType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, LongType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 /**
- * TextEmbedder performs text embedding on text.
+ * TextEncoder performs text encoding using HuggingFace tokenizers in Spark.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class TextEmbedder(override val uid: String) extends TextPredictor[String, Array[Float]]
+class HuggingFaceTextEncoder(override val uid: String) extends TextPredictor[String, Encoding]
   with HasInputCol with HasOutputCol {
 
-  def this() = this(Identifiable.randomUID("TextEmbedder"))
+  def this() = this(Identifiable.randomUID("HuggingFaceTextEncoder"))
+
+  final val name = new Param[String](this, "name", "The name of the tokenizer")
 
   private var inputColIndex : Int = _
 
@@ -44,17 +47,23 @@ class TextEmbedder(override val uid: String) extends TextPredictor[String, Array
    */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
+  /**
+   * Sets the name parameter.
+   *
+   * @param value the value of the parameter
+   */
+  def setName(value: String): this.type = set(name, value)
+
   setDefault(inputClass, classOf[String])
-  setDefault(outputClass, classOf[Array[Float]])
-  setDefault(translator, new TextEmbeddingTranslator())
+  setDefault(outputClass, classOf[Encoding])
 
   /**
-   * Performs text embedding on the provided dataset.
+   * Performs sentence encoding on the provided dataset.
    *
    * @param dataset input dataset
    * @return output dataset
    */
-  def embed(dataset: Dataset[_]): DataFrame = {
+  def encode(dataset: Dataset[_]): DataFrame = {
     transform(dataset)
   }
 
@@ -65,10 +74,12 @@ class TextEmbedder(override val uid: String) extends TextPredictor[String, Array
   }
 
   /** @inheritdoc */
-  override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
-    val predictor = model.newPredictor($(translator))
+  override def transformRows(iter: Iterator[Row]): Iterator[Row] = {
+    val tokenizer = HuggingFaceTokenizer.newInstance($(name))
     iter.map(row => {
-      Row.fromSeq(row.toSeq ++ Array[Any](predictor.predict(row.getString(inputColIndex))))
+      val encoding = tokenizer.encode(row.getString(inputColIndex))
+      Row.fromSeq(row.toSeq
+        ++ Array[Any](Row(encoding.getIds, encoding.getTypeIds, encoding.getAttentionMask)))
     })
   }
 
@@ -76,7 +87,9 @@ class TextEmbedder(override val uid: String) extends TextPredictor[String, Array
   override def transformSchema(schema: StructType): StructType = {
     validateInputType(schema($(inputCol)))
     val outputSchema = StructType(schema.fields ++
-      Array(StructField($(outputCol), ArrayType(FloatType))))
+      Array(StructField($(outputCol), StructType(Seq(StructField("ids", ArrayType(LongType)),
+        StructField("type_ids", ArrayType(LongType)),
+        StructField("attention_mask", ArrayType(LongType)))))))
     outputSchema
   }
 }

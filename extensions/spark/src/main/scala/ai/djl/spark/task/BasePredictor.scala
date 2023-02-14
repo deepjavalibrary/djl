@@ -88,7 +88,7 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
   }
 
   /** @inheritdoc */
-  override def copy(paramMap: ParamMap) = this
+  override def copy(extra: ParamMap): BasePredictor[A, B] = defaultCopy(extra)
 
   protected def transformRows(iter: Iterator[Row]): Iterator[Row]
 }

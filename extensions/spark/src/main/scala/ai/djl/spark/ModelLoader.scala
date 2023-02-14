@@ -21,7 +21,7 @@ import java.io.Serializable
 
 /**
  * `ModelLoader` load [[ai.djl.repository.zoo.ZooModel]] for Spark support.
-
+ *
  * @param url The url of the model
  * @param outputClass The output class
  */
@@ -29,7 +29,7 @@ import java.io.Serializable
 class ModelLoader[A, B](val engine: String, val url: String, val inputClass : Class[A], val outputClass : Class[B])
   extends Serializable {
 
-  @transient var model: ZooModel[A, B] = _
+  @transient private var model: ZooModel[A, B] = _
 
   /**
    * Creates a new Predictor.

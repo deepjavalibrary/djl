@@ -18,7 +18,6 @@ import ai.djl.spark.translator.vision.ImageClassificationTranslator
 import org.apache.spark.ml.param.Param
 import org.apache.spark.ml.param.shared.HasOutputCol
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types.{ArrayType, DoubleType, MapType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
@@ -75,9 +74,8 @@ class ImageClassifier(override val uid: String) extends ImagePredictor[Classific
         val t = it.next()
         top += (t.getClassName -> t.getProbability)
       }
-      new GenericRowWithSchema(row.toSeq.toArray
-        ++ Array[Any](Row(prediction.getClassNames.toArray, prediction.getProbabilities.toArray, top)),
-        outputSchema)
+      Row.fromSeq(row.toSeq ++ Array[Any](Row(prediction.getClassNames.toArray,
+        prediction.getProbabilities.toArray, top)))
     })
   }
 
