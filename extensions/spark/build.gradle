@@ -6,6 +6,7 @@ group "ai.djl.spark"
 
 dependencies {
     api project(":api")
+    api project(":extensions:tokenizers")
     api "org.apache.spark:spark-core_2.12:${spark_version}"
     api "org.apache.spark:spark-sql_2.12:${spark_version}"
     api "org.apache.spark:spark-mllib_2.12:${spark_version}"
