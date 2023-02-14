@@ -143,7 +143,8 @@ public class MxModel extends BaseModel {
         boolean trainParam =
                 options != null && Boolean.parseBoolean((String) options.get("trainParam"));
         if (!trainParam) {
-            block.freezeParameters(true);
+            // TODO: See https://github.com/deepjavalibrary/djl/pull/2360
+            // block.freezeParameters(true);
         }
     }
 
@@ -157,7 +158,8 @@ public class MxModel extends BaseModel {
         }
         if (wasLoaded) {
             // Unfreeze parameters if training directly
-            block.freezeParameters(false);
+            // TODO: See https://github.com/deepjavalibrary/djl/pull/2360
+            // block.freezeParameters(false);
         }
         for (Pair<Initializer, Predicate<Parameter>> pair : initializer) {
             if (pair.getKey() != null && pair.getValue() != null) {

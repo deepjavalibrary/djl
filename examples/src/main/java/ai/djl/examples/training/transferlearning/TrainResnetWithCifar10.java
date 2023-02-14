@@ -145,7 +145,6 @@ public final class TrainResnetWithCifar10 {
             SequentialBlock newBlock = new SequentialBlock();
             SymbolBlock block = (SymbolBlock) model.getBlock();
             block.removeLastBlock();
-            block.freezeParameters(false);
             newBlock.add(block);
             // the original model don't include the flatten
             // so apply the flatten here
