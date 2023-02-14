@@ -14,9 +14,9 @@ allows the user to run inference with a plain java object.
 
 We provide engine agnostic `ZooModel`s in basic model zoo package. They can be used on any DJL backend engine.
 
-## [MXNet symbolic model zoo](../engines/mxnet/mxnet-model-zoo/README.md)
+## [Huggingface model zoo](../extensions/tokenizers/README.md)
 
-Apache MXNet has a large number of existing pre-trained models. We created an Apache MXNet model zoo to make it easy for users to consume them.
+We created a Huggingface model zoo to make it easy for users to consume them.
 
 ## [PyTorch model zoo](../engines/pytorch/pytorch-model-zoo/README.md)
 
@@ -25,6 +25,11 @@ We created a PyTorch model zoo to make it easy for users to consume them.
 ## [TensorFlow model zoo](../engines/tensorflow/tensorflow-model-zoo/README.md)
 
 We created an TensorFlow model zoo to make it easy for users to consume them.
+
+## [MXNet symbolic model zoo](../engines/mxnet/mxnet-model-zoo/README.md)
+
+Apache MXNet has a large number of existing pre-trained models. We created an Apache MXNet model zoo to make it easy for users to consume them.
+
 
 ## Publish your own model to the model zoo
 

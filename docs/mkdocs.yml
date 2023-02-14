@@ -81,7 +81,6 @@ nav:
           - 'docs/development/configure_logging.md'
           - 'docs/how_to_collect_metrics.md'
           - 'docs/development/inference_performance_optimization.md'
-          - 'docs/serving/benchmark/README.md'
           - 'docs/development/profiler.md'
       - 'docs/development/cache_management.md'
       - 'docs/development/memory_management.md'

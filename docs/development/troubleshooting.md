@@ -183,6 +183,7 @@ it is most likely just the automatic binary dependency being updated. As the tot
 
 ## 8. `UnsatisfiedLinkError` when running with old version of libstdc++.so
 If you encountered the following error:
+
 ```bash
 Caused by: java.lang.UnsatisfiedLinkError: /home/ubuntu/.tensorflow/cache/2.3.1-cu101-linux-x86_64/libjni$
 ensorflow.so: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `CXXABI_1.3.11' not found (required by /home/ubuntu/.te
@@ -193,7 +194,8 @@ Please upgrade gcc version according to the steps on [TensorFlow install page](h
 
 ## 9. X11 error when running object detection notebooks on EC2 instances.
 
-When you run object detection using Jupyter Notebooks on EC2 instances via SSH, sometimes you may face X11 error when drawing bounding boxes. 
+When you run object detection using Jupyter Notebooks on EC2 instances via SSH, sometimes you may face X11 error when drawing bounding boxes.
+
 ```bash
 java.awt.HeadlessException:
 No X11 DISPLAY variable was set, but this program performed an operation which requires it.

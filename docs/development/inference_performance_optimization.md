@@ -22,7 +22,8 @@ you need to set corresponding configuration based on the engine you want to use.
 To use Apache MXNet Engine to run multi-threading, complete the following steps.
 
 #### Enable NaiveEngine with Apache MXNet
-If using the MXNet engine for a multi-threaded inference case, you need to specify the 'MXNET_ENGINE_TYPE' environment variable using the following command:
+If using the MXNet engine for a multi-threaded inference case, you need to specify the 
+'MXNET_ENGINE_TYPE' environment variable using the following command:
 
 ```
 export MXNET_ENGINE_TYPE=NaiveEngine
@@ -33,8 +34,6 @@ To get the best throughput, you may also need to set 'OMP_NUM_THREADS' environme
 ```
 export OMP_NUM_THREADS=1
 ```
-
-Note that MxNet uses thread_local storage: Every thread that performs inference will allocate memory. In order to avoid memory leaks it is necessary to call MxNet from a fixed size thread pool. See https://github.com/apache/incubator-mxnet/issues/16431#issuecomment-562052116.
 
 ### PyTorch
 
