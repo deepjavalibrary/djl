@@ -87,6 +87,7 @@ public class MxModel extends BaseModel {
      * @throws IOException Exception for file loading
      */
     @Override
+    @SuppressWarnings("PMD.EmptyControlStatement")
     public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws IOException, MalformedModelException {
         setModelDir(modelPath);
@@ -144,12 +145,14 @@ public class MxModel extends BaseModel {
                 options != null && Boolean.parseBoolean((String) options.get("trainParam"));
         if (!trainParam) {
             // TODO: See https://github.com/deepjavalibrary/djl/pull/2360
+            // NOPMD
             // block.freezeParameters(true);
         }
     }
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings("PMD.EmptyControlStatement")
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         PairList<Initializer, Predicate<Parameter>> initializer = trainingConfig.getInitializers();
         if (block == null) {
