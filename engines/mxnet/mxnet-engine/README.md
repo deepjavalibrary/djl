@@ -53,6 +53,7 @@ For macOS, you can use the following library:
 - ai.djl.mxnet:mxnet-native-mkl:1.9.1:osx-x86_64
 
     This package takes advantage of the Intel MKL library to boost performance.
+
 ```xml
 <dependency>
     <groupId>ai.djl.mxnet</groupId>

@@ -14,6 +14,19 @@ URL url = new URL("https://s3.amazonaws.com/images.pdpics.com/preview/3033-bicyc
 Image img = BufferedImageFactory.getInstance().fromUrl(url);
 ```
 
+## Using opencv extension for high performance image process
+
+The [DJL OpenCV extension](../extensions/opencv/README.md) provides better performance compare to
+java's built-in ImageIO. You only need to add it into your project and DJL will automatically
+pick it up:
+
+```
+<dependency>
+    <groupId>ai.djl.opencv</groupId>
+    <artifactId>opencv</artifactId>
+</dependency>
+```
+
 ## Image Manipulation
 [Image](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/modality/cv/Image.html) 
 provides a suite of image manipulation functions to let you pre- and post-process your images all within DJL.
