@@ -12,12 +12,16 @@
  */
 package ai.djl.repository;
 
+import ai.djl.MalformedModelException;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelNotFoundException;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class ZooTest {
 
@@ -36,5 +40,12 @@ public class ZooTest {
         Assert.assertEquals("testEngine2", criteria2.getEngine());
         Assert.assertEquals("testModelName", criteria1.getModelName());
         Assert.assertEquals("testModelName", criteria2.getModelName());
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testInvalidCriteria()
+            throws ModelNotFoundException, MalformedModelException, IOException {
+        Criteria<?, ?> criteria = Criteria.builder().build();
+        criteria.loadModel();
     }
 }
