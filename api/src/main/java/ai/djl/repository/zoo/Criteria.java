@@ -103,6 +103,10 @@ public class Criteria<I, O> {
      */
     public ZooModel<I, O> loadModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
+        if (inputClass == null || outputClass == null) {
+            throw new IllegalArgumentException("inputClass and outputClass are required.");
+        }
+
         Logger logger = LoggerFactory.getLogger(ModelZoo.class);
         logger.debug("Loading model with {}", this);
 
