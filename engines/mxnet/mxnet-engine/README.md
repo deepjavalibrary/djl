@@ -123,7 +123,7 @@ DJL on Windows, please download and install
 For the windows platform, we support both CPU and GPU.
 The CPU can be found using either the automatic runtime detection or through adding the CPU jar to your dependencies.
 However, due to the size of the windows GPU native library, we do not offer GPU support through a dependency jar.
-You can still access GPU on windows by using the [automatic runtime download](#Installation).
+You can still access GPU on windows by using the [automatic runtime download](#installation).
 
 #### Windows GPU
 
