@@ -12,7 +12,8 @@ The package contains the following two major features.
 1. It integrates DJL with [gluonTS](https://ts.gluon.ai/stable/index.html), a powerful timeseries python package. With this feature, the pretrained models in gluonTS, either with MXNet or PyTorch, can both be directly loaded into DJL for inference and deployment in Java environment. Also take a look at the python example [m5_gluonts_template](https://github.com/awslabs/gluonts/blob/dev/examples/m5_gluonts_template.ipynb). Our convention of the parameter names are the same as theirs.
 2. It contains training features, so that users can directly build and modify timeseries deep learning models in DJL within Java envinronment.
 
-In the following, we will demonstrate these features with [M5 Forecasting](https://www.kaggle.com/c/m5-forecasting-accuracy) data. We will also use the [airpassenger](https://ts.gluon.ai/stable/index.html) data to benchmark the pretrained model loaded from gluonTS. The blog is structured as follows.
+In the following, we will demonstrate these features with [M5 Forecasting](https://www.kaggle.com/c/m5-forecasting-accuracy) data. We will also use the [airpassenger](https://ts.gluon.ai/stable/index.html) data to benchmark the pretrained model loaded from gluonTS. The example is structured as follows.
+
 1. A simple demonstration with airpassenger data
 2. M5 Forecasting dataset
 3. DeepAR model
