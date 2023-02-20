@@ -14,6 +14,10 @@ Now it contains:
 - Two pre-trained model.
 - A pre-built trainable model (DeepAR).
 
+The following examples are included for both training and inference:
+
+- [Forecast with M5 data](docs/forecast_with_M5_data.md)
+
 ## Module structure
 
 ### Forecast
