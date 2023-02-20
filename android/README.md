@@ -19,10 +19,9 @@ dependencies {
     implementation platform("ai.djl:bom:0.21.0")
 
     implementation "ai.djl:api"
-    // TODO: remove djl android package version in 0.21.0
-    implementation "ai.djl.android:core:0.21.0"
+    implementation "ai.djl.android:core"
     runtimeOnly "ai.djl.pytorch:pytorch-engine"
-    runtimeOnly "ai.djl.android:pytorch-native:0.21.0"
-    runtimeOnly "ai.djl.android:onnxruntime:0.21.0"
+    runtimeOnly "ai.djl.android:pytorch-native"
+    runtimeOnly "ai.djl.android:onnxruntime"
 }
 ```
