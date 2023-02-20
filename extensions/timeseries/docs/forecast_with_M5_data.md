@@ -71,6 +71,7 @@ In order to realize the preprocessing of time series data, we define the `TimeSe
 So for your own dataset, you need to customize the way you get the data and put it into `TimeSeriesData` as the input to the translator. In this demo, we use `M5Dataset` which is located in `M5ForecastingDeepAR.java`.
 
 The dataset path is set in the follwing code.
+
 ```java
 Repository repository = Repository.newInstance("local_dataset",
     Paths.get("YOUR_PATH/m5-forecasting-accuracy"));
