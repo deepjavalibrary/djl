@@ -887,7 +887,7 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList unique(long dim, boolean sorted, boolean returnInverse, boolean returnCounts) {
+    public NDList unique(Integer dim, boolean sorted, boolean returnInverse, boolean returnCounts) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 

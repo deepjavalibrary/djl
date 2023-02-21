@@ -3498,7 +3498,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      *     will be an additional returned tensor (same shape as output or output.size(dim), if dim
      *     was specified) representing the number of occurrences for each unique value or tensor.
      */
-    NDList unique(long dim, boolean sorted, boolean returnInverse, boolean returnCounts);
+    NDList unique(Integer dim, boolean sorted, boolean returnInverse, boolean returnCounts);
 
     /**
      * Returns the unique elements of the input tensor. The output is flattened.
@@ -3517,7 +3517,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      *     was specified) representing the number of occurrences for each unique value or tensor.
      */
     default NDList unique(boolean sorted, boolean returnInverse, boolean returnCounts) {
-        return unique(Long.MIN_VALUE, sorted, returnInverse, returnCounts);
+        return unique(null, sorted, returnInverse, returnCounts);
     }
 
     /**
@@ -3532,7 +3532,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      *     was specified) representing the number of occurrences for each unique value or tensor.
      */
     default NDList unique() {
-        return unique(Long.MIN_VALUE, true, false, false);
+        return unique(null, true, false, false);
     }
 
     /**

@@ -1143,7 +1143,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDList unique(long dim, boolean sorted, boolean returnInverse, boolean returnCounts) {
+    public NDList unique(Integer dim, boolean sorted, boolean returnInverse, boolean returnCounts) {
         return JniUtils.unique(this, dim, sorted, returnInverse, returnCounts);
     }
 

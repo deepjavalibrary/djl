@@ -949,18 +949,19 @@ public final class JniUtils {
 
     public static NDList unique(
             PtNDArray ndArray,
-            long dim,
+            Integer dim,
             boolean sorted,
             boolean returnInverse,
             boolean returnCounts) {
         long[] handles;
-        if (dim < Long.MIN_VALUE + 1) {
-            // Long.MIN_VALUE is a code for dim=None, in which case the output will be flattened.
+        if (dim == null) {
+            // In this case the output will be flattened.
             handles =
                     PyTorchLibrary.LIB.torchUnique(
                             ndArray.getHandle(), -1, sorted, returnInverse, returnCounts);
         } else {
-            dim = Math.floorMod((int) dim, ndArray.getShape().dimension()); // enable dimension wrap
+            // Dimension wrap
+            dim = Math.floorMod(dim, ndArray.getShape().dimension());
             handles =
                     PyTorchLibrary.LIB.torchUnique(
                             ndArray.getHandle(), dim, sorted, returnInverse, returnCounts);
