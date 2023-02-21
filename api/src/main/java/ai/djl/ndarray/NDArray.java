@@ -3534,7 +3534,6 @@ public interface NDArray extends NDResource, BytesSupplier {
     default NDList unique() {
         return unique(Long.MIN_VALUE, true, false, false);
     }
-    ;
 
     /**
      * Joins a {@code NDArray} along the first axis.
