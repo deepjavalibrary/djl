@@ -12,7 +12,6 @@
 # the specific language governing permissions and limitations under the License.
 
 from pyspark import SparkContext
-from pyspark.sql import SQLContext
 from pyspark.sql import DataFrame
 
 
@@ -20,24 +19,26 @@ class ImageClassifier:
     """ImageClassifier performs image classification on images.
     """
 
-    def __init__(self, input_cols, output_cols, engine, model_url,
-                 output_class=None, translator=None):
+    def __init__(self, input_cols, output_col, engine, model_url,
+                 output_class=None, translator=None, topK=5):
         """
         Initializes the ImageClassifier.
 
         :param input_cols: The input columns
-        :param output_cols: The output columns
-        :param engine: The engine
+        :param output_col: The output column
+        :param engine (optional): The engine
         :param model_url: The model URL
-        :param output_class: The input class (optional)
-        :param translator: The translator (optional)
+        :param output_class (optional): The output class
+        :param translator (optional): The translator. Default is ImageClassificationTranslator.
+        :param topK (optional): The number of classes to return. Default is 5.
         """
         self.input_cols = input_cols
-        self.output_cols = output_cols
+        self.output_col = output_col
         self.engine = engine
         self.model_url = model_url
         self.output_class = output_class
         self.translator = translator
+        self.topK = topK
 
     def classify(self, dataset):
         """
@@ -47,7 +48,6 @@ class ImageClassifier:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        sqlContext = SQLContext(sc)
 
         # Convert the input_cols to Java array
         input_cols_arr = None
@@ -57,26 +57,16 @@ class ImageClassifier:
             for i in range(len(self.input_cols)):
                 input_cols_arr[i] = self.input_cols[i]
 
-        # Convert the output_cols to Java array
-        output_cols_arr = None
-        if self.output_cols is not None:
-            output_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String,
-                                                    len(self.output_cols))
-            for i in range(len(self.output_cols)):
-                output_cols_arr[i] = self.output_cols[i]
-
         classifier = sc._jvm.ai.djl.spark.task.vision.ImageClassifier()
         if input_cols_arr is not None:
             classifier = classifier.setInputCols(input_cols_arr)
-        if output_cols_arr is not None:
-            classifier = classifier.setOutputCols(output_cols_arr)
-        if self.output_class is None:
-            self.output_class = sc._jvm.ai.djl.modality.Classifications._java_lang_class
-        if self.translator is None:
-            self.translator = sc._jvm.ai.djl.spark.translator.vision.ImageClassificationTranslator()
-        classifier = classifier.setEngine(self.engine) \
+        if self.output_class is not None:
+            classifier = classifier.setOutputClass(self.output_class)
+        if self.translator is not None:
+            classifier = classifier.setTranslator(self.translator)
+        classifier = classifier.setOutputCol(self.output_col) \
+            .setEngine(self.engine) \
             .setModelUrl(self.model_url) \
-            .setOutputClass(self.output_class) \
-            .setTranslator(self.translator)
+            .setTopK(self.topK)
         return DataFrame(classifier.classify(dataset._jdf),
-                         sqlContext._ssql_ctx)
+                         dataset.sparkSession)
