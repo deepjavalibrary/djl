@@ -305,10 +305,6 @@ public class NDArrayShapesManipulationOpTest {
             Assert.assertEquals(actual.get(0), expect0);
             Assert.assertEquals(actual.get(1), expect1);
             Assert.assertEquals(actual.get(2), expect2);
-
-            System.out.println(actual.get(0));
-            System.out.println(actual.get(1));
-            System.out.println(actual.get(2));
         }
     }
 
