@@ -178,6 +178,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUnique(
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> output_tuple;
   if (jdim < 0) {
+    // negative jdim is a code for dim=None
     output_tuple = torch::_unique2(*tensor_ptr, jsorted, jreturn_inverse, jreturn_counts);
   } else {
     output_tuple = at::unique_dim(*tensor_ptr, jdim, jsorted, jreturn_inverse, jreturn_counts);

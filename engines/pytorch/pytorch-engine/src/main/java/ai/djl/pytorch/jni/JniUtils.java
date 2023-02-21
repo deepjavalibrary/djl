@@ -955,8 +955,7 @@ public final class JniUtils {
             boolean returnCounts) {
         long[] handles;
         if (dim < Long.MIN_VALUE + 1) {
-            // Long.MIN_VALUE is encoded to be equivalent to dim=None. In this case the output is
-            // flattened.
+            // Long.MIN_VALUE is a code for dim=None, in which case the output will be flattened.
             handles =
                     PyTorchLibrary.LIB.torchUnique(
                             ndArray.getHandle(), -1, sorted, returnInverse, returnCounts);
