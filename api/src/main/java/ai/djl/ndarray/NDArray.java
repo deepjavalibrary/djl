@@ -3453,6 +3453,90 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray squeeze(int[] axes);
 
     /**
+     * Returns the unique elements of the input tensor.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {3f, 1f, 2f, 3f, 1f, 2f, 1f, 3f, 2f}, new Shape(3, 3));
+     * jshell&gt; array;
+     * ND: (3, 3) cpu() float32
+     * [[[3., 1., 2.],
+     *   [3., 1., 2.],
+     *   [1., 3., 2.],
+     *  ],
+     * ]
+     * jshell&gt; NDList output = array.unique(0, true, true, true);
+     * jshell&gt; output.get(0);
+     * jshell&gt; output.get(1);
+     * jshell&gt; output.get(2);
+     *
+     * ND: (2, 3) cpu() float32
+     * [[1., 3., 2.],
+     *  [3., 1., 2.],
+     * ]
+     *
+     * ND: (3) cpu() int64
+     * [ 1,  1,  0]
+     *
+     * ND: (2) cpu() int64
+     * [ 1,  2]
+     *
+     * </pre>
+     *
+     * @param dim the dimension to apply unique
+     * @param sorted whether to sort the unique elements in ascending order before returning as
+     *     output
+     * @param returnInverse return the indices which, fed into the output unique array as indices,
+     *     will recover the original array
+     * @param returnCounts return the counts for each unique element
+     * @return An {@code NDList} containing: output (Tensor): the output list of unique elements or
+     *     low-rank tensors. inverse_indices (Tensor): (optional) if return_inverse is True, there
+     *     will be an additional returned tensor (same shape as input) representing the indices for
+     *     where elements in the original input map to in the output; otherwise, this function will
+     *     only return a single tensor. counts (Tensor): (optional) if return_counts is True, there
+     *     will be an additional returned tensor (same shape as output or output.size(dim), if dim
+     *     was specified) representing the number of occurrences for each unique value or tensor.
+     */
+    NDList unique(long dim, boolean sorted, boolean returnInverse, boolean returnCounts);
+
+    /**
+     * Returns the unique elements of the input tensor. The output is flattened.
+     *
+     * @param sorted whether to sort the unique elements in ascending order before returning as
+     *     output
+     * @param returnInverse return the indices which, fed into the output unique array as indices,
+     *     will recover the original array
+     * @param returnCounts return the counts for each unique element
+     * @return An {@code NDList} containing: output (Tensor): the output list of unique elements or
+     *     low-rank tensors. inverse_indices (Tensor): (optional) if return_inverse is True, there
+     *     will be an additional returned tensor (same shape as input) representing the indices for
+     *     where elements in the original input map to in the output; otherwise, this function will
+     *     only return a single tensor. counts (Tensor): (optional) if return_counts is True, there
+     *     will be an additional returned tensor (same shape as output or output.size(dim), if dim
+     *     was specified) representing the number of occurrences for each unique value or tensor.
+     */
+    default NDList unique(boolean sorted, boolean returnInverse, boolean returnCounts) {
+        return unique(Long.MIN_VALUE, sorted, returnInverse, returnCounts);
+    }
+
+    /**
+     * Returns the unique elements of the input tensor. The output is flattened.
+     *
+     * @return An {@code NDList} containing: output (Tensor): the output list of unique elements or
+     *     low-rank tensors. inverse_indices (Tensor): (optional) if return_inverse is True, there
+     *     will be an additional returned tensor (same shape as input) representing the indices for
+     *     where elements in the original input map to in the output; otherwise, this function will
+     *     only return a single tensor. counts (Tensor): (optional) if return_counts is True, there
+     *     will be an additional returned tensor (same shape as output or output.size(dim), if dim
+     *     was specified) representing the number of occurrences for each unique value or tensor.
+     */
+    default NDList unique() {
+        return unique(Long.MIN_VALUE, true, false, false);
+    }
+    ;
+
+    /**
      * Joins a {@code NDArray} along the first axis.
      *
      * <p>Examples

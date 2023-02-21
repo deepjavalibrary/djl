@@ -1214,6 +1214,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDList unique(long dim, boolean sorted, boolean returnInverse, boolean returnCounts) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray logicalAnd(NDArray n) {
         try (NDArray input1 = toType(DataType.BOOLEAN, true);
                 NDArray input2 = n.toType(DataType.BOOLEAN, true)) {

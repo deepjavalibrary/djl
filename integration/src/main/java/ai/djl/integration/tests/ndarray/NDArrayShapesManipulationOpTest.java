@@ -280,6 +280,38 @@ public class NDArrayShapesManipulationOpTest {
         }
     }
 
+    @Test
+    public void testUnique() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            // Simple unique: flattened dim, sorted=true, returnInverse=false, returnCounts=false
+            NDArray arraySimple = manager.create(new float[] {1f, 2f, 1f, 3f}, new Shape(1, 4));
+            NDList actualSimple = arraySimple.unique();
+            NDArray expectSimple0 = manager.create(new float[] {1f, 2f, 3f}, new Shape(3));
+            NDArray emptyArray = manager.create(new long[] {}, new Shape(0));
+
+            Assert.assertEquals(actualSimple.get(0), expectSimple0);
+            Assert.assertEquals(actualSimple.get(1), emptyArray);
+            Assert.assertEquals(actualSimple.get(2), emptyArray);
+
+            // Enable dim, sorted, returnInverse, returnCounts
+            NDArray array =
+                    manager.create(
+                            new float[] {3f, 1f, 2f, 3f, 1f, 2f, 1f, 3f, 2f}, new Shape(3, 3));
+            NDList actual = array.unique(0, true, true, true);
+            NDArray expect0 = manager.create(new float[] {1f, 3f, 2f, 3f, 1f, 2f}, new Shape(2, 3));
+            NDArray expect1 = manager.create(new long[] {1, 1, 0}, new Shape(3));
+            NDArray expect2 = manager.create(new long[] {1, 2}, new Shape(2));
+
+            Assert.assertEquals(actual.get(0), expect0);
+            Assert.assertEquals(actual.get(1), expect1);
+            Assert.assertEquals(actual.get(2), expect2);
+
+            System.out.println(actual.get(0));
+            System.out.println(actual.get(1));
+            System.out.println(actual.get(2));
+        }
+    }
+
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConcatNDlist() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {

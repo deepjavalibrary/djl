@@ -947,6 +947,33 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.torchUnsqueeze(ndArray.getHandle(), dim));
     }
 
+    public static NDList unique(
+            PtNDArray ndArray,
+            long dim,
+            boolean sorted,
+            boolean returnInverse,
+            boolean returnCounts) {
+        long[] handles;
+        if (dim < Long.MIN_VALUE + 1) {
+            // Long.MIN_VALUE is encoded to be equivalent to dim=None. In this case the output is
+            // flattened.
+            handles =
+                    PyTorchLibrary.LIB.torchUnique(
+                            ndArray.getHandle(), -1, sorted, returnInverse, returnCounts);
+        } else {
+            dim = Math.floorMod((int) dim, ndArray.getShape().dimension()); // enable dimension wrap
+            handles =
+                    PyTorchLibrary.LIB.torchUnique(
+                            ndArray.getHandle(), dim, sorted, returnInverse, returnCounts);
+        }
+        NDList list = new NDList(handles.length);
+        for (long handle : handles) {
+            PtNDArray array = new PtNDArray(ndArray.getManager(), handle);
+            list.add(array);
+        }
+        return list;
+    }
+
     public static PtNDArray flatten(PtNDArray ndArray, long startDim, long endDim) {
         return new PtNDArray(
                 ndArray.getManager(),
