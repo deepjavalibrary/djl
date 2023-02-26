@@ -133,6 +133,7 @@ public abstract class NDArrayIndexer {
                 throw new IllegalArgumentException(
                         "The type of value to assign cannot be other than NDArray and Number.");
             }
+            return;
         }
 
         throw new UnsupportedOperationException(

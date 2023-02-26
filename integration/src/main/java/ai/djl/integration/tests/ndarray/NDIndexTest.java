@@ -243,9 +243,18 @@ public class NDIndexTest {
             original.set(new NDIndex("..., 0"), 1);
             Assert.assertEquals(original, expected);
 
-            // set by index array
+            // set by boolean index array
             original = manager.arange(1, 10).reshape(3, 3);
-            NDArray index = manager.create(new long[] {0, 1}, new Shape(2));
+            NDArray index = manager.create(new boolean[] {true, false, true}, new Shape(3));
+            original.set(new NDIndex("{}", index), 666);
+            expected =
+                    manager.create(
+                            new int[] {666, 666, 666, 4, 5, 6, 666, 666, 666}, new Shape(3, 3));
+            Assert.assertEquals(original, expected);
+
+            // set by integer index array
+            original = manager.arange(1, 10).reshape(3, 3);
+            index = manager.create(new long[] {0, 1}, new Shape(2));
             original.set(new NDIndex("{}, :{}", index, 2), 666);
             expected =
                     manager.create(new int[] {666, 666, 3, 666, 666, 6, 7, 8, 9}, new Shape(3, 3));
