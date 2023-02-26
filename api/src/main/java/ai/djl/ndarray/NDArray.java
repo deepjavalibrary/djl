@@ -686,7 +686,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @throws IllegalArgumentException thrown if the result is not a single element
      */
     default long getLong(long... indices) {
-        return getScalar(indices).toLongArray()[0];
+        try (NDArray scalar = getScalar(indices)) {
+            return scalar.toLongArray()[0];
+        }
     }
 
     /**
@@ -697,7 +699,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @throws IllegalArgumentException thrown if the result is not a single element
      */
     default double getDouble(long... indices) {
-        return getScalar(indices).toDoubleArray()[0];
+        try (NDArray scalar = getScalar(indices)) {
+            return scalar.toDoubleArray()[0];
+        }
     }
 
     /**
@@ -708,7 +712,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @throws IllegalArgumentException thrown if the result is not a single element
      */
     default float getFloat(long... indices) {
-        return getScalar(indices).toFloatArray()[0];
+        try (NDArray scalar = getScalar(indices)) {
+            return scalar.toFloatArray()[0];
+        }
     }
 
     /**
@@ -719,7 +725,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @throws IllegalArgumentException thrown if the result is not a single element
      */
     default int getInt(long... indices) {
-        return getScalar(indices).toIntArray()[0];
+        try (NDArray scalar = getScalar(indices)) {
+            return scalar.toIntArray()[0];
+        }
     }
 
     /**
@@ -730,7 +738,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @throws IllegalArgumentException thrown if the result is not a single element
      */
     default byte getByte(long... indices) {
-        return getScalar(indices).toByteArray()[0];
+        try (NDArray scalar = getScalar(indices)) {
+            return scalar.toByteArray()[0];
+        }
     }
 
     /**
@@ -753,7 +763,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @throws IllegalArgumentException thrown if the result is not a single element
      */
     default boolean getBoolean(long... indices) {
-        return getScalar(indices).toBooleanArray()[0];
+        try (NDArray scalar = getScalar(indices)) {
+            return scalar.toBooleanArray()[0];
+        }
     }
 
     /**
