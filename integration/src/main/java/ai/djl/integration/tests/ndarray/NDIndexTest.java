@@ -248,7 +248,8 @@ public class NDIndexTest {
             NDArray index = manager.create(new boolean[] {true, false, true}, new Shape(3));
             original.set(new NDIndex("{}", index), 666);
             expected =
-                    manager.create(new int[] {666, 666, 666, 4, 5, 6, 666, 666, 666}, new Shape(3, 3));
+                    manager.create(
+                            new int[] {666, 666, 666, 4, 5, 6, 666, 666, 666}, new Shape(3, 3));
             Assert.assertEquals(original, expected);
 
             // set by integer index array
