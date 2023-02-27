@@ -21,7 +21,7 @@ ARG TENSORFLOW_CORE_VERSION=0.4.2
 ARG PROTOBUF_VERSION=3.21.9
 
 COPY extensions/spark/setup/dist/ dist/
-RUN pip3 install --no-cache-dir dist/djl_spark-${DJL_VERSION}-py3-none-any.whl && \
+RUN pip3 install --no-cache-dir dist/djl_spark-*-py3-none-any.whl && \
     rm -rf dist
 RUN pip3 install --no-cache-dir pillow pandas numpy
 
