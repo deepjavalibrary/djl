@@ -1,0 +1,38 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/object_detection",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "yolo5s",
+  "name": "YoloV5s",
+  "description": "YoloV5 Model",
+  "website": "http://www.djl.ai/engines/onnxruntime/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "yolo5s",
+      "arguments": {
+        "width": 640,
+        "height": 640,
+        "resize": true,
+        "threshold": 0.4,
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloV5TranslatorFactory"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/yolov5s.zip",
+          "name": "",
+          "sha1Hash": "493215e1d824bf013d45e0c8b0425c4ddf7cf2a9",
+          "size": 24838464
+        }
+      }
+    }
+  ]
+}
