@@ -89,7 +89,7 @@ final class NDSerializer {
         dos.writeInt(length);
 
         if (length > 0) {
-            if (bb.hasArray()) {
+            if (bb.hasArray() && bb.remaining() == bb.array().length) {
                 dos.write(bb.array(), bb.position(), length);
             } else {
                 if (length > BUFFER_SIZE) {
