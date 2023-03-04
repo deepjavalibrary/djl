@@ -272,12 +272,6 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void copyTo(NDArray array) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray booleanMask(NDArray index, int axis) {
         return getAlternativeArray().booleanMask(alternativeManager.from(index), axis);
     }
@@ -304,7 +298,8 @@ public abstract class NDArrayAdapter implements NDArray {
     @Override
     public boolean contentEquals(NDArray other) {
         if (other instanceof NDArrayAdapter) {
-            return Arrays.equals(toByteArray(), other.toByteArray());
+            return getShape().equals(other.getShape())
+                    && Arrays.equals(toByteArray(), other.toByteArray());
         }
         return other.contentEquals(this);
     }

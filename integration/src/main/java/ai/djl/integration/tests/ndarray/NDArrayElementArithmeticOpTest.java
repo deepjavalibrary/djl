@@ -48,7 +48,7 @@ public class NDArrayElementArithmeticOpTest {
         NDArray result = arrayArithmeticOp.apply(array1, array2);
         Assertions.assertAlmostEquals(result.getFloat(), arithmeticOp.apply(x1, x2));
         if (inplace) {
-            Assert.assertSame(array1, result);
+            Assertions.assertSame(array1, result);
         } else {
             // other cases only apply to non inplace test
             // test NDArray with scalar
@@ -86,7 +86,7 @@ public class NDArrayElementArithmeticOpTest {
         NDArray result = arrayArithmeticOp.apply(ndArray2);
         Assert.assertEquals(result.getFloat(), arithmeticOp.apply(x1, x2).floatValue());
         if (inplace) {
-            Assert.assertSame(scalarNDArray, result);
+            Assertions.assertSame(scalarNDArray, result);
         }
     }
 
@@ -102,7 +102,7 @@ public class NDArrayElementArithmeticOpTest {
         NDArray result = arrayArithmeticOp.apply(ndArray, x2);
         Assertions.assertAlmostEquals(result.getFloat(), arithmeticOp.apply(x1, x2));
         if (inplace) {
-            Assert.assertSame(ndArray, result);
+            Assertions.assertSame(ndArray, result);
         } else {
             // zero-dim with number
             ndArray = manager.create(new Shape(2, 0));
@@ -123,7 +123,7 @@ public class NDArrayElementArithmeticOpTest {
         NDArray result = arrayArithmeticOp.apply(x2, ndArray);
         Assertions.assertAlmostEquals(result.getFloat(), arithmeticOp.apply(x2, x1));
         if (inplace) {
-            Assert.assertSame(ndArray, result);
+            Assertions.assertSame(ndArray, result);
         } else {
             // number with zero-dim
             ndArray = manager.create(new Shape(0, 2, 3));

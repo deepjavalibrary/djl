@@ -355,7 +355,8 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     @Override
     public void copyTo(NDArray ndArray) {
         if (!(ndArray instanceof MxNDArray)) {
-            throw new IllegalArgumentException("Only MxNDArray is supported.");
+            ndArray.set(toByteBuffer());
+            return;
         }
         Shape inShape = getShape();
         Shape destShape = ndArray.getShape();

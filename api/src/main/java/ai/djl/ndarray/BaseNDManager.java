@@ -80,7 +80,7 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray create(Shape shape, DataType dataType) {
-        throw new UnsupportedOperationException("Not supported!");
+        return zeros(shape, dataType);
     }
 
     /** {@inheritDoc} */

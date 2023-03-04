@@ -95,17 +95,18 @@ public final class Assertions {
         }
     }
 
-    public static void assertInPlaceEquals(NDArray actual, NDArray expected, NDArray original) {
-        Assert.assertEquals(
-                actual, expected, getDefaultErrorMessage(actual, expected, "Assert Equal failed!"));
-        if (actual instanceof NDArrayAdapter || original instanceof NDArrayAdapter) {
+    public static void assertSame(NDArray actual, NDArray expected) {
+        if (actual instanceof NDArrayAdapter || expected instanceof NDArrayAdapter) {
             // NDArrayAdapter doesn't support inplace operation
             return;
         }
-        Assert.assertSame(
-                original,
-                actual,
-                getDefaultErrorMessage(original, expected, "Assert Inplace failed!"));
+        Assert.assertSame(actual, expected);
+    }
+
+    public static void assertInPlaceEquals(NDArray actual, NDArray expected, NDArray original) {
+        Assert.assertEquals(
+                actual, expected, getDefaultErrorMessage(actual, expected, "Assert Equal failed!"));
+        assertSame(original, actual);
     }
 
     public static void assertInPlaceAlmostEquals(
@@ -116,9 +117,6 @@ public final class Assertions {
     public static void assertInPlaceAlmostEquals(
             NDArray actual, NDArray expected, NDArray original, double rtol, double atol) {
         assertAlmostEquals(actual, expected, rtol, atol);
-        Assert.assertSame(
-                original,
-                actual,
-                getDefaultErrorMessage(original, expected, "Assert Inplace failed!"));
+        assertSame(original, actual);
     }
 }

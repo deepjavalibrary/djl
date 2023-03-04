@@ -164,6 +164,8 @@ public class LgbmNDArray extends NDArrayAdapter {
         floatData = array.floatData;
         doubleData = array.doubleData;
         typeConstant = array.typeConstant;
+        shape = array.shape;
+        dataType = array.dataType;
         replaced.close();
     }
 
