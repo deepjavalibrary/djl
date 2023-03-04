@@ -7,7 +7,7 @@ configurations {
 dependencies {
     api "org.bytedeco:javacpp:${javacpp_version}"
     api "com.google.protobuf:protobuf-java:${protobuf_version}"
-    api "org.tensorflow:tensorflow-core-api:0.4.2"
+    api "org.tensorflow:tensorflow-core-api:0.5.0"
 
     exclusion "org.bytedeco:javacpp:${javacpp_version}"
     exclusion "com.google.protobuf:protobuf-java:${protobuf_version}"
@@ -19,6 +19,7 @@ jar {
             it.isDirectory() ? it : zipTree(it)
         }
     }
+    exclude "module-info.class"
 }
 
 publishing {
