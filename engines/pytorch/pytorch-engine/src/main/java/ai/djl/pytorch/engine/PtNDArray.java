@@ -333,12 +333,6 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public void copyTo(NDArray array) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void attach(NDManager manager) {
         detach();
         this.manager = (PtNDManager) manager;

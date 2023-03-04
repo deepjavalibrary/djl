@@ -269,12 +269,6 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
-    public void copyTo(NDArray ndArray) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray duplicate() {
         return manager.opExecutor("DeepCopy").addInput(this).buildSingletonOrThrow();
     }

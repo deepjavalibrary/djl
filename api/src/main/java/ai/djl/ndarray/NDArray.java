@@ -773,7 +773,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      *
      * @param array this {@code NDArray} prepared to be copied to
      */
-    void copyTo(NDArray array);
+    default void copyTo(NDArray array) {
+        array.set(toByteBuffer());
+    }
 
     /**
      * Returns a copy of this {@code NDArray}.
