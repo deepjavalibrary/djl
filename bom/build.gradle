@@ -1,8 +1,3 @@
-import org.w3c.dom.Document
-import org.w3c.dom.Element
-import org.w3c.dom.Node
-import org.w3c.dom.NodeList
-
 plugins {
     id "java-platform"
     id "maven-publish"
@@ -22,34 +17,63 @@ dependencies {
         api "ai.djl.android:core:${version}"
         api "ai.djl.android:onnxruntime:${version}"
         api "ai.djl.android:pytorch-native:${version}"
-        api "ai.djl.aws:aws-ai:${version}"
         api "ai.djl.audio:audio:${version}"
+        api "ai.djl.aws:aws-ai:${version}"
         api "ai.djl.fasttext:fasttext-engine:${version}"
         api "ai.djl.hadoop:hadoop:${version}"
         api "ai.djl.huggingface:tokenizers:${version}"
         api "ai.djl.ml.lightgbm:lightgbm:${version}"
-        api "ai.djl.ml.xgboost:xgboost:${version}"
         api "ai.djl.ml.xgboost:xgboost-gpu:${version}"
+        api "ai.djl.ml.xgboost:xgboost:${version}"
         api "ai.djl.mxnet:mxnet-engine:${version}"
         api "ai.djl.mxnet:mxnet-model-zoo:${version}"
-        api "ai.djl.opencv:opencv:${version}"
+        api "ai.djl.mxnet:mxnet-native-cu102mkl:linux-x86_64:${mxnet_version}"
+        api "ai.djl.mxnet:mxnet-native-cu112mkl:linux-x86_64:${mxnet_version}"
+        api "ai.djl.mxnet:mxnet-native-mkl:linux-x86_64:${mxnet_version}"
+        api "ai.djl.mxnet:mxnet-native-mkl:osx-x86_64:${mxnet_version}"
+        api "ai.djl.mxnet:mxnet-native-mkl:win-x86_64:${mxnet_version}"
         api "ai.djl.onnxruntime:onnxruntime-engine:${version}"
+        api "ai.djl.opencv:opencv:${version}"
         api "ai.djl.paddlepaddle:paddlepaddle-engine:${version}"
         api "ai.djl.paddlepaddle:paddlepaddle-model-zoo:${version}"
+        api "ai.djl.paddlepaddle:paddlepaddle-native-cpu:linux-x86_64:${paddlepaddle_version}"
+        api "ai.djl.paddlepaddle:paddlepaddle-native-cpu:osx-x86_64:${paddlepaddle_version}"
+        api "ai.djl.paddlepaddle:paddlepaddle-native-cpu:win-x86_64:${paddlepaddle_version}"
+        api "ai.djl.paddlepaddle:paddlepaddle-native-cu102:linux-x86_64:${paddlepaddle_version}"
+        api "ai.djl.paddlepaddle:paddlepaddle-native-cu110:win-x86_64:${paddlepaddle_version}"
+        api "ai.djl.paddlepaddle:paddlepaddle-native-cu112:linux-x86_64:${paddlepaddle_version}"
         api "ai.djl.python:python:${version}"
         api "ai.djl.pytorch:pytorch-engine:${version}"
         api "ai.djl.pytorch:pytorch-jni:${pytorch_version}-${version}"
         api "ai.djl.pytorch:pytorch-model-zoo:${version}"
+        api "ai.djl.pytorch:pytorch-native-cpu-precxx11:linux-aarch64:${pytorch_version}"
+        api "ai.djl.pytorch:pytorch-native-cpu-precxx11:linux-x86_64:${pytorch_version}"
+        api "ai.djl.pytorch:pytorch-native-cpu:linux-x86_64:${pytorch_version}"
+        api "ai.djl.pytorch:pytorch-native-cpu:osx-aarch64:${pytorch_version}"
+        api "ai.djl.pytorch:pytorch-native-cpu:osx-x86_64:${pytorch_version}"
+        api "ai.djl.pytorch:pytorch-native-cpu:win-x86_64:${pytorch_version}"
+        api "ai.djl.pytorch:pytorch-native-cu102:linux-x86_64:${pytorch_version}"
+        api "ai.djl.pytorch:pytorch-native-cu117-precxx11:linux-x86_64:${pytorch_version}"
+        api "ai.djl.pytorch:pytorch-native-cu117:linux-x86_64:${pytorch_version}"
+        api "ai.djl.pytorch:pytorch-native-cu117:win-x86_64:${pytorch_version}"
         api "ai.djl.sentencepiece:sentencepiece:${version}"
+        api "ai.djl.spark:spark:${version}"
         api "ai.djl.tablesaw:tablesaw:${version}"
         api "ai.djl.tensorflow:tensorflow-api:${version}"
         api "ai.djl.tensorflow:tensorflow-engine:${version}"
         api "ai.djl.tensorflow:tensorflow-model-zoo:${version}"
+        api "ai.djl.tensorflow:tensorflow-native-cpu:linux-x86_64:${tensorflow_version}"
+        api "ai.djl.tensorflow:tensorflow-native-cpu:osx-x86_64:${tensorflow_version}"
+        api "ai.djl.tensorflow:tensorflow-native-cpu:win-x86_64:${tensorflow_version}"
+        api "ai.djl.tensorflow:tensorflow-native-cu113:linux-x86_64:${tensorflow_version}"
+        api "ai.djl.tensorflow:tensorflow-native-cu113:win-x86_64:${tensorflow_version}"
         api "ai.djl.tensorrt:tensorrt:${version}"
         api "ai.djl.tflite:tflite-engine:${version}"
+        api "ai.djl.tflite:tflite-native-cpu:linux-x86_64:${tflite_version}"
+        api "ai.djl.tflite:tflite-native-cpu:osx-x86_64:${tflite_version}"
         api "ai.djl.timeseries:timeseries:${version}"
-        api "ai.djl.spark:spark:${version}"
         api "com.microsoft.onnxruntime:onnxruntime:${onnxruntime_version}"
+        api "com.microsoft.onnxruntime:onnxruntime_gpu:${onnxruntime_version}"
     }
 }
 
@@ -98,40 +122,6 @@ publishing {
                         organizationUrl = "https://amazon.com"
                     }
                 }
-
-                withXml {
-                    Element pomNode = asElement()
-                    Element dm = (Element) findChild(pomNode, "dependencyManagement")
-                    Element dependencies = (Element) findChild(dm, "dependencies")
-                    addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-mkl", "osx-x86_64", "${mxnet_version}")
-                    addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-mkl", "linux-x86_64", "${mxnet_version}")
-                    addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-mkl", "win-x86_64", "${mxnet_version}")
-                    addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-cu102mkl", "linux-x86_64", "${mxnet_version}")
-                    addDependency(dependencies, "ai.djl.mxnet", "mxnet-native-cu112mkl", "linux-x86_64", "${mxnet_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cpu", "osx-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cpu", "osx-aarch64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cpu", "linux-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cpu", "win-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cpu-precxx11", "linux-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cpu-precxx11", "linux-aarch64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu102", "linux-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu117", "linux-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu117", "win-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.pytorch", "pytorch-native-cu117-precxx11", "linux-x86_64", "${pytorch_version}")
-                    addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cpu", "osx-x86_64", "${tensorflow_version}")
-                    addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cpu", "linux-x86_64", "${tensorflow_version}")
-                    addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cpu", "win-x86_64", "${tensorflow_version}")
-                    addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cu113", "linux-x86_64", "${tensorflow_version}")
-                    addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cu113", "win-x86_64", "${tensorflow_version}")
-                    addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cpu", "osx-x86_64", "${paddlepaddle_version}")
-                    addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cpu", "linux-x86_64", "${paddlepaddle_version}")
-                    addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cpu", "win-x86_64", "${paddlepaddle_version}")
-                    addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cu102", "linux-x86_64", "${paddlepaddle_version}")
-                    addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cu112", "linux-x86_64", "${paddlepaddle_version}")
-                    addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cu110", "win-x86_64", "${paddlepaddle_version}")
-                    addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "osx-x86_64", "${tflite_version}")
-                    addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "linux-x86_64", "${tflite_version}")
-                }
             }
         }
     }
@@ -158,31 +148,4 @@ publishing {
             }
         }
     }
-}
-
-def static findChild(Element element, String name) {
-    NodeList nl = element.getChildNodes()
-    for (int i = 0; i < nl.getLength(); ++i) {
-        Node node = nl.item(i)
-        if (node.getNodeName().endsWith(name)) {
-            return node
-        }
-    }
-    return null
-}
-
-def static addDependency(Element element, String groupId, String artifactId, String classifier, String version) {
-    Document doc = element.getOwnerDocument()
-    Element dep = doc.createElement("dependency")
-    addNode(doc, dep, "groupId", groupId)
-    addNode(doc, dep, "artifactId", artifactId)
-    addNode(doc, dep, "classifier", classifier)
-    addNode(doc, dep, "version", version)
-    element.appendChild(dep)
-}
-
-def static addNode(Document doc, Element element, String name, String value) {
-    Element node = doc.createElement(name)
-    node.appendChild(doc.createTextNode(value))
-    element.appendChild(node)
 }
