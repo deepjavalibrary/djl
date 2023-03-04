@@ -25,7 +25,7 @@ public interface BytesSupplier {
      */
     default byte[] getAsBytes() {
         ByteBuffer bb = toByteBuffer();
-        if (bb.hasArray() && bb.remaining() == bb.capacity()) {
+        if (bb.hasArray() && bb.remaining() == bb.array().length) {
             return bb.array();
         }
         byte[] buf = new byte[bb.remaining()];

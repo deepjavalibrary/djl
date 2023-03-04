@@ -302,7 +302,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      */
     default byte[] toByteArray() {
         ByteBuffer bb = toByteBuffer();
-        if (bb.hasArray()) {
+        if (bb.hasArray() && bb.remaining() == bb.array().length) {
             return bb.array();
         }
         byte[] buf = new byte[bb.remaining()];
