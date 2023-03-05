@@ -222,11 +222,20 @@ public class Classifications implements JsonSerializable, Ensembleable<Classific
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append('[').append(System.lineSeparator());
+        sb.append('{').append(System.lineSeparator());
+        boolean first = true;
         for (Classification item : topK(topK)) {
-            sb.append('\t').append(item).append(System.lineSeparator());
+            if (first) {
+                first = false;
+            } else {
+                sb.append(',').append(System.lineSeparator());
+            }
+            sb.append("\t\"")
+                    .append(item.getClassName())
+                    .append("\": ")
+                    .append(item.getProbability());
         }
-        sb.append(']');
+        sb.append(System.lineSeparator()).append('}');
         return sb.toString();
     }
 
