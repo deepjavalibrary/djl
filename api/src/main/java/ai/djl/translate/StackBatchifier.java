@@ -28,6 +28,8 @@ import java.util.stream.LongStream;
  */
 public class StackBatchifier implements Batchifier {
 
+    private static final long serialVersionUID = 1L;
+
     /** {@inheritDoc} */
     @Override
     public NDList batchify(NDList[] inputs) {
