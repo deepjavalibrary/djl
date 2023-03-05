@@ -27,9 +27,11 @@ import java.util.List;
  */
 public final class PaddingStackBatchifier implements Batchifier {
 
+    private static final long serialVersionUID = 1L;
+
     private List<Integer> arraysToPad;
     private List<Integer> dimsToPad;
-    private List<NDArraySupplier> paddingSuppliers;
+    private transient List<NDArraySupplier> paddingSuppliers;
     private List<Integer> paddingSizes;
     private boolean includeValidLengths;
 

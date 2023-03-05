@@ -22,6 +22,8 @@ import ai.djl.ndarray.NDManager;
  */
 public final class SimplePaddingStackBatchifier implements Batchifier {
 
+    private static final long serialVersionUID = 1L;
+
     private float padding;
 
     /**

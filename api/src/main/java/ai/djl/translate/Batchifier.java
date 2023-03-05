@@ -14,6 +14,7 @@ package ai.djl.translate;
 
 import ai.djl.ndarray.NDList;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -26,7 +27,7 @@ import java.util.stream.IntStream;
  * as axis 0. Another implementation could be a concatenated batchifier for sequence elements that
  * will concatenate the data elements along the time axis.
  */
-public interface Batchifier {
+public interface Batchifier extends Serializable {
 
     Batchifier STACK = new StackBatchifier();
 
