@@ -23,6 +23,7 @@ import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -30,7 +31,9 @@ import java.util.Map;
 import java.util.Set;
 
 /** A {@link TranslatorFactory} that creates a {@link TextEmbeddingTranslator} instance. */
-public class TextEmbeddingTranslatorFactory implements TranslatorFactory {
+public class TextEmbeddingTranslatorFactory implements TranslatorFactory, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();
 
