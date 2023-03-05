@@ -13,11 +13,11 @@ configurations {
 }
 
 dependencies {
-    download "org.tensorflow:tensorflow-core-api:0.4.2:linux-x86_64-gpu"
-    download "org.tensorflow:tensorflow-core-api:0.4.2:linux-x86_64"
-    download "org.tensorflow:tensorflow-core-api:0.4.2:macosx-x86_64"
-    download "org.tensorflow:tensorflow-core-api:0.4.2:windows-x86_64"
-    download "org.tensorflow:tensorflow-core-api:0.4.2:windows-x86_64-gpu"
+    download "org.tensorflow:tensorflow-core-api:0.5.0:linux-x86_64-gpu"
+    download "org.tensorflow:tensorflow-core-api:0.5.0:linux-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.5.0:macosx-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.5.0:windows-x86_64"
+    download "org.tensorflow:tensorflow-core-api:0.5.0:windows-x86_64-gpu"
 }
 
 task uploadTensorflowNativeLibs() {
@@ -76,6 +76,7 @@ task uploadTensorflowNativeLibs() {
         delete("${buildDir}/native/org/")
         delete("${buildDir}/native/com/")
         delete("${buildDir}/native/google/")
+        delete("${buildDir}/native/module-info.class.gz")
 
         exec {
             commandLine "aws", "s3", "sync", "${buildDir}/native/", "s3://djl-ai/publish/tensorflow-${tensorflow_version}/"
