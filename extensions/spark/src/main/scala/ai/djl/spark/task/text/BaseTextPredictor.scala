@@ -17,13 +17,13 @@ import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.sql.types.{StringType, StructField}
 
 /**
- * TextPredictor is the base class for text predictors.
+ * BaseTextPredictor is the base class for text predictors.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-abstract class TextPredictor[A, B](override val uid: String) extends BasePredictor[A, B] {
+abstract class BaseTextPredictor[A, B](override val uid: String) extends BasePredictor[A, B] {
 
-  def this() = this(Identifiable.randomUID("TextPredictor"))
+  def this() = this(Identifiable.randomUID("BaseTextPredictor"))
 
   def validateInputType(input: StructField): Unit = {
     require(input.dataType == StringType,

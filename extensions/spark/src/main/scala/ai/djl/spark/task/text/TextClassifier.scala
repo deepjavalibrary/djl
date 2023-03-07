@@ -12,26 +12,30 @@
  */
 package ai.djl.spark.task.text
 
-import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer
+import ai.djl.huggingface.translator.TextClassificationTranslatorFactory
+import ai.djl.modality.Classifications
+import ai.djl.modality.Classifications.Classification
 import org.apache.spark.ml.param.Param
 import org.apache.spark.ml.param.shared.{HasInputCol, HasOutputCol}
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, DoubleType, MapType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
+import scala.collection.mutable
+
 /**
- * TextTokenizer performs text tokenization using HuggingFace tokenizers in Spark.
+ * TextClassifier performs text classification on text.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class HuggingFaceTextTokenizer(override val uid: String) extends BaseTextPredictor[String, Array[String]]
+class TextClassifier(override val uid: String) extends BaseTextPredictor[String, Classifications]
   with HasInputCol with HasOutputCol {
 
-  def this() = this(Identifiable.randomUID("HuggingFaceTextTokenizer"))
+  def this() = this(Identifiable.randomUID("TextClassifier"))
 
-  final val tokenizer = new Param[String](this, "tokenizer", "The name of the tokenizer")
+  final val topK = new Param[Int](this, "topK", "The number of classes to return")
 
-  private var inputColIndex: Int = _
+  private var inputColIndex : Int = _
 
   /**
    * Sets the inputCol parameter.
@@ -48,22 +52,24 @@ class HuggingFaceTextTokenizer(override val uid: String) extends BaseTextPredict
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
   /**
-   * Sets the tokenizer parameter.
+   * Sets the topK parameter.
    *
    * @param value the value of the parameter
    */
-  def setTokenizer(value: String): this.type = set(tokenizer, value)
+  def setTopK(value: Int): this.type = set(topK, value)
 
   setDefault(inputClass, classOf[String])
-  setDefault(outputClass, classOf[Array[String]])
+  setDefault(outputClass, classOf[Classifications])
+  setDefault(translatorFactory, new TextClassificationTranslatorFactory())
+  setDefault(topK, 3)
 
   /**
-   * Performs sentence tokenization on the provided dataset.
+   * Performs text classification on the provided dataset.
    *
    * @param dataset input dataset
    * @return output dataset
    */
-  def tokenize(dataset: Dataset[_]): DataFrame = {
+  def classify(dataset: Dataset[_]): DataFrame = {
     transform(dataset)
   }
 
@@ -74,10 +80,18 @@ class HuggingFaceTextTokenizer(override val uid: String) extends BaseTextPredict
   }
 
   /** @inheritdoc */
-  override def transformRows(iter: Iterator[Row]): Iterator[Row] = {
-    val t = HuggingFaceTokenizer.newInstance($(tokenizer))
+  override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
+    val predictor = model.newPredictor()
     iter.map(row => {
-      Row.fromSeq(row.toSeq :+ t.tokenize(row.getString(inputColIndex)).toArray)
+      val prediction: Classifications = predictor.predict(row.getString(inputColIndex))
+      val top = mutable.LinkedHashMap[String, Double]()
+      val it: java.util.Iterator[Classification] = prediction.topK($(topK)).iterator()
+      while (it.hasNext) {
+        val t = it.next()
+        top += (t.getClassName -> t.getProbability)
+      }
+      Row.fromSeq(row.toSeq :+ Row(prediction.getClassNames.toArray,
+        prediction.getProbabilities.toArray, top))
     })
   }
 
@@ -85,7 +99,9 @@ class HuggingFaceTextTokenizer(override val uid: String) extends BaseTextPredict
   override def transformSchema(schema: StructType): StructType = {
     validateInputType(schema($(inputCol)))
     val outputSchema = StructType(schema.fields :+
-      StructField($(outputCol), ArrayType(StringType)))
+      StructField($(outputCol), StructType(Seq(StructField("class_names", ArrayType(StringType)),
+        StructField("probabilities", ArrayType(DoubleType)),
+        StructField("topK", MapType(StringType, DoubleType))))))
     outputSchema
   }
 }

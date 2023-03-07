@@ -24,12 +24,12 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row}
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class HuggingFaceTextEncoder(override val uid: String) extends TextPredictor[String, Encoding]
+class HuggingFaceTextEncoder(override val uid: String) extends BaseTextPredictor[String, Encoding]
   with HasInputCol with HasOutputCol {
 
   def this() = this(Identifiable.randomUID("HuggingFaceTextEncoder"))
 
-  final val name = new Param[String](this, "name", "The name of the tokenizer")
+  final val tokenizer = new Param[String](this, "tokenizer", "The name of the tokenizer")
 
   private var inputColIndex : Int = _
 
@@ -48,11 +48,11 @@ class HuggingFaceTextEncoder(override val uid: String) extends TextPredictor[Str
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
   /**
-   * Sets the name parameter.
+   * Sets the tokenizer parameter.
    *
    * @param value the value of the parameter
    */
-  def setName(value: String): this.type = set(name, value)
+  def setTokenizer(value: String): this.type = set(tokenizer, value)
 
   setDefault(inputClass, classOf[String])
   setDefault(outputClass, classOf[Encoding])
@@ -75,21 +75,20 @@ class HuggingFaceTextEncoder(override val uid: String) extends TextPredictor[Str
 
   /** @inheritdoc */
   override def transformRows(iter: Iterator[Row]): Iterator[Row] = {
-    val tokenizer = HuggingFaceTokenizer.newInstance($(name))
+    val t = HuggingFaceTokenizer.newInstance($(tokenizer))
     iter.map(row => {
-      val encoding = tokenizer.encode(row.getString(inputColIndex))
-      Row.fromSeq(row.toSeq
-        ++ Array[Any](Row(encoding.getIds, encoding.getTypeIds, encoding.getAttentionMask)))
+      val encoding = t.encode(row.getString(inputColIndex))
+      Row.fromSeq(row.toSeq :+ Row(encoding.getIds, encoding.getTypeIds, encoding.getAttentionMask))
     })
   }
 
   /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
     validateInputType(schema($(inputCol)))
-    val outputSchema = StructType(schema.fields ++
-      Array(StructField($(outputCol), StructType(Seq(StructField("ids", ArrayType(LongType)),
-        StructField("type_ids", ArrayType(LongType)),
-        StructField("attention_mask", ArrayType(LongType)))))))
+    val outputSchema = StructType(schema.fields :+ StructField($(outputCol),
+      StructType(Seq(StructField("ids", ArrayType(LongType)),
+      StructField("type_ids", ArrayType(LongType)),
+      StructField("attention_mask", ArrayType(LongType))))))
     outputSchema
   }
 }

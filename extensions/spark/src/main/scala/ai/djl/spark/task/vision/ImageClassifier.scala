@@ -14,7 +14,7 @@ package ai.djl.spark.task.vision
 
 import ai.djl.modality.Classifications
 import ai.djl.modality.Classifications.Classification
-import ai.djl.spark.translator.vision.ImageClassificationTranslator
+import ai.djl.spark.translator.vision.ImageClassificationTranslatorFactory
 import org.apache.spark.ml.param.Param
 import org.apache.spark.ml.param.shared.HasOutputCol
 import org.apache.spark.ml.util.Identifiable
@@ -28,7 +28,7 @@ import scala.collection.mutable
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class ImageClassifier(override val uid: String) extends ImagePredictor[Classifications]
+class ImageClassifier(override val uid: String) extends BaseImagePredictor[Classifications]
   with HasOutputCol {
 
   def this() = this(Identifiable.randomUID("ImageClassifier"))
@@ -50,7 +50,7 @@ class ImageClassifier(override val uid: String) extends ImagePredictor[Classific
   def setTopK(value: Int): this.type = set(topK, value)
 
   setDefault(outputClass, classOf[Classifications])
-  setDefault(translator, new ImageClassificationTranslator())
+  setDefault(translatorFactory, new ImageClassificationTranslatorFactory())
   setDefault(topK, 5)
 
   /**
@@ -65,26 +65,26 @@ class ImageClassifier(override val uid: String) extends ImagePredictor[Classific
 
   /** @inheritdoc */
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
-    val predictor = model.newPredictor($(translator))
+    val predictor = model.newPredictor()
     iter.map(row => {
-      val prediction = predictor.predict(row)
+      val prediction: Classifications = predictor.predict(row)
       val top = mutable.LinkedHashMap[String, Double]()
       val it: java.util.Iterator[Classification] = prediction.topK($(topK)).iterator()
       while (it.hasNext) {
         val t = it.next()
         top += (t.getClassName -> t.getProbability)
       }
-      Row.fromSeq(row.toSeq ++ Array[Any](Row(prediction.getClassNames.toArray,
-        prediction.getProbabilities.toArray, top)))
+      Row.fromSeq(row.toSeq :+ Row(prediction.getClassNames.toArray,
+        prediction.getProbabilities.toArray, top))
     })
   }
 
   /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
-    val outputSchema = StructType(schema.fields ++
-      Array(StructField($(outputCol), StructType(Seq(StructField("class_names", ArrayType(StringType)),
+    val outputSchema = StructType(schema.fields :+
+      StructField($(outputCol), StructType(Seq(StructField("class_names", ArrayType(StringType)),
         StructField("probabilities", ArrayType(DoubleType)),
-        StructField("topK", MapType(StringType, DoubleType)))))))
+        StructField("topK", MapType(StringType, DoubleType))))))
     outputSchema
   }
 }

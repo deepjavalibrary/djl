@@ -12,30 +12,32 @@
  */
 package ai.djl.spark.task.text
 
-import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory
-import org.apache.spark.ml.param.shared.{HasInputCol, HasOutputCol}
+import ai.djl.huggingface.translator.QuestionAnsweringTranslatorFactory
+import ai.djl.modality.nlp.qa.QAInput
+import org.apache.spark.ml.param.shared.{HasInputCols, HasOutputCol}
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types.{ArrayType, FloatType, StructField, StructType}
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 /**
- * TextEmbedder performs text embedding on text.
+ * QuestionAnswerer performs question answering on text.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class TextEmbedder(override val uid: String) extends BaseTextPredictor[String, Array[Float]]
-  with HasInputCol with HasOutputCol {
+class QuestionAnswerer(override val uid: String) extends BaseTextPredictor[QAInput, String]
+  with HasInputCols with HasOutputCol {
 
-  def this() = this(Identifiable.randomUID("TextEmbedder"))
+  def this() = this(Identifiable.randomUID("QuestionAnswerer"))
 
-  private var inputColIndex : Int = _
+  private val inputColIndices = new Array[Int](2)
 
   /**
-   * Sets the inputCol parameter.
+   * Sets the inputCols parameter. The number of columns has to be 2. The first column is the question
+   * and the second column is the context.
    *
    * @param value the value of the parameter
    */
-  def setInputCol(value: String): this.type = set(inputCol, value)
+  def setInputCols(value: Array[String]): this.type = set(inputCols, value)
 
   /**
    * Sets the outputCol parameter.
@@ -44,9 +46,9 @@ class TextEmbedder(override val uid: String) extends BaseTextPredictor[String, A
    */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  setDefault(inputClass, classOf[String])
-  setDefault(outputClass, classOf[Array[Float]])
-  setDefault(translatorFactory, new TextEmbeddingTranslatorFactory())
+  setDefault(inputClass, classOf[QAInput])
+  setDefault(outputClass, classOf[String])
+  setDefault(translatorFactory, new QuestionAnsweringTranslatorFactory())
 
   /**
    * Performs text embedding on the provided dataset.
@@ -54,13 +56,14 @@ class TextEmbedder(override val uid: String) extends BaseTextPredictor[String, A
    * @param dataset input dataset
    * @return output dataset
    */
-  def embed(dataset: Dataset[_]): DataFrame = {
+  def answer(dataset: Dataset[_]): DataFrame = {
     transform(dataset)
   }
 
   /** @inheritdoc */
   override def transform(dataset: Dataset[_]): DataFrame = {
-    inputColIndex = dataset.schema.fieldIndex($(inputCol))
+    inputColIndices(0) = dataset.schema.fieldIndex($(inputCols)(0))
+    inputColIndices(1) = dataset.schema.fieldIndex($(inputCols)(1))
     super.transform(dataset)
   }
 
@@ -68,14 +71,17 @@ class TextEmbedder(override val uid: String) extends BaseTextPredictor[String, A
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val predictor = model.newPredictor()
     iter.map(row => {
-      Row.fromSeq(row.toSeq :+ predictor.predict(row.getString(inputColIndex)))
+      Row.fromSeq(row.toSeq :+ predictor.predict(new QAInput(row.getString(inputColIndices(0)),
+        row.getString(inputColIndices(1)))))
     })
   }
 
   /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
-    validateInputType(schema($(inputCol)))
-    val outputSchema = StructType(schema.fields :+ StructField($(outputCol), ArrayType(FloatType)))
+    assert($(inputCols).length == 2, "inputCols must have 2 columns")
+    validateInputType(schema($(inputCols)(0)))
+    validateInputType(schema($(inputCols)(1)))
+    val outputSchema = StructType(schema.fields :+ StructField($(outputCol), StringType))
     outputSchema
   }
 }

@@ -18,14 +18,14 @@ import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.sql.Row
 
 /**
- * ImagePredictor is the base class for image predictors.
+ * BaseImagePredictor is the base class for image predictors.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-abstract class ImagePredictor[B](override val uid: String) extends BasePredictor[Row, B]
+abstract class BaseImagePredictor[B](override val uid: String) extends BasePredictor[Row, B]
   with HasInputCols {
 
-  def this() = this(Identifiable.randomUID("ImagePredictor"))
+  def this() = this(Identifiable.randomUID("BaseImagePredictor"))
 
   /**
    * Sets the inputCols parameter.
