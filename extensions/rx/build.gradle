@@ -1,0 +1,23 @@
+group 'ai.djl.rx'
+
+dependencies {
+    api project(":api")
+    api "io.reactivex.rxjava3:rxjava:3.1.6"
+
+    testImplementation project(":engines:pytorch:pytorch-engine")
+    testImplementation("org.testng:testng:${testng_version}") {
+        exclude group: "junit", module: "junit"
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "DJL Rx"
+                description = "DJL Rx extension"
+                url = "http://www.djl.ai/extensions/${project.name}"
+            }
+        }
+    }
+}

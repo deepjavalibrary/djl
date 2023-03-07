@@ -52,6 +52,17 @@ public class SequentialBlock extends AbstractBlock {
     }
 
     /**
+     * Constructs a copy of another {@link SequentialBlock}.
+     *
+     * @param block the source to copy
+     */
+    public SequentialBlock(SequentialBlock block) {
+        super(block);
+        version = block.version;
+        returnIntermediate = block.returnIntermediate;
+    }
+
+    /**
      * Adds an array of blocks to be executed in sequence, in order.
      *
      * @param blocks the array of blocks

@@ -30,6 +30,7 @@ include ':extensions:aws-ai'
 include ':extensions:fasttext'
 include ':extensions:hadoop'
 include ':extensions:opencv'
+include 'extensions:rx'
 include ':extensions:sentencepiece'
 include ':extensions:tokenizers'
 include ':extensions:tablesaw'
@@ -39,5 +40,4 @@ include ':integration'
 include ':model-zoo'
 include ':testing'
 include ':jacoco'
-
 

@@ -93,6 +93,17 @@ public abstract class AbstractBlock extends AbstractBaseBlock {
     }
 
     /**
+     * Constructs a copy of another {@link AbstractBlock}.
+     *
+     * @param block the block to copy
+     */
+    public AbstractBlock(AbstractBlock block) {
+        super(block);
+        children = block.children;
+        parameters = block.parameters;
+    }
+
+    /**
      * Use this to add a child block to this block.
      *
      * @param name Name of the block, must not be null.

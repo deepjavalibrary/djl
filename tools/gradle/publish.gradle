@@ -23,6 +23,7 @@ configure([
         project(':extensions:fasttext'),
         project(':extensions:hadoop'),
         project(':extensions:opencv'),
+        project(':extensions:rx'),
         project(':extensions:sentencepiece'),
         project(':extensions:tablesaw'),
         project(':extensions:timeseries'),

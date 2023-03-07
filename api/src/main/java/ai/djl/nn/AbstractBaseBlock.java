@@ -57,6 +57,18 @@ public abstract class AbstractBaseBlock implements Block {
     }
 
     /**
+     * Constructs a copy of another {@link AbstractBaseBlock}.
+     *
+     * @param block the source to copy
+     */
+    public AbstractBaseBlock(AbstractBaseBlock block) {
+        this.version = block.version;
+        this.inputShapes = block.inputShapes;
+        this.outputDataTypes = block.outputDataTypes;
+        this.inputNames = block.inputNames;
+    }
+
+    /**
      * Builds an empty block with the given version for parameter serialization.
      *
      * @param version the version to use for parameter serialization.

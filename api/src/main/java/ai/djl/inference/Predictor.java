@@ -82,10 +82,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Predictor<I, O> implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(Predictor.class);
-    private Translator<I, O> translator;
-    private long timestamp;
+    protected Translator<I, O> translator;
+    protected long timestamp;
 
-    private boolean prepared;
+    protected boolean prepared;
     private Model model;
     protected NDManager manager;
     protected Metrics metrics;
@@ -150,7 +150,7 @@ public class Predictor<I, O> implements AutoCloseable {
     @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.IdenticalCatchBranches"})
     public List<O> batchPredict(List<I> inputs) throws TranslateException {
         long begin = System.nanoTime();
-        try (PredictorContext context = new PredictorContext()) {
+        try (PredictorContext context = newPredictorContext()) {
             if (!prepared) {
                 translator.prepare(context);
                 prepared = true;
@@ -208,7 +208,7 @@ public class Predictor<I, O> implements AutoCloseable {
     }
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    private NDList processInputs(TranslatorContext ctx, List<I> inputs) throws Exception {
+    protected NDList processInputs(TranslatorContext ctx, List<I> inputs) throws Exception {
         int batchSize = inputs.size();
         NDList[] preprocessed = new NDList[batchSize];
         for (int i = 0; i < batchSize; ++i) {
@@ -218,7 +218,7 @@ public class Predictor<I, O> implements AutoCloseable {
     }
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    private List<O> processOutputs(TranslatorContext ctx, NDList list) throws Exception {
+    protected List<O> processOutputs(TranslatorContext ctx, NDList list) throws Exception {
         NDList[] unbatched = translator.getBatchifier().unbatchify(list);
         List<O> outputs = new ArrayList<>(unbatched.length);
         for (NDList output : unbatched) {
@@ -257,6 +257,10 @@ public class Predictor<I, O> implements AutoCloseable {
         }
     }
 
+    protected PredictorContext newPredictorContext() {
+        return new PredictorContext();
+    }
+
     /** {@inheritDoc} */
     @Override
     public void close() {
@@ -276,7 +280,7 @@ public class Predictor<I, O> implements AutoCloseable {
         super.finalize();
     }
 
-    private class PredictorContext implements TranslatorContext {
+    protected class PredictorContext implements TranslatorContext {
 
         private NDManager ctxManager;
         private Map<String, Object> attachments;
