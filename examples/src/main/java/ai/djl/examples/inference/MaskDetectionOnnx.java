@@ -23,7 +23,6 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,14 +38,14 @@ import java.nio.file.Paths;
  * href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/object_detection.md">doc</a>
  * for information about this example.
  */
-public final class ObjectDetection {
+public final class MaskDetectionOnnx {
 
-    private static final Logger logger = LoggerFactory.getLogger(ObjectDetection.class);
+    private static final Logger logger = LoggerFactory.getLogger(MaskDetectionOnnx.class);
 
-    private ObjectDetection() {}
+    private MaskDetectionOnnx() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        DetectedObjects detection = ObjectDetection.predict();
+        DetectedObjects detection = MaskDetectionOnnx.predict();
         logger.info("{}", detection);
     }
 
