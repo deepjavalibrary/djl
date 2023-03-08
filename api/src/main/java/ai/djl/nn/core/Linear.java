@@ -113,9 +113,9 @@ public class Linear extends AbstractBlock {
     protected void beforeInitialize(Shape... inputShapes) {
         super.beforeInitialize(inputShapes);
         Preconditions.checkArgument(inputShapes.length == 1, "Linear block only support 1 input");
-        Shape inputShape = inputShapes[0];
-        inputFeatures = inputShape.get(inputShape.dimension() - 1);
-        this.inputShape = inputShape.slice(0, inputShape.dimension() - 1);
+        Shape input = inputShapes[0];
+        inputFeatures = input.get(input.dimension() - 1);
+        inputShape = input.slice(0, input.dimension() - 1);
     }
 
     /** {@inheritDoc} */
@@ -165,6 +165,7 @@ public class Linear extends AbstractBlock {
                 throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
         inputShape = Shape.decode(is);
+        inputShapes = new Shape[] {inputShape};
     }
 
     /**
