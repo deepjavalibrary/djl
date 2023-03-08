@@ -58,7 +58,7 @@ public class Linear extends AbstractBlock {
 
     private long units;
     private long inputFeatures;
-
+    private Shape inputShape;
     private Parameter weight;
     private Parameter bias;
 
@@ -105,8 +105,7 @@ public class Linear extends AbstractBlock {
     @Override
     public PairList<String, Shape> describeInput() {
         return new PairList<>(
-                Collections.singletonList("linearInput"),
-                Collections.singletonList(inputShapes[0]));
+                Collections.singletonList("linearInput"), Collections.singletonList(inputShape));
     }
 
     /** {@inheritDoc} */
@@ -116,9 +115,7 @@ public class Linear extends AbstractBlock {
         Preconditions.checkArgument(inputShapes.length == 1, "Linear block only support 1 input");
         Shape inputShape = inputShapes[0];
         inputFeatures = inputShape.get(inputShape.dimension() - 1);
-        if (this.inputShapes == null) {
-            this.inputShapes = inputShapes;
-        }
+        this.inputShape = inputShape.slice(0, inputShape.dimension() - 1);
     }
 
     /** {@inheritDoc} */
@@ -136,7 +133,7 @@ public class Linear extends AbstractBlock {
     protected void saveMetadata(DataOutputStream os) throws IOException {
         os.writeLong(units);
         os.writeLong(inputFeatures);
-        os.write(inputShapes[0].getEncoded());
+        os.write(inputShape.getEncoded());
     }
 
     /** {@inheritDoc} */
@@ -167,10 +164,7 @@ public class Linear extends AbstractBlock {
             default:
                 throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
-        if (inputShapes == null) {
-            // Load inputShapes from parameter file if Block has not been initialized
-            inputShapes = new Shape[] {Shape.decode(is)};
-        }
+        inputShape = Shape.decode(is);
     }
 
     /**
