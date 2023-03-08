@@ -175,13 +175,13 @@ public abstract class AbstractBaseBlock implements Block {
     @Override
     public void initialize(NDManager manager, DataType dataType, Shape... inputShapes) {
         beforeInitialize(inputShapes);
-        // block has inputShape and params have arrays not null
+        // Block inputShape is null or params arrays are null
         if (!isInitialized()) {
-            // set the params' shape to be inputShapes
+            // Set the shape of parameter to be inputShapes
             prepare(inputShapes);
         }
         for (Parameter parameter : getDirectParameters().values()) {
-            // attach arrays to params if params are null; requires gradient
+            // Attach arrays to params if params are null; set require gradient if required
             parameter.initialize(manager, dataType);
         }
         initializeChildBlocks(manager, dataType, inputShapes);

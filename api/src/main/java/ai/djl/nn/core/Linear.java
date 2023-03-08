@@ -59,8 +59,6 @@ public class Linear extends AbstractBlock {
     private long units;
     private long inputFeatures;
 
-    private Shape inputShape;
-
     private Parameter weight;
     private Parameter bias;
 
@@ -107,7 +105,8 @@ public class Linear extends AbstractBlock {
     @Override
     public PairList<String, Shape> describeInput() {
         return new PairList<>(
-                Collections.singletonList("linearInput"), Collections.singletonList(inputShape));
+                Collections.singletonList("linearInput"),
+                Collections.singletonList(inputShapes[0]));
     }
 
     /** {@inheritDoc} */
@@ -115,9 +114,11 @@ public class Linear extends AbstractBlock {
     protected void beforeInitialize(Shape... inputShapes) {
         super.beforeInitialize(inputShapes);
         Preconditions.checkArgument(inputShapes.length == 1, "Linear block only support 1 input");
-        Shape input = inputShapes[0];
-        inputFeatures = input.get(input.dimension() - 1);
-        inputShape = input.slice(0, input.dimension() - 1);
+        Shape inputShape = inputShapes[0];
+        inputFeatures = inputShape.get(inputShape.dimension() - 1);
+        if (this.inputShapes == null) {
+            this.inputShapes = inputShapes;
+        }
     }
 
     /** {@inheritDoc} */
@@ -135,7 +136,7 @@ public class Linear extends AbstractBlock {
     protected void saveMetadata(DataOutputStream os) throws IOException {
         os.writeLong(units);
         os.writeLong(inputFeatures);
-        os.write(inputShape.getEncoded());
+        os.write(inputShapes[0].getEncoded());
     }
 
     /** {@inheritDoc} */
@@ -166,7 +167,10 @@ public class Linear extends AbstractBlock {
             default:
                 throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
-        inputShape = Shape.decode(is);
+        if (inputShapes == null) {
+            // Load inputShapes from parameter file if Block has not been initialized
+            inputShapes = new Shape[] {Shape.decode(is)};
+        }
     }
 
     /**
