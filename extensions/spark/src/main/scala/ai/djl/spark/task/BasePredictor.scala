@@ -13,7 +13,7 @@
 package ai.djl.spark.task
 
 import ai.djl.spark.ModelLoader
-import ai.djl.translate.Translator
+import ai.djl.translate.TranslatorFactory
 import org.apache.spark.ml.Transformer
 import org.apache.spark.ml.param.{Param, ParamMap}
 import org.apache.spark.ml.util.Identifiable
@@ -34,9 +34,10 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
   final val modelUrl = new Param[String](this, "modelUrl", "The model URL")
   final val inputClass = new Param[Class[A]](this, "inputClass", "The input class")
   final val outputClass = new Param[Class[B]](this, "outputClass", "The output class")
-  final val translator = new Param[Translator[A, B]](this, "translator", "The translator")
+  final val translatorFactory = new Param[TranslatorFactory](this, "translatorFactory", "The translator factory")
 
   protected var model: ModelLoader[A, B] = _
+  protected var arguments: java.util.Map[String, AnyRef] = _
   protected var outputSchema: StructType = _
 
   /**
@@ -72,15 +73,15 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
   def setOutputClass(value: Class[B]): this.type = set(outputClass, value)
 
   /**
-   * Sets the translator parameter.
+   * Sets the translatorFactory parameter.
    *
    * @param value the value of the parameter
    */
-  def setTranslator(value: Translator[A, B]): this.type = set(translator, value)
+  def setTranslatorFactory(value: TranslatorFactory): this.type = set(translatorFactory, value)
 
   /** @inheritdoc */
   override def transform(dataset: Dataset[_]): DataFrame = {
-    model = new ModelLoader[A, B]($(engine), $(modelUrl), $(inputClass), $(outputClass))
+    model = new ModelLoader[A, B]($(engine), $(modelUrl), $(inputClass), $(outputClass), $(translatorFactory), arguments)
     outputSchema = transformSchema(dataset.schema)
     val outputDf = dataset.toDF()
       .mapPartitions(transformRows)(RowEncoder.apply(outputSchema))
@@ -90,5 +91,11 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
   /** @inheritdoc */
   override def copy(extra: ParamMap): BasePredictor[A, B] = defaultCopy(extra)
 
+  /**
+   * Transforms the rows.
+   *
+   * @param iter the rows to transform
+   * @return the transformed rows
+   */
   protected def transformRows(iter: Iterator[Row]): Iterator[Row]
 }

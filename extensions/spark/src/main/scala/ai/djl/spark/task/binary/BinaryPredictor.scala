@@ -13,7 +13,7 @@
 package ai.djl.spark.task.binary
 
 import ai.djl.spark.task.BasePredictor
-import ai.djl.spark.translator.binary.NpBinaryTranslator
+import ai.djl.spark.translator.binary.NpBinaryTranslatorFactory
 import org.apache.spark.ml.param.Param
 import org.apache.spark.ml.param.shared.{HasInputCol, HasOutputCol}
 import org.apache.spark.ml.util.Identifiable
@@ -72,24 +72,25 @@ class BinaryPredictor(override val uid: String) extends BasePredictor[Array[Byte
 
   /** @inheritdoc */
   override def transform(dataset: Dataset[_]): DataFrame = {
-    setDefault(translator, new NpBinaryTranslator($(batchifier)))
+    arguments = new java.util.HashMap[String, AnyRef]
+    arguments.put("batchifier", $(batchifier))
+    setDefault(translatorFactory, new NpBinaryTranslatorFactory())
     inputColIndex = dataset.schema.fieldIndex($(inputCol))
     super.transform(dataset)
   }
 
   /** @inheritdoc */
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
-    val predictor = model.newPredictor($(translator))
+    val predictor = model.newPredictor()
     iter.map(row => {
-      Row.fromSeq(row.toSeq ++ Array[Any](predictor.predict(row.getAs[Array[Byte]](inputColIndex))))
+      Row.fromSeq(row.toSeq :+ predictor.predict(row.getAs[Array[Byte]](inputColIndex)))
     })
   }
 
   /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
     validateInputType(schema($(inputCol)))
-    val outputSchema = StructType(schema.fields ++
-      Array(StructField($(outputCol), BinaryType)))
+    val outputSchema = StructType(schema.fields :+ StructField($(outputCol), BinaryType))
     outputSchema
   }
 

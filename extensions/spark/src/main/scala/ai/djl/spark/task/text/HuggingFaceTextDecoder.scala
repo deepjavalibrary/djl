@@ -24,12 +24,12 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row}
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class HuggingFaceTextDecoder(override val uid: String) extends TextPredictor[Array[Long], String]
+class HuggingFaceTextDecoder(override val uid: String) extends BaseTextPredictor[Array[Long], String]
   with HasInputCol with HasOutputCol {
 
   def this() = this(Identifiable.randomUID("HuggingFaceTextDecoder"))
 
-  final val name = new Param[String](this, "name", "The name of the tokenizer")
+  final val tokenizer = new Param[String](this, "tokenizer", "The name of the tokenizer")
 
   private var inputColIndex : Int = _
 
@@ -48,11 +48,11 @@ class HuggingFaceTextDecoder(override val uid: String) extends TextPredictor[Arr
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
   /**
-   * Sets the name parameter.
+   * Sets the tokenizer parameter.
    *
    * @param value the value of the parameter
    */
-  def setName(value: String): this.type = set(name, value)
+  def setTokenizer(value: String): this.type = set(tokenizer, value)
 
   setDefault(inputClass, classOf[Array[Long]])
   setDefault(outputClass, classOf[String])
@@ -75,17 +75,16 @@ class HuggingFaceTextDecoder(override val uid: String) extends TextPredictor[Arr
 
   /** @inheritdoc */
   override def transformRows(iter: Iterator[Row]): Iterator[Row] = {
-    val tokenizer = HuggingFaceTokenizer.newInstance($(name))
+    val t = HuggingFaceTokenizer.newInstance($(tokenizer))
     iter.map(row => {
-      Row.fromSeq(row.toSeq ++ Array[Any](tokenizer.decode(row.getAs[Seq[Long]]($(inputCol)).toArray)))
+      Row.fromSeq(row.toSeq :+ t.decode(row.getAs[Seq[Long]]($(inputCol)).toArray))
     })
   }
 
   /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
     validateInputType(schema($(inputCol)))
-    val outputSchema = StructType(schema.fields ++
-      Array(StructField($(outputCol), StringType)))
+    val outputSchema = StructType(schema.fields :+ StructField($(outputCol), StringType))
     outputSchema
   }
 

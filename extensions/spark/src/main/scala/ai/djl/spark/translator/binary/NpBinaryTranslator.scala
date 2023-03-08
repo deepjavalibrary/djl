@@ -17,10 +17,8 @@ import ai.djl.translate.{Batchifier, Translator, TranslatorContext}
 
 /** A [[ai.djl.translate.Translator]] for Numpy tasks in Spark. */
 @SerialVersionUID(1L)
-class NpBinaryTranslator(val batchifier: String) extends Translator[Array[Byte], Array[Byte]]
+class NpBinaryTranslator(val batchifier: Batchifier) extends Translator[Array[Byte], Array[Byte]]
   with Serializable {
-
-  @transient private var batch: Batchifier = _
 
   /** @inheritdoc */
   override def processInput(ctx: TranslatorContext, input: Array[Byte]): NDList = {
@@ -33,10 +31,5 @@ class NpBinaryTranslator(val batchifier: String) extends Translator[Array[Byte],
   }
 
   /** @inheritdoc */
-  override def getBatchifier: Batchifier = {
-    if (batch == null) {
-      batch = Batchifier.fromString(batchifier)
-    }
-    batch
-  }
+  override def getBatchifier: Batchifier = batchifier
 }

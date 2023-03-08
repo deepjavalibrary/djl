@@ -15,7 +15,7 @@ package ai.djl.spark
 import ai.djl.inference.Predictor
 import ai.djl.repository.zoo.{Criteria, ZooModel}
 import ai.djl.training.util.ProgressBar
-import ai.djl.translate.Translator
+import ai.djl.translate.TranslatorFactory
 
 import java.io.Serializable
 
@@ -26,7 +26,8 @@ import java.io.Serializable
  * @param outputClass The output class
  */
 @SerialVersionUID(1L)
-class ModelLoader[A, B](val engine: String, val url: String, val inputClass : Class[A], val outputClass : Class[B])
+class ModelLoader[A, B](val engine: String, val url: String, val inputClass: Class[A], val outputClass: Class[B],
+                        var translatorFactory: TranslatorFactory, val arguments: java.util.Map[String, AnyRef])
   extends Serializable {
 
   @transient private var model: ZooModel[A, B] = _
@@ -34,18 +35,22 @@ class ModelLoader[A, B](val engine: String, val url: String, val inputClass : Cl
   /**
    * Creates a new Predictor.
    *
-   * @param translator The translator to use for inference
    * @return an instance of `Predictor`
    */
-  def newPredictor(translator: Translator[A, B]): Predictor[A, B] = {
+  def newPredictor(): Predictor[A, B] = {
     if (model == null) {
-      val criteria = Criteria.builder
+      val builder = Criteria.builder
         .setTypes(inputClass, outputClass)
         .optEngine(engine)
         .optModelUrls(url)
-        .optTranslator(translator)
+        .optTranslatorFactory(translatorFactory)
         .optProgress(new ProgressBar)
-        .build
+
+      if (arguments != null) {
+        builder.optArguments(arguments)
+      }
+
+      val criteria = builder.build
       model = criteria.loadModel
     }
     model.newPredictor
