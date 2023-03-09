@@ -30,7 +30,8 @@ processResources {
 checkstyleMain.source = 'src/main/java'
 pmdMain.source = 'src/main/java'
 
-task jnarator(dependsOn: ":engines:mxnet:jnarator:jar") {
+tasks.register('jnarator') {
+    dependsOn ":engines:mxnet:jnarator:jar"
     outputs.dir "${project.buildDir}/generated-src"
     doLast {
         File jnaGenerator = project(":engines:mxnet:jnarator").jar.outputs.files.singleFile
@@ -72,7 +73,7 @@ def checkForUpdate(String path, String url) {
     }
 }
 
-task checkHeaderFile() {
+tasks.register('checkHeaderFile') {
     outputs.files "${project.buildDir}/mxnet_c_api.h", "${project.buildDir}/nnvm_c_api.h"
     doFirst {
         if (gradle.startParameter.offline) {

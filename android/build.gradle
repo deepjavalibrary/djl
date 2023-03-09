@@ -27,6 +27,6 @@ allprojects {
     apply from: file("${rootProject.projectDir}/../tools/gradle/android-formatter.gradle")
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }

@@ -166,7 +166,7 @@ publishing.repositories {
 
 import java.util.zip.GZIPInputStream
 
-task downloadMxnetNativeLib() {
+tasks.register('downloadMxnetNativeLib') {
     doLast {
         def url = "https://publish.djl.ai/mxnet-${VERSION}"
         def files = [

@@ -84,7 +84,7 @@ publishing {
 
 apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
-task compileJNI {
+tasks.register('compileJNI') {
     doFirst {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
                 || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
@@ -108,7 +108,7 @@ task compileJNI {
     }
 }
 
-task formatPython {
+tasks.register('formatPython') {
     doFirst {
         exec {
             commandLine "bash", "-c", "find . -name '*.py' -print0 | xargs -0 yapf --in-place"

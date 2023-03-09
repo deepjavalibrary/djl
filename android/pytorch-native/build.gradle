@@ -101,7 +101,7 @@ afterEvaluate {
 }
 
 
-task processResources {
+tasks.register('processResources') {
     doLast {
         def url = "https://publish.djl.ai/pytorch/${pytorch_version}/jnilib/${djl_version}/android"
         def abis = ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"]

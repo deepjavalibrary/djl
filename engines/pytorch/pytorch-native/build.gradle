@@ -165,13 +165,13 @@ def copyNativeLibToOutputDir(Map<String, String> fileStoreMap, String binaryRoot
     }
 }
 
-task compileAndroidJNI {
+tasks.register('compileAndroidJNI') {
     doFirst {
         downloadBuildAndroid("${VERSION}")
     }
 }
 
-task cleanJNI() {
+tasks.register('cleanJNI') {
     doFirst {
         delete "${project.projectDir}/build"
         delete "${project.projectDir}/libtorch"
@@ -180,7 +180,7 @@ task cleanJNI() {
     }
 }
 
-task compileJNI {
+tasks.register('compileJNI') {
     doFirst {
         // You have to use an environment with CUDA persets for Linux and Windows
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
@@ -260,13 +260,13 @@ publishing.repositories {
     }
 }
 
-task downloadPyTorchNativeLib() {
+tasks.register('downloadPyTorchNativeLib') {
     doLast {
         prepareNativeLib("${BINARY_ROOT}", "${VERSION}")
     }
 }
 
-task uploadS3 {
+tasks.register('uploadS3') {
     doLast {
         delete "${BINARY_ROOT}"
         prepareNativeLib("${BINARY_ROOT}", "${VERSION}")

@@ -33,7 +33,7 @@ java {
     }
 }
 
-task copyDependencies(type: Copy) {
+tasks.register('copyDependencies', Copy) {
     into "build/dependencies"
     from configurations.runtimeClasspath
 }
@@ -50,7 +50,7 @@ run {
     jvmArgs "-Xverify:none"
 }
 
-task debugEnv(type: JavaExec) {
+tasks.register('debugEnv', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     systemProperties System.getProperties()
     systemProperties.remove("user.dir")
