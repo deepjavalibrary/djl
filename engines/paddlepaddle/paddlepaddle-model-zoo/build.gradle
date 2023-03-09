@@ -11,7 +11,7 @@ dependencies {
     testRuntimeOnly project(":engines:pytorch:pytorch-jni")
 }
 
-task syncS3(type: Exec) {
+tasks.register('syncS3', Exec) {
     commandLine "sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync src/test/resources/mlrepo s3://djl-ai/mlrepo --acl public-read"
 
     standardOutput = new ByteArrayOutputStream()

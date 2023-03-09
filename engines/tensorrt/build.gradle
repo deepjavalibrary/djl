@@ -80,7 +80,7 @@ def buildJNI(String os) {
     }
 }
 
-task compileJNI {
+tasks.register('compileJNI') {
     doFirst {
         if (System.properties['os.name'].startsWith("Linux")) {
             buildJNI("linux")

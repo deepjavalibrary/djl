@@ -31,7 +31,7 @@ def downloadBuild(String os, String flavor) {
     }
 }
 
-task compileJNI {
+tasks.register('compileJNI') {
     doFirst {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("windows")) {
             downloadBuild("win", "cpu")
@@ -48,7 +48,7 @@ task compileJNI {
     }
 }
 
-task prepareNativeLibs() {
+tasks.register('prepareNativeLibs') {
     doLast {
         delete "${buildDir}/native"
 
@@ -112,7 +112,7 @@ task prepareNativeLibs() {
     }
 }
 
-task uploadS3 {
+tasks.register('uploadS3') {
     doLast {
         exec {
             commandLine "sh", "-c", "find ${buildDir}/native -type f | xargs gzip"

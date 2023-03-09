@@ -57,7 +57,7 @@ publishing {
 
 apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
-task compileJNI {
+tasks.register('compileJNI') {
     doFirst {
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("win")) {
             exec {

@@ -1,4 +1,4 @@
-task release {
+tasks.register('release') {
     doLast {
         def collection = fileTree("jupyter").filter { it.name.endsWith(".ipynb") }
         collection += files("examples/build.gradle", "examples/pom.xml")
@@ -8,7 +8,7 @@ task release {
     }
 }
 
-task staging() {
+tasks.register('staging') {
     doLast {
         if (!project.hasProperty("stagingRepo")) {
             throw new GradleException("stagingRepo property is required.")
@@ -26,7 +26,7 @@ task staging() {
     }
 }
 
-task increaseBuildVersion {
+tasks.register('increaseBuildVersion') {
     doLast {
         if (!project.hasProperty("targetVersion")) {
             throw new GradleException("targetVersion property is required.")
@@ -48,7 +48,7 @@ task increaseBuildVersion {
     }
 }
 
-task increaseFinalVersion {
+tasks.register('increaseFinalVersion') {
     doLast {
         if (!project.hasProperty("previousVersion")) {
             throw new GradleException("previousVersion property is required.")

@@ -20,7 +20,7 @@ dependencies {
     download "org.tensorflow:tensorflow-core-api:0.5.0:windows-x86_64-gpu"
 }
 
-task uploadTensorflowNativeLibs() {
+tasks.register('uploadTensorflowNativeLibs') {
     doLast {
         delete "${buildDir}/download"
         delete "${buildDir}/native"
@@ -230,7 +230,7 @@ publishing.repositories {
 
 import java.util.zip.GZIPInputStream
 
-task downloadTensorflowNativeLib() {
+tasks.register('downloadTensorflowNativeLib') {
     doLast {
         def url = "https://publish.djl.ai/tensorflow-${tensorflow_version}"
         def files = [

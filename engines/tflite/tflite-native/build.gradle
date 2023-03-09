@@ -88,14 +88,14 @@ def downloadJni(String dir) {
     }
 }
 
-task downloadTfliteNativeLib() {
+tasks.register('downloadTfliteNativeLib') {
     doLast {
         delete "${BINARY_ROOT}"
         downloadJni("${BINARY_ROOT}")
     }
 }
 
-task uploadS3 {
+tasks.register('uploadS3') {
     doLast {
         delete "${BINARY_ROOT}"
         downloadJni("${BINARY_ROOT}")
