@@ -96,7 +96,9 @@ task checkHeaderFile() {
     }
 }
 
+sourcesJar.dependsOn(jnarator)
 compileJava.dependsOn(jnarator)
+javadoc.dependsOn(jnarator)
 
 publishing {
     publications {
