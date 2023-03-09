@@ -58,9 +58,7 @@ public class Linear extends AbstractBlock {
 
     private long units;
     private long inputFeatures;
-
     private Shape inputShape;
-
     private Parameter weight;
     private Parameter bias;
 
@@ -167,6 +165,7 @@ public class Linear extends AbstractBlock {
                 throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
         }
         inputShape = Shape.decode(is);
+        inputShapes = new Shape[] {inputShape};
     }
 
     /**
