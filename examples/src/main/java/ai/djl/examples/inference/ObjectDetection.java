@@ -51,7 +51,7 @@ public final class ObjectDetection {
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        Path imageFile = Paths.get("/Users/fenkexin/Desktop/djl/examples/src/test/resources/dog_bike_car.jpg");
+        Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
         String backbone;
@@ -65,8 +65,7 @@ public final class ObjectDetection {
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
-//                        .optFilter("backbone", backbone)
-                        .optEngine("OnnxRuntime")
+                        .optFilter("backbone", backbone)
                         .optProgress(new ProgressBar())
                         .build();
 
@@ -86,7 +85,7 @@ public final class ObjectDetection {
 
         img.drawBoundingBoxes(detection);
 
-        Path imagePath = outputDir.resolve("detected-dog_bike_car.png");
+        Path imagePath = outputDir.resolve("dog_bike_car.png");
         // OpenJDK can't save jpg with alpha channel
         img.save(Files.newOutputStream(imagePath), "png");
         logger.info("Detected objects image has been saved in: {}", imagePath);
