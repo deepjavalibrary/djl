@@ -1,15 +1,15 @@
 # Mask detection with YOLOv5 - training and inference
 
-[YOLOv5s]() is a powerful model for object detection tasks. With the transfer learning technique, a pre-trained YOLOv5 model can be utilized in various customized object detection tasks with relatively small dataset. 
+[YOLOv5]() is a powerful model for object detection tasks. With the transfer learning technique, a pre-trained YOLOv5 model can be utilized in various customized object detection tasks with relatively small dataset. 
 
 In this example, we apply it on the [Face Mask Detection dataset](https://www.kaggle.com/datasets/andrewmvd/face-mask-detection?select=images). We first train the YOLOv5s model in Python, with the help of [ATLearn](), a python transfer learning toolkit.
 Then, the model is saved as an ONNX model, which is then imported into DJL for inference. We apply it on the mask wearing detection task. The source code can be found at [MaskDetectionOnnx.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/MaskDetectionOnnx.java)
 
 ## The training part in ATLearn
 
-We initially attempted to import a pretrained YOLOv5 into DJL, and fine-tune it with the [Face Mask Detection dataset](https://www.kaggle.com/datasets/andrewmvd/face-mask-detection?select=images), similar to [Train ResNet for Fruit Freshness Classficiation](./train_transfer_fresh_fruit.md). However, YOLOv5 can not be converted to a PyTorch traced model, due to its data-dependent execution flow (see this [ref](https://discuss.pytorch.org/t/yolov5-convert-to-torchscript/150180)), whick blocks the idea of retraining a Yolov5 model in DJL. So the training part is entirely in python.
+We initially attempted to import a pretrained YOLOv5 into DJL, and fine-tune it with the [Face Mask Detection dataset](https://www.kaggle.com/datasets/andrewmvd/face-mask-detection?select=images), similar to [Train ResNet for Fruit Freshness Classficiation](./train_transfer_fresh_fruit.md). However, YOLOv5 can not be converted to a PyTorch traced model, due to its data-dependent execution flow (see this [discussion](https://discuss.pytorch.org/t/yolov5-convert-to-torchscript/150180)), whick blocks the idea of retraining a Yolov5 model in DJL. So the training part is entirely in python.
 
-The retraining of YOLOv5 can be found in an example in ATLearn [example](). In this example, the YOLOv5 layers near the input are frozen while those near the output are fine-tuned with the customized data. This follows the transfer learning idea.
+The retraining of YOLOv5 can be found in an example in ATLearn: `examples/docs/face_mask_detection.md`. In this example, the YOLOv5 layers near the input are frozen while those near the output are fine-tuned with the customized data. This follows the transfer learning idea.
 
 In this example, the trained model is exported to ONNX file and is then also used for inference in python, which will serve as a benchmark.
 
@@ -22,7 +22,7 @@ To configure your development environment, follow [setup](../../docs/development
 ### Input image file
 You can find the image used in this example in the project test resource folder: `src/test/resources/maksssksksss627.png`.
 
-![dogs](../src/test/resources/maksssksksss627.png)
+![dogs](../src/test/resources/face_mask.png)
 
 ### Build the project and run
 Use the following command to run the project:
@@ -46,4 +46,4 @@ Your output should look like the following:
 
 An output image with bounding box will be saved as `build/output/detected-mask-wearing.png`:
 
-![detected-dogs](img/detected-mask-wearing.png)
+![detected-dogs](../src/test/resources/face_mask_result.png)
