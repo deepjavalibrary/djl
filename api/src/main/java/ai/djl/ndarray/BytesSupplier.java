@@ -12,11 +12,30 @@
  */
 package ai.djl.ndarray;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /** Represents a supplier of {@code byte[]}. */
 public interface BytesSupplier {
+
+    /**
+     * Return true if the {@code BytesSupplier} support chunked read.
+     *
+     * @return true if the {@code BytesSupplier} support chunked read
+     */
+    default boolean isChunked() {
+        return false;
+    }
+
+    /**
+     * Returns the {@code InputStream} if chunked reading is supported.
+     *
+     * @return the {@code InputStream}
+     */
+    default InputStream getChunkedInput() {
+        throw new UnsupportedOperationException("Trunked reading is not supported.");
+    }
 
     /**
      * Returns the {@code byte[]} presentation of the object.
