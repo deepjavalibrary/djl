@@ -1,6 +1,6 @@
 # Mask detection with YOLOv5 - training and inference
 
-[YOLOv5]() is a powerful model for object detection tasks. With the transfer learning technique, a pre-trained YOLOv5 model can be utilized in various customized object detection tasks with relatively small dataset. 
+YOLOv5 is a powerful model for object detection tasks. With the transfer learning technique, a pre-trained YOLOv5 model can be utilized in various customized object detection tasks with relatively small dataset. 
 
 In this example, we apply it on the [Face Mask Detection dataset](https://www.kaggle.com/datasets/andrewmvd/face-mask-detection?select=images). We first train the YOLOv5s model in Python, with the help of [ATLearn](), a python transfer learning toolkit.
 Then, the model is saved as an ONNX model, which is then imported into DJL for inference. We apply it on the mask wearing detection task. The source code can be found at [MaskDetectionOnnx.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/MaskDetectionOnnx.java)
