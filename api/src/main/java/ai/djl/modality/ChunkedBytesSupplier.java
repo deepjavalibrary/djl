@@ -13,26 +13,24 @@
 package ai.djl.modality;
 
 import ai.djl.ndarray.BytesSupplier;
-import ai.djl.util.Utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.time.Duration;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /** A {link BytesSupplier} that supports chunked reading. */
 public class ChunkedBytesSupplier implements BytesSupplier {
 
-    private static final long CHUNK_READ_TIMEOUT = getTimeout(); // default 2 minutes
-    private static final BytesSupplier LAST_CHUNK = BytesSupplier.wrapAsJson(null);
-
     private LinkedBlockingQueue<BytesSupplier> queue;
+    private AtomicBoolean completed;
 
     /** Constructs a new {code ChunkedBytesSupplier} instance. */
     public ChunkedBytesSupplier() {
         queue = new LinkedBlockingQueue<>();
+        completed = new AtomicBoolean();
     }
 
     /**
@@ -44,95 +42,44 @@ public class ChunkedBytesSupplier implements BytesSupplier {
     public void appendContent(byte[] data, boolean lastChunk) {
         queue.offer(BytesSupplier.wrap(data));
         if (lastChunk) {
-            queue.offer(LAST_CHUNK);
+            completed.set(true);
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean isChunked() {
-        return true;
+    /**
+     * Returns {@code true} if has more chunk.
+     *
+     * @return {@code true} if has more chunk
+     */
+    public boolean hasNext() {
+        return !completed.get() || !queue.isEmpty();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public InputStream getChunkedInput() {
-        return new InputStream() {
-
-            private byte[] current;
-            private int pos;
-            private boolean closed;
-
-            /** {@inheritDoc} */
-            @Override
-            public int read(byte[] b, int off, int len) throws IOException {
-                if (closed) {
-                    return -1;
-                }
-
-                try {
-                    if (current == null || pos >= current.length) {
-                        BytesSupplier data = queue.poll(CHUNK_READ_TIMEOUT, TimeUnit.MILLISECONDS);
-                        if (data == null) {
-                            throw new IOException("Read chunk timeout.");
-                        }
-                        if (data == LAST_CHUNK) {
-                            closed = true;
-                            return -1;
-                        }
-                        current = data.getAsBytes();
-                        pos = 0;
-                    }
-
-                    int size = Math.min(len, current.length - pos);
-                    System.arraycopy(current, pos, b, off, size);
-                    pos += size;
-                    return size;
-                } catch (InterruptedException e) {
-                    throw new IOException("Read interrupted", e);
-                }
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public int read() throws IOException {
-                if (closed) {
-                    return -1;
-                }
-
-                if (current != null && pos < current.length) {
-                    return current[pos++] & 0xff;
-                }
-                while (true) {
-                    try {
-                        BytesSupplier data = queue.poll(CHUNK_READ_TIMEOUT, TimeUnit.MILLISECONDS);
-                        if (data == null) {
-                            throw new IOException("Read chunk timeout.");
-                        }
-                        if (data == LAST_CHUNK) {
-                            closed = true;
-                            return -1;
-                        }
-                        current = data.getAsBytes();
-                        if (current.length == 0) {
-                            continue;
-                        }
-                        pos = 1;
-                        return current[0] & 0xff;
-                    } catch (InterruptedException e) {
-                        throw new IOException("Read timeout", e);
-                    }
-                }
-            }
-        };
+    /**
+     * Returns the next chunk.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the timeout argument
+     * @return the next chunk
+     * @throws InterruptedException if the thread is interrupted
+     */
+    public byte[] nextChunk(long timeout, TimeUnit unit) throws InterruptedException {
+        BytesSupplier data = queue.poll(timeout, unit);
+        if (data == null) {
+            throw new IllegalStateException("Read chunk timeout.");
+        }
+        return data.getAsBytes();
     }
 
     /** {@inheritDoc} */
     @Override
     public byte[] getAsBytes() {
-        try {
-            return Utils.toByteArray(getChunkedInput());
-        } catch (IOException e) {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            while (hasNext()) {
+                bos.write(nextChunk(1, TimeUnit.MINUTES));
+            }
+            return bos.toByteArray();
+        } catch (IOException | InterruptedException e) {
             throw new AssertionError("Failed to read BytesSupplier", e);
         }
     }
@@ -141,13 +88,5 @@ public class ChunkedBytesSupplier implements BytesSupplier {
     @Override
     public ByteBuffer toByteBuffer() {
         return ByteBuffer.wrap(getAsBytes());
-    }
-
-    private static long getTimeout() {
-        String timeOut = Utils.getEnvOrSystemProperty("CHUNK_READ_TIMEOUT");
-        if (timeOut == null) {
-            return Duration.ofSeconds(120).toMillis();
-        }
-        return Duration.ofSeconds(Integer.parseInt(timeOut)).toMillis();
     }
 }

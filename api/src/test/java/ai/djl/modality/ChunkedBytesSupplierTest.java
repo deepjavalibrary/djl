@@ -16,33 +16,30 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
 
 public class ChunkedBytesSupplierTest {
 
     @Test
     public void test() throws InterruptedException, IOException {
         ChunkedBytesSupplier supplier = new ChunkedBytesSupplier();
+        Assert.assertThrows(() -> supplier.nextChunk(1, TimeUnit.MICROSECONDS));
+
         supplier.appendContent(new byte[] {1, 2}, false);
         supplier.appendContent(new byte[] {3}, true);
-
-        Assert.assertTrue(supplier.isChunked());
 
         ByteBuffer bb = supplier.toByteBuffer();
         Assert.assertEquals(bb.array(), new byte[] {1, 2, 3});
 
-        supplier = new ChunkedBytesSupplier();
-        supplier.appendContent(new byte[0], false);
-        supplier.appendContent(new byte[] {1, 2}, true);
+        ChunkedBytesSupplier data = new ChunkedBytesSupplier();
+        data.appendContent(new byte[0], false);
+        data.appendContent(new byte[] {1, 2}, true);
 
-        InputStream is = supplier.getChunkedInput();
-        byte[] buf = new byte[2];
+        Assert.assertTrue(data.hasNext());
+        Assert.assertEquals(data.nextChunk(1, TimeUnit.MILLISECONDS).length, 0);
+        Assert.assertEquals(data.nextChunk(1, TimeUnit.MILLISECONDS), new byte[] {1, 2});
 
-        Assert.assertEquals(is.read(), 1);
-        Assert.assertEquals(is.read(), 2);
-        Assert.assertEquals(is.read(), -1);
-        Assert.assertEquals(is.read(), -1);
-        Assert.assertEquals(is.read(buf), -1);
+        Assert.assertFalse(data.hasNext());
     }
 }
