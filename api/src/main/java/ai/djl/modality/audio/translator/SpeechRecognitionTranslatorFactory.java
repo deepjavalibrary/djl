@@ -18,13 +18,16 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 /** A {@link TranslatorFactory} that creates a {@link SpeechRecognitionTranslator} instance. */
-public class SpeechRecognitionTranslatorFactory implements TranslatorFactory {
+public class SpeechRecognitionTranslatorFactory implements TranslatorFactory, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();
 

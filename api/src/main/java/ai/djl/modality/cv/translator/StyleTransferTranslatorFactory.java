@@ -18,13 +18,16 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 /** A {@link TranslatorFactory} that creates a {@link StyleTransferTranslator} instance. */
-public class StyleTransferTranslatorFactory implements TranslatorFactory {
+public class StyleTransferTranslatorFactory implements TranslatorFactory, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** {@inheritDoc} */
     @Override

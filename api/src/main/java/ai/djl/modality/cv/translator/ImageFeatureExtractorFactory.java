@@ -17,10 +17,14 @@ import ai.djl.modality.cv.Image;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /** A {@link TranslatorFactory} that creates an {@link ImageClassificationTranslator}. */
-public class ImageFeatureExtractorFactory extends BaseImageTranslatorFactory<byte[]> {
+public class ImageFeatureExtractorFactory extends BaseImageTranslatorFactory<byte[]>
+        implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** {@inheritDoc} */
     @Override
