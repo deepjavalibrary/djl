@@ -82,8 +82,12 @@ class HuggingFaceTextTokenizer(override val uid: String) extends BaseTextPredict
   }
 
   /** @inheritdoc */
+  def validateInputType(schema: StructType): Unit = {
+    validateType(schema($(inputCol)), StringType)
+  }
+
+  /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
-    validateInputType(schema($(inputCol)))
     val outputSchema = StructType(schema.fields :+
       StructField($(outputCol), ArrayType(StringType)))
     outputSchema

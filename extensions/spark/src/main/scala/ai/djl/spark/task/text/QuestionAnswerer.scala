@@ -77,10 +77,14 @@ class QuestionAnswerer(override val uid: String) extends BaseTextPredictor[QAInp
   }
 
   /** @inheritdoc */
-  override def transformSchema(schema: StructType): StructType = {
+  def validateInputType(schema: StructType): Unit = {
     assert($(inputCols).length == 2, "inputCols must have 2 columns")
-    validateInputType(schema($(inputCols)(0)))
-    validateInputType(schema($(inputCols)(1)))
+    validateType(schema($(inputCols)(0)), StringType)
+    validateType(schema($(inputCols)(1)), StringType)
+  }
+
+  /** @inheritdoc */
+  override def transformSchema(schema: StructType): StructType = {
     val outputSchema = StructType(schema.fields :+ StructField($(outputCol), StringType))
     outputSchema
   }

@@ -14,7 +14,6 @@ package ai.djl.spark.task.text
 
 import ai.djl.spark.task.BasePredictor
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types.{StringType, StructField}
 
 /**
  * BaseTextPredictor is the base class for text predictors.
@@ -24,9 +23,4 @@ import org.apache.spark.sql.types.{StringType, StructField}
 abstract class BaseTextPredictor[A, B](override val uid: String) extends BasePredictor[A, B] {
 
   def this() = this(Identifiable.randomUID("BaseTextPredictor"))
-
-  def validateInputType(input: StructField): Unit = {
-    require(input.dataType == StringType,
-      s"Input column ${input.name} type must be StringType but got ${input.dataType}.")
-  }
 }

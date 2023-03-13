@@ -18,7 +18,7 @@ import org.apache.spark.ml.Transformer
 import org.apache.spark.ml.param.{Param, ParamMap}
 import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
-import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.types.{DataType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 /**
@@ -34,10 +34,12 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
   final val modelUrl = new Param[String](this, "modelUrl", "The model URL")
   final val inputClass = new Param[Class[A]](this, "inputClass", "The input class")
   final val outputClass = new Param[Class[B]](this, "outputClass", "The output class")
+  final val batchifier = new Param[String](this, "batchifier",
+    "The batchifier. Valid values include none (default), stack, and padding.")
   final val translatorFactory = new Param[TranslatorFactory](this, "translatorFactory", "The translator factory")
 
   protected var model: ModelLoader[A, B] = _
-  protected var arguments: java.util.Map[String, AnyRef] = _
+  protected var arguments: java.util.Map[String, AnyRef] = new java.util.HashMap[String, AnyRef]
   protected var outputSchema: StructType = _
 
   /**
@@ -47,16 +49,12 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
    */
   def setEngine(value: String): this.type = set(engine, value)
 
-  setDefault(engine, null)
-
   /**
    * Sets the modelUrl parameter.
    *
    * @param value the value of the parameter
    */
   def setModelUrl(value: String): this.type = set(modelUrl, value)
-
-  setDefault(modelUrl, null)
 
   /**
    * Sets the input class.
@@ -73,15 +71,29 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
   def setOutputClass(value: Class[B]): this.type = set(outputClass, value)
 
   /**
+   * Sets the batchifier parameter.
+   *
+   * @param value the value of the parameter
+   */
+  def setBatchifier(value: String): this.type = set(batchifier, value)
+
+  /**
    * Sets the translatorFactory parameter.
    *
    * @param value the value of the parameter
    */
   def setTranslatorFactory(value: TranslatorFactory): this.type = set(translatorFactory, value)
 
+  setDefault(engine, null)
+  setDefault(modelUrl, null)
+  setDefault(batchifier, "none")
+
   /** @inheritdoc */
   override def transform(dataset: Dataset[_]): DataFrame = {
-    model = new ModelLoader[A, B]($(engine), $(modelUrl), $(inputClass), $(outputClass), $(translatorFactory), arguments)
+    arguments.put("batchifier", $(batchifier))
+    model = new ModelLoader[A, B]($(engine), $(modelUrl), $(inputClass), $(outputClass), $(translatorFactory),
+      arguments)
+    validateInputType(dataset.schema)
     outputSchema = transformSchema(dataset.schema)
     val outputDf = dataset.toDF()
       .mapPartitions(transformRows)(RowEncoder.apply(outputSchema))
@@ -98,4 +110,22 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
    * @return the transformed rows
    */
   protected def transformRows(iter: Iterator[Row]): Iterator[Row]
+
+  /**
+   * Validate input type.
+   *
+   * @param schema the schema to validate
+   */
+  def validateInputType(schema: StructType): Unit
+
+  /**
+   * Validate data type.
+   *
+   * @param field the field to validate
+   * @param tp the expected type
+   */
+  def validateType(field: StructField, tp: DataType): Unit = {
+    require(field.dataType == tp,
+      s"Input column ${field.name} type must be ${tp} but got ${field.dataType}.")
+  }
 }

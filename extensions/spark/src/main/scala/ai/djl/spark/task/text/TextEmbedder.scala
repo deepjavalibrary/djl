@@ -15,7 +15,7 @@ package ai.djl.spark.task.text
 import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory
 import org.apache.spark.ml.param.shared.{HasInputCol, HasOutputCol}
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types.{ArrayType, FloatType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, FloatType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 /**
@@ -73,8 +73,12 @@ class TextEmbedder(override val uid: String) extends BaseTextPredictor[String, A
   }
 
   /** @inheritdoc */
+  def validateInputType(schema: StructType): Unit = {
+    validateType(schema($(inputCol)), StringType)
+  }
+
+  /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
-    validateInputType(schema($(inputCol)))
     val outputSchema = StructType(schema.fields :+ StructField($(outputCol), ArrayType(FloatType)))
     outputSchema
   }

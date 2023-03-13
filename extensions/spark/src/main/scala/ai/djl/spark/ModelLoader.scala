@@ -39,18 +39,14 @@ class ModelLoader[A, B](val engine: String, val url: String, val inputClass: Cla
    */
   def newPredictor(): Predictor[A, B] = {
     if (model == null) {
-      val builder = Criteria.builder
+      val criteria = Criteria.builder
         .setTypes(inputClass, outputClass)
         .optEngine(engine)
         .optModelUrls(url)
         .optTranslatorFactory(translatorFactory)
         .optProgress(new ProgressBar)
-
-      if (arguments != null) {
-        builder.optArguments(arguments)
-      }
-
-      val criteria = builder.build
+        .optArguments(arguments)
+        .build
       model = criteria.loadModel
     }
     model.newPredictor
