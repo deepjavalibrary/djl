@@ -42,7 +42,7 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Publish to snapshot repository
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
-        run: ./gradlew publish -Psnapshot
+        run: ./gradlew publish -Psnapshot --refresh-dependencies
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
@@ -51,7 +51,7 @@ jobs:
           DJL_STAGING: ${{ github.event.inputs.repo-id }}
       - name: Publish to staging repository
         if: ${{ github.event.inputs.mode == 'staging' }}
-        run: ./gradlew publish -Pstaging
+        run: ./gradlew publish -Pstaging --refresh-dependencies
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
