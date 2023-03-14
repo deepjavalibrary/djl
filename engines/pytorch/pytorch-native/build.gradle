@@ -403,6 +403,17 @@ flavorNames.each { flavor ->
     }
 }
 
+// Gradle 8.0 requires explicitly dependency
+tasks.withType(PublishToMavenRepository).configureEach {
+    flavorNames.each { flavor ->
+        def platformNames = file("${BINARY_ROOT}/${flavor}").list() ?: []
+
+        platformNames.each { osName ->
+            dependsOn "${flavor}-${osName}Jar"
+        }
+    }
+}
+
 clean.doFirst {
     delete "${project.projectDir}/jnilib"
     delete "${project.projectDir.getParent()}/pytorch-jni/jnilib"
