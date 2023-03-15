@@ -20,22 +20,22 @@ To configure your development environment, follow [setup](../../docs/development
 ## Run mask detection example
 
 ### Input image file
-You can find the image used in this example in the project test resource folder: `src/test/resources/maksssksksss627.png`.
+We use the following image as input:
 
-![dogs](../src/test/resources/face_mask.png)
+![mask](https://resources.djl.ai/images/face_mask_detection/face_mask.png)
 
 ### Build the project and run
 Use the following command to run the project:
 
 ```
 cd examples
-./gradlew run -Dai.djl.default_engine=PyTorch -Dmain=ai.djl.examples.inference.MaskDetectionOnnx
+./gradlew run -Dmain=ai.djl.examples.inference.MaskDetection
 ```
 
 Your output should look like the following:
 
 ```text
-[INFO ] - Detected objects image has been saved in: /Users/fenkexin/Desktop/djl/examples/build/output/mask-wearing.png
+[INFO ] - Detected objects image has been saved in: build/output/face_mask_result.png
 [INFO ] - {
 	"w/o mask": 0.8998132944107056,
 	"w/ mask": 0.8930246829986572,
@@ -46,4 +46,4 @@ Your output should look like the following:
 
 An output image with bounding box will be saved as `build/output/detected-mask-wearing.png`:
 
-![detected-dogs](../src/test/resources/face_mask_result.png)
+![detected-result](https://resources.djl.ai/images/face_mask_detection/face_mask_result.png)

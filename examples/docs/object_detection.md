@@ -45,14 +45,18 @@ An output image with bounding box will be saved as build/output/detected-dog_bik
 ![detected-dogs](img/detected-dog_bike_car.png)
 
 ## Run object detection example with other engines
-For objection detection application, other than the default model zoo with the default engine, we can also run it with other engines and model zoo. Here, we demonstrate with a pre-trained *YOLOV5s ONNX* model.
+For objection detection application, other than the default model zoo with the default engine,
+we can also run it with other engines and model zoo. Here, we demonstrate with a pre-trained *YOLOV5s ONNX* model.
 
-First, the following line needs to be added into the dependencies in `build.gradle`. Otherwise, the ONNX model zoo won't be found.
+First, the following line needs to be added into the dependencies in `build.gradle`. Otherwise,
+the ONNX model zoo won't be found.
+
 ```gradle
     runtimeOnly project(":engines:onnxruntime:onnxruntime-engine")
 ```
 
 Then use the following criteria
+
 ```java
     Criteria<Image, DetectedObjects> criteria =
             Criteria.builder()
@@ -62,4 +66,5 @@ Then use the following criteria
                     .optProgress(new ProgressBar())
                     .build();
 ```
+
 where the `optFilter` is removed and `optEngine` is specified. The rest would be the same. 

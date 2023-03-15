@@ -12,7 +12,6 @@
  */
 package ai.djl.examples.inference;
 
-import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
@@ -31,8 +30,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An example of inference using an object detection model.
@@ -53,27 +50,23 @@ public final class MaskDetection {
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        Path imageFile = Paths.get("src/test/resources/maksssksksss627.png");
-        Image img = ImageFactory.getInstance().fromFile(imageFile);
+        String imageUrl = "https://resources.djl.ai/images/face_mask_detection/face_mask.png";
+        Image img = ImageFactory.getInstance().fromUrl(imageUrl);
 
-        String modelPath = "src/test/resources/mask.onnx";
-        Map<String, Object> arguments = new ConcurrentHashMap<>();
-        arguments.put("translatorFactory", YoloV5TranslatorFactory.class.getName());
-
+        String modelUrl = "https://resources.djl.ai/demo/onnxruntime/face_mask_detection.zip";
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
-                        .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optModelUrls(modelPath)
+                        .optModelUrls(modelUrl)
                         .optEngine("OnnxRuntime")
-                        .optArguments(arguments)
+                        .optTranslatorFactory(new YoloV5TranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
 
         try (ZooModel<Image, DetectedObjects> model = criteria.loadModel()) {
             try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
                 DetectedObjects detection = predictor.predict(img);
-                String outputDir = "/Users/fenkexin/Desktop/djl/examples/build/output";
+                String outputDir = "build/output";
                 saveBoundingBoxImage(img, detection, outputDir);
                 return detection;
             }
@@ -87,7 +80,7 @@ public final class MaskDetection {
 
         img.drawBoundingBoxes(detection);
 
-        Path imagePath = outputPath.resolve("mask-wearing.png");
+        Path imagePath = outputPath.resolve("face_mask_result.png");
         // OpenJDK can't save jpg with alpha channel
         img.save(Files.newOutputStream(imagePath), "png");
         logger.info("Detected objects image has been saved in: {}", imagePath);
