@@ -17,6 +17,7 @@ import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;

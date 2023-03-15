@@ -50,9 +50,11 @@ public final class MaskDetection {
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
+        // To feed in local image, use ImageFactory.getInstance().fromFile(...)
         String imageUrl = "https://resources.djl.ai/images/face_mask_detection/face_mask.png";
         Image img = ImageFactory.getInstance().fromUrl(imageUrl);
 
+        // modelUrl can be replaced to local onnx model file
         String modelUrl = "https://resources.djl.ai/demo/onnxruntime/face_mask_detection.zip";
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
@@ -61,8 +63,8 @@ public final class MaskDetection {
                         .optEngine("OnnxRuntime")
                         .optTranslatorFactory(new YoloV5TranslatorFactory())
                         .optProgress(new ProgressBar())
-                        .optArgument("optApplyRatio", true)  // post process
-                        .optArgument("rescale", true)  // post process
+                        .optArgument("optApplyRatio", true) // post process
+                        .optArgument("rescale", true) // post process
                         .build();
 
         try (ZooModel<Image, DetectedObjects> model = criteria.loadModel()) {
