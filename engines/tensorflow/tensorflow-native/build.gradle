@@ -208,8 +208,17 @@ flavorNames.each { flavor ->
 // Gradle 8.0 requires explicitly dependency
 tasks.withType(PublishToMavenRepository).configureEach {
     flavorNames.each { flavor ->
-        def platformNames = file("${BINARY_ROOT}/${flavor}").list() ?: []
+        dependsOn "sign${flavor.substring(0, 1).toUpperCase() + flavor.substring(1)}Publication"
 
+        def platformNames = file("${BINARY_ROOT}/${flavor}").list() ?: []
+        platformNames.each { osName ->
+            dependsOn "${flavor}-${osName}Jar"
+        }
+    }
+}
+tasks.withType(Sign).configureEach {
+    flavorNames.each { flavor ->
+        def platformNames = file("${BINARY_ROOT}/${flavor}").list() ?: []
         platformNames.each { osName ->
             dependsOn "${flavor}-${osName}Jar"
         }
