@@ -1026,6 +1026,18 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray batchMatMul(NDArray other) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray xlogy(NDArray other) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray clip(Number min, Number max) {
         return getAlternativeArray().clip(min, max);
     }

@@ -1545,6 +1545,16 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
         }
     }
 
+    @Override
+    public NDArray batchMatMul(NDArray other) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public NDArray xlogy(NDArray other) {
+        throw new UnsupportedOperationException();
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray clip(Number min, Number max) {

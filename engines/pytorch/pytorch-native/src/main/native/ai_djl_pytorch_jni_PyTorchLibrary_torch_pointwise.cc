@@ -10,6 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
 #include "djl_pytorch_utils.h"
@@ -158,6 +159,26 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMatmul(
   const auto* self_ptr = reinterpret_cast<torch::Tensor*>(jself);
   const auto* other_ptr = reinterpret_cast<torch::Tensor*>(jother);
   const auto* result_ptr = new torch::Tensor(self_ptr->matmul(*other_ptr));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchBmm(
+    JNIEnv* env, jobject jthis, jlong jself, jlong jother) {
+  API_BEGIN()
+  const auto* self_ptr = reinterpret_cast<torch::Tensor*>(jself);
+  const auto* other_ptr = reinterpret_cast<torch::Tensor*>(jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->bmm(*other_ptr));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchXLogY(
+    JNIEnv* env, jobject jthis, jlong jself, jlong jother) {
+  API_BEGIN()
+  const auto* self_ptr = reinterpret_cast<torch::Tensor*>(jself);
+  const auto* other_ptr = reinterpret_cast<torch::Tensor*>(jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->xlogy(*other_ptr));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }

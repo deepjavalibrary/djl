@@ -17,6 +17,7 @@ import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Blocks;
 import ai.djl.nn.Parameter;
@@ -487,6 +488,16 @@ public class NDArrayElementArithmeticOpTest {
     }
 
     @Test
+    public void testBatchMatMul() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray lhs = manager.randomNormal(0f, 1f, new Shape(10, 5, 4), DataType.FLOAT32);
+            NDArray rhs = manager.randomNormal(0f, 1f, new Shape(10, 4, 3), DataType.FLOAT32);
+            NDArray output = lhs.batchMatMul(rhs);
+            Assert.assertEquals(output.getShape(), new Shape(10, 5, 3));
+        }
+    }
+
+    @Test
     public void testDivScalar() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray dividend = manager.create(new float[] {6, 9, 12, 15, 0});
@@ -692,6 +703,17 @@ public class NDArrayElementArithmeticOpTest {
                     manager, NDArrays::pow, (x, y) -> (float) Math.pow(x, y), false);
             testReverseScalarCornerCase(
                     manager, NDArrays::powi, (x, y) -> (float) Math.pow(x, y), true);
+        }
+    }
+
+    @Test
+    public void testXLogYNDArray() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array = manager.create(new float[] {6, 12, 2, 0});
+            NDArray other = manager.create(new float[] {3, 1, 2, 3});
+            NDArray result = array.xlogy(other);
+            NDArray expected = manager.create(new float[] {6.5917f, 0f, 1.3863f, 0f});
+            Assertions.assertAlmostEquals(result, expected);
         }
     }
 
