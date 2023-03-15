@@ -61,6 +61,8 @@ public final class MaskDetection {
                         .optEngine("OnnxRuntime")
                         .optTranslatorFactory(new YoloV5TranslatorFactory())
                         .optProgress(new ProgressBar())
+                        .optArgument("optApplyRatio", true)  // post process
+                        .optArgument("rescale", true)  // post process
                         .build();
 
         try (ZooModel<Image, DetectedObjects> model = criteria.loadModel()) {

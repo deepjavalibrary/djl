@@ -133,6 +133,7 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
             if (ArgumentsUtil.booleanValue(arguments, "rescale")) {
                 optRescaleSize(width, height);
             }
+            optApplyRatio(ArgumentsUtil.booleanValue(arguments, "optApplyRatio"));
             threshold = ArgumentsUtil.floatValue(arguments, "threshold", 0.2f);
         }
     }

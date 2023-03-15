@@ -304,8 +304,8 @@ public class BufferedImageFactory extends ImageFactory {
             g.setStroke(new BasicStroke(stroke));
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            float widthScale = (float) (image.getWidth() / 640.0);
-            float heightScale = (float) (image.getHeight() / 640.0);
+            int imageWidth = image.getWidth();
+            int imageHeight = image.getHeight();
 
             List<DetectedObjects.DetectedObject> list = detections.items();
             int k = 10;
@@ -322,13 +322,13 @@ public class BufferedImageFactory extends ImageFactory {
                 }
 
                 Rectangle rectangle = box.getBounds();
-                int x = (int) (rectangle.getX() * widthScale);
-                int y = (int) (rectangle.getY() * heightScale);
+                int x = (int) (rectangle.getX() * imageWidth);
+                int y = (int) (rectangle.getY() * imageHeight);
                 g.drawRect(
                         x,
                         y,
-                        (int) (rectangle.getWidth() * widthScale),
-                        (int) (rectangle.getHeight() * heightScale));
+                        (int) (rectangle.getWidth() * imageWidth),
+                        (int) (rectangle.getHeight() * imageHeight));
                 drawText(g, className, x, y, stroke, 4);
                 // If we have a mask instead of a plain rectangle, draw tha mask
                 if (box instanceof Mask) {
