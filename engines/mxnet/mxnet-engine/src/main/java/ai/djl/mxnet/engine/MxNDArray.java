@@ -1188,6 +1188,12 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDList unique(Integer dim, boolean sorted, boolean returnInverse, boolean returnCounts) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray logicalAnd(NDArray other) {
         // TODO switch to numpy op, although current op support zero-dim, scalar
         NDArray thisArr =

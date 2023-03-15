@@ -279,6 +279,9 @@ final class PyTorchLibrary {
 
     native long torchSqueeze(long handle, long axis);
 
+    native long[] torchUnique(
+            long handle, long dim, boolean sorted, boolean returnInverse, boolean returnCounts);
+
     native long torchStack(long[] handles, long dim);
 
     native long torchCat(long[] handles, long dim);

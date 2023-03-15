@@ -10,6 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+#include <ATen/ops/unique_dim.h>
 #include <djl/utils.h>
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
@@ -167,5 +168,28 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNonZeros(
   const torch::Tensor* result_ptr = new torch::Tensor(tensor_ptr->nonzero());
 
   return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUnique(JNIEnv* env, jobject jthis,
+    jlong jhandle, jlong jdim, jboolean jsorted, jboolean jreturn_inverse, jboolean jreturn_counts) {
+  API_BEGIN()
+  using namespace std;
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> output_tuple;
+  if (jdim < 0) {
+    // negative jdim is a code for dim=None
+    output_tuple = torch::_unique2(*tensor_ptr, jsorted, jreturn_inverse, jreturn_counts);
+  } else {
+    output_tuple = at::unique_dim(*tensor_ptr, jdim, jsorted, jreturn_inverse, jreturn_counts);
+  }
+  std::vector<jlong> jptrs;
+  jptrs.push_back(reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<0>(output_tuple))));
+  jptrs.push_back(reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<1>(output_tuple))));
+  jptrs.push_back(reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<2>(output_tuple))));
+  // Convert to jlongArray
+  jlongArray jarray = env->NewLongArray(jptrs.size());
+  env->SetLongArrayRegion(jarray, 0, jptrs.size(), jptrs.data());
+  return jarray;
   API_END_RETURN()
 }
