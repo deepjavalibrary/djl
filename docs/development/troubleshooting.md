@@ -3,7 +3,7 @@ The following are common problems you may face when using or developing DJL.
 	
 Please review this list before submitting an issue.
 
-## 1. `No deep learning engine found` exception.
+## `No deep learning engine found` exception.
 These could be due to several reasons.
 
 ```
@@ -15,12 +15,13 @@ ai.djl.engine.EngineException: No deep learning engine found.
 	at ai.djl.examples.training.TrainPikachu.main(TrainPikachu.java:72) [main/:?]
 ```
 
-For Windows 10 specifically, DJL many fail due to missing [Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
-You can install this package and reboot again to see if the issue persist. You can also check the below instruction to do further investigation.
+### Package your application with a fatjar
+This is a common error when you package your application in a fat jar. See discussion in:
+[issue #940](https://github.com/deepjavalibrary/djl/issues/940).
 
-CN: Windows 10 加载失败常常是因为缺少 Windows Visual C++ 相关扩展包而导致的。您可以通过下面Windows的步骤来修复系统缺失依赖项。
+We provided an [example project](https://github.com/deepjavalibrary/djl-demo/tree/master/development/fatjar) to show you how to distribute your application.
 
-### 1.1 Intellij Issue
+### Intellij Issue
 The error may appear after running the `./gradlew clean` command:
 This issue is caused by a mismatch between IntelliJ and the Gradle runner.
 To fix this, navigate to: `Preferences-> Build Execution Deployment -> Build Tools -> Gradle`. Then, change the `Build and running using:` option to `Gradle`.
@@ -35,7 +36,17 @@ Then, right click the resources folder and select `Rebuild<default>`.
 
 ![FAQ1](https://resources.djl.ai/images/FAQ_engine_not_found.png)
 
-### 1.3 UnsatisfiedLinkError issue
+## UnsatisfiedLinkError issue
+
+###
+
+```
+Caused by: java.lang.UnsatisfiedLinkError: /home/ubuntu/.tensorflow/cache/2.3.1-cu101-linux-x86_64/libjni$
+ensorflow.so: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `CXXABI_1.3.11' not found (required by /home/ubuntu/.te
+nsorflow/cache/2.3.1-cu101-linux-x86_64/libtensorflow.so.2)
+```
+
+
 You might see the error when DJL tries to load the native library for the engines, but some shared libraries are missing.
 Let's take the PyTorch engine as an example.
 DJL loads libtorch.dylib when creating the Engine instance.
@@ -53,6 +64,12 @@ libtorch.dylib:
 
 It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`.
 If one of them is missing, it throws an `UnsatisfiedLinkError` exception, please create an issue at `https://github.com/deepjavalibrary/djl`.
+
+For Windows specifically, DJL many fail due to missing [Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
+You can install this package and reboot again to see if the issue persist. You can also check the below instruction to do further investigation.
+
+CN: Windows 10 加载失败常常是因为缺少 Windows Visual C++ 相关扩展包而导致的。您可以通过下面Windows的步骤来修复系统缺失依赖项。
+
 
 **Windows**
 
