@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -211,5 +212,21 @@ public final class ClassLoaderUtils {
             throw new IOException("Resource not found in classpath: " + name);
         }
         return url.openStream();
+    }
+
+    /**
+     * Uses provided nativeHelper to load native library.
+     *
+     * @param nativeHelper a native helper class that loads native library
+     * @param path the native library file path
+     */
+    public static void nativeLoad(String nativeHelper, String path) {
+        try {
+            Class<?> clazz = Class.forName(nativeHelper, true, getContextClassLoader());
+            Method method = clazz.getDeclaredMethod("load", String.class);
+            method.invoke(null, path);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalArgumentException("Invalid native_helper: " + nativeHelper, e);
+        }
     }
 }
