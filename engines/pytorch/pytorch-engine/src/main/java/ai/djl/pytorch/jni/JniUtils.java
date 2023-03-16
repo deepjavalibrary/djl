@@ -806,6 +806,18 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchMatmul(ndArray1.getHandle(), ndArray2.getHandle()));
     }
 
+    public static PtNDArray bmm(PtNDArray ndArray1, PtNDArray ndArray2) {
+        return new PtNDArray(
+                ndArray1.getManager(),
+                PyTorchLibrary.LIB.torchBmm(ndArray1.getHandle(), ndArray2.getHandle()));
+    }
+
+    public static PtNDArray xlogy(PtNDArray ndArray1, PtNDArray ndArray2) {
+        return new PtNDArray(
+                ndArray1.getManager(),
+                PyTorchLibrary.LIB.torchXLogY(ndArray1.getHandle(), ndArray2.getHandle()));
+    }
+
     public static PtNDArray dot(PtNDArray ndArray1, PtNDArray ndArray2) {
         if (ndArray1.getShape().dimension() == 1) {
             return new PtNDArray(

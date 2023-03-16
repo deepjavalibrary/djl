@@ -1454,6 +1454,18 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray batchMatMul(NDArray other) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray xlogy(NDArray other) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray clip(Number min, Number max) {
         MxOpParams params = new MxOpParams();
         params.addParam("a_min", min);

@@ -593,6 +593,15 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray xlogy(NDArray other) {
+        if (isScalar() || other.isScalar()) {
+            throw new IllegalArgumentException("scalar is not allowed for xlogy()");
+        }
+        return JniUtils.xlogy(this, manager.from(other));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray addi(Number n) {
         try (NDArray number = manager.create(n)) {
             return addi(number);
@@ -1355,6 +1364,15 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             throw new IllegalArgumentException("scalar is not allowed for matMul()");
         }
         return JniUtils.matmul(this, manager.from(other));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray batchMatMul(NDArray other) {
+        if (isScalar() || other.isScalar()) {
+            throw new IllegalArgumentException("scalar is not allowed for batchMatMul()");
+        }
+        return JniUtils.bmm(this, manager.from(other));
     }
 
     /** {@inheritDoc} */

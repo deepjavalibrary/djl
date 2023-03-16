@@ -1528,6 +1528,14 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray pow(NDArray other);
 
     /**
+     * Computes this * log(other).
+     *
+     * @param other other the other {@code NDArray}
+     * @return the result {@code NDArray}
+     */
+    NDArray xlogy(NDArray other);
+
+    /**
      * Adds a number to this {@code NDArray} element-wise in place.
      *
      * <p>Examples
@@ -4291,6 +4299,14 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return the result {@code NDArray}
      */
     NDArray matMul(NDArray other);
+
+    /**
+     * Batch product matrix of this {@code NDArray} and the other {@code NDArray}.
+     *
+     * @param other the other {@code NDArray} to perform matrix product with
+     * @return the result {@code NDArray}
+     */
+    NDArray batchMatMul(NDArray other);
 
     /**
      * Clips (limit) the values in this {@code NDArray}.

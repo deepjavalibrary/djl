@@ -145,6 +145,10 @@ final class PyTorchLibrary {
 
     native long torchMatmul(long self, long other);
 
+    native long torchBmm(long self, long other);
+
+    native long torchXLogY(long self, long other);
+
     native long torchDot(long self, long other);
 
     native long torchLogicalAnd(long self, long other);
