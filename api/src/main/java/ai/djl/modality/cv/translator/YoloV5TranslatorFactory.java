@@ -18,10 +18,14 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /** An {@link TranslatorFactory} that creates a {@link YoloV5Translator} instance. */
-public class YoloV5TranslatorFactory extends ObjectDetectionTranslatorFactory {
+public class YoloV5TranslatorFactory extends ObjectDetectionTranslatorFactory
+        implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** {@inheritDoc} */
     @Override

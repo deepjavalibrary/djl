@@ -23,13 +23,17 @@ import ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * An {@link TranslatorFactory} that creates a {@link PpImageClassificationTranslatorFactory}
  * instance.
  */
-public class PpImageClassificationTranslatorFactory extends ImageClassificationTranslatorFactory {
+public class PpImageClassificationTranslatorFactory extends ImageClassificationTranslatorFactory
+        implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** {@inheritDoc} */
     @Override

@@ -18,11 +18,14 @@ import ai.djl.modality.cv.Image;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /** A {@link TranslatorFactory} that creates an {@link ImageClassificationTranslator}. */
 public class ImageClassificationTranslatorFactory
-        extends BaseImageTranslatorFactory<Classifications> {
+        extends BaseImageTranslatorFactory<Classifications> implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** {@inheritDoc} */
     @Override

@@ -19,10 +19,14 @@ import ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /** An {@link TranslatorFactory} that creates a {@link PpWordRotateTranslatorFactory} instance. */
-public class PpWordRotateTranslatorFactory extends ImageClassificationTranslatorFactory {
+public class PpWordRotateTranslatorFactory extends ImageClassificationTranslatorFactory
+        implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** {@inheritDoc} */
     @Override

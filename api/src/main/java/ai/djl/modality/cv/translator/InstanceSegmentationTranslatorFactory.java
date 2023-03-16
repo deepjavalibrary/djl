@@ -18,10 +18,14 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /** A {@link TranslatorFactory} that creates a {@link InstanceSegmentationTranslator} instance. */
-public class InstanceSegmentationTranslatorFactory extends ObjectDetectionTranslatorFactory {
+public class InstanceSegmentationTranslatorFactory extends ObjectDetectionTranslatorFactory
+        implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** {@inheritDoc} */
     @Override
