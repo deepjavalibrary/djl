@@ -14,6 +14,8 @@ package ai.djl.inference;
 
 import ai.djl.Device;
 import ai.djl.Model;
+import ai.djl.inference.streaming.StreamingBlock;
+import ai.djl.inference.streaming.StreamingTranslator;
 import ai.djl.metric.Metrics;
 import ai.djl.metric.Unit;
 import ai.djl.ndarray.LazyNDArray;
@@ -183,6 +185,70 @@ public class Predictor<I, O> implements AutoCloseable {
             List<O> ret = processOutputs(context, result);
             postProcessEnd(begin);
             return ret;
+        } catch (TranslateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new TranslateException(e);
+        }
+    }
+
+    /**
+     * Predicts an item for inference.
+     *
+     * @param input the input
+     * @return the output object defined by the user
+     * @throws TranslateException if an error occurs during prediction
+     */
+    @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.IdenticalCatchBranches"})
+    public O streamingPredict(I input) throws TranslateException {
+
+        if (!(block instanceof StreamingBlock)) {
+            throw new IllegalStateException(
+                    "streamingPredict() can only be called with a StreamingBlock");
+        }
+        StreamingBlock streamingBlock = (StreamingBlock) block;
+
+        if (!(translator instanceof StreamingTranslator)) {
+            throw new IllegalStateException(
+                    "streamingPredict() can only be called with a StreamingTranslator");
+        }
+        StreamingTranslator<I, O> streamingTranslator = (StreamingTranslator<I, O>) translator;
+
+        try {
+            PredictorContext context = new PredictorContext();
+            if (!prepared) {
+                translator.prepare(context);
+                prepared = true;
+            }
+            Batchifier batchifier = translator.getBatchifier();
+            if (batchifier == null) {
+                NDList ndList = translator.processInput(context, input);
+
+                return streamingTranslator.processStreamOutput(
+                        context,
+                        streamingBlock
+                                .forwardStream(parameterStore, ndList, false)
+                                .onClose(context::close));
+            }
+
+            // For the batched case, need to create singleton batch and unbatchify singleton
+            NDList inputBatch = processInputs(context, Collections.singletonList(input));
+            return streamingTranslator.processStreamOutput(
+                    context,
+                    streamingBlock
+                            .forwardStream(parameterStore, inputBatch, false)
+                            .map(
+                                    result -> {
+                                        NDList[] unbatched =
+                                                translator.getBatchifier().unbatchify(result);
+                                        if (unbatched.length != 1) {
+                                            throw new IllegalStateException(
+                                                    "Unexpected number of outputs from model");
+                                        }
+                                        return unbatched[0];
+                                    })
+                            .onClose(context::close));
+
         } catch (TranslateException e) {
             throw e;
         } catch (Exception e) {
