@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference.whisper;
+package ai.djl.audio.translator;
 
 import ai.djl.audio.processor.AudioProcessor;
 import ai.djl.audio.processor.LogMelSpectrogram;
@@ -22,6 +22,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.translate.NoBatchifyTranslator;
+import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 
@@ -37,11 +38,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A {@link Translator} that process the {@link Audio} into {@link String} to get a text translation
+ * of the audio.
+ */
 public class WhisperTranslator implements NoBatchifyTranslator<Audio, String> {
 
     private List<AudioProcessor> processors;
     private Vocabulary vocabulary;
 
+    /** Constructs a new instance of {@code WhisperTranslator}. */
     public WhisperTranslator() {
         processors = new ArrayList<>();
     }

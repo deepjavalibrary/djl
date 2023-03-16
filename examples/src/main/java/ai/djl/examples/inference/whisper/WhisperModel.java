@@ -13,6 +13,7 @@
 package ai.djl.examples.inference.whisper;
 
 import ai.djl.ModelException;
+import ai.djl.audio.translator.WhisperTranslatorFactory;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.audio.Audio;
 import ai.djl.modality.audio.AudioFactory;
@@ -37,7 +38,7 @@ public class WhisperModel implements AutoCloseable {
                         .optModelUrls(
                                 "https://resources.djl.ai/demo/pytorch/whisper/whisper_en.zip")
                         .optEngine("PyTorch")
-                        .optTranslator(new WhisperTranslator())
+                        .optTranslatorFactory(new WhisperTranslatorFactory())
                         .build();
         whisperModel = criteria.loadModel();
     }
