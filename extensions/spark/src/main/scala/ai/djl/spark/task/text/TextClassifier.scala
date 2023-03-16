@@ -60,8 +60,8 @@ class TextClassifier(override val uid: String) extends BaseTextPredictor[String,
 
   setDefault(inputClass, classOf[String])
   setDefault(outputClass, classOf[Classifications])
-  setDefault(translatorFactory, new TextClassificationTranslatorFactory())
   setDefault(topK, 3)
+  setDefault(translatorFactory, new TextClassificationTranslatorFactory())
 
   /**
    * Performs text classification on the provided dataset.
@@ -75,6 +75,8 @@ class TextClassifier(override val uid: String) extends BaseTextPredictor[String,
 
   /** @inheritdoc */
   override def transform(dataset: Dataset[_]): DataFrame = {
+    arguments.put("batchifier", $(batchifier))
+    arguments.put("topK", $(topK).toString)
     inputColIndex = dataset.schema.fieldIndex($(inputCol))
     super.transform(dataset)
   }
@@ -96,8 +98,12 @@ class TextClassifier(override val uid: String) extends BaseTextPredictor[String,
   }
 
   /** @inheritdoc */
+  def validateInputType(schema: StructType): Unit = {
+    validateType(schema($(inputCol)), StringType)
+  }
+
+  /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
-    validateInputType(schema($(inputCol)))
     val outputSchema = StructType(schema.fields :+
       StructField($(outputCol), StructType(Seq(StructField("class_names", ArrayType(StringType)),
         StructField("probabilities", ArrayType(DoubleType)),

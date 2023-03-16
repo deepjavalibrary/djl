@@ -13,7 +13,7 @@
 package ai.djl.spark.translator.binary
 
 import ai.djl.Model
-import ai.djl.translate.{Batchifier, Translator, TranslatorFactory}
+import ai.djl.translate.{ArgumentsUtil, Batchifier, Translator, TranslatorFactory}
 import ai.djl.util.Pair
 
 import java.lang.reflect.Type
@@ -33,7 +33,7 @@ class NpBinaryTranslatorFactory extends TranslatorFactory with Serializable {
   /** @inheritdoc */
   override def newInstance[I, O](input: Class[I], output: Class[O], model: Model,
                                  arguments: java.util.Map[String, _]): Translator[I, O] = {
-    val batchifier = arguments.get("batchifier").toString
+    val batchifier = ArgumentsUtil.stringValue(arguments, "batchifier", "none")
     if ((input eq classOf[Array[Byte]]) && (output eq classOf[Array[Byte]])) {
       return new NpBinaryTranslator(Batchifier.fromString(batchifier)).asInstanceOf[Translator[I, O]]
     }

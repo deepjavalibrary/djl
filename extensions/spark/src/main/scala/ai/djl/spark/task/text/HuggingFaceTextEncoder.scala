@@ -16,7 +16,7 @@ import ai.djl.huggingface.tokenizers.{Encoding, HuggingFaceTokenizer}
 import org.apache.spark.ml.param.Param
 import org.apache.spark.ml.param.shared.{HasInputCol, HasOutputCol}
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types.{ArrayType, LongType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, LongType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 /**
@@ -83,8 +83,12 @@ class HuggingFaceTextEncoder(override val uid: String) extends BaseTextPredictor
   }
 
   /** @inheritdoc */
+  def validateInputType(schema: StructType): Unit = {
+    validateType(schema($(inputCol)), StringType)
+  }
+
+  /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
-    validateInputType(schema($(inputCol)))
     val outputSchema = StructType(schema.fields :+ StructField($(outputCol),
       StructType(Seq(StructField("ids", ArrayType(LongType)),
       StructField("type_ids", ArrayType(LongType)),

@@ -82,14 +82,13 @@ class HuggingFaceTextDecoder(override val uid: String) extends BaseTextPredictor
   }
 
   /** @inheritdoc */
-  override def transformSchema(schema: StructType): StructType = {
-    validateInputType(schema($(inputCol)))
-    val outputSchema = StructType(schema.fields :+ StructField($(outputCol), StringType))
-    outputSchema
+  def validateInputType(schema: StructType): Unit = {
+    validateType(schema($(inputCol)), ArrayType(LongType))
   }
 
-  override def validateInputType(input: StructField): Unit = {
-    require(input.dataType == ArrayType(LongType),
-      s"Input column ${input.name} type must be ArrayType but got ${input.dataType}.")
+  /** @inheritdoc */
+  override def transformSchema(schema: StructType): StructType = {
+    val outputSchema = StructType(schema.fields :+ StructField($(outputCol), StringType))
+    outputSchema
   }
 }
