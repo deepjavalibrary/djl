@@ -18,7 +18,7 @@ import ai.djl.modality.cv.translator.SemanticSegmentationTranslatorFactory
 import org.apache.spark.ml.image.ImageSchema
 import org.apache.spark.ml.param.shared.HasOutputCol
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types._
+import org.apache.spark.sql.types.{ArrayType, IntegerType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 /**
@@ -57,13 +57,16 @@ class SemanticSegmenter(override val uid: String) extends BaseImagePredictor[Cat
     iter.map(row => {
       val image = ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
         ImageSchema.getWidth(row), ImageSchema.getHeight(row))
-      Row.fromSeq(row.toSeq :+ predictor.predict(image).toJson)
+      val prediction = predictor.predict(image)
+      Row.fromSeq(row.toSeq :+ Row(prediction.getClasses.toArray, prediction.getMask))
     })
   }
 
   /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
-    val outputSchema = StructType(schema.fields :+ StructField($(outputCol), StringType))
+    val outputSchema = StructType(schema.fields :+
+      StructField($(outputCol), StructType(Seq(StructField("classes", ArrayType(StringType)),
+        StructField("mask", ArrayType(ArrayType(IntegerType)))))))
     outputSchema
   }
 }

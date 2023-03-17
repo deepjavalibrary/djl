@@ -16,7 +16,7 @@ import ai.djl.spark.task.BasePredictor
 import ai.djl.spark.translator.binary.NpBinaryTranslatorFactory
 import org.apache.spark.ml.param.shared.{HasInputCol, HasOutputCol}
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types._
+import org.apache.spark.sql.types.{BinaryType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 /**

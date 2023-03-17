@@ -13,17 +13,16 @@
 package ai.djl.spark.task.vision
 
 import ai.djl.modality.Classifications
-import ai.djl.modality.Classifications.Classification
 import ai.djl.modality.cv.ImageFactory
 import ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory
 import org.apache.spark.ml.image.ImageSchema
 import org.apache.spark.ml.param.Param
 import org.apache.spark.ml.param.shared.HasOutputCol
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types.{ArrayType, DoubleType, MapType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, DoubleType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
-import scala.collection.mutable
+import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 
 /**
  * ImageClassifier performs image classification on images.
@@ -88,13 +87,8 @@ class ImageClassifier(override val uid: String) extends BaseImagePredictor[Class
     iter.map(row => {
       val image = ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
         ImageSchema.getWidth(row), ImageSchema.getHeight(row))
-      val prediction: Classifications = predictor.predict(image)
-      val top = mutable.LinkedHashMap[String, Double]()
-      val it: java.util.Iterator[Classification] = prediction.topK($(topK)).iterator()
-      while (it.hasNext) {
-        val t = it.next()
-        top += (t.getClassName -> t.getProbability)
-      }
+      val prediction = predictor.predict(image)
+      val top = prediction.topK[Classifications.Classification]($(topK)).map(item => item.toString)
       Row.fromSeq(row.toSeq :+ Row(prediction.getClassNames.toArray,
         prediction.getProbabilities.toArray, top))
     })
@@ -105,7 +99,7 @@ class ImageClassifier(override val uid: String) extends BaseImagePredictor[Class
     val outputSchema = StructType(schema.fields :+
       StructField($(outputCol), StructType(Seq(StructField("class_names", ArrayType(StringType)),
         StructField("probabilities", ArrayType(DoubleType)),
-        StructField("topK", MapType(StringType, DoubleType))))))
+        StructField("topK", ArrayType(StringType))))))
     outputSchema
   }
 }

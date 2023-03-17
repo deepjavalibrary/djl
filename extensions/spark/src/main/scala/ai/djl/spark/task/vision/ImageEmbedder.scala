@@ -17,7 +17,7 @@ import ai.djl.modality.cv.translator.ImageFeatureExtractorFactory
 import org.apache.spark.ml.image.ImageSchema
 import org.apache.spark.ml.param.shared.HasOutputCol
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types._
+import org.apache.spark.sql.types.{ArrayType, ByteType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 /**
