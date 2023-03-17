@@ -12,6 +12,8 @@
  */
 package ai.djl.modality.nlp.translator;
 
+import ai.djl.util.JsonUtils;
+
 /** A class that represents a {@code NamedEntity} object. */
 public class NamedEntity {
 
@@ -93,5 +95,11 @@ public class NamedEntity {
      */
     public int getEnd() {
         return end;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return JsonUtils.GSON_PRETTY.toJson(this);
     }
 }
