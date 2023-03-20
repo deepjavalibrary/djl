@@ -60,6 +60,7 @@ public class OrtTest {
                             .optOption("memoryPatternOptimization", "true")
                             .optOption("cpuArenaAllocator", "true")
                             .optOption("disablePerSessionThreads", "true")
+                            .optOption("profilerOutput", "build/testOrtProfiling")
                             .build();
 
             IrisFlower virginica = new IrisFlower(1.0f, 2.0f, 3.0f, 4.0f);
