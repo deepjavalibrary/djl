@@ -14,12 +14,15 @@ package ai.djl.spark.task.vision
 
 import ai.djl.modality.cv.ImageFactory
 import ai.djl.modality.cv.output.DetectedObjects
+import ai.djl.modality.cv.output.DetectedObjects.DetectedObject
 import ai.djl.modality.cv.translator.YoloV5TranslatorFactory
 import org.apache.spark.ml.image.ImageSchema
 import org.apache.spark.ml.param.shared.HasOutputCol
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types._
+import org.apache.spark.sql.types.{ArrayType, DoubleType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
+
+import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 
 /**
  * ObjectDetector performs object detection on images.
@@ -57,13 +60,19 @@ class ObjectDetector(override val uid: String) extends BaseImagePredictor[Detect
     iter.map(row => {
       val image = ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
         ImageSchema.getWidth(row), ImageSchema.getHeight(row))
-      Row.fromSeq(row.toSeq :+ predictor.predict(image).toJson)
+      val prediction = predictor.predict(image)
+      val boundingBoxes = prediction.items[DetectedObject].map(item => item.getBoundingBox.toString)
+      Row.fromSeq(row.toSeq :+ Row(prediction.getClassNames.toArray,
+        prediction.getProbabilities.toArray, boundingBoxes))
     })
   }
 
   /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
-    val outputSchema = StructType(schema.fields :+ StructField($(outputCol), StringType))
+    val outputSchema = StructType(schema.fields :+
+      StructField($(outputCol), StructType(Seq(StructField("class_names", ArrayType(StringType)),
+        StructField("probabilities", ArrayType(DoubleType)),
+        StructField("boundingBoxes", ArrayType(StringType))))))
     outputSchema
   }
 }
