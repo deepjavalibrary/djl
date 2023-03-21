@@ -193,6 +193,13 @@ public interface Model extends AutoCloseable {
     String getName();
 
     /**
+     * Returns the model's properties.
+     *
+     * @return the model's properties
+     */
+    Map<String, String> getProperties();
+
+    /**
      * Returns the property of the model based on property name.
      *
      * @param key the name of the property

@@ -224,6 +224,12 @@ public abstract class BaseModel implements Model {
         return properties.get(key);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
     protected void setModelDir(Path modelDir) {
         this.modelDir = Utils.getNestedModelDir(modelDir);
     }

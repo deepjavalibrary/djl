@@ -119,6 +119,12 @@ public class ZooModel<I, O> implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public Map<String, String> getProperties() {
+        return model.getProperties();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         return model.newTrainer(trainingConfig);
     }
