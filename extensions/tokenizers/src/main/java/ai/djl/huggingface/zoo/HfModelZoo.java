@@ -18,6 +18,7 @@ import ai.djl.engine.Engine;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Version;
 import ai.djl.repository.VersionRange;
+import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.JsonUtils;
@@ -36,6 +37,7 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -52,14 +54,9 @@ public class HfModelZoo extends ModelZoo {
 
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 
-    HfModelZoo() {
-        Version version = new Version(Engine.getDjlVersion());
-        addModels(NLP.FILL_MASK, version);
-        addModels(NLP.QUESTION_ANSWER, version);
-        addModels(NLP.TEXT_CLASSIFICATION, version);
-        addModels(NLP.TEXT_EMBEDDING, version);
-        addModels(NLP.TOKEN_CLASSIFICATION, version);
-    }
+    private boolean initialized;
+
+    HfModelZoo() {}
 
     /** {@inheritDoc} */
     @Override
@@ -71,6 +68,32 @@ public class HfModelZoo extends ModelZoo {
     @Override
     public Set<String> getSupportedEngines() {
         return Collections.singleton("PyTorch");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Collection<ModelLoader> getModelLoaders() {
+        init();
+        return super.getModelLoaders();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ModelLoader getModelLoader(String name) {
+        init();
+        return super.getModelLoader(name);
+    }
+
+    private void init() {
+        if (!initialized) {
+            Version version = new Version(Engine.getDjlVersion());
+            addModels(NLP.FILL_MASK, version);
+            addModels(NLP.QUESTION_ANSWER, version);
+            addModels(NLP.TEXT_CLASSIFICATION, version);
+            addModels(NLP.TEXT_EMBEDDING, version);
+            addModels(NLP.TOKEN_CLASSIFICATION, version);
+            initialized = true;
+        }
     }
 
     private void addModels(Application app, Version version) {
