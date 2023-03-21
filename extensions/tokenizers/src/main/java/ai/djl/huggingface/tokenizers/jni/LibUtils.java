@@ -67,7 +67,13 @@ public final class LibUtils {
         logger.debug("Loading huggingface library from: {}", dir);
 
         for (String libName : libs) {
-            System.load(dir.resolve(libName).toString()); // NOPMD
+            String path = dir.resolve(libName).toString();
+            logger.debug("Loading native library: {}", path);
+            String nativeHelper = System.getProperty("ai.djl.huggingface.native_helper");
+            if (nativeHelper != null && !nativeHelper.isEmpty()) {
+                ClassLoaderUtils.nativeLoad(nativeHelper, path);
+            }
+            System.load(path); // NOPMD
         }
     }
 

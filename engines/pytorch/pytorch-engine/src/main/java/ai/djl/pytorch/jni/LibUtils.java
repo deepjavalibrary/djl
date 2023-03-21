@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
@@ -349,13 +348,7 @@ public final class LibUtils {
         logger.debug("Loading native library: {}", path);
         String nativeHelper = System.getProperty("ai.djl.pytorch.native_helper");
         if (nativeHelper != null && !nativeHelper.isEmpty()) {
-            try {
-                Class<?> clazz = Class.forName(nativeHelper);
-                Method method = clazz.getDeclaredMethod("load", String.class);
-                method.invoke(null, path);
-            } catch (ReflectiveOperationException e) {
-                throw new IllegalArgumentException("Invalid native_helper: " + nativeHelper, e);
-            }
+            ClassLoaderUtils.nativeLoad(nativeHelper, path);
         }
         System.load(path); // NOPMD
     }
