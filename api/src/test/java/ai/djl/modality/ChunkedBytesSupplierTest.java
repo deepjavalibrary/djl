@@ -24,6 +24,7 @@ public class ChunkedBytesSupplierTest {
     @Test
     public void test() throws InterruptedException, IOException {
         ChunkedBytesSupplier supplier = new ChunkedBytesSupplier();
+        Assert.assertNull(supplier.poll());
         Assert.assertThrows(() -> supplier.nextChunk(1, TimeUnit.MICROSECONDS));
 
         supplier.appendContent(new byte[] {1, 2}, false);
@@ -37,7 +38,7 @@ public class ChunkedBytesSupplierTest {
         data.appendContent(new byte[] {1, 2}, true);
 
         Assert.assertTrue(data.hasNext());
-        Assert.assertEquals(data.nextChunk(1, TimeUnit.MILLISECONDS).length, 0);
+        Assert.assertEquals(data.poll().length, 0);
         Assert.assertEquals(data.nextChunk(1, TimeUnit.MILLISECONDS), new byte[] {1, 2});
 
         Assert.assertFalse(data.hasNext());

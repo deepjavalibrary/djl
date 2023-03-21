@@ -71,6 +71,16 @@ public class ChunkedBytesSupplier implements BytesSupplier {
         return data.getAsBytes();
     }
 
+    /**
+     * Retrieves and removes the head of chunk or returns {@code null} if data is not available.
+     *
+     * @return the head of chunk or returns {@code null} if data is not available
+     */
+    public byte[] poll() {
+        BytesSupplier data = queue.poll();
+        return data == null ? null : data.getAsBytes();
+    }
+
     /** {@inheritDoc} */
     @Override
     public byte[] getAsBytes() {
