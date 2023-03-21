@@ -32,6 +32,7 @@ dependencies {
     runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
     runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
     runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
+    runtimeOnly project(":engines:onnxruntime:onnxruntime-engine")
 
     testImplementation("org.testng:testng:${testng_version}") {
         exclude group: "junit", module: "junit"

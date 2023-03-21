@@ -39,6 +39,8 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.imageio.ImageIO;
 
@@ -306,10 +308,18 @@ public class BufferedImageFactory extends ImageFactory {
             int imageHeight = image.getHeight();
 
             List<DetectedObjects.DetectedObject> list = detections.items();
+            int k = 10;
+            Map<String, Integer> classNumberTable = new ConcurrentHashMap<>();
             for (DetectedObjects.DetectedObject result : list) {
                 String className = result.getClassName();
                 BoundingBox box = result.getBoundingBox();
-                g.setPaint(randomColor().darker());
+                if (classNumberTable.containsKey(className)) {
+                    g.setPaint(new Color(classNumberTable.get(className)));
+                } else {
+                    g.setPaint(new Color(k));
+                    classNumberTable.put(className, k);
+                    k = (k + 100) % 255;
+                }
 
                 Rectangle rectangle = box.getBounds();
                 int x = (int) (rectangle.getX() * imageWidth);

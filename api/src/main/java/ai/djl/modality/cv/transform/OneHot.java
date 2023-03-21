@@ -21,7 +21,7 @@ public class OneHot implements Transform {
     private int numClass;
 
     /**
-     * Creates a {@code toOneHot} {@link Transform} that converts the sparse label to one-hot label.
+     * Creates a {@code OneHot} {@link Transform} that converts the sparse label to one-hot label.
      *
      * @param numClass number of classes
      */

@@ -1,4 +1,4 @@
-# Blazing fast training with small dataset for Java applications
+# Train ResNet for Fruit Freshness Classficiation
 
 Deep learning has shown its strong power in solving problems in various areas like CV, NLP,
 reinforcement learning, etc., which generates numerous examples of successful applications.
@@ -205,7 +205,7 @@ Here, the data are preprocessed with the normalization and randomization functio
 commonly used for [image classification](https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html).
 The randomization are for training only.
 
-**Model training and export. ** Finally, we can run the model training with `Easytrain.fit`,
+**Model training and export.** Finally, we can run the model training with `Easytrain.fit`,
 and save the model for prediction. In the end, the `model.close()` and `embedding.close()`
 are called. In DJL, during the creation of `Model` and `ZooModel<NDList, NDList>`, the native
 resources (e.g., memories in the assigned in PyTorch) are allocated. These resources are managed
