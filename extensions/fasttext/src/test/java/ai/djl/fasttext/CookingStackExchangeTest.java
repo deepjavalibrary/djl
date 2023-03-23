@@ -101,6 +101,8 @@ public class CookingStackExchangeTest {
                 Classifications result = predictor.predict(input);
                 Assert.assertEquals(result.item(0).getClassName(), "__bread");
             }
+            Assert.assertEquals(model.getProperties().size(), 2);
+            Assert.assertEquals(model.getProperty("model-type"), "sup");
         }
     }
 

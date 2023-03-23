@@ -257,6 +257,12 @@ public class FtModel implements Model {
 
     /** {@inheritDoc} */
     @Override
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void close() {
         block.close();
     }
