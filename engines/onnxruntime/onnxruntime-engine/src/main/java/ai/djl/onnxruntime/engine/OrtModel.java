@@ -192,6 +192,11 @@ public class OrtModel extends BaseModel {
             ortSession.registerCustomOpLibrary(customOpLibrary);
         }
 
+        String profilerOutput = (String) options.get("profilerOutput");
+        if (profilerOutput != null) {
+            ortSession.enableProfiling(profilerOutput);
+        }
+
         Device device = manager.getDevice();
         if (options.containsKey("ortDevice")) {
             String ortDevice = (String) options.get("ortDevice");

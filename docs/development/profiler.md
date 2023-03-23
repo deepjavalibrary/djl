@@ -60,3 +60,20 @@ Each record contains `name`(operator name), `dur`(time duration), `shape`(input 
   "args": {}
 }
 ```
+
+### OnnxRuntime
+
+When loading a model, the profiler can be enabled by specifying the desired filepath in the criteria:
+
+```
+    Criteria<Image, Classifications> criteria =
+        Criteria.builder()
+            .optOption("profilerOutput", "build/testOrtProfiling")
+            ...
+            .build()
+```
+
+Following this, the file will appear at "build/tesetOrtProfiling_YYYY-MM-DD.json".
+
+You can view it in a browser using a trace consumer like `chrome://tracing `.
+For more details, see the [OnnxRuntime Profiler Docs](https://onnxruntime.ai/docs/performance/tune-performance/profiling-tools.html).
