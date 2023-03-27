@@ -37,12 +37,31 @@ public final class PassthroughNDManager implements NDManager {
     private static final String UNSUPPORTED = "Not supported by PassthroughNDManager";
     public static final PassthroughNDManager INSTANCE = new PassthroughNDManager();
 
-    private PassthroughNDManager() {}
+    private Engine engine;
+    private Device device;
+
+    /**
+     * Constructs a new {@code PassthroughNDManager} instance.
+     *
+     * @param engine the {@link Engine} associated with this manager
+     * @param device the default {@link Device}
+     */
+    public PassthroughNDManager(Engine engine, Device device) {
+        this.engine = engine;
+        this.device = device == null ? engine.defaultDevice() : device;
+    }
+
+    private PassthroughNDManager() {
+        device = Device.cpu();
+    }
 
     /** {@inheritDoc} */
     @Override
     public Device defaultDevice() {
-        return Device.cpu();
+        if (engine != null) {
+            return engine.defaultDevice();
+        }
+        return device;
     }
 
     /** {@inheritDoc} */
@@ -60,18 +79,28 @@ public final class PassthroughNDManager implements NDManager {
         return create(array.toByteBuffer(), array.getShape(), array.getDataType());
     }
 
+    /**
+     * Creates a new {@link PassthroughNDArray}.
+     *
+     * @param object the object to store
+     * @return a new {@code PassthroughNDArray}
+     */
+    public PassthroughNDArray create(Object object) {
+        return new PassthroughNDArray(this, object);
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray create(Buffer data, Shape shape, DataType dataType) {
         int size = Math.toIntExact(shape.size());
         BaseNDManager.validateBuffer(data, dataType, size);
         if (data instanceof ByteBuffer) {
-            return new PassthroughNDArray(data, shape, dataType);
+            return new PassthroughNDArray(this, data, shape, dataType);
         }
         ByteBuffer bb = ByteBuffer.allocate(size * dataType.getNumOfBytes());
         bb.order(ByteOrder.nativeOrder());
         BaseNDManager.copyBuffer(data, bb);
-        return new PassthroughNDArray(bb, shape, dataType);
+        return new PassthroughNDArray(this, bb, shape, dataType);
     }
 
     /** {@inheritDoc} */
@@ -247,13 +276,13 @@ public final class PassthroughNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDManager newSubManager(Device device) {
-        return this;
+        return new PassthroughNDManager(engine, device);
     }
 
     /** {@inheritDoc} */
     @Override
     public Device getDevice() {
-        return Device.cpu();
+        return device;
     }
 
     /** {@inheritDoc} */
@@ -264,28 +293,20 @@ public final class PassthroughNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public void attachInternal(String resourceId, AutoCloseable resource) {
-        throw new UnsupportedOperationException(UNSUPPORTED);
-    }
+    public void attachInternal(String resourceId, AutoCloseable resource) {}
 
     /** {@inheritDoc} */
     @Override
-    public void attachUncappedInternal(String resourceId, AutoCloseable resource) {
-        throw new UnsupportedOperationException(UNSUPPORTED);
-    }
+    public void attachUncappedInternal(String resourceId, AutoCloseable resource) {}
 
     /** {@inheritDoc} */
     @Override
     public void tempAttachInternal(
-            NDManager originalManager, String resourceId, NDResource resource) {
-        throw new UnsupportedOperationException(UNSUPPORTED);
-    }
+            NDManager originalManager, String resourceId, NDResource resource) {}
 
     /** {@inheritDoc} */
     @Override
-    public void detachInternal(String resourceId) {
-        throw new UnsupportedOperationException(UNSUPPORTED);
-    }
+    public void detachInternal(String resourceId) {}
 
     /** {@inheritDoc} */
     @Override
@@ -303,7 +324,7 @@ public final class PassthroughNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        return null;
+        return engine;
     }
 
     /** {@inheritDoc} */
