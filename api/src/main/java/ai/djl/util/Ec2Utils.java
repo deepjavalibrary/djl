@@ -15,20 +15,20 @@ package ai.djl.util;
 import ai.djl.engine.Engine;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.List;
 
 /** A utility class to retrieve EC2 metadata. */
 public final class Ec2Utils {
@@ -52,26 +52,6 @@ public final class Ec2Utils {
      */
     public static boolean isSageMaker() {
         return Files.exists(Paths.get(ENDPOINT_METADATA_FILE));
-    }
-
-    /**
-     * Returns the SageMaker endpoint metadata for specified key.
-     *
-     * @param key the key to retrieve
-     * @return the SageMaker endpoint metadata for specified key
-     */
-    public static String readEndpointMetadata(String key) {
-        try {
-            List<String> lines = Utils.readLines(Paths.get(ENDPOINT_METADATA_FILE));
-            if (lines.isEmpty()) {
-                return null;
-            }
-            JsonObject json = JsonParser.parseString(String.join("", lines)).getAsJsonObject();
-            return json.get(key).getAsString();
-        } catch (IOException e) {
-            // ignore
-        }
-        return null;
     }
 
     /**
@@ -127,13 +107,10 @@ public final class Ec2Utils {
             instanceId = readEndpointMetadata("ResourceId");
             region = Utils.getenv("AWS_REGION");
         } else { // Else, read from EC2 metadata API
-            instanceId = Ec2Utils.readMetadata("instance-id");
+            instanceId = readMetadata("instance-id");
             region = readMetadata("placement/region");
         }
-        if (instanceId == null) {
-            return;
-        }
-        if (region == null || region.length() == 0) {
+        if (instanceId == null || region == null || region.length() == 0) {
             return;
         }
         String url =
@@ -188,6 +165,17 @@ public final class Ec2Utils {
             if (conn != null) {
                 conn.disconnect();
             }
+        }
+        return null;
+    }
+
+    private static String readEndpointMetadata(String key) {
+        Path path = Paths.get(ENDPOINT_METADATA_FILE);
+        try (Reader reader = Files.newBufferedReader(path)) {
+            JsonObject json = JsonUtils.GSON.fromJson(reader, JsonObject.class);
+            return json.get(key).getAsString();
+        } catch (IOException e) {
+            // ignore
         }
         return null;
     }
