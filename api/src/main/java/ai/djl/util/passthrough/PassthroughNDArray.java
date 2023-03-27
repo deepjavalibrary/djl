@@ -14,6 +14,7 @@ package ai.djl.util.passthrough;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrayAdapter;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
@@ -36,19 +37,29 @@ public class PassthroughNDArray extends NDArrayAdapter {
      * @param object the object to store
      */
     public PassthroughNDArray(Object object) {
-        super(PassthroughNDManager.INSTANCE, null, null, null, null);
-        this.object = object;
+        this(PassthroughNDManager.INSTANCE, object);
     }
 
     /**
      * Constructs a {@link PassthroughNDArray} storing an object.
      *
+     * @param manager {@link NDManager} of the array
+     * @param object the object to store
+     */
+    public PassthroughNDArray(NDManager manager, Object object) {
+        this(manager, object, null, null);
+    }
+
+    /**
+     * Constructs a {@link PassthroughNDArray} storing an object.
+     *
+     * @param manager {@link NDManager} of the array
      * @param object the object to store
      * @param shape the {@link Shape} of the {@link NDArray}
      * @param dataType the {@link DataType} of the {@link NDArray}
      */
-    public PassthroughNDArray(Object object, Shape shape, DataType dataType) {
-        super(PassthroughNDManager.INSTANCE, null, shape, dataType, null);
+    public PassthroughNDArray(NDManager manager, Object object, Shape shape, DataType dataType) {
+        super(manager, null, shape, dataType, null);
         this.object = object;
     }
 
