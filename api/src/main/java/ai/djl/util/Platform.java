@@ -290,7 +290,8 @@ public final class Platform {
             // system flavor doesn't contain mkl, but MXNet has: cu110mkl
             return flavor.startsWith("cpu")
                     || "mkl".equals(flavor)
-                    || flavor.startsWith(system.flavor.substring(0, 4));
+                    || Integer.parseInt(flavor.substring(2, 5))
+                            <= Integer.parseInt(system.flavor.substring(2, 5));
         }
         return flavor.startsWith("cpu") || "mkl".equals(flavor);
     }

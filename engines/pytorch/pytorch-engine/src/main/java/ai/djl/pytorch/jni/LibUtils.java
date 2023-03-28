@@ -355,20 +355,23 @@ public final class LibUtils {
 
     private static LibTorch downloadPyTorch(Platform platform) {
         String version = platform.getVersion();
-        String flavor = platform.getFlavor();
         String classifier = platform.getClassifier();
         String precxx11;
-        if (System.getProperty("os.name").startsWith("Linux")
-                && (Boolean.getBoolean("PYTORCH_PRECXX11")
-                        || Boolean.parseBoolean(Utils.getEnvOrSystemProperty("PYTORCH_PRECXX11"))
-                        || ("aarch64".equals(platform.getOsArch())
-                                && "linux".equals(platform.getOsPrefix())))) {
-            precxx11 = "-precxx11";
+        String flavor = Utils.getEnvOrSystemProperty("PYTORCH_FLAVOR");
+        if (flavor == null || flavor.isEmpty()) {
+            flavor = platform.getFlavor();
+            if (System.getProperty("os.name").startsWith("Linux")
+                    && (Boolean.parseBoolean(Utils.getEnvOrSystemProperty("PYTORCH_PRECXX11"))
+                            || "aarch64".equals(platform.getOsArch()))) {
+                precxx11 = "-precxx11";
+            } else {
+                precxx11 = "";
+            }
+            flavor += precxx11;
         } else {
-            precxx11 = "";
+            logger.info("Uses override PYTORCH_FLAVOR: {}", flavor);
+            precxx11 = flavor.endsWith("-precxx11") ? "-precxx11" : "";
         }
-
-        flavor += precxx11;
 
         Path cacheDir = Utils.getEngineCacheDir("pytorch");
         Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
