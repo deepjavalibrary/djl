@@ -14,14 +14,20 @@ package ai.djl.util;
 
 import ai.djl.engine.Engine;
 
+import com.google.gson.JsonObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 
 /** A utility class to retrieve EC2 metadata. */
@@ -29,6 +35,8 @@ public final class Ec2Utils {
 
     private static final Logger logger = LoggerFactory.getLogger(Ec2Utils.class);
 
+    private static final String ENDPOINT_METADATA_FILE =
+            "/opt/ml/.sagemaker_infra/endpoint-metadata.json";
     private static final String TOKEN_URL = "http://169.254.169.254/latest/api/token";
     private static final String EC2_METADATA = "http://169.254.169.254/latest/meta-data/";
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
@@ -36,6 +44,15 @@ public final class Ec2Utils {
     private static long lastCheckIn;
 
     private Ec2Utils() {}
+
+    /**
+     * Check if the current environment is SageMaker.
+     *
+     * @return true if the current environment is SageMaker
+     */
+    public static boolean isSageMaker() {
+        return Files.exists(Paths.get(ENDPOINT_METADATA_FILE));
+    }
 
     /**
      * Returns the EC2 metadata for specified key.
@@ -82,15 +99,20 @@ public final class Ec2Utils {
         }
         lastCheckIn = System.currentTimeMillis();
 
-        String instanceId = Ec2Utils.readMetadata("instance-id");
-        if (instanceId == null) {
+        String instanceId;
+        String region;
+
+        // If running on SageMaker, read from endpoint metadata file
+        if (isSageMaker()) {
+            instanceId = readEndpointMetadata("ResourceId");
+            region = Utils.getenv("AWS_REGION");
+        } else { // Else, read from EC2 metadata API
+            instanceId = readMetadata("instance-id");
+            region = readMetadata("placement/region");
+        }
+        if (instanceId == null || region == null || region.length() == 0) {
             return;
         }
-        String region = readMetadata("placement/availability-zone");
-        if (region == null || region.length() == 0) {
-            return;
-        }
-        region = region.substring(0, region.length() - 1);
         String url =
                 "https://djl-telemetry-"
                         + region
@@ -143,6 +165,17 @@ public final class Ec2Utils {
             if (conn != null) {
                 conn.disconnect();
             }
+        }
+        return null;
+    }
+
+    private static String readEndpointMetadata(String key) {
+        Path path = Paths.get(ENDPOINT_METADATA_FILE);
+        try (Reader reader = Files.newBufferedReader(path)) {
+            JsonObject json = JsonUtils.GSON.fromJson(reader, JsonObject.class);
+            return json.get(key).getAsString();
+        } catch (IOException e) {
+            // ignore
         }
         return null;
     }
