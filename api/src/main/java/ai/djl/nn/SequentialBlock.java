@@ -13,6 +13,7 @@
 package ai.djl.nn;
 
 import ai.djl.MalformedModelException;
+import ai.djl.inference.streaming.StreamingBlock;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -38,7 +40,7 @@ import java.util.stream.Collectors;
  *
  * <p>{@code SequentialBlock} has no direct parameters.
  */
-public class SequentialBlock extends AbstractBlock {
+public class SequentialBlock extends AbstractBlock implements StreamingBlock {
 
     private static final byte VERSION = 3;
     private boolean returnIntermediate;
@@ -218,6 +220,16 @@ public class SequentialBlock extends AbstractBlock {
 
     /** {@inheritDoc} */
     @Override
+    public Iterator<NDList> forwardStreamIter(
+            ParameterStore parameterStore,
+            NDList inputs,
+            boolean training,
+            PairList<String, Object> params) {
+        return new StreamIterator(parameterStore, inputs, training);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void initializeChildBlocks(NDManager manager, DataType dataType, Shape... inputShapes) {
         Shape[] shapes = inputShapes;
         DataType[] lastDataTypes = null;
@@ -264,6 +276,37 @@ public class SequentialBlock extends AbstractBlock {
             readInputShapes(is);
         } else {
             throw new MalformedModelException("Unsupported encoding version: " + loadVersion);
+        }
+    }
+
+    private final class StreamIterator implements Iterator<NDList> {
+
+        private int childIndex;
+        private ParameterStore parameterStore;
+        private NDList current;
+        private boolean training;
+
+        private StreamIterator(ParameterStore parameterStore, NDList inputs, boolean training) {
+            this.parameterStore = parameterStore;
+            this.current = inputs;
+            this.training = training;
+            childIndex = 0;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean hasNext() {
+            return childIndex < children.size();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public NDList next() {
+            current =
+                    children.get(childIndex++)
+                            .getValue()
+                            .forward(parameterStore, current, training);
+            return current;
         }
     }
 }
