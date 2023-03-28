@@ -61,7 +61,7 @@ public class PlatformTest {
 
         url = createPropertyFile("version=1.8.0\nclassifier=cu102-linux-x86_64");
         platform = Platform.fromUrl(url);
-        Assert.assertFalse(platform.matches(system));
+        Assert.assertTrue(platform.matches(system));
 
         // MXNet
         url = createPropertyFile("version=1.8.0\nclassifier=cu113mkl-linux-x86_64");
