@@ -93,7 +93,7 @@ public final class Ec2Utils {
      */
     public static void callHome(String engine) {
         if (Boolean.getBoolean("offline")
-                || Boolean.parseBoolean(Utils.getenv("OPT_OUT_TRACKING"))
+                || Boolean.parseBoolean(Utils.getEnvOrSystemProperty("OPT_OUT_TRACKING"))
                 || System.currentTimeMillis() - lastCheckIn < ONE_DAY) {
             return;
         }
