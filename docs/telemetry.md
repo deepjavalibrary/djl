@@ -1,4 +1,4 @@
-= Usage Tracking
+# Usage Tracking
 
 Since DJL 0.20.0, DJL collects telemetry to help us better understand our users’ needs
 when running on AWS EC2. DJL contains code that allows DJL development team to collect the
@@ -8,7 +8,7 @@ the system is collected or retained.
 To opt out of usage tracking for DJL, you can set the `OPT_OUT_TRACKING` environment variable:
 
 ```
-OPT_OUT_TRACKING=true
+export OPT_OUT_TRACKING=true
 ```
 
 or Java System property:
