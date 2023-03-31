@@ -21,6 +21,7 @@ import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
+import ai.djl.util.Utils;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -161,7 +162,7 @@ public class HdfsRepository extends AbstractRepository {
         }
 
         metadata = new Metadata.MatchAllMetadata();
-        String hash = md5hash(uri.resolve(prefix).toString());
+        String hash = Utils.hash(uri.resolve(prefix).toString());
         MRL mrl = model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
         metadata.setRepositoryUri(mrl.toURI());
         metadata.setArtifactId(artifactId);
