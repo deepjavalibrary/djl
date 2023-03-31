@@ -16,6 +16,7 @@ import ai.djl.Application;
 import ai.djl.repository.Artifact.Item;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
+import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,7 +193,7 @@ public class SimpleRepository extends AbstractRepository {
             files.put(artifactId, item);
             artifact.setFiles(files);
 
-            String hash = md5hash(uri);
+            String hash = Utils.hash(uri);
             MRL mrl = model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
             metadata.setRepositoryUri(mrl.toURI());
         } else {

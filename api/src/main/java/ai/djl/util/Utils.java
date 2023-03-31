@@ -29,6 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -459,5 +461,21 @@ public final class Utils {
             throw new IOException("Offline model is enabled.");
         }
         return new BufferedInputStream(url.openStream());
+    }
+
+    /**
+     * Returns a hash of a string.
+     *
+     * @param input the input string
+     * @return a 20 bytes hash of the input stream in hex format
+     */
+    public static String hash(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] buf = md.digest(input.getBytes(StandardCharsets.UTF_8));
+            return Hex.toHexString(buf, 0, 20);
+        } catch (NoSuchAlgorithmException e) {
+            throw new AssertionError("SHA256 algorithm not found.", e);
+        }
     }
 }

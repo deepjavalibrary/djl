@@ -28,12 +28,25 @@ public final class Hex {
      * @return the converted hex String
      */
     public static String toHexString(byte[] block) {
+        return toHexString(block, 0, block.length);
+    }
+
+    /**
+     * Converts a byte array to a hex string.
+     *
+     * @param block the bytes to convert
+     * @param start the start position (inclusive) of the array
+     * @param end the end position (exclusive) of the array
+     * @return the converted hex String
+     */
+    public static String toHexString(byte[] block, int start, int end) {
         if (block == null) {
             return null;
         }
 
         StringBuilder buf = new StringBuilder();
-        for (byte aBlock : block) {
+        for (int i = start; i < end; ++i) {
+            byte aBlock = block[i];
             int high = ((aBlock & 0xf0) >> 4);
             int low = (aBlock & 0x0f);
 

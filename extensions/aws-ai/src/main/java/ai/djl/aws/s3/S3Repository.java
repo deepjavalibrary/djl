@@ -21,6 +21,7 @@ import ai.djl.repository.Metadata;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
+import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,7 +166,7 @@ public class S3Repository extends AbstractRepository {
             }
 
             metadata = new Metadata.MatchAllMetadata();
-            String hash = md5hash("s3://" + bucket + '/' + prefix);
+            String hash = Utils.hash("s3://" + bucket + '/' + prefix);
             MRL mrl = model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
             metadata.setRepositoryUri(mrl.toURI());
             metadata.setArtifactId(artifactId);

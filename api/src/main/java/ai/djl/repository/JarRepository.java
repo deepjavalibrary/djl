@@ -15,6 +15,7 @@ package ai.djl.repository;
 import ai.djl.Application;
 import ai.djl.repository.zoo.DefaultModelZoo;
 import ai.djl.util.Progress;
+import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,7 +123,8 @@ public class JarRepository extends AbstractRepository {
         metadata = new Metadata.MatchAllMetadata();
         metadata.setArtifactId(artifactId);
         metadata.setArtifacts(Collections.singletonList(artifact));
-        String hash = md5hash(queryString == null ? uri.toString() : uri.toString() + queryString);
+        String hash =
+                Utils.hash(queryString == null ? uri.toString() : uri.toString() + queryString);
         MRL mrl = model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
         metadata.setRepositoryUri(mrl.toURI());
 
