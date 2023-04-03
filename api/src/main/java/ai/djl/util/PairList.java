@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -375,6 +376,25 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
             }
         }
         return map;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PairList<?, ?> pairList = (PairList<?, ?>) o;
+        return keys.equals(pairList.keys) && values.equals(pairList.values);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return Objects.hash(keys, values);
     }
 
     /** Internal Iterator implementation. */

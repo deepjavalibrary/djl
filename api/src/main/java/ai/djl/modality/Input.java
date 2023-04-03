@@ -19,16 +19,25 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /** A class stores the generic input data for inference. */
 public class Input {
 
-    private Map<String, String> properties;
-    private PairList<String, BytesSupplier> content;
+    private static final long serialVersionUID = 1L;
+
+    protected Map<String, String> properties;
+    protected PairList<String, BytesSupplier> content;
 
     /** Constructs a new {@code Input} instance. */
     public Input() {
@@ -84,6 +93,21 @@ public class Input {
      */
     public PairList<String, BytesSupplier> getContent() {
         return content;
+    }
+
+    /**
+     * Returns the content of the input as {@link ByteBuffer}s.
+     *
+     * <p>A {@code Input} may contains multiple data.
+     *
+     * @return the content of the input as {@link ByteBuffer}s.
+     */
+    public PairList<String, ByteBuffer> getContentAsBuffers() {
+        PairList<String, ByteBuffer> result = new PairList<>(content.size());
+        for (Pair<String, BytesSupplier> c : content) {
+            result.add(c.getKey(), c.getValue().toByteBuffer());
+        }
+        return result;
     }
 
     /**
@@ -326,6 +350,113 @@ public class Input {
             return new NDList((NDArray) data);
         }
         return NDList.decode(manager, data.getAsBytes());
+    }
+
+    /**
+     * Encodes all data in the input to a binary form.
+     *
+     * @return the binary encoding
+     * @throws IOException if it fails to encode part of the data
+     */
+    public byte[] encode() throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            DataOutputStream os = new DataOutputStream(baos);
+            os.writeLong(serialVersionUID);
+            encodeInputBase(os);
+
+            return baos.toByteArray();
+        }
+    }
+
+    protected void encodeInputBase(DataOutputStream os) throws IOException {
+        os.writeInt(properties.size());
+        for (Entry<String, String> property : properties.entrySet()) {
+            os.writeUTF(property.getKey());
+            os.writeUTF(property.getValue());
+        }
+
+        os.writeInt(content.size());
+        for (Pair<String, BytesSupplier> c : content) {
+            if (c.getKey() != null) {
+                os.writeBoolean(true);
+                os.writeUTF(c.getKey());
+            } else {
+                os.writeBoolean(false);
+            }
+
+            byte[] cVal = c.getValue().getAsBytes();
+            os.writeInt(cVal.length);
+            os.write(cVal);
+        }
+    }
+
+    /**
+     * Decodes the input from {@link #encode()}.
+     *
+     * @param is the data to decode from
+     * @return the decoded input
+     * @throws IOException if it fails to decode part of the input
+     */
+    public static Input decode(InputStream is) throws IOException {
+        try (DataInputStream dis = new DataInputStream(is)) {
+            if (serialVersionUID != dis.readLong()) {
+                throw new IllegalArgumentException("Invalid Input version");
+            }
+
+            Input input = new Input();
+            decodeInputBase(dis, input);
+
+            return input;
+        }
+    }
+
+    protected static void decodeInputBase(DataInputStream dis, Input input) throws IOException {
+        int numProperties = dis.readInt();
+        for (int i = 0; i < numProperties; i++) {
+            String key = dis.readUTF();
+            String val = dis.readUTF();
+            input.addProperty(key, val);
+        }
+
+        int numContent = dis.readInt();
+        for (int i = 0; i < numContent; i++) {
+            boolean hasKey = dis.readBoolean();
+            String key = null;
+            if (hasKey) {
+                key = dis.readUTF();
+            }
+            int contentLength = dis.readInt();
+            byte[] contents = new byte[contentLength];
+            int contentRead = 0;
+            while (contentRead < contentLength) {
+                int newRead = dis.read(contents, contentRead, contentLength);
+                if (newRead < 0) {
+                    throw new IOException("Failed to read Input or Output content");
+                }
+                contentRead += newRead;
+            }
+            input.add(key, contents);
+        }
+    }
+
+    /** {@inheritDoc} * */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Input input = (Input) o;
+        return properties.equals(input.properties)
+                && getContentAsBuffers().equals(input.getContentAsBuffers());
+    }
+
+    /** {@inheritDoc} * */
+    @Override
+    public int hashCode() {
+        return Objects.hash(properties, content);
     }
 
     /** {@inheritDoc} * */

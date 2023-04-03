@@ -21,6 +21,8 @@ import ai.djl.ndarray.types.Shape;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class InputOutputTest {
@@ -72,5 +74,33 @@ public class InputOutputTest {
             NDList ndlist = output.getDataAsNDList(manager);
             Assert.assertEquals(ndlist.size(), 1);
         }
+    }
+
+    @Test
+    public void testEncodeDecodeInput() throws IOException {
+        Input input = new Input();
+        input.addProperty("prop1", "val1");
+        input.addProperty("prop2", "val2");
+        input.add("data");
+        input.add("kw", "data2");
+
+        byte[] encoded = input.encode();
+        Input decoded = Input.decode(new ByteArrayInputStream(encoded));
+        Assert.assertEquals(decoded, input);
+    }
+
+    @Test
+    public void testEncodeDecodeOutput() throws IOException {
+        Output output = new Output();
+        output.addProperty("prop1", "val1");
+        output.addProperty("prop2", "val2");
+        output.add("data");
+        output.add("kw", "data2");
+        output.setCode(123);
+        output.setMessage("message");
+
+        byte[] encoded = output.encode();
+        Output decoded = Output.decode(new ByteArrayInputStream(encoded));
+        Assert.assertEquals(decoded, output);
     }
 }
