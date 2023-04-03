@@ -16,18 +16,27 @@ LABEL maintainer="djl-dev@amazon.com"
 USER root
 ARG DJL_VERSION=0.21.0
 ARG JNA_VERSION=5.12.1
+ARG JAVACV_VERSION=1.5.8
 ARG JAVACPP_VERSION=1.5.8
+ARG FFMPEG_VERSION=5.1.2-1.5.8
 ARG TENSORFLOW_CORE_VERSION=0.4.2
 ARG PROTOBUF_VERSION=3.21.9
 
 COPY extensions/spark/setup/dist/ dist/
 RUN pip3 install --no-cache-dir dist/djl_spark-*-py3-none-any.whl && \
     rm -rf dist
-RUN pip3 install --no-cache-dir pillow pandas numpy
+RUN pip3 install --no-cache-dir pillow pandas numpy pyarrow
 
 ADD https://repo1.maven.org/maven2/ai/djl/api/${DJL_VERSION}/api-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-api-${DJL_VERSION}.jar
 ADD https://repo1.maven.org/maven2/ai/djl/spark/spark/${DJL_VERSION}/spark-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-spark-${DJL_VERSION}.jar
 ADD https://repo1.maven.org/maven2/ai/djl/huggingface/tokenizers/${DJL_VERSION}/tokenizers-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-tokenizers-${DJL_VERSION}.jar
+
+ADD https://repo1.maven.org/maven2/ai/djl/audio/audio/${DJL_VERSION}/audio-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-audio-${DJL_VERSION}.jar
+ADD https://repo1.maven.org/maven2/org/bytedeco/javacv/${JAVACV_VERSION}/javacv-${JAVACV_VERSION}.jar /usr/lib/spark/jars/
+ADD https://repo1.maven.org/maven2/org/bytedeco/javacpp/${JAVACPP_VERSION}/javacpp-${JAVACPP_VERSION}.jar /usr/lib/spark/jars/
+ADD https://repo1.maven.org/maven2/org/bytedeco/ffmpeg/${FFMPEG_VERSION}/ffmpeg-${FFMPEG_VERSION}.jar /usr/lib/spark/jars/
+ADD https://repo1.maven.org/maven2/org/bytedeco/ffmpeg/${FFMPEG_VERSION}/ffmpeg-${FFMPEG_VERSION}-linux-x86_64.jar /usr/lib/spark/jars/
+ADD https://repo1.maven.org/maven2/org/bytedeco/ffmpeg-platform/${FFMPEG_VERSION}/ffmpeg-platform-${FFMPEG_VERSION}.jar /usr/lib/spark/jars/
 
 ADD https://repo1.maven.org/maven2/ai/djl/pytorch/pytorch-engine/${DJL_VERSION}/pytorch-engine-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-pytorch-engine-${DJL_VERSION}.jar
 ADD https://repo1.maven.org/maven2/ai/djl/pytorch/pytorch-model-zoo/${DJL_VERSION}/pytorch-model-zoo-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-model-zoo-${DJL_VERSION}.jar
@@ -35,12 +44,13 @@ ADD https://repo1.maven.org/maven2/net/java/dev/jna/jna/${JNA_VERSION}/jna-${JNA
 
 ADD https://repo1.maven.org/maven2/ai/djl/tensorflow/tensorflow-engine/${DJL_VERSION}/tensorflow-engine-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-tensorflow-engine-${DJL_VERSION}.jar
 ADD https://repo1.maven.org/maven2/ai/djl/tensorflow/tensorflow-model-zoo/${DJL_VERSION}/tensorflow-model-zoo-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-tensorflow-model-zoo-${DJL_VERSION}.jar
-ADD https://repo1.maven.org/maven2/org/bytedeco/javacpp/${JAVACPP_VERSION}/javacpp-${JAVACPP_VERSION}.jar /usr/lib/spark/jars/
 ADD https://repo1.maven.org/maven2/org/tensorflow/tensorflow-core-api/${TENSORFLOW_CORE_VERSION}/tensorflow-core-api-${TENSORFLOW_CORE_VERSION}.jar /usr/lib/spark/jars/
 RUN rm /usr/lib/spark/jars/protobuf-java-*.jar
 ADD https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/${PROTOBUF_VERSION}/protobuf-java-${PROTOBUF_VERSION}.jar /usr/lib/spark/jars/
 
 RUN chmod -R +r /usr/lib/spark/jars/
+
+RUN echo 'export SPARK_JAVA_OPTS="$SPARK_JAVA_OPTS -Dai.djl.pytorch.graph_optimizer=false"' >> /usr/lib/spark/conf/spark-env.sh
 
 # Set environment
 ENV PYTORCH_PRECXX11 true

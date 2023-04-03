@@ -86,11 +86,12 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
 
   setDefault(engine, null)
   setDefault(modelUrl, null)
-  setDefault(batchifier, "none")
 
   /** @inheritdoc */
   override def transform(dataset: Dataset[_]): DataFrame = {
-    arguments.put("batchifier", $(batchifier))
+    if (isDefined(batchifier)) {
+      arguments.put("batchifier", $(batchifier))
+    }
     model = new ModelLoader[A, B]($(engine), $(modelUrl), $(inputClass), $(outputClass), $(translatorFactory),
       arguments)
     validateInputType(dataset.schema)
