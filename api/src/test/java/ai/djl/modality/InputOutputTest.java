@@ -86,7 +86,7 @@ public class InputOutputTest {
 
         byte[] encoded = input.encode();
         Input decoded = Input.decode(new ByteArrayInputStream(encoded));
-        Assert.assertEquals(decoded, input);
+        Assert.assertTrue(decoded.deepEquals(input));
     }
 
     @Test
@@ -101,6 +101,6 @@ public class InputOutputTest {
 
         byte[] encoded = output.encode();
         Output decoded = Output.decode(new ByteArrayInputStream(encoded));
-        Assert.assertEquals(decoded, output);
+        Assert.assertTrue(decoded.deepEquals(output));
     }
 }

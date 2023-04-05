@@ -123,25 +123,24 @@ public class Output extends Input {
         }
     }
 
-    /** {@inheritDoc} * */
+    /**
+     * Checks for deep equality with another output.
+     *
+     * @param o the other output.
+     * @return whether they and all properties, content, and data are equal
+     */
     @Override
-    public boolean equals(Object o) {
+    public boolean deepEquals(Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        if (!super.equals(o)) {
+        if (!super.deepEquals(o)) {
             return false;
         }
         Output output = (Output) o;
         return code == output.code && Objects.equals(message, output.message);
-    }
-
-    /** {@inheritDoc} * */
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), code, message);
     }
 }

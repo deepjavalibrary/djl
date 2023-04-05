@@ -28,7 +28,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.TreeMap;
 
 /** A class stores the generic input data for inference. */
@@ -439,9 +438,13 @@ public class Input {
         }
     }
 
-    /** {@inheritDoc} * */
-    @Override
-    public boolean equals(Object o) {
+    /**
+     * Checks for deep equality with another input.
+     *
+     * @param o the other input.
+     * @return whether they and all properties, content, and data are equal
+     */
+    public boolean deepEquals(Object o) {
         if (this == o) {
             return true;
         }
@@ -451,12 +454,6 @@ public class Input {
         Input input = (Input) o;
         return properties.equals(input.properties)
                 && getContentAsBuffers().equals(input.getContentAsBuffers());
-    }
-
-    /** {@inheritDoc} * */
-    @Override
-    public int hashCode() {
-        return Objects.hash(properties, content);
     }
 
     /** {@inheritDoc} * */
