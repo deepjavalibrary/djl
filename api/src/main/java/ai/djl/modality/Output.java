@@ -12,8 +12,17 @@
  */
 package ai.djl.modality;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Objects;
+
 /** A class stores the generic inference results. */
 public class Output extends Input {
+
+    private static final long serialVersionUID = 1L;
 
     private int code;
     private String message;
@@ -69,5 +78,69 @@ public class Output extends Input {
      */
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    /**
+     * Encodes all data in the output to a binary form.
+     *
+     * @return the binary encoding
+     * @throws IOException if it fails to encode part of the data
+     */
+    @Override
+    public byte[] encode() throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            DataOutputStream os = new DataOutputStream(baos);
+            os.writeLong(serialVersionUID);
+            encodeInputBase(os);
+
+            os.writeInt(code);
+            os.writeUTF(message);
+
+            return baos.toByteArray();
+        }
+    }
+
+    /**
+     * Decodes the output from {@link #encode()}.
+     *
+     * @param is the data to decode from
+     * @return the decoded output
+     * @throws IOException if it fails to decode part of the output
+     */
+    public static Output decode(InputStream is) throws IOException {
+        try (DataInputStream dis = new DataInputStream(is)) {
+            if (serialVersionUID != dis.readLong()) {
+                throw new IllegalArgumentException("Invalid Input version");
+            }
+
+            Output output = new Output();
+            decodeInputBase(dis, output);
+
+            output.code = dis.readInt();
+            output.message = dis.readUTF();
+
+            return output;
+        }
+    }
+
+    /**
+     * Checks for deep equality with another output.
+     *
+     * @param o the other output.
+     * @return whether they and all properties, content, and data are equal
+     */
+    @Override
+    public boolean deepEquals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.deepEquals(o)) {
+            return false;
+        }
+        Output output = (Output) o;
+        return code == output.code && Objects.equals(message, output.message);
     }
 }

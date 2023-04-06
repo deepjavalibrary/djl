@@ -21,6 +21,7 @@ import ai.djl.util.PairList;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * {@link TimeSeriesData} is a DataEntry for managing time series data in preprocess. It contains a
@@ -172,5 +173,28 @@ public class TimeSeriesData extends PairList<String, NDArray> {
      */
     public void remove(FieldName fieldName) {
         remove(fieldName.name());
+    }
+
+    /** {@inheritDoc} * */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        TimeSeriesData pairs = (TimeSeriesData) o;
+        return Objects.equals(startTime, pairs.startTime)
+                && Objects.equals(forecastStartTime, pairs.forecastStartTime);
+    }
+
+    /** {@inheritDoc} * */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), startTime, forecastStartTime);
     }
 }
