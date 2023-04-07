@@ -51,6 +51,7 @@ Then, all you need to do, is to load this model in DJL:
 Criteria<QAInput, String> criteria = Criteria.builder()
     .setTypes(QAInput.class, String.class)
     .optModelPath(Paths.get("model/nlp/question_answer/ai/djl/huggingface/pytorch/deepset/bert-base-cased-squad2/0.0.1/bert-base-cased-squad2.zip"))
+    .optTranslatorFactory(new DeferredTranslatorFactory())
     .optProgress(new ProgressBar()).build();
 ```
 
