@@ -43,8 +43,7 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljav
     map[name] = "";
   }
 
-  if (!jtrainParam) {
-    JITCallGuard guard;
+  jlong ret = [&]() {
     torch::jit::Module module;
     if (jmap_location) {
       module = torch::jit::load(path, device, map);
@@ -61,23 +60,13 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljav
       env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
     }
     return reinterpret_cast<uintptr_t>(module_ptr);
+  }();
+
+  if (!jtrainParam) {
+    JITCallGuard guard;
+    return ret;
   }
-  torch::jit::Module module;
-  if (jmap_location) {
-    module = torch::jit::load(path, device, map);
-    module.eval();
-  } else {
-    module = torch::jit::load(path, torch::nullopt, map);
-    module.eval();
-    module.to(device);
-  }
-  const auto* module_ptr = new torch::jit::Module(module);
-  for (size_t i = 0; i < len; ++i) {
-    auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
-    auto name = djl::utils::jni::GetStringFromJString(env, jname);
-    env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
-  }
-  return reinterpret_cast<uintptr_t>(module_ptr);
+  return ret;
   API_END_RETURN()
 }
 
