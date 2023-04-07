@@ -26,6 +26,7 @@ import ai.djl.pytorch.jni.IValue;
 import ai.djl.pytorch.jni.IValueUtils;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.ParameterStore;
+import ai.djl.util.NativeResource;
 import ai.djl.util.PairList;
 
 import org.slf4j.Logger;
@@ -152,6 +153,21 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             }
         }
         return IValueUtils.forward(this, inputs, training);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected IValue forwardInternal(NativeResource<Long>[] inputs) {
+        if (System.getProperty("ai.djl.pytorch.graph_optimizer") != null) {
+            boolean setOptimizer = Boolean.getBoolean("ai.djl.pytorch.graph_optimizer");
+            JniUtils.setGraphExecutorOptimize(setOptimizer);
+        }
+        inputDescriptions = new PairList<>();
+        outputDescriptions = new PairList<>();
+        inputDescriptions.add("nested IValue", null);
+        outputDescriptions.add("nested IValue", null);
+
+        return IValueUtils.forward(this, (IValue[]) inputs);
     }
 
     /** {@inheritDoc} */

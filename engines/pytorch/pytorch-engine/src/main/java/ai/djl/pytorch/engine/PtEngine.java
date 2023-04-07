@@ -21,6 +21,7 @@ import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
 import ai.djl.training.GradientCollector;
+import ai.djl.translate.StepGenerator;
 import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
@@ -143,6 +144,12 @@ public final class PtEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return PtNDManager.getSystemManager().newSubManager(device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public StepGenerator newStepGenerator() {
+        return new PtStepGenerator();
     }
 
     /** {@inheritDoc} */

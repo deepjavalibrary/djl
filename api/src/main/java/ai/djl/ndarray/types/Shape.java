@@ -135,6 +135,7 @@ public class Shape {
      * @return the shape in the given dimension
      */
     public long get(int dimension) {
+        dimension = dimension + (dimension < 0 ? shape.length : 0);
         return shape[dimension];
     }
 
@@ -158,9 +159,7 @@ public class Shape {
     public long size(int... dimensions) {
         long total = 1;
         for (long d : dimensions) {
-            if (d < 0 || d >= shape.length) {
-                throw new IllegalArgumentException("Invalid dimension " + d);
-            }
+            d = d + (d < 0 ? shape.length : 0);
             if (shape[Math.toIntExact(d)] == -1) {
                 return -1;
             }
