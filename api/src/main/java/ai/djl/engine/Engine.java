@@ -13,13 +13,16 @@
 package ai.djl.engine;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
+import ai.djl.translate.LMAdapter;
 import ai.djl.util.Ec2Utils;
 import ai.djl.util.RandomUtils;
 import ai.djl.util.Utils;
@@ -301,6 +304,11 @@ public abstract class Engine {
      * @return a new top-level {@code NDManager}
      */
     public abstract NDManager newBaseManager(Device device);
+
+    public LMAdapter newLMAdapter(String languageModel, String[] modelUrls)
+            throws ModelNotFoundException, MalformedModelException, IOException {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 
     /**
      * Returns a new instance of {@link GradientCollector}.

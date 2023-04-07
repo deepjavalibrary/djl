@@ -21,6 +21,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.util.NativeResource;
 import ai.djl.util.PairList;
 
 import java.io.DataInputStream;
@@ -126,6 +127,8 @@ public interface Block {
     default NDList forward(ParameterStore parameterStore, NDList inputs, boolean training) {
         return forward(parameterStore, inputs, training, null);
     }
+
+    NativeResource<Long> forward(NativeResource<Long>[] inputs);
 
     /**
      * Applies the operating function of the block once. This method should be called only on blocks

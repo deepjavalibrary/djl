@@ -12,6 +12,9 @@
  */
 package ai.djl.util;
 
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+
 import com.sun.jna.Pointer;
 
 import org.slf4j.Logger;
@@ -80,6 +83,16 @@ public abstract class NativeResource<T> implements AutoCloseable {
         if (TRACK_RESOURCE) {
             exception = new Exception();
         }
+    }
+
+    /**
+     * Returns the {@code NDList} value of this NativeResource.
+     *
+     * @param manager the NDManager to attach NDArrays to
+     * @return the {@code NDList} of this NativeResource
+     */
+    public NDList toNDList(NDManager manager) {
+        throw new UnsupportedOperationException("Not implemented.");
     }
 
     /** {@inheritDoc} */

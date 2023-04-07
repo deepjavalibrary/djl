@@ -66,7 +66,7 @@ public final class IValueUtils {
      * @param inputs the input {@link IValue}
      * @return the result {@link IValue}
      */
-    public static IValue forward(PtSymbolBlock block, IValue... inputs) {
+    public static IValue forward(PtSymbolBlock block, IValue[] inputs) {
         return runMethod(block, "forward", inputs);
     }
 
@@ -79,9 +79,10 @@ public final class IValueUtils {
      * @return the result {@link IValue}
      */
     public static IValue runMethod(PtSymbolBlock block, String methodName, IValue... inputs) {
-        long[] handles = Arrays.stream(inputs).mapToLong(IValue::getHandle).toArray();
+        long[] iValueHandles = Arrays.stream(inputs).mapToLong(IValue::getHandle).toArray();
         return new IValue(
-                PyTorchLibrary.LIB.moduleRunMethod(block.getHandle(), methodName, handles, false));
+                PyTorchLibrary.LIB.moduleRunMethod(
+                        block.getHandle(), methodName, iValueHandles, false));
     }
 
     private static int addToMap(
@@ -145,5 +146,33 @@ public final class IValueUtils {
             }
         }
         return new Pair<>(ret, methodName);
+    }
+
+    public static IValue toTupleIValue(NDList ndList, long[] dims) {
+        return toTupleIValueRecur(ndList, dims, 0, 0).getKey();
+    }
+
+    private static Pair<IValue, Integer> toTupleIValueRecur(
+            NDList ndList, long[] dims, int startCount, int level) {
+        if (startCount > ndList.size()) {
+            throw new IllegalArgumentException("startCount illegal");
+        }
+        if (dims.length - 1 == level) {
+            long dim = dims[level];
+            List<PtNDArray> vector = new ArrayList<>();
+            for (int i = startCount; i < startCount + dim; i++) {
+                vector.add((PtNDArray) ndList.get(i));
+            }
+            IValue[] output = vector.stream().map(IValue::from).toArray(IValue[]::new);
+            return new Pair<>(IValue.tupleFrom(output), (int) (startCount + dim));
+        }
+
+        IValue[] output = new IValue[(int) dims[0]];
+        for (int j = 0; j < dims[level]; j++) {
+            Pair<IValue, Integer> p = toTupleIValueRecur(ndList, dims, startCount, level + 1);
+            startCount = p.getValue();
+            output[j] = p.getKey();
+        }
+        return new Pair<>(IValue.tupleFrom(output), startCount);
     }
 }

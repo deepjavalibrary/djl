@@ -19,6 +19,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.training.ParameterStore;
 import ai.djl.training.initializer.Initializer;
+import ai.djl.util.NativeResource;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 
@@ -72,11 +73,15 @@ public abstract class AbstractBaseBlock implements Block {
             NDList inputs,
             boolean training,
             PairList<String, Object> params) {
-        NDManager paramsManager = parameterStore.getManager();
         if (training && !isInitialized()) {
-            initialize(paramsManager, DataType.FLOAT32, inputs.getShapes());
+            initialize(parameterStore.getManager(), DataType.FLOAT32, inputs.getShapes());
         }
         return forwardInternal(parameterStore, inputs, training, params);
+    }
+
+    @Override
+    public final NativeResource<Long> forward(NativeResource<Long>[] inputs) {
+        return forwardInternal(inputs);
     }
 
     /** {@inheritDoc} */
@@ -108,6 +113,10 @@ public abstract class AbstractBaseBlock implements Block {
             NDList inputs,
             boolean training,
             PairList<String, Object> params);
+
+    protected NativeResource<Long> forwardInternal(NativeResource<Long>[] inputs) {
+        return null;
+    }
 
     /**
      * A helper for {@link Block#forward(ParameterStore, NDList, NDList, PairList)} after

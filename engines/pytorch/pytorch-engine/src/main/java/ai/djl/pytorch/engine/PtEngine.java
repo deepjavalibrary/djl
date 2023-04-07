@@ -13,6 +13,7 @@
 package ai.djl.pytorch.engine;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
@@ -20,13 +21,16 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.GradientCollector;
+import ai.djl.translate.LMAdapter;
 import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -143,6 +147,17 @@ public final class PtEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return PtNDManager.getSystemManager().newSubManager(device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public LMAdapter newLMAdapter(String languageModel, String[] modelUrls)
+            throws ModelNotFoundException, MalformedModelException, IOException {
+        if ("GPT2".equals(languageModel)) {
+            return new GPT2PtLMAdapter(modelUrls);
+        } else {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 
     /** {@inheritDoc} */

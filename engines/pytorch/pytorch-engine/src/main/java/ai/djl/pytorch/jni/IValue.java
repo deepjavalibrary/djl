@@ -13,6 +13,7 @@
 package ai.djl.pytorch.jni;
 
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.engine.PtNDArray;
@@ -454,13 +455,10 @@ public class IValue extends NativeResource<Long> {
         return ret;
     }
 
-    /**
-     * Returns the {@code NDList} value of this IValue.
-     *
-     * @param manager the NDManager to create NDArray
-     * @return the {@code NDList} value of this IValue
-     */
-    public NDList toNDList(PtNDManager manager) {
+    /** {@inheritDoc} */
+    @Override
+    public NDList toNDList(NDManager ndManager) {
+        PtNDManager manager = (PtNDManager) ndManager;
         if (isTensor()) {
             return new NDList(toTensor(manager));
         } else if (isTensorList()) {

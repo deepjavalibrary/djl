@@ -23,6 +23,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
+import ai.onnxruntime.OrtUtil;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -57,7 +58,12 @@ public class OrtNDManager extends BaseNDManager {
         if (array == null || array instanceof OrtNDArray) {
             return (OrtNDArray) array;
         }
-        OrtNDArray result = create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        OrtNDArray result;
+        if (array.getDataType() == DataType.BOOLEAN) {
+            result = create(array.toBooleanArray());
+        } else {
+            result = create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        }
         result.setName(array.getName());
         return result;
     }
@@ -77,6 +83,27 @@ public class OrtNDManager extends BaseNDManager {
         BaseNDManager.validateBuffer(data, dataType, size);
         OnnxTensor tensor = OrtUtils.toTensor(env, data, shape, dataType);
         return new OrtNDArray(this, alternativeManager, tensor);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public OrtNDArray create(boolean[] data) {
+        try {
+            return new OrtNDArray(this, alternativeManager, OrtUtils.toTensor(env, data));
+        } catch (OrtException e) {
+            throw new EngineException(e);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public OrtNDArray create(boolean[] data, Shape shape) {
+        Object tensorIn = OrtUtil.reshape(data, shape.getShape());
+        try {
+            return new OrtNDArray(this, alternativeManager, OrtUtils.toTensor(env, tensorIn));
+        } catch (OrtException e) {
+            throw new EngineException(e);
+        }
     }
 
     /** {@inheritDoc} */

@@ -14,14 +14,19 @@
 package ai.djl.onnxruntime.engine;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.translate.LMAdapter;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtLoggingLevel;
 import ai.onnxruntime.OrtSession;
+
+import java.io.IOException;
 
 /**
  * The {@code OrtEngine} is an implementation of the {@link Engine} based on the <a
@@ -132,6 +137,17 @@ public final class OrtEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return OrtNDManager.getSystemManager().newSubManager(device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public LMAdapter newLMAdapter(String languageModel, String[] modelUrls)
+            throws ModelNotFoundException, MalformedModelException, IOException {
+        if ("GPT2".equals(languageModel)) {
+            return new GPT2OrtLMAdapter(modelUrls);
+        } else {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 
     /** {@inheritDoc} */
