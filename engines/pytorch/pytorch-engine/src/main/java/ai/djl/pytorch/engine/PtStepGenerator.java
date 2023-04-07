@@ -24,15 +24,67 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.CausalLMOutput;
 import ai.djl.translate.StepGenerator;
 import ai.djl.util.NativeResource;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class PtStepGenerator implements StepGenerator {
-    public PtStepGenerator() {}
+    Block[] blocks;
+    ZooModel<NDList, NDList>[] models;
 
-    public void stepGeneration(String inputType)
+    public PtStepGenerator(String[] modelUrls)
+            throws ModelNotFoundException, MalformedModelException, IOException {
+        blocks = new Block[modelUrls.length];
+        for (int i = 0; i < modelUrls.length; i++) {
+            Criteria<NDList, NDList> criteria =
+                    Criteria.builder()
+                            .setTypes(NDList.class, NDList.class)
+                            .optModelUrls(modelUrls[i])
+                            .optProgress(new ProgressBar())
+                            .optEngine("PyTorch")
+                            .optOption("trainParam", String.valueOf(false))
+                            .build();
+            ZooModel<NDList, NDList> model = criteria.loadModel();
+            blocks[i] = model.getBlock();
+            models[i] = model;
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public CausalLMOutput stepGeneration(
+            NDList input, NativeResource<Long> pastKeyValues, NDManager manager) {
+        IValue[] inputNative =
+                input.stream()
+                        .map(object -> IValue.from((PtNDArray) object))
+                        .toArray(IValue[]::new);
+
+        int blockIdx = pastKeyValues == null ? 0 : 1;
+        NativeResource<Long> resultIValue =
+                blocks[blockIdx].forward(
+                        pastKeyValues == null
+                                ? inputNative
+                                : new IValue[] {
+                                    inputNative[0],
+                                    inputNative[1],
+                                    inputNative[2],
+                                    (IValue) pastKeyValues
+                                });
+
+        IValue[] resultIValueArray = ((IValue) resultIValue).toIValueTuple();
+
+        manager.attachInternal("inputNative", inputNative);
+        manager.attachInternal("resultIValueArray", resultIValueArray);
+        manager.attachInternal("resultIValue", resultIValue);
+
+        return new CausalLMOutput(
+                resultIValueArray[0].toNDList(manager).singletonOrThrow(), resultIValueArray[1]);
+    }
+
+    public void poc(String inputType)
             throws ModelNotFoundException, MalformedModelException, IOException {
         NDManager manager = NDManager.newBaseManager();
 
@@ -51,7 +103,6 @@ public class PtStepGenerator implements StepGenerator {
                         .optEngine("PyTorch")
                         .optOption("trainParam", String.valueOf(false))
                         .build();
-
         ZooModel<NDList, NDList> generator_init = criteria_init.loadModel();
         Block block_init = generator_init.getBlock();
 
@@ -81,10 +132,10 @@ public class PtStepGenerator implements StepGenerator {
 
         // inference
         NativeResource<Long> resultIValue = block_init.forward(inputNativeInit);
-        IValue[] resultArray = ((IValue) resultIValue).toIValueTuple();
+        IValue[] resultIValueArray = ((IValue) resultIValue).toIValueTuple();
 
         manager.attachInternal("inputNativeInit", inputNativeInit);
-        manager.attachInternal("resultArray", resultArray);
+        manager.attachInternal("resultIValueArray", resultIValueArray);
 
         /////////////////////////////////////////////
         // Inference with cached key_values input
@@ -106,7 +157,7 @@ public class PtStepGenerator implements StepGenerator {
         Block block = generator.getBlock();
 
         // Prepare input
-        long pastSeqLen = resultArray[1].toNDList((PtNDManager) manager).get(0).getShape().size(-2);
+        long pastSeqLen = resultIValueArray[1].toNDList(manager).get(0).getShape().size(-2);
         if ("simple".equals(inputType)) {
             inputIds = manager.create(new int[] {404}, new Shape(1, 1));
         } else if ("batch".equals(inputType)) {
@@ -132,14 +183,14 @@ public class PtStepGenerator implements StepGenerator {
                         .toArray(IValue[]::new);
 
         // Inference
-        // Here resultArray[1] = past_key_values, which is from the first inference
+        // Here resultIValueArray[1] = past_key_values, which is from the first inference
         // and has been used here as a demo cached input.
         NativeResource<Long> output2 =
                 block.forward(
                         new IValue[] {
-                            inputNative[0], inputNative[1], inputNative[2], resultArray[1]
+                            inputNative[0], inputNative[1], inputNative[2], resultIValueArray[1]
                         });
-        NDList result = ((IValue) output2).toNDList((PtNDManager) manager);
+        NDList result = (output2).toNDList(manager);
 
         manager.attachInternal("inputNative", inputNative);
 
@@ -149,5 +200,10 @@ public class PtStepGenerator implements StepGenerator {
         manager.close();
         generator_init.close();
         generator.close();
+    }
+
+    @Override
+    public void close() {
+        Arrays.stream(models).forEach(ZooModel::close);
     }
 }

@@ -13,12 +13,22 @@
 package ai.djl.translate;
 
 import ai.djl.MalformedModelException;
+import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.util.NativeResource;
 
 import java.io.IOException;
 
-public interface StepGenerator {
+public interface StepGenerator extends AutoCloseable {
 
-    void stepGeneration(String inputType)
-            throws ModelNotFoundException, MalformedModelException, IOException;
+    /**
+     * @param input input
+     * @param pastKeyValues past_key_values
+     * @return CausalLMOutput
+     */
+    CausalLMOutput stepGeneration(
+            NDList input, NativeResource<Long> pastKeyValues, NDManager manager);
+
+    void poc(String inputType) throws ModelNotFoundException, MalformedModelException, IOException;
 }

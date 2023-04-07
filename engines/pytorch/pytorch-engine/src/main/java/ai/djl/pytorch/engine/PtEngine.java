@@ -13,6 +13,7 @@
 package ai.djl.pytorch.engine;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
@@ -20,6 +21,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.GradientCollector;
 import ai.djl.translate.StepGenerator;
 import ai.djl.util.Utils;
@@ -28,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -148,8 +151,9 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public StepGenerator newStepGenerator() {
-        return new PtStepGenerator();
+    public StepGenerator newStepGenerator(String[] modelUrls)
+            throws ModelNotFoundException, MalformedModelException, IOException {
+        return new PtStepGenerator(modelUrls);
     }
 
     /** {@inheritDoc} */

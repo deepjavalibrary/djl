@@ -13,9 +13,11 @@
 package ai.djl.engine;
 
 import ai.djl.Device;
+import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.SymbolBlock;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
@@ -303,10 +305,10 @@ public abstract class Engine {
      */
     public abstract NDManager newBaseManager(Device device);
 
-    public StepGenerator newStepGenerator() {
+    public StepGenerator newStepGenerator(String[] modelUrls)
+            throws ModelNotFoundException, MalformedModelException, IOException {
         throw new UnsupportedOperationException("Not supported.");
     }
-    ;
 
     /**
      * Returns a new instance of {@link GradientCollector}.
