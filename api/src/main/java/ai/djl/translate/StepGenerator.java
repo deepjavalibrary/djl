@@ -25,6 +25,7 @@ public interface StepGenerator extends AutoCloseable {
     /**
      * @param input input
      * @param pastKeyValues past_key_values
+     * @param manager manager
      * @return CausalLMOutput
      */
     CausalLMOutput stepGeneration(
