@@ -12,14 +12,18 @@
  */
 package ai.djl.examples.inference;
 
+import ai.djl.MalformedModelException;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.translate.CausalLMOutput;
 import ai.djl.translate.StepGenerator;
+
+import java.io.IOException;
 
 public final class TextGeneration {
 
@@ -32,18 +36,17 @@ public final class TextGeneration {
         };
 
         try (StepGenerator generator = Engine.getEngine("PyTorch").newStepGenerator(modelUrls);
-             NDManager manager = NDManager.newBaseManager()) {
-//             generator.poc("batch");
+                NDManager manager = NDManager.newBaseManager()) {
+            generator.poc("batch");
 
             /////////////////////////////////////////////
             // Inference without cached key_values input
             /////////////////////////////////////////////
 
-            // Prepare input
             int[] inputArray = {40, 2883, 6155, 351, 616, 13779};
+            int numBatch = 2;
 
             NDArray inputIds = manager.create(inputArray, new Shape(2, inputArray.length / 2));
-            int numBatch = 2;
 
             NDArray positionIds =
                     manager.arange(0, inputIds.getShape().size(-1), 1, DataType.INT64)
@@ -61,7 +64,7 @@ public final class TextGeneration {
             /////////////////////////////////////////////
 
             long pastSeqLen = outInit.pastKeyValues.toNDList(manager).get(0).getShape().size(-2);
-            inputIds = manager.create(new int[]{404, 403, 402, 401}, new Shape(numBatch, 2));
+            inputIds = manager.create(new int[] {404, 403, 402, 401}, new Shape(numBatch, 2));
             positionIds =
                     manager.arange(
                                     pastSeqLen,
@@ -81,7 +84,10 @@ public final class TextGeneration {
                             outInit.pastKeyValues,
                             manager);
 
-        } catch (Exception e) {
+            System.out.println(out.logits);
+            System.out.println(out.pastKeyValues);
+
+        } catch (ModelNotFoundException | MalformedModelException | IOException e) {
             throw new RuntimeException(e);
         }
     }

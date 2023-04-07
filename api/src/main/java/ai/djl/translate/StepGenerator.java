@@ -31,4 +31,8 @@ public interface StepGenerator extends AutoCloseable {
             NDList input, NativeResource<Long> pastKeyValues, NDManager manager);
 
     void poc(String inputType) throws ModelNotFoundException, MalformedModelException, IOException;
+
+    /** {@inheritDoc} */
+    @Override
+    void close();
 }

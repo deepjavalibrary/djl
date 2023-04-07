@@ -29,15 +29,17 @@ import ai.djl.translate.StepGenerator;
 import ai.djl.util.NativeResource;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PtStepGenerator implements StepGenerator {
     Block[] blocks;
-    ZooModel<NDList, NDList>[] models;
+    List<ZooModel<NDList, NDList>> models;
 
     public PtStepGenerator(String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
         blocks = new Block[modelUrls.length];
+        models = new ArrayList<>();
         for (int i = 0; i < modelUrls.length; i++) {
             Criteria<NDList, NDList> criteria =
                     Criteria.builder()
@@ -49,7 +51,7 @@ public class PtStepGenerator implements StepGenerator {
                             .build();
             ZooModel<NDList, NDList> model = criteria.loadModel();
             blocks[i] = model.getBlock();
-            models[i] = model;
+            models.add(model);
         }
     }
 
@@ -204,6 +206,6 @@ public class PtStepGenerator implements StepGenerator {
 
     @Override
     public void close() {
-        Arrays.stream(models).forEach(ZooModel::close);
+        models.forEach(ZooModel::close);
     }
 }
