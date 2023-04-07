@@ -8,7 +8,7 @@ Use of these classes will couple your code with PyTorch and make switching betwe
 
 ## Documentation
 
-The latest javadocs can be found on [here](https://javadoc.io/doc/ai.djl.pytorch/pytorch-engine/latest/index.html).
+The latest javadocs can be found [here](https://javadoc.io/doc/ai.djl.pytorch/pytorch-engine/latest/index.html).
 
 You can also build the latest javadocs locally using the following command:
 
