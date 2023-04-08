@@ -92,6 +92,8 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             translator.setArguments(arguments);
             logger.info("Using translator: {}", translator.getClass().getName());
             return (Translator<I, O>) translator;
+        } else if (className != null) {
+            throw new TranslateException("Failed to load translator: " + className);
         }
         return (Translator<I, O>) loadDefaultTranslator(arguments);
     }
