@@ -202,16 +202,12 @@ public class Predictor<I, O> implements AutoCloseable {
     @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.IdenticalCatchBranches"})
     public O streamingPredict(I input) throws TranslateException {
 
-        if (!(block instanceof StreamingBlock)) {
-            throw new IllegalStateException(
-                    "streamingPredict() can only be called with a StreamingBlock");
+        String streamingSupported = streamingSupportError();
+        if (streamingSupported != null) {
+            throw new IllegalStateException(streamingSupported);
         }
-        StreamingBlock streamingBlock = (StreamingBlock) block;
 
-        if (!(translator instanceof StreamingTranslator)) {
-            throw new IllegalStateException(
-                    "streamingPredict() can only be called with a StreamingTranslator");
-        }
+        StreamingBlock streamingBlock = (StreamingBlock) block;
         StreamingTranslator<I, O> streamingTranslator = (StreamingTranslator<I, O>) translator;
 
         try {
@@ -254,6 +250,25 @@ public class Predictor<I, O> implements AutoCloseable {
         } catch (Exception e) {
             throw new TranslateException(e);
         }
+    }
+
+    /**
+     * Returns true if streaming is supported by the predictor, block, and translator.
+     *
+     * @return true if streaming is supported by the predictor, block, and translator
+     */
+    public boolean supportsStreaming() {
+        return streamingSupportError() == null;
+    }
+
+    private String streamingSupportError() {
+        if (!(block instanceof StreamingBlock)) {
+            return "streamingPredict() can only be called with a StreamingBlock";
+        }
+        if (!(translator instanceof StreamingTranslator)) {
+            return "streamingPredict() can only be called with a StreamingTranslator";
+        }
+        return null;
     }
 
     /**

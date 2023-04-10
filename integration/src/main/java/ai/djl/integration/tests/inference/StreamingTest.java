@@ -49,6 +49,7 @@ public class StreamingTest {
 
             try (Predictor<Double, DoubleStream> predictor =
                     model.newPredictor(new TestTranslator())) {
+                Assert.assertTrue(predictor.supportsStreaming());
                 List<Double> results =
                         predictor.streamingPredict(1.0).boxed().collect(Collectors.toList());
                 Assert.assertEquals(results, Arrays.asList(1.0, 1.0));
