@@ -56,6 +56,7 @@ class HuggingFaceTextEncoder(override val uid: String) extends BaseTextPredictor
 
   setDefault(inputClass, classOf[String])
   setDefault(outputClass, classOf[Encoding])
+  setDefault(translatorFactory, null)
 
   /**
    * Performs sentence encoding on the provided dataset.

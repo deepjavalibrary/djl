@@ -56,6 +56,7 @@ class HuggingFaceTextTokenizer(override val uid: String) extends BaseTextPredict
 
   setDefault(inputClass, classOf[String])
   setDefault(outputClass, classOf[Array[String]])
+  setDefault(translatorFactory, null)
 
   /**
    * Performs sentence tokenization on the provided dataset.
