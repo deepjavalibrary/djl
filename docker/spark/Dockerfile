@@ -25,7 +25,8 @@ ARG PROTOBUF_VERSION=3.21.9
 COPY extensions/spark/setup/dist/ dist/
 RUN pip3 install --no-cache-dir dist/djl_spark-*-py3-none-any.whl && \
     rm -rf dist
-RUN pip3 install --no-cache-dir pillow pandas numpy pyarrow
+RUN pip3 install --no-cache-dir torch==1.13.1 --index-url https://download.pytorch.org/whl/cpu
+RUN pip3 install --no-cache-dir pillow pandas numpy pyarrow 'transformers[torch]'
 
 ADD https://repo1.maven.org/maven2/ai/djl/api/${DJL_VERSION}/api-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-api-${DJL_VERSION}.jar
 ADD https://repo1.maven.org/maven2/ai/djl/spark/spark/${DJL_VERSION}/spark-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-spark-${DJL_VERSION}.jar
