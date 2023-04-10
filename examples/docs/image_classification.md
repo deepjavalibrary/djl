@@ -39,11 +39,11 @@ Your output should look like the following:
 
 ```text
 [INFO ] - [
-        class: "0", probability: 0.99996
-        class: "2", probability: 0.00002
-        class: "6", probability: 5.4e-06
-        class: "9", probability: 2.5e-06
-        class: "8", probability: 8.5e-07
+	{"class": "0", "probability": 0.99997}
+	{"class": "2", "probability": 0.00002}
+	{"class": "8", "probability": 2.0e-06}
+	{"class": "9", "probability": 1.6e-06}
+	{"class": "6", "probability": 6.9e-07}
 ]
 ```
 

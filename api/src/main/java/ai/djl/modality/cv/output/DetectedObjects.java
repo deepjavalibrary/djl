@@ -104,11 +104,19 @@ public class DetectedObjects extends Classifications {
         /** {@inheritDoc} */
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(super.toString());
-            if (getBoundingBox() != null) {
-                sb.append(", bounds: ").append(getBoundingBox());
+            double probability = getProbability();
+            StringBuilder sb = new StringBuilder(200);
+            sb.append("{\"class\": \"").append(getClassName()).append("\", \"probability\": ");
+            if (probability < 0.00001) {
+                sb.append(String.format("%.1e", probability));
+            } else {
+                probability = (int) (probability * 100000) / 100000f;
+                sb.append(String.format("%.5f", probability));
             }
+            if (getBoundingBox() != null) {
+                sb.append(", \"bounds\": ").append(getBoundingBox());
+            }
+            sb.append('}');
             return sb.toString();
         }
     }

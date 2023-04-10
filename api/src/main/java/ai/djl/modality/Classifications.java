@@ -222,20 +222,11 @@ public class Classifications implements JsonSerializable, Ensembleable<Classific
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append('{').append(System.lineSeparator());
-        boolean first = true;
+        sb.append('[').append(System.lineSeparator());
         for (Classification item : topK(topK)) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(',').append(System.lineSeparator());
-            }
-            sb.append("\t\"")
-                    .append(item.getClassName())
-                    .append("\": ")
-                    .append(item.getProbability());
+            sb.append('\t').append(item).append(System.lineSeparator());
         }
-        sb.append(System.lineSeparator()).append('}');
+        sb.append(']');
         return sb.toString();
     }
 
@@ -306,11 +297,16 @@ public class Classifications implements JsonSerializable, Ensembleable<Classific
         /** {@inheritDoc} */
         @Override
         public String toString() {
+            StringBuilder sb = new StringBuilder(100);
+            sb.append("{\"class\": \"").append(className).append("\", \"probability\": ");
             if (probability < 0.00001) {
-                return String.format("class: \"%s\", probability: %.1e", className, probability);
+                sb.append(String.format("%.1e", probability));
+            } else {
+                probability = (int) (probability * 100000) / 100000f;
+                sb.append(String.format("%.5f", probability));
             }
-            probability = (int) (probability * 100000) / 100000f;
-            return String.format("class: \"%s\", probability: %.5f", className, probability);
+            sb.append('}');
+            return sb.toString();
         }
     }
 

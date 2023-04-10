@@ -34,10 +34,10 @@ Your output should look like the following:
 ```text
 [INFO ] - Detected objects image has been saved in: build/output/detected-dog_bike_car.png
 [INFO ] - [
-          	class: "car", probability: 0.99991, bounds: [x=0.611, y=0.137, width=0.293, height=0.160]
-          	class: "bicycle", probability: 0.95385, bounds: [x=0.162, y=0.207, width=0.594, height=0.588]
-          	class: "dog", probability: 0.93752, bounds: [x=0.168, y=0.350, width=0.274, height=0.593]
-          ]
+	{"class": "car", "probability": 0.99991, "bounds": {"x"=0.611, "y"=0.137, "width"=0.293, "height"=0.160}}
+	{"class": "bicycle", "probability": 0.95385, "bounds": {"x"=0.162, "y"=0.207, "width"=0.594, "height"=0.588}}
+	{"class": "dog", "probability": 0.93752, "bounds": {"x"=0.168, "y"=0.350, "width"=0.274, "height"=0.593}}
+]
 ```
 
 An output image with bounding box will be saved as build/output/detected-dog_bike_car.png:

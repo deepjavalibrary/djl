@@ -35,11 +35,11 @@ Your output should look like the following:
 ```text
 [INFO ] - Face detection result image has been saved in: build/output/retinaface_detected.png
 [INFO ] - [
-	class: "Face", probability: 0.99993, bounds: [x=0.552, y=0.762, width=0.071, height=0.156]
-	class: "Face", probability: 0.99992, bounds: [x=0.696, y=0.665, width=0.071, height=0.155]
-	class: "Face", probability: 0.99976, bounds: [x=0.176, y=0.778, width=0.033, height=0.073]
-	class: "Face", probability: 0.99961, bounds: [x=0.934, y=0.686, width=0.032, height=0.068]
-	class: "Face", probability: 0.99949, bounds: [x=0.026, y=0.756, width=0.039, height=0.078]
+	{"class": "Face", "probability": 0.99993, "bounds": {"x"=0.552, "y"=0.762, "width"=0.071, "height"=0.156}}
+	{"class": "Face", "probability": 0.99992, "bounds": {"x"=0.696, "y"=0.665, "width"=0.071, "height"=0.155}}
+	{"class": "Face", "probability": 0.99976, "bounds": {"x"=0.176, "y"=0.778, "width"=0.033, "height"=0.073}}
+	{"class": "Face", "probability": 0.99961, "bounds": {"x"=0.934, "y"=0.686, "width"=0.032, "height"=0.068}}
+	{"class": "Face", "probability": 0.99949, "bounds": {"x"=0.026, "y"=0.756, "width"=0.039, "height"=0.078}}
 ]
 ```
 

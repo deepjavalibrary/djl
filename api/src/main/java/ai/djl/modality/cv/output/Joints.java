@@ -49,7 +49,7 @@ public class Joints implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(4000);
-        sb.append("\n[\t");
+        sb.append("\n[\n\t");
         boolean first = true;
         for (Joint joint : joints) {
             if (first) {
@@ -97,7 +97,8 @@ public class Joints implements Serializable {
         @Override
         public String toString() {
             return String.format(
-                    "Joint [x=%.3f, y=%.3f], confidence: %.4f", getX(), getY(), getConfidence());
+                    "{\"Joint\": {\"x\"=%.3f, \"y\"=%.3f}, \"confidence\": %.4f}",
+                    getX(), getY(), getConfidence());
         }
     }
 }
