@@ -144,6 +144,11 @@ public class ResnetTest {
             NoopTranslator translator = new NoopTranslator(Batchifier.STACK);
             try (Predictor<NDList, NDList> predictor = model.newPredictor(translator)) {
                 NDList input = new NDList(model.getNDManager().ones(new Shape(3, 32, 32)));
+
+                // Verify streaming does not work (due to Translator)
+                Assert.assertFalse(predictor.supportsStreaming());
+                Assert.assertThrows(() -> predictor.streamingPredict(input));
+
                 List<NDList> inputs = Collections.nCopies(16, input);
                 predictor.batchPredict(inputs);
             }
