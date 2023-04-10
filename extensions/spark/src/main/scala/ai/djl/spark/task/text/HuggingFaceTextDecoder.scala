@@ -56,6 +56,7 @@ class HuggingFaceTextDecoder(override val uid: String) extends BaseTextPredictor
 
   setDefault(inputClass, classOf[Array[Long]])
   setDefault(outputClass, classOf[String])
+  setDefault(translatorFactory, null)
 
   /**
    * Decodes String from the input ids on the provided dataset.
