@@ -32,8 +32,8 @@ This should produce the following output
 ```text
 [INFO ] - Segmentation result image has been saved in: build/output/instances.png
 [INFO ] - [
-	class: "bicycle", probability: 0.99887, bounds: [x=0.095, y=0.214, width=0.477, height=0.683]
-	class: "bicycle", probability: 0.97689, bounds: [x=0.495, y=0.183, width=0.434, height=0.662]
+	{"class": "bicycle", "probability": 0.99887, "bounds": {"x"=0.095, "y"=0.214, "width"=0.477, "height"=0.683}}
+	{"class": "bicycle", "probability": 0.97689, "bounds": {"x"=0.495, "y"=0.183, "width"=0.434, "height"=0.662}}
 ]
 ```
 

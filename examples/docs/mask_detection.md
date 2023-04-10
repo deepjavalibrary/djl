@@ -37,9 +37,9 @@ Your output should look like the following:
 ```text
 [INFO ] - Detected objects image has been saved in: build/output/face_mask_result.png
 [INFO ] - {
-	"w/o mask": 0.8998132944107056,
-	"w/ mask": 0.8930246829986572,
-	"w/ mask": 0.8708265423774719,
+	{"class": "w/o mask", "probability": 0.90062, "bounds": {"x"=0.416, "y"=0.362, "width"=0.121, "height"=0.158}}
+	{"class": "w/ mask", "probability": 0.88587, "bounds": {"x"=0.653, "y"=0.603, "width"=0.130, "height"=0.189}}
+	{"class": "w/ mask", "probability": 0.87304, "bounds": {"x"=0.816, "y"=0.224, "width"=0.100, "height"=0.117}}
 	...
 }
 ```

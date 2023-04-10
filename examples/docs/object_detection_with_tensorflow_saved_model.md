@@ -51,11 +51,11 @@ cd examples
 Your output should look like the following:
 
 ```text
-[main] INFO ObjectDetectionWithTensorflowSavedModel - Detected objects image has been saved in: build\output\detected-dog_bike_car.png
-[main] INFO ObjectDetectionWithTensorflowSavedModel - [
-	class: "bicycle", probability: 0.80220, bounds: [x=0.147, y=0.209, width=0.576, height=0.603]
-	class: "car", probability: 0.73779, bounds: [x=0.596, y=0.145, width=0.297, height=0.149]
-	class: "dog", probability: 0.72259, bounds: [x=0.172, y=0.397, width=0.261, height=0.548]
+[main] INFO - Detected objects image has been saved in: build\output\detected-dog_bike_car.png
+[main] INFO - [
+	{"class": "bicycle", "probability": 0.80220, "bounds": {"x"=0.147, "y"=0.209, "width"=0.576, "height"=0.603}}
+	{"class": "car", "probability": 0.73779, "bounds": {"x"=0.596, "y"=0.145, "width"=0.297, "height"=0.149}}
+	{"class": "dog", "probability": 0.72259, "bounds": {"x"=0.172, "y"=0.397, "width"=0.261, "height"=0.548}}
 ]
 ```
 

@@ -138,6 +138,7 @@ public class Rectangle implements BoundingBox {
     public String toString() {
         double x = getX();
         double y = getY();
-        return String.format("[x=%.3f, y=%.3f, width=%.3f, height=%.3f]", x, y, width, height);
+        return String.format(
+                "{\"x\"=%.3f, \"y\"=%.3f, \"width\"=%.3f, \"height\"=%.3f}", x, y, width, height);
     }
 }
