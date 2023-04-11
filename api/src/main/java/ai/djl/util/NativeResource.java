@@ -85,6 +85,12 @@ public abstract class NativeResource<T> implements AutoCloseable {
         }
     }
 
+    /**
+     * Returns the {@code NDList} value of this NativeResource.
+     *
+     * @param manager the NDManager to attach NDArrays to
+     * @return the {@code NDList} of this NativeResource
+     */
     public NDList toNDList(NDManager manager) {
         throw new UnsupportedOperationException("Not implemented.");
     }

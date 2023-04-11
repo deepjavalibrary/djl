@@ -64,18 +64,19 @@ public class PtStepGenerator implements StepGenerator {
                         .map(object -> IValue.from((PtNDArray) object))
                         .toArray(IValue[]::new);
 
-        int blockIdx = pastKeyValues == null ? 0 : 1;
-        NativeResource<Long> resultIValue =
-                blocks[blockIdx].forward(
-                        pastKeyValues == null
-                                ? inputNative
-                                : new IValue[] {
-                                    inputNative[0],
-                                    inputNative[1],
-                                    inputNative[2],
-                                    (IValue) pastKeyValues
-                                });
-
+        NativeResource<Long> resultIValue;
+        if (pastKeyValues == null) {
+            resultIValue = blocks[0].forward(inputNative);
+        } else {
+            resultIValue =
+                    blocks[1].forward(
+                            new IValue[] {
+                                inputNative[0],
+                                inputNative[1],
+                                inputNative[2],
+                                (IValue) pastKeyValues
+                            });
+        }
         IValue[] resultIValueArray = ((IValue) resultIValue).toIValueTuple();
 
         manager.attachInternal("inputNative", inputNative);

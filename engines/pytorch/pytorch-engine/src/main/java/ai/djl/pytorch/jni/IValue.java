@@ -455,12 +455,7 @@ public class IValue extends NativeResource<Long> {
         return ret;
     }
 
-    /**
-     * Returns the {@code NDList} value of this IValue.
-     *
-     * @param ndManager the NDManager to create NDArray
-     * @return the {@code NDList} value of this IValue
-     */
+    /** {@inheritDoc} */
     @Override
     public NDList toNDList(NDManager ndManager) {
         PtNDManager manager = (PtNDManager) ndManager;
