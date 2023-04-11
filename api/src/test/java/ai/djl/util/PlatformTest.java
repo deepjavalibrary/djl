@@ -36,6 +36,7 @@ public class PlatformTest {
         Assert.assertThrows(IllegalArgumentException.class, () -> Platform.fromUrl(invalid));
 
         URL url = createPropertyFile("version=1.8.0\nclassifier=cu113-linux-x86_64");
+        // Use cu113 as target machine
         Platform system = Platform.fromUrl(url);
         Assert.assertEquals(system.getFlavor(), "cu113");
         Assert.assertEquals(system.getClassifier(), "linux-x86_64");
@@ -48,6 +49,7 @@ public class PlatformTest {
         Assert.assertEquals(platform.getClassifier(), "linux-x86_64");
         Assert.assertEquals(platform.getOsPrefix(), "linux");
         Assert.assertEquals(platform.getOsArch(), "x86_64");
+        // cpu should always match with system
         Assert.assertTrue(platform.matches(system));
         Assert.assertFalse(system.matches(platform));
 
@@ -57,11 +59,17 @@ public class PlatformTest {
 
         url = createPropertyFile("version=1.8.0\nclassifier=cu111-linux-x86_64");
         platform = Platform.fromUrl(url);
+        // cu111 can run on cu113 machine
         Assert.assertTrue(platform.matches(system));
+        // cu113 can run on cu111 machine (the same major version)
+        Assert.assertTrue(system.matches(platform));
 
         url = createPropertyFile("version=1.8.0\nclassifier=cu102-linux-x86_64");
         platform = Platform.fromUrl(url);
+        // cu102 (lower major version) can run on cu113 machine,
         Assert.assertTrue(platform.matches(system));
+        // cu113 can not run on cu102 machine
+        Assert.assertFalse(system.matches(platform));
 
         // MXNet
         url = createPropertyFile("version=1.8.0\nclassifier=cu113mkl-linux-x86_64");
