@@ -37,6 +37,8 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Properties;
 
 public class OrtTest {
 
@@ -44,6 +46,17 @@ public class OrtTest {
     public void setUp() {
         System.setProperty("ai.djl.onnxruntime.num_threads", "1");
         System.setProperty("ai.djl.onnxruntime.num_interop_threads", "1");
+    }
+
+    @Test
+    public void testOrtVersion() throws IOException {
+        Engine engine = Engine.getEngine("OnnxRuntime");
+        Properties prop = new Properties();
+        Path path = Paths.get("../../../gradle.properties");
+        try (InputStream is = Files.newInputStream(path)) {
+            prop.load(is);
+            Assert.assertEquals(engine.getVersion(), prop.get("onnxruntime_version"));
+        }
     }
 
     @Test
