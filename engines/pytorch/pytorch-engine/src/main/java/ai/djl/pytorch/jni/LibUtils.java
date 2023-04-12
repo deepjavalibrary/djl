@@ -313,15 +313,7 @@ public final class LibUtils {
             if (!m.matches()) {
                 throw new AssertionError("Unexpected version: " + version);
             }
-            String[] versions = m.group(1).split("\\.");
-            int minorVersion = Integer.parseInt(versions[1]);
-            int buildVersion = Integer.parseInt(versions[2]);
-            String pathPrefix;
-            if (minorVersion > 10 || (minorVersion == 10 && buildVersion == 2)) {
-                pathPrefix = "pytorch/" + flavor + '/' + classifier;
-            } else {
-                pathPrefix = "native/lib";
-            }
+            String pathPrefix = "pytorch/" + flavor + '/' + classifier;
 
             Files.createDirectories(cacheDir);
             tmp = Files.createTempDirectory(cacheDir, "tmp");
