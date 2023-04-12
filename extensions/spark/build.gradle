@@ -33,6 +33,8 @@ tasks.register('formatPython') {
 publishing {
     publications {
         maven(MavenPublication) {
+            groupId 'ai.djl.spark'
+            artifactId 'spark_2.12'
             pom {
                 name = "Apache Spark integration for DJL"
                 description = "Apache Spark integration for DJL"
