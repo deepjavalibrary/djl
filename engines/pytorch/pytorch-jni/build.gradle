@@ -24,7 +24,13 @@ processResources {
                 "osx-x86_64/cpu/libdjl_torch.dylib",
                 "win-x86_64/cpu/djl_torch.dll"
         ]
-        if (ptVersion.startsWith("1.13.")) {
+        if (ptVersion.startsWith("2.0.")) {
+            files.add("linux-aarch64/cpu-precxx11/libdjl_torch.so")
+            files.add("linux-x86_64/cu118/libdjl_torch.so")
+            files.add("linux-x86_64/cu118-precxx11/libdjl_torch.so")
+            files.add("win-x86_64/cu118/djl_torch.dll")
+            files.add("osx-aarch64/cpu/libdjl_torch.dylib")
+        } else if (ptVersion.startsWith("1.13.")) {
             files.add("linux-aarch64/cpu-precxx11/libdjl_torch.so")
             files.add("linux-x86_64/cu117/libdjl_torch.so")
             files.add("linux-x86_64/cu117-precxx11/libdjl_torch.so")

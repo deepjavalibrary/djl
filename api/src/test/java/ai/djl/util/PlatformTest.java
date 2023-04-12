@@ -61,8 +61,8 @@ public class PlatformTest {
         platform = Platform.fromUrl(url);
         // cu111 can run on cu113 machine
         Assert.assertTrue(platform.matches(system));
-        // cu113 can run on cu111 machine (the same major version)
-        Assert.assertTrue(system.matches(platform));
+        // cu113 cannot run on cu111 machine (the same major version)
+        Assert.assertFalse(system.matches(platform));
 
         url = createPropertyFile("version=1.8.0\nclassifier=cu102-linux-x86_64");
         platform = Platform.fromUrl(url);

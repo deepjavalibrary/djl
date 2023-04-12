@@ -22,6 +22,8 @@ if (project.hasProperty("cu11")) {
         FLAVOR = "cu116"
     } else if (VERSION.startsWith("1.13.")) {
         FLAVOR = "cu117"
+    } else if (VERSION.startsWith("2.0.")) {
+        FLAVOR = "cu118"
     } else {
         throw new GradleException("Unsupported PyTorch version: ${VERSION}")
     }
@@ -93,6 +95,8 @@ def prepareNativeLib(String binaryRoot, String ver) {
         cu11 = "cu116"
     } else if (ver.startsWith("1.13.")) {
         cu11 = "cu117"
+    } else if (ver.startsWith("2.0.")) {
+        cu11 = "cu118"
     } else {
         throw new GradleException("Unsupported PyTorch version: ${ver}")
     }
@@ -283,9 +287,9 @@ tasks.register('uploadS3') {
                 "${BINARY_ROOT}/cpu/win-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-aarch64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu117/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu117/win-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu117-precxx11/linux-x86_64/native/lib/"
+                "${BINARY_ROOT}/cu118/linux-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu118/win-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu118-precxx11/linux-x86_64/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
@@ -351,6 +355,7 @@ flavorNames.each { flavor ->
             }
             from "src/main/resources"
             archiveClassifier = "${osName}"
+            archiveBaseName = "pytorch-native-${flavor}"
 
             manifest {
                 attributes("Automatic-Module-Name": "ai.djl.pytorch_native_${flavor}_${osName}")
