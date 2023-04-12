@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -289,6 +290,7 @@ public final class LibUtils {
     }
 
     private static LibTorch copyNativeLibraryFromClasspath(Platform platform) {
+        logger.debug("Found bundled PyTorch package: {}.", platform);
         String version = platform.getVersion();
         String flavor = platform.getFlavor();
         if (!flavor.endsWith("-precxx11")
@@ -350,6 +352,7 @@ public final class LibUtils {
         String classifier = platform.getClassifier();
         String precxx11;
         String flavor = Utils.getEnvOrSystemProperty("PYTORCH_FLAVOR");
+        boolean override;
         if (flavor == null || flavor.isEmpty()) {
             flavor = platform.getFlavor();
             if (System.getProperty("os.name").startsWith("Linux")
@@ -360,9 +363,11 @@ public final class LibUtils {
                 precxx11 = "";
             }
             flavor += precxx11;
+            override = false;
         } else {
             logger.info("Uses override PYTORCH_FLAVOR: {}", flavor);
             precxx11 = flavor.endsWith("-precxx11") ? "-precxx11" : "";
+            override = true;
         }
 
         Path cacheDir = Utils.getEngineCacheDir("pytorch");
@@ -399,23 +404,32 @@ public final class LibUtils {
             Files.createDirectories(cacheDir);
             List<String> lines = Utils.readLines(is);
             if (flavor.startsWith("cu")) {
-                String cudaMajor = flavor.substring(0, 4);
+                int cudaVersion = Integer.parseInt(flavor.substring(2, 5));
                 Pattern pattern =
                         Pattern.compile(
-                                '('
-                                        + cudaMajor
-                                        + "\\d"
+                                "cu(\\d\\d\\d)"
                                         + precxx11
-                                        + ")/"
+                                        + '/'
                                         + classifier
                                         + "/native/lib/"
                                         + NATIVE_LIB_NAME
                                         + ".gz");
+                List<Integer> cudaVersions = new ArrayList<>();
                 boolean match = false;
                 for (String line : lines) {
                     Matcher m = pattern.matcher(line);
                     if (m.matches()) {
-                        flavor = m.group(1);
+                        cudaVersions.add(Integer.parseInt(m.group(1)));
+                    }
+                }
+                // find highest matching CUDA version
+                cudaVersions.sort(Collections.reverseOrder());
+                for (int cuda : cudaVersions) {
+                    if (override && cuda == cudaVersion) {
+                        match = true;
+                        break;
+                    } else if (cuda <= cudaVersion) {
+                        flavor = "cu" + cuda + precxx11;
                         match = true;
                         break;
                     }
