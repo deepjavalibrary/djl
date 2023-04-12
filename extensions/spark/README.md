@@ -33,8 +33,8 @@ You can pull the module from the central Maven repository by including the follo
 ```xml
 <dependency>
     <groupId>ai.djl.spark</groupId>
-    <artifactId>spark</artifactId>
-    <version>0.21.0</version>
+    <artifactId>spark_2.12</artifactId>
+    <version>0.22.0</version>
 </dependency>
 ```
 
