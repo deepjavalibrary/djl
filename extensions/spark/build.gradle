@@ -8,9 +8,9 @@ dependencies {
     api project(":api")
     api project(":extensions:tokenizers")
     api project(":extensions:audio")
-    implementation "org.apache.spark:spark-core_2.12:${spark_version}"
-    implementation "org.apache.spark:spark-sql_2.12:${spark_version}"
-    implementation "org.apache.spark:spark-mllib_2.12:${spark_version}"
+    api "org.apache.spark:spark-core_2.12:${spark_version}"
+    api "org.apache.spark:spark-sql_2.12:${spark_version}"
+    api "org.apache.spark:spark-mllib_2.12:${spark_version}"
 
     testImplementation project(":testing")
     testRuntimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_slf4j_version}"
