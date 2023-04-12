@@ -162,11 +162,11 @@ jobs:
           LD_LIBRARY_PATH=/root/.djl.ai/paddle/${PADDLE_VERSION}-cu102-linux-x86_64:/usr/local/cuda/lib64 \
           ./gradlew :engines:paddlepaddle:paddlepaddle-model-zoo:test
 
-  test-cuda-113:
+  test-cuda-118:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: [ self-hosted, gpu ]
     container:
-      image: nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu18.04
+      image: nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu18.04
       options: --gpus all --runtime=nvidia
     timeout-minutes: 30
     needs: create-runners
@@ -203,7 +203,7 @@ jobs:
   publish:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    needs: [ build, test-pytorch, test-tensorflow, test-aarch64, test-cuda-102, test-cuda-113 ]
+    needs: [ build, test-pytorch, test-tensorflow, test-aarch64, test-cuda-102, test-cuda-118 ]
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 11
@@ -223,6 +223,7 @@ jobs:
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.11.0 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.12.1 -Psnapshot
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -Psnapshot
           ./gradlew clean engines:ml:xgboost:publish -Pgpu -Psnapshot
           ./gradlew clean publish -Psnapshot
           cd bom
@@ -237,6 +238,7 @@ jobs:
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.11.0 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.12.1 -P${{ github.event.inputs.mode }}
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:ml:xgboost:publish -Pgpu -P${{ github.event.inputs.mode }}
           ./gradlew clean publish -P${{ github.event.inputs.mode }}
           cd bom
@@ -282,7 +284,7 @@ jobs:
   stop-runners:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: [ self-hosted, scheduler ]
-    needs: [ create-runners, test-aarch64, test-cuda-102, test-cuda-113 ]
+    needs: [ create-runners, test-aarch64, test-cuda-102, test-cuda-118 ]
     steps:
       - name: Stop all instances
         run: |

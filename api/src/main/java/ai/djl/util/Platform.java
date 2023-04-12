@@ -295,10 +295,10 @@ public final class Platform {
             return true;
         }
 
-        // native package can run on system which major version is greater or equal
+        // native package can run on system which CUDA version is greater or equal
         if (system.flavor.startsWith("cu")
-                && Integer.parseInt(flavor.substring(2, 4))
-                        <= Integer.parseInt(system.flavor.substring(2, 4))) {
+                && Integer.parseInt(flavor.substring(2, 5))
+                        <= Integer.parseInt(system.flavor.substring(2, 5))) {
             return true;
         }
         logger.warn("The bundled library: " + this + " doesn't match system: " + system);
