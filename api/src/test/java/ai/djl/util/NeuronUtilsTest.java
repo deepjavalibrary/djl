@@ -12,6 +12,8 @@
  */
 package ai.djl.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -19,24 +21,39 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class NeuronUtilsTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(NeuronUtilsTest.class);
+
     @Test
     public void testNeuronUtils() throws IOException {
-        Path dir = Paths.get("build/neuron_device/");
+        Path dev = Paths.get("build/dev/");
+        Path sys = Paths.get("build/neuron_device/");
         try {
-            for (int i = 0; i < 4; ++i) {
-                Path nd = dir.resolve("neuron" + i);
+            Files.createDirectories(dev);
+            for (int i = 1; i < 4; ++i) {
+                Path nd = dev.resolve("neuron" + i);
+                Files.createFile(nd);
+
+                Path vd = sys.resolve("neuron" + i);
+                Files.createDirectories(vd);
                 for (int j = 0; j < 2; ++j) {
-                    Path nc = nd.resolve("neuron_core" + j);
+                    Path nc = vd.resolve("neuron_core" + j);
                     Files.createDirectories(nc);
                 }
             }
-            NeuronUtils.hasNeuron();
-            Assert.assertEquals(NeuronUtils.getNeuronCores(dir.toString()), 8);
+
+            logger.info("hasNeuron: {}", NeuronUtils.hasNeuron());
+            logger.info("# neuron cores: {}", NeuronUtils.getNeuronCores());
+            List<Path> devices = NeuronUtils.getNeuronDevices(dev.toString());
+            Assert.assertEquals(devices.size(), 3);
+            String vd = sys.resolve("neuron1").toString();
+            Assert.assertEquals(NeuronUtils.getNeuronCoresPerDevice(vd), 2);
         } finally {
-            Utils.deleteQuietly(dir);
+            Utils.deleteQuietly(sys);
+            Utils.deleteQuietly(dev);
         }
     }
 }

@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** A utility class to detect number of nueron cores. */
@@ -44,32 +46,43 @@ public final class NeuronUtils {
      * @return the number of NeuronCores available in the system
      */
     public static int getNeuronCores() {
-        return getNeuronCores("/sys/devices/virtual/neuron_device/");
+        List<Path> nd = getNeuronDevices("/dev/");
+        if (nd.isEmpty()) {
+            return 0;
+        }
+        String dev = nd.get(0).toFile().getName();
+        int cores = getNeuronCoresPerDevice("/sys/devices/virtual/neuron_device/" + dev);
+        return nd.size() * cores;
     }
 
-    @SuppressWarnings("PMD.ForLoopCanBeForeach")
-    static int getNeuronCores(String location) {
+    static List<Path> getNeuronDevices(String location) {
+        Path path = Paths.get(location);
+        if (!Files.exists(path)) {
+            return Collections.emptyList();
+        }
+        try (Stream<Path> dev = Files.list(path)) {
+            return dev.filter(p -> matches(p, "neuron")).collect(Collectors.toList());
+        } catch (IOException e) {
+            logger.warn("Failed to list neuron cores", e);
+        }
+        return Collections.emptyList();
+    }
+
+    static int getNeuronCoresPerDevice(String location) {
         Path path = Paths.get(location);
         if (!Files.exists(path)) {
             return 0;
         }
         int count = 0;
         try (Stream<Path> dev = Files.list(path)) {
-            for (Iterator<Path> it = dev.iterator(); it.hasNext(); ) {
-                Path dir = it.next();
-                if (dir.toFile().getName().startsWith("neuron")) {
-                    Stream<Path> cores = Files.list(dir);
-                    count += Math.toIntExact(cores.filter(NeuronUtils::matches).count());
-                    cores.close();
-                }
-            }
+            return Math.toIntExact(dev.filter(p -> matches(p, "neuron_core")).count());
         } catch (IOException e) {
             logger.warn("Failed to list neuron cores", e);
         }
         return count;
     }
 
-    private static boolean matches(Path p) {
-        return p.getFileName().toString().startsWith("neuron_core");
+    private static boolean matches(Path p, String pattern) {
+        return p.toFile().getName().startsWith(pattern);
     }
 }
