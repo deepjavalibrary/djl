@@ -107,9 +107,6 @@ public class GPT2OrtStepGenerator implements StepGenerator {
         return null;
     }
 
-    public void poc(String inputType)
-            throws ModelNotFoundException, MalformedModelException, IOException {}
-
     @Override
     public void close() {
         models.forEach(ZooModel::close);

@@ -13,11 +13,8 @@
 package ai.djl.pytorch.engine;
 
 import ai.djl.MalformedModelException;
-import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.pytorch.jni.IValue;
 import ai.djl.repository.zoo.Criteria;
@@ -85,124 +82,6 @@ public class GPT2PtStepGenerator implements StepGenerator {
 
         return new CausalLMOutput(
                 resultIValueArray[0].toNDList(manager).singletonOrThrow(), resultIValueArray[1]);
-    }
-
-    public void poc(String inputType)
-            throws ModelNotFoundException, MalformedModelException, IOException {
-        NDManager manager = NDManager.newBaseManager();
-
-        /////////////////////////////////////////////
-        // Inference without cached key_values input
-        /////////////////////////////////////////////
-
-        // Load model for init inference
-        String modelUrl =
-                "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/transformer/traced_GPT2_init.pt";
-        Criteria<NDList, NDList> criteria_init =
-                Criteria.builder()
-                        .setTypes(NDList.class, NDList.class)
-                        .optModelUrls(modelUrl)
-                        .optProgress(new ProgressBar())
-                        .optEngine("PyTorch")
-                        .optOption("trainParam", String.valueOf(false))
-                        .build();
-        ZooModel<NDList, NDList> generator_init = criteria_init.loadModel();
-        Block block_init = generator_init.getBlock();
-
-        // Prepare input
-        int[] inputArray = {40, 2883, 6155, 351, 616, 13779};
-
-        NDArray inputIds = manager.create(inputArray);
-        int numBatch = 1;
-        if ("simple".equals(inputType)) {
-            inputIds = manager.create(inputArray, new Shape(1, inputArray.length));
-        } else if ("batch".equals(inputType)) {
-            inputIds = manager.create(inputArray, new Shape(2, inputArray.length / 2));
-            numBatch = 2;
-        }
-
-        NDArray positionIds =
-                manager.arange(0, inputIds.getShape().size(-1), 1, DataType.INT64)
-                        .reshape(1, -1)
-                        .repeat(0, numBatch);
-
-        NDArray attentionMask = manager.ones(positionIds.getShape());
-        NDList input = new NDList(inputIds, positionIds, attentionMask);
-        IValue[] inputNativeInit =
-                input.stream()
-                        .map(object -> IValue.from((PtNDArray) object))
-                        .toArray(IValue[]::new);
-
-        // inference
-        NativeResource<Long> resultIValue = block_init.forward(inputNativeInit);
-        IValue[] resultIValueArray = ((IValue) resultIValue).toIValueTuple();
-
-        manager.attachInternal("inputNativeInit", inputNativeInit);
-        manager.attachInternal("resultIValueArray", resultIValueArray);
-
-        /////////////////////////////////////////////
-        // Inference with cached key_values input
-        /////////////////////////////////////////////
-
-        // Load model
-        modelUrl =
-                "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/transformer/traced_GPT2.pt";
-        Criteria<NDList, NDList> criteria =
-                Criteria.builder()
-                        .setTypes(NDList.class, NDList.class)
-                        .optModelUrls(modelUrl)
-                        .optProgress(new ProgressBar())
-                        .optEngine("PyTorch")
-                        .optOption("trainParam", String.valueOf(false))
-                        .build();
-
-        ZooModel<NDList, NDList> generator = criteria.loadModel();
-        Block block = generator.getBlock();
-
-        // Prepare input
-        long pastSeqLen = resultIValueArray[1].toNDList(manager).get(0).getShape().size(-2);
-        if ("simple".equals(inputType)) {
-            inputIds = manager.create(new int[] {404}, new Shape(1, 1));
-        } else if ("batch".equals(inputType)) {
-            inputIds = manager.create(new int[] {404, 403, 402, 401}, new Shape(numBatch, 2));
-        }
-        positionIds =
-                manager.arange(
-                                pastSeqLen,
-                                pastSeqLen + inputIds.getShape().get(-1),
-                                1,
-                                DataType.INT64)
-                        .reshape(1, -1)
-                        .repeat(0, numBatch);
-        attentionMask =
-                manager.ones(new Shape(1, pastSeqLen + inputIds.getShape().get(-1)))
-                        .reshape(1, -1)
-                        .repeat(0, numBatch);
-        input = new NDList(inputIds, positionIds, attentionMask);
-
-        IValue[] inputNative =
-                input.stream()
-                        .map(object -> IValue.from((PtNDArray) object))
-                        .toArray(IValue[]::new);
-
-        // Inference
-        // Here resultIValueArray[1] = past_key_values, which is from the first inference
-        // and has been used here as a demo cached input.
-        NativeResource<Long> output2 =
-                block.forward(
-                        new IValue[] {
-                            inputNative[0], inputNative[1], inputNative[2], resultIValueArray[1]
-                        });
-        NDList result = (output2).toNDList(manager);
-
-        manager.attachInternal("inputNative", inputNative);
-
-        ////////////////////////
-        // close resources
-        ////////////////////////
-        manager.close();
-        generator_init.close();
-        generator.close();
     }
 
     @Override

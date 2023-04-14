@@ -103,7 +103,6 @@ public final class TextGeneration {
         try (StepGenerator generator =
                         Engine.getEngine("PyTorch").newStepGenerator("GPT2", modelUrls);
                 NDManager manager = NDManager.newBaseManager()) {
-            generator.poc("batch");
 
             /////////////////////////////////////////////
             // Inference without cached key_values input
