@@ -22,15 +22,16 @@
         "width": 640,
         "height": 640,
         "resize": true,
-        "normalize": true,
+        "rescale": true,
+        "optApplyRatio": true,
         "translatorFactory": "ai.djl.modality.cv.translator.YoloV5TranslatorFactory"
       },
       "files": {
         "model": {
           "uri": "0.0.1/yolov5s.zip",
           "name": "",
-          "sha1Hash": "c30c24c8b67e0105ad468753efd2e4921e732dae",
-          "size": 24704995
+          "sha1Hash": "f62cbd5c5209010cbf565bd784f8201f2c1e2cae",
+          "size": 24705005
         }
       }
     }

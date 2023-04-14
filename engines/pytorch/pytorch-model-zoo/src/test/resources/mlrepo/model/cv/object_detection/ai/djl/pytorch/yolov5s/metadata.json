@@ -17,11 +17,13 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo5s",
+      "name": "yolov5s",
       "arguments": {
         "width": 640,
         "height": 640,
         "resize": true,
+        "rescale": true,
+        "optApplyRatio": true,
         "threshold": 0.4,
         "translatorFactory": "ai.djl.modality.cv.translator.YoloV5TranslatorFactory"
       },
@@ -29,8 +31,8 @@
         "model": {
           "uri": "0.0.1/yolov5s.zip",
           "name": "",
-          "sha1Hash": "493215e1d824bf013d45e0c8b0425c4ddf7cf2a9",
-          "size": 24838464
+          "sha1Hash": "a9df550da5914d109d95dd3a0371aedc714fa083",
+          "size": 24838479
         }
       }
     }
