@@ -151,9 +151,13 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public StepGenerator newStepGenerator(String[] modelUrls)
+    public StepGenerator newStepGenerator(String languageModel, String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
-        return new PtStepGenerator(modelUrls);
+        if ("GPT2".equals(languageModel)) {
+            return new GPT2PtStepGenerator(modelUrls);
+        } else {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 
     /** {@inheritDoc} */

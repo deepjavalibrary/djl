@@ -305,7 +305,7 @@ public abstract class Engine {
      */
     public abstract NDManager newBaseManager(Device device);
 
-    public StepGenerator newStepGenerator(String[] modelUrls)
+    public StepGenerator newStepGenerator(String languageModel, String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
         throw new UnsupportedOperationException("Not supported.");
     }

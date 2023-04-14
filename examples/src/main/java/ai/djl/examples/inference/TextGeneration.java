@@ -30,12 +30,78 @@ public final class TextGeneration {
     private TextGeneration() {}
 
     public static void main(String[] args) {
+        String[] modelUrls =
+                new String[] {
+                    "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/gpt2_onnx/decoder_model_merged.onnx"
+                };
+
+        try (StepGenerator generator =
+                        Engine.getEngine("OnnxRuntime").newStepGenerator("GPT2", modelUrls);
+                NDManager manager = NDManager.newBaseManager()) {
+
+            /////////////////////////////////////////////
+            // Inference without cached key_values input
+            /////////////////////////////////////////////
+
+            long[] inputArray = {40, 2883, 6155, 351, 616, 13779};
+            int numBatch = 2;
+
+            NDArray inputIds = manager.create(inputArray, new Shape(2, inputArray.length / 2));
+
+            NDArray positionIds =
+                    manager.arange(0, inputIds.getShape().size(-1), 1, DataType.INT64)
+                            .reshape(1, -1)
+                            .repeat(0, numBatch);
+
+            NDArray attentionMask = manager.ones(positionIds.getShape(), DataType.INT64);
+
+            CausalLMOutput outInit =
+                    generator.stepGeneration2(
+                            new NDList(inputIds, positionIds, attentionMask), null, manager);
+
+            /////////////////////////////////////////////
+            // Inference with cached key_values input
+            /////////////////////////////////////////////
+
+            long pastSeqLen = outInit.pastKeyValuesList.get(0).getShape().size(-2);
+            inputIds = manager.create(new long[] {404, 403, 402, 401}, new Shape(numBatch, 2));
+            positionIds =
+                    manager.arange(
+                                    pastSeqLen,
+                                    pastSeqLen + inputIds.getShape().get(-1),
+                                    1,
+                                    DataType.INT64)
+                            .reshape(1, -1)
+                            .repeat(0, numBatch);
+            attentionMask =
+                    manager.ones(
+                                    new Shape(1, pastSeqLen + inputIds.getShape().get(-1)),
+                                    DataType.INT64)
+                            .reshape(1, -1)
+                            .repeat(0, numBatch);
+
+            CausalLMOutput out =
+                    generator.stepGeneration2(
+                            new NDList(inputIds, positionIds, attentionMask),
+                            outInit.pastKeyValuesList,
+                            manager);
+
+            System.out.println(out.logits);
+            System.out.println(out.pastKeyValuesList);
+
+        } catch (ModelNotFoundException | MalformedModelException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void main2(String[] args) {
         String[] modelUrls = {
             "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/transformer/traced_GPT2_init.pt",
             "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/transformer/traced_GPT2.pt"
         };
 
-        try (StepGenerator generator = Engine.getEngine("PyTorch").newStepGenerator(modelUrls);
+        try (StepGenerator generator =
+                        Engine.getEngine("PyTorch").newStepGenerator("GPT2", modelUrls);
                 NDManager manager = NDManager.newBaseManager()) {
             generator.poc("batch");
 

@@ -20,6 +20,16 @@ import ai.djl.util.NativeResource;
 
 import java.io.IOException;
 
+/**
+ * This is a wrapper over the model files from different sources, e.g. gpt2.pt, gpt2.onnx, etc. This
+ * interface is an abstraction of the causal language model, which in essence is a conditional
+ * probability function: p_\theta(v_t | x_{< t})}, v_t \in V. i.e. given the past tokens up to a
+ * certain time x_{< t}, the probability that the next token is v, taken from a vocabulary set V.
+ * \theta is the model's weight. This function can take an input sequence `inputIds`, whose length
+ * can be greater than one. In this case, the output is still p_\theta(v_i | x_{< i})}, i in
+ * range(|inputIds|). This means for each i, the output probability is conditional on the past
+ * sequence up to i.
+ */
 public interface StepGenerator extends AutoCloseable {
 
     /**
@@ -28,8 +38,16 @@ public interface StepGenerator extends AutoCloseable {
      * @param manager manager
      * @return CausalLMOutput
      */
-    CausalLMOutput stepGeneration(
-            NDList input, NativeResource<Long> pastKeyValues, NDManager manager);
+
+    // Will be deprecated
+    default CausalLMOutput stepGeneration(
+            NDList input, NativeResource<Long> pastKeyValues, NDManager manager) {
+        return null;
+    }
+
+    default CausalLMOutput stepGeneration2(NDList ndList, NDList pastKeyValues, NDManager manager) {
+        return null;
+    }
 
     void poc(String inputType) throws ModelNotFoundException, MalformedModelException, IOException;
 

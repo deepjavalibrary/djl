@@ -32,11 +32,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PtStepGenerator implements StepGenerator {
+public class GPT2PtStepGenerator implements StepGenerator {
     Block[] blocks;
     List<ZooModel<NDList, NDList>> models;
 
-    public PtStepGenerator(String[] modelUrls)
+    public GPT2PtStepGenerator(String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
         blocks = new Block[modelUrls.length];
         models = new ArrayList<>();

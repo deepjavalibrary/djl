@@ -57,7 +57,12 @@ public class OrtNDManager extends BaseNDManager {
         if (array == null || array instanceof OrtNDArray) {
             return (OrtNDArray) array;
         }
-        OrtNDArray result = create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        OrtNDArray result;
+        if (array.getDataType() == DataType.BOOLEAN) {
+            result = create(array.toBooleanArray());
+        } else {
+            result = create(array.toByteBuffer(), array.getShape(), array.getDataType());
+        }
         result.setName(array.getName());
         return result;
     }
@@ -77,6 +82,18 @@ public class OrtNDManager extends BaseNDManager {
         BaseNDManager.validateBuffer(data, dataType, size);
         OnnxTensor tensor = OrtUtils.toTensor(env, data, shape, dataType);
         return new OrtNDArray(this, alternativeManager, tensor);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public OrtNDArray create(boolean[] data) {
+        // TODO: enable create(boolean[] data, long[] shape). This requires resizing boolean[]
+        // according to shape, and then feeding it to OrtUtils.toTensor.
+        try {
+            return new OrtNDArray(this, alternativeManager, OrtUtils.toTensor(env, data));
+        } catch (OrtException e) {
+            throw new EngineException(e);
+        }
     }
 
     /** {@inheritDoc} */
