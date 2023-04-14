@@ -112,7 +112,6 @@ To implement a simple pytorch feature, generally you can do the following steps.
 ./gradlew :engines:pytorch:pytorch-native:clean
 ./gradlew :engines:pytorch:pytorch-native:compileJNI
 
-./gradlew :engines:pytorch:pytorch-engine:clean 
 ./gradlew :engines:pytorch:pytorch-engine:build;
 ```
 
@@ -128,7 +127,6 @@ Here is another **workaround** to test the JNI without having to complete all th
 ./gradlew :engines:pytorch:pytorch-native:clean
 ./gradlew :engines:pytorch:pytorch-native:compileJNI
 
-./gradlew :engines:pytorch:pytorch-engine:clean 
 ./gradlew :engines:pytorch:pytorch-engine:build;
 ```
 
