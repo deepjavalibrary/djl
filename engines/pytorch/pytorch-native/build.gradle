@@ -141,7 +141,7 @@ def copyNativeLibToOutputDir(Map<String, String> fileStoreMap, String binaryRoot
         // CPU dependencies
         copy {
             from("${outputDir}/libtorch/lib/") {
-                include "libc10.*", "c10.dll", "libiomp5*.*", "libarm_compute*.*", "libgomp*.*", "libtorch.*", "libtorch_cpu.*", "torch.dll", "torch_cpu.dll", "fbgemm.dll", "asmjit.dll", "uv.dll"
+                include "libc10.*", "c10.dll", "libiomp5*.*", "libarm_compute*.*", "libgomp*.*", "libnvfuser_codegen.so", "libtorch.*", "libtorch_cpu.*", "torch.dll", "torch_cpu.dll", "fbgemm.dll", "asmjit.dll", "uv.dll", "nvfuser_codegen.dll"
             }
             into("${outputDir}/native/lib")
         }
