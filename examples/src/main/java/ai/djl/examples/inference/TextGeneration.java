@@ -42,7 +42,7 @@ public final class TextGeneration {
 
         try (LMAdapter generator =
                         Engine.getEngine("OnnxRuntime").newStepGenerator("GPT2", modelUrls);
-             NDManager manager = NDManager.newBaseManager()) {
+                NDManager manager = NDManager.newBaseManager()) {
 
             /////////////////////////////////////////////
             // Inference without cached key_values input
@@ -105,9 +105,8 @@ public final class TextGeneration {
             "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/transformer/traced_GPT2.pt"
         };
 
-        try (LMAdapter generator =
-                        Engine.getEngine("PyTorch").newStepGenerator("GPT2", modelUrls);
-             NDManager manager = NDManager.newBaseManager()) {
+        try (LMAdapter generator = Engine.getEngine("PyTorch").newStepGenerator("GPT2", modelUrls);
+                NDManager manager = NDManager.newBaseManager()) {
 
             /////////////////////////////////////////////
             // Inference without cached key_values input
