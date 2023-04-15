@@ -305,7 +305,7 @@ public abstract class Engine {
      */
     public abstract NDManager newBaseManager(Device device);
 
-    public LMAdapter newStepGenerator(String languageModel, String[] modelUrls)
+    public LMAdapter newLMAdapter(String languageModel, String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
         throw new UnsupportedOperationException("Not supported.");
     }

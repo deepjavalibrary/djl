@@ -151,7 +151,7 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public LMAdapter newStepGenerator(String languageModel, String[] modelUrls)
+    public LMAdapter newLMAdapter(String languageModel, String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
         if ("GPT2".equals(languageModel)) {
             return new GPT2PtLMAdapter(modelUrls);
