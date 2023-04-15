@@ -22,7 +22,7 @@ import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
-import ai.djl.translate.StepGenerator;
+import ai.djl.translate.LMAdapter;
 import ai.djl.util.Ec2Utils;
 import ai.djl.util.RandomUtils;
 import ai.djl.util.Utils;
@@ -305,7 +305,7 @@ public abstract class Engine {
      */
     public abstract NDManager newBaseManager(Device device);
 
-    public StepGenerator newStepGenerator(String languageModel, String[] modelUrls)
+    public LMAdapter newStepGenerator(String languageModel, String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
         throw new UnsupportedOperationException("Not supported.");
     }

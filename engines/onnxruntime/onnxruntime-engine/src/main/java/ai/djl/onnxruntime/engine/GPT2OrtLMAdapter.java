@@ -25,21 +25,19 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.CausalLMOutput;
 import ai.djl.translate.GPTConfig;
-import ai.djl.translate.StepGenerator;
-import ai.djl.util.NativeResource;
+import ai.djl.translate.LMAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GPT2OrtStepGenerator implements StepGenerator {
+public class GPT2OrtLMAdapter implements LMAdapter {
     Block[] blocks;
     List<ZooModel<NDList, NDList>> models;
-
     GPTConfig config;
 
-    public GPT2OrtStepGenerator(String[] modelUrls)
+    public GPT2OrtLMAdapter(String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
         config = new GPTConfig();
 
@@ -62,7 +60,7 @@ public class GPT2OrtStepGenerator implements StepGenerator {
 
     private NDList dummyPastKeyValues(NDArray inputIds, NDManager manager) {
         long numBatch = inputIds.getShape().get(0);
-        long hiddenSize = config.hiddenSize;
+        long hiddenSize = config.logitsSize;
         long numAttentionHeads = config.numAttentionHeads;
         int numLayers = config.numLayers;
 
@@ -73,7 +71,7 @@ public class GPT2OrtStepGenerator implements StepGenerator {
     }
 
     @Override
-    public CausalLMOutput stepGeneration2(NDList input, NDList pastKeyValues, NDManager manager) {
+    public CausalLMOutput forward(NDList input, NDList pastKeyValues, NDManager manager) {
         NDArray inputIds = input.get(0);
         inputIds.setName("input_ids");
         NDArray attentionMask = input.get(2);
@@ -99,12 +97,6 @@ public class GPT2OrtStepGenerator implements StepGenerator {
         NDList output = blocks[0].forward(null, input, false, null);
 
         return new CausalLMOutput(output.get(0), output.subNDList(1));
-    }
-
-    @Override
-    public CausalLMOutput stepGeneration(
-            NDList input, NativeResource<Long> pastKeyValues, NDManager manager) {
-        return null;
     }
 
     @Override

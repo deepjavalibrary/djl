@@ -14,7 +14,6 @@ package ai.djl.translate;
 
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.util.NativeResource;
 
 /**
  * This is a wrapper over the model files from different sources, e.g. gpt2.pt, gpt2.onnx, etc. This
@@ -26,7 +25,7 @@ import ai.djl.util.NativeResource;
  * range(|inputIds|). This means for each i, the output probability is conditional on the past
  * sequence up to i.
  */
-public interface StepGenerator extends AutoCloseable {
+public interface LMAdapter extends AutoCloseable {
 
     /**
      * @param input input
@@ -34,14 +33,7 @@ public interface StepGenerator extends AutoCloseable {
      * @param manager manager
      * @return CausalLMOutput
      */
-
-    // Will be deprecated
-    default CausalLMOutput stepGeneration(
-            NDList input, NativeResource<Long> pastKeyValues, NDManager manager) {
-        return null;
-    }
-
-    default CausalLMOutput stepGeneration2(NDList ndList, NDList pastKeyValues, NDManager manager) {
+    default CausalLMOutput forward(NDList input, NDList pastKeyValues, NDManager manager) {
         return null;
     }
 

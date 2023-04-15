@@ -20,7 +20,7 @@ import ai.djl.engine.Engine;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.translate.StepGenerator;
+import ai.djl.translate.LMAdapter;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtLoggingLevel;
@@ -141,10 +141,10 @@ public final class OrtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public StepGenerator newStepGenerator(String languageModel, String[] modelUrls)
+    public LMAdapter newStepGenerator(String languageModel, String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
         if ("GPT2".equals(languageModel)) {
-            return new GPT2OrtStepGenerator(modelUrls);
+            return new GPT2OrtLMAdapter(modelUrls);
         } else {
             throw new UnsupportedOperationException("Not supported.");
         }

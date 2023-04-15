@@ -73,7 +73,7 @@ final class OrtUtils {
         return OnnxTensor.createTensor(env, inputs, shape.getShape());
     }
 
-    public static OnnxTensor toTensor(OrtEnvironment env, boolean[] inputs) throws OrtException {
+    public static OnnxTensor toTensor(OrtEnvironment env, Object inputs) throws OrtException {
         return OnnxTensor.createTensor(env, inputs);
     }
 

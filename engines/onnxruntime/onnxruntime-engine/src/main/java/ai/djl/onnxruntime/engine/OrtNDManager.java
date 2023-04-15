@@ -23,6 +23,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
+import ai.onnxruntime.OrtUtil;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -87,10 +88,19 @@ public class OrtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public OrtNDArray create(boolean[] data) {
-        // TODO: enable create(boolean[] data, long[] shape). This requires resizing boolean[]
-        // according to shape, and then feeding it to OrtUtils.toTensor.
         try {
             return new OrtNDArray(this, alternativeManager, OrtUtils.toTensor(env, data));
+        } catch (OrtException e) {
+            throw new EngineException(e);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public OrtNDArray create(boolean[] data, Shape shape) {
+        Object tensorIn = OrtUtil.reshape(data, shape.getShape());
+        try {
+            return new OrtNDArray(this, alternativeManager, OrtUtils.toTensor(env, tensorIn));
         } catch (OrtException e) {
             throw new EngineException(e);
         }

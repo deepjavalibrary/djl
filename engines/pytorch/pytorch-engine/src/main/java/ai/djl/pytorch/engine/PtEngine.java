@@ -23,7 +23,7 @@ import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.GradientCollector;
-import ai.djl.translate.StepGenerator;
+import ai.djl.translate.LMAdapter;
 import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
@@ -151,10 +151,10 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public StepGenerator newStepGenerator(String languageModel, String[] modelUrls)
+    public LMAdapter newStepGenerator(String languageModel, String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
         if ("GPT2".equals(languageModel)) {
-            return new GPT2PtStepGenerator(modelUrls);
+            return new GPT2PtLMAdapter(modelUrls);
         } else {
             throw new UnsupportedOperationException("Not supported.");
         }

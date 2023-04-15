@@ -17,24 +17,28 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Block;
 import ai.djl.pytorch.jni.IValue;
+import ai.djl.pytorch.jni.IValueUtils;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.CausalLMOutput;
-import ai.djl.translate.StepGenerator;
-import ai.djl.util.NativeResource;
+import ai.djl.translate.GPTConfig;
+import ai.djl.translate.LMAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GPT2PtStepGenerator implements StepGenerator {
+public class GPT2PtLMAdapter implements LMAdapter {
     Block[] blocks;
     List<ZooModel<NDList, NDList>> models;
+    GPTConfig config;
 
-    public GPT2PtStepGenerator(String[] modelUrls)
+    public GPT2PtLMAdapter(String[] modelUrls)
             throws ModelNotFoundException, MalformedModelException, IOException {
+        config = new GPTConfig();
+
         blocks = new Block[modelUrls.length];
         models = new ArrayList<>();
         for (int i = 0; i < modelUrls.length; i++) {
@@ -54,34 +58,33 @@ public class GPT2PtStepGenerator implements StepGenerator {
 
     /** {@inheritDoc} */
     @Override
-    public CausalLMOutput stepGeneration(
-            NDList input, NativeResource<Long> pastKeyValues, NDManager manager) {
+    public CausalLMOutput forward(NDList input, NDList pastKeyValues, NDManager manager) {
         IValue[] inputNative =
                 input.stream()
                         .map(object -> IValue.from((PtNDArray) object))
                         .toArray(IValue[]::new);
 
-        NativeResource<Long> resultIValue;
+        IValue resultIValue;
         if (pastKeyValues == null) {
-            resultIValue = blocks[0].forward(inputNative);
+            resultIValue = (IValue) blocks[0].forward(inputNative);
         } else {
             resultIValue =
-                    blocks[1].forward(
-                            new IValue[] {
-                                inputNative[0],
-                                inputNative[1],
-                                inputNative[2],
-                                (IValue) pastKeyValues
-                            });
+                    (IValue)
+                            blocks[1].forward(
+                                    new IValue[] {
+                                        inputNative[0],
+                                        inputNative[1],
+                                        inputNative[2],
+                                        IValueUtils.toTupleIValue(
+                                                pastKeyValues, new long[] {config.numLayers, 2})
+                                    });
         }
-        IValue[] resultIValueArray = ((IValue) resultIValue).toIValueTuple();
+        NDList output = resultIValue.toNDList(manager);
 
         manager.attachInternal("inputNative", inputNative);
-        manager.attachInternal("resultIValueArray", resultIValueArray);
         manager.attachInternal("resultIValue", resultIValue);
 
-        return new CausalLMOutput(
-                resultIValueArray[0].toNDList(manager).singletonOrThrow(), resultIValueArray[1]);
+        return new CausalLMOutput(output.get(0), output.subNDList(1));
     }
 
     @Override

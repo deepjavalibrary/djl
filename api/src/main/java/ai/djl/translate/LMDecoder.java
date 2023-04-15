@@ -14,7 +14,7 @@ package ai.djl.translate;
 
 public class LMDecoder {
 
-    private StepGenerator generator;
+    private LMAdapter generator;
 
     private float temperature;
 
