@@ -1080,6 +1080,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDList topK(int k, int axis, boolean largest, boolean sorted) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray argMin() {
         return getAlternativeArray().argMin();
     }

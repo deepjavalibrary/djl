@@ -21,17 +21,18 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.translate.CausalLMOutput;
+import ai.djl.translate.GPTConfig;
 import ai.djl.translate.LMAdapter;
 
 import java.io.IOException;
 
-public final class TextGeneration {
+public final class TestLMAdapter {
 
-    private TextGeneration() {}
+    private TestLMAdapter() {}
 
     public static void main(String[] args) {
         mainOnnx(args);
-        mainPt(args);
+        //        mainPt(args);
     }
 
     public static void mainOnnx(String[] args) {
@@ -40,8 +41,7 @@ public final class TextGeneration {
                     "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/gpt2_onnx/decoder_model_merged.onnx"
                 };
 
-        try (LMAdapter generator =
-                        Engine.getEngine("OnnxRuntime").newLMAdapter("GPT2", modelUrls);
+        try (LMAdapter generator = Engine.getEngine("OnnxRuntime").newLMAdapter("GPT2", new GPTConfig(modelUrls));
              NDManager manager = NDManager.newBaseManager()) {
 
             /////////////////////////////////////////////
@@ -101,12 +101,12 @@ public final class TextGeneration {
 
     public static void mainPt(String[] args) {
         String[] modelUrls = {
-            "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/transformer/traced_GPT2_init.pt",
-            "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/transformer/traced_GPT2.pt"
+            "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/transformer/traced_GPT2_init_hidden.pt",
+            "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/transformer/traced_GPT2_hidden.pt"
         };
 
-        try (LMAdapter generator = Engine.getEngine("PyTorch").newLMAdapter("GPT2", modelUrls);
-             NDManager manager = NDManager.newBaseManager()) {
+        try (LMAdapter generator = Engine.getEngine("PyTorch").newLMAdapter("GPT2", new GPTConfig(modelUrls));
+                NDManager manager = NDManager.newBaseManager()) {
 
             /////////////////////////////////////////////
             // Inference without cached key_values input

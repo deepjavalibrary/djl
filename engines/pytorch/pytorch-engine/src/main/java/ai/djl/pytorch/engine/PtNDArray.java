@@ -1440,6 +1440,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDList topK(int k, int axis, boolean largest, boolean sorted) {
+        return JniUtils.topK(this, k, axis, largest, sorted);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray argMin() {
         if (isEmpty()) {
             throw new IllegalArgumentException("attempt to get argMin of an empty NDArray");

@@ -4137,7 +4137,8 @@ public interface NDArray extends NDResource, BytesSupplier {
      * jshell&gt; NDArray array = manager.create(new float[] {0f, 1f, 2f, 3f}, new Shape(2, 2));
      * jshell&gt; array.repeat(1, 2);
      * ND: (6) cpu() float32
-     * [0., 0., 1., 1., 2., 2.]
+     * [[0., 0., 1., 1.],
+     *  [2., 2., 3., 3.]]
      * </pre>
      *
      * @param axis the axis to repeat
@@ -4543,6 +4544,12 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return a {@code NDArray} containing indices
      */
     NDArray argMax(int axis);
+
+    default NDList topK(int k, int axis) {
+        return topK(k, axis, true, true);
+    }
+
+    NDList topK(int k, int axis, boolean largest, boolean sorted);
 
     /**
      * Returns the indices of the minimum values into the flattened {@code NDArray}.
