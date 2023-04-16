@@ -36,6 +36,21 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArgMax__JJZ(
   API_END_RETURN()
 }
 
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchTopK(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong jtopk, jlong jasix, jboolean jlargest, jboolean jsorted) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const auto output_tuple = tensor_ptr->topk(jtopk, jasix, jlargest, jsorted);
+  std::vector<jlong> jptrs;
+  jptrs.push_back(reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<0>(output_tuple))));
+  jptrs.push_back(reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<1>(output_tuple))));
+  // Convert to jlongArray
+  jlongArray jarray = env->NewLongArray(jptrs.size());
+  env->SetLongArrayRegion(jarray, 0, jptrs.size(), jptrs.data());
+  return jarray;
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchArgMin__J(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
