@@ -23,6 +23,7 @@ import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.GradientCollector;
+import ai.djl.translate.GPTConfig;
 import ai.djl.translate.LMAdapter;
 import ai.djl.util.Utils;
 
@@ -151,10 +152,10 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public LMAdapter newLMAdapter(String languageModel, String[] modelUrls)
+    public LMAdapter newLMAdapter(String languageModel, GPTConfig gptConfig)
             throws ModelNotFoundException, MalformedModelException, IOException {
         if ("GPT2".equals(languageModel)) {
-            return new GPT2PtLMAdapter(modelUrls);
+            return new GPT2PtLMAdapter(gptConfig);
         } else {
             throw new UnsupportedOperationException("Not supported.");
         }

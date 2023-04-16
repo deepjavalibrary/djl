@@ -22,6 +22,7 @@ import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
 import ai.djl.training.ParameterServer;
 import ai.djl.training.optimizer.Optimizer;
+import ai.djl.translate.GPTConfig;
 import ai.djl.translate.LMAdapter;
 import ai.djl.util.Ec2Utils;
 import ai.djl.util.RandomUtils;
@@ -305,7 +306,7 @@ public abstract class Engine {
      */
     public abstract NDManager newBaseManager(Device device);
 
-    public LMAdapter newLMAdapter(String languageModel, String[] modelUrls)
+    public LMAdapter newLMAdapter(String languageModel, GPTConfig gptConfig)
             throws ModelNotFoundException, MalformedModelException, IOException {
         throw new UnsupportedOperationException("Not supported.");
     }

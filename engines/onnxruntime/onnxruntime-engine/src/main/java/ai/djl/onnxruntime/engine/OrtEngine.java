@@ -20,6 +20,7 @@ import ai.djl.engine.Engine;
 import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.translate.GPTConfig;
 import ai.djl.translate.LMAdapter;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
@@ -141,10 +142,10 @@ public final class OrtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
-    public LMAdapter newLMAdapter(String languageModel, String[] modelUrls)
+    public LMAdapter newLMAdapter(String languageModel, GPTConfig gptConfig)
             throws ModelNotFoundException, MalformedModelException, IOException {
         if ("GPT2".equals(languageModel)) {
-            return new GPT2OrtLMAdapter(modelUrls);
+            return new GPT2OrtLMAdapter(gptConfig);
         } else {
             throw new UnsupportedOperationException("Not supported.");
         }

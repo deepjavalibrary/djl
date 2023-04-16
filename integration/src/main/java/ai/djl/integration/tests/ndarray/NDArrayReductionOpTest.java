@@ -14,6 +14,7 @@ package ai.djl.integration.tests.ndarray;
 
 import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -190,6 +191,21 @@ public class NDArrayReductionOpTest {
             Assert.assertEquals(original, expect);
             original = manager.arange(24.0f).reshape(new Shape(2, 2, 2, 3)).trace();
             Assert.assertEquals(original.getShape(), new Shape(2, 3));
+        }
+    }
+
+    @Test
+    public void testTopK() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array =
+                    manager.create(
+                            new float[] {1f, 2f, 5f, 1f, 2f, 3f, 8f, 9f, 0f}, new Shape(3, 3));
+            NDList outputs = array.topK(2, -1, true, true);
+            Assert.assertEquals(
+                    outputs.get(0),
+                    manager.create(new float[] {5, 2, 3, 2, 9, 8}, new Shape(3, 2)));
+            Assert.assertEquals(
+                    outputs.get(1), manager.create(new long[] {2, 1, 2, 1, 1, 0}, new Shape(3, 2)));
         }
     }
 }

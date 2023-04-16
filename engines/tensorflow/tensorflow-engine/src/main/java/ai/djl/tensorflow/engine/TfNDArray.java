@@ -1642,6 +1642,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDList topK(int k, int axis, boolean largest, boolean sorted) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray argMin() {
         if (isEmpty()) {
             throw new IllegalArgumentException("attempt to get argMin of an empty NDArray");
