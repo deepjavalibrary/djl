@@ -46,11 +46,11 @@ The following table illustrates which pytorch version that DJL supports:
 
 | PyTorch engine version | PyTorch native library version            |
 |------------------------|-------------------------------------------|
-| pytorch-engine:0.22.0  | 1.11.0, 1.12.1, 1.13.1, 2.0.0             |
-| pytorch-engine:0.21.0  | 1.11.0, 1.12.1, 1.13.1                    |
-| pytorch-engine:0.20.0  | 1.11.0, 1.12.1, 1.13.0                    |
-| pytorch-engine:0.19.0  | 1.10.0, 1.11.0, 1.12.1                    |
-| pytorch-engine:0.18.0  | 1.9.1, 1.10.0, 1.11.0                     |
+| pytorch-engine:0.22.0  | 1.11.0, 1.12.1, **1.13.1**, 2.0.0         |
+| pytorch-engine:0.21.0  | 1.11.0, 1.12.1, **1.13.1**                |
+| pytorch-engine:0.20.0  | 1.11.0, 1.12.1, **1.13.0**                |
+| pytorch-engine:0.19.0  | 1.10.0, 1.11.0, **1.12.1**                |
+| pytorch-engine:0.18.0  | 1.9.1, 1.10.0, **1.11.0**                 |
 | pytorch-engine:0.17.0  | 1.9.1, 1.10.0, 1.11.0                     |
 | pytorch-engine:0.16.0  | 1.8.1, 1.9.1, 1.10.0                      |
 | pytorch-engine:0.15.0  | pytorch-native-auto: 1.8.1, 1.9.1, 1.10.0 |
