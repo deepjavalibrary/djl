@@ -128,7 +128,7 @@ For macOS, you can use the following library:
 </dependency>
 ```
 
-**Note:** PyTorch 1.13+ doesn't support mac 11 any more.
+**Note:** PyTorch 1.13+ doesn't support mac 11 any more, you must use DJL 0.19.0 ane lower version.
 
 ### macOS M1
 For macOS M1, you can use the following library:
