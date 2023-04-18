@@ -9,11 +9,10 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS"
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
-FROM 711395599931.dkr.ecr.us-east-2.amazonaws.com/spark/emr-6.9.0:latest
+FROM 314815235551.dkr.ecr.us-east-2.amazonaws.com/sagemaker-spark-processing:3.3-cpu
 LABEL maintainer="djl-dev@amazon.com"
 
-# Install DJL dependencies
-USER root
+# Install dependencies
 ARG DJL_VERSION=0.21.0
 ARG JNA_VERSION=5.12.1
 ARG JAVACV_VERSION=1.5.8
@@ -21,13 +20,14 @@ ARG JAVACPP_VERSION=1.5.8
 ARG FFMPEG_VERSION=5.1.2-1.5.8
 ARG TENSORFLOW_CORE_VERSION=0.4.2
 ARG PROTOBUF_VERSION=3.21.9
+ARG PYTORCH_VERSION=1.13.1
 
-RUN yum -y install python3-devel gcc
+RUN pip3 install --no-cache-dir torch==${PYTORCH_VERSION} --index-url https://download.pytorch.org/whl/cpu
+RUN pip3 install --no-cache-dir pillow pandas numpy pyarrow librosa 'transformers[torch]'
+
 COPY extensions/spark/setup/dist/ dist/
 RUN pip3 install --no-cache-dir dist/djl_spark-*-py3-none-any.whl && \
     rm -rf dist
-RUN pip3 install --no-cache-dir torch==1.13.1 --index-url https://download.pytorch.org/whl/cpu
-RUN pip3 install --no-cache-dir pillow pandas numpy pyarrow librosa 'transformers[torch]'
 
 ADD --chmod=644 https://repo1.maven.org/maven2/ai/djl/api/${DJL_VERSION}/api-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-api-${DJL_VERSION}.jar
 ADD --chmod=644 https://repo1.maven.org/maven2/ai/djl/spark/spark/${DJL_VERSION}/spark-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-spark-${DJL_VERSION}.jar
@@ -50,10 +50,13 @@ ADD --chmod=644 https://repo1.maven.org/maven2/org/tensorflow/tensorflow-core-ap
 RUN rm /usr/lib/spark/jars/protobuf-java-*.jar
 ADD --chmod=644 https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/${PROTOBUF_VERSION}/protobuf-java-${PROTOBUF_VERSION}.jar /usr/lib/spark/jars/
 
-RUN echo 'export SPARK_JAVA_OPTS="$SPARK_JAVA_OPTS -Dai.djl.pytorch.graph_optimizer=false"' >> /usr/lib/spark/conf/spark-env.sh
-
 # Set environment
 ENV PYTORCH_PRECXX11 true
 ENV OMP_NUM_THREADS 1
 
-USER hadoop:hadoop
+RUN echo 'export SPARK_JAVA_OPTS="$SPARK_JAVA_OPTS -Dai.djl.pytorch.graph_optimizer=false"' >> /opt/hadoop-config/spark-env.sh
+RUN echo "export PYTORCH_PRECXX11=true" >> /opt/hadoop-config/spark-env.sh
+RUN echo "export OMP_NUM_THREADS=1" >> /opt/hadoop-config/spark-env.sh
+RUN echo "spark.yarn.appMasterEnv.PYTORCH_PRECXX11 true" >> /opt/hadoop-config/spark-defaults.conf
+RUN echo "spark.executorEnv.PYTORCH_PRECXX11 true" >> /opt/hadoop-config/spark-defaults.conf
+RUN echo "spark.hadoop.fs.s3a.connection.maximum 1000" >> /opt/hadoop-config/spark-defaults.conf

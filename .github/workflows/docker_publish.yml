@@ -28,7 +28,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          registries: "711395599931"
+          registries: "314815235551"
       - name: Login to Docker
         uses: docker/login-action@v2
         with:
@@ -38,12 +38,12 @@ jobs:
         run: |
           DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
           echo "DJL_VERSION=$DJL_VERSION" >> $GITHUB_ENV
-      - name: Build wheel
+      - name: Build djl_spark wheel
         working-directory: extensions/spark/setup/
         run: ./setup.py bdist_wheel
       - name: Build and push nightly docker image
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'nightly' }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
@@ -51,7 +51,7 @@ jobs:
           tags: deepjavalibrary/djl-spark:cpu-nightly
       - name: Build and push release docker image
         if: ${{ github.event.inputs.mode == 'release' }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: docker/spark/Dockerfile
