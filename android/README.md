@@ -16,7 +16,7 @@ In gradle, you can add the 5 modules in your dependencies:
 
 ```
 dependencies {
-    implementation platform("ai.djl:bom:0.22.0")
+    implementation platform("ai.djl:bom:0.22.1")
 
     implementation "ai.djl:api"
     implementation "ai.djl.android:core"
