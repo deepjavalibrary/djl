@@ -41,9 +41,9 @@ public final class TestLMAdapter {
                     "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/gpt2_onnx/decoder_model_merged.onnx"
                 };
 
-        try (LMAdapter generator = Engine.getEngine("OnnxRuntime").newLMAdapter("GPT2", new GPTConfig(modelUrls));
-             NDManager manager = NDManager.newBaseManager()) {
-
+        try (NDManager manager = NDManager.newBaseManager()) {
+            LMAdapter generator =
+                    Engine.getEngine("PyTorch").newLMAdapter("GPT2", new GPTConfig(modelUrls));
             /////////////////////////////////////////////
             // Inference without cached key_values input
             /////////////////////////////////////////////
@@ -93,7 +93,6 @@ public final class TestLMAdapter {
 
             System.out.println(out.logits);
             System.out.println(out.pastKeyValuesList);
-
         } catch (ModelNotFoundException | MalformedModelException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -105,9 +104,9 @@ public final class TestLMAdapter {
             "/Users/fenkexin/Desktop/tasks/HuggingFaceQa_relavant/transformer/traced_GPT2_hidden.pt"
         };
 
-        try (LMAdapter generator = Engine.getEngine("PyTorch").newLMAdapter("GPT2", new GPTConfig(modelUrls));
-                NDManager manager = NDManager.newBaseManager()) {
-
+        try (NDManager manager = NDManager.newBaseManager()) {
+            LMAdapter generator =
+                    Engine.getEngine("PyTorch").newLMAdapter("GPT2", new GPTConfig(modelUrls));
             /////////////////////////////////////////////
             // Inference without cached key_values input
             /////////////////////////////////////////////

@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GPT2PtLMAdapter implements LMAdapter {
+public class GPT2PtLMAdapter implements LMAdapter, AutoCloseable {
     Block[] blocks;
     List<ZooModel<NDList, NDList>> models;
     GPTConfig config;

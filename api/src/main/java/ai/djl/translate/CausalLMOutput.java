@@ -17,7 +17,7 @@ public class CausalLMOutput {
 
     // (k, v) * numLayer,
     // kv: [batch, heads, seq_past, feature]
-    // The cache of past sequence. seq-dim-size == |past_seq| + |inputIds|
+    // The cache of past sequence. seq-dim-size == |seq_past| + |inputIds|
     public NDList pastKeyValuesList;
 
     public CausalLMOutput(NDArray logits, NDList pastKeyValues) {

@@ -25,7 +25,7 @@ import ai.djl.ndarray.NDManager;
  * range(|inputIds|). This means for each i, the output probability is conditional on the past
  * sequence up to i.
  */
-public interface LMAdapter extends AutoCloseable {
+public interface LMAdapter {
 
     /**
      * @param input input
@@ -37,7 +37,7 @@ public interface LMAdapter extends AutoCloseable {
         return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    void close();
+    //    /** {@inheritDoc} */
+    //    @Override
+    //    void close();
 }

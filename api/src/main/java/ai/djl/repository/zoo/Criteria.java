@@ -182,7 +182,8 @@ public class Criteria<I, O> {
             }
         }
         throw new ModelNotFoundException(
-                "No matching model with specified Input/Output type found.", lastException);
+                "No model with the specified URI or the matching Input/Output type is found.",
+                lastException);
     }
 
     /**
