@@ -23,6 +23,7 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.RandomUtils;
 
@@ -277,7 +278,16 @@ public class BufferedImageFactory extends ImageFactory {
                 }
             }
             bb.rewind();
-            return manager.create(bb, new Shape(height, width, channel), DataType.UINT8);
+            Shape shape =
+                    new Shape(
+                            new long[] {height, width, channel},
+                            new LayoutType[] {
+                                LayoutType.BATCH,
+                                LayoutType.HEIGHT,
+                                LayoutType.WIDTH,
+                                LayoutType.CHANNEL
+                            });
+            return manager.create(bb, shape, DataType.UINT8);
         }
 
         /** {@inheritDoc} */

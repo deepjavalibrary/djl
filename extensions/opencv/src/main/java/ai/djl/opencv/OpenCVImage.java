@@ -22,6 +22,7 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.LayoutType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.RandomUtils;
 
@@ -139,7 +140,15 @@ class OpenCVImage implements Image {
         }
         byte[] buf = new byte[mat.height() * mat.width() * mat.channels()];
         mat.get(0, 0, buf);
-        Shape shape = new Shape(mat.height(), mat.width(), mat.channels());
+        Shape shape =
+                new Shape(
+                        new long[] {mat.height(), mat.width(), mat.channels()},
+                        new LayoutType[] {
+                            LayoutType.BATCH,
+                            LayoutType.HEIGHT,
+                            LayoutType.WIDTH,
+                            LayoutType.CHANNEL
+                        });
         return manager.create(ByteBuffer.wrap(buf), shape, DataType.UINT8);
     }
 
