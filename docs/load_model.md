@@ -181,7 +181,7 @@ Here is a few tips you can use to help you debug model loading issue:
 See [here](development/configure_logging.md#configure-logging-level) for how to enable debug log
 
 #### List models programmatically in your code
-You can use [ModelZoo.listModels()](https://javadoc.io/static/ai.djl/api/0.22.0/ai/djl/repository/zoo/ModelZoo.html#listModels--) API to query available models.
+You can use [ModelZoo.listModels()](https://javadoc.io/static/ai.djl/api/0.22.1/ai/djl/repository/zoo/ModelZoo.html#listModels--) API to query available models.
 
 #### List available models using DJL command line
 
