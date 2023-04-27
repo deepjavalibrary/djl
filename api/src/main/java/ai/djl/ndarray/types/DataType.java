@@ -25,6 +25,7 @@ import java.nio.ShortBuffer;
 
 /** An enum representing the underlying {@link NDArray}'s data type. */
 public enum DataType {
+    // do not change order, pytorch engine rely on DataType.ordinal()
     FLOAT32(Format.FLOATING, 4),
     FLOAT64(Format.FLOATING, 8),
     FLOAT16(Format.FLOATING, 2),
@@ -35,7 +36,12 @@ public enum DataType {
     BOOLEAN(Format.BOOLEAN, 1),
     COMPLEX64(Format.FLOATING, 4),
     UNKNOWN(Format.UNKNOWN, 0),
-    STRING(Format.STRING, -1);
+    STRING(Format.STRING, -1),
+    BFLOAT16(Format.FLOATING, 2),
+    UINT64(Format.UINT, 8),
+    UINT32(Format.UINT, 4),
+    UINT16(Format.UINT, 2),
+    INT16(Format.INT, 2);
 
     /** The general data type format categories. */
     public enum Format {
@@ -147,12 +153,28 @@ public enum DataType {
                 return FLOAT16;
             case "|u1":
                 return UINT8;
+            case "<u2":
+            case ">u2":
+            case "=u2":
+                return UINT16;
+            case "<u4":
+            case ">u4":
+            case "=u4":
+                return UINT32;
+            case "<u8":
+            case ">u8":
+            case "=u8":
+                return UINT64;
+            case "|i1":
+                return INT8;
+            case "<i2":
+            case ">i2":
+            case "=i2":
+                return INT16;
             case "<i4":
             case ">i4":
             case "=i4":
                 return INT32;
-            case "|i1":
-                return INT8;
             case "<i8":
             case ">i8":
             case "=i8":
@@ -175,14 +197,17 @@ public enum DataType {
     public Buffer asDataType(ByteBuffer data) {
         switch (this) {
             case FLOAT16:
+            case BFLOAT16:
                 return data.asShortBuffer();
             case FLOAT32:
                 return data.asFloatBuffer();
             case FLOAT64:
                 return data.asDoubleBuffer();
             case INT32:
+            case UINT32:
                 return data.asIntBuffer();
             case INT64:
+            case UINT64:
                 return data.asLongBuffer();
             case UINT8:
             case INT8:
@@ -209,16 +234,25 @@ public enum DataType {
                 return order + "f2";
             case UINT8:
                 return "|u1";
-            case INT32:
-                return order + "i4";
+            case UINT16:
+                return order + "u2";
+            case UINT32:
+                return order + "u4";
+            case UINT64:
+                return order + "u8";
             case INT8:
                 return "|i1";
+            case INT16:
+                return order + "i2";
+            case INT32:
+                return order + "i4";
             case INT64:
-                return "<i8";
+                return order + "i8";
             case BOOLEAN:
                 return "|b1";
             case STRING:
                 return "|S1";
+            case BFLOAT16:
             case COMPLEX64:
             case UNKNOWN:
             default:
