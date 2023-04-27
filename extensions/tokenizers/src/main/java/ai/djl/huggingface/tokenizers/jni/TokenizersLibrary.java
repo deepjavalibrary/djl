@@ -24,6 +24,8 @@ public final class TokenizersLibrary {
 
     public native long createTokenizerFromString(String json);
 
+    public native long createBpeTokenizer(String vocabulary, String merges);
+
     public native void deleteTokenizer(long handle);
 
     public native long encode(long tokenizer, String text, boolean addSpecialTokens);

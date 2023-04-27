@@ -20,6 +20,7 @@ use tk::utils::padding::{PaddingParams, PaddingStrategy};
 use tk::utils::truncation::{TruncationParams, TruncationStrategy};
 use tk::Tokenizer;
 use tk::{FromPretrainedParameters, Offsets};
+use tk::models::bpe::BPE;
 
 use jni::objects::{JClass, JMethodID, JObject, JString, JValue, ReleaseMode};
 use jni::sys::{jboolean, jint, jlong, jlongArray, jobjectArray, jsize, jstring, JNI_TRUE};
@@ -62,6 +63,33 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     let tokenizer = Tokenizer::from_str(&data);
     match tokenizer {
         Ok(output) => to_handle(output),
+        Err(err) => {
+            env.throw(err.to_string()).unwrap();
+            0
+        }
+    }
+}
+
+// Tokenizer using BPE model
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_createBpeTokenizer(
+    env: JNIEnv,
+    _: JObject,
+    vocabulary: JString,
+    merges: JString,
+) -> jlong {
+    let vocabulary: String = env
+        .get_string(vocabulary)
+        .expect("Couldn't get java string!")
+        .into();
+
+    let merges: String = env
+        .get_string(merges)
+        .expect("Couldn't get java string!")
+        .into();
+
+    match BPE::from_file(&vocabulary, &merges).build() {
+        Ok(model) => to_handle(Tokenizer::new(model)),
         Err(err) => {
             env.throw(err.to_string()).unwrap();
             0
@@ -702,6 +730,6 @@ fn cast_handle<T>(handle: jlong) -> &'static mut T {
 
 fn drop_handle<T: 'static>(handle: jlong) {
     unsafe {
-        Box::from_raw(handle as *mut T);
+        let _ = Box::from_raw(handle as *mut T);
     }
 }

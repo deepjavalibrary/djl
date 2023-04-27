@@ -137,6 +137,26 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     /**
+     * Create a pre-trained BPE {@code HuggingFaceTokenizer} instance from existing models.
+     *
+     * @param vocab the BPE vocabulary file
+     * @param merges the BPE merges file
+     * @param options tokenizer options
+     * @return a {@code HuggingFaceTokenizer} instance
+     * @throws IOException when IO operation fails in loading a resource
+     */
+    public static HuggingFaceTokenizer newInstance(
+            Path vocab, Path merges, Map<String, String> options) throws IOException {
+        Ec2Utils.callHome("Huggingface");
+        LibUtils.checkStatus();
+
+        String vocabFile = vocab.toAbsolutePath().toString();
+        String mergesFile = merges.toAbsolutePath().toString();
+        long handle = TokenizersLibrary.LIB.createBpeTokenizer(vocabFile, mergesFile);
+        return new HuggingFaceTokenizer(handle, options);
+    }
+
+    /**
      * Create a pre-trained {@code HuggingFaceTokenizer} instance from {@code InputStream}.
      *
      * @param is {@code InputStream}
@@ -755,6 +775,20 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
             }
             if (tokenizerPath == null) {
                 throw new IllegalArgumentException("Missing tokenizer path.");
+            }
+            if (Files.isDirectory(tokenizerPath)) {
+                Path tokenizerFile = tokenizerPath.resolve("tokenizer.json");
+                if (Files.exists(tokenizerFile)) {
+                    return managed(HuggingFaceTokenizer.newInstance(tokenizerPath, options));
+                }
+                Path vocab = tokenizerPath.resolve("vocab.json");
+                Path merges = tokenizerPath.resolve("merges.txt");
+                if (Files.exists(vocab) && Files.exists(merges)) {
+                    return managed(HuggingFaceTokenizer.newInstance(vocab, merges, options));
+                }
+                throw new IOException("tokenizer.json file not found.");
+            } else if (Files.exists(tokenizerPath)) {
+                throw new IOException("Tokenizer file not exits: " + tokenizerPath);
             }
             return managed(HuggingFaceTokenizer.newInstance(tokenizerPath, options));
         }
