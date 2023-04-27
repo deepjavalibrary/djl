@@ -58,8 +58,10 @@ inline jint GetDTypeFromScalarType(const torch::ScalarType& type) {
     return 6;
   } else if (torch::kBool == type) {
     return 7;
-  } else {
+  } else if (torch::kComplexFloat == type) {
     return 8;
+  } else {
+    return 9;
   }
 }
 

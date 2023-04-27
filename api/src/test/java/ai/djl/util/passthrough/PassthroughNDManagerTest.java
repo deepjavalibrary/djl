@@ -16,10 +16,16 @@ import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
 
 public class PassthroughNDManagerTest {
 
@@ -40,6 +46,41 @@ public class PassthroughNDManagerTest {
             NDArray array = manager.zeros(shape);
             array.toByteBuffer();
             manager.from(array);
+
+            LongBuffer lb = LongBuffer.allocate(1);
+            lb.put(0, 10);
+            NDArray ui64 = manager.create(lb, new Shape(1, 1), DataType.UINT64);
+            ByteBuffer bb = ui64.toByteBuffer();
+            Assert.assertEquals(bb.remaining(), 8);
+            Assert.assertEquals(bb.getLong(), 10);
+
+            IntBuffer ib = IntBuffer.allocate(1);
+            ib.put(0, 11);
+            NDArray ui32 = manager.create(ib, new Shape(1, 1), DataType.UINT32);
+            bb = ui32.toByteBuffer();
+            Assert.assertEquals(bb.remaining(), 4);
+            Assert.assertEquals(bb.getInt(), 11);
+
+            ShortBuffer sb = ShortBuffer.allocate(1);
+            sb.put(0, (short) 12);
+            NDArray ui16 = manager.create(sb, new Shape(1, 1), DataType.UINT16);
+            bb = ui16.toByteBuffer();
+            Assert.assertEquals(bb.remaining(), 2);
+            Assert.assertEquals(bb.getShort(), 12);
+
+            sb.rewind();
+            sb.put(0, (short) 13);
+            NDArray i16 = manager.create(sb, new Shape(1, 1), DataType.INT16);
+            bb = i16.toByteBuffer();
+            Assert.assertEquals(bb.remaining(), 2);
+            Assert.assertEquals(bb.getShort(), 13);
+
+            sb.rewind();
+            sb.put(0, (short) 14);
+            NDArray bf16 = manager.create(sb, new Shape(1, 1), DataType.BFLOAT16);
+            bb = bf16.toByteBuffer();
+            Assert.assertEquals(bb.remaining(), 2);
+            Assert.assertEquals(bb.getShort(), 14);
 
             PassthroughNDArray pa = manager.create((Object) "test");
             Assert.assertThrows(pa::toByteBuffer);
