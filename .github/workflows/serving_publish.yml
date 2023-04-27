@@ -78,6 +78,9 @@ jobs:
           DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
           aws s3 cp serving/build/distributions/*.deb s3://djl-ai/publish/djl-serving/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/djl-serving_${DJL_VERSION}*"
+          if [[ $(aws s3 ls s3://djl-ai/publish/djl-serving/serving-$DJL_VERSION.tar | wc -l) -eq 0 ]]; \
+            then aws s3 cp serving/build/distributions/*.tar s3://djl-ai/publish/djl-serving/; \
+            else echo serving tarball published already!; fi
           aws s3 cp serving/build/distributions/*.tar s3://djl-ai/publish/djl-serving/
           aws s3 cp serving/build/distributions/*.zip s3://djl-ai/publish/djl-serving/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/serving-${DJL_VERSION}*"
@@ -86,9 +89,7 @@ jobs:
         run: |
           ./gradlew :benchmark:dZ :benchmark:createDeb -Pstaging
           DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
-          if [[ $(aws s3 ls s3://djl-ai/publish/djl-serving/serving-$DJL_VERSION.tar | wc -l) -eq 0 ]]; \
-            then aws s3 cp benchmark/build/distributions/*.tar s3://djl-ai/publish/djl-bench/${DJL_VERSION}/; \
-            else echo serving tarball published already!; fi
+          aws s3 cp benchmark/build/distributions/*.tar s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
           aws s3 cp benchmark/build/distributions/*.deb s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
           aws s3 cp benchmark/build/distributions/*.zip s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-bench/${DJL_VERSION}/*"
