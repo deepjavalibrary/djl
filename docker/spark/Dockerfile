@@ -13,13 +13,13 @@ FROM 314815235551.dkr.ecr.us-east-2.amazonaws.com/sagemaker-spark-processing:3.3
 LABEL maintainer="djl-dev@amazon.com"
 
 # Install dependencies
-ARG DJL_VERSION=0.21.0
-ARG JNA_VERSION=5.12.1
+ARG DJL_VERSION=0.22.1
+ARG JNA_VERSION=5.13.0
 ARG JAVACV_VERSION=1.5.8
 ARG JAVACPP_VERSION=1.5.8
 ARG FFMPEG_VERSION=5.1.2-1.5.8
 ARG TENSORFLOW_CORE_VERSION=0.4.2
-ARG PROTOBUF_VERSION=3.21.9
+ARG PROTOBUF_VERSION=3.22.2
 ARG PYTORCH_VERSION=1.13.1
 
 RUN pip3 install --no-cache-dir torch==${PYTORCH_VERSION} --index-url https://download.pytorch.org/whl/cpu
@@ -30,7 +30,7 @@ RUN pip3 install --no-cache-dir dist/djl_spark-*-py3-none-any.whl && \
     rm -rf dist
 
 ADD --chmod=644 https://repo1.maven.org/maven2/ai/djl/api/${DJL_VERSION}/api-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-api-${DJL_VERSION}.jar
-ADD --chmod=644 https://repo1.maven.org/maven2/ai/djl/spark/spark/${DJL_VERSION}/spark-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-spark-${DJL_VERSION}.jar
+ADD --chmod=644 https://repo1.maven.org/maven2/ai/djl/spark/spark_2.12/${DJL_VERSION}/spark_2.12-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-spark_2.12-${DJL_VERSION}.jar
 ADD --chmod=644 https://repo1.maven.org/maven2/ai/djl/huggingface/tokenizers/${DJL_VERSION}/tokenizers-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-tokenizers-${DJL_VERSION}.jar
 
 ADD --chmod=644 https://repo1.maven.org/maven2/ai/djl/audio/audio/${DJL_VERSION}/audio-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-audio-${DJL_VERSION}.jar
