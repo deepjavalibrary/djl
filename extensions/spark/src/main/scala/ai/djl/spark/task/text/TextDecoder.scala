@@ -16,22 +16,22 @@ import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer
 import org.apache.spark.ml.param.Param
 import org.apache.spark.ml.param.shared.{HasInputCol, HasOutputCol}
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, LongType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 /**
- * TextTokenizer performs text tokenization using HuggingFace tokenizers in Spark.
+ * TextDecoder performs text decoding using HuggingFace tokenizers in Spark.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class HuggingFaceTextTokenizer(override val uid: String) extends BaseTextPredictor[String, Array[String]]
+class TextDecoder(override val uid: String) extends BaseTextPredictor[Array[Long], String]
   with HasInputCol with HasOutputCol {
 
-  def this() = this(Identifiable.randomUID("HuggingFaceTextTokenizer"))
+  def this() = this(Identifiable.randomUID("TextDecoder"))
 
-  final val tokenizer = new Param[String](this, "tokenizer", "The name of the tokenizer")
+  final val hfModelId = new Param[String](this, "hfModelId", "The Huggingface model ID")
 
-  private var inputColIndex: Int = _
+  private var inputColIndex : Int = _
 
   /**
    * Sets the inputCol parameter.
@@ -48,23 +48,23 @@ class HuggingFaceTextTokenizer(override val uid: String) extends BaseTextPredict
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
   /**
-   * Sets the tokenizer parameter.
+   * Sets the hfModelId parameter.
    *
    * @param value the value of the parameter
    */
-  def setTokenizer(value: String): this.type = set(tokenizer, value)
+  def setHfModelId(value: String): this.type = set(hfModelId, value)
 
-  setDefault(inputClass, classOf[String])
-  setDefault(outputClass, classOf[Array[String]])
+  setDefault(inputClass, classOf[Array[Long]])
+  setDefault(outputClass, classOf[String])
   setDefault(translatorFactory, null)
 
   /**
-   * Performs sentence tokenization on the provided dataset.
+   * Decodes String from the input ids on the provided dataset.
    *
    * @param dataset input dataset
    * @return output dataset
    */
-  def tokenize(dataset: Dataset[_]): DataFrame = {
+  def decode(dataset: Dataset[_]): DataFrame = {
     transform(dataset)
   }
 
@@ -76,21 +76,20 @@ class HuggingFaceTextTokenizer(override val uid: String) extends BaseTextPredict
 
   /** @inheritdoc */
   override def transformRows(iter: Iterator[Row]): Iterator[Row] = {
-    val t = HuggingFaceTokenizer.newInstance($(tokenizer))
+    val tokenizer = HuggingFaceTokenizer.newInstance($(hfModelId))
     iter.map(row => {
-      Row.fromSeq(row.toSeq :+ t.tokenize(row.getString(inputColIndex)).toArray)
+      Row.fromSeq(row.toSeq :+ tokenizer.decode(row.getAs[Seq[Long]]($(inputCol)).toArray))
     })
   }
 
   /** @inheritdoc */
   def validateInputType(schema: StructType): Unit = {
-    validateType(schema($(inputCol)), StringType)
+    validateType(schema($(inputCol)), ArrayType(LongType))
   }
 
   /** @inheritdoc */
   override def transformSchema(schema: StructType): StructType = {
-    val outputSchema = StructType(schema.fields :+
-      StructField($(outputCol), ArrayType(StringType)))
+    val outputSchema = StructType(schema.fields :+ StructField($(outputCol), StringType))
     outputSchema
   }
 }

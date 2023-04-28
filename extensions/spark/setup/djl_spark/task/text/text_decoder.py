@@ -15,31 +15,31 @@ from pyspark import SparkContext
 from pyspark.sql import DataFrame
 
 
-class HuggingFaceTextTokenizer:
+class TextDecoder:
 
-    def __init__(self, input_col, output_col, name):
+    def __init__(self, input_col, output_col, hf_model_id):
         """
-        Initializes the HuggingFaceTextEncoder.
+        Initializes the TextDecoder.
 
         :param input_col: The input column
         :param output_col: The output column
-        :param name: The name of the tokenizer
+        :param hf_model_id: The Huggingface model ID
         """
         self.input_col = input_col
         self.output_col = output_col
-        self.name = name
+        self.hf_model_id = hf_model_id
 
-    def tokenize(self, dataset):
+    def decode(self, dataset):
         """
-        Performs sentence encoding on the provided dataset.
+        Performs sentence decoding on the provided dataset.
 
         :param dataset: input dataset
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        tokenizer = sc._jvm.ai.djl.spark.task.text.HuggingFaceTextTokenizer() \
+        decoder = sc._jvm.ai.djl.spark.task.text.TextDecoder() \
             .setInputCol(self.input_col) \
             .setOutputCol(self.output_col) \
-            .setName(self.name)
-        return DataFrame(tokenizer.tokenize(dataset._jdf),
+            .setHfModelId(self.hf_model_id)
+        return DataFrame(decoder.decode(dataset._jdf),
                          dataset.sparkSession)
