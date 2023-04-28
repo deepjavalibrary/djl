@@ -53,10 +53,16 @@ ADD --chmod=644 https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java
 # Set environment
 ENV PYTORCH_PRECXX11 true
 ENV OMP_NUM_THREADS 1
+ENV DJL_CACHE_DIR /tmp/.djl.ai
+ENV HUGGINGFACE_HUB_CACHE /tmp
+ENV TRANSFORMERS_CACHE /tmp
 
 RUN echo 'export SPARK_JAVA_OPTS="$SPARK_JAVA_OPTS -Dai.djl.pytorch.graph_optimizer=false"' >> /opt/hadoop-config/spark-env.sh
 RUN echo "export PYTORCH_PRECXX11=true" >> /opt/hadoop-config/spark-env.sh
 RUN echo "export OMP_NUM_THREADS=1" >> /opt/hadoop-config/spark-env.sh
+RUN echo "export DJL_CACHE_DIR=/tmp/.djl.ai" >> /opt/hadoop-config/spark-env.sh
+RUN echo "export HUGGINGFACE_HUB_CACHE=/tmp" >> /opt/hadoop-config/spark-env.sh
+RUN echo "export TRANSFORMERS_CACHE=/tmp" >> /opt/hadoop-config/spark-env.sh
 RUN echo "spark.yarn.appMasterEnv.PYTORCH_PRECXX11 true" >> /opt/hadoop-config/spark-defaults.conf
 RUN echo "spark.executorEnv.PYTORCH_PRECXX11 true" >> /opt/hadoop-config/spark-defaults.conf
 RUN echo "spark.hadoop.fs.s3a.connection.maximum 1000" >> /opt/hadoop-config/spark-defaults.conf

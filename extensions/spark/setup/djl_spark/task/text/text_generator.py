@@ -12,30 +12,35 @@
 # the specific language governing permissions and limitations under the License.
 
 import pandas as pd
-from pyspark import SparkContext
 from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import StringType
 from typing import Iterator
 from transformers import pipeline
+from ...util import files_util, dependency_util
+
+
+TASK = "text-generation"
+APPLICATION = "nlp/text_generation"
+GROUP_ID = "ai/djl/huggingface/pytorch"
 
 
 class TextGenerator:
 
-    def __init__(self, input_col, output_col, engine, model_url=None, model_name=None):
+    def __init__(self, input_col, output_col, model_url=None, hf_model_id=None, engine="PyTorch"):
         """
         Initializes the TextGenerator.
 
         :param input_col: The input column
         :param output_col: The output column
-        :param engine: The engine. Currently only PyTorch is supported.
         :param model_url: The model URL
-        :param model_name: The model name
+        :param hf_model_id: The Huggingface model ID
+        :param engine: The engine. Currently only PyTorch is supported.
         """
         self.input_col = input_col
         self.output_col = output_col
-        self.engine = engine
         self.model_url = model_url
-        self.model_name = model_name
+        self.hf_model_id = hf_model_id
+        self.engine = engine
 
     def generate(self, dataset, **kwargs):
         """
@@ -44,18 +49,25 @@ class TextGenerator:
         :param dataset: input dataset
         :return: output dataset
         """
-        sc = SparkContext._active_spark_context
-        if not self.model_url and not self.model_name:
-            raise ValueError("Either model_url or model_name must be provided.")
-        model_name_or_url = self.model_url if self.model_url else self.model_name
-        pipe = pipeline('text-generation', model=model_name_or_url, **kwargs)
-        bc_pipe = sc.broadcast(pipe)
+        if self.engine is None or self.engine.lower() != "pytorch":
+            raise ValueError("Only PyTorch engine is supported.")
+
+        if self.model_url:
+            cache_dir = files_util.get_cache_dir(APPLICATION, GROUP_ID, self.model_url)
+            files_util.download_and_extract(self.model_url, cache_dir)
+            dependency_util.install(cache_dir)
+            model_id_or_path = cache_dir
+        elif self.hf_model_id:
+            model_id_or_path = self.hf_model_id
+        else:
+            raise ValueError("Either model_url or hf_model_id must be provided.")
 
         @pandas_udf(StringType())
         def predict_udf(iterator: Iterator[pd.Series]) -> Iterator[pd.Series]:
+            pipe = pipeline(TASK, model=model_id_or_path, **kwargs)
             for s in iterator:
-                output = bc_pipe.value(s.tolist())
-                text = [o["generated_text"] for o in output[0]]
+                output = pipe(s.tolist())
+                text = map(lambda x: x["generated_text"], output[0])
                 yield pd.Series(text)
 
         return dataset.withColumn(self.output_col, predict_udf(self.input_col))

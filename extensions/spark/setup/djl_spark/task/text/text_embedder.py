@@ -17,24 +17,24 @@ from pyspark.sql import DataFrame
 
 class TextEmbedder:
 
-    def __init__(self, input_col, output_col, engine, model_url,
-                 output_class=None, translator=None):
+    def __init__(self, input_col, output_col, model_url, engine=None,
+                 output_class=None, translator_factory=None):
         """
         Initializes the TextEmbedder.
 
         :param input_col: The input column
         :param output_col: The output column
-        :param engine (optional): The engine
         :param model_url: The model URL
+        :param engine (optional): The engine
         :param output_class (optional): The output class
-        :param translator (optional): The translator. Default is TextEmbeddingTranslator.
+        :param translator_factory (optional): The translator factory. Default is TextEmbeddingTranslatorFactory.
         """
         self.input_col = input_col
         self.output_col = output_col
         self.engine = engine
         self.model_url = model_url
         self.output_class = output_class
-        self.translator = translator
+        self.translator_factory = translator_factory
 
     def embed(self, dataset):
         """
@@ -47,8 +47,8 @@ class TextEmbedder:
         embedder = sc._jvm.ai.djl.spark.task.text.TextEmbedder()
         if self.output_class is not None:
             embedder = embedder.setOutputClass(self.output_class)
-        if self.translator is not None:
-            embedder = embedder.setTranslator(self.translator)
+        if self.translator_factory is not None:
+            embedder = embedder.setTranslatorFactory(self.translator_factory)
         embedder = embedder.setInputCol(self.input_col) \
             .setOutputCol(self.output_col) \
             .setEngine(self.engine) \

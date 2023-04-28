@@ -13,18 +13,19 @@
 
 """DJL Spark Tasks Text API."""
 
-from . import huggingface_text_decoder
-from . import huggingface_text_encoder
-from . import huggingface_text_tokenizer
-from . import text_embedder
+from . import text_decoder, text_encoder, text_tokenizer, text_embedder, text2text_generator, text_generator
 
-HuggingFaceTextDecoder = huggingface_text_decoder.HuggingFaceTextDecoder
-HuggingFaceTextEncoder = huggingface_text_encoder.HuggingFaceTextEncoder
-HuggingFaceTextTokenizer = huggingface_text_tokenizer.HuggingFaceTextTokenizer
+TextDecoder = text_decoder.TextDecoder
+TextEncoder = text_encoder.TextEncoder
+TextTokenizer = text_tokenizer.TextTokenizer
 TextEmbedder = text_embedder.TextEmbedder
+Text2TextGenerator = text2text_generator.Text2TextGenerator
+TextGenerator = text_generator.TextGenerator
 
 # Remove unnecessary modules to avoid duplication in API.
-del huggingface_text_decoder
-del huggingface_text_encoder
-del huggingface_text_tokenizer
+del text_decoder
+del text_encoder
+del text_tokenizer
 del text_embedder
+del text2text_generator
+del text_generator
