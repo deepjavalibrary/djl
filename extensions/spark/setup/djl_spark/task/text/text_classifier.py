@@ -55,18 +55,18 @@ class TextClassifier:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        classifier = (
-            sc._jvm.ai.djl.spark.task.text.TextClassifier()
-            .setInputCol(self.input_col)
-            .setOutputCol(self.output_col)
+        classifier = sc._jvm.ai.djl.spark.task.text.TextClassifier() \
+            .setInputCol(self.input_col) \
+            .setOutputCol(self.output_col) \
             .setModelUrl(self.model_url)
-        )
         if self.engine is not None:
             classifier = classifier.setEngine(self.engine)
         if self.batch_size is not None:
             classifier = classifier.setBatchSize(self.batch_size)
         if self.translator_factory is not None:
-            classifier = classifier.setTranslatorFactory(self.translator_factory)
+            classifier = classifier.setTranslatorFactory(
+                self.translator_factory)
         if self.batchifier is not None:
             classifier = classifier.setBatchifier(self.batchifier)
-        return DataFrame(classifier.classify(dataset._jdf), dataset.sparkSession)
+        return DataFrame(classifier.classify(dataset._jdf),
+                         dataset.sparkSession)

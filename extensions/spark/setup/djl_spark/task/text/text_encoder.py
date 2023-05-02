@@ -44,12 +44,10 @@ class TextEncoder:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        encoder = (
-            sc._jvm.ai.djl.spark.task.text.TextEncoder()
-            .setInputCol(self.input_col)
-            .setOutputCol(self.output_col)
+        encoder = sc._jvm.ai.djl.spark.task.text.TextEncoder() \
+            .setInputCol(self.input_col) \
+            .setOutputCol(self.output_col) \
             .setHfModelId(self.hf_model_id)
-        )
         if self.batch_size is not None:
             encoder = encoder.setBatchSize(self.batch_size)
         return DataFrame(encoder.encode(dataset._jdf), dataset.sparkSession)

@@ -63,12 +63,10 @@ class BinaryPredictor:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        predictor = (
-            sc._jvm.ai.djl.spark.task.binary.BinaryPredictor()
-            .setInputCol(self.input_col)
-            .setOutputCol(self.output_col)
+        predictor = sc._jvm.ai.djl.spark.task.binary.BinaryPredictor() \
+            .setInputCol(self.input_col) \
+            .setOutputCol(self.output_col) \
             .setModelUrl(self.model_url)
-        )
         if self.engine is not None:
             predictor = predictor.setEngine(self.engine)
         if self.batch_size is not None:

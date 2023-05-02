@@ -63,11 +63,9 @@ class ImageClassifier:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        classifier = (
-            sc._jvm.ai.djl.spark.task.vision.ImageClassifier()
-            .setOutputCol(self.output_col)
+        classifier = sc._jvm.ai.djl.spark.task.vision.ImageClassifier() \
+            .setOutputCol(self.output_col) \
             .setModelUrl(self.model_url)
-        )
         if self.input_cols is not None:
             # Convert the input_cols to Java array
             input_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String,
@@ -79,11 +77,13 @@ class ImageClassifier:
         if self.batch_size is not None:
             classifier = classifier.setBatchSize(self.batch_size)
         if self.translator_factory is not None:
-            classifier = classifier.setTranslatorFactory(self.translator_factory)
+            classifier = classifier.setTranslatorFactory(
+                self.translator_factory)
         if self.batchifier is not None:
             classifier = classifier.setBatchifier(self.batchifier)
         if self.apply_softmax is not None:
             classifier = classifier.setApplySoftmax(self.apply_softmax)
         if self.top_k is not None:
             classifier = classifier.setTopK(self.top_k)
-        return DataFrame(classifier.classify(dataset._jdf), dataset.sparkSession)
+        return DataFrame(classifier.classify(dataset._jdf),
+                         dataset.sparkSession)

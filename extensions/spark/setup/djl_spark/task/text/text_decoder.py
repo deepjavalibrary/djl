@@ -44,12 +44,10 @@ class TextDecoder:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        decoder = (
-            sc._jvm.ai.djl.spark.task.text.TextDecoder()
-            .setInputCol(self.input_col)
-            .setOutputCol(self.output_col)
+        decoder = sc._jvm.ai.djl.spark.task.text.TextDecoder() \
+            .setInputCol(self.input_col) \
+            .setOutputCol(self.output_col) \
             .setHfModelId(self.hf_model_id)
-        )
         if self.batch_size is not None:
             decoder = decoder.setBatchSize(self.batch_size)
         return DataFrame(decoder.decode(dataset._jdf), dataset.sparkSession)

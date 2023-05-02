@@ -55,11 +55,9 @@ class QuestionAnswerer:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        answerer = (
-            sc._jvm.ai.djl.spark.task.text.QuestionAnswerer()
-            .setOutputCol(self.output_col)
+        answerer = sc._jvm.ai.djl.spark.task.text.QuestionAnswerer() \
+            .setOutputCol(self.output_col) \
             .setModelUrl(self.model_url)
-        )
         if self.input_cols is not None:
             # Convert the input_cols to Java array
             input_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String,

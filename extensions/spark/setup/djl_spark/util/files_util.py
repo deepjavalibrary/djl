@@ -28,7 +28,8 @@ def get_cache_dir(application, group_id, url):
     :param group_id: The group ID.
     :param url: The url of the file to store to the cache.
     """
-    base_dir = os.environ.get("DJL_CACHE_DIR", os.path.join(os.path.expanduser("~"), ".djl.ai"))
+    base_dir = os.environ.get("DJL_CACHE_DIR",
+                              os.path.join(os.path.expanduser("~"), ".djl.ai"))
     h = hashlib.sha256(url.encode('UTF-8')).hexdigest()[:40]
     return os.path.join(base_dir, "cache/repo/model", application, group_id, h)
 
@@ -55,7 +56,8 @@ def s3_download(url, path):
     url = urlparse(url)
 
     if url.scheme != "s3":
-        raise ValueError("Expecting 's3' scheme, got: %s in %s" % (url.scheme, url))
+        raise ValueError("Expecting 's3' scheme, got: %s in %s" %
+                         (url.scheme, url))
 
     bucket, key = url.netloc, url.path.lstrip("/")
     s3 = boto3.client("s3")

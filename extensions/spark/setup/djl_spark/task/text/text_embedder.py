@@ -55,12 +55,10 @@ class TextEmbedder:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        embedder = (
-            sc._jvm.ai.djl.spark.task.text.TextEmbedder()
-            .setInputCol(self.input_col)
-            .setOutputCol(self.output_col)
+        embedder = sc._jvm.ai.djl.spark.task.text.TextEmbedder() \
+            .setInputCol(self.input_col) \
+            .setOutputCol(self.output_col) \
             .setModelUrl(self.model_url)
-        )
         if self.engine is not None:
             embedder = embedder.setEngine(self.engine)
         if self.batch_size is not None:

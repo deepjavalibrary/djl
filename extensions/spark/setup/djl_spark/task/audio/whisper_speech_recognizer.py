@@ -20,7 +20,6 @@ from typing import Iterator, Optional
 from transformers import pipeline
 from ...util import files_util, dependency_util
 
-
 TASK = "automatic-speech-recognition"
 APPLICATION = "audio/automatic_speech_recognition"
 GROUP_ID = "ai/djl/huggingface/pytorch"
@@ -65,22 +64,31 @@ class WhisperSpeechRecognizer:
             raise ValueError("Only PyTorch engine is supported.")
 
         if self.model_url:
-            cache_dir = files_util.get_cache_dir(APPLICATION, GROUP_ID, self.model_url)
+            cache_dir = files_util.get_cache_dir(APPLICATION, GROUP_ID,
+                                                 self.model_url)
             files_util.download_and_extract(self.model_url, cache_dir)
             dependency_util.install(cache_dir)
             model_id_or_path = cache_dir
         elif self.hf_model_id:
             model_id_or_path = self.hf_model_id
         else:
-            raise ValueError("Either model_url or hf_model_id must be provided.")
+            raise ValueError(
+                "Either model_url or hf_model_id must be provided.")
 
         @pandas_udf(StringType())
         def predict_udf(iterator: Iterator[pd.Series]) -> Iterator[pd.Series]:
-            pipe = pipeline(TASK, generate_kwargs=generate_kwargs, model=model_id_or_path,
-                            batch_size=self.batch_size, chunk_length_s=30, **kwargs)
+            pipe = pipeline(TASK,
+                            generate_kwargs=generate_kwargs,
+                            model=model_id_or_path,
+                            batch_size=self.batch_size,
+                            chunk_length_s=30,
+                            **kwargs)
             for s in iterator:
                 # Model expects single channel, 16000 sample rate audio
-                batch = [librosa.load(io.BytesIO(d), mono=True, sr=16000)[0] for d in s]
+                batch = [
+                    librosa.load(io.BytesIO(d), mono=True, sr=16000)[0]
+                    for d in s
+                ]
                 output = pipe(batch)
                 text = [o["text"] for o in output]
                 yield pd.Series(text)

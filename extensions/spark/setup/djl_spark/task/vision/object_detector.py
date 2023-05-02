@@ -57,11 +57,9 @@ class ObjectDetector:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        detector = (
-            sc._jvm.ai.djl.spark.task.vision.ObjectDetector()
-            .setOutputCol(self.output_col)
+        detector = sc._jvm.ai.djl.spark.task.vision.ObjectDetector() \
+            .setOutputCol(self.output_col) \
             .setModelUrl(self.model_url)
-        )
         if self.input_cols is not None:
             # Convert the input_cols to Java array
             input_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String,

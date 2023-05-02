@@ -60,18 +60,23 @@ class Text2TextGenerator:
             raise ValueError("Only PyTorch engine is supported.")
 
         if self.model_url:
-            cache_dir = files_util.get_cache_dir(APPLICATION, GROUP_ID, self.model_url)
+            cache_dir = files_util.get_cache_dir(APPLICATION, GROUP_ID,
+                                                 self.model_url)
             files_util.download_and_extract(self.model_url, cache_dir)
             dependency_util.install(cache_dir)
             model_id_or_path = cache_dir
         elif self.hf_model_id:
             model_id_or_path = self.hf_model_id
         else:
-            raise ValueError("Either model_url or hf_model_id must be provided.")
+            raise ValueError(
+                "Either model_url or hf_model_id must be provided.")
 
         @pandas_udf(StringType())
         def predict_udf(iterator: Iterator[pd.Series]) -> Iterator[pd.Series]:
-            pipe = pipeline(TASK, model=model_id_or_path, batch_size=self.batch_size, **kwargs)
+            pipe = pipeline(TASK,
+                            model=model_id_or_path,
+                            batch_size=self.batch_size,
+                            **kwargs)
             for s in iterator:
                 output = pipe(s.tolist())
                 text = [o["generated_text"] for o in output]

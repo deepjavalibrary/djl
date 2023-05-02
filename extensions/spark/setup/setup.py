@@ -36,7 +36,9 @@ class BuildPy(setuptools.command.build_py.build_py):
 if __name__ == '__main__':
     version = detect_version()
 
-    requirements = ['packaging', 'wheel', 'pillow', 'pandas', 'numpy', 'pyarrow']
+    requirements = [
+        'packaging', 'wheel', 'pillow', 'pandas', 'numpy', 'pyarrow'
+    ]
 
     test_requirements = ['numpy', 'requests']
 

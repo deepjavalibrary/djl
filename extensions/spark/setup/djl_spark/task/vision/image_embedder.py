@@ -57,11 +57,9 @@ class ImageEmbedder:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        embedder = (
-            sc._jvm.ai.djl.spark.task.vision.ImageEmbedder()
-            .setOutputCol(self.output_col)
+        embedder = sc._jvm.ai.djl.spark.task.vision.ImageEmbedder() \
+            .setOutputCol(self.output_col) \
             .setModelUrl(self.model_url)
-        )
         if self.input_cols is not None:
             # Convert the input_cols to Java array
             input_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String,

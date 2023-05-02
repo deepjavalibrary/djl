@@ -64,18 +64,18 @@ class SpeechRecognizer:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        recognizer = (
-            sc._jvm.ai.djl.spark.task.audio.SpeechRecognizer()
-            .setInputCol(self.input_col)
-            .setOutputCol(self.output_col)
+        recognizer = sc._jvm.ai.djl.spark.task.audio.SpeechRecognizer() \
+            .setInputCol(self.input_col) \
+            .setOutputCol(self.output_col) \
             .setModelUrl(self.model_url)
-        )
         if self.engine is not None:
             recognizer = recognizer.setEngine(self.engine)
         if self.batch_size is not None:
             recognizer = recognizer.setBatchSize(self.batch_size)
         if self.translator_factory is not None:
-            recognizer = recognizer.setTranslatorFactory(self.translator_factory)
+            recognizer = recognizer.setTranslatorFactory(
+                self.translator_factory)
         if self.batchifier is not None:
             recognizer = recognizer.setBatchifier(self.batchifier)
-        return DataFrame(recognizer.recognize(dataset._jdf), dataset.sparkSession)
+        return DataFrame(recognizer.recognize(dataset._jdf),
+                         dataset.sparkSession)
