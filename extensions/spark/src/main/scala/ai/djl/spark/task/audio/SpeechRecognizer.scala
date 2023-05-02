@@ -21,6 +21,8 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row}
 import org.apache.spark.sql.types.{BinaryType, StringType, StructField, StructType}
 
 import java.io.ByteArrayInputStream
+import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
+import scala.jdk.CollectionConverters.seqAsJavaListConverter
 
 /**
  * SpeechRecognizer performs speech recognition on audio.
@@ -92,33 +94,41 @@ class SpeechRecognizer(override val uid: String) extends BaseAudioPredictor[Stri
     super.transform(dataset)
   }
 
-  /**
-   * Transforms the rows.
-   *
-   * @param iter the rows to transform
-   * @return the transformed rows
-   */
+  /** @inheritdoc */
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val predictor = model.newPredictor()
-    iter.map(row => {
-      val data = row.getAs[Array[Byte]](inputColIndex)
-      val audioFactory = AudioFactory.newInstance
-      if (isDefined(channels)) {
-        audioFactory.setChannels($(channels))
+    val audioFactory = AudioFactory.newInstance()
+    if (isDefined(channels)) {
+      audioFactory.setChannels($(channels))
+    }
+    if (isDefined(sampleRate)) {
+      audioFactory.setSampleRate($(sampleRate))
+    }
+    if (isDefined(sampleFormat)) {
+      audioFactory.setSampleFormat($(sampleFormat))
+    }
+    iter.grouped($(batchSize)).flatMap { batch =>
+      // Read inputs
+      val inputs = batch.map { row =>
+        val data = row.getAs[Array[Byte]](inputColIndex)
+        val is = new ByteArrayInputStream(data)
+        try {
+          audioFactory.fromInputStream(is)
+        } finally {
+          is.close()
+        }
+      }.asJava
+
+      // Batch predict
+      val output = predictor.batchPredict(inputs)
+      batch.zip(output).map { case (row, out) =>
+        Row.fromSeq(row.toSeq :+ out)
       }
-      if (isDefined(sampleRate)) {
-        audioFactory.setSampleRate($(sampleRate))
-      }
-      if (isDefined(sampleFormat)) {
-        audioFactory.setSampleFormat($(sampleFormat))
-      }
-      val audio = audioFactory.fromInputStream(new ByteArrayInputStream(data))
-      Row.fromSeq(row.toSeq :+ predictor.predict(audio))
-    })
+    }
   }
 
   /** @inheritdoc */
-  def validateInputType(schema: StructType): Unit = {
+  override protected def validateInputType(schema: StructType): Unit = {
     validateType(schema($(inputCol)), BinaryType)
   }
 

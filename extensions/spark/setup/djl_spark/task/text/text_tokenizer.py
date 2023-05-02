@@ -17,7 +17,7 @@ from pyspark.sql import DataFrame
 
 class TextTokenizer:
 
-    def __init__(self, input_col, output_col, hf_model_id):
+    def __init__(self, input_col: str, output_col: str, hf_model_id: str):
         """
         Initializes the TextTokenizer.
 

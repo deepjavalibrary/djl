@@ -75,16 +75,19 @@ class TextEncoder(override val uid: String) extends BaseTextPredictor[String, En
   }
 
   /** @inheritdoc */
-  override def transformRows(iter: Iterator[Row]): Iterator[Row] = {
+  override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val tokenizer = HuggingFaceTokenizer.newInstance($(hfModelId))
-    iter.map(row => {
-      val encoding = tokenizer.encode(row.getString(inputColIndex))
-      Row.fromSeq(row.toSeq :+ Row(encoding.getIds, encoding.getTypeIds, encoding.getAttentionMask))
-    })
+    iter.grouped($(batchSize)).flatMap { batch =>
+      val inputs = batch.map(_.getString(inputColIndex)).toArray
+      val output = tokenizer.batchEncode(inputs)
+      batch.zip(output).map { case (row, out) =>
+        Row.fromSeq(row.toSeq :+ Row(out.getIds, out.getTypeIds, out.getAttentionMask))
+      }
+    }
   }
 
   /** @inheritdoc */
-  def validateInputType(schema: StructType): Unit = {
+  override protected def validateInputType(schema: StructType): Unit = {
     validateType(schema($(inputCol)), StringType)
   }
 

@@ -23,7 +23,7 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row}
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class TextEmbedder(override val uid: String) extends BaseTextPredictor[String, Array[Float]]
+class TextEmbedder(override val uid: String) extends BaseTextPredictor[Array[String], Array[Array[Float]]]
   with HasInputCol with HasOutputCol {
 
   def this() = this(Identifiable.randomUID("TextEmbedder"))
@@ -44,8 +44,8 @@ class TextEmbedder(override val uid: String) extends BaseTextPredictor[String, A
    */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  setDefault(inputClass, classOf[String])
-  setDefault(outputClass, classOf[Array[Float]])
+  setDefault(inputClass, classOf[Array[String]])
+  setDefault(outputClass, classOf[Array[Array[Float]]])
   setDefault(translatorFactory, new TextEmbeddingTranslatorFactory())
 
   /**
@@ -67,13 +67,17 @@ class TextEmbedder(override val uid: String) extends BaseTextPredictor[String, A
   /** @inheritdoc */
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val predictor = model.newPredictor()
-    iter.map(row => {
-      Row.fromSeq(row.toSeq :+ predictor.predict(row.getString(inputColIndex)))
-    })
+    iter.grouped($(batchSize)).flatMap { batch =>
+      val inputs = batch.map(_.getString(inputColIndex)).toArray
+      val output = predictor.predict(inputs)
+      batch.zip(output).map { case (row, out) =>
+        Row.fromSeq(row.toSeq :+ out)
+      }
+    }
   }
 
   /** @inheritdoc */
-  def validateInputType(schema: StructType): Unit = {
+  override protected def validateInputType(schema: StructType): Unit = {
     validateType(schema($(inputCol)), StringType)
   }
 

@@ -20,6 +20,9 @@ import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.sql.types.{ArrayType, ByteType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
+import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
+import scala.jdk.CollectionConverters.seqAsJavaListConverter
+
 /**
  * ImageEmbedder performs image embedding on images.
  *
@@ -53,11 +56,15 @@ class ImageEmbedder(override val uid: String) extends BaseImagePredictor[Array[B
   /** @inheritdoc */
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val predictor = model.newPredictor()
-    iter.map(row => {
-      val image = ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
-        ImageSchema.getWidth(row), ImageSchema.getHeight(row))
-      Row.fromSeq(row.toSeq :+ predictor.predict(image))
-    })
+    iter.grouped($(batchSize)).flatMap { batch =>
+      val inputs = batch.map(row =>
+        ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
+          ImageSchema.getWidth(row), ImageSchema.getHeight(row))).asJava
+      val output = predictor.batchPredict(inputs)
+      batch.zip(output).map { case (row, out) =>
+        Row.fromSeq(row.toSeq :+ out)
+      }
+    }
   }
 
   /** @inheritdoc */

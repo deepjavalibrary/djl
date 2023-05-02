@@ -23,6 +23,7 @@ import org.apache.spark.sql.types.{ArrayType, DoubleType, StringType, StructFiel
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
+import scala.jdk.CollectionConverters.seqAsJavaListConverter
 
 /**
  * ImageClassifier performs image classification on images.
@@ -61,8 +62,6 @@ class ImageClassifier(override val uid: String) extends BaseImagePredictor[Class
 
   setDefault(outputClass, classOf[Classifications])
   setDefault(translatorFactory, new ImageClassificationTranslatorFactory())
-  setDefault(applySoftmax, true)
-  setDefault(topK, 5)
 
   /**
    * Performs image classification on the provided dataset.
@@ -76,22 +75,28 @@ class ImageClassifier(override val uid: String) extends BaseImagePredictor[Class
 
   /** @inheritdoc */
   override def transform(dataset: Dataset[_]): DataFrame = {
-    arguments.put("applySoftmax", $(applySoftmax).toString)
-    arguments.put("topK", $(topK).toString)
+    if (isDefined(applySoftmax)) {
+      arguments.put("applySoftmax", $(applySoftmax).toString)
+    }
+    if (isDefined(topK)) {
+      arguments.put("topK", $(topK).toString)
+    }
     super.transform(dataset)
   }
 
   /** @inheritdoc */
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val predictor = model.newPredictor()
-    iter.map(row => {
-      val image = ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
-        ImageSchema.getWidth(row), ImageSchema.getHeight(row))
-      val prediction = predictor.predict(image)
-      val top = prediction.topK[Classifications.Classification]($(topK)).map(item => item.toString)
-      Row.fromSeq(row.toSeq :+ Row(prediction.getClassNames.toArray,
-        prediction.getProbabilities.toArray, top))
-    })
+    iter.grouped($(batchSize)).flatMap { batch =>
+      val inputs = batch.map(row =>
+        ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
+          ImageSchema.getWidth(row), ImageSchema.getHeight(row))).asJava
+      val output = predictor.batchPredict(inputs)
+      batch.zip(output).map { case (row, out) =>
+        Row.fromSeq(row.toSeq :+ Row(out.getClassNames.toArray(), out.getProbabilities.toArray(),
+          out.topK[Classifications.Classification]().map(_.toString)))
+      }
+    }
   }
 
   /** @inheritdoc */
@@ -99,7 +104,7 @@ class ImageClassifier(override val uid: String) extends BaseImagePredictor[Class
     val outputSchema = StructType(schema.fields :+
       StructField($(outputCol), StructType(Seq(StructField("class_names", ArrayType(StringType)),
         StructField("probabilities", ArrayType(DoubleType)),
-        StructField("topK", ArrayType(StringType))))))
+        StructField("top_k", ArrayType(StringType))))))
     outputSchema
   }
 }

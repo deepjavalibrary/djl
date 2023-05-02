@@ -16,8 +16,8 @@ from pyspark.sql import DataFrame
 from typing import Optional
 
 
-class ImageClassifier:
-    """ImageClassifier performs image classification on images.
+class SemanticSegmenter:
+    """SemanticSegmenter performs semantic segmentation on images.
     """
 
     def __init__(self,
@@ -27,23 +27,21 @@ class ImageClassifier:
                  engine: Optional[str] = None,
                  batch_size: Optional[int] = None,
                  translator_factory=None,
-                 batchifier: Optional[str] = None,
-                 apply_softmax: Optional[bool] = None,
-                 top_k: Optional[int] = None):
+                 batchifier: Optional[str] = None):
         """
-        Initializes the ImageClassifier.
+        Initializes the SemanticSegmenter.
 
         :param input_cols: The input columns
         :param output_col: The output column
         :param model_url: The model URL
         :param engine (optional): The engine
-        :param batch_size (optional): The batch size
+        :param batch_size (optional): The batch size. Note that to enable batch predict
+                                      by setting batch size greater than 1,
+                                      we expect the input images to have the same size.
         :param translator_factory (optional): The translator factory.
                                               Default is ImageClassificationTranslatorFactory.
         :param batchifier (optional): The batchifier. Valid values include "none" (default),
                                       "stack", and "padding".
-        :param apply_softmax (optional): Whether to apply softmax when processing output.
-        :param top_k (optional): The number of classes to return.
         """
         self.input_cols = input_cols
         self.output_col = output_col
@@ -52,18 +50,16 @@ class ImageClassifier:
         self.batch_size = batch_size
         self.translator_factory = translator_factory
         self.batchifier = batchifier
-        self.apply_softmax = apply_softmax
-        self.top_k = top_k
 
-    def classify(self, dataset):
+    def segment(self, dataset):
         """
-        Performs image classification on the provided dataset.
+        Performs semantic segmentation on the provided dataset.
 
         :param dataset: input dataset
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        classifier = sc._jvm.ai.djl.spark.task.vision.ImageClassifier() \
+        segmenter = sc._jvm.ai.djl.spark.task.vision.SemanticSegmenter() \
             .setOutputCol(self.output_col) \
             .setModelUrl(self.model_url)
         if self.input_cols is not None:
@@ -71,19 +67,13 @@ class ImageClassifier:
             input_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String,
                                                    len(self.input_cols))
             input_cols_arr[:] = [col for col in self.input_cols]
-            classifier = classifier.setInputCols(input_cols_arr)
+            segmenter = segmenter.setInputCols(input_cols_arr)
         if self.engine is not None:
-            classifier = classifier.setEngine(self.engine)
+            segmenter = segmenter.setEngine(self.engine)
         if self.batch_size is not None:
-            classifier = classifier.setBatchSize(self.batch_size)
+            segmenter = segmenter.setBatchSize(self.batch_size)
         if self.translator_factory is not None:
-            classifier = classifier.setTranslatorFactory(
-                self.translator_factory)
+            segmenter = segmenter.setTranslatorFactory(self.translator_factory)
         if self.batchifier is not None:
-            classifier = classifier.setBatchifier(self.batchifier)
-        if self.apply_softmax is not None:
-            classifier = classifier.setApplySoftmax(self.apply_softmax)
-        if self.top_k is not None:
-            classifier = classifier.setTopK(self.top_k)
-        return DataFrame(classifier.classify(dataset._jdf),
-                         dataset.sparkSession)
+            segmenter = segmenter.setBatchifier(self.batchifier)
+        return DataFrame(segmenter.segment(dataset._jdf), dataset.sparkSession)

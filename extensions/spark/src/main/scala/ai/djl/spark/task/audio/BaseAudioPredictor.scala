@@ -25,5 +25,6 @@ abstract class BaseAudioPredictor[B](override val uid: String) extends BasePredi
 
   def this() = this(Identifiable.randomUID("BaseAudioPredictor"))
 
+  setDefault(batchSize, 10)
   setDefault(inputClass, classOf[Audio])
 }

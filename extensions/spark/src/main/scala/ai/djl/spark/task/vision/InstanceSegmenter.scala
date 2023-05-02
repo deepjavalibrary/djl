@@ -23,6 +23,7 @@ import org.apache.spark.sql.types.{ArrayType, DoubleType, StringType, StructFiel
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
+import scala.jdk.CollectionConverters.seqAsJavaListConverter
 
 /**
  * InstanceSegmenter performs instance segmentation on images.
@@ -41,6 +42,16 @@ class InstanceSegmenter(override val uid: String) extends BaseImagePredictor[Det
    */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
+  /**
+   * Sets the batchSize parameter. Note that to enable batch predict by
+   * setting batch size greater than 1, we expect the input images to
+   * have the same size.
+   *
+   * @param value the value of the parameter
+   */
+  override def setBatchSize(value: Int): this.type = set(batchSize, value)
+
+  setDefault(batchSize, 1)
   setDefault(outputClass, classOf[DetectedObjects])
   setDefault(translatorFactory, new InstanceSegmentationTranslatorFactory())
 
@@ -57,14 +68,16 @@ class InstanceSegmenter(override val uid: String) extends BaseImagePredictor[Det
   /** @inheritdoc */
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val predictor = model.newPredictor()
-    iter.map(row => {
-      val image = ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
-        ImageSchema.getWidth(row), ImageSchema.getHeight(row))
-      val prediction = predictor.predict(image)
-      val boundingBoxes = prediction.items[DetectedObject].map(item => item.getBoundingBox.toString)
-      Row.fromSeq(row.toSeq :+ Row(prediction.getClassNames.toArray,
-        prediction.getProbabilities.toArray, boundingBoxes))
-    })
+    iter.grouped($(batchSize)).flatMap { batch =>
+      val inputs = batch.map(row =>
+        ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
+          ImageSchema.getWidth(row), ImageSchema.getHeight(row))).asJava
+      val output = predictor.batchPredict(inputs)
+      batch.zip(output).map { case (row, out) =>
+        Row.fromSeq(row.toSeq :+ Row(out.getClassNames.toArray(), out.getProbabilities.toArray(),
+          out.items[DetectedObject]().map(_.getBoundingBox.toString)))
+      }
+    }
   }
 
   /** @inheritdoc */
@@ -72,7 +85,7 @@ class InstanceSegmenter(override val uid: String) extends BaseImagePredictor[Det
     val outputSchema = StructType(schema.fields :+
       StructField($(outputCol), StructType(Seq(StructField("class_names", ArrayType(StringType)),
         StructField("probabilities", ArrayType(DoubleType)),
-        StructField("boundingBoxes", ArrayType(StringType))))))
+        StructField("bounding_boxes", ArrayType(StringType))))))
     outputSchema
   }
 }

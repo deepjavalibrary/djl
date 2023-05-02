@@ -83,7 +83,7 @@ class TextTokenizer(override val uid: String) extends BaseTextPredictor[String, 
   }
 
   /** @inheritdoc */
-  def validateInputType(schema: StructType): Unit = {
+  override protected def validateInputType(schema: StructType): Unit = {
     validateType(schema($(inputCol)), StringType)
   }
 

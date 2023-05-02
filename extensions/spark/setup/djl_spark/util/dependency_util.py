@@ -21,7 +21,10 @@ def install(path):
     :param path: The path to find the requirements.txt.
     """
     if os.path.exists(os.path.join(path, "requirements.txt")):
-        cmd = [python_executable(), "-m", "pip", "install", "-r", os.path.join(path, "requirements.txt")]
+        cmd = [
+            python_executable(), "-m", "pip", "install", "-r",
+            os.path.join(path, "requirements.txt")
+        ]
         try:
             subprocess.run(cmd, stderr=subprocess.STDOUT, check=True)
         except subprocess.CalledProcessError as e:
@@ -34,5 +37,6 @@ def python_executable():
     :return: The path of the Python executable.
     """
     if not sys.executable:
-        raise RuntimeError("Failed to retrieve the path of the Python executable.")
+        raise RuntimeError(
+            "Failed to retrieve the path of the Python executable.")
     return sys.executable

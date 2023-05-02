@@ -10,12 +10,27 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS"
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
-
 """DJL Spark Tasks Vision API."""
 
-from . import image_classifier
+from . import (
+    image_classifier,
+    image_embedder,
+    instance_segmenter,
+    object_detector,
+    semantic_segmenter,
+)
 
 ImageClassifier = image_classifier.ImageClassifier
+ImageEmbedder = image_embedder.ImageEmbedder
+InstanceSegmenter = instance_segmenter.InstanceSegmenter
+ObjectDetector = object_detector.ObjectDetector
+SemanticSegmenter = semantic_segmenter.SemanticSegmenter
 
 # Remove unnecessary modules to avoid duplication in API.
-del image_classifier
+del (
+    image_classifier,
+    image_embedder,
+    instance_segmenter,
+    object_detector,
+    semantic_segmenter,
+)

@@ -36,9 +36,11 @@ class BuildPy(setuptools.command.build_py.build_py):
 if __name__ == '__main__':
     version = detect_version()
 
-    requirements = ['packaging', 'wheel']
+    requirements = [
+        'packaging', 'wheel', 'pillow', 'pandas', 'numpy', 'pyarrow'
+    ]
 
-    test_requirements = ['numpy', 'requests', 'Pillow']
+    test_requirements = ['numpy', 'requests']
 
     setup(name='djl_spark',
           version=version,

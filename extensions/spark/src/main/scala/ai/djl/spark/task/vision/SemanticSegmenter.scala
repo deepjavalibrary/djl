@@ -21,6 +21,9 @@ import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.sql.types.{ArrayType, IntegerType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
+import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
+import scala.jdk.CollectionConverters.seqAsJavaListConverter
+
 /**
  * SemanticSegmenter performs semantic segmentation on images.
  *
@@ -38,6 +41,16 @@ class SemanticSegmenter(override val uid: String) extends BaseImagePredictor[Cat
    */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
+  /**
+   * Sets the batchSize parameter. Note that to enable batch predict by
+   * setting batch size greater than 1, we expect the input images to
+   * have the same size.
+   *
+   * @param value the value of the parameter
+   */
+  override def setBatchSize(value: Int): this.type = set(batchSize, value)
+
+  setDefault(batchSize, 1)
   setDefault(outputClass, classOf[CategoryMask])
   setDefault(translatorFactory, new SemanticSegmentationTranslatorFactory())
 
@@ -54,12 +67,15 @@ class SemanticSegmenter(override val uid: String) extends BaseImagePredictor[Cat
   /** @inheritdoc */
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val predictor = model.newPredictor()
-    iter.map(row => {
-      val image = ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
-        ImageSchema.getWidth(row), ImageSchema.getHeight(row))
-      val prediction = predictor.predict(image)
-      Row.fromSeq(row.toSeq :+ Row(prediction.getClasses.toArray, prediction.getMask))
-    })
+    iter.grouped($(batchSize)).flatMap { batch =>
+      val inputs = batch.map(row =>
+        ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
+          ImageSchema.getWidth(row), ImageSchema.getHeight(row))).asJava
+      val output = predictor.batchPredict(inputs)
+      batch.zip(output).map { case (row, out) =>
+        Row.fromSeq(row.toSeq :+ Row(out.getClasses.toArray, out.getMask))
+      }
+    }
   }
 
   /** @inheritdoc */

@@ -24,7 +24,7 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row}
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class QuestionAnswerer(override val uid: String) extends BaseTextPredictor[QAInput, String]
+class QuestionAnswerer(override val uid: String) extends BaseTextPredictor[Array[QAInput], Array[String]]
   with HasInputCols with HasOutputCol {
 
   def this() = this(Identifiable.randomUID("QuestionAnswerer"))
@@ -46,8 +46,8 @@ class QuestionAnswerer(override val uid: String) extends BaseTextPredictor[QAInp
    */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  setDefault(inputClass, classOf[QAInput])
-  setDefault(outputClass, classOf[String])
+  setDefault(inputClass, classOf[Array[QAInput]])
+  setDefault(outputClass, classOf[Array[String]])
   setDefault(translatorFactory, new QuestionAnsweringTranslatorFactory())
 
   /**
@@ -70,14 +70,18 @@ class QuestionAnswerer(override val uid: String) extends BaseTextPredictor[QAInp
   /** @inheritdoc */
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val predictor = model.newPredictor()
-    iter.map(row => {
-      Row.fromSeq(row.toSeq :+ predictor.predict(new QAInput(row.getString(inputColIndices(0)),
-        row.getString(inputColIndices(1)))))
-    })
+    iter.grouped($(batchSize)).flatMap { batch =>
+      val inputs = batch.map(row => new QAInput(row.getString(inputColIndices(0)),
+        row.getString(inputColIndices(1)))).toArray
+      val output = predictor.predict(inputs)
+      batch.zip(output).map { case (row, out) =>
+        Row.fromSeq(row.toSeq :+ out)
+      }
+    }
   }
 
   /** @inheritdoc */
-  def validateInputType(schema: StructType): Unit = {
+  override protected def validateInputType(schema: StructType): Unit = {
     assert($(inputCols).length == 2, "inputCols must have 2 columns")
     validateType(schema($(inputCols)(0)), StringType)
     validateType(schema($(inputCols)(1)), StringType)
