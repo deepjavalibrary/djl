@@ -13,19 +13,34 @@
 
 """DJL Spark Tasks Text API."""
 
-from . import text_decoder, text_encoder, text_tokenizer, text_embedder, text2text_generator, text_generator
+from . import (
+    question_answerer,
+    text2text_generator,
+    text_classifier,
+    text_decoder,
+    text_embedder,
+    text_encoder,
+    text_generator,
+    text_tokenizer,
+)
 
-TextDecoder = text_decoder.TextDecoder
-TextEncoder = text_encoder.TextEncoder
-TextTokenizer = text_tokenizer.TextTokenizer
-TextEmbedder = text_embedder.TextEmbedder
+QuestionAnswerer = question_answerer.QuestionAnswerer
 Text2TextGenerator = text2text_generator.Text2TextGenerator
+TextClassifier = text_classifier.TextClassifier
+TextDecoder = text_decoder.TextDecoder
+TextEmbedder = text_embedder.TextEmbedder
+TextEncoder = text_encoder.TextEncoder
 TextGenerator = text_generator.TextGenerator
+TextTokenizer = text_tokenizer.TextTokenizer
 
 # Remove unnecessary modules to avoid duplication in API.
-del text_decoder
-del text_encoder
-del text_tokenizer
-del text_embedder
-del text2text_generator
-del text_generator
+del (
+    question_answerer,
+    text2text_generator,
+    text_classifier,
+    text_decoder,
+    text_embedder,
+    text_encoder,
+    text_generator,
+    text_tokenizer,
+)

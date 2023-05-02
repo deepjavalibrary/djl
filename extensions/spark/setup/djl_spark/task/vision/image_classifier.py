@@ -13,32 +13,47 @@
 
 from pyspark import SparkContext
 from pyspark.sql import DataFrame
+from typing import Optional
 
 
 class ImageClassifier:
     """ImageClassifier performs image classification on images.
     """
 
-    def __init__(self, input_cols, output_col, engine, model_url,
-                 output_class=None, translator=None, topK=5):
+    def __init__(self,
+                 input_cols: list[str],
+                 output_col: str,
+                 model_url: str,
+                 engine: Optional[str] = None,
+                 batch_size: Optional[int] = None,
+                 translator_factory=None,
+                 batchifier: Optional[str] = None,
+                 apply_softmax: Optional[bool] = None,
+                 top_k: Optional[int] = None):
         """
         Initializes the ImageClassifier.
 
         :param input_cols: The input columns
         :param output_col: The output column
-        :param engine (optional): The engine
         :param model_url: The model URL
-        :param output_class (optional): The output class
-        :param translator (optional): The translator. Default is ImageClassificationTranslator.
-        :param topK (optional): The number of classes to return. Default is 5.
+        :param engine (optional): The engine
+        :param batch_size (optional): The batch size
+        :param translator_factory (optional): The translator factory.
+                                              Default is ImageClassificationTranslatorFactory.
+        :param batchifier (optional): The batchifier. Valid values include "none" (default),
+                                      "stack", and "padding".
+        :param apply_softmax (optional): Whether to apply softmax when processing output.
+        :param top_k (optional): The number of classes to return.
         """
         self.input_cols = input_cols
         self.output_col = output_col
-        self.engine = engine
         self.model_url = model_url
-        self.output_class = output_class
-        self.translator = translator
-        self.topK = topK
+        self.engine = engine
+        self.batch_size = batch_size
+        self.translator_factory = translator_factory
+        self.batchifier = batchifier
+        self.apply_softmax = apply_softmax
+        self.top_k = top_k
 
     def classify(self, dataset):
         """
@@ -48,25 +63,27 @@ class ImageClassifier:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-
-        # Convert the input_cols to Java array
-        input_cols_arr = None
+        classifier = (
+            sc._jvm.ai.djl.spark.task.vision.ImageClassifier()
+            .setOutputCol(self.output_col)
+            .setModelUrl(self.model_url)
+        )
         if self.input_cols is not None:
+            # Convert the input_cols to Java array
             input_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String,
                                                    len(self.input_cols))
-            for i in range(len(self.input_cols)):
-                input_cols_arr[i] = self.input_cols[i]
-
-        classifier = sc._jvm.ai.djl.spark.task.vision.ImageClassifier()
-        if input_cols_arr is not None:
+            input_cols_arr[:] = [col for col in self.input_cols]
             classifier = classifier.setInputCols(input_cols_arr)
-        if self.output_class is not None:
-            classifier = classifier.setOutputClass(self.output_class)
-        if self.translator is not None:
-            classifier = classifier.setTranslator(self.translator)
-        classifier = classifier.setOutputCol(self.output_col) \
-            .setEngine(self.engine) \
-            .setModelUrl(self.model_url) \
-            .setTopK(self.topK)
-        return DataFrame(classifier.classify(dataset._jdf),
-                         dataset.sparkSession)
+        if self.engine is not None:
+            classifier = classifier.setEngine(self.engine)
+        if self.batch_size is not None:
+            classifier = classifier.setBatchSize(self.batch_size)
+        if self.translator_factory is not None:
+            classifier = classifier.setTranslatorFactory(self.translator_factory)
+        if self.batchifier is not None:
+            classifier = classifier.setBatchifier(self.batchifier)
+        if self.apply_softmax is not None:
+            classifier = classifier.setApplySoftmax(self.apply_softmax)
+        if self.top_k is not None:
+            classifier = classifier.setTopK(self.top_k)
+        return DataFrame(classifier.classify(dataset._jdf), dataset.sparkSession)

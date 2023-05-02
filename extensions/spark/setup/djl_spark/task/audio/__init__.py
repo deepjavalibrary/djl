@@ -11,11 +11,18 @@
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
 
-"""DJL Spark Tasks Text API."""
+"""DJL Spark Tasks Audio API."""
 
-from . import whisper_speech_recognizer
+from . import (
+    speech_recognizer,
+    whisper_speech_recognizer,
+)
 
+SpeechRecognizer = speech_recognizer.SpeechRecognizer
 WhisperSpeechRecognizer = whisper_speech_recognizer.WhisperSpeechRecognizer
 
 # Remove unnecessary modules to avoid duplication in API.
-del whisper_speech_recognizer
+del (
+    speech_recognizer,
+    whisper_speech_recognizer,
+)

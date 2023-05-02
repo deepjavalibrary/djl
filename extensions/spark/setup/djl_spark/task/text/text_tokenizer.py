@@ -17,7 +17,10 @@ from pyspark.sql import DataFrame
 
 class TextTokenizer:
 
-    def __init__(self, input_col, output_col, hf_model_id):
+    def __init__(self,
+                 input_col: str,
+                 output_col: str,
+                 hf_model_id: str):
         """
         Initializes the TextTokenizer.
 
@@ -37,9 +40,10 @@ class TextTokenizer:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        tokenizer = sc._jvm.ai.djl.spark.task.text.TextTokenizer() \
-            .setInputCol(self.input_col) \
-            .setOutputCol(self.output_col) \
+        tokenizer = (
+            sc._jvm.ai.djl.spark.task.text.TextTokenizer()
+            .setInputCol(self.input_col)
+            .setOutputCol(self.output_col)
             .setHfModelId(self.hf_model_id)
-        return DataFrame(tokenizer.tokenize(dataset._jdf),
-                         dataset.sparkSession)
+        )
+        return DataFrame(tokenizer.tokenize(dataset._jdf), dataset.sparkSession)

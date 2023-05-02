@@ -13,21 +13,28 @@
 
 from pyspark import SparkContext
 from pyspark.sql import DataFrame
+from typing import Optional
 
 
 class TextEncoder:
 
-    def __init__(self, input_col, output_col, hf_model_id):
+    def __init__(self,
+                 input_col: str,
+                 output_col: str,
+                 hf_model_id: str,
+                 batch_size: Optional[int] = None):
         """
         Initializes the TextEncoder.
 
         :param input_col: The input column
         :param output_col: The output column
         :param hf_model_id: The Huggingface model ID
+        :param batch_size (optional): The batch size
         """
         self.input_col = input_col
         self.output_col = output_col
         self.hf_model_id = hf_model_id
+        self.batch_size = batch_size
 
     def encode(self, dataset):
         """
@@ -37,9 +44,12 @@ class TextEncoder:
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        encoder = sc._jvm.ai.djl.spark.task.text.TextEncoder() \
-            .setInputCol(self.input_col) \
-            .setOutputCol(self.output_col) \
+        encoder = (
+            sc._jvm.ai.djl.spark.task.text.TextEncoder()
+            .setInputCol(self.input_col)
+            .setOutputCol(self.output_col)
             .setHfModelId(self.hf_model_id)
-        return DataFrame(encoder.encode(dataset._jdf),
-                         dataset.sparkSession)
+        )
+        if self.batch_size is not None:
+            encoder = encoder.setBatchSize(self.batch_size)
+        return DataFrame(encoder.encode(dataset._jdf), dataset.sparkSession)

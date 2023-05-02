@@ -16,69 +16,64 @@ from pyspark.sql import DataFrame
 from typing import Optional
 
 
-class BinaryPredictor:
-    """BinaryPredictor performs prediction on binary input.
+class ImageEmbedder:
+    """ImageEmbedder performs image embedding on images.
     """
 
     def __init__(self,
-                 input_col: str,
+                 input_cols: list[str],
                  output_col: str,
                  model_url: str,
                  engine: Optional[str] = None,
                  batch_size: Optional[int] = None,
-                 input_class=None,
-                 output_class=None,
                  translator_factory=None,
                  batchifier: Optional[str] = None):
         """
-        Initializes the BinaryPredictor.
+        Initializes the ImageEmbedder.
 
-        :param input_col: The input column
+        :param input_cols: The input columns
         :param output_col: The output column
         :param model_url: The model URL
         :param engine (optional): The engine
         :param batch_size (optional): The batch size
-        :param input_class (optional): The input class. Default is byte array.
-        :param output_class (optional): The output class. Default is byte array.
         :param translator_factory (optional): The translator factory.
-                                              Default is NpBinaryTranslatorFactory.
+                                              Default is ImageClassificationTranslatorFactory.
         :param batchifier (optional): The batchifier. Valid values include "none" (default),
                                       "stack", and "padding".
         """
-        self.input_col = input_col
+        self.input_cols = input_cols
         self.output_col = output_col
         self.model_url = model_url
         self.engine = engine
         self.batch_size = batch_size
-        self.input_class = input_class
-        self.output_class = output_class
         self.translator_factory = translator_factory
         self.batchifier = batchifier
 
-    def predict(self, dataset):
+    def embed(self, dataset):
         """
-        Performs prediction on the provided dataset.
+        Performs image classification on the provided dataset.
 
         :param dataset: input dataset
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        predictor = (
-            sc._jvm.ai.djl.spark.task.binary.BinaryPredictor()
-            .setInputCol(self.input_col)
+        embedder = (
+            sc._jvm.ai.djl.spark.task.vision.ImageEmbedder()
             .setOutputCol(self.output_col)
             .setModelUrl(self.model_url)
         )
+        if self.input_cols is not None:
+            # Convert the input_cols to Java array
+            input_cols_arr = sc._gateway.new_array(sc._jvm.java.lang.String,
+                                                   len(self.input_cols))
+            input_cols_arr[:] = [col for col in self.input_cols]
+            embedder = embedder.setInputCols(input_cols_arr)
         if self.engine is not None:
-            predictor = predictor.setEngine(self.engine)
+            embedder = embedder.setEngine(self.engine)
         if self.batch_size is not None:
-            predictor = predictor.setBatchSize(self.batch_size)
-        if self.input_class is not None:
-            predictor = predictor.setinputClass(self.input_class)
-        if self.output_class is not None:
-            predictor = predictor.setOutputClass(self.output_class)
+            embedder = embedder.setBatchSize(self.batch_size)
         if self.translator_factory is not None:
-            predictor = predictor.setTranslatorFactory(self.translator_factory)
+            embedder = embedder.setTranslatorFactory(self.translator_factory)
         if self.batchifier is not None:
-            predictor = predictor.setBatchifier(self.batchifier)
-        return DataFrame(predictor.predict(dataset._jdf), dataset.sparkSession)
+            embedder = embedder.setBatchifier(self.batchifier)
+        return DataFrame(embedder.embed(dataset._jdf), dataset.sparkSession)

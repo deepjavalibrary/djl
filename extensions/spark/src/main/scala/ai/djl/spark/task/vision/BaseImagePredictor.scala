@@ -35,11 +35,11 @@ abstract class BaseImagePredictor[B](override val uid: String) extends BasePredi
    */
   def setInputCols(value: Array[String]): this.type = set(inputCols, value)
 
+  setDefault(batchSize, 10)
   setDefault(inputClass, classOf[Image])
-  setDefault(batchifier, "stack")
 
   /** @inheritdoc */
-  def validateInputType(schema: StructType): Unit = {
+  override protected def validateInputType(schema: StructType): Unit = {
     assert($(inputCols).length == 6, "inputCols must have 6 columns")
     validateType(schema($(inputCols)(0)), StringType)
     validateType(schema($(inputCols)(1)), IntegerType)

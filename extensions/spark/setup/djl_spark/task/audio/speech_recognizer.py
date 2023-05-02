@@ -16,9 +16,7 @@ from pyspark.sql import DataFrame
 from typing import Optional
 
 
-class BinaryPredictor:
-    """BinaryPredictor performs prediction on binary input.
-    """
+class SpeechRecognizer:
 
     def __init__(self,
                  input_col: str,
@@ -26,59 +24,58 @@ class BinaryPredictor:
                  model_url: str,
                  engine: Optional[str] = None,
                  batch_size: Optional[int] = None,
-                 input_class=None,
-                 output_class=None,
                  translator_factory=None,
-                 batchifier: Optional[str] = None):
+                 batchifier: Optional[str] = None,
+                 channels: Optional[int] = None,
+                 sample_rate: Optional[int] = None,
+                 sample_format: Optional[int] = None):
         """
-        Initializes the BinaryPredictor.
+        Initializes the SpeechRecognizer.
 
         :param input_col: The input column
         :param output_col: The output column
         :param model_url: The model URL
         :param engine (optional): The engine
         :param batch_size (optional): The batch size
-        :param input_class (optional): The input class. Default is byte array.
-        :param output_class (optional): The output class. Default is byte array.
         :param translator_factory (optional): The translator factory.
-                                              Default is NpBinaryTranslatorFactory.
+                                              Default is SpeechRecognitionTranslatorFactory.
         :param batchifier (optional): The batchifier. Valid values include "none" (default),
                                       "stack", and "padding".
+        :param channels (optional): The number of channels
+        :param sample_rate (optional): The audio sample rate
+        :param sample_format (optional): The audio sample format
         """
         self.input_col = input_col
         self.output_col = output_col
         self.model_url = model_url
         self.engine = engine
         self.batch_size = batch_size
-        self.input_class = input_class
-        self.output_class = output_class
         self.translator_factory = translator_factory
         self.batchifier = batchifier
+        self.channels = channels
+        self.sample_rate = sample_rate
+        self.sample_format = sample_format
 
-    def predict(self, dataset):
+    def recognize(self, dataset):
         """
-        Performs prediction on the provided dataset.
+        Performs speech recognition on the provided dataset.
 
         :param dataset: input dataset
         :return: output dataset
         """
         sc = SparkContext._active_spark_context
-        predictor = (
-            sc._jvm.ai.djl.spark.task.binary.BinaryPredictor()
+        recognizer = (
+            sc._jvm.ai.djl.spark.task.audio.SpeechRecognizer()
             .setInputCol(self.input_col)
             .setOutputCol(self.output_col)
             .setModelUrl(self.model_url)
         )
         if self.engine is not None:
-            predictor = predictor.setEngine(self.engine)
+            recognizer = recognizer.setEngine(self.engine)
         if self.batch_size is not None:
-            predictor = predictor.setBatchSize(self.batch_size)
-        if self.input_class is not None:
-            predictor = predictor.setinputClass(self.input_class)
-        if self.output_class is not None:
-            predictor = predictor.setOutputClass(self.output_class)
+            recognizer = recognizer.setBatchSize(self.batch_size)
         if self.translator_factory is not None:
-            predictor = predictor.setTranslatorFactory(self.translator_factory)
+            recognizer = recognizer.setTranslatorFactory(self.translator_factory)
         if self.batchifier is not None:
-            predictor = predictor.setBatchifier(self.batchifier)
-        return DataFrame(predictor.predict(dataset._jdf), dataset.sparkSession)
+            recognizer = recognizer.setBatchifier(self.batchifier)
+        return DataFrame(recognizer.recognize(dataset._jdf), dataset.sparkSession)

@@ -23,4 +23,6 @@ import org.apache.spark.ml.util.Identifiable
 abstract class BaseTextPredictor[A, B](override val uid: String) extends BasePredictor[A, B] {
 
   def this() = this(Identifiable.randomUID("BaseTextPredictor"))
+
+  setDefault(batchSize, 100)
 }

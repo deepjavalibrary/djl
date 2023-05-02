@@ -16,7 +16,7 @@ from pyspark.sql.types import StringType
 import io
 import librosa
 import pandas as pd
-from typing import Iterator
+from typing import Iterator, Optional
 from transformers import pipeline
 from ...util import files_util, dependency_util
 
@@ -28,7 +28,13 @@ GROUP_ID = "ai/djl/huggingface/pytorch"
 
 class WhisperSpeechRecognizer:
 
-    def __init__(self, input_col, output_col, model_url=None, hf_model_id=None, engine="PyTorch"):
+    def __init__(self,
+                 input_col: str,
+                 output_col: str,
+                 model_url: Optional[str] = None,
+                 hf_model_id: Optional[str] = None,
+                 engine: Optional[str] = "PyTorch",
+                 batch_size: Optional[int] = 10):
         """
         Initializes the WhisperSpeechRecognizer.
 
@@ -37,12 +43,14 @@ class WhisperSpeechRecognizer:
         :param model_url: The model URL
         :param hf_model_id: The Huggingface model ID
         :param engine: The engine. Currently only PyTorch is supported.
+        :param batch_size: The batch size
         """
         self.input_col = input_col
         self.output_col = output_col
         self.model_url = model_url
         self.hf_model_id = hf_model_id
         self.engine = engine
+        self.batch_size = batch_size
 
     def recognize(self, dataset, generate_kwargs=None, **kwargs):
         """
@@ -68,13 +76,13 @@ class WhisperSpeechRecognizer:
 
         @pandas_udf(StringType())
         def predict_udf(iterator: Iterator[pd.Series]) -> Iterator[pd.Series]:
-            pipe = pipeline(TASK, generate_kwargs=generate_kwargs,
-                            model=model_id_or_path, chunk_length_s=30, **kwargs)
+            pipe = pipeline(TASK, generate_kwargs=generate_kwargs, model=model_id_or_path,
+                            batch_size=self.batch_size, chunk_length_s=30, **kwargs)
             for s in iterator:
                 # Model expects single channel, 16000 sample rate audio
                 batch = [librosa.load(io.BytesIO(d), mono=True, sr=16000)[0] for d in s]
                 output = pipe(batch)
-                text = map(lambda x: x["text"], output)
+                text = [o["text"] for o in output]
                 yield pd.Series(text)
 
         return dataset.withColumn(self.output_col, predict_udf(self.input_col))

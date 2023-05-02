@@ -13,9 +13,25 @@
 
 """DJL Spark Tasks Vision API."""
 
-from . import image_classifier
+from . import (
+    image_classifier,
+    image_embedder,
+    instance_segmenter,
+    object_detector,
+    semantic_segmenter,
+)
 
 ImageClassifier = image_classifier.ImageClassifier
+ImageEmbedder = image_embedder.ImageEmbedder
+InstanceSegmenter = instance_segmenter.InstanceSegmenter
+ObjectDetector = object_detector.ObjectDetector
+SemanticSegmenter = semantic_segmenter.SemanticSegmenter
 
 # Remove unnecessary modules to avoid duplication in API.
-del image_classifier
+del (
+    image_classifier,
+    image_embedder,
+    instance_segmenter,
+    object_detector,
+    semantic_segmenter,
+)
