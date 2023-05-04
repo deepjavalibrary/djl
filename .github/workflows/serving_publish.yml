@@ -40,24 +40,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Publish to snapshot repository
-        if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
-        run: ./gradlew publish -Psnapshot --refresh-dependencies
-        env:
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
-          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
-          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
-          DJL_STAGING: ${{ github.event.inputs.repo-id }}
-      - name: Publish to staging repository
-        if: ${{ github.event.inputs.mode == 'staging' }}
-        run: ./gradlew publish -Pstaging --refresh-dependencies
-        env:
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
-          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
-          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
-          DJL_STAGING: ${{ github.event.inputs.repo-id }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
@@ -81,7 +63,6 @@ jobs:
           if [[ $(aws s3 ls s3://djl-ai/publish/djl-serving/serving-$DJL_VERSION.tar | wc -l) -eq 0 ]]; \
             then aws s3 cp serving/build/distributions/*.tar s3://djl-ai/publish/djl-serving/; \
             else echo serving tarball published already!; fi
-          aws s3 cp serving/build/distributions/*.tar s3://djl-ai/publish/djl-serving/
           aws s3 cp serving/build/distributions/*.zip s3://djl-ai/publish/djl-serving/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/serving-${DJL_VERSION}*"
       - name: Copy benchmark release artifacts to S3
@@ -93,3 +74,21 @@ jobs:
           aws s3 cp benchmark/build/distributions/*.deb s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
           aws s3 cp benchmark/build/distributions/*.zip s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-bench/${DJL_VERSION}/*"
+      - name: Publish to snapshot repository
+        if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
+        run: ./gradlew publish -Psnapshot --refresh-dependencies
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
+          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
+          DJL_STAGING: ${{ github.event.inputs.repo-id }}
+      - name: Publish to staging repository
+        if: ${{ github.event.inputs.mode == 'staging' }}
+        run: ./gradlew publish -Pstaging --refresh-dependencies
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
+          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
+          DJL_STAGING: ${{ github.event.inputs.repo-id }}
