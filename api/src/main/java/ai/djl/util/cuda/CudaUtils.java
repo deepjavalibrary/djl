@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.management.MemoryUsage;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 /** A class containing CUDA utility methods. */
@@ -100,7 +101,7 @@ public final class CudaUtils {
         int version = getCudaVersion();
         int major = version / 1000;
         int minor = (version / 10) % 10;
-        return String.valueOf(major) + minor;
+        return String.format(Locale.ROOT, "%02d", major) + minor;
     }
 
     /**
