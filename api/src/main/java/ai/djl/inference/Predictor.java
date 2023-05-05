@@ -84,11 +84,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Predictor<I, O> implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(Predictor.class);
-    private Translator<I, O> translator;
-    private long timestamp;
 
-    private boolean prepared;
-    private Model model;
+    protected Translator<I, O> translator;
+    protected long timestamp;
+
+    protected boolean prepared;
+    protected Model model;
     protected NDManager manager;
     protected Metrics metrics;
     protected Block block;
@@ -357,12 +358,12 @@ public class Predictor<I, O> implements AutoCloseable {
         super.finalize();
     }
 
-    private class PredictorContext implements TranslatorContext {
+    protected class PredictorContext implements TranslatorContext {
 
         private NDManager ctxManager;
         private Map<String, Object> attachments;
 
-        PredictorContext() {
+        protected PredictorContext() {
             ctxManager = manager.newSubManager();
             ctxManager.setName("predictor ctx");
             attachments = new ConcurrentHashMap<>();
