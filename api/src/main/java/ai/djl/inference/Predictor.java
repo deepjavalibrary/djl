@@ -363,7 +363,8 @@ public class Predictor<I, O> implements AutoCloseable {
         private NDManager ctxManager;
         private Map<String, Object> attachments;
 
-        protected PredictorContext() {
+        /** Constructs a new {@code PredictorContext} instance. */
+        public PredictorContext() {
             ctxManager = manager.newSubManager();
             ctxManager.setName("predictor ctx");
             attachments = new ConcurrentHashMap<>();
