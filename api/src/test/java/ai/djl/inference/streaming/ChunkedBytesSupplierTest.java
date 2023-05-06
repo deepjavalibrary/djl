@@ -38,7 +38,7 @@ public class ChunkedBytesSupplierTest {
         data.appendContent(new byte[] {1, 2}, true);
 
         Assert.assertTrue(data.hasNext());
-        Assert.assertEquals(data.poll().length, 0);
+        Assert.assertEquals(data.pollChunk().length, 0);
         Assert.assertEquals(data.nextChunk(1, TimeUnit.MILLISECONDS), new byte[] {1, 2});
 
         Assert.assertFalse(data.hasNext());

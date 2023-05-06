@@ -40,7 +40,17 @@ public class ChunkedBytesSupplier implements BytesSupplier {
      * @param lastChunk true if this is the last chunk
      */
     public void appendContent(byte[] data, boolean lastChunk) {
-        queue.offer(BytesSupplier.wrap(data));
+        appendContent(BytesSupplier.wrap(data), lastChunk);
+    }
+
+    /**
+     * Appends content to the {@code BytesSupplier}.
+     *
+     * @param bytesSupplier BytesSupplier to append
+     * @param lastChunk true if this is the last chunk
+     */
+    public void appendContent(BytesSupplier bytesSupplier, boolean lastChunk) {
+        queue.offer(bytesSupplier);
         if (lastChunk) {
             completed.set(true);
         }
@@ -63,12 +73,24 @@ public class ChunkedBytesSupplier implements BytesSupplier {
      * @return the next chunk
      * @throws InterruptedException if the thread is interrupted
      */
-    public byte[] nextChunk(long timeout, TimeUnit unit) throws InterruptedException {
+    public BytesSupplier next(long timeout, TimeUnit unit) throws InterruptedException {
         BytesSupplier data = queue.poll(timeout, unit);
         if (data == null) {
             throw new IllegalStateException("Read chunk timeout.");
         }
-        return data.getAsBytes();
+        return data;
+    }
+
+    /**
+     * Returns the next chunk.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the timeout argument
+     * @return the next chunk
+     * @throws InterruptedException if the thread is interrupted
+     */
+    public byte[] nextChunk(long timeout, TimeUnit unit) throws InterruptedException {
+        return next(timeout, unit).getAsBytes();
     }
 
     /**
@@ -76,8 +98,17 @@ public class ChunkedBytesSupplier implements BytesSupplier {
      *
      * @return the head of chunk or returns {@code null} if data is not available
      */
-    public byte[] poll() {
-        BytesSupplier data = queue.poll();
+    public BytesSupplier poll() {
+        return queue.poll();
+    }
+
+    /**
+     * Retrieves and removes the head of chunk or returns {@code null} if data is not available.
+     *
+     * @return the head of chunk or returns {@code null} if data is not available
+     */
+    public byte[] pollChunk() {
+        BytesSupplier data = poll();
         return data == null ? null : data.getAsBytes();
     }
 
