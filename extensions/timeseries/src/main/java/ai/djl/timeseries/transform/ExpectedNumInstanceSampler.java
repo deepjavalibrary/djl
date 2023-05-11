@@ -14,10 +14,10 @@
 package ai.djl.timeseries.transform;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.util.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Keeps track of the average time series length and adjusts the probability per time point such
@@ -62,10 +62,9 @@ public class ExpectedNumInstanceSampler extends InstanceSampler {
 
         double prob = numInstances / avgLength;
         List<Integer> indices = new ArrayList<>();
-        Random random = new Random();
         while (indices.isEmpty()) {
             for (int i = 0; i < windowSize; i++) {
-                if (random.nextDouble() < prob) {
+                if (RandomUtils.RANDOM.nextDouble() < prob) {
                     indices.add(i + bound[0]);
                 }
             }

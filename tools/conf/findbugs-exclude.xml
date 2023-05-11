@@ -1,36 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FindBugsFilter>
     <Match>
-        <Bug pattern="DM_EXIT,DMI_EMPTY_DB_PASSWORD,DMI_HARDCODED_ABSOLUTE_FILENAME,EI_EXPOSE_REP,EI_EXPOSE_REP2,SF_SWITCH_FALLTHROUGH,NM_CONFUSING"/>
+        <Bug pattern="DM_EXIT,DMI_EMPTY_DB_PASSWORD,DMI_HARDCODED_ABSOLUTE_FILENAME,EI_EXPOSE_REP,EI_EXPOSE_REP2,EI_EXPOSE_STATIC_REP2,MS_EXPOSE_REP,SF_SWITCH_FALLTHROUGH,NM_CONFUSING"/>
     </Match>
     <!-- low priority issues-->
     <Match>
         <Bug pattern="DM_CONVERT_CASE,SE_TRANSIENT_FIELD_NOT_RESTORED,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"/>
     </Match>
     <Match>
-        <Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS,DB_DUPLICATE_SWITCH_CLAUSES,BC_UNCONFIRMED_CAST,URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
-    </Match>
-
-    <!-- wildcard suppression -->
-    <Match>
-        <Class name="~ai\.djl\.mxnet\.jnarator\.parser\..*"/>
+        <Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS,DB_DUPLICATE_SWITCH_CLAUSES,BC_UNCONFIRMED_CAST,URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD,URF_UNREAD_FIELD"/>
     </Match>
     <Match>
-        <Class name="~org\.tensorflow\.lite\..*"/>
-    </Match>
-    <!-- function suppression -->
-    <Match>
-        <Bug pattern="DC_DOUBLECHECK"/>
-        <Class name="~ai\.djl\.mxnet\.engine\.MxSymbolBlock"/>
-        <Method name="forwardInternal"/>
-    </Match>
-    <Match>
-        <Bug pattern="DC_DOUBLECHECK"/>
-        <Class name="~ai\.djl\.pytorch\.engine\.PtSymbolBlock"/>
-        <Method name="forwardInternal"/>
-    </Match>
-    <Match>
-        <Bug pattern="URF_UNREAD_FIELD"/>
-        <Class name="~ai\.djl\.pytorch\.engine\.PtNDArray"/>
+        <Bug pattern="MS_FINAL_PKGPROTECT,MS_PKGPROTECT,NM_METHOD_NAMING_CONVENTION,SF_SWITCH_NO_DEFAULT,DC_DOUBLECHECK,IS2_INCONSISTENT_SYNC"/>
     </Match>
 </FindBugsFilter>

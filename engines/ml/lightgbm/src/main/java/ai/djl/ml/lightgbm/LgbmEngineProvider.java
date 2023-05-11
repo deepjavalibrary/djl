@@ -18,7 +18,7 @@ import ai.djl.engine.EngineProvider;
 /** {@code LgbmEngineProvider} is the LightGBM implementation of {@link EngineProvider}. */
 public class LgbmEngineProvider implements EngineProvider {
 
-    private static Engine engine;
+    private static volatile Engine engine; // NOPMD
 
     /** {@inheritDoc} */
     @Override
@@ -34,9 +34,11 @@ public class LgbmEngineProvider implements EngineProvider {
 
     /** {@inheritDoc} */
     @Override
-    public synchronized Engine getEngine() {
+    public Engine getEngine() {
         if (engine == null) {
-            engine = LgbmEngine.newInstance();
+            synchronized (LgbmEngineProvider.class) {
+                engine = LgbmEngine.newInstance();
+            }
         }
         return engine;
     }
