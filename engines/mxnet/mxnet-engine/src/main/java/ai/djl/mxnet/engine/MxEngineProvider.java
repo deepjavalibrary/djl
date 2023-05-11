@@ -36,7 +36,7 @@ public class MxEngineProvider implements EngineProvider {
     @Override
     public Engine getEngine() {
         if (engine == null) {
-            synchronized (this) {
+            synchronized (MxEngineProvider.class) {
                 engine = MxEngine.newInstance();
             }
         }

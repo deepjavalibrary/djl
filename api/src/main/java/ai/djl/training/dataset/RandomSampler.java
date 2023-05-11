@@ -16,7 +16,6 @@ import ai.djl.util.RandomUtils;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Random;
 import java.util.stream.LongStream;
 
 /**
@@ -26,19 +25,6 @@ import java.util.stream.LongStream;
  * <p>{@code RandomSampler} samples the data from [0, dataset.size) randomly.
  */
 public class RandomSampler implements Sampler.SubSampler {
-    private Integer seed;
-
-    /** Creates a new instance of {@code RandomSampler}. */
-    public RandomSampler() {}
-
-    /**
-     * Creates a new instance of {@code RandomSampler} with the given seed.
-     *
-     * @param seed the value of the seed
-     */
-    public RandomSampler(int seed) {
-        this.seed = seed;
-    }
 
     private static void swap(long[] arr, int i, int j) {
         long tmp = arr[i];
@@ -49,7 +35,7 @@ public class RandomSampler implements Sampler.SubSampler {
     /** {@inheritDoc} */
     @Override
     public Iterator<Long> sample(RandomAccessDataset dataset) {
-        return new Iterate(dataset, seed);
+        return new Iterate(dataset);
     }
 
     static class Iterate implements Iterator<Long> {
@@ -57,15 +43,14 @@ public class RandomSampler implements Sampler.SubSampler {
         private long[] indices;
         private long current;
 
-        Iterate(RandomAccessDataset dataset, Integer seed) {
+        Iterate(RandomAccessDataset dataset) {
             long size = dataset.size();
             current = 0;
             indices = LongStream.range(0, size).toArray();
-            Random rnd = (seed != null) ? new Random(seed) : RandomUtils.RANDOM;
             // java array didn't support index greater than max integer
             // so cast to int for now
             for (int i = Math.toIntExact(size) - 1; i > 0; --i) {
-                swap(indices, i, rnd.nextInt(i));
+                swap(indices, i, RandomUtils.nextInt(i));
             }
         }
 

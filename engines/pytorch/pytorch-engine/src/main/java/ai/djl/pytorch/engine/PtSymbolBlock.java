@@ -135,7 +135,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
             JniUtils.setGraphExecutorOptimize(setOptimizer);
         }
         if (first) {
-            synchronized (PtSymbolBlock.class) {
+            synchronized (this) {
                 if (first) {
                     inputDescriptions = new PairList<>();
                     outputDescriptions = new PairList<>();
