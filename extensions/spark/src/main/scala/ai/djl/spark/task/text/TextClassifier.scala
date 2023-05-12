@@ -17,10 +17,10 @@ import ai.djl.modality.Classifications
 import org.apache.spark.ml.param.Param
 import org.apache.spark.ml.param.shared.{HasInputCol, HasOutputCol}
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.types.{ArrayType, DoubleType, MapType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, DoubleType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
-import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
+import scala.jdk.CollectionConverters.collectionAsScalaIterableConverter
 
 /**
  * TextClassifier performs text classification on text.
@@ -88,7 +88,7 @@ class TextClassifier(override val uid: String) extends BaseTextPredictor[Array[S
       val output = predictor.predict(inputs)
       batch.zip(output).map { case (row, out) =>
         Row.fromSeq(row.toSeq :+ Row(out.getClassNames.toArray(), out.getProbabilities.toArray(),
-          out.topK[Classifications.Classification]().map(_.toString)))
+          out.topK[Classifications.Classification]().asScala.map(_.toString)))
       }
     }
   }

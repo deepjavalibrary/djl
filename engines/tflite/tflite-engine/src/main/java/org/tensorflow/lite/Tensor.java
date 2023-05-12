@@ -274,6 +274,8 @@ public final class Tensor {
                     return DataType.STRING;
                 }
             }
+        } else {
+            throw new NullPointerException();
         }
         throw new IllegalArgumentException(
                 "DataType error: cannot resolve DataType of " + o.getClass().getName());

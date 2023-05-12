@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.spotbugs" version "4.7.1" apply false
+    id "com.github.spotbugs" version "5.0.14" apply false
 }
 
 defaultTasks 'build'

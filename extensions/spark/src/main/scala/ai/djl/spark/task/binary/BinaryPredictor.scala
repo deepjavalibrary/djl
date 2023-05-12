@@ -19,8 +19,7 @@ import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.sql.types.{BinaryType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
-import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
-import scala.jdk.CollectionConverters.seqAsJavaListConverter
+import scala.jdk.CollectionConverters.{collectionAsScalaIterableConverter, seqAsJavaListConverter}
 
 /**
  * BinaryPredictor performs prediction on binary input.
@@ -74,7 +73,7 @@ class BinaryPredictor(override val uid: String) extends BasePredictor[Array[Byte
     val predictor = model.newPredictor()
     iter.grouped($(batchSize)).flatMap { batch =>
       val inputs = batch.map(_.getAs[Array[Byte]](inputColIndex)).asJava
-      val output = predictor.batchPredict(inputs)
+      val output = predictor.batchPredict(inputs).asScala
       batch.zip(output).map { case (row, out) =>
         Row.fromSeq(row.toSeq :+ out)
       }

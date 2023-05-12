@@ -36,7 +36,7 @@ public class PpEngineProvider implements EngineProvider {
     @Override
     public Engine getEngine() {
         if (engine == null) {
-            synchronized (this) {
+            synchronized (PpEngineProvider.class) {
                 engine = PpEngine.newInstance();
             }
         }

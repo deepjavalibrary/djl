@@ -36,7 +36,7 @@ public class TfLiteEngineProvider implements EngineProvider {
     @Override
     public Engine getEngine() {
         if (engine == null) {
-            synchronized (this) {
+            synchronized (TfLiteEngineProvider.class) {
                 engine = TfLiteEngine.newInstance();
             }
         }
