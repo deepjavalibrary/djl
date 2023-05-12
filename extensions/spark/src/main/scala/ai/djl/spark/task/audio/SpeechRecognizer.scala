@@ -21,8 +21,7 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row}
 import org.apache.spark.sql.types.{BinaryType, StringType, StructField, StructType}
 
 import java.io.ByteArrayInputStream
-import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
-import scala.jdk.CollectionConverters.seqAsJavaListConverter
+import scala.jdk.CollectionConverters.{collectionAsScalaIterableConverter, seqAsJavaListConverter}
 
 /**
  * SpeechRecognizer performs speech recognition on audio.
@@ -120,7 +119,7 @@ class SpeechRecognizer(override val uid: String) extends BaseAudioPredictor[Stri
       }.asJava
 
       // Batch predict
-      val output = predictor.batchPredict(inputs)
+      val output = predictor.batchPredict(inputs).asScala
       batch.zip(output).map { case (row, out) =>
         Row.fromSeq(row.toSeq :+ out)
       }
