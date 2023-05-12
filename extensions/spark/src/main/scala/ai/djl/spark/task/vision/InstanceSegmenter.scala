@@ -22,8 +22,7 @@ import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.sql.types.{ArrayType, DoubleType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
-import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
-import scala.jdk.CollectionConverters.seqAsJavaListConverter
+import scala.jdk.CollectionConverters.{collectionAsScalaIterableConverter, seqAsJavaListConverter}
 
 /**
  * InstanceSegmenter performs instance segmentation on images.
@@ -72,10 +71,10 @@ class InstanceSegmenter(override val uid: String) extends BaseImagePredictor[Det
       val inputs = batch.map(row =>
         ImageFactory.getInstance().fromPixels(bgrToRgb(ImageSchema.getData(row)),
           ImageSchema.getWidth(row), ImageSchema.getHeight(row))).asJava
-      val output = predictor.batchPredict(inputs)
+      val output = predictor.batchPredict(inputs).asScala
       batch.zip(output).map { case (row, out) =>
         Row.fromSeq(row.toSeq :+ Row(out.getClassNames.toArray(), out.getProbabilities.toArray(),
-          out.items[DetectedObject]().map(_.getBoundingBox.toString)))
+          out.items[DetectedObject]().asScala.map(_.getBoundingBox.toString)))
       }
     }
   }
