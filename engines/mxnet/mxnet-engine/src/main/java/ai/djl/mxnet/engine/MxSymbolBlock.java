@@ -187,7 +187,7 @@ public class MxSymbolBlock extends AbstractSymbolBlock {
             boolean training,
             PairList<String, Object> params) {
         if (first) {
-            synchronized (MxSymbolBlock.class) {
+            synchronized (this) {
                 if (first) {
                     // create CachedOp is not thread-safe
                     // add synchronized block to avoid creating multiple CachedOps

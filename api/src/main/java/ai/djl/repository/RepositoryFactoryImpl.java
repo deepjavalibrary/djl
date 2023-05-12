@@ -15,11 +15,15 @@ package ai.djl.repository;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.util.ClassLoaderUtils;
+import ai.djl.util.JsonUtils;
+
+import com.google.gson.JsonParseException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -179,12 +183,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             Path path = Paths.get(parseFilePath(uri));
             if (Files.exists(path) && Files.isDirectory(path)) {
                 try {
-                    if (Files.walk(path)
-                            .anyMatch(
-                                    f ->
-                                            f.endsWith("metadata.json")
-                                                    && Files.isRegularFile(f)
-                                                    && !f.getParent().equals(path))) {
+                    if (Files.walk(path).anyMatch(f -> isLocalRepository(path, f))) {
                         logger.debug("Found local repository: {}", path);
                         return new LocalRepository(name, path.toUri(), path);
                     }
@@ -193,6 +192,22 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                 }
             }
             return new SimpleRepository(name, uri, path);
+        }
+
+        private boolean isLocalRepository(Path root, Path file) {
+            if (!Files.isRegularFile(file) || root.equals(file.getParent())) {
+                return false;
+            }
+            if (!"metadata.json".equals(file.toFile().getName())) {
+                return false;
+            }
+            try (Reader reader = Files.newBufferedReader(file)) {
+                Metadata metadata = JsonUtils.GSON.fromJson(reader, Metadata.class);
+                return metadata.getMetadataVersion() != null && metadata.getArtifacts() != null;
+            } catch (IOException | JsonParseException e) {
+                logger.warn("Invalid metadata.json file", e);
+            }
+            return false;
         }
 
         /** {@inheritDoc} */
