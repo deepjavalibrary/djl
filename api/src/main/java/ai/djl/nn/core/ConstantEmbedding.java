@@ -53,9 +53,11 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
         NDManager manager = inputs.get(0).getManager();
         NDArray base = manager.create(embedding.getShape());
         embedding.copyTo(base);
+        System.out.println("Base: " + base);
         Shape shape = inputs.get(0).getShape().addAll(embedding.getShape());
+        System.out.println(shape);
         return new NDList(
-                base.reshape(embedding.size()).repeat(inputs.get(0).size()).reshape(shape));
+                base.reshape(1, embedding.size()).repeat(0, inputs.get(0).size()).reshape(shape));
     }
 
     /** {@inheritDoc} */
@@ -105,8 +107,8 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
     public NDArray embed(NDManager manager, Object[] items) {
         NDArray base = manager.create(embedding.getShape());
         embedding.copyTo(base);
-        return base.reshape(embedding.size())
-                .repeat(items.length)
+        System.out.println("Length: " + items.length);
+        return base.repeat(0, items.length)
                 .reshape(new Shape(items.length).addAll(embedding.getShape()));
     }
 

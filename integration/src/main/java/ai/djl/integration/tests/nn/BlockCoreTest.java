@@ -34,6 +34,7 @@ import ai.djl.nn.convolutional.Conv1dTranspose;
 import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.convolutional.Conv2dTranspose;
 import ai.djl.nn.convolutional.Conv3d;
+import ai.djl.nn.core.ConstantEmbedding;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.core.LinearCollection;
 import ai.djl.nn.core.Multiplication;
@@ -582,6 +583,41 @@ public class BlockCoreTest {
                                 .singletonOrThrow(),
                         manager.create(new float[] {1, 1, 1, 1}, new Shape(2, 2)));
                 testEncode(manager, block);
+            }
+        }
+    }
+
+    @Test
+    public void testConstantEmbedding() throws IOException, MalformedModelException {
+        TrainingConfig config =
+                new DefaultTrainingConfig(Loss.l2Loss())
+                        .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
+
+        ConstantEmbedding block =
+                new ConstantEmbedding(
+                        NDManager.newBaseManager().create(new float[] {1, 2}, new Shape(2)));
+        try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
+            model.setBlock(block);
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                Shape inputShape = new Shape(2);
+                trainer.initialize(inputShape);
+
+                NDManager manager = trainer.getManager();
+
+                Assert.assertEquals(
+                        trainer.forward(new NDList(manager.create("x"))).singletonOrThrow(),
+                        manager.create(new float[] {1, 2}));
+
+                Assert.assertEquals(
+                        trainer.forward(new NDList(manager.create(new float[] {1, 1})))
+                                .singletonOrThrow(),
+                        manager.create(new float[] {1, 2, 1, 2}, new Shape(2, 2)));
+
+                Assert.assertEquals(block.embed("x"), 0);
+                Assert.assertEquals(
+                        block.embed(manager, new String[] {"x"}),
+                        manager.create(new float[] {1, 2}));
             }
         }
     }
