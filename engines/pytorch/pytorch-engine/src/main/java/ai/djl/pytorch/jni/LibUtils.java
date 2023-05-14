@@ -32,10 +32,13 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -121,7 +124,7 @@ public final class LibUtils {
 
         Set<String> loadLater = new HashSet<>(deferred);
         try (Stream<Path> paths = Files.walk(libDir)) {
-            List<Path> dependants = new ArrayList<>();
+            Map<Path, Integer> rank = new ConcurrentHashMap<>();
             paths.filter(
                             path -> {
                                 String name = path.getFileName().toString();
@@ -130,23 +133,26 @@ public final class LibUtils {
                                         && name.contains("cudart")
                                         && name.contains("nvTools")) {
                                     return false;
-                                }
-                                if (name.startsWith("libarm_compute_")) {
-                                    dependants.add(path);
-                                    return false;
-                                }
-                                return !loadLater.contains(name)
+                                } else if (name.startsWith("libarm_compute-")) {
+                                    rank.put(path, 2);
+                                    return true;
+                                } else if (name.startsWith("libarm_compute_")) {
+                                    rank.put(path, 3);
+                                    return true;
+                                } else if (!loadLater.contains(name)
                                         && Files.isRegularFile(path)
                                         && !name.endsWith(JNI_LIB_NAME)
                                         && !name.contains("torch_")
                                         && !name.contains("caffe2_")
-                                        && !name.startsWith("cudnn");
+                                        && !name.startsWith("cudnn")) {
+                                    rank.put(path, 1);
+                                    return true;
+                                }
+                                return false;
                             })
+                    .sorted(Comparator.comparingInt(rank::get))
                     .map(Path::toString)
                     .forEach(LibUtils::loadNativeLibrary);
-            for (Path dep : dependants) {
-                loadNativeLibrary(dep.toAbsolutePath().toString());
-            }
 
             if (Files.exists((libDir.resolve("cudnn64_8.dll")))) {
                 loadNativeLibrary(libDir.resolve("cudnn64_8.dll").toString());
