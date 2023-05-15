@@ -28,7 +28,7 @@ The following pseudocode demonstrates running inference:
     // Assume user uses a pre-trained model from model zoo, they just need to load it
     Criteria<Image, Classifications> criteria =
             Criteria.builder()
-                    .optApplication(Application.CV.OBJECT_DETECTION) // find object dection model
+                    .optApplication(Application.CV.OBJECT_DETECTION) // find object detection model
                     .setTypes(Image.class, Classifications.class)    // define input and output
                     .optFilter("backbone", "resnet50")               // choose network architecture
                     .build();
