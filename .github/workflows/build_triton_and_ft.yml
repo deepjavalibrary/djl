@@ -26,6 +26,7 @@ jobs:
         with:
           python-version: '3.x'
       - name: Build Triton Binary
+        shell: 'script -q -e -c "bash --noprofile --norc -eo pipefail {0}"'
         run: |
           python3 build.py --enable-logging --enable-metrics --enable-stats --enable-cpu-metrics
       - name: Configure AWS Credentials
@@ -48,10 +49,10 @@ jobs:
         run: |
           cd /home/ubuntu/djl_benchmark_script/scripts
           token=$( curl -X POST -H "Authorization: token ${{ secrets.ACTION_RUNNER_PERSONAL_TOKEN }}" \
-          https://api.github.com/repos/deepjavalibrary/djl-serving/actions/runners/registration-token \
+          https://api.github.com/repos/deepjavalibrary/djl/actions/runners/registration-token \
           --fail \
           | jq '.token' | tr -d '"' )
-          ./start_instance.sh action_cpu $token djl-serving
+          ./start_instance.sh action_cpu $token djl
     outputs:
       cpu_instance_id: ${{ steps.create_cpu.outputs.action_cpu_instance_id }}
 
