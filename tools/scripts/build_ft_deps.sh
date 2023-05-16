@@ -5,7 +5,7 @@ set -ex
 FT_VERSION=$1
 NVIDIA_TRITON_SERVER_VERSION=$2
 
-apt-get install -y rapidjson-dev
+apt-get update && apt-get install -y rapidjson-dev
 
 pushd /tmp
 
