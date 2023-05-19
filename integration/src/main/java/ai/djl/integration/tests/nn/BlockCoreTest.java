@@ -607,7 +607,7 @@ public class BlockCoreTest {
 
                 Assert.assertEquals(
                         trainer.forward(new NDList(manager.create("x"))).singletonOrThrow(),
-                        manager.create(new float[] {1, 2}));
+                        manager.create(new float[] {1, 2}), new Shape(1, 2));
 
                 Assert.assertEquals(
                         trainer.forward(new NDList(manager.create(new float[] {1, 1})))
@@ -617,7 +617,7 @@ public class BlockCoreTest {
                 Assert.assertEquals(block.embed("x"), 0);
                 Assert.assertEquals(
                         block.embed(manager, new String[] {"x"}),
-                        manager.create(new float[] {1, 2}));
+                        manager.create(new float[] {1, 2}), new Shape(1, 2));
             }
         }
     }
