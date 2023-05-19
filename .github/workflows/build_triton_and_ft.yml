@@ -1,0 +1,91 @@
+name: Build Triton Server and FasterTransformers
+
+on:
+  workflow_dispatch:
+    inputs:
+      triton:
+        description: 'triton branch version'
+        required: true
+        default: 'r23.04'
+      fastertransformer:
+        description: 'fastertransformer branch/tag version'
+        required: true
+        default: 'main'
+
+jobs:
+  build-triton:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: triton-inference-server/server
+          ref: ${{ github.event.inputs.triton }}
+      - name: Set up Python3
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Build Triton Binary
+        shell: 'script -q -e -c "bash --noprofile --norc -eo pipefail {0}"'
+        run: |
+          python3 build.py --enable-logging --enable-metrics --enable-stats --enable-cpu-metrics
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Copy files to S3 with the AWS CLI
+        run: |
+          aws s3 cp build/install/lib/libtritonserver.so s3://djl-ai/publish/tritonserver/${{ github.event.inputs.triton }}/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tritonserver/${{ github.event.inputs.triton }}/*"
+
+  create-runner:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: [ self-hosted, scheduler ]
+    steps:
+      - name: Create new CPU instance
+        id: create_cpu
+        run: |
+          cd /home/ubuntu/djl_benchmark_script/scripts
+          token=$( curl -X POST -H "Authorization: token ${{ secrets.ACTION_RUNNER_PERSONAL_TOKEN }}" \
+          https://api.github.com/repos/deepjavalibrary/djl/actions/runners/registration-token \
+          --fail \
+          | jq '.token' | tr -d '"' )
+          ./start_instance.sh action_cpu $token djl
+    outputs:
+      cpu_instance_id: ${{ steps.create_cpu.outputs.action_cpu_instance_id }}
+
+
+  build-fastertransformer:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: [ self-hosted, cpu ]
+    container: deepjavalibrary/djl-serving:fastertransformer-nightly
+    timeout-minutes: 60
+    needs: create-runner
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build FasterTransformers
+        run: |
+          tools/scripts/build_ft_deps.sh ${{ github.event.inputs.fastertransformer }} ${{ github.event.inputs.triton }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Copy files to S3 with the AWS CLI
+        run: |
+          aws s3 sync /tmp/binaries/ s3://djl-ai/publish/fastertransformer/${{ github.event.inputs.fastertransformer }}/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/fastertransformer/${{ github.event.inputs.fastertransformer }}/*"
+
+  stop-runner:
+    if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
+    runs-on: [ self-hosted, scheduler ]
+    needs: [ create-runner, build-fastertransformer]
+    steps:
+      - name: Stop all instances
+        run: |
+          cd /home/ubuntu/djl_benchmark_script/scripts
+          instance_id=${{ needs.create-runner.outputs.cpu_instance_id }}
+          ./stop_instance.sh $instance_id
