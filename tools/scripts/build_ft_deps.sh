@@ -28,7 +28,7 @@ cmake \
       -D TRITON_BACKEND_REPO_TAG="${NVIDIA_TRITON_SERVER_VERSION}" \
       ..
 make -j$(nproc) install
-cp /opt/tritonserver/backends/*.so /tmp/binaries/
+cp /opt/tritonserver/backends/fastertransformer/*.so /tmp/binaries/
 cd ../../
 
 # Build FasterTransformer TH Ops library
