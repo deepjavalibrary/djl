@@ -588,15 +588,14 @@ public class BlockCoreTest {
     }
 
     @Test
-    public void testConstantEmbedding() throws IOException, MalformedModelException {
+    public void testConstantEmbedding() {
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.l2Loss())
                         .optInitializer(Initializer.ONES, Parameter.Type.WEIGHT);
 
-        ConstantEmbedding block =
-                new ConstantEmbedding(
-                        NDManager.newBaseManager().create(new float[] {1, 2}, new Shape(2)));
         try (Model model = Model.newInstance("model", TestUtils.getEngine())) {
+            NDArray embedding = model.getNDManager().create(new float[] {1, 2}, new Shape(2));
+            ConstantEmbedding block = new ConstantEmbedding(embedding);
             model.setBlock(block);
 
             try (Trainer trainer = model.newTrainer(config)) {
@@ -606,7 +605,7 @@ public class BlockCoreTest {
                 NDManager manager = trainer.getManager();
 
                 Assert.assertEquals(
-                        trainer.forward(new NDList(manager.create("x"))).singletonOrThrow(),
+                        trainer.forward(new NDList(manager.create(0.1f))).singletonOrThrow(),
                         manager.create(new float[] {1, 2}, new Shape(2)));
 
                 Assert.assertEquals(
