@@ -103,51 +103,33 @@ It uses clang-format to format the code.
 This is adjusted from the comments in [PR#2349](https://github.com/deepjavalibrary/djl/issues/2349#issuecomment-1409003379).
 
 To implement a simple pytorch feature, generally you can do the following steps.
+
 1. Find the c-api in torch library for the feature to add. This can be done by searching in the document like [this](https://pytorch.org/cppdocs/api/function_namespaceat_1a854b1b19549a17f87a69b5f6b1134e22.html?highlight=bmm) or searching in the torch cpp source code.
 2. Implement the JNI and api's in Java. The JNI can then be compiled with gradle commands. Here is the commands you can use on cpu machine, to compile JNI and run it with java api.
 
-```
-./gradlew cleanJNI
-./gradlew :engines:pytorch:pytorch-jni:clean
-./gradlew :engines:pytorch:pytorch-native:clean
-./gradlew :engines:pytorch:pytorch-native:compileJNI
-
-./gradlew :engines:pytorch:pytorch-engine:build;
-```
-
-In the above gradle command lines, the `pytorch-jni:build` and `pytorch-engine:build` are called. This will require completing javadocs as well, which is not unnecessary during experiments. See the workaround below.
-
-The above commands have been tested in Linux and MacOS.
-
-Here is another **workaround** to test the JNI without having to complete all the java docs. You can create a clean git branch, update the JNI, and then do the commands above with pytorch-engine:build, ie
-
-```
-./gradlew cleanJNI
-./gradlew :engines:pytorch:pytorch-jni:clean
-./gradlew :engines:pytorch:pytorch-native:clean
-./gradlew :engines:pytorch:pytorch-native:compileJNI
-
-./gradlew :engines:pytorch:pytorch-engine:build;
-```
-
-Here you don't have to finish java docs. Then switch back to the original git branch, where the updates in JNI is still effective.
-
-**Note**:
-In case the JNI is supposed to run with GPU, the compilation needs to be the following:
-
-```
-./gradlew :engines:pytorch:pytorch-native:cleanJNI 
-./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu11
-```
+    ```
+    cd engines/pytorch/pytorch-native
+    ./gradlew cleanJNI compileJNI
+   
+    ./gradlew :engines:pytorch:pytorch-jni:clean
+    ./gradlew :engines:pytorch:pytorch-engine:test
+    ```
+    
+    **Note**:
+    In case your need test with GPU, the compilation needs to be the following:
+    
+    ```
+    ./gradlew cleanJNI 
+    ./gradlew compileJNI -Pcu11
+    ```
 
 3. Document the api and add the unit tests.
-
 4. Format the code and pass the PR tests
 
-Run the following tasks
-
-```
-./gradlew fJ fC checkstyleMain checkstyleTest pmdMain pmdTest
-./gradlew test
-```
+    Run the following tasks
+    
+    ```
+    ./gradlew fJ fC checkstyleMain checkstyleTest pmdMain pmdTest
+    ./gradlew test
+    ```
 
