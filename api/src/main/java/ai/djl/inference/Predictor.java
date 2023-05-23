@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.inference.streaming.StreamingBlock;
 import ai.djl.inference.streaming.StreamingTranslator;
+import ai.djl.inference.streaming.StreamingTranslator.StreamOutput;
 import ai.djl.metric.Metrics;
 import ai.djl.metric.Unit;
 import ai.djl.ndarray.LazyNDArray;
@@ -201,7 +202,7 @@ public class Predictor<I, O> implements AutoCloseable {
      * @throws TranslateException if an error occurs during prediction
      */
     @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.IdenticalCatchBranches"})
-    public O streamingPredict(I input) throws TranslateException {
+    public StreamOutput<O> streamingPredict(I input) throws TranslateException {
 
         String streamingSupported = streamingSupportError();
         if (streamingSupported != null) {

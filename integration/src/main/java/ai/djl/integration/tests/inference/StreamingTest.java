@@ -15,6 +15,7 @@ package ai.djl.integration.tests.inference;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.inference.streaming.StreamingTranslator;
+import ai.djl.inference.streaming.StreamingTranslator.StreamOutput;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -28,10 +29,10 @@ import ai.djl.translate.TranslatorContext;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 public class StreamingTest {
@@ -47,17 +48,27 @@ public class StreamingTest {
             block.setInitializer(Initializer.ONES, Type.WEIGHT);
             block.initialize(model.getNDManager(), DataType.FLOAT64, new Shape(1, 1));
 
-            try (Predictor<Double, DoubleStream> predictor =
+            try (Predictor<Double, Iterator<Double>> predictor =
                     model.newPredictor(new TestTranslator())) {
                 Assert.assertTrue(predictor.supportsStreaming());
-                List<Double> results =
-                        predictor.streamingPredict(1.0).boxed().collect(Collectors.toList());
+
+                // Test iterative streaming
+                List<Double> results = new ArrayList<>(3);
+                predictor.streamingPredict(1.0).getIterativeOutput().forEachRemaining(results::add);
+                Assert.assertEquals(results, Arrays.asList(1.0, 1.0));
+
+                // Test async streaming
+                StreamOutput<Iterator<Double>> so = predictor.streamingPredict(1.0);
+                results = new ArrayList<>(3);
+                Iterator<Double> id = so.getAsyncOutput();
+                so.computeAsyncOutput();
+                id.forEachRemaining(results::add);
                 Assert.assertEquals(results, Arrays.asList(1.0, 1.0));
             }
         }
     }
 
-    private static class TestTranslator implements StreamingTranslator<Double, DoubleStream> {
+    private static class TestTranslator implements StreamingTranslator<Double, Iterator<Double>> {
 
         /** {@inheritDoc} */
         @Override
@@ -67,13 +78,66 @@ public class StreamingTest {
 
         /** {@inheritDoc} */
         @Override
-        public DoubleStream processOutput(TranslatorContext ctx, NDList list) {
-            return Arrays.stream(list.singletonOrThrow().toDoubleArray());
+        public Iterator<Double> processOutput(TranslatorContext ctx, NDList list) {
+            return Arrays.stream(list.singletonOrThrow().toDoubleArray()).iterator();
         }
 
         @Override
-        public DoubleStream processStreamOutput(TranslatorContext ctx, Stream<NDList> list) {
-            return list.mapToDouble(l -> l.singletonOrThrow().getDouble());
+        public StreamOutput<Iterator<Double>> processStreamOutput(
+                TranslatorContext ctx, Stream<NDList> list) {
+            return new StreamOutput<>() {
+                List<Double> outList;
+
+                @Override
+                protected Iterator<Double> buildAsyncOutput() {
+                    outList = new ArrayList<>();
+                    return new TestListIterator<>(outList);
+                }
+
+                @Override
+                protected void computeAsyncOutputInternal(Iterator<Double> output) {
+                    list.forEach(
+                            d -> {
+                                outList.add(d.singletonOrThrow().getDouble());
+                            });
+                }
+
+                @Override
+                public Iterator<Double> getIterativeOutputInternal() {
+                    return list.mapToDouble(l -> l.singletonOrThrow().getDouble()).iterator();
+                }
+            };
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Support getSupport() {
+            return Support.BOTH;
+        }
+    }
+
+    /**
+     * A testing {@link Iterator} for a list with concurrent modification.
+     *
+     * @param <E> the list and iterator element type
+     */
+    private static class TestListIterator<E> implements Iterator<E> {
+
+        List<E> lst;
+        int index;
+
+        public TestListIterator(List<E> lst) {
+            this.lst = lst;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return lst.size() > index;
+        }
+
+        @Override
+        public E next() {
+            return lst.get(index++);
         }
     }
 }
