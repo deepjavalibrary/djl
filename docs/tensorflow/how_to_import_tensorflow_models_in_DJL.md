@@ -83,10 +83,12 @@ Criteria<String[], float[][]> criteria =
         .optProgress(new ProgressBar())
         .build();
 
+// Make sure TensorFlow engine is loaded before loading extension
+Engine.getEngine("TensorFlow");
 // Load TensorFlow Text libraries for necessary ops
 // Example Path of installation on Linux may look like: /home/<user>/.local/python-3.8.3/lib/python3.8/site-packages/tensorflow_text/
 TensorFlow.loadLibrary("<path_to_library_installation>/python/ops/_sentencepiece_tokenizer.so");
-        
+
 // Run the model
 try (ZooModel<String[], float[][]> model = criteria.loadModel();
     Predictor<String[], float[][]> predictor = model.newPredictor()) {
