@@ -38,6 +38,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           aws s3 cp build/install/lib/libtritonserver.so s3://djl-ai/publish/tritonserver/${{ github.event.inputs.triton }}/
+          aws s3 cp build/install/bin/tritonserver s3://djl-ai/publish/tritonserver/${{ github.event.inputs.triton }}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tritonserver/${{ github.event.inputs.triton }}/*"
 
   create-runner:
