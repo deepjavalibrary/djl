@@ -179,7 +179,7 @@ We use the following metrics to evaluate the performance of the DeepAR model in 
 > [INFO ] - metric: MSE:   70.64
 ```
 
-Here, we focus on the metric *Root Mean Squared Scaled Error*, ie. [RMSSE](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/evaluation). The detailed formula is in [here](https://mofc.unic.ac.cy/wp-content/uploads/2020/03/). It is different from the Root-mean-square error [RMSE](https://en.wikipedia.org/wiki/Root-mean-square_deviation) in that RMSSE is based on the variation between two contiguous data points. So this metric is scale invariant, suitable for timeseries data.
+Here, we focus on the metric *Root Mean Squared Scaled Error*, ie. [RMSSE](https://www.kaggle.com/competitions/m5-forecasting-accuracy/overview/evaluation). The detailed formula is in [here](https://mofc.unic.ac.cy/wp-content/uploads/2020/03/M5-Competitors-Guide-Final-10-March-2020.docx). It is different from the Root-mean-square error [RMSE](https://en.wikipedia.org/wiki/Root-mean-square_deviation) in that RMSSE is based on the variation between two contiguous data points. So this metric is scale invariant, suitable for timeseries data.
 
 As you can see, in the result metric above, the model has `RMSSE = 1.00`. This means that, on average, the error
 between the prediction and the actual data is around `1.00` time the average variation of the timeseries. This is also
