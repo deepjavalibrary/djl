@@ -18,6 +18,7 @@ dependencies {
         api "ai.djl:api:${version}"
         api "ai.djl:basicdataset:${version}"
         api "ai.djl:model-zoo:${version}"
+        api "ai.djl:djl-zero:${version}"
         api "ai.djl:serving:${version}"
         api "ai.djl.android:core:${version}"
         api "ai.djl.android:onnxruntime:${version}"
