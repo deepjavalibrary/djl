@@ -28,7 +28,7 @@ int[] input = {100, 207, 971, 970, 933};
 ### Build the project and run
 Use the following commands to run the project:
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.BigGAN
 ```

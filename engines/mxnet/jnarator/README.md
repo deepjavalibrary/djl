@@ -17,7 +17,7 @@ walks through the tree to find C API calls and generates their corresponding Jav
 
 The following example demonstrates how to use this module in the Apache MXNet module:
 
-```
+```groovy
 task jnarator(dependsOn: ":jnarator:jar") {
     doLast {
         File jnaGenerator = project(":jnarator").jar.outputs.files.singleFile

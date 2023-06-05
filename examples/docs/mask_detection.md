@@ -30,7 +30,7 @@ We use the following image as input:
 ### Build the project and run
 Use the following command to run the project:
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.MaskDetection
 ```

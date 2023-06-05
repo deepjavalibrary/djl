@@ -47,7 +47,7 @@ run on a single GPU by default, unless the user specifies otherwise.
 During training, if you wish to train on multiple GPUs or if you wish to limit the number of GPUs to be used (you may want to limit the number of GPU for smaller datasets), you have to configure the `TrainingConfig` to do so by
 setting the devices. For example, if you have 7 GPUs available, and you want the `Trainer` to train on 5 GPUs, you can configure it as follows. 
 
-```
+```java
     int maxNumberOfGpus = 5;
     TrainingConfig config = new DefaultTrainingConfig(initializer, loss)
             .setOptimizer(optimizer)

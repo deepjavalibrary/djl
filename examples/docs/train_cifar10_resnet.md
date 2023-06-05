@@ -35,7 +35,7 @@ For example, you can create ResNet50 using the following code:
 
 To run the example, use the following command: 
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.transferlearning.TrainResnetWithCifar10 --args="-e 10 -b 32 -g 1"
 ```
@@ -49,7 +49,7 @@ Models are trained in Python and exported to `.symbol`(model architecture) and `
 
 To run the example using MXNet model, use the option `-s` as shown in the following command: 
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.transferlearning.TrainResnetWithCifar10 --args="-e 10 -b 32 -g 1 -s -p"
 ```
@@ -86,7 +86,7 @@ They come with powerful Nvidia GPUs, and include pre-installed drivers and all d
 For example, on an [p3.16xlarge](https://aws.amazon.com/ec2/instance-types/) instance with [Ubuntu Deep Learning Base AMI](https://aws.amazon.com/marketplace/pp/Amazon-Web-Services-Deep-Learning-Base-AMI-Amazon-/B077GFM7L7), 
 run the following command to check the GPU status, driver information, and CUDA version.
 
-```
+```sh
 nvidia-smi
 ```
 
@@ -140,7 +140,7 @@ Usually, you use `32*number_of_gpus`, so each GPU will get a data batch size of 
 
 Run the following command to train using 4 GPUs:
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.transferlearning.TrainResnetWithCifar10 --args="-e 10 -b 128 -g 4 -p"
 ```

@@ -24,7 +24,7 @@ to narrow down your search condition and locate the model you want to load.
 DJL Builder convention. The methods start with `set` are required fields, and `opt` for optional fields.
 You must call `setType()` method when creating a `Criteria` object:
 
-```
+```java
 Criteria<Image, Classifications> criteria = Criteria.builder()
         .setTypes(Image.class, Classifications.class)
         .build();
@@ -95,7 +95,7 @@ naming the model file name to be the same as the directory or archive file.
 If your model file located in a sub-folder of the model directory or has a different name,
 you can specify modelName by `.optModelName()` in criteria:
 
-```
+```java
 Criteria<Image, Classifications> criteria = Criteria.builder()
         .optModelName("traced_model/resnet18.pt") // specify model file prefix
 ```

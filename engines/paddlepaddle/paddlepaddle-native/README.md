@@ -7,7 +7,7 @@ You need to install `cmake` and C++ compiler on your machine in order to build
 
 ### Linux
 
-```
+```sh
 apt install cmake g++
 ```
 
@@ -21,13 +21,13 @@ Use the following task to build PaddlePaddle JNI library:
 
 ### Mac/Linux
 
-```
+```sh
 ./gradlew compileJNI
 ```
 
 ### Windows
 
-```
+```cmd
 gradlew compileJNI
 ```
 

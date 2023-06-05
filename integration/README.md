@@ -12,12 +12,12 @@ When running the integration tests, code coverage is also collected. The easiest
 ## Switch Engine for tests
 You can switch the engine through setting the system property `ai.djl.default_engine`:
 
-```
+```bash
 ./gradlew build -Dai.djl.default_engine=<Engine_Name>
 ```
 
 ### Windows PowerShell
 
-```
+```bash
 ..\gradlew build "-Dai.djl.default_engine=<Engine_Name>"
 ```

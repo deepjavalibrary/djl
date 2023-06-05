@@ -1,20 +1,22 @@
 ## Stable Diffusion in DJL
 
+[Stable Diffusion](https://stability.ai/blog/stable-diffusion-public-release) is an open-source model
+developed by Stability.ai. It aimed to produce images (artwork, pictures, etc.) based on
+an input sentence and images.
+
+This example is a basic reimplementation of Stable Diffusion in Java.
+It can be run with CPU or GPU using the PyTorch engine.
+
 Java solution Developed by:
+
 - Tyler (Github: tosterberg)
 - Calvin (Github: mymagicpower)
 - Qing (GitHub: lanking520)
 
-[Stable Diffusion](https://stability.ai/blog/stable-diffusion-public-release) is a open-source model
-developed by Stability.ai. It aimed to produce artworks based on
-the input sentences and images.
-
-This example is a basic reimplementation of Stable Diffusion in Java.
-The example can be both running in CPU/GPU with PyTorch engine.
-
 ## Model Architecture
 
-We took 4 components from the original Stable Diffusion models and traced them in PyTorch:
+We took four components from the original Stable Diffusion models and traced them in PyTorch:
+
 - Text Encoder: The CLIP encoder used for text embedding generation
 - Image Encoder: The VAE encoder to build image to embedding
 - Image Decoder: The VAE decoder to convert embedding to image
@@ -22,10 +24,10 @@ We took 4 components from the original Stable Diffusion models and traced them i
 
 ## Getting started
 
-We recommend to run the model on GPU devices, CPU generation is slow.
+We recommend running the model on GPU devices because CPU generation is slow.
 To run this example, just do:
 
-```
+```bash
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.stablediffusion.ImageGeneration
 ```
@@ -42,7 +44,7 @@ Output:
 
 ## Conversion script
 
-Use the below script to get the exported model
+Use the below script to export the model:
 
 ```python
 from diffusers import EulerDiscreteScheduler, UNet2DConditionModel, AutoencoderKL

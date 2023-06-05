@@ -7,7 +7,7 @@ Follow this setup guide in order to run DJL apps on an Android. In order to succ
 
 ## Prerequisites
 
-```
+```sh
 # Run the following command (assume you have python3 installed already)
 export PYTHON=python3
 
@@ -20,7 +20,7 @@ This will install the android-sdk on your machine as well as python3. It sets th
 
 ### Linux (Ubuntu 20.04) android-sdk install
 
-```
+```sh
 # install python and Android sdk
 sudo apt-get install android-sdk python3
 
@@ -33,7 +33,7 @@ sudo chown -R ubuntu:ubuntu $ANDROID_HOME
 
 ### Mac android-sdk install
 
-```
+```sh
 # install python and Android sdk
 brew install android-sdk
 
@@ -48,7 +48,7 @@ sudo chown -R $USER $ANDROID_HOME
 
 Find latest command line only tools: [https://developer.android.com/studio#downloads](https://developer.android.com/studio#downloads:~:text=Command%20line%20tools%20only)
 
-```
+```sh
 # create directory for Android command line tools
 mkdir -p $ANDROID_HOME/cmdline-tools
 cd $ANDROID_HOME/cmdline-tools
@@ -68,7 +68,7 @@ mv cmdline-tools tools
 
 See GitHub actions to ensure latest NDK_VERSION: [https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/native_s3_pytorch_android.yml](https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/native_s3_pytorch_android.yml)
 
-```
+```sh
 # set Android NDK version and install it
 export NDK_VERSION=21.1.6352462
 echo "y" | sudo ${ANDROID_HOME}/cmdline-tools/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}"
@@ -78,7 +78,7 @@ echo "y" | sudo ${ANDROID_HOME}/cmdline-tools/tools/bin/sdkmanager --install "nd
 
 See: [https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/native_s3_pytorch_android.yml](https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/native_s3_pytorch_android.yml)
 
-```
+```sh
 # cd into whatever directory holds your djl directory
 export PYTORCH_VERSION=1.13.0
 export ANDROID_NDK=${ANDROID_HOME}/ndk/${NDK_VERSION}
@@ -106,7 +106,7 @@ See: [https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/nativ
 
 This command unzips all the files we zipped in the previous code block. It puts them into the directories where the DJL build expects to find them when it compiles.
 
-```
+```sh
 cd ../djl/engines/pytorch/pytorch-native
 
 # to avoid download PyTorch native from S3, manually unzip PyTorch native
@@ -132,7 +132,7 @@ See: [ https://github.com/deepjavalibrary/djl/blob/master/.github/workflows/publ
 
 The final command in this code block `./gradlew pTML` is optional. It stores a local copy of the DJL snapshot in your maven directory. If not done, then the app will pull the snapshot release of DJL from Sonatype. 
 
-```
+```sh
 # move into djl/android directory
 cd ../../../android 
 
@@ -153,7 +153,7 @@ See: [https://github.com/deepjavalibrary/djl-demo/tree/master/android/pytorch_an
 
 From Android Studio, with an emulator turned on, run the following commands
 
-```
+```sh
 cd djl-demo/android/pytorch_android/style_transfer_cyclegan
 ./gradlew iD
 ```

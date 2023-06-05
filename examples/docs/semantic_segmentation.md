@@ -22,7 +22,7 @@ You can find the image used in this example in project test resource folder: `sr
 
 ### Build the project and run
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.SemanticSegmentation
 ```
@@ -49,13 +49,13 @@ You can find the image used in this example in project test resource folder: `sr
 
 In the `SemanticSegmentation.java` file, find the `predict()` method. Change the `imageFile` path to look like this:
 
-```
+```jav
 Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
 ```
 
 ### Build the project and run
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.InstanceSegmentation
 ```

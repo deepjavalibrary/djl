@@ -93,7 +93,7 @@ If the issue continues to persist, you can use the [docker file](https://github.
 Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other
 versions of Windows, you need to pass the version as an argument as follows:
 
-```
+```bash
 docker build --build-arg version=<YOUR_VERSION>
 ```
 

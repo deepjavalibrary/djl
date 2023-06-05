@@ -30,7 +30,7 @@ You can find the following image in your project test resource folder: `src/test
 
 Run the project by using the following command:
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.ImageClassification
 ```

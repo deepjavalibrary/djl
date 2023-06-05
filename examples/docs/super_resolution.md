@@ -28,7 +28,7 @@ List<Image> input = Arrays.asList(
 ### Build the project and run
 Use the following commands to run the project:
 
-```
+```bash
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.sr.SuperResolution
 ```

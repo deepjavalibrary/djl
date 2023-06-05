@@ -74,7 +74,7 @@ For larger topics which do not have a corresponding javadoc section, they should
 
 This project uses a gradle wrapper, so you don't have to install gradle on your machine. You can just call the gradle wrapper using the following command:
 
-```
+```bash
 ./gradlew
 ```
 
@@ -100,19 +100,19 @@ If you are developing with an IDE, you can run a test by selecting the test and 
 
 From the command line, you can run the following command to run a test:
 
-```
+```bash
 ./gradlew :<module>:run -Dmain=<class_name> --args ""
 ```
 
 For example, if you would like to run the complete integration test, you can use the following command:
 
-```
+```bash
 ./gradlew :integration:run -Dmain=ai.djl.integration.IntegrationTest
 ```
 
 To run an individual integration test from the command line, use the following: 
 
-```
+```bash
 ./gradlew :integration:run --args="-c <class_name> -m <method_name>"
 ```
 

@@ -27,7 +27,7 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 
 ### Run Inference
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.SentimentAnalysis
 ```

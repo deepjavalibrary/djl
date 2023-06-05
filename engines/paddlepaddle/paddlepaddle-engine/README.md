@@ -73,7 +73,7 @@ For macOS, you can use the following library:
 
 To use Linux packages, users are also required to set `LD_LIBRARY_PATH` to the folder:
 
-```
+```sh
 LD_LIBRARY_PATH=$HOME/.djl.ai/paddle/2.2.2-<cuda-flavor>-linux-x86_64
 ```
 
