@@ -665,6 +665,18 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchArgMax(ndArray.getHandle(), dim, keepDim));
     }
 
+    public static NDList topK(
+            PtNDArray ndArray, long k, long axis, boolean largest, boolean sorted) {
+        long[] handles =
+                PyTorchLibrary.LIB.torchTopK(ndArray.getHandle(), k, axis, largest, sorted);
+        NDList list = new NDList(handles.length);
+        for (long handle : handles) {
+            PtNDArray array = new PtNDArray(ndArray.getManager(), handle);
+            list.add(array);
+        }
+        return list;
+    }
+
     public static PtNDArray argMin(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchArgMin(ndArray.getHandle()));

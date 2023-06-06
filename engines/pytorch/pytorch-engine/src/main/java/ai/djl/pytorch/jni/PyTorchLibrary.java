@@ -169,6 +169,8 @@ final class PyTorchLibrary {
 
     native long torchArgMax(long handle, long dim, boolean keepDim);
 
+    native long[] torchTopK(long handle, long k, long axis, boolean largest, boolean sorted);
+
     native long torchArgMin(long handle);
 
     native long torchArgMin(long handle, long dim, boolean keepDim);
