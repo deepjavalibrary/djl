@@ -80,7 +80,7 @@ Maven:
 
 Gradle:
 
-```
+```groovy
 implementation("ai.djl.onnxruntime:onnxruntime-engine:0.22.1") {
     exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
 }

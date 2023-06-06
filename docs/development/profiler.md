@@ -11,7 +11,7 @@ In the future, we are considering to design a unified APIs and output unified fo
 
 By setting the following environment variable, it generates `profile.json` after executing the code.
 
-```
+```bash
 export MXNET_PROFILER_AUTOSTART=1
 ```
 
@@ -30,7 +30,7 @@ DJL have integrated PyTorch C++ profiler API and expose `JniUtils.startProfile` 
 Wrap the code snippet you want to profile in between `JniUtils.startProfile` and `JniUtils.stopProfile`.
 Here is an example.
 
-```
+```java
 try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
     try (Predictor<Image, Classifications> predictor = model.newPredictor()) {
         Image image = ImageFactory.getInstance()
@@ -47,7 +47,7 @@ try (ZooModel<Image, Classifications> model = criteria.loadModel()) {
 The output format is composed of operator execution record. 
 Each record contains `name`(operator name), `dur`(time duration), `shape`(input shapes), `cpu mem`(cpu memory footprint).
 
-```
+```json
 {
   "name": "aten::empty",
   "ph": "X",
@@ -65,7 +65,7 @@ Each record contains `name`(operator name), `dur`(time duration), `shape`(input 
 
 When loading a model, the profiler can be enabled by specifying the desired filepath in the criteria:
 
-```
+```java
     Criteria<Image, Classifications> criteria =
         Criteria.builder()
             .optOption("profilerOutput", "build/testOrtProfiling")

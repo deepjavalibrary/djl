@@ -64,7 +64,7 @@ You can trace by using the `torch.traceModule` function.
 
 To run inference with such model in DJL, you could provide a placeholder NDArray like below:
 
-```
+```java
 NDArray array = NDManager.create("");
 array.setName("module_method:get_text_features");
 ```

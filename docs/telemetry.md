@@ -7,18 +7,18 @@ the system is collected or retained.
 
 To opt out of usage tracking for DJL, you can set the `OPT_OUT_TRACKING` environment variable:
 
-```
+```bash
 export OPT_OUT_TRACKING=true
 ```
 
 or Java System property:
 
-```
+```java
 System.setProperty("OPT_OUT_TRACKING", "true")
 ```
 
 Usage tracking is also disable in `offline` mode:
 
-```
+```java
 System.setProperty("offline", "true")
 ```

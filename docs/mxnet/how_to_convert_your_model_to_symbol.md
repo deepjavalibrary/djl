@@ -3,7 +3,7 @@
 DJL currently supports symbolic model loading from MXNet.
 A gluon [HybridBlock](https://mxnet.apache.org/api/python/docs/api/gluon/hybrid_block.html) can be converted into a symbol for loading by doing as follows:
 
-```
+```python
 from mxnet import nd
 from mxnet.gluon import nn
 
@@ -30,7 +30,7 @@ These can be loaded in DJL.
 In real applications, you may want to create and train a HybridBlock before exporting it.
 The code block below shows how you can convert a [GluonCV](https://gluon-cv.mxnet.io/) pretrained model:
 
-```
+```python
 import mxnet as mx
 from gluoncv import model_zoo
 
@@ -52,7 +52,7 @@ It is always recommended enabling the static settings when exporting Apache MXNe
 
 If you run hybridize without `static_alloc=True, static_shape=True`:
 
-```
+```python
 net.hybridize()
 ```
 

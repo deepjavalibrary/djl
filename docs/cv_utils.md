@@ -20,7 +20,7 @@ The [DJL OpenCV extension](../extensions/opencv/README.md) provides better perfo
 java's built-in ImageIO. You only need to add it into your project and DJL will automatically
 pick it up:
 
-```
+```xml
 <dependency>
     <groupId>ai.djl.opencv</groupId>
     <artifactId>opencv</artifactId>

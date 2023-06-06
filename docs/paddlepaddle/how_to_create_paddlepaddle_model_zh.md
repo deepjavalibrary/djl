@@ -24,7 +24,7 @@ PaddlePaddle的模型来源有很多种。你可以选择直接从 PaddleHub 下
 
 然后在 "代码示例" 找到代码
 
-```
+```python
 import paddlehub as hub
 import cv2
 
@@ -39,7 +39,7 @@ result = classifier.classification(images=[cv2.imread('/PATH/TO/IMAGE')])
 
 接下来，我们只需要添加以下一行到之前的代码上:
 
-```
+```python
 module.save_inference_model(dirname="model/mobilenet")
 ```
 
@@ -58,7 +58,7 @@ module.save_inference_model(dirname="model/mobilenet")
 
 总结, 以下两行就是在 PaddleHub 中转换模型的泛用模版:
 
-```
+```python
 import paddlehub as hub
 
 model = hub.Module(name="modelname")
@@ -76,7 +76,7 @@ model.save_inference_model(dirname="model/modelname")
 
 Paddle 2.0 的动态图模型可用如下代码表达:
 
-```
+```python
 class LinearNet(nn.Layer):
     def __init__(self):
         super(LinearNet, self).__init__()
@@ -106,7 +106,7 @@ paddle.jit.save(layer, path)
 
 对于 2.0 以前的Paddle模型, 它们会是静态图的格式:
 
-```
+```python
 import paddle
 
 paddle.enable_static()

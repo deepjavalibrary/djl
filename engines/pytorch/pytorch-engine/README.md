@@ -76,7 +76,7 @@ It will automatically determine the appropriate jars for your system based on th
 If you are running on an older operating system (like CentOS 7), you have to use
 [precxx11 build](#for-pre-cxx11-build) or set system property to auto select for precxx11 binary:
 
-```
+```java
 System.setProperty("PYTORCH_PRECXX11", "true");
 ```
 

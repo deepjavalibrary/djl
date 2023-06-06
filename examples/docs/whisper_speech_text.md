@@ -12,7 +12,7 @@ https://resources.djl.ai/audios/jfk.flac
 
 ## Run the example
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.whisper.SpeechToTextGeneration
 ```

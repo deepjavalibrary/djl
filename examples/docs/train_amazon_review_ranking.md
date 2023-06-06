@@ -12,11 +12,11 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 
 ## Train the model
 
-In this example, we used [GluonNLP pretrained DistilBert](https://nlp.gluon.ai/model_zoo/bert/index.html) model followed by a simple MLP layer.
-The input is the BERT formatted tokens and output is the star rating.
+In this example, we used the [GluonNLP pretrained DistilBert](https://nlp.gluon.ai/model_zoo/bert/index.html) model followed by a simple MLP layer.
+The input is the BERT formatted tokens and the output is the star rating.
 We recommend using GPU for training since CPU training is slow with this dataset.
 
-```
+```bash
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.transferlearning.TrainAmazonReviewRanking --args="-e 2 -b 8 -g 1"
 ```

@@ -20,7 +20,7 @@ We expect cats text will win based on the image.
 
 ## Run the example
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.clip.ImageTextComparison
 ```

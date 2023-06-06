@@ -19,7 +19,7 @@ Follow [setup](../../docs/development/setup.md) to configure your development en
 ### Build the project and run it
 The following command trains the model for 2 epochs. The trained model is saved in the following folder: `build/model`.
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainPikachu
 ```
@@ -51,7 +51,7 @@ Validating:  100% |████████████████████�
 
 You can also run the example with your own arguments, for example, to train 5 epochs using batch size 64, and save it to a specified folder `ssd_model`:
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainPikachu --args="-e 5 -b 64 -o ssd_model"
 ```

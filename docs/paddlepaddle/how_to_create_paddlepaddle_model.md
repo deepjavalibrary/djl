@@ -25,7 +25,7 @@ just go to the following link:
 
 Then we find "代码示例" section here:
 
-```
+```python
 import paddlehub as hub
 import cv2
 
@@ -40,7 +40,7 @@ please replace the `'/PATH/TO/IMAGE'` to your local image path.
 
 Then, all we need to do is appending one more line to the previous code:
 
-```
+```python
 module.save_inference_model(dirname="model/mobilenet")
 ```
 
@@ -59,7 +59,7 @@ Finally, you can directly feed the `mobilenet.zip` file in DJL for inference tas
 
 As a summary, here is the pattern for you to save the model in the rest of PaddleHub:
 
-```
+```python
 import paddlehub as hub
 
 model = hub.Module(name="modelname")
@@ -77,7 +77,7 @@ Firstly let's assume you have code, and you already load the pretrained weight.
 
 For imperative model trained using Paddle 2.0 like below:
 
-```
+```python
 class LinearNet(nn.Layer):
     def __init__(self):
         super(LinearNet, self).__init__()
@@ -107,7 +107,7 @@ is `inference.*` since DJL will only find files with this prefix.
 
 For Paddle model created before 2.0, it is usually in Symbolic form:
 
-```
+```python
 import paddle
 
 paddle.enable_static()

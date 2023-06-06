@@ -46,7 +46,7 @@ There are two ways to supply configurations to the `Translator`:
 
     Here is an example:
 
-```
+```config
 # serving.properties can be used to define model's metadata, all the arguments will be
 # passed to TranslatorFactory to create proper Translator
 
@@ -73,7 +73,7 @@ softmax=true
 
     You can customize Translator's behavior with Criteria, for example:
 
-```
+```java
 Criteria<Image, Classifications> criteria = Criteria.builder()
         .setTypes(Image.class, Classifications.class) // defines input and output data type
         .optApplication(Application.CV.IMAGE_CLASSIFICATION) // spcific model's application

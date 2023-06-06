@@ -23,7 +23,7 @@ to your project to enable logging (slf4j-simple is not recommended for productio
 
 For Maven:
 
-```
+```xml
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-simple</artifactId>
@@ -60,7 +60,7 @@ If you want to use other logging framework such as `logback`, you can just add t
 
 or for Maven:
 
-```
+```xml
 <dependency>
     <groupId>ch.qos.logback</groupId>
     <artifactId>logback-classic</artifactId>

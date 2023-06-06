@@ -9,7 +9,7 @@ You need to install `cmake` and C++ compiler on your machine in order to build
 
 ### Linux
 
-```
+```sh
 apt-get install -y locales cmake curl unzip software-properties-common
 ```
 
@@ -19,13 +19,13 @@ Use the following task to build PyTorch JNI library:
 
 ### Mac/Linux
 
-```
+```sh
 ./gradlew compileJNI
 ```
 
 ### Windows
 
-```
+```cmd
 gradlew compileJNI
 ```
 
@@ -38,14 +38,14 @@ Use the following task to build pytorch JNI library for GPU:
 
 ### Mac/Linux
 
-```
+```sh
 # compile CUDA 11.X version of JNI
 ./gradlew compileJNI -Pcu11
 ```
 
 ## Windows
 
-```
+```cmd
 # compile CUDA 11.X version of JNI
 gradlew compileJNI -Pcu11
 ```
@@ -53,7 +53,7 @@ gradlew compileJNI -Pcu11
 ### Format C++ code
 It uses clang-format to format the code.
 
-```
+```sh
 ./gradlew formatCpp
 ```
 
@@ -107,7 +107,7 @@ To implement a simple pytorch feature, generally you can do the following steps.
 1. Find the c-api in torch library for the feature to add. This can be done by searching in the document like [this](https://pytorch.org/cppdocs/api/function_namespaceat_1a854b1b19549a17f87a69b5f6b1134e22.html?highlight=bmm) or searching in the torch cpp source code.
 2. Implement the JNI and api's in Java. The JNI can then be compiled with gradle commands. Here is the commands you can use on cpu machine, to compile JNI and run it with java api.
 
-    ```
+    ```sh
     cd engines/pytorch/pytorch-native
     ./gradlew cleanJNI compileJNI
    
@@ -118,7 +118,7 @@ To implement a simple pytorch feature, generally you can do the following steps.
     **Note**:
     In case your need test with GPU, the compilation needs to be the following:
     
-    ```
+    ```sh
     ./gradlew cleanJNI 
     ./gradlew compileJNI -Pcu11
     ```
@@ -128,7 +128,7 @@ To implement a simple pytorch feature, generally you can do the following steps.
 
     Run the following tasks
     
-    ```
+    ```sh
     ./gradlew fJ fC checkstyleMain checkstyleTest pmdMain pmdTest
     ./gradlew test
     ```

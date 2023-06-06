@@ -19,7 +19,7 @@ To configure your development environment, follow [setup](../../docs/development
 
 The following command trains the model for two epochs. The trained model is saved in the `build/model` folder.
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainMnist
 ```
@@ -54,7 +54,7 @@ The results show that you reached 96.93 percent validation accuracy at the end o
 
 You can also run the example with your own arguments. For example, you can train for five epochs using batch size 64 and save the model to a specified folder `mlp_model` using the following command:
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.training.TrainMnist --args="-e 5 -b 64 -o mlp_model"
 ```

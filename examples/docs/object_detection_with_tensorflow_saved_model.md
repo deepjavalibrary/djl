@@ -21,7 +21,7 @@ The pre-trained SSD model can be found [here](http://download.tensorflow.org/mod
 You'll find a folder named ```ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model```. You need
 to specify model name to let ModelZoo load the model from right location:
 
-```
+```java
 Criteria<Image, DetectedObjects> criteria =  Criteria.builder()
     .setTypes(Image.class, DetectedObjects.class)
     .optModelUrls(modelUrl)
@@ -43,7 +43,7 @@ You can find the image used in this example in the project test resource folder:
 ### Build the project and run
 Use the following command to run the project:
 
-```
+```sh
 cd examples
 ./gradlew run -Dmain=ai.djl.examples.inference.ObjectDetectionWithTensorflowSavedModel
 ```

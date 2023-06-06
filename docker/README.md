@@ -9,7 +9,7 @@ You can use the [docker file](https://github.com/deepjavalibrary/djl/blob/master
 Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other
 versions of Windows, you need to pass the version as an argument as follows:
 
-```
+```bash
 docker build --build-arg version=<YOUR_VERSION>
 ```
 
@@ -20,7 +20,7 @@ This docker file is a modification of the one provided by NVIDIA in
 By default this sets up a container using Ubuntu 18.04 and CUDA 11.6.2. You can build the container with other versions as follows, 
 but keep in mind the TensorRT software requirements outlined [here](https://github.com/NVIDIA/TensorRT#prerequisites):
 
-```
+```bash
 docker build --build-arg OS_VERSION=<YOUR_VERSION> --build-arg CUDA_VERSION=<YOUR_VERSION>
 ```
 

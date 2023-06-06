@@ -84,7 +84,7 @@ options to configure the model. Among them, `trainParam` is an option specific f
 learning (or model retraining). Setting it "false" will freeze the parameter in the loaded
 embedding layer (or model), and "true" will be the other way around.
 
-```
+```java
 String modelUrl = "/EXPORT_PATH/resnet18_embedding.pt";
 Criteria<NDList, NDList> criteria = Criteria.builder()
         .setTypes(NDList.class, NDList.class)
@@ -102,7 +102,7 @@ the output dimension of which is the number of classes, i.e., 2 in this task. We
 block model to contain the embedding and fully connected layer. The final output is a SoftMax
 function to get class probability, as shown below.
 
-```
+```java
 Block blocks = new SequentialBlock()
         .add(baseBlock)
         .addSingleton(nd -> nd.squeeze(new int[] {2, 3}))  // squeeze the size-1 dimensions from the baseBlock
@@ -117,7 +117,7 @@ function (`SoftmaxCrossEntropy` in this case), the evaluation metric (`Accuracy`
 training listener which is used to fetch the training monitoring data, and so on. In our task,
 they are specified as shown below.
 
-```
+```java
 private static DefaultTrainingConfig setupTrainingConfig(Block baseBlock) {
     String outputDir = "build/fruits";
     SaveModelTrainingListener listener = new SaveModelTrainingListener(outputDir);
@@ -146,7 +146,7 @@ in the embedding layer is not changed too much. This assignment of learning rate
 `learningRateTracker`, which is then fed into the `learningRateTracker` option in `Optimizer`,
 as shown below.
 
-```
+```java
 // Customized learning rate
 float lr = 0.001f;
 FixedPerVarTracker.Builder learningRateTrackerBuilder = FixedPerVarTracker.builder().setDefaultValue(lr);
@@ -161,14 +161,14 @@ config.optOptimizer(optimizer);
 After this step, a training configuration is returned by `setupTrainingConfig` function. It is then
 used to set the trainer.
 
-```
+```java
 Trainer trainer = model.newTrainer(config);
-``` 
+```
 
 Next, the trainer is initialized by the following code, where the parameters' shape and initial
 value in each block will be specified. The `inputShape` has to be known beforehand.
 
-```
+```java
 int batchSize = 32;
 Shape inputShape = new Shape(batchSize, 3, 224, 224);
 trainer.initialize(inputShape);
@@ -176,7 +176,7 @@ trainer.initialize(inputShape);
 
 **Data loading.** The data is loaded and preprocessed with the following function.
 
-```
+```java
 private static RandomAccessDataset getData(String usage, int batchSize)
         throws TranslateException, IOException {
     float[] mean = {0.485f, 0.456f, 0.406f};
@@ -211,7 +211,7 @@ are called. In DJL, during the creation of `Model` and `ZooModel<NDList, NDList>
 resources (e.g., memories in the assigned in PyTorch) are allocated. These resources are managed
 by `NDManager` which inherits `AutoCloseable` class.
 
-```
+```java
 EasyTrain.fit(trainer, numEpoch, datasetTrain, datasetTest);
 model.save(Paths.get("SAVE_PATH"), "transferFreshFruit");
 
@@ -242,7 +242,7 @@ the `FreshFruit` dataset. The full experiment code is available
 In this experiment, the training dataset size needs to be controlled and randomly chosen.
 This part is implemented as below, where `cut` is the size of the training data.
 
-```
+```java
 List<Long> batchIndexList = new ArrayList<>();
 try (NDManager manager = NDManager.newBaseManager()) {
     NDArray indices = manager.randomPermutation(dataset.size());
