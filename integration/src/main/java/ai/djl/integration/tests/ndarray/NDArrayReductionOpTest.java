@@ -201,11 +201,12 @@ public class NDArrayReductionOpTest {
                     manager.create(
                             new float[] {1f, 2f, 5f, 1f, 2f, 3f, 8f, 9f, 0f}, new Shape(3, 3));
             NDList outputs = array.topK(2, -1, true, true);
-            Assert.assertEquals(
-                    outputs.get(0),
-                    manager.create(new float[] {5, 2, 3, 2, 9, 8}, new Shape(3, 2)));
-            Assert.assertEquals(
-                    outputs.get(1), manager.create(new long[] {2, 1, 2, 1, 1, 0}, new Shape(3, 2)));
+            NDArray expectedValues =
+                    manager.create(new float[] {5, 2, 3, 2, 9, 8}, new Shape(3, 2));
+            NDArray expectedIndices =
+                    manager.create(new long[] {2, 1, 2, 1, 1, 0}, new Shape(3, 2));
+            Assert.assertEquals(outputs.get(0), expectedValues);
+            Assert.assertEquals(outputs.get(1), expectedIndices);
         }
     }
 }
