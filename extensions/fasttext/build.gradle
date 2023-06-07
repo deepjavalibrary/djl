@@ -16,7 +16,8 @@ processResources {
         def url = "https://publish.djl.ai/fasttext-${fasttext_version}/jnilib/${djl_version}"
         def files = [
                 "linux-x86_64": "libjni_fasttext.so",
-                "osx-x86_64"  : "libjni_fasttext.dylib"
+                "osx-x86_64"  : "libjni_fasttext.dylib",
+                "osx-aarch64" : "libjni_fasttext.dylib"
         ]
         def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
