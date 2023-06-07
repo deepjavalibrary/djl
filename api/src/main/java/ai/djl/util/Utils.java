@@ -382,6 +382,23 @@ public final class Utils {
     }
 
     /**
+     * Utility function to get python virtual env directory.
+     *
+     * @return DJL venv directory
+     */
+    public static Path getVenvDir() {
+        String venvDir = getEnvOrSystemProperty("DJL_VENV_DIR");
+        if (venvDir == null || venvDir.isEmpty()) {
+            Path dir = Paths.get(System.getProperty("user.home"));
+            if (!Files.isWritable(dir)) {
+                dir = Paths.get(System.getProperty("java.io.tmpdir"));
+            }
+            return dir.resolve(".venv");
+        }
+        return Paths.get(venvDir);
+    }
+
+    /**
      * Gets the value of the specified environment variable or system property.
      *
      * @param name the name of the environment variable
