@@ -1589,7 +1589,7 @@ public interface NDManager extends AutoCloseable {
      * @param resourceId the unique resourceId
      * @param resource the {@link AutoCloseable} resource to be attached
      */
-    void attachInternal(String resourceId, AutoCloseable resource);
+    void attachInternal(String resourceId, AutoCloseable... resource);
 
     /**
      * Attaches a resource to this {@code NDManager} circumventing any cap protection.

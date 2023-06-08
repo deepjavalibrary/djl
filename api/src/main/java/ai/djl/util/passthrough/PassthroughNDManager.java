@@ -293,7 +293,7 @@ public final class PassthroughNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public void attachInternal(String resourceId, AutoCloseable resource) {}
+    public void attachInternal(String resourceId, AutoCloseable... resource) {}
 
     /** {@inheritDoc} */
     @Override

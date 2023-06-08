@@ -259,6 +259,16 @@ public class NDIndex {
     }
 
     /**
+     * Appends ellipse index in the current dimension.
+     *
+     * @return the updated {@link NDIndex}
+     */
+    public NDIndex addEllipseDim() {
+        ellipsisIndex = indices.size();
+        return this;
+    }
+
+    /**
      * Appends a new index to get all values in the dimension.
      *
      * @return the updated {@link NDIndex}

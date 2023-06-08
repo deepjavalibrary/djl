@@ -139,6 +139,17 @@ public class Shape {
     }
 
     /**
+     * Returns the shape in the given dimension with possible index wrapping.
+     *
+     * @param dimension the dimension to get the shape in
+     * @return the shape in the given dimension
+     */
+    public long getWrap(int dimension) {
+        dimension = dimension + (dimension < 0 ? shape.length : 0);
+        return shape[dimension];
+    }
+
+    /**
      * Returns the layout type in the given dimension.
      *
      * @param dimension the dimension to get the layout type in

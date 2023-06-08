@@ -270,7 +270,16 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
      * @return a view of the portion of this NDList
      */
     public NDList subNDList(int fromIndex) {
-        return new NDList(subList(fromIndex, size()));
+        return subList(fromIndex, size());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDList subList(int fromIndex, int toIndex) {
+        List<NDArray> subList = super.subList(fromIndex, toIndex);
+        NDList output = new NDList();
+        output.addAll(subList);
+        return output;
     }
 
     /**

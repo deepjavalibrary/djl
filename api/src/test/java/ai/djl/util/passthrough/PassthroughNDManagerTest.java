@@ -91,7 +91,7 @@ public class PassthroughNDManagerTest {
             Assert.assertEquals(manager.getName(), "PassthroughNDManager");
             Assert.assertTrue(manager.isOpen());
             Assert.assertNotNull(manager.getParentManager());
-            manager.attachInternal(null, null);
+            manager.attachInternal(null, (AutoCloseable) null);
             manager.attachUncappedInternal(null, null);
             manager.tempAttachInternal(null, null, null);
             manager.detachInternal(null);
