@@ -39,6 +39,7 @@ public final class LLMBlock {
 
     public static int main(String[] args)
             throws ModelNotFoundException, MalformedModelException, IOException {
+        mainOnnx();
         mainPt();
         return 0;
     }
@@ -68,6 +69,66 @@ public final class LLMBlock {
                 // package
                 // `pytorch-engines.main` cannot be loaded here.
                 Engine.getEngine(engine).newLMBlock(modelName, new GPTConfig(), blocks), models);
+    }
+
+    public static void mainOnnx()
+            throws ModelNotFoundException, MalformedModelException, IOException {
+        String[] modelUrls = {"https://djl-misc.s3.amazonaws.com/test/models/gpt2/gpt2.onnx.zip"};
+
+        Pair<Block, List<Model>> result = LLMBlock.getLMBlock(modelUrls, "OnnxRuntime", "GPT2");
+        LMBlock generator = (LMBlock) result.getKey();
+        List<Model> models = result.getValue();
+
+        try (NDManager manager = NDManager.newBaseManager()) {
+
+            /////////////////////////////////////////////
+            // Inference without cached key_values input
+            /////////////////////////////////////////////
+
+            long[] inputArray = {40, 2883, 6155, 351, 616, 13779};
+            int numBatch = 2;
+
+            NDArray inputIds = manager.create(inputArray, new Shape(2, inputArray.length / 2));
+
+            NDArray positionIds =
+                    manager.arange(0, inputIds.getShape().size(1), 1, DataType.INT64)
+                            .reshape(1, -1)
+                            .repeat(0, numBatch);
+
+            NDArray attentionMask = manager.ones(positionIds.getShape(), DataType.INT64);
+
+            CausalLMOutput outInit =
+                    generator.forward(
+                            new NDList(inputIds, positionIds, attentionMask), null, manager);
+
+            /////////////////////////////////////////////
+            // Inference with cached key_values input
+            /////////////////////////////////////////////
+
+            long pastSeqLen = outInit.getPastKeyValuesList().get(0).getShape().size(2);
+            inputIds = manager.create(new long[] {404, 403, 402, 401}, new Shape(numBatch, 2));
+            positionIds =
+                    manager.arange(
+                                    pastSeqLen,
+                                    pastSeqLen + inputIds.getShape().getLastDimension(),
+                                    1,
+                                    DataType.INT64)
+                            .reshape(1, -1)
+                            .repeat(0, numBatch);
+            attentionMask =
+                    manager.ones(
+                                    new Shape(
+                                            1, pastSeqLen + inputIds.getShape().getLastDimension()),
+                                    DataType.INT64)
+                            .reshape(1, -1)
+                            .repeat(0, numBatch);
+
+            generator.forward(
+                    new NDList(inputIds, positionIds, attentionMask),
+                    outInit.getPastKeyValuesList(),
+                    manager);
+        }
+        models.forEach(Model::close);
     }
 
     public static void mainPt()

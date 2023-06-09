@@ -23,6 +23,9 @@ import ai.djl.nn.Block;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.util.Pair;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -30,7 +33,13 @@ public final class AutoRegressiveSearch {
 
     LMBlock lmBlockPt;
 
+    LMBlock lmBlockOnnx;
+
     List<Model> modelsPt;
+
+    List<Model> modelsOnnx;
+
+    private static final Logger logger = LoggerFactory.getLogger(AutoRegressiveSearch.class);
 
     public AutoRegressiveSearch()
             throws ModelNotFoundException, MalformedModelException, IOException {
@@ -38,12 +47,20 @@ public final class AutoRegressiveSearch {
         Pair<Block, List<Model>> result = LLMBlock.getLMBlock(modelUrls, "PyTorch", "GPT2");
         lmBlockPt = (LMBlock) result.getKey();
         modelsPt = result.getValue();
+
+        modelUrls =
+                new String[] {"https://djl-misc.s3.amazonaws.com/test/models/gpt2/gpt2.onnx.zip"};
+        result = LLMBlock.getLMBlock(modelUrls, "OnnxRuntime", "GPT2");
+        lmBlockOnnx = (LMBlock) result.getKey();
+        modelsOnnx = result.getValue();
     }
 
     public void main(String[] args)
             throws ModelNotFoundException, MalformedModelException, IOException {
         mainContrastivePt(args);
         mainGreedyPt(args);
+        mainBeamPt(args);
+        mainBeamOnnx(args);
     }
 
     public boolean mainContrastivePt(String[] args) {
@@ -107,6 +124,72 @@ public final class AutoRegressiveSearch {
                                 {257, 6576, 13, 314, 460, 470, 3505, 262, 938, 640}
                             });
             return output.get(":, -10:").equals(expected);
+        }
+    }
+
+    public boolean mainBeamPt(String[] args) {
+        LMBlock lmBlock = lmBlockPt;
+        try (NDManager manager = NDManager.newBaseManager()) {
+
+            SearchConfig config = new SearchConfig();
+            config.setMaxSeqLength(60);
+            config.setBeam(3);
+
+            // [r'DeepMind Company is',
+            // r'Memories follow me left and right. I can']
+            NDArray inputIds =
+                    manager.create(
+                            new long[][] {
+                                {50256, 50256, 50256, 50256, 50256, 50256, 29744, 28478, 5834, 318},
+                                {13579, 1749, 1061, 502, 1364, 290, 826, 13, 314, 460}
+                            });
+            config.setPadTokenId(50256);
+            config.setSuffixPadding(false);
+
+            LMSearch lmSearch = new LMSearch(lmBlock, "beam", config);
+
+            NDArray output = lmSearch.beamSearch(inputIds);
+            NDArray expected =
+                    manager.create(
+                            new long[] {2267, 290, 2478, 13, 198, 198, 5122, 4365, 318, 284});
+            return output.get("0, -10:").equals(expected);
+        }
+    }
+
+    public boolean mainBeamOnnx(String[] args)
+            throws ModelNotFoundException, MalformedModelException, IOException {
+        LMBlock lmBlock = lmBlockOnnx;
+        try (NDManager manager = NDManager.newBaseManager()) {
+
+            SearchConfig config = new SearchConfig();
+            config.setMaxSeqLength(60);
+            config.setBeam(3);
+
+            // [r'DeepMind Company is',
+            // r'Memories follow me left and right. I can']
+            NDArray inputIds =
+                    manager.create(
+                            new long[][] {
+                                {220, 220, 220, 220, 220, 220, 29744, 28478, 5834, 318},
+                                {13579, 1749, 1061, 502, 1364, 290, 826, 13, 314, 460}
+                            });
+            config.setPadTokenId(220);
+            config.setSuffixPadding(false);
+            // The positionIds is not effective in onnx model traced from huggingface optimum.
+
+            LMSearch lmSearch = new LMSearch(lmBlock, "beam", config);
+            NDArray output = lmSearch.beamSearch(inputIds);
+
+            logger.info(
+                    "Notice: with OnnxRuntime model, it doesn't take positionId yet (only"
+                            + " attentionMask is effective), so the output is pathologic.");
+
+            NDArray expected =
+                    manager.create(
+                            new long[] {
+                                10766, 10766, 10766, 10766, 10766, 10766, 10766, 10766, 10766, 10766
+                            });
+            return output.get("0, -10:").equals(expected);
         }
     }
 }

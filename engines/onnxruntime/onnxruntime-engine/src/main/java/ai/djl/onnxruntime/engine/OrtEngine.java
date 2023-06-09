@@ -17,7 +17,10 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.engine.StandardCapabilities;
+import ai.djl.modality.nlp.generate.GPTConfig;
+import ai.djl.modality.nlp.generate.LMBlock;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.Block;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtLoggingLevel;
@@ -132,6 +135,16 @@ public final class OrtEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return OrtNDManager.getSystemManager().newSubManager(device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public LMBlock newLMBlock(String languageModel, GPTConfig gptConfig, Block[] blocks) {
+        if ("GPT2".equals(languageModel)) {
+            return new GPT2OrtLMBlock(gptConfig, blocks);
+        } else {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 
     /** {@inheritDoc} */
