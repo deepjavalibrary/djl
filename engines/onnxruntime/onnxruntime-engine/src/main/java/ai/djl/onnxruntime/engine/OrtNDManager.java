@@ -24,6 +24,7 @@ import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtUtil;
+import ai.onnxruntime.TensorInfo;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -98,7 +99,15 @@ public class OrtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public OrtNDArray create(boolean[] data, Shape shape) {
-        Object tensorIn = OrtUtil.reshape(data, shape.getShape());
+        long[] sh = shape.getShape();
+        if (sh.length == 0 || sh.length > TensorInfo.MAX_DIMENSIONS) {
+            throw new UnsupportedOperationException(
+                    "Arrays with less than 1 and greater than "
+                            + TensorInfo.MAX_DIMENSIONS
+                            + " dimensions are not supported.");
+        }
+
+        Object tensorIn = OrtUtil.reshape(data, sh);
         try {
             return new OrtNDArray(this, alternativeManager, OrtUtils.toTensor(env, tensorIn));
         } catch (OrtException e) {
