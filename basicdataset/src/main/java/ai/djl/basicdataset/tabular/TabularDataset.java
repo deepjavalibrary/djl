@@ -106,6 +106,21 @@ public abstract class TabularDataset extends RandomAccessDataset {
     }
 
     /**
+     * Returns the direct designated features (either data or label features) from a row.
+     *
+     * @param index the index of the requested data item
+     * @param selected the features to pull from the row
+     * @return the direct features
+     */
+    public List<String> getRowDirect(long index, List<Feature> selected) {
+        List<String> results = new ArrayList<>(selected.size());
+        for (Feature feature : selected) {
+            results.add(getCell(index, feature.getName()));
+        }
+        return results;
+    }
+
+    /**
      * Returns the designated features (either data or label features) from a row.
      *
      * @param manager the manager used to create the arrays

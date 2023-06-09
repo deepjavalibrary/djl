@@ -62,7 +62,7 @@ public class TabularTranslator implements Translator<ListFeatures, TabularResult
     @Override
     public TabularResults processOutput(TranslatorContext ctx, NDList list) throws Exception {
         List<TabularResult> results = new ArrayList<>(labels.size());
-        float[] data = list.singletonOrThrow().toFloatArray();
+        float[] data = list.head().toFloatArray();
         int dataIndex = 0;
         for (Feature label : labels) {
             Featurizer featurizer = label.getFeaturizer();
