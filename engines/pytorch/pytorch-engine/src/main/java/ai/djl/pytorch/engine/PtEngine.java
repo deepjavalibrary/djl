@@ -16,7 +16,10 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
+import ai.djl.modality.nlp.generate.GPTConfig;
+import ai.djl.modality.nlp.generate.LMBlock;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.Block;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.pytorch.jni.LibUtils;
@@ -143,6 +146,16 @@ public final class PtEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return PtNDManager.getSystemManager().newSubManager(device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public LMBlock newLMBlock(String languageModel, GPTConfig gptConfig, Block[] blocks) {
+        if ("GPT2".equals(languageModel)) {
+            return new GPT2PtLMBlock(gptConfig, blocks);
+        } else {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 
     /** {@inheritDoc} */
