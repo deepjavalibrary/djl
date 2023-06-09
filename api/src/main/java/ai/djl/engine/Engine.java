@@ -14,7 +14,10 @@ package ai.djl.engine;
 
 import ai.djl.Device;
 import ai.djl.Model;
+import ai.djl.modality.nlp.generate.GPTConfig;
+import ai.djl.modality.nlp.generate.LMBlock;
 import ai.djl.ndarray.NDManager;
+import ai.djl.nn.Block;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.training.GradientCollector;
 import ai.djl.training.LocalParameterServer;
@@ -301,6 +304,10 @@ public abstract class Engine {
      * @return a new top-level {@code NDManager}
      */
     public abstract NDManager newBaseManager(Device device);
+
+    public LMBlock newLMBlock(String languageModel, GPTConfig gptConfig, Block[] blocks) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 
     /**
      * Returns a new instance of {@link GradientCollector}.
