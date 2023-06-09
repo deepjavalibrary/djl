@@ -37,5 +37,10 @@ public class TextGenerationTest {
         AutoRegressiveSearch search = new AutoRegressiveSearch();
         Assert.assertTrue(search.mainContrastivePt(args));
         Assert.assertTrue(search.mainGreedyPt(args));
+        Assert.assertTrue(search.mainBeamPt(args));
+        Assert.assertTrue(search.mainBeamOnnx(args));
+
+        // DynamicSequenceScheduler
+        Assert.assertTrue(DynamicSequenceScheduler.mainContrastivePt());
     }
 }

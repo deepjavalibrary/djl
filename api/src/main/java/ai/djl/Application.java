@@ -88,6 +88,8 @@ public class Application {
                 return NLP.TOKEN_CLASSIFICATION;
             case "nlp/word_embedding":
                 return NLP.WORD_EMBEDDING;
+            case "nlp/text_generation":
+                return NLP.TEXT_GENERATION;
             case "tabular":
                 return Tabular.ANY;
             case "tabular/linear_regression":
@@ -260,6 +262,8 @@ public class Application {
          * ai.djl.ndarray.NDList}s instead of {@link ai.djl.ndarray.NDArray}.
          */
         Application WORD_EMBEDDING = new Application("nlp/word_embedding");
+
+        Application TEXT_GENERATION = new Application("nlp/text_generation");
 
         /**
          * An application that translates text from one language to another.
