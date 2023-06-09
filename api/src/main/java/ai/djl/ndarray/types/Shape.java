@@ -139,6 +139,15 @@ public class Shape {
     }
 
     /**
+     * Returns the last index.
+     *
+     * @return the last index
+     */
+    public long getLastDimension() {
+        return shape[shape.length - 1];
+    }
+
+    /**
      * Returns the layout type in the given dimension.
      *
      * @param dimension the dimension to get the layout type in

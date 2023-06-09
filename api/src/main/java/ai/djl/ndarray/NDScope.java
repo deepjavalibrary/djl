@@ -61,6 +61,26 @@ public class NDScope implements AutoCloseable {
         queue.getLast().resources.remove(array);
     }
 
+    /**
+     * Unregisters {@link NDArray} object from this scope.
+     *
+     * @param arrays the array of {@link NDArray} object
+     */
+    public static void unregister(NDArray... arrays) {
+        for (NDArray array : arrays) {
+            unregister(array);
+        }
+    }
+
+    /**
+     * Unregisters {@link NDArray} object from this scope.
+     *
+     * @param ndlist the {@link NDList} object
+     */
+    public static void unregister(NDList ndlist) {
+        ndlist.forEach(NDScope::unregister);
+    }
+
     /** {@inheritDoc} */
     @Override
     public void close() {

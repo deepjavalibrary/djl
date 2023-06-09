@@ -303,11 +303,14 @@ public abstract class BaseNDManager implements NDManager {
 
     /** {@inheritDoc} */
     @Override
-    public synchronized void attachInternal(String resourceId, AutoCloseable resource) {
+    public synchronized void attachInternal(String resourceId, AutoCloseable... resources) {
         if (capped.get()) {
             throw new IllegalStateException("NDManager is capped for addition of resources.");
         }
-        attachUncappedInternal(resourceId, resource);
+        for (int i = 0; i < resources.length; i++) {
+            attachUncappedInternal(
+                    resources.length == 1 ? resourceId : resourceId + "_" + i, resources[i]);
+        }
     }
 
     /** {@inheritDoc} */
