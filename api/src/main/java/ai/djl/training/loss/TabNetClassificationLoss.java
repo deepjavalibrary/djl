@@ -42,6 +42,6 @@ public final class TabNetClassificationLoss extends Loss {
     public NDArray evaluate(NDList labels, NDList predictions) {
         return Loss.softmaxCrossEntropyLoss()
                 .evaluate(labels, new NDList(predictions.get(0)))
-                .add(predictions.get(1));
+                .add(predictions.get(1).mean());
     }
 }

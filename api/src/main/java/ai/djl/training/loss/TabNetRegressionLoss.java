@@ -46,6 +46,6 @@ public class TabNetRegressionLoss extends Loss {
                 .sub(predictions.get(0))
                 .square()
                 .mean()
-                .add(predictions.get(1));
+                .add(predictions.get(1).mean());
     }
 }

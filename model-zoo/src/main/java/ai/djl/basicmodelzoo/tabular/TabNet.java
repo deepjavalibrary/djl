@@ -444,8 +444,7 @@ public final class TabNet extends AbstractBlock {
             NDArray sparseLoss =
                     mask.singletonOrThrow()
                             .mul(-1)
-                            .mul(NDArrays.add(mask.singletonOrThrow(), 1e-10).log())
-                            .mean();
+                            .mul(NDArrays.add(mask.singletonOrThrow(), 1e-10).log());
             NDList x1 = featureTransformer.forward(parameterStore, new NDList(x), training);
             return new NDList(x1.singletonOrThrow(), sparseLoss);
         }
