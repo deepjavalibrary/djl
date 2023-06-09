@@ -180,10 +180,10 @@ public final class IValueUtils {
                 vector.add((PtNDArray) ndList.get(i));
             }
             IValue[] output = vector.stream().map(IValue::from).toArray(IValue[]::new);
-            return new Pair<>(IValue.tupleFrom(output), (int) (startCount + dim));
+            return new Pair<>(IValue.tupleFrom(output), Math.toIntExact((startCount + dim)));
         }
 
-        IValue[] output = new IValue[(int) dims[0]];
+        IValue[] output = new IValue[Math.toIntExact(dims[0])];
         for (int j = 0; j < dims[level]; j++) {
             Pair<IValue, Integer> p = toTupleIValueRecur(ndList, dims, startCount, level + 1);
             startCount = p.getValue();
