@@ -139,14 +139,12 @@ public class Shape {
     }
 
     /**
-     * Returns the shape in the given dimension with possible index wrapping.
+     * Returns the last index.
      *
-     * @param dimension the dimension to get the shape in
-     * @return the shape in the given dimension
+     * @return the last index
      */
-    public long getWrap(int dimension) {
-        dimension = dimension + (dimension < 0 ? shape.length : 0);
-        return shape[dimension];
+    public long getLastDimension() {
+        return shape[shape.length - 1];
     }
 
     /**
