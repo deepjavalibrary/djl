@@ -53,22 +53,13 @@ public class GPT2PtLMBlock extends LMBlock {
             input = new NDList(input.get(0), input.get(1), attentionMask);
         }
 
-        // forward call
-        IValue[] inputNative =
-                input.stream()
-                        .map(object -> IValue.from((PtNDArray) object))
-                        .toArray(IValue[]::new);
-        IValue resultIValue =
-                ((PtSymbolBlock) blocks[0])
-                        .forward(
-                                inputNative[0],
-                                inputNative[1],
-                                inputNative[2],
-                                IValueUtils.toTupleIValue(
-                                        pastKeyValues, new long[] {config.getNumLayers(), 2}));
+        String tupleName = "past_key_values(" + config.getNumLayers() + ',' + 2 + ')';
+        for (NDArray array : pastKeyValues) {
+            array.setName(tupleName);
+        }
+        input.addAll(pastKeyValues);
 
-        NDList output = resultIValue.toNDList((PtNDManager) manager);
-        Arrays.stream(inputNative).forEach(IValue::close);
+        NDList output = blocks[0].forward(null, input, false, null);
 
         NDArray logitsOutput = output.get(0);
         NDList pastKeyValuesOutput = output.subNDList(1, config.getNumLayers() * 2 + 1);
