@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** IValueUtils is utility class to deal with IValue in PyTorch. */
@@ -33,6 +34,7 @@ public final class IValueUtils {
 
     private static final Pattern PATTERN_LIST = Pattern.compile("\\w+\\[]");
     private static final Pattern PATTERN_TUPLE = Pattern.compile("\\w+\\(\\)");
+    private static final Pattern PATTERN_TUPLE_OF_TUPLE = Pattern.compile("\\w+(\\([\\d,]+\\))");
 
     private IValueUtils() {}
 
@@ -101,6 +103,7 @@ public final class IValueUtils {
         String methodName = "forward";
         for (NDArray array : ndList) {
             String name = array.getName();
+            Matcher m;
             if (name != null && name.contains(".")) {
                 String[] strings = name.split("\\.", 2);
                 int index = addToMap(indexMap, strings[0], outputs);
@@ -116,6 +119,11 @@ public final class IValueUtils {
                 int index = addToMap(indexMap, name, outputs);
                 PairList<String, PtNDArray> pl = outputs.get(index);
                 pl.add("()", (PtNDArray) array);
+            } else if (name != null && (m = PATTERN_TUPLE_OF_TUPLE.matcher(name)).matches()) {
+                int index = addToMap(indexMap, name, outputs);
+                String key = m.group(1);
+                PairList<String, PtNDArray> pl = outputs.get(index);
+                pl.add(key, (PtNDArray) array);
             } else {
                 PairList<String, PtNDArray> pl = new PairList<>();
                 pl.add(null, (PtNDArray) array);
@@ -137,6 +145,19 @@ public final class IValueUtils {
                 // Tuple
                 IValue[] arrays = pl.values().stream().map(IValue::from).toArray(IValue[]::new);
                 ret[i] = IValue.tupleFrom(arrays);
+            } else if (key.startsWith("(")) {
+                // Tuple of tuple
+                String[] keys = key.substring(1, key.length() - 1).split(",");
+                int[] dim = Arrays.stream(keys).mapToInt(Integer::parseInt).toArray();
+                List<PtNDArray> arrays = pl.values();
+                int product = 1;
+                for (int d : dim) {
+                    product *= d;
+                }
+                if (product != arrays.size()) {
+                    throw new IllegalArgumentException("Invalid NDList tuple size: " + key);
+                }
+                ret[i] = IValueUtils.toTupleIValueRecur(arrays, dim, 0, 0).getKey();
             } else {
                 Map<String, PtNDArray> map = new ConcurrentHashMap<>();
                 for (Pair<String, PtNDArray> pair : pl) {
@@ -148,47 +169,23 @@ public final class IValueUtils {
         return new Pair<>(ret, methodName);
     }
 
-    /**
-     * Converts ndList to IValue.
-     *
-     * @param ndList the NDList to convert
-     * @param dims the shape of the output
-     * @return the result {@link IValue}
-     */
-    public static IValue toTupleIValue(NDList ndList, long[] dims) {
-        return toTupleIValueRecur(ndList, dims, 0, 0).getKey();
-    }
-
-    /**
-     * Helper function.
-     *
-     * @param ndList the NDList to convert
-     * @param dims the shape of the output
-     * @param startCount the start index of the current recursion level
-     * @param level the recursion level
-     * @return the result
-     */
     private static Pair<IValue, Integer> toTupleIValueRecur(
-            NDList ndList, long[] dims, int startCount, int level) {
-        if (startCount > ndList.size()) {
-            throw new IllegalArgumentException("startCount illegal");
-        }
+            List<PtNDArray> list, int[] dims, int start, int level) {
         if (dims.length - 1 == level) {
-            long dim = dims[level];
-            List<PtNDArray> vector = new ArrayList<>();
-            for (int i = startCount; i < startCount + dim; i++) {
-                vector.add((PtNDArray) ndList.get(i));
+            int dim = dims[level];
+            IValue[] iValues = new IValue[dim];
+            for (int i = 0; i < dim; i++) {
+                iValues[i] = IValue.from(list.get(i + start));
             }
-            IValue[] output = vector.stream().map(IValue::from).toArray(IValue[]::new);
-            return new Pair<>(IValue.tupleFrom(output), Math.toIntExact((startCount + dim)));
+            return new Pair<>(IValue.tupleFrom(iValues), Math.toIntExact((start + dim)));
         }
 
-        IValue[] output = new IValue[Math.toIntExact(dims[0])];
+        IValue[] output = new IValue[dims[0]];
         for (int j = 0; j < dims[level]; j++) {
-            Pair<IValue, Integer> p = toTupleIValueRecur(ndList, dims, startCount, level + 1);
-            startCount = p.getValue();
+            Pair<IValue, Integer> p = toTupleIValueRecur(list, dims, start, level + 1);
+            start = p.getValue();
             output[j] = p.getKey();
         }
-        return new Pair<>(IValue.tupleFrom(output), startCount);
+        return new Pair<>(IValue.tupleFrom(output), start);
     }
 }

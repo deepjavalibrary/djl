@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.util.Pair;
 
 import org.testng.Assert;
@@ -44,6 +45,47 @@ public class IValueUtilsTest {
             Assert.assertEquals(result.getValue(), "forward");
 
             Arrays.stream(iValues).forEach(IValue::close);
+        }
+    }
+
+    @Test
+    public void testTupleOfTuple() {
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
+            NDArray array1 = manager.zeros(new Shape(1));
+            array1.setName("input1(2,3)");
+            NDArray array2 = manager.ones(new Shape(2));
+            array2.setName("input1(2,3)");
+            NDArray array3 = manager.ones(new Shape(3));
+            array3.setName("input1(2,3)");
+            NDArray array4 = manager.ones(new Shape(4));
+            array4.setName("input1(2,3)");
+            NDArray array5 = manager.ones(new Shape(5));
+            array5.setName("input1(2,3)");
+            NDArray array6 = manager.ones(new Shape(6));
+            array6.setName("input1(2,3)");
+            NDList input = new NDList(array1, array2, array3, array4, array5, array6);
+            // the NDList is mapped to (input1: Tuple((t1, t2, t3), (t34, t5, t6))
+            input.attach(manager);
+
+            Pair<IValue[], String> result = IValueUtils.getInputs(input);
+            IValue[] iValues = result.getKey();
+            Assert.assertEquals(result.getValue(), "forward");
+            Assert.assertEquals(iValues.length, 1);
+            Assert.assertTrue(iValues[0].isTuple());
+
+            IValue[] tuple = iValues[0].toIValueTuple();
+            Assert.assertEquals(tuple.length, 2);
+            Assert.assertTrue(tuple[0].isTuple());
+            IValue[] subTuple = tuple[1].toIValueTuple();
+            Assert.assertEquals(subTuple.length, 3);
+            NDList output = iValues[0].toNDList(manager);
+            Assert.assertEquals(output.size(), 6);
+            Assert.assertEquals(output.get(5).getShape().get(0), 6);
+
+            Arrays.stream(iValues).forEach(IValue::close);
+
+            NDList input2 = new NDList(array1, array2);
+            Assert.assertThrows(() -> IValueUtils.getInputs(input2));
         }
     }
 
