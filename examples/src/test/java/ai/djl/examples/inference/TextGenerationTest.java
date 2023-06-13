@@ -12,9 +12,10 @@
  */
 package ai.djl.examples.inference;
 
-import ai.djl.MalformedModelException;
-import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.ModelException;
+import ai.djl.examples.inference.nlp.TextGeneration;
 import ai.djl.testing.TestRequirements;
+import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -24,23 +25,18 @@ import java.io.IOException;
 public class TextGenerationTest {
 
     @Test
-    public void testTextGeneration()
-            throws ModelNotFoundException, MalformedModelException, IOException {
+    public void testTextGeneration() throws TranslateException, ModelException, IOException {
+        TestRequirements.nightly();
         TestRequirements.engine("PyTorch");
 
-        String[] args = new String[] {};
+        String expected =
+                "DeepMind Company is a global leader in the field of artificial"
+                        + " intelligence and artificial intelligence. We are a leading provider"
+                        + " of advanced AI solutions for the automotive industry, including the"
+                        + " latest in advanced AI solutions for the automotive industry. We are"
+                        + " also a leading provider of advanced AI solutions for the automotive"
+                        + " industry, including the";
 
-        // LMBlock
-        Assert.assertEquals(LLMBlock.main(args), 0);
-
-        // LMSearch
-        AutoRegressiveSearch search = new AutoRegressiveSearch();
-        Assert.assertTrue(search.mainContrastivePt(args));
-        Assert.assertTrue(search.mainGreedyPt(args));
-        Assert.assertTrue(search.mainBeamPt(args));
-        Assert.assertTrue(search.mainBeamOnnx(args));
-
-        // DynamicSequenceScheduler
-        Assert.assertTrue(DynamicSequenceScheduler.mainContrastivePt());
+        Assert.assertEquals(TextGeneration.generateTextWithPyTorch(), expected);
     }
 }

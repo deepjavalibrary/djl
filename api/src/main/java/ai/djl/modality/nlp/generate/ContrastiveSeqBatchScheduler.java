@@ -12,12 +12,14 @@
  */
 package ai.djl.modality.nlp.generate;
 
+import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDScope;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.TranslateException;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -25,12 +27,13 @@ import java.util.stream.Collectors;
 
 public class ContrastiveSeqBatchScheduler extends SeqBatchScheduler {
 
-    public ContrastiveSeqBatchScheduler(LMBlock lmBlock, SearchConfig config) {
+    public ContrastiveSeqBatchScheduler(
+            Predictor<NDList, CausalLMOutput> lmBlock, SearchConfig config) {
         super(lmBlock, config);
     }
 
     @Override
-    public SeqBatcher initForward(NDArray inputIds, NDArray batchUids) {
+    public SeqBatcher initForward(NDArray inputIds, NDArray batchUids) throws TranslateException {
         try (NDScope scope = new NDScope()) {
             scope.suppressNotUsedWarning();
             manager = inputIds.getManager();
@@ -39,8 +42,7 @@ public class ContrastiveSeqBatchScheduler extends SeqBatchScheduler {
             NDArray positionIds = computePositionIds(inputIds, initOffSets, 0, 1);
 
             CausalLMOutput output =
-                    lmBlock.forward(
-                            new NDList(inputIds, positionIds, attentionMask), null, manager);
+                    predictor.predict(new NDList(inputIds, positionIds, attentionMask));
             NDArray lastLogits = output.getLogits().get(":, -1, :");
 
             // Used to mark the sequence dimension's ordinal number for each tensor in the
@@ -71,7 +73,7 @@ public class ContrastiveSeqBatchScheduler extends SeqBatchScheduler {
     }
 
     @Override
-    public NDArray inferenceCall() {
+    public NDArray inferenceCall() throws TranslateException {
         NDArray outputIds;
         try (NDScope scope = new NDScope()) {
             scope.suppressNotUsedWarning();
@@ -116,14 +118,10 @@ public class ContrastiveSeqBatchScheduler extends SeqBatchScheduler {
                             seqBatcher.offSets,
                             searchState.getPastOutputIds().getShape().getLastDimension(),
                             config.getK());
-            CausalLMOutput candidateOutput =
-                    lmBlock.forward(
-                            new NDList(
-                                    candidateInputIds,
-                                    candidatePositionIds,
-                                    kCopyPastAttentionMask),
-                            kCopyPastKeyValues,
-                            manager);
+            NDList modelInputs =
+                    new NDList(candidateInputIds, candidatePositionIds, kCopyPastAttentionMask);
+            modelInputs.addAll(kCopyPastKeyValues);
+            CausalLMOutput candidateOutput = predictor.predict(modelInputs);
 
             NDList generatedOutput =
                     StepGeneration.constrastiveStepGeneration(

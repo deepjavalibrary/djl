@@ -12,6 +12,7 @@
  */
 package ai.djl.modality.nlp.generate;
 
+import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -19,36 +20,36 @@ import ai.djl.ndarray.NDScope;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.nn.AbstractBlock;
-import ai.djl.training.ParameterStore;
-import ai.djl.util.PairList;
+import ai.djl.translate.TranslateException;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class LMSearch extends AbstractBlock {
+public class TextGenerator {
 
     private String searchName;
     private SearchConfig config;
-    private LMBlock lmBlock;
+    private Predictor<NDList, CausalLMOutput> predictor;
 
     private NDArray positionOffset;
 
-    public LMSearch(LMBlock lmBlock, String searchName, SearchConfig searchConfig) {
-        this.lmBlock = lmBlock;
+    public TextGenerator(
+            Predictor<NDList, CausalLMOutput> predictor,
+            String searchName,
+            SearchConfig searchConfig) {
+        this.predictor = predictor;
         this.searchName = searchName;
         this.config = searchConfig;
     }
 
-    public NDArray greedySearch(NDArray inputIds) {
+    @SuppressWarnings("try")
+    public NDArray greedySearch(NDArray inputIds) throws TranslateException {
         NDArray attentionMask = prepareAttentionMaskOffset(inputIds, config);
         NDManager manager = inputIds.getManager();
         GreedyBatchTensorList searchState =
                 new GreedyBatchTensorList(inputIds, null, null, attentionMask);
         while (true) {
-            try (NDScope scope = new NDScope()) {
-                scope.suppressNotUsedWarning();
-
+            try (NDScope ignore = new NDScope()) {
                 long pastSeqLength =
                         searchState.getPastOutputIds() == null
                                 ? 0
@@ -59,8 +60,11 @@ public class LMSearch extends AbstractBlock {
                                 searchState.getPastAttentionMask(),
                                 pastSeqLength,
                                 1);
-                CausalLMOutput modelOutput =
-                        lmBlock.forward(modelInput, searchState.getPastKeyValues(), manager);
+                NDList pastKeyValues = searchState.getPastKeyValues();
+                if (pastKeyValues != null) {
+                    modelInput.addAll(pastKeyValues);
+                }
+                CausalLMOutput modelOutput = predictor.predict(modelInput);
 
                 NDArray outputIds = StepGeneration.greedyStepGen(modelOutput.getLogits());
 
@@ -101,8 +105,16 @@ public class LMSearch extends AbstractBlock {
         return searchState.getPastOutputIds().concat(searchState.getNextInputIds(), 1);
     }
 
-    // https://huggingface.co/blog/how-to-generate
-    public NDArray beamSearch(NDArray inputIds) {
+    /**
+     * Generates text using beam search.
+     *
+     * @param inputIds input tokens ids
+     * @see https://huggingface.co/blog/how-to-generate
+     * @return output tensor
+     * @throws TranslateException if failed run forward
+     */
+    @SuppressWarnings("try")
+    public NDArray beamSearch(NDArray inputIds) throws TranslateException {
         NDArray attentionMask = prepareAttentionMaskOffset(inputIds, config);
         NDManager manager = inputIds.getManager();
         long numBeam = config.getBeam();
@@ -115,7 +127,7 @@ public class LMSearch extends AbstractBlock {
             if (searchState.getPastAttentionMask() == null) {
                 // Initial beams
                 NDList modelInput = prepareInput(inputIds, attentionMask, 0, 1);
-                CausalLMOutput modelOutput = lmBlock.forward(modelInput, null, manager);
+                CausalLMOutput modelOutput = predictor.predict(modelInput);
 
                 // [batch, probDim]
                 NDArray allProbs = modelOutput.getLogits().get(":, -1, :").softmax(1);
@@ -152,9 +164,7 @@ public class LMSearch extends AbstractBlock {
                 kvDim = pastKeyValues.get(0).getShape().getLastDimension();
             }
 
-            try (NDScope scope = new NDScope()) {
-                scope.suppressNotUsedWarning();
-
+            try (NDScope ignore = new NDScope()) {
                 long pastSeqLength = searchState.getPastOutputIds().getShape().getLastDimension();
                 NDList modelInput =
                         prepareInput(
@@ -177,7 +187,8 @@ public class LMSearch extends AbstractBlock {
                                 searchState.getPastKeyValues().stream()
                                         .map(fn)
                                         .collect(Collectors.toList()));
-                CausalLMOutput modelOutput = lmBlock.forward(modelInput, pastKeyValues, manager);
+                modelInput.addAll(pastKeyValues);
+                CausalLMOutput modelOutput = predictor.predict(modelInput);
 
                 NDList generatedOutput =
                         StepGeneration.beamStepGeneration(
@@ -212,8 +223,16 @@ public class LMSearch extends AbstractBlock {
                 .reshape(numBatch * numBeam, -1);
     }
 
-    // https://huggingface.co/blog/introducing-csearch
-    public NDArray contrastiveSearch(NDArray inputIds) {
+    /**
+     * Generates text using contrastive search.
+     *
+     * @param inputIds input token ids
+     * @see https://huggingface.co/blog/introducing-csearch
+     * @return the generated {@code NDArray}
+     * @throws TranslateException if forward failed
+     */
+    @SuppressWarnings("try")
+    public NDArray contrastiveSearch(NDArray inputIds) throws TranslateException {
         // inputIds: [batchSize, seqLength: t_init]
         // attentionMask: [batchSize, pastSeq]. seq-dim-size = |past_seq| + |inputIds|.
 
@@ -223,7 +242,7 @@ public class LMSearch extends AbstractBlock {
         while (true) {
             if (searchState.getPastKeyValues() == null) {
                 NDList modelInput = prepareInput(inputIds, attentionMask, 0, 1);
-                CausalLMOutput output = lmBlock.forward(modelInput, null, manager);
+                CausalLMOutput output = predictor.predict(modelInput);
                 NDArray lastLogits = output.getLogits().get(":, -1, :");
                 searchState =
                         new ContrastiveBatchTensorList(
@@ -239,9 +258,7 @@ public class LMSearch extends AbstractBlock {
             // (1) candidate tokens recall;
             // (2) candidate re-rank by degeneration penalty
 
-            try (NDScope scope = new NDScope()) {
-                scope.suppressNotUsedWarning();
-
+            try (NDScope ignore = new NDScope()) {
                 NDArray topKIds =
                         searchState
                                 .getLogits()
@@ -284,8 +301,8 @@ public class LMSearch extends AbstractBlock {
                                 kCopyPastAttentionMask,
                                 searchState.getPastOutputIds().getShape().getLastDimension(),
                                 config.getK());
-                CausalLMOutput candidateOutput =
-                        lmBlock.forward(candidateModelInput, kCopyPastKeyValues, manager);
+                candidateModelInput.addAll(kCopyPastKeyValues);
+                CausalLMOutput candidateOutput = predictor.predict(candidateModelInput);
 
                 NDList generatedOutput =
                         StepGeneration.constrastiveStepGeneration(
@@ -504,7 +521,7 @@ public class LMSearch extends AbstractBlock {
         return new NDList(inputIds, positionIds, attentionMask);
     }
 
-    public NDArray forward(NDArray inputIds) {
+    public NDArray forward(NDArray inputIds) throws TranslateException {
         switch (searchName) {
             case "greedy":
                 return greedySearch(inputIds);
@@ -517,21 +534,5 @@ public class LMSearch extends AbstractBlock {
                         "searchName not correctly specified. Please choose among: {greedy, beam,"
                                 + " contrastive}");
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected NDList forwardInternal(
-            ParameterStore parameterStore,
-            NDList inputs,
-            boolean training,
-            PairList<String, Object> params) {
-        return new NDList(forward(inputs.get(0)));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Shape[] getOutputShapes(Shape[] inputShapes) {
-        return new Shape[] {};
     }
 }

@@ -12,11 +12,14 @@
  */
 package ai.djl.modality.nlp.generate;
 
+import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.TranslateException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class SeqBatchScheduler {
     private static final Logger logger = LoggerFactory.getLogger(SeqBatchScheduler.class);
 
-    LMBlock lmBlock;
+    Predictor<NDList, CausalLMOutput> predictor;
     SeqBatcher seqBatcher;
 
     NDManager manager;
@@ -41,8 +44,8 @@ public abstract class SeqBatchScheduler {
 
     Map<Long, NDArray> results;
 
-    public SeqBatchScheduler(LMBlock lmBlock, SearchConfig config) {
-        this.lmBlock = lmBlock;
+    public SeqBatchScheduler(Predictor<NDList, CausalLMOutput> lmBlock, SearchConfig config) {
+        this.predictor = lmBlock;
         this.config = config;
         results = new ConcurrentHashMap<>();
     }
@@ -52,14 +55,15 @@ public abstract class SeqBatchScheduler {
      *
      * @return SeqBatcher. Stores the search state and operate on the BatchTensorList.
      */
-    public abstract SeqBatcher initForward(NDArray inputIds, NDArray batchUids);
+    public abstract SeqBatcher initForward(NDArray inputIds, NDArray batchUids)
+            throws TranslateException;
 
     /**
      * Go forward for a given number of iterations.
      *
      * @return boolean. Indicate whether the Batch is empty.
      */
-    public boolean incrementForward(int count) {
+    public boolean incrementForward(int count) throws TranslateException {
         int i = 0;
         while (i++ < count) {
             if (seqBatcher == null || seqBatcher.getData() == null) {
@@ -78,10 +82,10 @@ public abstract class SeqBatchScheduler {
         return false;
     }
 
-    abstract NDArray inferenceCall();
+    abstract NDArray inferenceCall() throws TranslateException;
 
     /** Add new batch. */
-    public void addRequest(NDArray inputIds, NDArray batchUids) {
+    public void addRequest(NDArray inputIds, NDArray batchUids) throws TranslateException {
         SeqBatcher seqBatcherNew = initForward(inputIds, batchUids);
         if (seqBatcher == null) {
             seqBatcher = seqBatcherNew;
