@@ -10,10 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.nlp;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.nlp.TextGeneration;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 

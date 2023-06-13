@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class PtGptTranslatorFactory  implements TranslatorFactory {
+public class PtGptTranslatorFactory implements TranslatorFactory {
 
     private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();
 
@@ -48,8 +48,8 @@ public class PtGptTranslatorFactory  implements TranslatorFactory {
             throw new IllegalArgumentException("Unsupported input/output types.");
         }
         long kvDim = ArgumentsUtil.longValue(arguments, "kvDim", 64);
-        int numAttentionHeads= ArgumentsUtil.intValue(arguments, "numAttentionHeads", 12);
-        int numLayers= ArgumentsUtil.intValue(arguments, "numLayers", 12);
+        int numAttentionHeads = ArgumentsUtil.intValue(arguments, "numAttentionHeads", 12);
+        int numLayers = ArgumentsUtil.intValue(arguments, "numLayers", 12);
 
         return (Translator<I, O>) (new PtGptTranslator(kvDim, numAttentionHeads, numLayers));
     }
