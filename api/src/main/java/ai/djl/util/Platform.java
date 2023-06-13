@@ -79,10 +79,14 @@ public final class Platform {
             if (platform.isPlaceholder()) {
                 placeholder = platform;
             } else if (platform.matches(systemPlatform)) {
+                logger.info("Found matching platform from: {}", url);
                 return platform;
+            } else {
+                logger.info("Ignore mismatching platform from: {}", url);
             }
         }
         if (placeholder != null) {
+            logger.info("Found placeholder platform from: {}", placeholder);
             return placeholder;
         }
 
