@@ -46,7 +46,9 @@ You can use the IDE of your choice. We recommend using IntelliJ.
 You use Gradle and Maven wrappers to build the project, so you don't need to install Gradle or Maven.
 However, you should have basic knowledge about the Gradle or Maven build system.
 
-## M1 Macs. 
-DLJ defaults to the MXNet Engine which is not supported on Macs. To get your code to run on a mac - use either:
+## M1 Mac
+
+DLJ defaults to the MXNet Engine which is not supported on M1 Macs. To get your code to run on a mac use either:
+
 1. The environment variable `DJL_DEFAULT_ENGINE=PyTorch` which you can export on the command line or set in the Edit Run Configuration in Intellij. 
 2. The runtime commandline parameter `-Dai.djl.default_engine=PyTorch` which you can add to the end of the command line when running or add in the Edit Run Configuration in Intellij. 
