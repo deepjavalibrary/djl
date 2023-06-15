@@ -18,9 +18,7 @@ theme:
     primary: light-blue
     accent: light-blue
   edit_uri: ''
-google_analytics:
-  - UA-159559852-2
-  - auto
+
 extra:
   social:
     - icon: fontawesome/brands/github-alt
@@ -31,6 +29,9 @@ extra:
       link: https://join.slack.com/t/deepjavalibrary/shared_invite/zt-ar91gjkz-qbXhr1l~LFGEIEeGBibT7w
     - icon: fontawesome/brands/zhihu
       link: https://zhuanlan.zhihu.com/c_1255493231133417472
+  analytics:
+    provider: google
+    property: G-JE0V807433
 docs_dir: '../'
 plugins:
   - search
