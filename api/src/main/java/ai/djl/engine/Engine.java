@@ -39,6 +39,7 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * The {@code Engine} interface is the base of the provided implementation for DJL.
@@ -59,6 +60,8 @@ public abstract class Engine {
     private static final Map<String, EngineProvider> ALL_ENGINES = new ConcurrentHashMap<>();
 
     private static final String DEFAULT_ENGINE = initEngine();
+    private static final Pattern PATTERN =
+            Pattern.compile("KEY|TOKEN|PASSWORD", Pattern.CASE_INSENSITIVE);
 
     private Device defaultDevice;
 
@@ -372,11 +375,11 @@ public abstract class Engine {
     @SuppressWarnings("PMD.SystemPrintln")
     public static void debugEnvironment() {
         System.out.println("----------- System Properties -----------");
-        System.getProperties().forEach((k, v) -> System.out.println(k + ": " + v));
+        System.getProperties().forEach((k, v) -> print((String) k, v));
 
         System.out.println();
         System.out.println("--------- Environment Variables ---------");
-        Utils.getenv().forEach((k, v) -> System.out.println(k + ": " + v));
+        Utils.getenv().forEach(Engine::print);
 
         System.out.println();
         System.out.println("-------------- Directories --------------");
@@ -421,5 +424,12 @@ public abstract class Engine {
         for (EngineProvider provider : ALL_ENGINES.values()) {
             System.out.println(provider.getEngineName() + ": " + provider.getEngineRank());
         }
+    }
+
+    private static void print(String key, Object value) {
+        if (PATTERN.matcher(key).find()) {
+            value = "*********";
+        }
+        System.out.println(key + ": " + value); // NOPMD
     }
 }
