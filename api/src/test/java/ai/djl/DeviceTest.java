@@ -35,6 +35,7 @@ public class DeviceTest {
         Device dev = Device.of("myDevice", 1);
         Assert.assertEquals(dev.getDeviceType(), "myDevice");
 
+        System.setProperty("test_key", "test");
         Engine.debugEnvironment();
     }
 
