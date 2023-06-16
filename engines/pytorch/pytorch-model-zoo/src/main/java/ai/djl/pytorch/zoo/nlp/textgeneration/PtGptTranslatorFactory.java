@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/** An {@link TranslatorFactory} that creates a {@link PtGptTranslator} instance. */
 public class PtGptTranslatorFactory implements TranslatorFactory {
 
     private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();

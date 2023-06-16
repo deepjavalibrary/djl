@@ -25,8 +25,8 @@ public class TextGenerationTest {
 
     @Test
     public void testTextGeneration() throws TranslateException, ModelException, IOException {
-        TestRequirements.nightly();
-        TestRequirements.engine("PyTorch");
+//        TestRequirements.nightly();
+//        TestRequirements.engine("PyTorch");
 
         String expected =
                 "DeepMind Company is a global leader in the field of artificial"

@@ -24,6 +24,7 @@ import ai.djl.translate.TranslatorContext;
 
 import java.util.stream.Collectors;
 
+/** The {@link ai.djl.translate.Translator} for PyTorch GPT2 model. */
 public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOutput> {
 
     private long kvDim;
@@ -31,6 +32,13 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
     private int numLayers;
     private String tupleName;
 
+    /**
+     * Constructs a new instance of {@code PtGptTranslator}.
+     *
+     * @param kvDim the kv dimension
+     * @param numAttentionHeads the number of attention heads
+     * @param numLayers the number of layers
+     */
     public PtGptTranslator(long kvDim, int numAttentionHeads, int numLayers) {
         this.kvDim = kvDim;
         this.numAttentionHeads = numAttentionHeads;
@@ -38,6 +46,7 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
         tupleName = "past_key_values(" + numLayers + ',' + 2 + ')';
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, NDList input) throws Exception {
         NDManager manager = ctx.getNDManager();
@@ -55,6 +64,7 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
         return input;
     }
 
+    /** {@inheritDoc} */
     @Override
     public CausalLMOutput processOutput(TranslatorContext ctx, NDList output) throws Exception {
         NDArray logitsOutput = output.get(0);
@@ -62,9 +72,10 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
         NDList pastKeyValuesOutput = output.subNDList(1, numLayers * 2 + 1);
         NDArray hiddenStatesOutput;
         if (output.size() > numLayers * 2 + 2) {
-            // TODO: Why this can happen?
-            hiddenStatesOutput = output.subNDList(numLayers * 2 + 2).get(0);
+            // TODO: Should this be 2 * numberLayers + 1?
+            hiddenStatesOutput = output.get(numLayers * 2 + 1);
         } else {
+            // TODO: In which case this will happen?
             hiddenStatesOutput = manager.zeros(new Shape(1));
         }
 

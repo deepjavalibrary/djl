@@ -50,17 +50,13 @@ public class TextGenerator {
                 new GreedyBatchTensorList(inputIds, null, null, attentionMask);
         while (true) {
             try (NDScope ignore = new NDScope()) {
-                long pastSeqLength =
-                        searchState.getPastOutputIds() == null
-                                ? 0
-                                : searchState.getPastOutputIds().getShape().getLastDimension();
-                NDList modelInput =
-                        prepareInput(
-                                searchState.getNextInputIds(),
-                                searchState.getPastAttentionMask(),
-                                pastSeqLength,
-                                1);
+                NDArray pastOutputIds = searchState.getPastOutputIds();
+                NDArray nextInputIds = searchState.getNextInputIds();
+                NDArray pastAttentionMask = searchState.getPastAttentionMask();
                 NDList pastKeyValues = searchState.getPastKeyValues();
+                long pastSeqLength =
+                        pastOutputIds == null ? 0 : pastOutputIds.getShape().getLastDimension();
+                NDList modelInput = prepareInput(nextInputIds, pastAttentionMask, pastSeqLength, 1);
                 if (pastKeyValues != null) {
                     modelInput.addAll(pastKeyValues);
                 }
@@ -69,31 +65,27 @@ public class TextGenerator {
                 NDArray outputIds = StepGeneration.greedyStepGen(modelOutput.getLogits());
 
                 // Update searchState
-                if (searchState.getPastOutputIds() == null) {
-                    searchState.setPastOutputIds(searchState.getNextInputIds());
+                if (pastOutputIds == null) {
+                    pastOutputIds = nextInputIds;
+                    searchState.setPastOutputIds(pastOutputIds);
                 } else {
-                    searchState.setPastOutputIds(
-                            searchState
-                                    .getPastOutputIds()
-                                    .concat(searchState.getNextInputIds(), 1));
+                    pastOutputIds = pastOutputIds.concat(nextInputIds, 1);
+                    searchState.setPastOutputIds(pastOutputIds);
                 }
-                searchState.setNextInputIds(outputIds);
-                searchState.setPastKeyValues(modelOutput.getPastKeyValuesList());
-                searchState.setPastAttentionMask(
-                        searchState
-                                .getPastAttentionMask()
-                                .concat(
-                                        manager.ones(
-                                                new Shape(inputIds.getShape().get(0), 1),
-                                                DataType.INT64),
-                                        1));
+                nextInputIds = outputIds;
+                searchState.setNextInputIds(nextInputIds);
+                pastKeyValues = modelOutput.getPastKeyValuesList();
+                searchState.setPastKeyValues(pastKeyValues);
+                pastAttentionMask =
+                        pastAttentionMask.concat(
+                                manager.ones(
+                                        new Shape(inputIds.getShape().get(0), 1), DataType.INT64),
+                                1);
+                searchState.setPastAttentionMask(pastAttentionMask);
 
                 // memory management
-                NDScope.unregister(
-                        searchState.getNextInputIds(),
-                        searchState.getPastAttentionMask(),
-                        searchState.getPastOutputIds());
-                NDScope.unregister(searchState.getPastKeyValues());
+                NDScope.unregister(nextInputIds, pastAttentionMask, pastOutputIds);
+                NDScope.unregister(pastKeyValues);
             }
 
             // Termination Criteria
@@ -109,7 +101,7 @@ public class TextGenerator {
      * Generates text using beam search.
      *
      * @param inputIds input tokens ids
-     * @see https://huggingface.co/blog/how-to-generate
+     * @see <a href="https://huggingface.co/blog/how-to-generate">Beam Search</a>
      * @return output tensor
      * @throws TranslateException if failed run forward
      */
@@ -227,7 +219,7 @@ public class TextGenerator {
      * Generates text using contrastive search.
      *
      * @param inputIds input token ids
-     * @see https://huggingface.co/blog/introducing-csearch
+     * @see <a href="https://huggingface.co/blog/introducing-csearch">Contrastive Search</a>
      * @return the generated {@code NDArray}
      * @throws TranslateException if forward failed
      */
