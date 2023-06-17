@@ -42,7 +42,6 @@ public class XgbModelTest {
 
     @BeforeClass
     public void downloadXGBoostModel() throws IOException {
-        TestRequirements.notArm();
         TestRequirements.notWindows();
 
         Path modelDir = Paths.get("build/model");
