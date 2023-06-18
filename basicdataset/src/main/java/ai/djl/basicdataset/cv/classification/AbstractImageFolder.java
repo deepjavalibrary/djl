@@ -128,7 +128,7 @@ public abstract class AbstractImageFolder extends ImageClassificationDataset {
 
     protected abstract Path getImagePath(String key);
 
-    private boolean isImage(File file) {
+    protected boolean isImage(File file) {
         String path = file.getName();
         if (!file.isFile() || file.isHidden() || path.startsWith(".")) {
             return false;
