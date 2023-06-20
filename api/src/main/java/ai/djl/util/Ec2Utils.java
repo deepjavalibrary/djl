@@ -51,7 +51,12 @@ public final class Ec2Utils {
      * @return true if the current environment is SageMaker
      */
     public static boolean isSageMaker() {
-        return Files.exists(Paths.get(ENDPOINT_METADATA_FILE));
+        try {
+            return Files.exists(Paths.get(ENDPOINT_METADATA_FILE));
+        } catch (SecurityException e) {
+            logger.warn("Security manager doesn't allow access file");
+            return false;
+        }
     }
 
     /**
