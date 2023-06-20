@@ -17,6 +17,7 @@ import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
 
+import org.bytedeco.javacpp.Loader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,9 @@ public final class LibUtils {
             // workaround javacpp physical memory check bug
             System.setProperty("org.bytedeco.javacpp.maxBytes", "0");
             System.setProperty("org.bytedeco.javacpp.maxPhysicalBytes", "0");
+
+            // https://github.com/deepjavalibrary/djl/issues/2318
+            Loader.loadProperties(true);
         }
         // defer to tensorflow-core-api to handle loading native library.
     }
