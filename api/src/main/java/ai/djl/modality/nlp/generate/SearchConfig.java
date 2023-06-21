@@ -30,7 +30,7 @@ public class SearchConfig {
         this.maxSeqLength = 30;
         this.eosTokenId = 50256;
         this.padTokenId = 50256;
-        this.suffixPadding = true;
+        this.suffixPadding = false;
     }
 
     /**
