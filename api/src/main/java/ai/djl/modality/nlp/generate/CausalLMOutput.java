@@ -32,11 +32,24 @@ public class CausalLMOutput {
     // The cache of past sequence. seq-dim-size == |seq_past| + |inputIds|
     private NDList pastKeyValuesList;
 
+    /**
+     * Construct the CausalLMOutput.
+     *
+     * @param logits the logits NDArray
+     * @param pastKeyValues the key-value cache
+     */
     public CausalLMOutput(NDArray logits, NDList pastKeyValues) {
         this.logits = logits;
         this.pastKeyValuesList = pastKeyValues;
     }
 
+    /**
+     * Construct the CausalLMOutput.
+     *
+     * @param logits the logits NDArray
+     * @param hiddenState the first layer hiddenStates used as word embedding
+     * @param pastKeyValueList the key-value cache
+     */
     public CausalLMOutput(NDArray logits, NDArray hiddenState, NDList pastKeyValueList) {
         this.logits = logits;
         this.pastKeyValuesList = pastKeyValueList;
@@ -52,6 +65,11 @@ public class CausalLMOutput {
         return logits;
     }
 
+    /**
+     * Sets the value of the logits.
+     *
+     * @param logits value of logits NDArray
+     */
     public void setLogits(NDArray logits) {
         this.logits = logits;
     }

@@ -18,10 +18,25 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 
+/**
+ * {@code StepGeneration} is a utility class containing the step generation utility functions used
+ * in autoregressive search.
+ */
 public final class StepGeneration {
 
     private StepGeneration() {}
 
+    /**
+     * Generate the output token id and selecting indices used in contrastive search.
+     *
+     * @param topKIds the topk candidate token ids
+     * @param logits the logits from the language model
+     * @param contextHiddenStates the embedding of the past generated token ids
+     * @param topkHiddenStates the embedding of the topk candidate token ids
+     * @param offSets the offsets
+     * @param alpha the repetition penalty
+     * @return the output token ids and selecting indices
+     */
     public static NDList constrastiveStepGeneration(
             NDArray topKIds,
             NDArray logits,
@@ -80,6 +95,12 @@ public final class StepGeneration {
     // b = torch.randn(batch, topK, dim)
     // result = torch.einsum('bik,bjk->bij', a, b)
 
+    /**
+     * Generate the output token id for greedy search.
+     *
+     * @param logits the logits from the language model
+     * @return the output token ids
+     */
     public static NDArray greedyStepGen(NDArray logits) {
         // logits:  [batch, seq, probDim]
         assert logits.getShape().getShape().length == 3 : "unexpected input";
@@ -87,6 +108,15 @@ public final class StepGeneration {
         return logits.argMax(-1).expandDims(1); // [batch, vacDim]
     }
 
+    /**
+     * Generate the output token id and selecting indices used in beam search.
+     *
+     * @param lastProbs the probabilities of the past prefix sequences
+     * @param logits the logits
+     * @param numBatch number of batch
+     * @param numBeam number of beam
+     * @return the output token ids and selecting indices
+     */
     public static NDList beamStepGeneration(
             NDArray lastProbs, NDArray logits, long numBatch, long numBeam) {
         // [batch * beamSource, seq, probDim] -> [batch, beamSource, probDim]

@@ -25,13 +25,24 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * {@code ContrastiveSeqBatchScheduler} is a class which implements the contrastive search algorithm
+ * used in SeqBatchScheduler.
+ */
 public class ContrastiveSeqBatchScheduler extends SeqBatchScheduler {
 
+    /**
+     * Construct a ContrastiveSeqBatchScheduler.
+     *
+     * @param lmBlock the predictor containing language model
+     * @param config the autoregressive search configuration
+     */
     public ContrastiveSeqBatchScheduler(
             Predictor<NDList, CausalLMOutput> lmBlock, SearchConfig config) {
         super(lmBlock, config);
     }
 
+    /** {@inheritDoc} */
     @Override
     public SeqBatcher initForward(NDArray inputIds, NDArray batchUids) throws TranslateException {
         try (NDScope scope = new NDScope()) {
@@ -72,6 +83,7 @@ public class ContrastiveSeqBatchScheduler extends SeqBatchScheduler {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray inferenceCall() throws TranslateException {
         NDArray outputIds;

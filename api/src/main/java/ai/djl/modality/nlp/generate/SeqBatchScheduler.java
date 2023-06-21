@@ -27,11 +27,13 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-// This is a scheduler, serving as an API to the consumer of the system, allowing for three major
-// actions: initForward, addBatch, fastForward, collectResults.
-// An optimal control sequence should be solved, after considering the time consumption of each
-// action, the batch size and sequence length of queueing requests. Such optimal control solver
-// needs additional effort. Primitive policy is setting several thresholds.
+/**
+ * This is a scheduler, serving as an API to the consumer of the system, allowing for three major
+ * actions: initForward, addBatch, fastForward, collectResults. An optimal control sequence should
+ * be solved, after considering the time consumption of each action, the batch size and sequence
+ * length of queueing requests. Such optimal control solver needs additional effort. Primitive
+ * policy is setting several thresholds.
+ */
 public abstract class SeqBatchScheduler {
     private static final Logger logger = LoggerFactory.getLogger(SeqBatchScheduler.class);
 
@@ -44,6 +46,12 @@ public abstract class SeqBatchScheduler {
 
     Map<Long, NDArray> results;
 
+    /**
+     * Constructor of seqBatchScheduler.
+     *
+     * @param lmBlock the predictor that cont
+     * @param config the search parameter configuration
+     */
     public SeqBatchScheduler(Predictor<NDList, CausalLMOutput> lmBlock, SearchConfig config) {
         this.predictor = lmBlock;
         this.config = config;
@@ -51,9 +59,12 @@ public abstract class SeqBatchScheduler {
     }
 
     /**
-     * Initialize the iteration and SeqBatcher
+     * Initialize the iteration and SeqBatcher.
      *
-     * @return SeqBatcher. Stores the search state and operate on the BatchTensorList.
+     * @param inputIds the input token ids.
+     * @param batchUids the request uid identifying a sequence
+     * @return SeqBatcher Stores the search state and operate on the BatchTensorList
+     * @throws TranslateException if forward fails
      */
     public abstract SeqBatcher initForward(NDArray inputIds, NDArray batchUids)
             throws TranslateException;
@@ -61,7 +72,9 @@ public abstract class SeqBatchScheduler {
     /**
      * Go forward for a given number of iterations.
      *
-     * @return boolean. Indicate whether the Batch is empty.
+     * @param count the time of forward calls
+     * @return boolean Indicate whether the Batch is empty
+     * @throws TranslateException if forward fails
      */
     public boolean incrementForward(int count) throws TranslateException {
         int i = 0;
@@ -82,9 +95,21 @@ public abstract class SeqBatchScheduler {
         return false;
     }
 
+    /**
+     * An inference call in an iteration.
+     *
+     * @return the output token ids
+     * @throws TranslateException if forward fails
+     */
     abstract NDArray inferenceCall() throws TranslateException;
 
-    /** Add new batch. */
+    /**
+     * Add new batch.
+     *
+     * @param inputIds the input token ids.
+     * @param batchUids the request uid identifying a sequence
+     * @throws TranslateException if forward fails
+     */
     public void addRequest(NDArray inputIds, NDArray batchUids) throws TranslateException {
         SeqBatcher seqBatcherNew = initForward(inputIds, batchUids);
         if (seqBatcher == null) {
@@ -94,13 +119,24 @@ public abstract class SeqBatchScheduler {
         }
     }
 
-    /** Collect finished results. */
+    /**
+     * Collect finished results.
+     *
+     * @return the outputs stored as a map from requestUid to output token ids
+     */
     public Map<Long, NDArray> collectResults() {
         Map<Long, NDArray> output = results;
         results = new ConcurrentHashMap<>();
         return output;
     }
 
+    /**
+     * Compute the offSets by linear search from the left.
+     *
+     * @param inputIds input token ids
+     * @param config search configuration
+     * @return the offsets NDArray
+     */
     static NDArray computeOffSets(NDArray inputIds, SearchConfig config) {
         int numBatch = Math.toIntExact(inputIds.getShape().get(0));
         int initSeqSize = Math.toIntExact(inputIds.getShape().get(1));
@@ -123,6 +159,13 @@ public abstract class SeqBatchScheduler {
         return manager.create(offSetsArray).reshape(-1, 1);
     }
 
+    /**
+     * Compute the attention mask by linear search from the left.
+     *
+     * @param inputIds input token ids
+     * @param config search configuration
+     * @return the attention mask NDArray
+     */
     static NDArray computeAttentionMask(NDArray inputIds, SearchConfig config) {
         int numBatch = Math.toIntExact(inputIds.getShape().get(0));
         int initSeqSize = Math.toIntExact(inputIds.getShape().get(1));
@@ -150,6 +193,16 @@ public abstract class SeqBatchScheduler {
         return attentionMask;
     }
 
+    /**
+     * Compute the position ids by linear search from the left.
+     *
+     * @param inputIds input token ids
+     * @param offSets the offset
+     * @param pastSeqLength past sequence length
+     * @param repeat the number of repeats used in interleave-repeating the position_ids to multiple
+     *     rows
+     * @return the position ids NDArray
+     */
     static NDArray computePositionIds(
             NDArray inputIds, NDArray offSets, long pastSeqLength, int repeat) {
         NDManager manager = inputIds.getManager();

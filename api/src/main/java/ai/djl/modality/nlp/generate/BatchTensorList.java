@@ -14,13 +14,12 @@ package ai.djl.modality.nlp.generate;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-
-// BatchTensorList represents a search state, and the NDArrays inside are updated in each iteration
-// of the
-// autoregressive loop.
-// It is a struct consisting of NDArrays, whose first dimension is batch, and also contains
-// sequence dimension (whose position in tensor's shape is specified by seqDimOrder).
-// The SeqBatcher batch operations will operate on these two dimensions.
+/**
+ * BatchTensorList represents a search state, and the NDArrays inside are updated in each iteration
+ * of the autoregressive loop It is a struct consisting of NDArrays, whose first dimension is batch,
+ * and also contains sequence dimension (whose position in tensor's shape is specified by seqDimOrder).
+ * The SeqBatcher batch operations will operate on these two dimensions.
+ */
 public abstract class BatchTensorList {
     // [batch, seq_past]. seq-dim-size == |past_seq| + |inputIds|. Will grow.
     private NDArray pastOutputIds;
@@ -39,6 +38,13 @@ public abstract class BatchTensorList {
 
     BatchTensorList() {}
 
+    /**
+     * Constructs a BatchTensorList.
+     *
+     * @param list the NDList that contains the serialized version of the batch tensors
+     * @param seqDimOrder the sequence dimension order that specifies where the sequence dimension
+     *     is in a tensor's shape
+     */
     BatchTensorList(NDList list, long[] seqDimOrder) {
         this.seqDimOrder = seqDimOrder;
         pastOutputIds = list.get(0);
@@ -46,6 +52,15 @@ public abstract class BatchTensorList {
         pastKeyValues = list.subNDList(2);
     }
 
+    /**
+     * Constructs a BatchTensorList.
+     *
+     * @param pastOutputIds past output token ids
+     * @param pastAttentionMask past attention mask
+     * @param pastKeyValues past kv cache
+     * @param seqDimOrder the sequence dimension order that specifies where the sequence dimension
+     *     is in a tensor's shape
+     */
     BatchTensorList(
             NDArray pastOutputIds,
             NDArray pastAttentionMask,
@@ -57,11 +72,32 @@ public abstract class BatchTensorList {
         this.seqDimOrder = seqDimOrder;
     }
 
+    /**
+     * Construct a BatchTensorList from the serialized version of the batch tensors. The
+     * pastOutputIds has to be the first in the output list.
+     *
+     * @param inputList the serialized version of the batch tensors
+     * @param seqDimOrder the sequence dimension order that specifies where the sequence dimension
+     *     is in a tensor's shape
+     * @return BatchTensorList
+     */
     public abstract BatchTensorList fromList(NDList inputList, long[] seqDimOrder);
 
-    // The pastOutputIds has to be the first in the output list
+    /**
+     * Gets the serialized version of the BatchTensorList. The pastOutputIds has to be the first in
+     * the output list.
+     *
+     * @return the NDList that contains the serialized BatchTensorList
+     */
     public abstract NDList getList();
 
+    /**
+     * Gets the sequence dimension order which specifies where the sequence dimension is in a
+     * tensor's shape.
+     *
+     * @return the sequence dimension order which specifies where the sequence dimension is in a
+     *     tensor's shape
+     */
     public long[] getSeqDimOrder() {
         return seqDimOrder;
     }
@@ -75,6 +111,11 @@ public abstract class BatchTensorList {
         return pastOutputIds;
     }
 
+    /**
+     * Sets the past output token ids.
+     *
+     * @param pastOutputIds the past output token ids
+     */
     public void setPastOutputIds(NDArray pastOutputIds) {
         this.pastOutputIds = pastOutputIds;
     }
@@ -88,6 +129,11 @@ public abstract class BatchTensorList {
         return pastAttentionMask;
     }
 
+    /**
+     * Sets the attention mask.
+     *
+     * @param pastAttentionMask the attention mask
+     */
     public void setPastAttentionMask(NDArray pastAttentionMask) {
         this.pastAttentionMask = pastAttentionMask;
     }
@@ -101,10 +147,22 @@ public abstract class BatchTensorList {
         return pastKeyValues;
     }
 
+    /**
+     * Sets the kv cache.
+     *
+     * @param pastKeyValues the kv cache
+     */
     public void setPastKeyValues(NDList pastKeyValues) {
         this.pastKeyValues = pastKeyValues;
     }
 
+    /**
+     * Sets the sequence dimension order which specifies where the sequence dimension is in a
+     * tensor's shape.
+     *
+     * @param seqDimOrder the sequence dimension order which specifies where the sequence dimension
+     *     is in a tensor's shape
+     */
     public void setSeqDimOrder(long[] seqDimOrder) {
         this.seqDimOrder = seqDimOrder;
     }

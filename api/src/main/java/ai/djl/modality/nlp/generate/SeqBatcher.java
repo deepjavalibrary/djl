@@ -24,8 +24,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-// This stores the search state (BatchTensorList), the control variables (e.g. seqLength, offSets,
-// etc), and batch operations (merge, trim, exitCriteria, etc) on BatchTensorList.
+/**
+ * {@code SeqBatcher} stores the search state (BatchTensorList), the control variables (e.g.
+ * seqLength, offSets, etc), and batch operations (merge, trim, exitCriteria, etc) on
+ * BatchTensorList.
+ */
 public class SeqBatcher {
     NDManager manager;
 
@@ -56,17 +59,32 @@ public class SeqBatcher {
         exitIndexEndPosition = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Get the batch data which is stored as a {@code BatchTensorList}.
+     *
+     * @return the batch data stored as BatchTensorList
+     */
     public BatchTensorList getData() {
         return data;
     }
 
-    /** Add new batch. Modify the batch dimension and the left padding. */
+    /**
+     * Add new batch. Modify the batch dimension and the left padding.
+     *
+     * @param seqBatcherNew the seqBatcher to add.
+     */
     public void addBatch(SeqBatcher seqBatcherNew) {
         merge(this, seqBatcherNew, seqLength - seqBatcherNew.seqLength);
         // manager and finishedSequences stay the same;
     }
 
-    /** Merge two batchers together. Modify the batch dimension and the left padding. */
+    /**
+     * Merge two batchers together. Modify the batch dimension and the left padding.
+     *
+     * @param seqBatcher1 the first seqBatcher
+     * @param seqBatcher2 the second seqBatcher
+     * @param seqDelta the sequence length difference
+     */
     private void merge(SeqBatcher seqBatcher1, SeqBatcher seqBatcher2, long seqDelta) {
         if (seqDelta < 0) {
             SeqBatcher swapTmp = seqBatcher1;
@@ -149,6 +167,10 @@ public class SeqBatcher {
     /**
      * Check which batch needs to exit, according certain criteria like EOS or maxLength. It is an
      * iteration over batch and is thus also considered as batch operation.
+     *
+     * @param outputIds output token ids in an incremental forward call
+     * @param maxLength max total sequence length
+     * @param eosTokenId end of sentence token id
      */
     public void exitCriteria(NDArray outputIds, long maxLength, long eosTokenId) {
         long[] outputIdsArray = outputIds.toLongArray();
@@ -162,7 +184,11 @@ public class SeqBatcher {
         }
     }
 
-    /** Collect the finished sequences and trim the left padding. */
+    /**
+     * Collect the finished sequences and trim the left padding.
+     *
+     * @return a map that stores request id to output token ids
+     */
     public Map<Long, NDArray> collectAndTrim() {
         if (exitIndexEndPosition.isEmpty()) {
             return new ConcurrentHashMap<>();
@@ -261,6 +287,11 @@ public class SeqBatcher {
         }
     }
 
+    /**
+     * Compute the position ids by linear search from the left.
+     *
+     * @return the boolean indicating whether all sequences are empty
+     */
     public boolean sequenceComplete() {
         return !exitIndexEndPosition.isEmpty();
     }

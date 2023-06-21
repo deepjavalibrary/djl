@@ -25,6 +25,11 @@ import ai.djl.translate.TranslateException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * {@code TextGenerator} is an LMSearch (language model search) which contains multiple
+ * autoregressive search methods. It has a Predictor from NDList to CausalLMOutput, which is called
+ * inside an autoregressive inference loop.
+ */
 public class TextGenerator {
 
     private String searchName;
@@ -33,6 +38,13 @@ public class TextGenerator {
 
     private NDArray positionOffset;
 
+    /**
+     * Construct a text generator.
+     *
+     * @param predictor the language model
+     * @param searchName the autoregressive search name
+     * @param searchConfig the autoregressive search configuration
+     */
     public TextGenerator(
             Predictor<NDList, CausalLMOutput> predictor,
             String searchName,
@@ -42,6 +54,13 @@ public class TextGenerator {
         this.config = searchConfig;
     }
 
+    /**
+     * Greedy search.
+     *
+     * @param inputIds the input token ids.
+     * @return the output token ids stored as NDArray
+     * @throws TranslateException if forward fails
+     */
     @SuppressWarnings("try")
     public NDArray greedySearch(NDArray inputIds) throws TranslateException {
         NDArray attentionMask = prepareAttentionMaskOffset(inputIds, config);
@@ -513,6 +532,13 @@ public class TextGenerator {
         return new NDList(inputIds, positionIds, attentionMask);
     }
 
+    /**
+     * Forward function call to generate text.
+     *
+     * @param inputIds the input token ids
+     * @return generated token ids
+     * @throws TranslateException if prediction fails
+     */
     public NDArray forward(NDArray inputIds) throws TranslateException {
         switch (searchName) {
             case "greedy":

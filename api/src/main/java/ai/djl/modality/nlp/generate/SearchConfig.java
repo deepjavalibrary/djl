@@ -12,6 +12,10 @@
  */
 package ai.djl.modality.nlp.generate;
 
+/**
+ * {@code SearchConfig} is a class whose fields are parameters used for autoregressive search / text
+ * generation.
+ */
 public class SearchConfig {
 
     private int k;
@@ -30,7 +34,7 @@ public class SearchConfig {
         this.maxSeqLength = 30;
         this.eosTokenId = 50256;
         this.padTokenId = 50256;
-        this.suffixPadding = true;
+        this.suffixPadding = false;
     }
 
     /**
@@ -42,6 +46,11 @@ public class SearchConfig {
         return k;
     }
 
+    /**
+     * Sets the value for the topk choice.
+     *
+     * @param k the value for topk choice
+     */
     public void setK(int k) {
         this.k = k;
     }
@@ -55,6 +64,11 @@ public class SearchConfig {
         return alpha;
     }
 
+    /**
+     * Sets the value of alpha the penalty for repetition.
+     *
+     * @param alpha the value of the penalty for repetition
+     */
     public void setAlpha(float alpha) {
         this.alpha = alpha;
     }
@@ -68,6 +82,11 @@ public class SearchConfig {
         return beam;
     }
 
+    /**
+     * Sets the value of beam size.
+     *
+     * @param beam the value of beam size
+     */
     public void setBeam(int beam) {
         this.beam = beam;
     }
@@ -81,6 +100,11 @@ public class SearchConfig {
         return maxSeqLength;
     }
 
+    /**
+     * Sets the value of max sequence length.
+     *
+     * @param maxSeqLength the value max sequence length
+     */
     public void setMaxSeqLength(int maxSeqLength) {
         this.maxSeqLength = maxSeqLength;
     }
@@ -94,6 +118,11 @@ public class SearchConfig {
         return padTokenId;
     }
 
+    /**
+     * Sets the value of padTokenId.
+     *
+     * @param padTokenId the token id for padding
+     */
     public void setPadTokenId(long padTokenId) {
         this.padTokenId = padTokenId;
     }
@@ -116,6 +145,11 @@ public class SearchConfig {
         return suffixPadding;
     }
 
+    /**
+     * Sets the value of suffixPadding or rightPadding.
+     *
+     * @param suffixPadding whether the padding is from right
+     */
     public void setSuffixPadding(boolean suffixPadding) {
         this.suffixPadding = suffixPadding;
     }
