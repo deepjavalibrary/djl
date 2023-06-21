@@ -89,8 +89,8 @@ public final class AutoRegressiveSearch {
             NDArray expected =
                     manager.create(
                             new long[][] {
-                                {284, 8494, 3716, 2761, 11, 884, 355, 1692, 1535, 11},
-                                {4436, 329, 257, 2910, 1332, 13, 632, 373, 257, 3487}
+                                {1212, 2708, 318, 546, 262, 2095, 13, 921, 743, 307},
+                                {379, 502, 351, 10953, 287, 607, 2951, 13, 366, 40}
                             });
             return output.get(":, -10:").equals(expected);
         }

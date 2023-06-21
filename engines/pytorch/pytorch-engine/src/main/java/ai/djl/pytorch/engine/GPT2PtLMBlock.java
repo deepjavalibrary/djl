@@ -22,10 +22,7 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
-import ai.djl.pytorch.jni.IValue;
-import ai.djl.pytorch.jni.IValueUtils;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class GPT2PtLMBlock extends LMBlock {
@@ -65,7 +62,7 @@ public class GPT2PtLMBlock extends LMBlock {
         NDList pastKeyValuesOutput = output.subNDList(1, config.getNumLayers() * 2 + 1);
         NDArray hiddenStatesOutput = manager.zeros(new Shape(1));
         if (output.size() > config.getNumLayers() * 2 + 2) {
-            hiddenStatesOutput = output.subNDList(config.getNumLayers() * 2 + 2).get(0);
+            hiddenStatesOutput = output.subNDList(config.getNumLayers() * 2 + 1).get(0);
         }
 
         if (flagDummyKvCach) {
