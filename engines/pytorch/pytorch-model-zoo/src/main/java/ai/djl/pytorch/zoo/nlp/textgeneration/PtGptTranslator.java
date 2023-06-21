@@ -58,7 +58,7 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
                     manager.zeros(new Shape(batchSize, 1), DataType.INT64)
                             .concat(attentionMask, -1);
             input.set(2, attentionMask);
-            addInitialPastKeyValues(input, input.get(0), manager);
+            addInitialDummyPastKeyValues(input, input.get(0), manager);
         }
 
         return input;
@@ -71,11 +71,11 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
         NDManager manager = output.getManager();
         NDList pastKeyValuesOutput = output.subNDList(1, numLayers * 2 + 1);
         NDArray hiddenStatesOutput;
-        if (output.size() > numLayers * 2 + 2) {
-            // TODO: Should this be 2 * numberLayers + 1?
+        if (output.size() > numLayers * 2 + 1) {
             hiddenStatesOutput = output.get(numLayers * 2 + 1);
         } else {
-            // TODO: In which case this will happen?
+            // If the traced_GPT2 model outputs hiddenStates, then this is not executed. If the
+            // provided traced model doesn't output hiddenStates, we can throw a warning here.
             hiddenStatesOutput = manager.zeros(new Shape(1));
         }
 
@@ -95,7 +95,7 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
         return new CausalLMOutput(logitsOutput, hiddenStatesOutput, pastKeyValuesOutput);
     }
 
-    private void addInitialPastKeyValues(NDList list, NDArray inputIds, NDManager manager) {
+    private void addInitialDummyPastKeyValues(NDList list, NDArray inputIds, NDManager manager) {
         long numBatch = inputIds.getShape().get(0);
         for (int i = 0; i < numLayers * 2; ++i) {
             NDArray array = manager.zeros(new Shape(numBatch, numAttentionHeads, 1, kvDim));
