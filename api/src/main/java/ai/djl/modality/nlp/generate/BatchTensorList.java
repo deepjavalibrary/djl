@@ -14,11 +14,12 @@ package ai.djl.modality.nlp.generate;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+
 /**
  * BatchTensorList represents a search state, and the NDArrays inside are updated in each iteration
  * of the autoregressive loop It is a struct consisting of NDArrays, whose first dimension is batch,
- * and also contains sequence dimension (whose position in tensor's shape is specified by seqDimOrder).
- * The SeqBatcher batch operations will operate on these two dimensions.
+ * and also contains sequence dimension (whose position in tensor's shape is specified by
+ * seqDimOrder). The SeqBatcher batch operations will operate on these two dimensions.
  */
 public abstract class BatchTensorList {
     // [batch, seq_past]. seq-dim-size == |past_seq| + |inputIds|. Will grow.
