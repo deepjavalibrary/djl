@@ -181,6 +181,9 @@ public class Criteria<I, O> {
                 }
             }
         }
+        logger.debug(
+                "If you're on an MacOS arch64 (Apple Silicon) you may be getting here "+
+                        "because you do not have the pytorch-model-zoo dependency installed.");
         throw new ModelNotFoundException(
                 "No model with the specified URI or the matching Input/Output type is found.",
                 lastException);
