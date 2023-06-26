@@ -47,7 +47,7 @@ public abstract class SeqBatchScheduler {
     Map<Long, NDArray> results;
 
     /**
-     * Constructor of seqBatchScheduler.
+     * Constructs a new {@code SeqBatchScheduler} instance.
      *
      * @param lmBlock the predictor that cont
      * @param config the search parameter configuration
@@ -59,7 +59,7 @@ public abstract class SeqBatchScheduler {
     }
 
     /**
-     * Initialize the iteration and SeqBatcher.
+     * Initializes the iteration and SeqBatcher.
      *
      * @param inputIds the input token ids.
      * @param batchUids the request uid identifying a sequence
@@ -70,7 +70,7 @@ public abstract class SeqBatchScheduler {
             throws TranslateException;
 
     /**
-     * Go forward for a given number of iterations.
+     * Executes forward for a given number of iterations.
      *
      * @param count the time of forward calls
      * @return boolean Indicate whether the Batch is empty
@@ -104,7 +104,7 @@ public abstract class SeqBatchScheduler {
     abstract NDArray inferenceCall() throws TranslateException;
 
     /**
-     * Add new batch.
+     * Adds new batch.
      *
      * @param inputIds the input token ids.
      * @param batchUids the request uid identifying a sequence
@@ -120,7 +120,7 @@ public abstract class SeqBatchScheduler {
     }
 
     /**
-     * Collect finished results.
+     * Collects finished results.
      *
      * @return the outputs stored as a map from requestUid to output token ids
      */
@@ -131,7 +131,7 @@ public abstract class SeqBatchScheduler {
     }
 
     /**
-     * Compute the offSets by linear search from the left.
+     * Computes the offSets by linear search from the left.
      *
      * @param inputIds input token ids
      * @param config search configuration
@@ -160,7 +160,7 @@ public abstract class SeqBatchScheduler {
     }
 
     /**
-     * Compute the attention mask by linear search from the left.
+     * Computes the attention mask by linear search from the left.
      *
      * @param inputIds input token ids
      * @param config search configuration
@@ -194,7 +194,7 @@ public abstract class SeqBatchScheduler {
     }
 
     /**
-     * Compute the position ids by linear search from the left.
+     * Computes the position ids by linear search from the left.
      *
      * @param inputIds input token ids
      * @param offSets the offset

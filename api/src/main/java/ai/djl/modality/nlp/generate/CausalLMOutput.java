@@ -33,7 +33,7 @@ public class CausalLMOutput {
     private NDList pastKeyValuesList;
 
     /**
-     * Construct the CausalLMOutput.
+     * Constructs a new {@code CausalLMOutput} instance.
      *
      * @param logits the logits NDArray
      * @param pastKeyValues the key-value cache
@@ -44,7 +44,7 @@ public class CausalLMOutput {
     }
 
     /**
-     * Construct the CausalLMOutput.
+     * Constructs a new {@code CausalLMOutput} intance.
      *
      * @param logits the logits NDArray
      * @param hiddenState the first layer hiddenStates used as word embedding
@@ -57,7 +57,7 @@ public class CausalLMOutput {
     }
 
     /**
-     * Gets the value of the logits.
+     * Returns the value of the logits.
      *
      * @return the value of logits
      */
@@ -75,7 +75,7 @@ public class CausalLMOutput {
     }
 
     /**
-     * Gets the value of the allHiddenStates.
+     * Returns the value of the allHiddenStates.
      *
      * @return the value of allHiddenStates
      */
@@ -84,7 +84,7 @@ public class CausalLMOutput {
     }
 
     /**
-     * Gets the value of the pastKeyValuesList.
+     * Returns the value of the pastKeyValuesList.
      *
      * @return the value of pastKeyValuesList
      */

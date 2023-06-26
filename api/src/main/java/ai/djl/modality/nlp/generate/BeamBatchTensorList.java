@@ -16,6 +16,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 
 class BeamBatchTensorList extends BatchTensorList {
+
     // [batch, beam, seq=1]
     private NDArray nextInputIds;
 
@@ -51,18 +52,20 @@ class BeamBatchTensorList extends BatchTensorList {
         this.lastProbs = lastProb;
     }
 
+    /** {@inheritDoc} */
     @Override
     public BatchTensorList fromList(NDList inputList, long[] seqDimOrder) {
         return new BeamBatchTensorList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList getList() {
         return new NDList();
     }
 
     /**
-     * Gets the value of the nextInputIds.
+     * Returns the value of the nextInputIds.
      *
      * @return the value of nextInputIds
      */
@@ -75,7 +78,7 @@ class BeamBatchTensorList extends BatchTensorList {
     }
 
     /**
-     * Gets the value of the lastProbs.
+     * Returns the value of the lastProbs.
      *
      * @return the value of lastProbs
      */
@@ -87,46 +90,37 @@ class BeamBatchTensorList extends BatchTensorList {
         this.lastProbs = lastProbs;
     }
 
-    /**
-     * Gets the value of the pastAttentionMask.
-     *
-     * @return the value of pastAttentionMask
-     */
+    /** {@inheritDoc} */
     @Override
     public NDArray getPastAttentionMask() {
         return pastAttentionMask;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setPastAttentionMask(NDArray pastAttentionMask) {
         this.pastAttentionMask = pastAttentionMask;
     }
 
-    /**
-     * Gets the value of the pastOutputIds.
-     *
-     * @return the value of pastOutputIds
-     */
+    /** {@inheritDoc} */
     @Override
     public NDArray getPastOutputIds() {
         return pastOutputIds;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setPastOutputIds(NDArray pastOutputIds) {
         this.pastOutputIds = pastOutputIds;
     }
 
-    /**
-     * Gets the value of the pastKeyValues.
-     *
-     * @return the value of pastKeyValues
-     */
+    /** {@inheritDoc} */
     @Override
     public NDList getPastKeyValues() {
         return pastKeyValues;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setPastKeyValues(NDList pastKeyValues) {
         this.pastKeyValues = pastKeyValues;

@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class ContrastiveSeqBatchScheduler extends SeqBatchScheduler {
 
     /**
-     * Construct a ContrastiveSeqBatchScheduler.
+     * Constructs a new {@code ContrastiveSeqBatchScheduler} instance.
      *
      * @param lmBlock the predictor containing language model
      * @param config the autoregressive search configuration

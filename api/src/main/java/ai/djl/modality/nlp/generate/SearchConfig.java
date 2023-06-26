@@ -26,7 +26,7 @@ public class SearchConfig {
     private long eosTokenId;
     private boolean suffixPadding;
 
-    /** Constructs a new ContrastiveSearchConfig object with default values. */
+    /** Constructs a new {@code ContrastiveSearchConfig} instance with default values. */
     public SearchConfig() {
         this.k = 4;
         this.alpha = 0.6f;
@@ -34,11 +34,10 @@ public class SearchConfig {
         this.maxSeqLength = 30;
         this.eosTokenId = 50256;
         this.padTokenId = 50256;
-        this.suffixPadding = false;
     }
 
     /**
-     * Gets the value of the k.
+     * Returns the value of the k.
      *
      * @return the value of k
      */
@@ -56,7 +55,7 @@ public class SearchConfig {
     }
 
     /**
-     * Gets the value of the alpha.
+     * Returns the value of the alpha.
      *
      * @return the value of alpha
      */
@@ -74,7 +73,7 @@ public class SearchConfig {
     }
 
     /**
-     * Gets the value of the beam.
+     * Returns the value of the beam.
      *
      * @return the value of beam
      */
@@ -92,7 +91,7 @@ public class SearchConfig {
     }
 
     /**
-     * Gets the value of the maxSeqLength.
+     * Returns the value of the maxSeqLength.
      *
      * @return the value of maxSeqLength
      */
@@ -110,7 +109,7 @@ public class SearchConfig {
     }
 
     /**
-     * Gets the value of the padTokenId.
+     * Returns the value of the padTokenId.
      *
      * @return the value of padTokenId
      */
@@ -128,7 +127,7 @@ public class SearchConfig {
     }
 
     /**
-     * Gets the value of the eosTokenId.
+     * Returns the value of the eosTokenId.
      *
      * @return the value of eosTokenId
      */
@@ -137,7 +136,7 @@ public class SearchConfig {
     }
 
     /**
-     * Gets the value of the suffixPadding.
+     * Returns the value of the suffixPadding.
      *
      * @return the value of suffixPadding
      */

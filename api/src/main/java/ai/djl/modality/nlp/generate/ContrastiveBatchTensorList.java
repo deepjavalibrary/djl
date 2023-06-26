@@ -43,11 +43,13 @@ class ContrastiveBatchTensorList extends BatchTensorList {
 
     public ContrastiveBatchTensorList() {}
 
+    /** {@inheritDoc} */
     @Override
     public ContrastiveBatchTensorList fromList(NDList inputList, long[] seqDimOrder) {
         return new ContrastiveBatchTensorList(inputList, seqDimOrder);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDList getList() {
         // The pastOutputIds has to be the first in the output list
@@ -60,7 +62,7 @@ class ContrastiveBatchTensorList extends BatchTensorList {
     }
 
     /**
-     * Gets the value of the pastHiddenStates.
+     * Returns the value of the pastHiddenStates.
      *
      * @return the value of pastHiddenStates
      */
@@ -73,7 +75,7 @@ class ContrastiveBatchTensorList extends BatchTensorList {
     }
 
     /**
-     * Gets the value of the logits.
+     * Returns the value of the logits.
      *
      * @return the value of logits
      */

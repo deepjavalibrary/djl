@@ -17,9 +17,11 @@ import ai.djl.ndarray.NDList;
 
 /**
  * BatchTensorList represents a search state, and the NDArrays inside are updated in each iteration
- * of the autoregressive loop It is a struct consisting of NDArrays, whose first dimension is batch,
- * and also contains sequence dimension (whose position in tensor's shape is specified by
- * seqDimOrder). The SeqBatcher batch operations will operate on these two dimensions.
+ * of the autoregressive loop.
+ *
+ * <p>It is a struct consisting of NDArrays, whose first dimension is batch, and also contains
+ * sequence dimension (whose position in tensor's shape is specified by seqDimOrder). The SeqBatcher
+ * batch operations will operate on these two dimensions.
  */
 public abstract class BatchTensorList {
     // [batch, seq_past]. seq-dim-size == |past_seq| + |inputIds|. Will grow.
@@ -40,7 +42,7 @@ public abstract class BatchTensorList {
     BatchTensorList() {}
 
     /**
-     * Constructs a BatchTensorList.
+     * Constructs a new {@code BatchTensorList} instance.
      *
      * @param list the NDList that contains the serialized version of the batch tensors
      * @param seqDimOrder the sequence dimension order that specifies where the sequence dimension
@@ -54,7 +56,7 @@ public abstract class BatchTensorList {
     }
 
     /**
-     * Constructs a BatchTensorList.
+     * Constructs a new {@code BatchTensorList} instance.
      *
      * @param pastOutputIds past output token ids
      * @param pastAttentionMask past attention mask
@@ -74,8 +76,10 @@ public abstract class BatchTensorList {
     }
 
     /**
-     * Construct a BatchTensorList from the serialized version of the batch tensors. The
-     * pastOutputIds has to be the first in the output list.
+     * Constructs a new {@code BatchTensorList} instance from the serialized version of the batch
+     * tensors.
+     *
+     * <p>The pastOutputIds has to be the first in the output list.
      *
      * @param inputList the serialized version of the batch tensors
      * @param seqDimOrder the sequence dimension order that specifies where the sequence dimension
@@ -85,15 +89,15 @@ public abstract class BatchTensorList {
     public abstract BatchTensorList fromList(NDList inputList, long[] seqDimOrder);
 
     /**
-     * Gets the serialized version of the BatchTensorList. The pastOutputIds has to be the first in
-     * the output list.
+     * Returns the serialized version of the BatchTensorList. The pastOutputIds has to be the first
+     * in the output list.
      *
      * @return the NDList that contains the serialized BatchTensorList
      */
     public abstract NDList getList();
 
     /**
-     * Gets the sequence dimension order which specifies where the sequence dimension is in a
+     * Returns the sequence dimension order which specifies where the sequence dimension is in a
      * tensor's shape.
      *
      * @return the sequence dimension order which specifies where the sequence dimension is in a
@@ -104,7 +108,7 @@ public abstract class BatchTensorList {
     }
 
     /**
-     * Gets the value of the pastOutputIds.
+     * Returns the value of the pastOutputIds.
      *
      * @return the value of pastOutputIds
      */
@@ -122,7 +126,7 @@ public abstract class BatchTensorList {
     }
 
     /**
-     * Gets the value of the pastAttentionMask.
+     * Returns the value of the pastAttentionMask.
      *
      * @return the value of pastAttentionMask
      */
@@ -140,7 +144,7 @@ public abstract class BatchTensorList {
     }
 
     /**
-     * Gets the value of the pastKeyValues.
+     * Returns the value of the pastKeyValues.
      *
      * @return the value of pastKeyValues
      */

@@ -96,7 +96,7 @@ public final class StepGeneration {
     // result = torch.einsum('bik,bjk->bij', a, b)
 
     /**
-     * Generate the output token id for greedy search.
+     * Generates the output token id for greedy search.
      *
      * @param logits the logits from the language model
      * @return the output token ids
@@ -109,7 +109,7 @@ public final class StepGeneration {
     }
 
     /**
-     * Generate the output token id and selecting indices used in beam search.
+     * Generates the output token id and selecting indices used in beam search.
      *
      * @param lastProbs the probabilities of the past prefix sequences
      * @param logits the logits

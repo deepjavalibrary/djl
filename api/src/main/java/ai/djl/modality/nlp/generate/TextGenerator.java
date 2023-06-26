@@ -27,8 +27,10 @@ import java.util.stream.Collectors;
 
 /**
  * {@code TextGenerator} is an LMSearch (language model search) which contains multiple
- * autoregressive search methods. It has a Predictor from NDList to CausalLMOutput, which is called
- * inside an autoregressive inference loop.
+ * autoregressive search methods.
+ *
+ * <p>It has a Predictor from NDList to CausalLMOutput, which is called inside an autoregressive
+ * inference loop.
  */
 public class TextGenerator {
 
@@ -39,7 +41,7 @@ public class TextGenerator {
     private NDArray positionOffset;
 
     /**
-     * Construct a text generator.
+     * Constructs a new {@code TextGenerator} instance.
      *
      * @param predictor the language model
      * @param searchName the autoregressive search name
@@ -55,7 +57,7 @@ public class TextGenerator {
     }
 
     /**
-     * Greedy search.
+     * Executes greedy search.
      *
      * @param inputIds the input token ids.
      * @return the output token ids stored as NDArray

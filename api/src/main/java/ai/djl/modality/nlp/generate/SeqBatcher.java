@@ -30,23 +30,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * BatchTensorList.
  */
 public class SeqBatcher {
+
     NDManager manager;
-
     long batchSize;
-
     long seqLength;
 
-    // [batch] stores the uid and is trimmed or enhanced correspondingly to the batch.
+    /** [batch] stores the uid and is trimmed or enhanced correspondingly to the batch. */
     NDArray batchUid;
 
-    // Minheap with lazy removal
-    // map: batchIdx -> offset
+    /** Minheap with lazy removal, map: batchIdx -> offset. */
     NDArray offSets;
 
-    // This is a struct that contains NDArrays with batch dimension
+    /** This is a struct that contains NDArrays with batch dimension. */
     BatchTensorList data;
 
-    // batchIndex -> seqEndPosition
+    /** batchIndex -> seqEndPosition. */
     private Map<Long, Long> exitIndexEndPosition;
 
     SeqBatcher(BatchTensorList data, NDArray batchUid, NDArray offSets, NDManager manager) {
@@ -60,7 +58,7 @@ public class SeqBatcher {
     }
 
     /**
-     * Get the batch data which is stored as a {@code BatchTensorList}.
+     * Returns the batch data which is stored as a {@code BatchTensorList}.
      *
      * @return the batch data stored as BatchTensorList
      */
@@ -69,7 +67,9 @@ public class SeqBatcher {
     }
 
     /**
-     * Add new batch. Modify the batch dimension and the left padding.
+     * Adds new batch.
+     *
+     * <p>Modify the batch dimension and the left padding.
      *
      * @param seqBatcherNew the seqBatcher to add.
      */
@@ -79,7 +79,9 @@ public class SeqBatcher {
     }
 
     /**
-     * Merge two batchers together. Modify the batch dimension and the left padding.
+     * Merges two batchers together.
+     *
+     * <p>Modify the batch dimension and the left padding.
      *
      * @param seqBatcher1 the first seqBatcher
      * @param seqBatcher2 the second seqBatcher
@@ -165,8 +167,9 @@ public class SeqBatcher {
     }
 
     /**
-     * Check which batch needs to exit, according certain criteria like EOS or maxLength. It is an
-     * iteration over batch and is thus also considered as batch operation.
+     * Checks which batch needs to exit, according certain criteria like EOS or maxLength.
+     *
+     * <p>It is an iteration over batch and is thus also considered as batch operation.
      *
      * @param outputIds output token ids in an incremental forward call
      * @param maxLength max total sequence length
@@ -185,7 +188,7 @@ public class SeqBatcher {
     }
 
     /**
-     * Collect the finished sequences and trim the left padding.
+     * Collects the finished sequences and trim the left padding.
      *
      * @return a map that stores request id to output token ids
      */
@@ -288,7 +291,7 @@ public class SeqBatcher {
     }
 
     /**
-     * Compute the position ids by linear search from the left.
+     * Computes the position ids by linear search from the left.
      *
      * @return the boolean indicating whether all sequences are empty
      */
