@@ -41,7 +41,7 @@ public interface BoundingBox extends Serializable {
     Point getPoint();
 
     /**
-     * Gets the Intersection over Union (IoU) value between bounding boxes.
+     * Returns the Intersection over Union (IoU) value between bounding boxes.
      *
      * <p>Also known as <a href="https://en.wikipedia.org/wiki/Jaccard_index">Jaccard index</a>
      *

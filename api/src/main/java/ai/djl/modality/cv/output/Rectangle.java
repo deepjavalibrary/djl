@@ -86,30 +86,26 @@ public class Rectangle implements BoundingBox {
     /** {@inheritDoc} */
     @Override
     public double getIoU(BoundingBox box) {
-        return getIoU(this, (Rectangle) box);
-    }
+        Rectangle rect = box.getBounds();
 
-    public double getIoU(Rectangle rec1, Rectangle rec2) {
         // computing area of each rectangles
-        double s1 = rec1.getWidth() * rec1.getHeight();
-        double s2 = rec2.getWidth() * rec2.getHeight();
-
-        // computing the sum_area
+        double s1 = (width + 1) * (height + 1);
+        double s2 = (rect.getWidth() + 1) * (rect.getHeight() + 1);
         double sumArea = s1 + s2;
 
-        // find the each edge of intersect rectangle
-        double left = Math.max(rec1.getX(), rec2.getX());
-        double top = Math.max(rec1.getY(), rec2.getY());
-        double right = Math.min(rec1.getX() + rec1.getWidth(), rec2.getX() + rec2.getWidth());
-        double bottom = Math.min(rec1.getY() + rec1.getHeight(), rec2.getY() + rec2.getHeight());
+        // find each edge of intersect rectangle
+        double left = Math.max(getX(), rect.getX());
+        double top = Math.max(getY(), rect.getY());
+        double right = Math.min(getX() + getWidth(), rect.getX() + rect.getWidth());
+        double bottom = Math.min(getY() + getHeight(), rect.getY() + rect.getHeight());
 
-        // judge if there is an intersect
-        if (left >= right || top >= bottom) {
+        // judge if there is a intersect
+        if (left > right || top > bottom) {
             return 0.0;
-        } else {
-            double intersect = (right - left) * (bottom - top);
-            return intersect / (sumArea - intersect);
         }
+
+        double intersect = (right - left + 1) * (bottom - top + 1);
+        return intersect / (sumArea - intersect);
     }
 
     /**
