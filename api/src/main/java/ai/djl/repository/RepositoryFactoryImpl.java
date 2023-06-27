@@ -253,14 +253,12 @@ class RepositoryFactoryImpl implements RepositoryFactory {
 
             ModelZoo zoo = ModelZoo.getModelZoo(groupId);
             if (zoo == null) {
-                logger.warn("ModelZoo not found: {}", groupId);
-                return repo;
+                throw new IllegalArgumentException("ModelZoo not found in classpath: " + groupId);
             }
 
             ModelLoader loader = zoo.getModelLoader(artifactId);
             if (loader == null) {
-                logger.warn("Artifact not found: {}/{}", groupId, artifactId);
-                return repo;
+                throw new IllegalArgumentException("Invalid djl URL: " + uri);
             }
 
             MRL mrl =

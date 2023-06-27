@@ -37,11 +37,13 @@ public class DjlRepositoryTest {
         repo = Repository.newInstance("DJL", "djl://ai.djl.pytorch/resnet/0.0.1/traced_resnet18");
         Assert.assertEquals(repo.getResources().size(), 1);
 
-        repo = Repository.newInstance("DJL", "djl://ai.djl.pytorch/fake/0.0.1");
-        Assert.assertEquals(repo.getResources().size(), 0);
+        Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> Repository.newInstance("DJL", "djl://ai.djl.pytorch/fake/0.0.1"));
 
-        repo = Repository.newInstance("DJL", "djl://ai.djl.fake/mlp/0.0.1");
-        Assert.assertEquals(repo.getResources().size(), 0);
+        Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> Repository.newInstance("DJL", "djl://ai.djl.fake/mlp/0.0.1"));
 
         Assert.expectThrows(
                 IllegalArgumentException.class, () -> Repository.newInstance("DJL", "djl://"));
