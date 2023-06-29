@@ -106,6 +106,17 @@ You can also use the URL query string to tell DJL how to load model:
 file:///var/models/resnet.zip?model_name=saved_model/resnet-18
 ```
 
+Note that you **can't** load the modelname of a `.params` model file by specifying the full file including file extension. You have to specify the name of the model *without* the file extension eg
+
+```java
+.optModelName("myModelName")
+```
+not
+```java
+.optModelName("myModelName.params")
+```
+
+
 ### Load model from a URL
 
 DJL supports loading a model from a URL. Since a model consists multiple files, some of URL must be
