@@ -1351,7 +1351,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         int otherDim = other.getShape().dimension();
         if (selfDim != otherDim || selfDim > 2) {
             throw new UnsupportedOperationException(
-                    "Dimension mismatch or high dimensional dot operation is not supported. Please"
+                    "Dimension mismatch or dimension is greater than 2.  Dot product is only applied on two 1D vectors. For high dimensions, please"
                             + " use .matMul instead.");
         }
         return JniUtils.dot(this, manager.from(other));
