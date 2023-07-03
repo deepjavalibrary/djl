@@ -58,7 +58,7 @@ tensor.tensor(a)
 ```
 
 ```
-float[][] array = {{1, 2, 3}, {4, 5, 6}};
+float[][] array = { {1, 2, 3}, {4, 5, 6} };
 NDArray nd = manager.create(array);
 ```
 
@@ -107,7 +107,7 @@ torch.zeros_like(a)
 NDArray ones = manager.ones(new Shape(1, 2, 3));
 NDarray zeros = manager.zeros(new Shape(1, 2, 3));
 
-NDArray a = manager.create(new float[][] {{1, 2, 3}, {4, 5, 6}});
+NDArray a = manager.create(new float[][] { {1, 2, 3}, {4, 5, 6} });
 ones = a.onesLike();
 zeros= a.zerosLike();
 ```
@@ -125,7 +125,7 @@ torch.tensor(a, requires_grad=True, dtype=float)
 ```
 
 ```
-NDArray a = manager.create(new float[][] {{1, 2, 3}, {4, 5, 6}});
+NDArray a = manager.create(new float[][] { {1, 2, 3}, {4, 5, 6} });
 a.setRequiresGradient(true);
 a
 ```
@@ -587,7 +587,7 @@ a.T
 Java
 
 ```
-var a = manager.create(new float[][] {{1, 2}, {3, 4}});
+var a = manager.create(new float[][] { {1, 2}, {3, 4} });
 a.transpose();
 ```
 
@@ -683,7 +683,7 @@ ND: (3) cpu() int32
 </details>
 
 ```
-var indices = manager.create(new int[][] {{2, 4}, {6, 8}});
+var indices = manager.create(new int[][] { {2, 4}, {6, 8} });
 a.get(indices);
 ```
 
@@ -705,7 +705,7 @@ ND: (2, 2) cpu() int32
 ### multi-dimension ndarray slice
 
 ```
-var a = manager.create(new int[][] {{5, 10, 20}, {30, 40, 50}, {60, 70, 80}});
+var a = manager.create(new int[][] { {5, 10, 20}, {30, 40, 50}, {60, 70, 80} });
 ```
 
 ---
@@ -1028,8 +1028,8 @@ ND: (2, 6) cpu() float32
 #### stack
 
 ```
-var images0 = manager.create(new int[][] {{128, 0, 0}, {0, 128, 0}});
-var images1 = manager.create(new int[][] {{0, 0, 128}, {127, 127, 127}});
+var images0 = manager.create(new int[][] { {128, 0, 0}, {0, 128, 0} });
+var images1 = manager.create(new int[][] { {0, 0, 128}, {127, 127, 127} });
 ```
 
 ```
@@ -1198,7 +1198,7 @@ torch.abs(tensor)
 ```
 
 ```
-var ndarray = manager.create(new int[][] {{1, 2}, {-1, -2}});
+var ndarray = manager.create(new int[][] { {1, 2}, {-1, -2} });
 ndarray.abs();
 ```
 
@@ -1226,7 +1226,7 @@ torch.ceil(tensor)
 ```
 
 ```
-var ndarray = manager.create(new double[][] {{1.0,1.1,1.2,1.3,1.4}, {1.5,1.6,1.7,1.8,1.9});
+var ndarray = manager.create(new double[][] { {1.0,1.1,1.2,1.3,1.4}, {1.5,1.6,1.7,1.8,1.9} });
 ndarray.ceil();
 ```
 
@@ -1254,7 +1254,7 @@ torch.floor(tensor)
 ```
 
 ```
-var ndarray = manager.create(new double[][] {{1.0,1.1,1.2,1.3,1.4}, {1.5,1.6,1.7,1.8,1.9});
+var ndarray = manager.create(new double[][] { {1.0,1.1,1.2,1.3,1.4}, {1.5,1.6,1.7,1.8,1.9} });
 ndarray.floor();
 ```
 
@@ -1282,7 +1282,7 @@ torch.round(tensor)
 ```
 
 ```
-var ndarray = manager.create(new double[][] {{1.0,1.1,1.2,1.3,1.4}, {1.5,1.6,1.7,1.8,1.9}});
+var ndarray = manager.create(new double[][] { {1.0,1.1,1.2,1.3,1.4}, {1.5,1.6,1.7,1.8,1.9} });
 ndarray.round();
 ```
 
@@ -1310,7 +1310,7 @@ torch.sign(tensor)
 ```
 
 ```
-var ndarray = manager.create(new double[][] {{-0.1, -0.0}, {0.0, 0.1});
+var ndarray = manager.create(new double[][] { {-0.1, -0.0}, {0.0, 0.1} });
 ndarray.sign();
 ```
 
@@ -1440,7 +1440,7 @@ torch.nonzero()
 ```
 
 ```
-var a = manager.create(new long[][] {{0.0,0.1}, {0.2,0.3}});
+var a = manager.create(new long[][] { {0.0,0.1}, {0.2,0.3} });
 a.nonzero();
 ```
 
@@ -1482,8 +1482,8 @@ torch.masked_select(t, mask)
 ```
 
 ```
-var ndarray = manager.create(new double[][] {{0.1, 0.2}, {0.3, 0.4}});
-var mask = manager.create(new boolean[][] {false, true}, {true,false}});
+var ndarray = manager.create(new double[][] { {0.1, 0.2}, {0.3, 0.4} });
+var mask = manager.create(new boolean[][] { {false, true}, {true,false} });
 ndarray.booleanMask(mask);
 ```
 
