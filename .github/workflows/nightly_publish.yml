@@ -163,7 +163,7 @@ jobs:
   publish:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    needs: [ build, test-pytorch, test-tensorflow, test-aarch64, test-cuda-102, test-cuda-118 ]
+    needs: [ build, test-pytorch, test-tensorflow, test-aarch64, test-cuda-118 ]
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 11
@@ -244,7 +244,7 @@ jobs:
   stop-runners:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: [ self-hosted, scheduler ]
-    needs: [ create-runners, test-aarch64, test-cuda-102, test-cuda-118 ]
+    needs: [ create-runners, test-aarch64, test-cuda-118 ]
     steps:
       - name: Stop all instances
         run: |
