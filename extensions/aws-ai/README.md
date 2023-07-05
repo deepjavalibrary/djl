@@ -58,6 +58,6 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl.aws</groupId>
     <artifactId>aws-ai</artifactId>
-    <version>0.22.1</version>
+    <version>0.23.0</version>
 </dependency>
 ```
