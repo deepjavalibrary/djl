@@ -213,6 +213,20 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMinimum(
   API_END_RETURN()
 }
 
+JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchMedian(
+        JNIEnv* env, jobject jthis, jlong jself, jlong jdim, jboolean keep_dim) {
+    API_BEGIN()
+        const auto* self_ptr = reinterpret_cast<torch::Tensor*>(jself);
+        const auto result = self_ptr->median(jdim, keep_dim);
+        const auto* value_ptr = new torch::Tensor(std::get<0>(result));
+        const auto* indices_ptr = new torch::Tensor(std::get<1>(result));
+        std::vector<uintptr_t> vect;
+        vect.push_back(reinterpret_cast<uintptr_t>(value_ptr));
+        vect.push_back(reinterpret_cast<uintptr_t>(indices_ptr));
+        return djl::utils::jni::GetLongArrayFromVec(env, vect);
+    API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchAbs(JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);

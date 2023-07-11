@@ -602,6 +602,16 @@ public class NDArrayElementComparisonOpTest {
     }
 
     @Test
+    public void testMedian() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array1 = manager.create(new float[] {1, 3, 2, 5, 4});
+            Assert.assertEquals(array1.median(), manager.create(3.0f));
+            array1 = manager.create(new float[] {1, 3, 2, 5, 4, 8}, new Shape(2, 3));
+            Assert.assertEquals(array1.median(new int[] {1}), manager.create(new float[] {2, 5}));
+        }
+    }
+
+    @Test
     public void testWhere() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array1 = manager.create(new float[] {1f, 2f, 2f, 4f, 5f, 4f});

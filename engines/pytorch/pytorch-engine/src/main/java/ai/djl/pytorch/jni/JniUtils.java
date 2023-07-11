@@ -875,6 +875,13 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchMin(ndArray.getHandle(), dim, keepDim));
     }
 
+    public static NDList median(PtNDArray ndArray, long dim, boolean keepDim) {
+        long[] handles = PyTorchLibrary.LIB.torchMedian(ndArray.getHandle(), dim, keepDim);
+        return new NDList(
+                new PtNDArray(ndArray.getManager(), handles[0]),
+                new PtNDArray(ndArray.getManager(), handles[1]));
+    }
+
     public static PtNDArray mean(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchMean(ndArray.getHandle()));
