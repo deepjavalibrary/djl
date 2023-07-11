@@ -1489,9 +1489,11 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public PtNDArray median(int[] axes) {
         if (axes.length != 1) {
-            throw new UnsupportedOperationException("Not supporting zero or multi-dimension median");
+            throw new UnsupportedOperationException(
+                    "Not supporting zero or multi-dimension median");
         }
         NDList result = JniUtils.median(this, axes[0], false);
+        result.get(1).close();
         return (PtNDArray) result.get(0);
     }
 
