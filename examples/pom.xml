@@ -63,6 +63,10 @@
             <groupId>ai.djl.huggingface</groupId>
             <artifactId>tokenizers</artifactId>
         </dependency>
+        <dependency>
+            <groupId>ai.djl.audio</groupId>
+            <artifactId>audio</artifactId>
+        </dependency>
         <!-- MXNet -->
         <dependency>
             <groupId>ai.djl.mxnet</groupId>
