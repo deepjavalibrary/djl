@@ -16,6 +16,7 @@
 #ifdef USE_CUDA
 #include <c10/cuda/CUDAGuard.h>
 #include <c10/cuda/CUDAStream.h>
+#include <ATen/cuda/CUDAContext.h>
 #endif
 
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
