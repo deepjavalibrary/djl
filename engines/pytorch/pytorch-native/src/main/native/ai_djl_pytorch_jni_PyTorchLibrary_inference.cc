@@ -13,6 +13,11 @@
 #include <torch/csrc/jit/python/update_graph_executor_opt.h>
 #include <torch/script.h>
 
+#ifdef USE_CUDA
+#include <c10/cuda/CUDAGuard.h>
+#include <c10/cuda/CUDAStream.h>
+#endif
+
 #include "ai_djl_pytorch_jni_PyTorchLibrary.h"
 #include "djl_pytorch_jni_exception.h"
 #include "djl_pytorch_utils.h"
@@ -211,7 +216,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleTrain(
 }
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleRunMethod(JNIEnv* env, jobject jthis,
-    jlong module_handle, jstring jmethod_name, jlongArray jivalue_ptrs, jboolean jis_train) {
+    jlong module_handle, jstring jmethod_name, jlongArray jivalue_ptrs, jboolean jis_train, jboolean jinference_separate_cuda_stream) {
   API_BEGIN()
   auto* module_ptr = reinterpret_cast<torch::jit::script::Module*>(module_handle);
   size_t len = env->GetArrayLength(jivalue_ptrs);
@@ -228,6 +233,13 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleRunMethod(J
     }
     // disable autograd
     JITCallGuard guard;
+    #ifdef USE_CUDA
+    if (jinference_separate_cuda_stream && torch::cuda::is_available()) {
+      c10::cuda::CUDAStream stream = c10::cuda::getStreamFromPool();
+      c10::cuda::CUDAStreamGuard stream_guard(stream);
+      return module_ptr->get_method(method_name)(std::move(inputs));
+    }
+    #endif
     return module_ptr->get_method(method_name)(std::move(inputs));
   }();
   env->ReleaseLongArrayElements(jivalue_ptrs, jptrs, djl::utils::jni::RELEASE_MODE);

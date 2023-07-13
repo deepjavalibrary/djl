@@ -51,9 +51,10 @@ public final class IValueUtils {
         IValue[] ivalues = inputPair.getKey();
         String method = inputPair.getValue();
         long[] iValueHandles = Arrays.stream(ivalues).mapToLong(IValue::getHandle).toArray();
+        boolean inferenceSeparateCudaStream = Boolean.getBoolean("ai.djl.pytorch.inference_separate_cuda_stream");
         long result =
                 PyTorchLibrary.LIB.moduleRunMethod(
-                        block.getHandle(), method, iValueHandles, isTrain);
+                        block.getHandle(), method, iValueHandles, isTrain, inferenceSeparateCudaStream);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
         Arrays.stream(ivalues).forEach(IValue::close);
         try (IValue iValue = new IValue(result)) {
@@ -82,9 +83,10 @@ public final class IValueUtils {
      */
     public static IValue runMethod(PtSymbolBlock block, String methodName, IValue... inputs) {
         long[] iValueHandles = Arrays.stream(inputs).mapToLong(IValue::getHandle).toArray();
+        boolean inferenceSeparateCudaStream = Boolean.getBoolean("ai.djl.pytorch.inference_separate_cuda_stream");
         return new IValue(
                 PyTorchLibrary.LIB.moduleRunMethod(
-                        block.getHandle(), methodName, iValueHandles, false));
+                        block.getHandle(), methodName, iValueHandles, false, inferenceSeparateCudaStream));
     }
 
     private static int addToMap(
