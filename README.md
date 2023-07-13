@@ -108,7 +108,7 @@ The following pseudocode demonstrates running training:
 * [0.2.1](https://github.com/deepjavalibrary/djl/releases/tag/v0.2.1) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.2.1))
 * [0.2.0 Initial release](https://github.com/deepjavalibrary/djl/releases/tag/v0.2.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.2.0))
 
-The release of DJL 0.23.0 is planned for June or July 2023.
+The release of DJL 0.24.0 is planned for August or September 2023.
 
 ## Building From Source
 
