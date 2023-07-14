@@ -35,6 +35,8 @@ public final class IValueUtils {
     private static final Pattern PATTERN_LIST = Pattern.compile("\\w+\\[]");
     private static final Pattern PATTERN_TUPLE = Pattern.compile("\\w+\\(\\)");
     private static final Pattern PATTERN_TUPLE_OF_TUPLE = Pattern.compile("\\w+(\\([\\d,]+\\))");
+    private static final boolean CUDA_STREAM =
+            Boolean.getBoolean("ai.djl.pytorch.enable_cuda_stream");
 
     private IValueUtils() {}
 
@@ -53,7 +55,7 @@ public final class IValueUtils {
         long[] iValueHandles = Arrays.stream(ivalues).mapToLong(IValue::getHandle).toArray();
         long result =
                 PyTorchLibrary.LIB.moduleRunMethod(
-                        block.getHandle(), method, iValueHandles, isTrain);
+                        block.getHandle(), method, iValueHandles, isTrain, CUDA_STREAM);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
         Arrays.stream(ivalues).forEach(IValue::close);
         try (IValue iValue = new IValue(result)) {
@@ -84,7 +86,7 @@ public final class IValueUtils {
         long[] iValueHandles = Arrays.stream(inputs).mapToLong(IValue::getHandle).toArray();
         return new IValue(
                 PyTorchLibrary.LIB.moduleRunMethod(
-                        block.getHandle(), methodName, iValueHandles, false));
+                        block.getHandle(), methodName, iValueHandles, false, CUDA_STREAM));
     }
 
     private static int addToMap(

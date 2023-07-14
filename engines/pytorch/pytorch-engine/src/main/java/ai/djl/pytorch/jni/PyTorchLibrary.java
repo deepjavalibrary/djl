@@ -540,7 +540,11 @@ final class PyTorchLibrary {
     native void moduleTrain(long handle);
 
     native long moduleRunMethod(
-            long moduleHandle, String methodName, long[] iValueHandles, boolean isTrain);
+            long moduleHandle,
+            String methodName,
+            long[] iValueHandles,
+            boolean isTrain,
+            boolean separateCudaStream);
 
     native void setGraphExecutorOptimize(boolean enabled);
 
