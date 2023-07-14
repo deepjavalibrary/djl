@@ -544,7 +544,7 @@ final class PyTorchLibrary {
             String methodName,
             long[] iValueHandles,
             boolean isTrain,
-            boolean inferenceSeparateCudaStream);
+            boolean separateCudaStream);
 
     native void setGraphExecutorOptimize(boolean enabled);
 
