@@ -50,10 +50,10 @@ public class ChunkedBytesSupplier implements BytesSupplier {
      * @param lastChunk true if this is the last chunk
      */
     public void appendContent(BytesSupplier bytesSupplier, boolean lastChunk) {
-        queue.offer(bytesSupplier);
         if (lastChunk) {
             completed.set(true);
         }
+        queue.offer(bytesSupplier);
     }
 
     /**
