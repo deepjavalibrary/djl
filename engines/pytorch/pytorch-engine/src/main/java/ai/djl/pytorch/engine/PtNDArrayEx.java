@@ -26,6 +26,8 @@ import ai.djl.pytorch.jni.JniUtils;
 
 import java.util.List;
 
+import static ai.djl.pytorch.jni.JniUtils.sqrt;
+
 /** {@code PtNDArrayEx} is the PyTorch implementation of the {@link NDArrayEx}. */
 public class PtNDArrayEx implements NDArrayEx {
 
@@ -694,7 +696,59 @@ public class PtNDArrayEx implements NDArrayEx {
             List<Float> steps,
             List<Float> offsets,
             boolean clip) {
-        throw new UnsupportedOperationException("Not implemented");
+        //Based on https://github.com/apache/mxnet/blob/a720b15b5fa011a9610dfaeabf0792443c6abec5/src/operator/contrib/multibox_prior.cc
+
+        NDManager ndManager = array.getManager().getParentManager();
+
+        Float step_x   = steps.get(1);
+        Float step_y   = steps.get(0);
+        int num_sizes  = sizes.size();
+        int num_ratios = ratios.size();
+        int count = 0;
+        float[][] out = new float[num_sizes][num_ratios];
+
+        //Based on https://github.com/apache/mxnet/blob/a720b15b5fa011a9610dfaeabf0792443c6abec5/src/operator/contrib/multibox_prior-inl.h#L116
+
+        PtNDArray input = array;
+        //int in_height         = in_data[mboxprior_enum::kData].size(2);
+        //int in_width          = in_data[mboxprior_enum::kData].size(3);
+        int in_height         = input.getInt(2);
+        int in_width          = input.getInt(3);
+
+        for (int r = 0; r < in_height; ++r) {
+            float center_y = (r + offsets.get(0)) * step_y;
+            for (int c = 0; c < in_width; ++c) {
+                float center_x = (c + offsets.get(1)) * step_x;
+                // ratio = first ratio, various sizes
+                float ratio = num_ratios > 0 ? (float)Math.sqrt(ratios.get(0)) : 1.f;
+                for (int i = 0; i < num_sizes; ++i) {
+                    float size    = sizes.get(i);
+                    float w       = size * in_height / in_width * ratio / 2;
+                    float h       = size / ratio / 2;
+
+                    out[count][0] = center_x - w;  // xmin
+                    out[count][1] = center_y - h;  // ymin
+                    out[count][2] = center_x + w;  // xmax
+                    out[count][3] = center_y + h;  // ymax
+                    ++count;
+                }
+                // various ratios, size = min_size = size[0]
+                float size = sizes.get(0);
+                for (int j = 1; j < num_ratios; ++j) {
+                    float ratioLocal = (float)Math.sqrt(ratios.get(j));
+                    float w       = size * in_height / in_width * ratioLocal / 2;
+                    float h       = size / ratioLocal / 2;
+                    out[count][0] = center_x - w;  // xmin
+                    out[count][1] = center_y - h;  // ymin
+                    out[count][2] = center_x + w;  // xmax
+                    out[count][3] = center_y + h;  // ymax
+                    ++count;
+                }
+            }
+        }
+        NDArray ndArray = ndManager.create(out);
+        NDList outResult = new NDList(ndArray);
+        return outResult;
     }
 
     /** {@inheritDoc} */
