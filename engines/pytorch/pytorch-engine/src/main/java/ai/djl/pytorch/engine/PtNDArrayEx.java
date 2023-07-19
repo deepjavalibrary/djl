@@ -694,62 +694,54 @@ public class PtNDArrayEx implements NDArrayEx {
             List<Float> steps,
             List<Float> offsets,
             boolean clip) {
-        // Based on
-        // https://github.com/apache/mxnet/blob/a720b15b5fa011a9610dfaeabf0792443c6abec5/src/operator/contrib/multibox_prior.cc
 
         NDManager ndManager = array.getManager().getParentManager();
 
-        Float step_x = steps.get(1);
-        Float step_y = steps.get(0);
-        int num_sizes = sizes.size();
-        int num_ratios = ratios.size();
+        Float stepX = steps.get(1);
+        Float stepY = steps.get(0);
+        int numSizes = sizes.size();
+        int numRatios = ratios.size();
         int count = 0;
 
-        // Based on
-        // https://github.com/apache/mxnet/blob/a720b15b5fa011a9610dfaeabf0792443c6abec5/src/operator/contrib/multibox_prior-inl.h#L116
-
         Shape input = array.getShape();
-        // int in_height         = in_data[mboxprior_enum::kData].size(2);
-        // int in_width          = in_data[mboxprior_enum::kData].size(3);
-        int in_height = (int) input.get(2);
-        int in_width = (int) input.get(3);
+        int inHeight = Math.toIntExact(input.get(2));
+        int inWidth = Math.toIntExact(input.get(3));
 
-        float[][] out = new float[(in_height + 1) * (in_width + 1) * (num_sizes + 1) * 2][4];
+        float[][] out = new float[inHeight * inWidth * numSizes * 2][4];
 
-        for (int r = 0; r < in_height; ++r) {
-            float center_y = (r + offsets.get(0)) * step_y;
-            for (int c = 0; c < in_width; ++c) {
-                float center_x = (c + offsets.get(1)) * step_x;
+        for (int r = 0; r < inHeight; ++r) {
+            float centerY = (r + offsets.get(0)) * stepY;
+            for (int c = 0; c < inWidth; ++c) {
+                float centerX = (c + offsets.get(1)) * stepX;
                 // ratio = first ratio, various sizes
-                float ratio = num_ratios > 0 ? (float) Math.sqrt(ratios.get(0)) : 1.f;
-                for (int i = 0; i < num_sizes; ++i) {
+                float ratio = numRatios > 0 ? (float) Math.sqrt(ratios.get(0)) : 1.f;
+                for (int i = 0; i < numSizes; ++i) {
                     float size = sizes.get(i);
-                    float w = size * in_height / in_width * ratio / 2;
+                    float w = size * inHeight / inWidth * ratio / 2;
                     float h = size / ratio / 2;
 
-                    out[count][0] = center_x - w; // xmin
-                    out[count][1] = center_y - h; // ymin
-                    out[count][2] = center_x + w; // xmax
-                    out[count][3] = center_y + h; // ymax
+                    out[count][0] = centerX - w; // xmin
+                    out[count][1] = centerY - h; // ymin
+                    out[count][2] = centerX + w; // xmax
+                    out[count][3] = centerY + h; // ymax
                     ++count;
                 }
                 // various ratios, size = min_size = size[0]
                 float size = sizes.get(0);
-                for (int j = 1; j < num_ratios; ++j) {
+                for (int j = 1; j < numRatios; ++j) {
                     float ratioLocal = (float) Math.sqrt(ratios.get(j));
-                    float w = size * in_height / in_width * ratioLocal / 2;
+                    float w = size * inHeight / inWidth * ratioLocal / 2;
                     float h = size / ratioLocal / 2;
-                    out[count][0] = center_x - w; // xmin
-                    out[count][1] = center_y - h; // ymin
-                    out[count][2] = center_x + w; // xmax
-                    out[count][3] = center_y + h; // ymax
+                    out[count][0] = centerX - w; // xmin
+                    out[count][1] = centerY - h; // ymin
+                    out[count][2] = centerX + w; // xmax
+                    out[count][3] = centerY + h; // ymax
                     ++count;
                 }
             }
         }
-        NDArray ndArray = ndManager.create(out);
-        NDList outResult = new NDList(ndArray);
-        return outResult;
+        NDArray ndArray = ndManager.create(out).expandDims(0);
+        return new NDList(ndArray);
     }
 
     /** {@inheritDoc} */
