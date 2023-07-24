@@ -46,29 +46,42 @@ public final class NeuronUtils {
      * @return the number of NeuronCores available in the system
      */
     public static int getNeuronCores() {
-        List<Path> nd = getNeuronDevices("/dev/");
+        List<String> nd = getNeuronDevices("/dev/");
         if (nd.isEmpty()) {
             return 0;
         }
-        String dev = nd.get(0).toFile().getName();
-        int cores = getNeuronCoresPerDevice("/sys/devices/virtual/neuron_device/" + dev);
+        int cores = getNeuronCoresForDevice(nd.get(0));
         return nd.size() * cores;
     }
 
-    static List<Path> getNeuronDevices(String location) {
+    /**
+     * Returns a list of neuron device file path.
+     *
+     * @param location the neuron device path
+     * @return a list of neuron device name
+     */
+    public static List<String> getNeuronDevices(String location) {
         Path path = Paths.get(location);
         if (!Files.exists(path)) {
             return Collections.emptyList();
         }
         try (Stream<Path> dev = Files.list(path)) {
-            return dev.filter(p -> matches(p, "neuron")).collect(Collectors.toList());
+            return dev.filter(p -> matches(p, "neuron"))
+                    .map(p -> "/sys/devices/virtual/neuron_device/" + p.toFile().getName())
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             logger.warn("Failed to list neuron cores", e);
         }
         return Collections.emptyList();
     }
 
-    static int getNeuronCoresPerDevice(String location) {
+    /**
+     * Returns the number of neuron cores per device.
+     *
+     * @param location the neuron device file path
+     * @return the number of neuron cores
+     */
+    public static int getNeuronCoresForDevice(String location) {
         Path path = Paths.get(location);
         if (!Files.exists(path)) {
             return 0;
