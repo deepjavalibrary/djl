@@ -47,10 +47,10 @@ public class NeuronUtilsTest {
 
             logger.info("hasNeuron: {}", NeuronUtils.hasNeuron());
             logger.info("# neuron cores: {}", NeuronUtils.getNeuronCores());
-            List<Path> devices = NeuronUtils.getNeuronDevices(dev.toString());
+            List<String> devices = NeuronUtils.getNeuronDevices(dev.toString());
             Assert.assertEquals(devices.size(), 3);
             String vd = sys.resolve("neuron1").toString();
-            Assert.assertEquals(NeuronUtils.getNeuronCoresPerDevice(vd), 2);
+            Assert.assertEquals(NeuronUtils.getNeuronCoresForDevice(vd), 2);
         } finally {
             Utils.deleteQuietly(sys);
             Utils.deleteQuietly(dev);
