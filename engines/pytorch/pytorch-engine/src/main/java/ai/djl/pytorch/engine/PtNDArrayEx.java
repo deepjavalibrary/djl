@@ -695,10 +695,10 @@ public class PtNDArrayEx implements NDArrayEx {
             List<Float> offsets,
             boolean clip) {
 
-        NDManager ndManager = array.getManager().getParentManager();
+        NDManager ndManager = array.getManager();
 
-        Float stepX = steps.get(1);
-        Float stepY = steps.get(0);
+        float stepX = steps.get(1);
+        float stepY = steps.get(0);
         int numSizes = sizes.size();
         int numRatios = ratios.size();
         int count = 0;
