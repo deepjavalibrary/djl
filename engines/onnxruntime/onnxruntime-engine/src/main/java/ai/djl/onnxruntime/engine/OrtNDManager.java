@@ -107,7 +107,16 @@ public class OrtNDManager extends BaseNDManager {
                             + " dimensions are not supported.");
         }
 
-        Object tensorIn = OrtUtil.reshape(data, sh);
+        Object tensorIn;
+        if (sh.length != 1) {
+            tensorIn = OrtUtil.reshape(data, sh);
+        } else {
+            // Work around the bug in OrtUtil.reshape() when sh.length == 1.
+            long[] shExpanded = {1, sh[0]};
+            boolean[][] arrayIn = (boolean[][]) OrtUtil.reshape(data, shExpanded);
+            tensorIn = arrayIn[0];
+        }
+
         try {
             return new OrtNDArray(this, alternativeManager, OrtUtils.toTensor(env, tensorIn));
         } catch (OrtException e) {
