@@ -34,10 +34,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class TextGenerationTest {
+public class GptTranslatorTest {
 
     @Test
     public void testGpt2() throws TranslateException, ModelException, IOException {
+        // This is a fake model that simulates language models like GPT2: NDList(inputIds, posIds,
+        // attnMask) -> NDList(logits(1), pastKv(12*2)[, hiddenStates(13)])
         Block block =
                 new LambdaBlock(
                         a -> {
