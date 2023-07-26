@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 /** The {@link ai.djl.translate.Translator} for PyTorch GPT2 model. */
@@ -49,16 +50,31 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, NDList input) throws Exception {
+        // input = [inputIds, posIds, attnMask]
         NDManager manager = ctx.getNDManager();
         if (input.size() == 3) {
-            ctx.setAttachment("initialCall", Boolean.TRUE);
+            // In this case, input has null pastKeyValues. We prefix-append a dummy pastKeyValues,
+            // which is treated as prefix padding, and set the corresponding attnMask to be zero. No
+            // need to shift the position ids.
+            ctx.setAttachment("useDummyPastKeyValues", Boolean.TRUE);
+
+            // Pad the null pastKeyValues with dummy values
+            NDList pastKeyValues = initialDummyPastKeyValues(input.get(0), manager);
+            for (NDArray pkv : pastKeyValues) {
+                pkv.setName(tupleName);
+                input.add(pkv);
+            }
+
+            // Append zero to the attentionMask from left, corresponding to the padding
             long batchSize = input.get(0).getShape().get(0);
-            NDArray attentionMask = input.get(2);
-            attentionMask =
-                    manager.zeros(new Shape(batchSize, 1), DataType.INT64)
-                            .concat(attentionMask, -1);
+            NDArray attentionMask =
+                    manager.zeros(new Shape(batchSize, 1), DataType.INT64).concat(input.get(2), -1);
             input.set(2, attentionMask);
-            addInitialDummyPastKeyValues(input, input.get(0), manager);
+        } else {
+            for (int i = 3; i < numLayers * 2 + 3; ++i) {
+                NDArray pkv = input.get(i);
+                pkv.setName(tupleName);
+            }
         }
 
         return input;
@@ -74,12 +90,12 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
         if (output.size() > numLayers * 2 + 1) {
             hiddenStatesOutput = output.get(numLayers * 2 + 1);
         } else {
-            // If the traced_GPT2 model outputs hiddenStates, then this is not executed. If the
-            // provided traced model doesn't output hiddenStates, we can throw a warning here.
+            // Here is reached only if the language model doesn't output hiddenStates, which is
+            // needed only in contrastive search. We can also throw a warning here.
             hiddenStatesOutput = manager.zeros(new Shape(1));
         }
 
-        if (ctx.getAttachment("initialCall") != null) {
+        if (ctx.getAttachment("useDummyPastKeyValues") != null) {
             NDIndex index2 = new NDIndex(":, :, 1:, ...");
             pastKeyValuesOutput =
                     new NDList(
@@ -95,12 +111,11 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
         return new CausalLMOutput(logitsOutput, hiddenStatesOutput, pastKeyValuesOutput);
     }
 
-    private void addInitialDummyPastKeyValues(NDList list, NDArray inputIds, NDManager manager) {
+    private NDList initialDummyPastKeyValues(NDArray inputIds, NDManager manager) {
         long numBatch = inputIds.getShape().get(0);
-        for (int i = 0; i < numLayers * 2; ++i) {
-            NDArray array = manager.zeros(new Shape(numBatch, numAttentionHeads, 1, kvDim));
-            array.setName(tupleName);
-            list.add(array);
-        }
+        NDArray dummyKV = manager.zeros(new Shape(numBatch, numAttentionHeads, 1, kvDim));
+        NDList pastKeyValues = new NDList();
+        pastKeyValues.addAll(Collections.nCopies(2 * numLayers, dummyKV));
+        return pastKeyValues;
     }
 }
