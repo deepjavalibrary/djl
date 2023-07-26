@@ -17,24 +17,9 @@
       },
       "files": {
         "amazon_reviews": {
-          "uri": "https://s3.amazonaws.com/amazon-reviews-pds/tsv/amazon_reviews_us_Digital_Software_v1_00.tsv.gz",
-          "sha1Hash": "b8390100b92579ed814eede4112514417e339902",
-          "size": 18997559
-        }
-      }
-    },
-    {
-      "version": "1.0",
-      "snapshot": false,
-      "name": "amazon_reviews_us_Software",
-      "properties": {
-        "dataset": "us_Software"
-      },
-      "files": {
-        "amazon_reviews": {
-          "uri": "https://s3.amazonaws.com/amazon-reviews-pds/tsv/amazon_reviews_us_Software_v1_00.tsv.gz",
-          "sha1Hash": "e48346dd356698ce680e385e3ecf07501de695b8",
-          "size": 94010685
+          "uri": "1.0/amazon_reviews_us_Digital_Software_v1_00.tsv.gz",
+          "sha1Hash": "098fb62c5731161dd1e10298a5d11636253609a1",
+          "size": 18997604
         }
       }
     }
