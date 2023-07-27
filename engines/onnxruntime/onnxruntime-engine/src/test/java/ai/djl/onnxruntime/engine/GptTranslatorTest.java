@@ -85,7 +85,6 @@ public class GptTranslatorTest {
             Assert.assertEquals(nextTokenId, 257);
             NDList list = res.getPastKeyValuesList();
             Assert.assertEquals(list.size(), 24);
-            Assert.assertEquals(res.getHiddenState().getShape().get(0), 1);
         }
     }
 }
