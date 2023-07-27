@@ -30,6 +30,9 @@ import ai.djl.util.Pair;
 import ai.djl.util.Progress;
 import ai.djl.util.Utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
@@ -42,6 +45,8 @@ import java.util.stream.Collectors;
 
 /** Shared code for the {@link ModelLoader} implementations. */
 public class BaseModelLoader implements ModelLoader {
+
+    private static final Logger logger = LoggerFactory.getLogger(BaseModelLoader.class);
 
     protected MRL mrl;
     protected TranslatorFactory defaultFactory;
@@ -238,6 +243,9 @@ public class BaseModelLoader implements ModelLoader {
         if (factoryClass != null) {
             ClassLoader cl = ClassLoaderUtils.getContextClassLoader();
             factory = ClassLoaderUtils.initClass(cl, TranslatorFactory.class, factoryClass);
+            if (factory == null) {
+                logger.warn("Failed to load translatorFactory: {}", factoryClass);
+            }
         }
         return factory;
     }

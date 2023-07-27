@@ -82,7 +82,11 @@ public final class ClassLoaderUtils {
                             (PrivilegedAction<ClassLoader>)
                                     () -> new URLClassLoader(urls, contextCl));
             if (className != null && !className.isEmpty()) {
-                return initClass(cl, type, className);
+                T impl = initClass(cl, type, className);
+                if (impl == null) {
+                    logger.warn("Failed to load class: {}", className);
+                }
+                return impl;
             }
 
             T implemented = scanDirectory(cl, type, classesDir);
