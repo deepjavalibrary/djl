@@ -125,7 +125,7 @@ public final class TrainAmazonReviewRanking {
     private static CsvDataset getDataset(
             Arguments arguments, BertFullTokenizer tokenizer, int maxLength) {
         String amazonReview =
-                "https://s3.amazonaws.com/amazon-reviews-pds/tsv/amazon_reviews_us_Digital_Software_v1_00.tsv.gz";
+                "https://mlrepo.djl.ai/dataset/nlp/ai/djl/basicdataset/amazon_reviews/1.0/amazon_reviews_us_Digital_Software_v1_00.tsv.gz";
         float paddingToken = tokenizer.getVocabulary().getIndex("[PAD]");
         return CsvDataset.builder()
                 .optCsvUrl(amazonReview)

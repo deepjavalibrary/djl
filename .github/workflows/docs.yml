@@ -27,7 +27,7 @@ jobs:
       - name: Install CN fonts
         run: sudo apt-get update && sudo apt-get install fonts-arphic-uming
       - name: install Python Dependencies
-        run: pip3 install nbconvert mkdocs mkdocs-exclude mknotebooks mkdocs-material jupyter Pygments Markdown
+        run: pip3 install nbconvert mkdocs==1.4.3 mkdocs-exclude mknotebooks mkdocs-material jupyter Pygments Markdown
       - name: Install IJava kernel
         run: |
           git clone https://github.com/frankfliu/IJava.git
