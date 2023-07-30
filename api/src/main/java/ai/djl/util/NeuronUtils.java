@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -85,6 +86,14 @@ public final class NeuronUtils {
         Path path = Paths.get(location);
         if (!Files.exists(path)) {
             return 0;
+        }
+        Path file = path.resolve("core_count");
+        if (Files.exists(file)) {
+            try (InputStream is = Files.newInputStream(file)) {
+                return Integer.parseInt(Utils.toString(is));
+            } catch (IOException e) {
+                throw new AssertionError("Failed to read core_count file", e);
+            }
         }
         int count = 0;
         try (Stream<Path> dev = Files.list(path)) {
