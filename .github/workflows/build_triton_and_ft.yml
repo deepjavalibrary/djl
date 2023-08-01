@@ -85,6 +85,7 @@ jobs:
         run: |
           aws s3 sync /tmp/binaries/ s3://djl-ai/publish/fastertransformer/${{ github.event.inputs.fastertransformer }}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/fastertransformer/${{ github.event.inputs.fastertransformer }}/*"
+      - name: Copy files for llama build to S3 with AWS CLI
         if: ${{ github.event.inputs.is_llama_build }} == 'true'
         run: |
           echo "pushing binaries to ft/llama"
