@@ -11,6 +11,11 @@ on:
         description: 'fastertransformer branch/tag version'
         required: true
         default: 'main'
+      is_llama_build:
+        description: 'whether to build custom llama source'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build-triton:
@@ -68,7 +73,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build FasterTransformers
         run: |
-          tools/scripts/build_ft_deps.sh ${{ github.event.inputs.fastertransformer }} ${{ github.event.inputs.triton }}
+          tools/scripts/build_ft_deps.sh ${{ github.event.inputs.fastertransformer }} ${{ github.event.inputs.triton }} ${{ github.event.inputs.is_llama_build }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -76,9 +81,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
+        if !${{ github.event.inputs.is_llama_build }}
         run: |
           aws s3 sync /tmp/binaries/ s3://djl-ai/publish/fastertransformer/${{ github.event.inputs.fastertransformer }}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/fastertransformer/${{ github.event.inputs.fastertransformer }}/*"
+        if ${{ github.event.inputs.is_llama_build }}
+        run: |
+          echo "pushing binaries to ft llama path"
+          aws s3 sync /tmp/binaries/ s3://djl-ai/publish/fastertransformer-llama/${{ github.event.inputs.fastertransformer }}/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/fastertransformer-llama/${{ github.event.inputs.fastertransformer }}/*"
 
   stop-runner:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
