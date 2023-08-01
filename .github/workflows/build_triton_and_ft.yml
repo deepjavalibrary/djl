@@ -84,21 +84,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
-        if: ${{ github.event.inputs.is_llama_build }} == 'false'
+        if: github.event.inputs.is_llama_build == 'false'
         run: |
           echo "pushing binaries to ft/main"
-          echo ${{ github.event.inputs.is_llama_build }} == 'false'
-          echo ${{ github.event.inputs.is_llama_build }}
+          echo github.event.inputs.is_llama_build == 'false'
+          echo github.event.inputs.is_llama_build
           echo !${{ github.event.inputs.is_llama_build }}
           # aws s3 sync /tmp/binaries/ s3://djl-ai/publish/fastertransformer/${{ github.event.inputs.fastertransformer }}/
           # aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/fastertransformer/${{ github.event.inputs.fastertransformer }}/*"
       - name: Copy files for llama build to S3 with AWS CLI
-        if: ${{ github.event.inputs.is_llama_build }} == 'true'
+        if: github.event.inputs.is_llama_build == 'true'
         run: |
           echo "pushing binaries to ft/llama"
-          echo ${{ github.event.inputs.is_llama_build }} == 'false'
-          echo ${{ github.event.inputs.is_llama_build }}
-          echo !${{ github.event.inputs.is_llama_build }}
+          echo github.event.inputs.is_llama_build == 'true'
+          echo github.event.inputs.is_llama_build
+          echo !github.event.inputs.is_llama_build
           # aws s3 sync /tmp/binaries/ s3://djl-ai/publish/fastertransformer/llama/
           # aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/fastertransformer-llama/${{ github.event.inputs.fastertransformer }}/*"
 
