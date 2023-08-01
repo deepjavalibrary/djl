@@ -81,11 +81,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
-        if ${{ github.event.inputs.is_llama_build }} == 'false'
+        if: ${{ github.event.inputs.is_llama_build }} == 'false'
         run: |
           aws s3 sync /tmp/binaries/ s3://djl-ai/publish/fastertransformer/${{ github.event.inputs.fastertransformer }}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/fastertransformer/${{ github.event.inputs.fastertransformer }}/*"
-        if ${{ github.event.inputs.is_llama_build }} == 'true'
+        if: ${{ github.event.inputs.is_llama_build }} == 'true'
         run: |
           echo "pushing binaries to ft/llama"
           aws s3 sync /tmp/binaries/ s3://djl-ai/publish/fastertransformer/llama/
