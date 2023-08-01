@@ -16,7 +16,7 @@ export FT_DIR=/tmp/FasterTransformer
 mkdir -p /tmp/binaries
 
 # Build FasterTransformer Triton library
-if [ "$IS_LLAMA_BUILD" = false ] ; then
+if [ "$IS_LLAMA_BUILD" = "false" ] ; then
       git clone https://github.com/triton-inference-server/fastertransformer_backend.git
 else
       echo "cloning forked FT backend repo with llama support"
