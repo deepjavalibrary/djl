@@ -88,7 +88,7 @@ public final class NeuronUtils {
             return 0;
         }
         Path file = path.resolve("core_count");
-        if (Files.exists(file)) {
+        if (Files.exists(file) && Files.isReadable(file)) {
             try (InputStream is = Files.newInputStream(file)) {
                 return Integer.parseInt(Utils.toString(is));
             } catch (IOException e) {
