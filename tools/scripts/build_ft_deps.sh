@@ -4,6 +4,7 @@ set -ex
 
 FT_VERSION=$1
 NVIDIA_TRITON_SERVER_VERSION=$2
+IS_LLAMA_BUILD=$3
 
 apt-get update && apt-get install -y rapidjson-dev
 
@@ -15,7 +16,12 @@ export FT_DIR=/tmp/FasterTransformer
 mkdir -p /tmp/binaries
 
 # Build FasterTransformer Triton library
-git clone https://github.com/triton-inference-server/fastertransformer_backend.git
+if [ "$IS_LLAMA_BUILD" = "false" ] ; then
+      git clone https://github.com/triton-inference-server/fastertransformer_backend.git
+else
+      echo "cloning forked FT backend repo with llama support"
+      git clone https://github.com/rohithkrn/fastertransformer_backend.git -b llama_void_main
+fi
 mkdir -p fastertransformer_backend/build
 cd fastertransformer_backend/build
 cmake \
