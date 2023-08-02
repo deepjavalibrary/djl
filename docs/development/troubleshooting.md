@@ -38,14 +38,11 @@ Then, right click the resources folder and select `Rebuild<default>`.
 
 ## UnsatisfiedLinkError issue
 
-###
-
 ```
 Caused by: java.lang.UnsatisfiedLinkError: /home/ubuntu/.tensorflow/cache/2.3.1-cu101-linux-x86_64/libjni$
 ensorflow.so: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `CXXABI_1.3.11' not found (required by /home/ubuntu/.te
 nsorflow/cache/2.3.1-cu101-linux-x86_64/libtensorflow.so.2)
 ```
-
 
 You might see the error when DJL tries to load the native library for the engines, but some shared libraries are missing.
 Let's take the PyTorch engine as an example.
@@ -226,24 +223,13 @@ Follow the [steps here](https://github.com/deepjavalibrary/d2l-java/blob/master/
 
 It is very unfortunate to have issue since the error logging is not very clear.
 There are many causes that can trigger this issue. If you have issues debugging,
-please file us an issue on GitHub or on Slack and we can check with you. Here is a summary on the issues we have dealt before.
-
-### 1. Java heap memory not sufficient
+please file us an issue on GitHub or on Slack and we can check with you.
 
 Sometimes the OOM issue will trigger the `Core Dump` error message.
 It can be the heap memory overflow and cause a chain of failure from native memory to Java.
 Try to increase the `xmx` may help to reduce this issue,
 you can also try to monitor the heap memory cost to identify if this is the root cause.
 
-### 2. Illegal memory access
-
-This issue is fairly common in the Multithreaded Inference/Training cases and will trigger the `segfault` or `Core Dump` error message.
-The Java GC has kicked in and release some of the pointers beforehand. Generally, you may need to disable the GC happened in this case
-and relying on DJL's `NDManager` to efficiently GC the memory. You can do that by adding flag
-
-```
--Dai.djl.disable_close_resource_on_finalize=true
-```
 
 ## 11. Special character issues (PaddlePaddle)
 
