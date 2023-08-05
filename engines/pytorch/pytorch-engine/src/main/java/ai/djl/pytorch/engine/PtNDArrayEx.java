@@ -697,15 +697,21 @@ public class PtNDArrayEx implements NDArrayEx {
 
         NDManager ndManager = array.getManager();
 
+        Shape input = array.getShape();
+        int inHeight = Math.toIntExact(input.get(2));
+        int inWidth = Math.toIntExact(input.get(3));
+
+        if (steps.get(0) <= 0 || steps.get(1) <= 0) {
+            // estimate using layer shape
+            steps.set(0, 1.f / inHeight);
+            steps.set(1, 1.f / inWidth);
+        }
+
         float stepX = steps.get(1);
         float stepY = steps.get(0);
         int numSizes = sizes.size();
         int numRatios = ratios.size();
         int count = 0;
-
-        Shape input = array.getShape();
-        int inHeight = Math.toIntExact(input.get(2));
-        int inWidth = Math.toIntExact(input.get(3));
 
         float[][] out = new float[inHeight * inWidth * numSizes * 2][4];
 
