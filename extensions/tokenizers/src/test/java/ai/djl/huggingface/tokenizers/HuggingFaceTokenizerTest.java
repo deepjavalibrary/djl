@@ -464,4 +464,22 @@ public class HuggingFaceTokenizerTest {
             Assert.assertEquals(outputs, outputsWithoutSpecialTokens);
         }
     }
+
+    @Test
+    public void testTokenizerWithPresetPaddingConfiguration() throws IOException {
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.builder()
+                        .optTokenizerPath(
+                                Paths.get("src/test/resources/fake-tokenizer-with-padding/"))
+                        .optMaxLength(8)
+                        .optPadToMaxLength()
+                        .build()) {
+            Encoding encoding = tokenizer.encode("test sentence");
+            String[] tokens = encoding.getTokens();
+            String[] expected = {
+                "<s>", "▁", "test", "▁sentence", "</s>", "<pad>", "<pad>", "<pad>"
+            };
+            Assert.assertEquals(tokens, expected);
+        }
+    }
 }
