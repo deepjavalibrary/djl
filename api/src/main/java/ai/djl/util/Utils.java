@@ -388,7 +388,32 @@ public final class Utils {
      * @return the string value of the variable or system property
      */
     public static String getEnvOrSystemProperty(String name) {
-        return getenv(name, System.getProperty(name));
+        return getEnvOrSystemProperty(name, null);
+    }
+
+    /**
+     * Gets the value of the specified environment variable or system property.
+     *
+     * @param name the name of the environment variable
+     * @param def a default value
+     * @return the string value of the variable or system property
+     */
+    public static String getEnvOrSystemProperty(String name, String def) {
+        try {
+            String env = System.getenv(name);
+            if (env != null) {
+                return env;
+            }
+        } catch (SecurityException e) {
+            logger.warn("Security manager doesn't allow access to the environment variable");
+        }
+
+        String prop = System.getProperty(name);
+        if (prop != null) {
+            return prop;
+        }
+
+        return def;
     }
 
     /**
