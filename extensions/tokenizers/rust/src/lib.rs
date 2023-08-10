@@ -661,11 +661,24 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
         _ => Err("strategy must be one of [longest, max_length]"),
     };
 
-    let mut params = PaddingParams::default();
-    params.strategy = res_strategy.unwrap();
-    params.pad_to_multiple_of = Some(pad_to_multiple_of as usize);
+    let res_pad_to_multiple_of = match pad_to_multiple_of as usize {
+        0 => None,
+        val => Some(val)
+    };
+
     let tokenizer = cast_handle::<Tokenizer>(handle);
-    tokenizer.with_padding(Some(params));
+
+    if let Some(padding_params) = tokenizer.get_padding_mut() {
+        padding_params.strategy = res_strategy.unwrap();
+        padding_params.pad_to_multiple_of = res_pad_to_multiple_of;
+    } else {
+        let padding_params = PaddingParams {
+            strategy: res_strategy.unwrap(),
+            pad_to_multiple_of: res_pad_to_multiple_of,
+            ..Default::default()
+        };
+        tokenizer.with_padding(Some(padding_params));
+    }
 }
 
 #[no_mangle]
@@ -697,13 +710,22 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
         "ONLY_SECOND" => Ok(TruncationStrategy::OnlySecond),
         _ => Err("strategy must be one of [longest_first, only_first, only_second]"),
     };
-    let mut params = TruncationParams::default();
-    params.max_length = truncation_max_length as usize;
-    params.strategy = res_strategy.unwrap();
-    params.stride = truncation_stride as usize;
 
     let tokenizer = cast_handle::<Tokenizer>(handle);
-    tokenizer.with_truncation(Some(params));
+
+    if let Some(truncation_params) = tokenizer.get_truncation_mut() {
+        truncation_params.strategy = res_strategy.unwrap();
+        truncation_params.stride = truncation_stride as usize;
+        truncation_params.max_length = truncation_max_length as usize;
+    } else {
+        let truncation_params = TruncationParams {
+            strategy: res_strategy.unwrap(),
+            stride: truncation_stride as usize,
+            max_length: truncation_max_length as usize,
+            ..Default::default()
+        };
+        tokenizer.with_truncation(Some(truncation_params));
+    }
 }
 
 #[no_mangle]
