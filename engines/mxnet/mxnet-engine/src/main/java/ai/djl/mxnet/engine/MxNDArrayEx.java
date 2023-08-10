@@ -1044,7 +1044,11 @@ class MxNDArrayEx implements NDArrayEx {
             array2 = other;
         }
         try {
-            return getManager().invoke("where", new NDArray[] {condition, array1, array2}, null);
+            MxNDManager manager = getManager();
+            return manager.invoke(
+                    "where",
+                    new NDArray[] {manager.from(condition), array1, manager.from(array2)},
+                    null);
         } finally {
             if (array1 != array) {
                 array1.close();
