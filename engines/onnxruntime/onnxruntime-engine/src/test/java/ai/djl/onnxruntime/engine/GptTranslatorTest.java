@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.pytorch.zoo.nlp.textgeneration;
+package ai.djl.onnxruntime.engine;
 
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
+import ai.djl.onnxruntime.zoo.nlp.textgeneration.OrtGptTranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
@@ -67,7 +68,7 @@ public class GptTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optOption("hasParameter", "false")
-                        .optTranslatorFactory(new PtGptTranslatorFactory())
+                        .optTranslatorFactory(new OrtGptTranslatorFactory())
                         .build();
 
         try (ZooModel<NDList, CausalLMOutput> model = criteria.loadModel();
@@ -84,7 +85,6 @@ public class GptTranslatorTest {
             Assert.assertEquals(nextTokenId, 257);
             NDList list = res.getPastKeyValuesList();
             Assert.assertEquals(list.size(), 24);
-            Assert.assertEquals(res.getHiddenState().getShape().get(0), 1);
         }
     }
 }

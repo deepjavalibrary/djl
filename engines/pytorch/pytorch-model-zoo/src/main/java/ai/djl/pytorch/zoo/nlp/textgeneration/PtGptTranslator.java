@@ -22,7 +22,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
 
-import java.util.Collections;
 import java.util.stream.Collectors;
 
 /** The {@link ai.djl.translate.Translator} for PyTorch GPT2 model. */
@@ -55,26 +54,22 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
         if (input.size() == 3) {
             // In this case, input has null pastKeyValues. We prefix-append a dummy pastKeyValues,
             // which is treated as prefix padding, and set the corresponding attnMask to be zero. No
-            // need to shift the position ids.
+            // need to shift the position ids, since the starting position id, which is 0, won't
+            // change after appending the dummy kv_cache.
             ctx.setAttachment("useDummyPastKeyValues", Boolean.TRUE);
 
             // Pad the null pastKeyValues with dummy values
-            NDList pastKeyValues = initialDummyPastKeyValues(input.get(0), manager);
-            for (NDArray pkv : pastKeyValues) {
-                pkv.setName(tupleName);
-                input.add(pkv);
-            }
+            initialDummyPastKeyValues(input.get(0), manager, input);
 
             // Append zero to the attentionMask from left, corresponding to the padding
             long batchSize = input.get(0).getShape().get(0);
             NDArray attentionMask =
                     manager.zeros(new Shape(batchSize, 1), DataType.INT64).concat(input.get(2), -1);
             input.set(2, attentionMask);
-        } else {
-            for (int i = 3; i < numLayers * 2 + 3; ++i) {
-                NDArray pkv = input.get(i);
-                pkv.setName(tupleName);
-            }
+        }
+
+        for (int i = 3; i < numLayers * 2 + 3; ++i) {
+            input.get(i).setName(tupleName);
         }
 
         return input;
@@ -111,11 +106,11 @@ public class PtGptTranslator implements NoBatchifyTranslator<NDList, CausalLMOut
         return new CausalLMOutput(logitsOutput, hiddenStatesOutput, pastKeyValuesOutput);
     }
 
-    private NDList initialDummyPastKeyValues(NDArray inputIds, NDManager manager) {
+    private void initialDummyPastKeyValues(NDArray inputIds, NDManager manager, NDList list) {
         long numBatch = inputIds.getShape().get(0);
-        NDArray dummyKV = manager.zeros(new Shape(numBatch, numAttentionHeads, 1, kvDim));
-        NDList pastKeyValues = new NDList();
-        pastKeyValues.addAll(Collections.nCopies(2 * numLayers, dummyKV));
-        return pastKeyValues;
+        for (int i = 0; i < numLayers * 2; ++i) {
+            NDArray array = manager.zeros(new Shape(numBatch, numAttentionHeads, 1, kvDim));
+            list.add(array);
+        }
     }
 }

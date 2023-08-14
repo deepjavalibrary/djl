@@ -535,13 +535,13 @@ public class TextGenerator {
     }
 
     /**
-     * Forward function call to generate text.
+     * Generate function call to generate text.
      *
      * @param inputIds the input token ids
      * @return generated token ids
      * @throws TranslateException if prediction fails
      */
-    public NDArray forward(NDArray inputIds) throws TranslateException {
+    public NDArray generate(NDArray inputIds) throws TranslateException {
         switch (searchName) {
             case "greedy":
                 return greedySearch(inputIds);
@@ -554,5 +554,14 @@ public class TextGenerator {
                         "searchName not correctly specified. Please choose among: {greedy, beam,"
                                 + " contrastive}");
         }
+    }
+
+    /**
+     * Gets the value of the positionOffset.
+     *
+     * @return the value of positionOffset
+     */
+    public NDArray getPositionOffset() {
+        return positionOffset;
     }
 }
