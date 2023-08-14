@@ -20,6 +20,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -157,8 +158,46 @@ public abstract class NDArrayAdapter implements NDArray {
             }
             return this;
         }
-        // TODO: each engine should override this method
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+        Number[] numbers = toArray();
+        ByteBuffer bb = toTypeInternal(numbers, dataType);
+        return manager.create(bb, getShape(), dataType);
+    }
+
+    private ByteBuffer toTypeInternal(Number[] numbers, DataType dataType) {
+        int size = dataType.getNumOfBytes() * numbers.length;
+        ByteBuffer bb = manager.allocateDirect(size);
+        for (Number number : numbers) {
+            switch (dataType) {
+                case FLOAT16:
+                case FLOAT32:
+                    bb.putFloat(number.floatValue());
+                    break;
+                case FLOAT64:
+                    bb.putDouble(number.doubleValue());
+                    break;
+                case INT16:
+                case UINT16:
+                    bb.putShort(number.shortValue());
+                    break;
+                case INT32:
+                case UINT32:
+                    bb.putInt(number.intValue());
+                    break;
+                case INT64:
+                case UINT64:
+                    bb.putLong(number.longValue());
+                    break;
+                case BOOLEAN:
+                case INT8:
+                case UINT8:
+                    bb.put(number.byteValue());
+                    break;
+                default:
+                    throw new IllegalStateException("Unsupported DataType: " + getDataType());
+            }
+        }
+        bb.rewind();
+        return bb;
     }
 
     /** {@inheritDoc} */
