@@ -694,7 +694,60 @@ public class PtNDArrayEx implements NDArrayEx {
             List<Float> steps,
             List<Float> offsets,
             boolean clip) {
-        throw new UnsupportedOperationException("Not implemented");
+
+        NDManager ndManager = array.getManager();
+
+        Shape input = array.getShape();
+        int inHeight = Math.toIntExact(input.get(2));
+        int inWidth = Math.toIntExact(input.get(3));
+
+        if (steps.get(0) <= 0 || steps.get(1) <= 0) {
+            // estimate using layer shape
+            steps.set(0, 1.f / inHeight);
+            steps.set(1, 1.f / inWidth);
+        }
+
+        float stepX = steps.get(1);
+        float stepY = steps.get(0);
+        int numSizes = sizes.size();
+        int numRatios = ratios.size();
+        int count = 0;
+
+        float[][] out = new float[inHeight * inWidth * numSizes * 2][4];
+
+        for (int r = 0; r < inHeight; ++r) {
+            float centerY = (r + offsets.get(0)) * stepY;
+            for (int c = 0; c < inWidth; ++c) {
+                float centerX = (c + offsets.get(1)) * stepX;
+                // ratio = first ratio, various sizes
+                float ratio = numRatios > 0 ? (float) Math.sqrt(ratios.get(0)) : 1.f;
+                for (int i = 0; i < numSizes; ++i) {
+                    float size = sizes.get(i);
+                    float w = size * inHeight / inWidth * ratio / 2;
+                    float h = size / ratio / 2;
+
+                    out[count][0] = centerX - w; // xmin
+                    out[count][1] = centerY - h; // ymin
+                    out[count][2] = centerX + w; // xmax
+                    out[count][3] = centerY + h; // ymax
+                    ++count;
+                }
+                // various ratios, size = min_size = size[0]
+                float size = sizes.get(0);
+                for (int j = 1; j < numRatios; ++j) {
+                    float ratioLocal = (float) Math.sqrt(ratios.get(j));
+                    float w = size * inHeight / inWidth * ratioLocal / 2;
+                    float h = size / ratioLocal / 2;
+                    out[count][0] = centerX - w; // xmin
+                    out[count][1] = centerY - h; // ymin
+                    out[count][2] = centerX + w; // xmax
+                    out[count][3] = centerY + h; // ymax
+                    ++count;
+                }
+            }
+        }
+        NDArray ndArray = ndManager.create(out).expandDims(0);
+        return new NDList(ndArray);
     }
 
     /** {@inheritDoc} */
