@@ -22,6 +22,7 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.TranslateException;
 
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,8 @@ public class TextGenerator {
     private Predictor<NDList, CausalLMOutput> predictor;
 
     private NDArray positionOffset;
+
+    private long[] endPosition;
 
     /**
      * Constructs a new {@code TextGenerator} instance.
@@ -60,11 +63,15 @@ public class TextGenerator {
      * Executes greedy search.
      *
      * @param inputIds the input token ids.
-     * @return the output token ids stored as NDArray
+     * @return the output token ids stored as NDArray and the endPosition of each sentence
      * @throws TranslateException if forward fails
      */
     @SuppressWarnings("try")
     public NDArray greedySearch(NDArray inputIds) throws TranslateException {
+        // Initialize the end position of each sentence
+        endPosition = new long[Math.toIntExact(inputIds.getShape().get(0))];
+        Arrays.fill(endPosition, config.getMaxSeqLength());
+
         NDArray attentionMask = prepareAttentionMaskOffset(inputIds, config);
         NDManager manager = inputIds.getManager();
         GreedyBatchTensorList searchState =
@@ -110,7 +117,12 @@ public class TextGenerator {
             }
 
             // Termination Criteria
-            // TODO: <EOS>, delete the sentence and add it to result.
+            long[] outputIdsArray = searchState.getNextInputIds().toLongArray();
+            for (int i = 0; i < outputIdsArray.length; i++) {
+                if (outputIdsArray[i] == config.getEosTokenId()) {
+                    endPosition[i] = searchState.getPastOutputIds().getShape().get(1) + 1;
+                }
+            }
             if (searchState.getPastOutputIds().getShape().get(1) + 1 >= config.getMaxSeqLength()) {
                 break;
             }
@@ -123,11 +135,15 @@ public class TextGenerator {
      *
      * @param inputIds input tokens ids
      * @see <a href="https://huggingface.co/blog/how-to-generate">Beam Search</a>
-     * @return output tensor
+     * @return the output token ids stored as NDArray and the endPosition of each sentence
      * @throws TranslateException if failed run forward
      */
     @SuppressWarnings("try")
     public NDArray beamSearch(NDArray inputIds) throws TranslateException {
+        // Initialize the end position of each sentence
+        endPosition = new long[Math.toIntExact(inputIds.getShape().get(0))];
+        Arrays.fill(endPosition, config.getMaxSeqLength());
+
         NDArray attentionMask = prepareAttentionMaskOffset(inputIds, config);
         NDManager manager = inputIds.getManager();
         long numBeam = config.getBeam();
@@ -223,7 +239,12 @@ public class TextGenerator {
             }
 
             // Termination Criteria
-            // TODO: <EOS>, delete the sentence and add it to result.
+            long[] outputIdsArray = searchState.getNextInputIds().toLongArray();
+            for (int i = 0; i < outputIdsArray.length; i++) {
+                if (outputIdsArray[i] == config.getEosTokenId()) {
+                    endPosition[i] = searchState.getPastOutputIds().getShape().get(1) + 1;
+                }
+            }
             if (searchState.getPastOutputIds().getShape().getLastDimension() + 1
                     >= config.getMaxSeqLength()) {
                 break;
@@ -241,13 +262,17 @@ public class TextGenerator {
      *
      * @param inputIds input token ids
      * @see <a href="https://huggingface.co/blog/introducing-csearch">Contrastive Search</a>
-     * @return the generated {@code NDArray}
+     * @return the output token ids stored as NDArray
      * @throws TranslateException if forward failed
      */
     @SuppressWarnings("try")
     public NDArray contrastiveSearch(NDArray inputIds) throws TranslateException {
         // inputIds: [batchSize, seqLength: t_init]
         // attentionMask: [batchSize, pastSeq]. seq-dim-size = |past_seq| + |inputIds|.
+
+        // Initialize the end position of each sentence
+        endPosition = new long[Math.toIntExact(inputIds.getShape().get(0))];
+        Arrays.fill(endPosition, config.getMaxSeqLength());
 
         NDManager manager = inputIds.getManager();
         NDArray attentionMask = prepareAttentionMaskOffset(inputIds, config);
@@ -339,7 +364,13 @@ public class TextGenerator {
                 NDScope.unregister(searchState.getPastKeyValues());
             }
 
-            // TODO: <EOS>, delete the sentence and add it to result.
+            // Termination Criteria
+            long[] outputIdsArray = searchState.getPastOutputIds().toLongArray();
+            for (int i = 0; i < outputIdsArray.length; i++) {
+                if (outputIdsArray[i] == config.getEosTokenId()) {
+                    endPosition[i] = searchState.getPastOutputIds().getShape().get(1);
+                }
+            }
             if (searchState.getPastOutputIds().getShape().get(1) >= config.getMaxSeqLength()) {
                 break;
             }
@@ -557,11 +588,20 @@ public class TextGenerator {
     }
 
     /**
-     * Gets the value of the positionOffset.
+     * Returns the value of the positionOffset.
      *
      * @return the value of positionOffset
      */
     public NDArray getPositionOffset() {
         return positionOffset;
+    }
+
+    /**
+     * Returns the end position of each sentence induced by EOS tokenId or reaching maxSeqLength.
+     *
+     * @return the end position of each sentence
+     */
+    public long[] getEndPosition() {
+        return endPosition;
     }
 }
