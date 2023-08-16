@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.inference.whisper;
 
+import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.audio.translator.WhisperTranslatorFactory;
 import ai.djl.inference.Predictor;
@@ -32,12 +33,14 @@ public class WhisperModel implements AutoCloseable {
     ZooModel<Audio, String> whisperModel;
 
     public WhisperModel() throws ModelException, IOException {
+        // this model is traced on CPU and can only be loaded on CPU
         Criteria<Audio, String> criteria =
                 Criteria.builder()
                         .setTypes(Audio.class, String.class)
                         .optModelUrls(
                                 "https://resources.djl.ai/demo/pytorch/whisper/whisper_en.zip")
                         .optEngine("PyTorch")
+                        .optDevice(Device.cpu())
                         .optTranslatorFactory(new WhisperTranslatorFactory())
                         .build();
         whisperModel = criteria.loadModel();
