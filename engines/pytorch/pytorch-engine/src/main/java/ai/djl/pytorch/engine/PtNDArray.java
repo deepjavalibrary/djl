@@ -162,7 +162,9 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         if (device.equals(getDevice()) && !copy) {
             return this;
         }
-        return JniUtils.to(this, getDataType(), device);
+        PtNDArray array = JniUtils.to(this, getDataType(), device);
+        array.setName(getName());
+        return array;
     }
 
     /** {@inheritDoc} */
@@ -171,7 +173,9 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         if (dataType.equals(getDataType()) && !copy) {
             return this;
         }
-        return JniUtils.to(this, dataType, getDevice());
+        PtNDArray array = JniUtils.to(this, dataType, getDevice());
+        array.setName(array.getName());
+        return array;
     }
 
     /** {@inheritDoc} */
@@ -366,7 +370,9 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray duplicate() {
-        return JniUtils.clone(this);
+        NDArray array = JniUtils.clone(this);
+        array.setName(getName());
+        return array;
     }
 
     /** {@inheritDoc} */
