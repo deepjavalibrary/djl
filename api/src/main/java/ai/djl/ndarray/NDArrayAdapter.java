@@ -146,7 +146,10 @@ public abstract class NDArrayAdapter implements NDArray {
             }
             return this;
         }
-        throw new UnsupportedOperationException(UNSUPPORTED_MSG);
+        NDArray array = getManager().create(getShape(), getDataType(), device);
+        array.setName(getName());
+        copyTo(array);
+        return array;
     }
 
     /** {@inheritDoc} */
@@ -160,7 +163,9 @@ public abstract class NDArrayAdapter implements NDArray {
         }
         Number[] numbers = toArray();
         ByteBuffer bb = toTypeInternal(numbers, dataType);
-        return manager.create(bb, getShape(), dataType);
+        NDArray array = manager.create(bb, getShape(), dataType);
+        array.setName(getName());
+        return array;
     }
 
     private ByteBuffer toTypeInternal(Number[] numbers, DataType dataType) {
