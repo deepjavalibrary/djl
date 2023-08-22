@@ -41,6 +41,8 @@ def main():
     temp_dir = f"{args.output_dir}/tmp"
 
     models = huggingface_models.list_models(args)
+    if not models:
+        logging.warning(f"model not found: {args}")
 
     for model in models:
         task = model["task"]
