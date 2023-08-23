@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class StreamingTest {
 
     @Test

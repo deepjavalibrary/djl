@@ -51,6 +51,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class IntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(IntegrationTest.class);

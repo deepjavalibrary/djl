@@ -20,6 +20,7 @@ import org.testng.SkipException;
 
 import java.util.Arrays;
 
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public final class TestUtils {
 
     private static String engineName = Engine.getDefaultEngineName();

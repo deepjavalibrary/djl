@@ -99,6 +99,7 @@ public class BlockFactoryTest {
         return zipPath;
     }
 
+    @SuppressWarnings("PMD.TestClassWithoutTestCases")
     public static class TestBlockFactory implements BlockFactory {
 
         private static final long serialVersionUID = 1234567L;

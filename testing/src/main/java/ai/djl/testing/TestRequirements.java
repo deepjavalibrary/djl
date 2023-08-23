@@ -24,6 +24,7 @@ import java.util.Calendar;
  * <p>When the test requirements are not fulfilled, the test is skipped with a {@link
  * SkipException}.
  */
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public final class TestRequirements {
 
     private TestRequirements() {}
