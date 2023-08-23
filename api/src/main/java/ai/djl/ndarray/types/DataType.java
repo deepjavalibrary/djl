@@ -189,6 +189,37 @@ public enum DataType {
     }
 
     /**
+     * Returns the data type from Safetensors value.
+     *
+     * @param dtype the Safetensors datatype
+     * @return the data type
+     */
+    public static DataType fromSafetensors(String dtype) {
+        switch (dtype) {
+            case "F64":
+                return FLOAT64;
+            case "F32":
+                return FLOAT32;
+            case "F16":
+                return FLOAT16;
+            case "BF16":
+                return BFLOAT16;
+            case "I64":
+                return INT64;
+            case "I32":
+                return INT32;
+            case "I8":
+                return INT8;
+            case "U8":
+                return UINT8;
+            case "BOOL":
+                return BOOLEAN;
+            default:
+                throw new IllegalArgumentException("Unsupported safetensors dataType: " + dtype);
+        }
+    }
+
+    /**
      * Converts a {@link ByteBuffer} to a buffer for this data type.
      *
      * @param data the buffer to convert
@@ -253,6 +284,43 @@ public enum DataType {
             case STRING:
                 return "|S1";
             case BFLOAT16:
+            case COMPLEX64:
+            case UNKNOWN:
+            default:
+                throw new IllegalArgumentException("Unsupported dataType: " + this);
+        }
+    }
+
+    /**
+     * Returns a safetensors string value.
+     *
+     * @return a safetensors string value
+     */
+    public String asSafetensors() {
+        switch (this) {
+            case FLOAT64:
+                return "F64";
+            case FLOAT32:
+                return "F32";
+            case FLOAT16:
+                return "F16";
+            case BFLOAT16:
+                return "BF16";
+            case INT64:
+                return "I64";
+            case INT32:
+                return "I32";
+            case INT8:
+                return "I8";
+            case UINT8:
+                return "U8";
+            case BOOLEAN:
+                return "BOOL";
+            case INT16:
+            case UINT64:
+            case UINT32:
+            case UINT16:
+            case STRING:
             case COMPLEX64:
             case UNKNOWN:
             default:

@@ -45,6 +45,15 @@ public class ServingTranslatorTest {
 
     @Test
     public void testNumpy() throws IOException, TranslateException, ModelException {
+        test("tensor/npz");
+    }
+
+    @Test
+    public void testSafetensors() throws IOException, TranslateException, ModelException {
+        test("tensor/safetensors");
+    }
+
+    private void test(String contentType) throws IOException, TranslateException, ModelException {
         Path path = Paths.get("build/model");
         Files.createDirectories(path);
         Input input = new Input();
@@ -58,8 +67,13 @@ public class ServingTranslatorTest {
             model.close();
             NDList list = new NDList();
             list.add(manager.create(10f));
-            input.add(list.encode(true));
-            input.add("Content-Type", "tensor/npz");
+            if ("tensor/safetensors".equalsIgnoreCase(contentType)) {
+                input.add(list.encode(NDList.Encoding.SAFETENSORS));
+                input.add("Content-Type", "tensor/safetensors");
+            } else {
+                input.add(list.encode(NDList.Encoding.NPZ));
+                input.add("Content-Type", "tensor/npz");
+            }
         }
 
         Criteria<Input, Output> criteria =

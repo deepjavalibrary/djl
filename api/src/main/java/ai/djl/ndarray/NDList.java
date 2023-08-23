@@ -13,7 +13,13 @@
 package ai.djl.ndarray;
 
 import ai.djl.Device;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.JsonUtils;
+import ai.djl.util.Pair;
+
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,10 +31,14 @@ import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -84,7 +94,7 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
      * @return {@code NDList}
      */
     public static NDList decode(NDManager manager, byte[] byteArray) {
-        if (byteArray.length < 4) {
+        if (byteArray.length < 9) {
             throw new IllegalArgumentException("Invalid input length: " + byteArray.length);
         }
         try {
@@ -96,6 +106,8 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
                     && byteArray[3] == 'M') {
                 return new NDList(
                         NDSerializer.decode(manager, new ByteArrayInputStream(byteArray)));
+            } else if (byteArray[8] == '{') {
+                return decodeSafetensors(manager, new ByteArrayInputStream(byteArray));
             }
 
             ByteBuffer bb = ByteBuffer.wrap(byteArray);
@@ -124,10 +136,10 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
     public static NDList decode(NDManager manager, InputStream is) {
         try {
             DataInputStream dis = new DataInputStream(is);
-            byte[] magic = new byte[4];
+            byte[] magic = new byte[9];
             dis.readFully(magic);
 
-            PushbackInputStream pis = new PushbackInputStream(is, 4);
+            PushbackInputStream pis = new PushbackInputStream(is, 9);
             pis.unread(magic);
             if (magic[0] == 'P' && magic[1] == 'K') {
                 // assume this is npz file
@@ -137,6 +149,8 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
                     && magic[2] == 'U'
                     && magic[3] == 'M') {
                 return new NDList(NDSerializer.decode(manager, pis));
+            } else if (magic[8] == '{') {
+                return decodeSafetensors(manager, pis);
             }
 
             dis = new DataInputStream(pis);
@@ -152,6 +166,54 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
         } catch (IOException e) {
             throw new IllegalArgumentException("Malformed data", e);
         }
+    }
+
+    private static NDList decodeSafetensors(NDManager manager, InputStream is) throws IOException {
+        DataInputStream dis;
+        if (is instanceof DataInputStream) {
+            dis = (DataInputStream) is;
+        } else {
+            dis = new DataInputStream(is);
+        }
+
+        byte[] buf = new byte[8];
+        dis.readFully(buf);
+        int len = Math.toIntExact(ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).getLong());
+        buf = new byte[len];
+        dis.readFully(buf);
+        String json = new String(buf, StandardCharsets.UTF_8);
+        // rust implementation sort by name, our implementation preserve the order.
+        JsonObject jsonObject = JsonUtils.GSON.fromJson(json, JsonObject.class);
+        List<Pair<String, SafeTensor>> list = new ArrayList<>();
+        int max = 0;
+        for (String key : jsonObject.keySet()) {
+            if ("__metadata__".equals(key)) {
+                continue;
+            }
+            SafeTensor value = JsonUtils.GSON.fromJson(jsonObject.get(key), SafeTensor.class);
+            if (value.offsets.length != 2) {
+                throw new IOException("Malformed safetensors metadata: " + json);
+            }
+            max = Math.max(max, value.offsets[1]);
+            list.add(new Pair<>(key, value));
+        }
+        buf = new byte[max];
+        dis.readFully(buf);
+        NDList ret = new NDList(list.size());
+        for (Pair<String, SafeTensor> pair : list) {
+            if ("__metadata__".equals(pair.getKey())) {
+                continue;
+            }
+            SafeTensor st = pair.getValue();
+            Shape shape = new Shape(st.shape);
+            ByteBuffer bb = ByteBuffer.wrap(buf, st.offsets[0], st.size());
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+            DataType dataType = DataType.fromSafetensors(st.dtype);
+            NDArray array = manager.create(bb, shape, dataType);
+            array.setName(pair.getKey());
+            ret.add(array);
+        }
+        return ret;
     }
 
     private static NDList decodeNumpy(NDManager manager, InputStream is) throws IOException {
@@ -340,18 +402,18 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
      * @return the byte array
      */
     public byte[] encode() {
-        return encode(false);
+        return encode(Encoding.ND_LIST);
     }
 
     /**
      * Encodes the NDList to byte array.
      *
-     * @param numpy encode in npz format if true
+     * @param encoding encode mode, one of ndlist/npz/safetensor format
      * @return the byte array
      */
-    public byte[] encode(boolean numpy) {
+    public byte[] encode(Encoding encoding) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            encode(baos, numpy);
+            encode(baos, encoding);
             return baos.toByteArray();
         } catch (IOException e) {
             throw new AssertionError("NDList is not writable", e);
@@ -365,18 +427,18 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
      * @throws IOException if failed on IO operation
      */
     public void encode(OutputStream os) throws IOException {
-        encode(os, false);
+        encode(os, Encoding.ND_LIST);
     }
 
     /**
      * Writes the encoded NDList to {@code OutputStream}.
      *
      * @param os the {@code OutputStream} to be written to
-     * @param numpy encode in npz format if true
+     * @param encoding encode mode, one of ndlist/npz/safetensor format
      * @throws IOException if failed on IO operation
      */
-    public void encode(OutputStream os, boolean numpy) throws IOException {
-        if (numpy) {
+    public void encode(OutputStream os, Encoding encoding) throws IOException {
+        if (encoding == Encoding.NPZ) {
             ZipOutputStream zos = new ZipOutputStream(os);
             int i = 0;
             for (NDArray nd : this) {
@@ -391,6 +453,36 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
             }
             zos.finish();
             zos.flush();
+            return;
+        } else if (encoding == Encoding.SAFETENSORS) {
+            Map<String, SafeTensor> map = new ConcurrentHashMap<>(size());
+            int i = 0;
+            int offset = 0;
+            for (NDArray nd : this) {
+                String name = nd.getName();
+                if (name == null) {
+                    name = "arr_" + i;
+                    ++i;
+                }
+                SafeTensor st = new SafeTensor();
+                st.dtype = nd.getDataType().asSafetensors();
+                st.shape = nd.getShape().getShape();
+                long size = nd.getDataType().getNumOfBytes() * nd.size();
+                int limit = offset + Math.toIntExact(size);
+                st.offsets = new int[] {offset, limit};
+                map.put(name, st);
+                offset = limit;
+            }
+            byte[] json = JsonUtils.GSON.toJson(map).getBytes(StandardCharsets.UTF_8);
+
+            ByteBuffer buf = ByteBuffer.allocate(8);
+            buf.order(ByteOrder.LITTLE_ENDIAN);
+            buf.putLong(0, json.length);
+            os.write(buf.array());
+            os.write(json);
+            for (NDArray nd : this) {
+                os.write(nd.toByteArray());
+            }
             return;
         }
 
@@ -449,5 +541,24 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
                     .append('\n');
         }
         return builder.toString();
+    }
+
+    /** An enum represents NDList serialization format. */
+    public enum Encoding {
+        ND_LIST,
+        NPZ,
+        SAFETENSORS
+    }
+
+    private static final class SafeTensor {
+        String dtype;
+        long[] shape;
+
+        @SerializedName("data_offsets")
+        int[] offsets;
+
+        int size() {
+            return offsets[1] - offsets[0];
+        }
     }
 }

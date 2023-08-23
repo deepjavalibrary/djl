@@ -38,4 +38,35 @@ public class DataTypeTest {
         Assert.expectThrows(IllegalArgumentException.class, DataType.UNKNOWN::asNumpy);
         Assert.expectThrows(IllegalArgumentException.class, () -> DataType.fromNumpy("|i8"));
     }
+
+    @Test
+    public void safetensorsTest() {
+        Assert.assertEquals(DataType.FLOAT64.asSafetensors(), "F64");
+        Assert.assertEquals(DataType.FLOAT32.asSafetensors(), "F32");
+        Assert.assertEquals(DataType.FLOAT16.asSafetensors(), "F16");
+        Assert.assertEquals(DataType.BFLOAT16.asSafetensors(), "BF16");
+        Assert.assertEquals(DataType.INT64.asSafetensors(), "I64");
+        Assert.assertEquals(DataType.INT32.asSafetensors(), "I32");
+        Assert.assertEquals(DataType.INT8.asSafetensors(), "I8");
+        Assert.assertEquals(DataType.UINT8.asSafetensors(), "U8");
+        Assert.assertEquals(DataType.BOOLEAN.asSafetensors(), "BOOL");
+
+        Assert.assertEquals(DataType.fromSafetensors("F64"), DataType.FLOAT64);
+        Assert.assertEquals(DataType.fromSafetensors("F32"), DataType.FLOAT32);
+        Assert.assertEquals(DataType.fromSafetensors("F16"), DataType.FLOAT16);
+        Assert.assertEquals(DataType.fromSafetensors("BF16"), DataType.BFLOAT16);
+        Assert.assertEquals(DataType.fromSafetensors("I64"), DataType.INT64);
+        Assert.assertEquals(DataType.fromSafetensors("I32"), DataType.INT32);
+        Assert.assertEquals(DataType.fromSafetensors("I8"), DataType.INT8);
+        Assert.assertEquals(DataType.fromSafetensors("U8"), DataType.UINT8);
+        Assert.assertEquals(DataType.fromSafetensors("BOOL"), DataType.BOOLEAN);
+
+        Assert.expectThrows(IllegalArgumentException.class, DataType.UINT64::asSafetensors);
+        Assert.expectThrows(IllegalArgumentException.class, DataType.UINT32::asSafetensors);
+        Assert.expectThrows(IllegalArgumentException.class, DataType.UINT16::asSafetensors);
+        Assert.expectThrows(IllegalArgumentException.class, DataType.COMPLEX64::asSafetensors);
+        Assert.expectThrows(IllegalArgumentException.class, DataType.STRING::asSafetensors);
+        Assert.expectThrows(IllegalArgumentException.class, DataType.UNKNOWN::asSafetensors);
+        Assert.expectThrows(IllegalArgumentException.class, () -> DataType.fromSafetensors("U16"));
+    }
 }

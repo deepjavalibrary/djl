@@ -82,10 +82,14 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
             Output output = new Output();
             if ("tensor/npz".equalsIgnoreCase(accept)
                     || "tensor/npz".equalsIgnoreCase(contentType)) {
-                output.add(list.encode(true));
+                output.add(list.encode(NDList.Encoding.NPZ));
                 output.addProperty("Content-Type", "tensor/npz");
+            } else if ("tensor/safetensors".equalsIgnoreCase(accept)
+                    || "tensor/safetensors".equalsIgnoreCase(contentType)) {
+                output.add(list.encode(NDList.Encoding.SAFETENSORS));
+                output.addProperty("Content-Type", "tensor/safetensors");
             } else {
-                output.add(list.encode(false));
+                output.add(list.encode());
                 output.addProperty("Content-Type", "tensor/ndlist");
             }
             return output;

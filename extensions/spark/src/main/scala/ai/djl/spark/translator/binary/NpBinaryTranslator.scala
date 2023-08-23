@@ -27,7 +27,7 @@ class NpBinaryTranslator(val batchifier: Batchifier) extends Translator[Array[By
 
   /** @inheritdoc */
   override def processOutput(ctx: TranslatorContext, list: NDList): Array[Byte] = {
-    list.encode(true)
+    list.encode(NDList.Encoding.NPZ)
   }
 
   /** @inheritdoc */
