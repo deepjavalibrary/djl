@@ -30,6 +30,7 @@ import ai.djl.training.initializer.NormalInitializer;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class ScaledDotProductAttentionBlockTest {
 
     private double[] keySequenceInitialization = {

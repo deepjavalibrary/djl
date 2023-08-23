@@ -281,7 +281,7 @@ public class Trainer implements AutoCloseable {
      *
      * @param listenerConsumer a consumer that executes the method
      */
-    public void notifyListeners(Consumer<TrainingListener> listenerConsumer) {
+    public final void notifyListeners(Consumer<TrainingListener> listenerConsumer) {
         listeners.forEach(listenerConsumer);
     }
 

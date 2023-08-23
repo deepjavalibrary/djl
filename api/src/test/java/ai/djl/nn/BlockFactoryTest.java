@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class BlockFactoryTest {
 
     @Test
