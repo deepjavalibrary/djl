@@ -29,10 +29,25 @@ public class NDListTest {
             NDList decoded = NDList.decode(manager, data);
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length + 1);
-            decoded.encode(bos, true);
+            decoded.encode(bos, NDList.Encoding.NPZ);
             NDList list = NDList.decode(manager, bos.toByteArray());
             Assert.assertEquals(list.size(), 2);
             Assert.assertEquals(list.get(0).getName(), "bool8");
+        }
+    }
+
+    @Test
+    public void testSafetensors() throws IOException {
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
+            byte[] data = NDSerializerTest.readFile("list.safetensors");
+            NDList decoded = NDList.decode(manager, data);
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length + 1);
+            decoded.encode(bos, NDList.Encoding.SAFETENSORS);
+            NDList list = NDList.decode(manager, bos.toByteArray());
+            Assert.assertEquals(list.size(), 2);
+            Assert.assertEquals(list.get(0).getName(), "attention");
+            Assert.assertEquals(list.get(0).toByteArray(), new byte[] {0, 1, 2, 3, 4, 5});
         }
     }
 }

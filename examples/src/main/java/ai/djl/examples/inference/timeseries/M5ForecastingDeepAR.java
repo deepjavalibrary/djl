@@ -153,7 +153,7 @@ public final class M5ForecastingDeepAR {
     private static void saveNDArray(NDArray array) throws IOException {
         Path path = Paths.get("build").resolve(array.getName() + ".npz");
         try (OutputStream os = Files.newOutputStream(path)) {
-            new NDList(new NDList(array)).encode(os, true);
+            new NDList(new NDList(array)).encode(os, NDList.Encoding.NPZ);
         }
     }
 
