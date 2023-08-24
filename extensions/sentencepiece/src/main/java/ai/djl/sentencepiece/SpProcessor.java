@@ -18,7 +18,7 @@ import ai.djl.util.Ec2Utils;
 import ai.djl.util.NativeResource;
 
 /** The processor holder for SentencePiece. */
-final class SpProcessor extends NativeResource<Long> {
+public final class SpProcessor extends NativeResource<Long> {
 
     private static RuntimeException libraryStatus;
 
