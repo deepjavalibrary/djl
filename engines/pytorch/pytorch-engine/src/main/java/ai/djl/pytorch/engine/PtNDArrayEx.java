@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.index.NDArrayIndexer;
+import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
@@ -24,6 +25,7 @@ import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.pytorch.jni.JniUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 /** {@code PtNDArrayEx} is the PyTorch implementation of the {@link NDArrayEx}. */
@@ -760,8 +762,191 @@ public class PtNDArrayEx implements NDArrayEx {
             float nmsThreshold,
             boolean forceSuppress,
             int nmsTopK) {
-        throw new UnsupportedOperationException("Not implemented");
+        assert (inputs.size() == 3);
+
+        Shape ashape = inputs.get(2).getShape();
+
+        NDArray cls_prob = inputs.get(0);
+        NDArray loc_pred = inputs.get(1);
+        NDArray anchors = inputs.get(2).reshape(new Shape(ashape.get(1), 4));
+
+        NDManager ndManager = array.getManager();
+
+        NDArray variances = ndManager.create(new float[]{0.1f, 0.1f, 0.2f, 0.2f});
+
+        assert (variances.size() == 4);// << "Variance size must be 4";
+        final int num_classes = (int) cls_prob.size(1);
+        final int num_anchors = (int) cls_prob.size(2);
+        final int num_batches = (int) cls_prob.size(0);
+
+        final float[] p_anchor = anchors.toFloatArray();
+        float nms_threshold = 0.5f;
+
+        // [id, prob, xmin, ymin, xmax, ymax]
+        float[][] outputs = new float[num_anchors][6];
+        for (int nbatch = 0; nbatch < num_batches; ++nbatch) {
+            final float[] p_cls_prob = cls_prob.get((long) nbatch * num_classes * num_anchors).toFloatArray();
+            final float[] p_loc_pred = loc_pred.get((long) nbatch * num_anchors * 4).toFloatArray();
+
+            for (int i = 0; i < num_anchors; ++i) {
+                // find the predicted class id and probability
+                float score = -1;
+                int id = 0;
+                for (int j = 1; j < num_classes; ++j) {
+                    float temp = p_cls_prob[j * num_anchors + i];
+                    if (temp > score) {
+                        score = temp;
+                        id = j;
+                    }
+                }
+
+                if (id > 0 && score < threshold) {
+                    id = 0;
+                }
+
+                // [id, prob, xmin, ymin, xmax, ymax]
+                outputs[i][0] = id - 1;
+                outputs[i][1] = score;
+                int offset = i * 4;
+                float[] p_anchorRow4 = new float[4];
+                p_anchorRow4[0] = p_anchor[offset];
+                p_anchorRow4[1] = p_anchor[offset + 1];
+                p_anchorRow4[2] = p_anchor[offset + 2];
+                p_anchorRow4[3] = p_anchor[offset + 3];
+                float[] p_loc_predRow4 = new float[4];
+                p_loc_predRow4[0] = p_loc_pred[offset];
+                p_loc_predRow4[1] = p_loc_pred[offset + 1];
+                p_loc_predRow4[2] = p_loc_pred[offset + 2];
+                p_loc_predRow4[3] = p_loc_pred[offset + 3];
+                float[] outRowLast4 = transformLocations(
+                        p_anchorRow4,
+                        p_loc_predRow4,
+                        clip,
+                        variances.toFloatArray()[0],
+                        variances.toFloatArray()[1],
+                        variances.toFloatArray()[2],
+                        variances.toFloatArray()[3]);
+                outputs[i][2] = outRowLast4[0];
+                outputs[i][3] = outRowLast4[1];
+                outputs[i][4] = outRowLast4[2];
+                outputs[i][5] = outRowLast4[3];
+            }
+
+            int valid_count = 0;
+            for (int i = 0; i < num_anchors; ++i) {
+                int offset1 = valid_count;
+                if (outputs[i][0] >= 0) {
+                    outputs[offset1][0] = outputs[i][0];
+                    outputs[offset1][1] = outputs[i][1];
+                    outputs[offset1][2] = outputs[i][2];
+                    outputs[offset1][3] = outputs[i][3];
+                    outputs[offset1][4] = outputs[i][4];
+                    outputs[offset1][5] = outputs[i][5];
+                    ++valid_count;
+                }
+            }
+
+            if (valid_count < 1)
+                continue;
+
+            float[][] sorter;
+            sorter = new float[valid_count][2];
+            for (int i = 0; i < valid_count; ++i) {
+                sorter[i][0] = outputs[i][1];
+                sorter[i][1] = i;
+            }
+            Arrays.sort(sorter, (a, b) -> Double.compare(a[0], b[0]) * -1);
+
+            // re-order output
+            float[][] ptemp = new float[outputs.length][6];
+            for (int i = 0; i < outputs.length; i++) {
+                for (int j = 0; j < 6; j++) {
+                    ptemp[i][j] = outputs[(int) sorter[i][1]][j];
+                }
+            }
+            int nkeep = sorter.length;
+
+            for (int i = 0; i < nkeep; ++i) {
+                for (int j = 0; j < 6; ++j) {
+                    outputs[i][j] = ptemp[i][j];
+                }
+            }
+
+            // apply nms
+            for (int i = 0; i < nkeep; ++i) {
+                if (outputs[i][0] < 0)
+                    continue;  // skip eliminated
+                for (int j = i + 1; j < nkeep; ++j) {
+                    if (outputs[j][0] < 0)
+                        continue;  // skip eliminated
+                    if (outputs[i][0] == outputs[j][0]) {
+                        float[] outputsIRow4 = new float[4];
+                        float[] outputsJRow4 = new float[4];
+                        outputsIRow4[0] = outputs[i][2];
+                        outputsIRow4[1] = outputs[i][3];
+                        outputsIRow4[2] = outputs[i][4];
+                        outputsIRow4[3] = outputs[i][5];
+                        outputsJRow4[0] = outputs[j][2];
+                        outputsJRow4[1] = outputs[j][3];
+                        outputsJRow4[2] = outputs[j][4];
+                        outputsJRow4[3] = outputs[j][5];
+                        float iou = calculateOverlap(outputsIRow4, outputsJRow4);
+                        if (iou >= nms_threshold) {
+                            outputs[j][0] = -1;
+                        }
+                    }
+                }
+            }
+        }  // end iter batch
+
+        NDArray p_outNDArray = ndManager.create(outputs).reshape(1, 4, 6);
+        NDList resultNDList = new NDList();
+        resultNDList.add(p_outNDArray);
+        assert (resultNDList.size() == 1);
+        return resultNDList;
     }
+
+
+    private float[] transformLocations(final float[] anchors,
+                                       final float[] loc_pred,
+                                       final boolean clip,
+                                       final float vx,
+                                       final float vy,
+                                       final float vw,
+                                       final float vh) {
+        float[] outRowLast4 = new float[4];
+        // transform predictions to detection results
+        float al = anchors[0];
+        float at = anchors[1];
+        float ar = anchors[2];
+        float ab = anchors[3];
+        float aw = ar - al;
+        float ah = ab - at;
+        float ax = (al + ar) / 2.f;
+        float ay = (at + ab) / 2.f;
+        float px = loc_pred[0];
+        float py = loc_pred[1];
+        float pw = loc_pred[2];
+        float ph = loc_pred[3];
+        float ox = px * vx * aw + ax;
+        float oy = py * vy * ah + ay;
+        float ow = (float) (Math.exp(pw * vw) * aw / 2);
+        float oh = (float) (Math.exp(ph * vh) * ah / 2);
+        outRowLast4[0] = clip ? Math.max(0f, Math.min(1f, ox - ow)) : (ox - ow);
+        outRowLast4[1] = clip ? Math.max(0f, Math.min(1f, oy - oh)) : (oy - oh);
+        outRowLast4[2] = clip ? Math.max(0f, Math.min(1f, ox + ow)) : (ox + ow);
+        outRowLast4[3] = clip ? Math.max(0f, Math.min(1f, oy + oh)) : (oy + oh);
+        return outRowLast4;
+    }
+
+    private float calculateOverlap(final float[] a, final float[] b) {
+        float w = Math.max(0f, Math.min(a[2], b[2]) - Math.max(a[0], b[0]));
+        float h = Math.max(0f, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
+        float i = w * h;
+        float u = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - i;
+        return u <= 0.f ? 0f : (i / u);
+    }
+
 
     /** {@inheritDoc} */
     @Override
