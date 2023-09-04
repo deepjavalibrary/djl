@@ -862,6 +862,7 @@ public class PtNDArrayEx implements NDArrayEx {
                     ptemp[i][j] = outputs[(int) sorter[i][1]][j];
                 }
             }
+            
             int nkeep = sorter.length;
 
             for (int i = 0; i < nkeep; ++i) {
