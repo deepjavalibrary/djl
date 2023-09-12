@@ -20,10 +20,12 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.Translator;
 
+/** An {@link TranslatorFactory} that creates a {@link YoloV8Translator} instance. */
 public class YoloV8TranslatorFactory extends ObjectDetectionTranslatorFactory implements Serializable {
 
   private static final long serialVersionUID = 1L;
-
+  
+  /** {@inheritDoc} */
   @Override
   protected Translator<Image, DetectedObjects> buildBaseTranslator(Model model, Map<String, ?> arguments) {
     return YoloV8Translator.builder(arguments).build();
