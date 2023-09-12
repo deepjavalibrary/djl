@@ -90,6 +90,7 @@ public class YoloV8Translator extends YoloV5Translator {
          *
          * @return the new translator
          */
+        @Override
         public YoloV8Translator build() {
             if (pipeline == null) {
                 addTransform(
