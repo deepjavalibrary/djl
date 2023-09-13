@@ -308,8 +308,13 @@ JNIEXPORT jbyteArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDataPtr
   // sparse and mkldnn are required to be converted to dense to access data ptr
   auto tensor = (tensor_ptr->is_sparse() || tensor_ptr->is_mkldnn()) ? tensor_ptr->to_dense() : *tensor_ptr;
   tensor = (tensor.is_contiguous()) ? tensor : tensor.contiguous();
-  jbyteArray result = env->NewByteArray(tensor.nbytes());
-  env->SetByteArrayRegion(result, 0, tensor.nbytes(), static_cast<const jbyte*>(tensor.data_ptr()));
+  size_t nbytes = tensor.nbytes();
+  if (nbytes > 0x7fffffff) {
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, "toByteBuffer() is not supported for large tensor");
+    return env->NewByteArray(0);
+  }
+  jbyteArray result = env->NewByteArray(nbytes);
+  env->SetByteArrayRegion(result, 0, nbytes, static_cast<const jbyte*>(tensor.data_ptr()));
   return result;
   API_END_RETURN()
 }

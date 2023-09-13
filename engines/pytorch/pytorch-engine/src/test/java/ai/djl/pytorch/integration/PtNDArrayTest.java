@@ -12,8 +12,11 @@
  */
 package ai.djl.pytorch.integration;
 
+import ai.djl.engine.EngineException;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -32,6 +35,14 @@ public class PtNDArrayTest {
             Assert.assertEquals(arr.toDebugString(true), Arrays.toString(str));
 
             Assert.assertThrows(UnsupportedOperationException.class, () -> arr.get(0));
+        }
+    }
+
+    @Test
+    public void testLargeTensor() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            NDArray array = manager.zeros(new Shape(10 * 2850, 18944), DataType.FLOAT32);
+            Assert.assertThrows(EngineException.class, array::toByteArray);
         }
     }
 }
