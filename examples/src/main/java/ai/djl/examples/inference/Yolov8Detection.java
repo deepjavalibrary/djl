@@ -66,7 +66,6 @@ public final class Yolov8Detection {
         Criteria<Image, DetectedObjects> criteria = Criteria.builder().setTypes(Image.class, DetectedObjects.class).optModelPath(modelPath).optSynset(classes)
             .optEngine("OnnxRuntime").optTranslator(translator).optProgress(new ProgressBar()).build();
 
-        
         DetectedObjects detectedObjects = null;
         DetectedObject detectedObject = null;
         try (ZooModel<Image, DetectedObjects> model = criteria.loadModel()) {
