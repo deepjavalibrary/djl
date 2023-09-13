@@ -58,7 +58,7 @@ public final class Yolov8Detection {
         arguments.put("resize", "true");
         arguments.put("toTensor", true);
         arguments.put("applyRatio", true);
-        arguments.put("threshold", 0.6f);
+        arguments.put("threshold", 0.8f);
 
         YoloV8TranslatorFactory yoloV8TranslatorFactory = new YoloV8TranslatorFactory();
         Translator<Image, DetectedObjects> translator = yoloV8TranslatorFactory.newInstance(Image.class, DetectedObjects.class, null, arguments);
