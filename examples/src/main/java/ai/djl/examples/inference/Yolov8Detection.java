@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -46,44 +46,55 @@ public final class Yolov8Detection {
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        Path modelPath = Paths.get("/src/test/resources/yolov8n.onnx");
-        Path synsetPath = Paths.get("/src/test/resources/yolov8_synset.txt");
-        Image img = factory.fromFile(Paths.get("/src/test/resources/yolov8_test.jpg");
-        
-        List<String> classes = Files.readAllLines(synsetPath);
-        
+        String classPath = System.getProperty("java.class.path");
+        String pathSeparator = System.getProperty("path.separator");
+        classPath = classPath.split(pathSeparator)[0];
+        Path modelPath = Paths.get(classPath + "/yolov8n.onnx");
+        Path imgPath = Paths.get(classPath + "/yolov8_test.jpg");
+        Image img = ImageFactory.getInstance().fromFile(imgPath);
+
         Map<String, Object> arguments = new HashMap<>();
         arguments.put("width", Integer.valueOf(640));
         arguments.put("height", Integer.valueOf(640));
         arguments.put("resize", "true");
         arguments.put("toTensor", true);
         arguments.put("applyRatio", true);
-        arguments.put("threshold", 0.8f);
+        arguments.put("threshold", 0.6f);
+        arguments.put("synsetFileName", "yolov8_synset.txt");
 
         YoloV8TranslatorFactory yoloV8TranslatorFactory = new YoloV8TranslatorFactory();
         Translator<Image, DetectedObjects> translator = yoloV8TranslatorFactory.newInstance(Image.class, DetectedObjects.class, null, arguments);
 
-        Criteria<Image, DetectedObjects> criteria = Criteria.builder().setTypes(Image.class, DetectedObjects.class).optModelPath(modelPath).optSynset(classes)
-            .optEngine("OnnxRuntime").optTranslator(translator).optProgress(new ProgressBar()).build();
+        Criteria<Image, DetectedObjects> criteria = Criteria.builder().setTypes(Image.class, DetectedObjects.class).optModelPath(modelPath).optEngine("OnnxRuntime").optTranslator(translator)
+            .optProgress(new ProgressBar()).build();
 
         DetectedObjects detectedObjects = null;
         DetectedObject detectedObject = null;
         try (ZooModel<Image, DetectedObjects> model = criteria.loadModel()) {
           try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
-            Path outputPath = Paths.get("build/output");
+            Path outputPath = Paths.get(classPath + "/output");
             Files.createDirectories(outputPath);
 
-              detectedObjects = predictor.predict(img);
-                List<DetectedObject> detectedObjectList = detectedObjects.items();
-                for (int i = 0; i < detectedObjectList.size(); i++) {
-                  detectedObject = detectedObjectList.get(i);
-                  BoundingBox boundingBox = detectedObject.getBoundingBox();
-                  Rectangle tectangle = boundingBox.getBounds();
-                }
-                
-                saveBoundingBoxImage(img.resize(640, 640, false), detectedObjects, outputPath, img.getName());
+            detectedObjects = predictor.predict(img);
+
+            if (detectedObjects.getNumberOfObjects() > 0) {
+              List<DetectedObject> detectedObjectList = detectedObjects.items();
+              for (int i = 0; i < detectedObjectList.size(); i++) {
+                detectedObject = detectedObjectList.get(i);
+                BoundingBox boundingBox = detectedObject.getBoundingBox();
+                Rectangle tectangle = boundingBox.getBounds();
+                System.out.println(
+                    detectedObject.getClassName() + " " + detectedObject.getProbability() + " " + tectangle.getX() + " " + tectangle.getY() + " " + tectangle.getWidth() + " " + tectangle.getHeight());
+              }
+              
+              saveBoundingBoxImage(img.resize(640, 640, false), detectedObjects, outputPath, imgPath.toFile().getName());
+            }
+            
+            return detectedObjects;
           }
         }
+      
+        return null;
     }
 
     private static void saveBoundingBoxImage(Image img, DetectedObjects detectedObjects, Path outputPath, String outputFileName) throws IOException {
