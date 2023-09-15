@@ -16,11 +16,15 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.translator.YoloV5TranslatorFactory;
+import ai.djl.modality.cv.output.DetectedObjects.DetectedObject;
+import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.modality.cv.translator.YoloV8TranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.Translator;
 import ai.djl.translate.TranslateException;
 
 import org.slf4j.Logger;
@@ -30,6 +34,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * An example of inference using an yolov8 model.
