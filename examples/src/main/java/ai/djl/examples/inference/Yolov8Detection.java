@@ -24,8 +24,8 @@ import ai.djl.modality.cv.translator.YoloV8TranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.Translator;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.Translator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +35,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * An example of inference using an yolov8 model.
- */
+/** An example of inference using an yolov8 model. */
 public final class Yolov8Detection {
 
     private static final Logger logger = LoggerFactory.getLogger(Yolov8Detection.class);
@@ -58,9 +58,9 @@ public final class Yolov8Detection {
         Path imgPath = Paths.get(classPath + "/yolov8_test.jpg");
         Image img = ImageFactory.getInstance().fromFile(imgPath);
 
-        Map<String, Object> arguments = new HashMap<>();
-        arguments.put("width", Integer.valueOf(640));
-        arguments.put("height", Integer.valueOf(640));
+        Map<String, Object> arguments = new ConcurrentHashMap<>();
+        arguments.put("width", 640);
+        arguments.put("height", 640);
         arguments.put("resize", "true");
         arguments.put("toTensor", true);
         arguments.put("applyRatio", true);
@@ -68,44 +68,65 @@ public final class Yolov8Detection {
         arguments.put("synsetFileName", "yolov8_synset.txt");
 
         YoloV8TranslatorFactory yoloV8TranslatorFactory = new YoloV8TranslatorFactory();
-        Translator<Image, DetectedObjects> translator = yoloV8TranslatorFactory.newInstance(Image.class, DetectedObjects.class, null, arguments);
+        Translator<Image, DetectedObjects> translator =
+                yoloV8TranslatorFactory.newInstance(
+                        Image.class, DetectedObjects.class, null, arguments);
 
-        Criteria<Image, DetectedObjects> criteria = Criteria.builder().setTypes(Image.class, DetectedObjects.class).optModelPath(modelPath).optEngine("OnnxRuntime").optTranslator(translator)
-            .optProgress(new ProgressBar()).build();
+        Criteria<Image, DetectedObjects> criteria =
+                Criteria.builder()
+                        .setTypes(Image.class, DetectedObjects.class)
+                        .optModelPath(modelPath)
+                        .optEngine("OnnxRuntime")
+                        .optTranslator(translator)
+                        .optProgress(new ProgressBar())
+                        .build();
 
-        DetectedObjects detectedObjects = null;
-        DetectedObject detectedObject = null;
-        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel()) {
-          try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
+        DetectedObjects detectedObjects;
+        DetectedObject detectedObject;
+        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel();
+                Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
             Path outputPath = Paths.get(classPath + "/output");
             Files.createDirectories(outputPath);
 
             detectedObjects = predictor.predict(img);
 
             if (detectedObjects.getNumberOfObjects() > 0) {
-              List<DetectedObject> detectedObjectList = detectedObjects.items();
-              for (int i = 0; i < detectedObjectList.size(); i++) {
-                detectedObject = detectedObjectList.get(i);
-                BoundingBox boundingBox = detectedObject.getBoundingBox();
-                Rectangle tectangle = boundingBox.getBounds();
-                System.out.println(
-                    detectedObject.getClassName() + " " + detectedObject.getProbability() + " " + tectangle.getX() + " " + tectangle.getY() + " " + tectangle.getWidth() + " " + tectangle.getHeight());
-              }
-              
-              saveBoundingBoxImage(img.resize(640, 640, false), detectedObjects, outputPath, imgPath.toFile().getName());
+                List<DetectedObject> detectedObjectList = detectedObjects.items();
+                for (DetectedObject object : detectedObjectList) {
+                    detectedObject = object;
+                    BoundingBox boundingBox = detectedObject.getBoundingBox();
+                    Rectangle tectangle = boundingBox.getBounds();
+                    logger.info(
+                            detectedObject.getClassName()
+                                    + " "
+                                    + detectedObject.getProbability()
+                                    + " "
+                                    + tectangle.getX()
+                                    + " "
+                                    + tectangle.getY()
+                                    + " "
+                                    + tectangle.getWidth()
+                                    + " "
+                                    + tectangle.getHeight());
+                }
+
+                saveBoundingBoxImage(
+                        img.resize(640, 640, false),
+                        detectedObjects,
+                        outputPath,
+                        imgPath.toFile().getName());
             }
-            
+
             return detectedObjects;
-          }
         }
-      
-        return null;
     }
 
-    private static void saveBoundingBoxImage(Image img, DetectedObjects detectedObjects, Path outputPath, String outputFileName) throws IOException {
-      img.drawBoundingBoxes(detectedObjects);
+    private static void saveBoundingBoxImage(
+            Image img, DetectedObjects detectedObjects, Path outputPath, String outputFileName)
+            throws IOException {
+        img.drawBoundingBoxes(detectedObjects);
 
-      Path imagePath = outputPath.resolve(outputFileName);
-      img.save(Files.newOutputStream(imagePath), "png");
+        Path imagePath = outputPath.resolve(outputFileName);
+        img.save(Files.newOutputStream(imagePath), "png");
     }
 }
