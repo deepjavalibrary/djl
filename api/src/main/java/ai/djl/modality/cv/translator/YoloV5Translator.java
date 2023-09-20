@@ -160,7 +160,7 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
         return right - left;
     }
 
-    private DetectedObjects processFromBoxOutput(NDList list) {
+    protected DetectedObjects processFromBoxOutput(NDList list) {
         float[] flattened = list.get(0).toFloatArray();
         ArrayList<IntermediateResult> intermediateResults = new ArrayList<>();
         int sizeClasses = classes.size();
@@ -280,7 +280,7 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
         }
     }
 
-    private static final class IntermediateResult {
+    protected static final class IntermediateResult {
 
         /**
          * A sortable score for how good the recognition is relative to others. Higher should be
