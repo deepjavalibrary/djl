@@ -41,7 +41,7 @@ cd ../../
 mkdir -p FasterTransformer/build
 cd FasterTransformer/build
 git submodule init && git submodule update
-cmake -DCMAKE_BUILD_TYPE=Release -DSM=70,75,80,86 -DBUILD_PYT=ON -DBUILD_MULTI_GPU=ON ..
+cmake -DCMAKE_BUILD_TYPE=Release -DSM=70,75,80,86,90 -DBUILD_PYT=ON -DBUILD_MULTI_GPU=ON ..
 make -j$(nproc)
 cp lib/libth_transformer.so /tmp/binaries/
 cd ../../
