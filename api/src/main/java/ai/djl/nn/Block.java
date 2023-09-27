@@ -314,6 +314,21 @@ public interface Block {
     }
 
     /**
+     * Freezes or unfreezes all parameters inside the block that pass the predicate.
+     *
+     * @param freeze true to mark as frozen rather than unfrozen
+     * @param pred true tests if the parameter should be updated
+     * @see Parameter#freeze(boolean)
+     */
+    default void freezeParameters(boolean freeze, Predicate<Parameter> pred) {
+        for (Parameter parameter : getParameters().values()) {
+            if (pred.test(parameter)) {
+                parameter.freeze(freeze);
+            }
+        }
+    }
+
+    /**
      * Validates that actual layout matches the expected layout.
      *
      * @param expectedLayout the expected layout

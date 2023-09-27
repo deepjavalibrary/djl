@@ -18,6 +18,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.nn.Parameter;
+import ai.djl.nn.Parameter.Type;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
@@ -189,7 +190,9 @@ public class PtModel extends BaseModel {
         }
         if (wasLoaded) {
             // Unfreeze parameters if training directly
-            block.freezeParameters(false);
+            block.freezeParameters(
+                    false,
+                    p -> p.getType() != Type.RUNNING_MEAN && p.getType() != Type.RUNNING_VAR);
         }
         for (Pair<Initializer, Predicate<Parameter>> pair : initializer) {
             if (pair.getKey() != null && pair.getValue() != null) {

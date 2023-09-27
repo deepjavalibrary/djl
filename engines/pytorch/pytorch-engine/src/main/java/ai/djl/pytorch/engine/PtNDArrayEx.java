@@ -13,6 +13,7 @@
 package ai.djl.pytorch.engine;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.NDUtils;
@@ -25,6 +26,7 @@ import ai.djl.nn.recurrent.RNN;
 import ai.djl.pytorch.jni.JniUtils;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /** {@code PtNDArrayEx} is the PyTorch implementation of the {@link NDArrayEx}. */
@@ -763,11 +765,9 @@ public class PtNDArrayEx implements NDArrayEx {
             int nmsTopK) {
         assert (inputs.size() == 3);
 
-        Shape ashape = inputs.get(2).getShape();
-
         NDArray clsProb = inputs.get(0);
         NDArray locPred = inputs.get(1);
-        NDArray anchors = inputs.get(2).reshape(new Shape(ashape.get(1), 4));
+        NDArray anchors = inputs.get(2).reshape(new Shape(-1, 4));
 
         NDManager ndManager = array.getManager();
 
@@ -781,11 +781,12 @@ public class PtNDArrayEx implements NDArrayEx {
         final float[] pAnchor = anchors.toFloatArray();
 
         // [id, prob, xmin, ymin, xmax, ymax]
-        float[][] outputs = new float[numAnchors][6];
+        // TODO Move to NDArray-based implementation
+        NDList batchOutputs = new NDList();
         for (int nbatch = 0; nbatch < numBatches; ++nbatch) {
-            final float[] pClsProb =
-                    clsProb.get((long) nbatch * numClasses * numAnchors).toFloatArray();
-            final float[] pLocPred = locPred.get((long) nbatch * numAnchors * 4).toFloatArray();
+            float[][] outputs = new float[numAnchors][6];
+            final float[] pClsProb = clsProb.get(nbatch).toFloatArray();
+            final float[] pLocPred = locPred.get(nbatch).toFloatArray();
 
             for (int i = 0; i < numAnchors; ++i) {
                 // find the predicted class id and probability
@@ -832,50 +833,15 @@ public class PtNDArrayEx implements NDArrayEx {
                 outputs[i][5] = outRowLast4[3];
             }
 
-            int validCount = 0;
-            for (int i = 0; i < numAnchors; ++i) {
-                int offset1 = validCount;
-                if (outputs[i][0] >= 0) {
-                    outputs[offset1][0] = outputs[i][0];
-                    outputs[offset1][1] = outputs[i][1];
-                    outputs[offset1][2] = outputs[i][2];
-                    outputs[offset1][3] = outputs[i][3];
-                    outputs[offset1][4] = outputs[i][4];
-                    outputs[offset1][5] = outputs[i][5];
-                    ++validCount;
-                }
-            }
-
-            if (validCount < 1) continue;
-
-            float[][] sorter;
-            sorter = new float[validCount][2];
-            for (int i = 0; i < validCount; ++i) {
-                sorter[i][0] = outputs[i][1];
-                sorter[i][1] = i;
-            }
-            Arrays.sort(sorter, (a, b) -> Double.compare(a[0], b[0]) * -1);
-
-            // re-order output
-            float[][] ptemp = new float[outputs.length][6];
-            for (int i = 0; i < outputs.length; i++) {
-                for (int j = 0; j < 6; j++) {
-                    ptemp[i][j] = outputs[(int) sorter[i][1]][j];
-                }
-            }
-            int nkeep = sorter.length;
-
-            for (int i = 0; i < nkeep; ++i) {
-                for (int j = 0; j < 6; ++j) {
-                    outputs[i][j] = ptemp[i][j];
-                }
-            }
+            outputs =
+                    Arrays.stream(outputs)
+                            .filter(o -> o[0] >= 0)
+                            .sorted(Comparator.comparing(o -> -o[1]))
+                            .toArray(float[][]::new);
 
             // apply nms
-            for (int i = 0; i < nkeep; ++i) {
-                if (outputs[i][0] < 0) continue; // skip eliminated
-                for (int j = i + 1; j < nkeep; ++j) {
-                    if (outputs[j][0] < 0) continue; // skip eliminated
+            for (int i = 0; i < outputs.length; ++i) {
+                for (int j = i + 1; j < outputs.length; ++j) {
                     if (outputs[i][0] == outputs[j][0]) {
                         float[] outputsIRow4 = new float[4];
                         float[] outputsJRow4 = new float[4];
@@ -894,9 +860,10 @@ public class PtNDArrayEx implements NDArrayEx {
                     }
                 }
             }
+            batchOutputs.add(ndManager.create(outputs));
         } // end iter batch
 
-        NDArray pOutNDArray = ndManager.create(outputs).reshape(1, 4, 6);
+        NDArray pOutNDArray = NDArrays.stack(batchOutputs);
         NDList resultNDList = new NDList();
         resultNDList.add(pOutNDArray);
         assert (resultNDList.size() == 1);
