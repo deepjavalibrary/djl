@@ -771,9 +771,9 @@ public class PtNDArrayEx implements NDArrayEx {
 
         NDManager ndManager = array.getManager();
 
-        NDArray variances = ndManager.create(new float[]{0.1f, 0.1f, 0.2f, 0.2f});
+        NDArray variances = ndManager.create(new float[] {0.1f, 0.1f, 0.2f, 0.2f});
 
-        assert (variances.size() == 4);// << "Variance size must be 4";
+        assert (variances.size() == 4); // << "Variance size must be 4";
         final int numClasses = (int) clsProb.size(1);
         final int numAnchors = (int) clsProb.size(2);
         final int numBatches = (int) clsProb.size(0);
@@ -783,7 +783,8 @@ public class PtNDArrayEx implements NDArrayEx {
         // [id, prob, xmin, ymin, xmax, ymax]
         float[][] outputs = new float[numAnchors][6];
         for (int nbatch = 0; nbatch < numBatches; ++nbatch) {
-            final float[] pClsProb = clsProb.get((long) nbatch * numClasses * numAnchors).toFloatArray();
+            final float[] pClsProb =
+                    clsProb.get((long) nbatch * numClasses * numAnchors).toFloatArray();
             final float[] pLocPred = locPred.get((long) nbatch * numAnchors * 4).toFloatArray();
 
             for (int i = 0; i < numAnchors; ++i) {
@@ -816,14 +817,15 @@ public class PtNDArrayEx implements NDArrayEx {
                 pLocPredRow4[1] = pLocPred[offset + 1];
                 pLocPredRow4[2] = pLocPred[offset + 2];
                 pLocPredRow4[3] = pLocPred[offset + 3];
-                float[] outRowLast4 = transformLocations(
-                        pAnchorRow4,
-                        pLocPredRow4,
-                        clip,
-                        variances.toFloatArray()[0],
-                        variances.toFloatArray()[1],
-                        variances.toFloatArray()[2],
-                        variances.toFloatArray()[3]);
+                float[] outRowLast4 =
+                        transformLocations(
+                                pAnchorRow4,
+                                pLocPredRow4,
+                                clip,
+                                variances.toFloatArray()[0],
+                                variances.toFloatArray()[1],
+                                variances.toFloatArray()[2],
+                                variances.toFloatArray()[3]);
                 outputs[i][2] = outRowLast4[0];
                 outputs[i][3] = outRowLast4[1];
                 outputs[i][4] = outRowLast4[2];
@@ -844,8 +846,7 @@ public class PtNDArrayEx implements NDArrayEx {
                 }
             }
 
-            if (validCount < 1)
-                continue;
+            if (validCount < 1) continue;
 
             float[][] sorter;
             sorter = new float[validCount][2];
@@ -872,11 +873,9 @@ public class PtNDArrayEx implements NDArrayEx {
 
             // apply nms
             for (int i = 0; i < nkeep; ++i) {
-                if (outputs[i][0] < 0)
-                    continue;  // skip eliminated
+                if (outputs[i][0] < 0) continue; // skip eliminated
                 for (int j = i + 1; j < nkeep; ++j) {
-                    if (outputs[j][0] < 0)
-                        continue;  // skip eliminated
+                    if (outputs[j][0] < 0) continue; // skip eliminated
                     if (outputs[i][0] == outputs[j][0]) {
                         float[] outputsIRow4 = new float[4];
                         float[] outputsJRow4 = new float[4];
@@ -895,7 +894,7 @@ public class PtNDArrayEx implements NDArrayEx {
                     }
                 }
             }
-        }  // end iter batch
+        } // end iter batch
 
         NDArray pOutNDArray = ndManager.create(outputs).reshape(1, 4, 6);
         NDList resultNDList = new NDList();
@@ -904,14 +903,14 @@ public class PtNDArrayEx implements NDArrayEx {
         return resultNDList;
     }
 
-
-    private float[] transformLocations(final float[] anchors,
-                                       final float[] locPred,
-                                       final boolean clip,
-                                       final float vx,
-                                       final float vy,
-                                       final float vw,
-                                       final float vh) {
+    private float[] transformLocations(
+            final float[] anchors,
+            final float[] locPred,
+            final boolean clip,
+            final float vx,
+            final float vy,
+            final float vw,
+            final float vh) {
         float[] outRowLast4 = new float[4];
         // transform predictions to detection results
         float al = anchors[0];
@@ -944,7 +943,6 @@ public class PtNDArrayEx implements NDArrayEx {
         float u = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - i;
         return u <= 0.f ? 0f : (i / u);
     }
-
 
     /** {@inheritDoc} */
     @Override
