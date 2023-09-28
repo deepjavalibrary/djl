@@ -31,6 +31,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.nn.SequentialBlock;
 import ai.djl.repository.zoo.Criteria;
+import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
@@ -123,10 +124,8 @@ public class SingleShotDetectionTest {
     }
 
     private ZooModel<Image, DetectedObjects> getModel() throws IOException, ModelException {
-        // SSD-pikachu model only available in MXNet
-        // TODO: Add PyTorch model to model zoo
-        TestUtils.requiresEngine("MXNet");
-
+        TestUtils.requiresEngine(
+                ModelZoo.getModelZoo("ai.djl.zoo").getSupportedEngines().toArray(String[]::new));
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
