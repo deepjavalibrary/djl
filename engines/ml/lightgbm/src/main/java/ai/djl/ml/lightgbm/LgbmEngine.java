@@ -31,7 +31,7 @@ import java.io.IOException;
 public final class LgbmEngine extends Engine {
 
     public static final String ENGINE_NAME = "LightGBM";
-    public static final String ENGINE_VERSION = "3.2.110";
+    public static final String ENGINE_VERSION = "3.3.510";
     static final int RANK = 10;
 
     private Engine alternativeEngine;
