@@ -30,7 +30,7 @@ You can pull the PaddlePaddle engine from the central Maven repository by includ
 <dependency>
     <groupId>ai.djl.paddlepaddle</groupId>
     <artifactId>paddlepaddle-engine</artifactId>
-    <version>0.23.0</version>
+    <version>0.24.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
