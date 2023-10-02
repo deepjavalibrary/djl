@@ -83,7 +83,7 @@ class HuggingfaceModels:
                 continue
 
             languages = get_lang_tags(model_info)
-            if "en" not in languages:
+            if "en" not in languages and not os.environ["HF_IMPORT_ALL"]:
                 logging.warning(f"Skip non-English model: {model_id}.")
                 continue
 
