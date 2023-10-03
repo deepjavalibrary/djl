@@ -178,7 +178,7 @@ public final class Ec2Utils {
         Path path = Paths.get(ENDPOINT_METADATA_FILE);
         try (Reader reader = Files.newBufferedReader(path)) {
             JsonObject json = JsonUtils.GSON.fromJson(reader, JsonObject.class);
-            return json.get(key).getAsString();
+            return (json.get(key) != null) ? json.get(key).getAsString() : null;
         } catch (IOException e) {
             // ignore
         }
