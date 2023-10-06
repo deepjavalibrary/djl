@@ -11,6 +11,11 @@ on:
         description: 'fastertransformer branch/tag version'
         required: true
         default: 'main'
+      build_triton_only:
+        description: 'whether to just build triton library'
+        required: false
+        type: boolean
+        default: false
       is_llama_build:
         description: 'whether to build custom llama source'
         required: false
@@ -47,7 +52,7 @@ jobs:
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tritonserver/${{ github.event.inputs.triton }}/*"
 
   create-runner:
-    if: github.repository == 'deepjavalibrary/djl'
+    if: ${{ github.repository == 'deepjavalibrary/djl' && ! github.event.inputs.build_triton_only }}
     runs-on: [ self-hosted, scheduler ]
     steps:
       - name: Create new CPU instance
@@ -64,7 +69,7 @@ jobs:
 
 
   build-fastertransformer:
-    if: github.repository == 'deepjavalibrary/djl'
+    if: ${{ github.repository == 'deepjavalibrary/djl' }}
     runs-on: [ self-hosted, cpu ]
     container: deepjavalibrary/djl-serving:fastertransformer-nightly
     timeout-minutes: 60
