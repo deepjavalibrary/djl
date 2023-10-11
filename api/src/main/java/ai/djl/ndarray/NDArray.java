@@ -147,6 +147,15 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
+     * Encodes {@code NDArray} to a numpy .npy byte array.
+     *
+     * @return a numpy .npy byte array
+     */
+    default byte[] encodeAsNumpy() {
+        return NDSerializer.encodeAsNumpy(this);
+    }
+
+    /**
      * Moves this {@code NDArray} to a different {@link Device}.
      *
      * @param device the {@link Device} to be set

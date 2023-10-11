@@ -222,7 +222,7 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
         ZipEntry entry;
         while ((entry = zis.getNextEntry()) != null) {
             String name = entry.getName();
-            NDArray array = NDSerializer.decodeNumpy(manager, zis);
+            NDArray array = manager.decodeNumpy(zis);
             if (!name.startsWith("arr_") && name.endsWith(".npy")) {
                 array.setName(name.substring(0, name.length() - 4));
             }

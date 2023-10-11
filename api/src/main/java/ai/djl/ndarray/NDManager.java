@@ -720,6 +720,27 @@ public interface NDManager extends AutoCloseable {
     }
 
     /**
+     * Decodes a numpy .npy {@link NDArray} through byte array.
+     *
+     * @param bytes byte array to load from
+     * @return {@link NDArray}
+     */
+    default NDArray decodeNumpy(byte[] bytes) {
+        return NDSerializer.decodeNumpy(this, ByteBuffer.wrap(bytes));
+    }
+
+    /**
+     * Decodes a numpy .npy {@link NDArray} through {@link DataInputStream}.
+     *
+     * @param is input stream data to load from
+     * @return {@link NDArray}
+     * @throws IOException data is not readable
+     */
+    default NDArray decodeNumpy(InputStream is) throws IOException {
+        return NDSerializer.decodeNumpy(this, is);
+    }
+
+    /**
      * Loads the NDArrays saved to a file.
      *
      * @param path the path to the file

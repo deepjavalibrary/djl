@@ -842,6 +842,16 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
+    public void testEncodeDecodeNumpy() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array = manager.create(new byte[] {0, 3}, new Shape(2));
+            byte[] bytes = array.encodeAsNumpy();
+            NDArray recovered = manager.decodeNumpy(bytes);
+            Assertions.assertAlmostEquals(recovered, array);
+        }
+    }
+
+    @Test
     public void testErfinv() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test 1-D

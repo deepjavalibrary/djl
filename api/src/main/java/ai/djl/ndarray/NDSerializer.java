@@ -15,6 +15,7 @@ package ai.djl.ndarray;
 
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.ByteBufferBackedInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -109,6 +110,16 @@ final class NDSerializer {
         dos.flush();
     }
 
+    static byte[] encodeAsNumpy(NDArray array) {
+        int total = Math.toIntExact(array.size()) * array.getDataType().getNumOfBytes() + 100;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(total)) {
+            encodeAsNumpy(array, baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new AssertionError("This should never happen", e);
+        }
+    }
+
     static void encodeAsNumpy(NDArray array, OutputStream os) throws IOException {
         StringBuilder sb = new StringBuilder(80);
         sb.append("{'descr': '")
@@ -141,48 +152,12 @@ final class NDSerializer {
     }
 
     static NDArray decode(NDManager manager, ByteBuffer bb) {
-        if (!"NDAR".equals(readUTF(bb))) {
-            throw new IllegalArgumentException("Malformed NDArray data");
+        try {
+            return decode(manager, new ByteBufferBackedInputStream(bb));
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Unexpected IOException with ByteBufferBackedInputStream", e);
         }
-
-        // NDArray encode version
-        int version = bb.getInt();
-        if (version < 1 || version > VERSION) {
-            throw new IllegalArgumentException("Unexpected NDArray encode version " + version);
-        }
-
-        String name = null;
-        if (version > 1) {
-            byte flag = bb.get();
-            if (flag == 1) {
-                name = readUTF(bb);
-            }
-        }
-
-        readUTF(bb); // ignore SparseFormat
-
-        // DataType
-        DataType dataType = DataType.valueOf(readUTF(bb));
-
-        // Shape
-        Shape shape = Shape.decode(bb);
-
-        // Data
-        ByteOrder order;
-        if (version > 2) {
-            order = bb.get() == '>' ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
-        } else {
-            order = ByteOrder.nativeOrder();
-        }
-        int length = bb.getInt();
-        ByteBuffer data = bb.slice();
-        data.limit(length);
-        data.order(order);
-
-        NDArray array = manager.create(data, shape, dataType);
-        array.setName(name);
-        bb.position(bb.position() + length);
-        return array;
     }
 
     /**
@@ -201,7 +176,7 @@ final class NDSerializer {
             dis = new DataInputStream(is);
         }
 
-        if (!"NDAR".equals(dis.readUTF())) {
+        if (!MAGIC_NUMBER.equals(dis.readUTF())) {
             throw new IllegalArgumentException("Malformed NDArray data");
         }
 
@@ -242,6 +217,15 @@ final class NDSerializer {
         NDArray array = manager.create(data, shape, dataType);
         array.setName(name);
         return array;
+    }
+
+    static NDArray decodeNumpy(NDManager manager, ByteBuffer bb) {
+        try {
+            return decodeNumpy(manager, new ByteBufferBackedInputStream(bb));
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Unexpected IOException with ByteBufferBackedInputStream", e);
+        }
     }
 
     static NDArray decodeNumpy(NDManager manager, InputStream is) throws IOException {
