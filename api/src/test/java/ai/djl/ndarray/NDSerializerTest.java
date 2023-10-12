@@ -107,7 +107,7 @@ public class NDSerializerTest {
 
     private static NDArray decode(NDManager manager, byte[] data) throws IOException {
         try (ByteArrayInputStream bis = new ByteArrayInputStream(data)) {
-            return NDSerializer.decodeNumpy(manager, bis);
+            return NDList.decode(manager, bis).get(0);
         }
     }
 
