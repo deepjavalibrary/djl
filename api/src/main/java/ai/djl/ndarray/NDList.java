@@ -100,12 +100,12 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
         try {
             if (byteArray[0] == 'P' && byteArray[1] == 'K') {
                 return decodeNumpy(manager, new ByteArrayInputStream(byteArray));
-            } else if (byteArray[0] == (byte) 0x39
+            } else if (byteArray[0] == (byte) 0x93
                     && byteArray[1] == 'N'
                     && byteArray[2] == 'U'
                     && byteArray[3] == 'M') {
                 return new NDList(
-                        NDSerializer.decode(manager, new ByteArrayInputStream(byteArray)));
+                        NDSerializer.decodeNumpy(manager, new ByteArrayInputStream(byteArray)));
             } else if (byteArray[8] == '{') {
                 return decodeSafetensors(manager, new ByteArrayInputStream(byteArray));
             }
@@ -144,11 +144,11 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
             if (magic[0] == 'P' && magic[1] == 'K') {
                 // assume this is npz file
                 return decodeNumpy(manager, pis);
-            } else if (magic[0] == (byte) 0x39
+            } else if (magic[0] == (byte) 0x93
                     && magic[1] == 'N'
                     && magic[2] == 'U'
                     && magic[3] == 'M') {
-                return new NDList(NDSerializer.decode(manager, pis));
+                return new NDList(NDSerializer.decodeNumpy(manager, pis));
             } else if (magic[8] == '{') {
                 return decodeSafetensors(manager, pis);
             }
