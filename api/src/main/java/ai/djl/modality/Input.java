@@ -37,11 +37,30 @@ public class Input {
 
     protected Map<String, String> properties;
     protected PairList<String, BytesSupplier> content;
+    private boolean cancelled;
 
     /** Constructs a new {@code Input} instance. */
     public Input() {
         properties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         content = new PairList<>();
+    }
+
+    /**
+     * Returns {@code true} if the input is cancelled.
+     *
+     * @return {@code true} if the input is cancelled.
+     */
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    /**
+     * Sets the cancelled status.
+     *
+     * @param cancelled the cancelled status
+     */
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     /**
