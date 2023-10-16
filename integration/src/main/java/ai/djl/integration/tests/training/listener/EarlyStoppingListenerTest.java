@@ -1,3 +1,15 @@
+/*
+ * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+ * with the License. A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 package ai.djl.integration.tests.training.listener;
 
 import ai.djl.Model;
@@ -18,50 +30,59 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Optimizer;
 import ai.djl.training.tracker.Tracker;
 import ai.djl.translate.TranslateException;
+
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.time.Duration;
 
 public class EarlyStoppingListenerTest {
 
-    private final Optimizer sgd = Optimizer.sgd().setLearningRateTracker(Tracker.fixed(0.1f)).build();
+    private final Optimizer sgd =
+            Optimizer.sgd().setLearningRateTracker(Tracker.fixed(0.1f)).build();
 
     private Mnist testMnistDataset;
     private Mnist trainMnistDataset;
 
     @BeforeTest
     public void setUp() throws IOException, TranslateException {
-        testMnistDataset = Mnist.builder()
-                .optUsage(Dataset.Usage.TEST)
-                .setSampling(32, false)
-                .build();
+        testMnistDataset =
+                Mnist.builder()
+                        .optUsage(Dataset.Usage.TEST)
+                        .optLimit(8)
+                        .setSampling(8, false)
+                        .build();
         testMnistDataset.prepare();
 
-        trainMnistDataset = Mnist.builder()
-                .optUsage(Dataset.Usage.TRAIN)
-                .setSampling(32, false)
-                .build();
+        trainMnistDataset =
+                Mnist.builder()
+                        .optUsage(Dataset.Usage.TRAIN)
+                        .optLimit(16)
+                        .setSampling(8, false)
+                        .build();
         trainMnistDataset.prepare();
     }
 
     @Test
     public void testEarlyStoppingStopsOnEpoch2() throws Exception {
-        Mlp mlpModel = new Mlp(784, 1, new int[]{256}, Activation::relu);
+        Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
 
         try (Model model = Model.newInstance("lin-reg", TestUtils.getEngine())) {
             model.setBlock(mlpModel);
 
-            DefaultTrainingConfig config = new DefaultTrainingConfig(Loss.l2Loss())
-                    .optOptimizer(sgd)
-                    .addTrainingListeners(TrainingListener.Defaults.logging())
-                    .addTrainingListeners(new EarlyStoppingListener()
-                            .setEpochPatience(1)
-                            .setEarlyStopPctImprovement(50)
-                            .setMaxMinutes(60)
-                            .setMinEpochs(1)
-                    );
+            DefaultTrainingConfig config =
+                    new DefaultTrainingConfig(Loss.l2Loss())
+                            .optOptimizer(sgd)
+                            .addTrainingListeners(TrainingListener.Defaults.logging())
+                            .addTrainingListeners(
+                                    EarlyStoppingListener.builder()
+                                            .optEpochPatience(1)
+                                            .optEarlyStopPctImprovement(99)
+                                            .optMaxDuration(Duration.ofMinutes(1))
+                                            .optMinEpochs(1)
+                                            .build());
 
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(1, 784));
@@ -72,7 +93,8 @@ public class EarlyStoppingListenerTest {
                     // Set epoch to 5 as we expect the early stopping to stop after the second epoch
                     EasyTrain.fit(trainer, 5, trainMnistDataset, testMnistDataset);
                 } catch (EarlyStoppingListener.EarlyStoppedException e) {
-                    Assert.assertEquals(e.getMessage(), "failed to achieve 50.0% improvement 1 times in a row");
+                    Assert.assertEquals(
+                            e.getMessage(), "failed to achieve 99.0% improvement 1 times in a row");
                     Assert.assertEquals(e.getStopEpoch(), 2);
                 }
 
@@ -84,15 +106,22 @@ public class EarlyStoppingListenerTest {
 
     @Test
     public void testEarlyStoppingStopsOnEpoch3AsMinEpochsIs3() throws Exception {
-        Mlp mlpModel = new Mlp(784, 1, new int[]{256}, Activation::relu);
+        Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
 
         try (Model model = Model.newInstance("lin-reg", TestUtils.getEngine())) {
             model.setBlock(mlpModel);
 
-            DefaultTrainingConfig config = new DefaultTrainingConfig(Loss.l2Loss())
-                    .optOptimizer(sgd)
-                    .addTrainingListeners(TrainingListener.Defaults.logging())
-                    .addTrainingListeners(new EarlyStoppingListener(0, 3, 60, 50, 1));
+            DefaultTrainingConfig config =
+                    new DefaultTrainingConfig(Loss.l2Loss())
+                            .optOptimizer(sgd)
+                            .addTrainingListeners(TrainingListener.Defaults.logging())
+                            .addTrainingListeners(
+                                    EarlyStoppingListener.builder()
+                                            .optEpochPatience(1)
+                                            .optEarlyStopPctImprovement(50)
+                                            .optMaxMillis(60_000)
+                                            .optMinEpochs(3)
+                                            .build());
 
             try (Trainer trainer = model.newTrainer(config)) {
                 trainer.initialize(new Shape(1, 784));
@@ -103,7 +132,8 @@ public class EarlyStoppingListenerTest {
                     // Set epoch to 5 as we expect the early stopping to stop after the second epoch
                     EasyTrain.fit(trainer, 5, trainMnistDataset, testMnistDataset);
                 } catch (EarlyStoppingListener.EarlyStoppedException e) {
-                    Assert.assertEquals(e.getMessage(), "failed to achieve 50.0% improvement 1 times in a row");
+                    Assert.assertEquals(
+                            e.getMessage(), "failed to achieve 50.0% improvement 1 times in a row");
                     Assert.assertEquals(e.getStopEpoch(), 3);
                 }
 
@@ -113,4 +143,36 @@ public class EarlyStoppingListenerTest {
         }
     }
 
+    @Test
+    public void testEarlyStoppingStopsOnEpoch1AsMaxDurationIs1ms() throws Exception {
+        Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
+
+        try (Model model = Model.newInstance("lin-reg", TestUtils.getEngine())) {
+            model.setBlock(mlpModel);
+
+            DefaultTrainingConfig config =
+                    new DefaultTrainingConfig(Loss.l2Loss())
+                            .optOptimizer(sgd)
+                            .addTrainingListeners(TrainingListener.Defaults.logging())
+                            .addTrainingListeners(
+                                    EarlyStoppingListener.builder().optMaxMillis(1).build());
+
+            try (Trainer trainer = model.newTrainer(config)) {
+                trainer.initialize(new Shape(1, 784));
+                Metrics metrics = new Metrics();
+                trainer.setMetrics(metrics);
+
+                try {
+                    // Set epoch to 5 as we expect the early stopping to stop after the second epoch
+                    EasyTrain.fit(trainer, 5, trainMnistDataset, testMnistDataset);
+                } catch (EarlyStoppingListener.EarlyStoppedException e) {
+                    Assert.assertTrue(e.getMessage().contains("ms elapsed >= 1 maxMillis"));
+                    Assert.assertEquals(e.getStopEpoch(), 1);
+                }
+
+                TrainingResult trainingResult = trainer.getTrainingResult();
+                Assert.assertEquals(trainingResult.getEpoch(), 1);
+            }
+        }
+    }
 }
