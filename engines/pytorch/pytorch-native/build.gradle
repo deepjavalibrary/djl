@@ -24,6 +24,8 @@ if (project.hasProperty("cu11")) {
         FLAVOR = "cu117"
     } else if (VERSION.startsWith("2.0.")) {
         FLAVOR = "cu118"
+    } else if (VERSION.startsWith("2.1.")) {
+        FLAVOR = "cu121"
     } else {
         throw new GradleException("Unsupported PyTorch version: ${VERSION}")
     }
@@ -88,15 +90,17 @@ def prepareNativeLib(String binaryRoot, String ver) {
 
     def officialPytorchUrl = "https://download.pytorch.org/libtorch"
     def aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
-    String cu11
+    String cuda
     if (ver.startsWith("1.11.")) {
-        cu11 = "cu113"
+        cuda = "cu113"
     } else if (ver.startsWith("1.12.")) {
-        cu11 = "cu116"
+        cuda = "cu116"
     } else if (ver.startsWith("1.13.")) {
-        cu11 = "cu117"
+        cuda = "cu117"
     } else if (ver.startsWith("2.0.")) {
-        cu11 = "cu118"
+        cuda = "cu118"
+    } else if (ver.startsWith("2.1.")) {
+        cuda = "cu121"
     } else {
         throw new GradleException("Unsupported PyTorch version: ${ver}")
     }
@@ -105,10 +109,10 @@ def prepareNativeLib(String binaryRoot, String ver) {
             "cpu/libtorch-cxx11-abi-shared-with-deps-${ver}%2Bcpu.zip"        : "cpu/linux-x86_64",
             "cpu/libtorch-macos-${ver}.zip"                                   : "cpu/osx-x86_64",
             "cpu/libtorch-win-shared-with-deps-${ver}%2Bcpu.zip"              : "cpu/win-x86_64",
-            "${cu11}/libtorch-cxx11-abi-shared-with-deps-${ver}%2B${cu11}.zip": "${cu11}/linux-x86_64",
-            "${cu11}/libtorch-win-shared-with-deps-${ver}%2B${cu11}.zip"      : "${cu11}/win-x86_64",
+            "${cuda}/libtorch-cxx11-abi-shared-with-deps-${ver}%2B${cuda}.zip": "${cuda}/linux-x86_64",
+            "${cuda}/libtorch-win-shared-with-deps-${ver}%2B${cuda}.zip"      : "${cuda}/win-x86_64",
             "cpu/libtorch-shared-with-deps-${ver}%2Bcpu.zip"                  : "cpu-precxx11/linux-x86_64",
-            "${cu11}/libtorch-shared-with-deps-${ver}%2B${cu11}.zip"          : "${cu11}-precxx11/linux-x86_64"
+            "${cuda}/libtorch-shared-with-deps-${ver}%2B${cuda}.zip"          : "${cuda}-precxx11/linux-x86_64"
     ]
 
     def aarch64Files = [
@@ -138,17 +142,12 @@ def copyNativeLibToOutputDir(Map<String, String> fileStoreMap, String binaryRoot
             from zipTree(file)
             into outputDir
         }
-        // CPU dependencies
+        delete "${outputDir}/libtorch/lib/*.lib"
+        delete "${outputDir}/libtorch/lib/*.a"
+
         copy {
             from("${outputDir}/libtorch/lib/") {
-                include "libc10.*", "c10.dll", "libiomp5*.*", "libarm_compute*.*", "libgomp*.*", "libnvfuser_codegen.so", "libtorch.*", "libtorch_cpu.*", "torch.dll", "torch_cpu.dll", "fbgemm.dll", "asmjit.dll", "uv.dll", "nvfuser_codegen.dll"
-            }
-            into("${outputDir}/native/lib")
-        }
-        // GPU dependencies
-        copy {
-            from("${outputDir}/libtorch/lib/") {
-                include "libtorch_cuda*.so", "torch_cuda*.dll", "libc10_cuda.so", "c10_cuda.dll", "libcaffe2_nvrtc.so", "libnvrtc*.so.*", "libcudart*.*", "*nvToolsExt*.*", "cudnn*.dll", "caffe2_nvrtc.dll", "nvrtc64*.dll", "uv.dll", "libcublas*", "zlibwapi.dll"
+                include "libarm_compute*", "libc10_cuda.so", "libc10.*", "libcaffe2_nvrtc.so", "libcu*", "libgfortran-*", "libgomp*", "libiomp*", "libnv*", "libopenblasp-*", "libtorch_cpu.*", "libtorch_cuda*.so", "libtorch.*", "asmjit.dll", "c10_cuda.dll", "c10.dll", "caffe2_nvrtc.dll", "cu*.dll", "fbgemm.dll", "nv*.dll", "torch_cpu.dll", "torch_cuda*.dll", "torch.dll", "uv.dll", "zlibwapi.dll"
             }
             into("${outputDir}/native/lib")
         }
@@ -287,9 +286,9 @@ tasks.register('uploadS3') {
                 "${BINARY_ROOT}/cpu/win-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-aarch64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu118/linux-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu118/win-x86_64/native/lib/",
-                "${BINARY_ROOT}/cu118-precxx11/linux-x86_64/native/lib/"
+                "${BINARY_ROOT}/cu121/linux-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu121/win-x86_64/native/lib/",
+                "${BINARY_ROOT}/cu121-precxx11/linux-x86_64/native/lib/"
         ]
         uploadDirs.each { item ->
             fileTree(item).files.name.each {
