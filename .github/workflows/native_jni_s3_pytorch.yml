@@ -136,7 +136,8 @@ jobs:
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
-          ./gradlew :engines:pytorch:pytorch-native:cleanJNI
+          ./gradlew :engines:pytorch:pytorch-native:cleanJNI clean
+          rm -rf ~/.djl.ai
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu11 -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
