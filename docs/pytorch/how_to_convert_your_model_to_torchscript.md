@@ -1,4 +1,4 @@
-## How to convert your PyTorch model to TorchScript
+# How to convert your PyTorch model to TorchScript
 
 There are two ways to convert your model to TorchScript: tracing and scripting.
 We will only demonstrate the first one, tracing, but you can find information about scripting from the PyTorch documentation.
