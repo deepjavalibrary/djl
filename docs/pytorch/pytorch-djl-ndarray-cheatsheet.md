@@ -1,4 +1,4 @@
-## PyTorch NDArray operators
+# PyTorch NDArray operators
 
 In the following examples, we assume
 
