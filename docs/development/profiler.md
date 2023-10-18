@@ -1,4 +1,4 @@
-## Profiler (Experimental)
+# Engine Profiler Support
 
 Currently, DJL supports experimental profilers for developers that 
 investigate the performance of operator execution as well as memory consumption.

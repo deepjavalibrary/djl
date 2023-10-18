@@ -1,4 +1,4 @@
-## Stable Diffusion in DJL
+# Stable Diffusion in DJL
 
 [Stable Diffusion](https://stability.ai/blog/stable-diffusion-public-release) is an open-source model
 developed by Stability.ai. It aimed to produce images (artwork, pictures, etc.) based on

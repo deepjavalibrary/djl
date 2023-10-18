@@ -1,5 +1,4 @@
-
-## DJL external dependencies
+# DJL external dependencies
 
 This document contains external libraries that DJL depends on and their versions.
 

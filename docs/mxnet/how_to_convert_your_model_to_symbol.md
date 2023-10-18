@@ -1,4 +1,4 @@
-## How to convert your Gluon model to an MXNet Symbol
+# How to convert your Gluon model to an MXNet Symbol
 
 DJL currently supports symbolic model loading from MXNet.
 A gluon [HybridBlock](https://mxnet.apache.org/api/python/docs/api/gluon/hybrid_block.html) can be converted into a symbol for loading by doing as follows:
