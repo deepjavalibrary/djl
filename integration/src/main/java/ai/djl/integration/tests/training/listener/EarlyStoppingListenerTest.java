@@ -17,6 +17,7 @@ import ai.djl.basicdataset.cv.classification.Mnist;
 import ai.djl.basicmodelzoo.basic.Mlp;
 import ai.djl.integration.util.TestUtils;
 import ai.djl.metric.Metrics;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
 import ai.djl.training.DefaultTrainingConfig;
@@ -32,6 +33,7 @@ import ai.djl.training.tracker.Tracker;
 import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -43,14 +45,17 @@ public class EarlyStoppingListenerTest {
     private final Optimizer sgd =
             Optimizer.sgd().setLearningRateTracker(Tracker.fixed(0.1f)).build();
 
+    private NDManager manager;
     private Mnist testMnistDataset;
     private Mnist trainMnistDataset;
 
     @BeforeTest
     public void setUp() throws IOException, TranslateException {
+        manager = NDManager.newBaseManager(TestUtils.getEngine());
         testMnistDataset =
                 Mnist.builder()
                         .optUsage(Dataset.Usage.TEST)
+                        .optManager(manager)
                         .optLimit(8)
                         .setSampling(8, false)
                         .build();
@@ -59,10 +64,16 @@ public class EarlyStoppingListenerTest {
         trainMnistDataset =
                 Mnist.builder()
                         .optUsage(Dataset.Usage.TRAIN)
+                        .optManager(manager)
                         .optLimit(16)
                         .setSampling(8, false)
                         .build();
         trainMnistDataset.prepare();
+    }
+
+    @AfterTest
+    public void closeResources() {
+        manager.close();
     }
 
     @Test
