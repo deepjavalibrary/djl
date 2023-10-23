@@ -80,6 +80,8 @@ public class XgbModel extends BaseModel {
             String fileName = file.toFile().getName();
             if (fileName.endsWith(".json")) {
                 modelName = fileName.substring(0, fileName.length() - 5);
+            } else if (fileName.endsWith(".xgb")) {
+                modelName = fileName.substring(0, fileName.length() - 4);
             } else {
                 modelName = fileName;
             }
@@ -90,13 +92,22 @@ public class XgbModel extends BaseModel {
         }
         Path modelFile = modelDir.resolve(prefix);
         if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
-            if (prefix.endsWith(".json")) {
+            if (prefix.endsWith(".json") || prefix.endsWith(".xgb")) {
                 return null;
             }
             modelFile = modelDir.resolve(prefix + ".json");
-            if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
-                return null;
+            if (Files.isRegularFile(modelFile)) {
+                return modelFile;
             }
+            modelFile = modelDir.resolve(prefix + ".xgb");
+            if (Files.isRegularFile(modelFile)) {
+                return modelFile;
+            }
+            modelFile = modelDir.resolve("model.xgb");
+            if (Files.isRegularFile(modelFile)) {
+                return modelFile;
+            }
+            return null;
         }
         return modelFile;
     }
