@@ -490,7 +490,7 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
         }
     }
     let decoding: String = tokenizer
-        .decode(decode_ids, skip_special_tokens == JNI_TRUE)
+        .decode(&*decode_ids, skip_special_tokens == JNI_TRUE)
         .unwrap();
     let ret = env
         .new_string(decoding)
@@ -527,8 +527,12 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
         }
         batch_decode_input.push(decode_ids);
     }
+    let mut references: Vec<&[u32]> = Vec::new();
+    for reference in batch_decode_input.iter() {
+        references.push(reference);
+    }
     let decoding: Vec<String> = tokenizer
-        .decode_batch(batch_decode_input, skip_special_tokens == JNI_TRUE)
+        .decode_batch(&references, skip_special_tokens == JNI_TRUE)
         .unwrap();
     let ret: jobjectArray = env
         .new_object_array(batch_len, "java/lang/String", JObject::null())
