@@ -3,7 +3,7 @@
 @rem choco install rust -y
 @rem choco install jdk8 -y
 
-set VERSION=python-v"%1"
+set VERSION=v"%1"
 
 if exist "tokenizers" (
     echo Found "tokenizers"

@@ -10,7 +10,7 @@ elif [[ -n $(command -v sysctl) ]]; then
 fi
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 
-VERSION=python-v$1
+VERSION=v$1
 ARCH=$2
 
 pushd $WORK_DIR
