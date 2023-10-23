@@ -45,7 +45,7 @@ jobs:
       - name: Install Environment
         run: |
           yum -y update
-          yum -y install centos-release-scl-rh epel-release
+          yum -y install centos-release-scl-rh epel-release perl-core
           yum -y install devtoolset-7 git patch cmake3 libstdc++-static
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           curl https://sh.rustup.rs -sSf | sh -s -- -y
@@ -184,7 +184,7 @@ jobs:
       - name: Install Environment
         run: |
           yum -y update
-          yum -y install centos-release-scl-rh epel-release
+          yum -y install centos-release-scl-rh epel-release perl-core
           yum -y install devtoolset-7 git patch cmake3 libstdc++-static
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           curl https://sh.rustup.rs -sSf | sh -s -- -y
