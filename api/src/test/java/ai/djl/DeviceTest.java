@@ -13,6 +13,7 @@
 
 package ai.djl;
 
+import ai.djl.Device.MultiDevice;
 import ai.djl.engine.Engine;
 
 import org.testng.Assert;
@@ -37,6 +38,8 @@ public class DeviceTest {
 
         System.setProperty("test_key", "test");
         Engine.debugEnvironment();
+
+        Assert.assertEquals(2, new MultiDevice(Device.gpu(1), Device.gpu(2)).getDevices().size());
     }
 
     @Test
@@ -54,5 +57,9 @@ public class DeviceTest {
         Device defaultDevice = Engine.getInstance().defaultDevice();
         Assert.assertEquals(Device.fromName(""), defaultDevice);
         Assert.assertEquals(Device.fromName(null), defaultDevice);
+
+        Assert.assertEquals(
+                Device.fromName("gpu1+gpu2"), new MultiDevice(Device.gpu(2), Device.gpu(1)));
+        Assert.assertEquals(Device.fromName("gpu1+gpu2"), new MultiDevice("gpu", 1, 3));
     }
 }
