@@ -39,6 +39,7 @@ public class DeviceTest {
         System.setProperty("test_key", "test");
         Engine.debugEnvironment();
 
+        Assert.assertEquals(1, Device.cpu().getDevices().size());
         Assert.assertEquals(2, new MultiDevice(Device.gpu(1), Device.gpu(2)).getDevices().size());
     }
 
