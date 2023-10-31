@@ -15,32 +15,38 @@ package ai.djl.inference.streaming;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PublisherBytesSupplierTest {
 
     @Test
-    public void test() {
+    public void test() throws ExecutionException, InterruptedException {
         AtomicInteger contentCount = new AtomicInteger();
         PublisherBytesSupplier supplier = new PublisherBytesSupplier();
 
-        // Add to supplier without subscriber
-        supplier.appendContent(new byte[] {1}, false);
-        Assert.assertEquals(contentCount.get(), 0);
+        new Thread(
+                        () -> {
+                            // Add to supplier without subscriber
+                            supplier.appendContent(new byte[] {1}, false);
+                            // Add to supplier with subscriber
+                            supplier.appendContent(new byte[] {1}, true);
+                        })
+                .start();
 
         // Subscribing with data should trigger subscriptions
-        supplier.subscribe(
-                d -> {
-                    if (d == null) {
-                        // Do nothing on completion
-                        return;
-                    }
-                    contentCount.getAndIncrement();
-                });
-        Assert.assertEquals(contentCount.get(), 1);
+        CompletableFuture<Void> future =
+                supplier.subscribe(
+                        d -> {
+                            if (d == null) {
+                                // Do nothing on completion
+                                return;
+                            }
+                            contentCount.getAndIncrement();
+                        });
 
-        // Add to supplier with subscriber
-        supplier.appendContent(new byte[] {1}, true);
+        future.get();
         Assert.assertEquals(contentCount.get(), 2);
     }
 }
