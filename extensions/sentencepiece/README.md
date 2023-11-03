@@ -23,6 +23,6 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl.sentencepiece</groupId>
     <artifactId>sentencepiece</artifactId>
-    <version>0.23.0</version>
+    <version>0.24.0</version>
 </dependency>
 ```
