@@ -67,9 +67,12 @@ public final class JniUtils {
         return handles[0];
     }
 
-    public static long createDMatrixCSR(long[] indptr, int[] indices, float[] array) {
+    public static long createDMatrixCSR(
+            long[] indptr, int[] indices, float[] array, float missing, int nthread) {
         long[] handles = new long[1];
-        checkCall(XGBoostJNI.XGDMatrixCreateFromCSREx(indptr, indices, array, 0, handles));
+        checkCall(
+                XGBoostJNI.XGDMatrixCreateFromCSR(
+                        indptr, indices, array, 0, missing, nthread, handles));
         return handles[0];
     }
 

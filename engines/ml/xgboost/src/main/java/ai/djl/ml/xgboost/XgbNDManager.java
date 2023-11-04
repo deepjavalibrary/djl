@@ -39,6 +39,7 @@ public class XgbNDManager extends BaseNDManager {
     private static final XgbNDManager SYSTEM_MANAGER = new SystemManager();
 
     private float missingValue = Float.NaN;
+    private int nthread = 1;
 
     private XgbNDManager(NDManager parent, Device device) {
         super(parent, device);
@@ -55,6 +56,15 @@ public class XgbNDManager extends BaseNDManager {
      */
     public void setMissingValue(float missingValue) {
         this.missingValue = missingValue;
+    }
+
+    /**
+     * Sets the default number of threads.
+     *
+     * @param nthread the default number of threads
+     */
+    public void setNthread(int nthread) {
+        this.nthread = nthread;
     }
 
     /** {@inheritDoc} */
@@ -166,7 +176,7 @@ public class XgbNDManager extends BaseNDManager {
         int[] intIndices = Arrays.stream(indices).mapToInt(Math::toIntExact).toArray();
         float[] data = new float[buffer.remaining()];
         ((FloatBuffer) buffer).get(data);
-        long handle = JniUtils.createDMatrixCSR(indptr, intIndices, data);
+        long handle = JniUtils.createDMatrixCSR(indptr, intIndices, data, missingValue, nthread);
         return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.CSR);
     }
 

@@ -34,7 +34,7 @@ jobs:
         run: |
           yum -y update
           yum -y install centos-release-scl-rh epel-release
-          yum -y install devtoolset-7 git patch libstdc++-static curl python3-devel
+          yum -y install devtoolset-8 git patch libstdc++-static curl python3-devel
           curl -L -o cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.27.0-rc2/cmake-3.27.0-rc2-linux-aarch64.tar.gz
           tar xvfz cmake.tar.gz
           ln -sf $PWD/cmake-3.*/bin/cmake /usr/bin/cmake
@@ -50,7 +50,7 @@ jobs:
           XGBOOST_VERSION=${{ github.event.inputs.xgb_version }}
           XGBOOST_VERSION=${XGBOOST_VERSION:-$(cat gradle.properties | awk -F '=' '/xgboost_version/ {print $2}')}
           git clone https://github.com/dmlc/xgboost --recursive -b v"$XGBOOST_VERSION"
-          export PATH=$PATH:/opt/rh/devtoolset-7/root/usr/bin
+          export PATH=$PATH:/opt/rh/devtoolset-8/root/usr/bin
           cd xgboost/jvm-packages
           python3 create_jni.py
           cd ../..
