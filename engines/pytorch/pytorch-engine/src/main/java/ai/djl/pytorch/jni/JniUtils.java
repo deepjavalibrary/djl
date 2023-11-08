@@ -1147,7 +1147,8 @@ public final class JniUtils {
 
     public static PtNDArray atan2(PtNDArray self, PtNDArray other) {
         return new PtNDArray(
-                self.getManager(), PyTorchLibrary.LIB.torchAtan2(self.getHandle(), other.getHandle()));
+                self.getManager(),
+                PyTorchLibrary.LIB.torchAtan2(self.getHandle(), other.getHandle()));
     }
 
     public static PtNDArray sqrt(PtNDArray ndArray) {

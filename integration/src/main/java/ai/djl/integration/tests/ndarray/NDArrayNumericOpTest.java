@@ -507,7 +507,10 @@ public class NDArrayNumericOpTest {
             NDArray array = manager.create(x1);
             double[] y1 = {1.0, 0.0, -1.0, 1.0, -1.0, 0.0};
             NDArray other = manager.create(y1);
-            double[] output = IntStream.range(0, x1.length).mapToDouble(i->Math.atan2(x1[i], y1[i])).toArray();
+            double[] output =
+                    IntStream.range(0, x1.length)
+                            .mapToDouble(i -> Math.atan2(x1[i], y1[i]))
+                            .toArray();
             NDArray expected = manager.create(output);
             Assertions.assertAlmostEquals(array.atan2(other), expected);
             // test multi-dim
@@ -515,7 +518,10 @@ public class NDArrayNumericOpTest {
             array = manager.create(x2, new Shape(5, 1));
             double[] y2 = {-2.0, 3.0, 6.0, 0.0, -0.3};
             other = manager.create(y2, new Shape(5, 1));
-            output = IntStream.range(0, x2.length).mapToDouble(i->Math.atan2(x2[i], y2[i])).toArray();
+            output =
+                    IntStream.range(0, x2.length)
+                            .mapToDouble(i -> Math.atan2(x2[i], y2[i]))
+                            .toArray();
             expected = manager.create(output, new Shape(5, 1));
             Assertions.assertAlmostEquals(array.atan2(other), expected);
             // test scalar

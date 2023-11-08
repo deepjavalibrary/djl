@@ -886,15 +886,15 @@ public class NDArrayOtherOpTest {
             array =
                     manager.create(
                                     new float[] {
-                                            Float.NEGATIVE_INFINITY,
-                                            -0.8134f,
-                                            -0.4769f,
-                                            -0.2253f,
-                                            0f,
-                                            0.2253f,
-                                            0.4769f,
-                                            0.8134f,
-                                            Float.POSITIVE_INFINITY
+                                        Float.NEGATIVE_INFINITY,
+                                        -0.8134f,
+                                        -0.4769f,
+                                        -0.2253f,
+                                        0f,
+                                        0.2253f,
+                                        0.4769f,
+                                        0.8134f,
+                                        Float.POSITIVE_INFINITY
                                     })
                             .reshape(3, 1, 3);
             expected = manager.linspace(-1.0f, 1.0f, 9).reshape(3, 1, 3);
