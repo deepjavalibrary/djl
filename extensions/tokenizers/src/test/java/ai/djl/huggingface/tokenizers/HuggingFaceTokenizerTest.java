@@ -115,6 +115,12 @@ public class HuggingFaceTokenizerTest {
             Assert.assertEquals(encodings.length, 2);
             Assert.assertEquals(encodings[0].getIds(), ids);
         }
+
+        Assert.assertThrows(
+                () -> {
+                    Path file = Paths.get("build/tokenizer/non-exists.json");
+                    HuggingFaceTokenizer.builder().optTokenizerPath(file).build();
+                });
     }
 
     @Test
