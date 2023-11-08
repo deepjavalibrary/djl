@@ -2345,6 +2345,24 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray atan();
 
     /**
+     * Returns the element-wise arc-tangent of this/other choosing the quadrant correctly.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray x = manager.create(new float[] {0f, 1f});
+     * jshell&gt; NDArray y = manager.create(new float[] {0f, -6f});
+     * jshell&gt; x.atan2(y);
+     * ND: (2) cpu() float64
+     * [0.    , 2.9764]
+     * </pre>
+     *
+     * @param other The other {@code NDArray}
+     * @return the result {@code NDArray}
+     */
+    NDArray atan2(NDArray other);
+
+    /**
      * Returns the hyperbolic sine of this {@code NDArray} element-wise.
      *
      * <p>sinh(x)=0.5*(exp(x) - exp(-x))

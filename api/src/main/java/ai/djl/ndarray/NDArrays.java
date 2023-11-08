@@ -2009,6 +2009,7 @@ public final class NDArrays {
      * [0., 0.5, -1]
      * </pre>
      *
+     * @param input The input {@code NDArray}
      * @return The of gauss error of the {@code NDArray}, element-wise
      */
     public static NDArray erf(NDArray input) {

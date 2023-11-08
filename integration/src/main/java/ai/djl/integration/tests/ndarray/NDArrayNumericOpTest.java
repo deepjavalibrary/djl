@@ -22,6 +22,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 public class NDArrayNumericOpTest {
 
@@ -496,6 +497,36 @@ public class NDArrayNumericOpTest {
             // test zero-dim
             array = manager.create(new Shape(1, 0));
             Assert.assertEquals(array.atan(), array);
+        }
+    }
+
+    @Test
+    public void testAtan2() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            double[] x1 = {1.0, -1.0, -1.0, 0.0, 0.0, 0.0};
+            NDArray array = manager.create(x1);
+            double[] y1 = {1.0, 0.0, -1.0, 1.0, -1.0, 0.0};
+            NDArray other = manager.create(y1);
+            double[] output = IntStream.range(0, x1.length).mapToDouble(i->Math.atan2(x1[i], y1[i])).toArray();
+            NDArray expected = manager.create(output);
+            Assertions.assertAlmostEquals(array.atan2(other), expected);
+            // test multi-dim
+            double[] x2 = {-1.0, -0.5, 0, 0.5, 1.0};
+            array = manager.create(x2, new Shape(5, 1));
+            double[] y2 = {-2.0, 3.0, 6.0, 0.0, -0.3};
+            other = manager.create(y2, new Shape(5, 1));
+            output = IntStream.range(0, x2.length).mapToDouble(i->Math.atan2(x2[i], y2[i])).toArray();
+            expected = manager.create(output, new Shape(5, 1));
+            Assertions.assertAlmostEquals(array.atan2(other), expected);
+            // test scalar
+            array = manager.create(0f);
+            other = manager.create(0f);
+            expected = manager.create(0f);
+            Assertions.assertAlmostEquals(array.atan2(other), expected);
+            // test zero-dim
+            array = manager.create(new Shape(1, 0));
+            other = manager.create(new Shape(1, 0));
+            Assert.assertEquals(array.atan2(other), array);
         }
     }
 

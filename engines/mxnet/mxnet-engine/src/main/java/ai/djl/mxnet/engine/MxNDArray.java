@@ -890,6 +890,13 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray atan2(NDArray other) {
+        other = manager.from(other);
+        return manager.invoke("_npi_arctan2", new NDArray[] {this, other}, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray sinh() {
         return manager.invoke("_npi_sinh", this, null);
     }

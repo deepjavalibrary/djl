@@ -355,6 +355,16 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchAtan(JNIEnv*
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchAtan2(
+JNIEnv* env, jobject jthis, jlong jself, jlong jother) {
+  API_BEGIN()
+  const auto* self_ptr = reinterpret_cast<torch::Tensor*>(jself);
+  const auto* other_ptr = reinterpret_cast<torch::Tensor*>(jother);
+  const auto* result_ptr = new torch::Tensor(self_ptr->atan2(other_ptr));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSqrt(JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);

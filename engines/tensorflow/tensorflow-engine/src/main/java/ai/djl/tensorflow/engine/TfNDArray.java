@@ -919,6 +919,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDArray atan2(NDArray other) {
+        return manager.opExecutor("Atan2").addInput(this).addInput(other).buildSingletonOrThrow();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray sinh() {
         return manager.opExecutor("Sinh").addInput(this).buildSingletonOrThrow();
     }

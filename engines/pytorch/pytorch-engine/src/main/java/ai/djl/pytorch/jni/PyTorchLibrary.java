@@ -332,6 +332,8 @@ final class PyTorchLibrary {
 
     native long torchAtan(long handle);
 
+    native long torchAtan2(long self, long other);
+
     native long torchSqrt(long handle);
 
     native long torchSinh(long handle);

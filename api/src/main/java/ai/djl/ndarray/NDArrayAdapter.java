@@ -728,6 +728,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray atan2(NDArray other) {
+        return getAlternativeArray().atan2(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray sinh() {
         return getAlternativeArray().sinh();
     }
