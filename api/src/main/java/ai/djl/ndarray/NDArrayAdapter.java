@@ -1190,6 +1190,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray erf() {
+        return getAlternativeArray().erf();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray inverse() {
         return getAlternativeArray().inverse();
     }

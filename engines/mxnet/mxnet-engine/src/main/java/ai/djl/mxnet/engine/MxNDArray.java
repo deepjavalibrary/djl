@@ -1603,6 +1603,12 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray erf() {
+        return manager.invoke("erf", this, null);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray norm(boolean keepDims) {
         MxOpParams params = new MxOpParams();
         params.add("flag", -2);

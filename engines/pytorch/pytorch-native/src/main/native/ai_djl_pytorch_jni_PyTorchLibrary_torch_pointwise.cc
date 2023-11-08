@@ -496,6 +496,14 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchErfinv(JNIEn
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchErf(JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->erf());
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchInverse(JNIEnv* env, jobject jthis, jlong jself) {
   API_BEGIN()
   const auto* self_ptr = reinterpret_cast<torch::Tensor*>(jself);

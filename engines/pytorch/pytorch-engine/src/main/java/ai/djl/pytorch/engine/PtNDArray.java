@@ -1541,6 +1541,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public PtNDArray erf() {
+        return JniUtils.erf(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray inverse() {
         return JniUtils.inverse(this);
     }

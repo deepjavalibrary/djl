@@ -405,6 +405,8 @@ final class PyTorchLibrary {
 
     native long torchErfinv(long handle);
 
+    native long torchErf(long handle);
+
     native long torchInverse(long self);
 
     native long torchNNInterpolate(long handle, long[] size, int mode, boolean alignCorners);
