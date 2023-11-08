@@ -2010,7 +2010,7 @@ public final class NDArrays {
      * </pre>
      *
      * @param input The input {@code NDArray}
-     * @return The of gauss error of the {@code NDArray}, element-wise
+     * @return The gauss error of the {@code NDArray}, element-wise
      */
     public static NDArray erf(NDArray input) {
         return input.erf();

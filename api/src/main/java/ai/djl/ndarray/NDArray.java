@@ -4952,7 +4952,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      * [0., 0.5, -1]
      * </pre>
      *
-     * @return The of gauss error of the {@code NDArray}, element-wise
+     * @return The gauss error of the {@code NDArray}, element-wise
      */
     NDArray erf();
 
