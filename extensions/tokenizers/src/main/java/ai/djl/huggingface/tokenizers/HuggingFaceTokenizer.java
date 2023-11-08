@@ -787,7 +787,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
                     return managed(HuggingFaceTokenizer.newInstance(vocab, merges, options));
                 }
                 throw new IOException("tokenizer.json file not found.");
-            } else if (Files.exists(tokenizerPath)) {
+            } else if (!Files.exists(tokenizerPath)) {
                 throw new IOException("Tokenizer file not exits: " + tokenizerPath);
             }
             return managed(HuggingFaceTokenizer.newInstance(tokenizerPath, options));
