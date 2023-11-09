@@ -3396,9 +3396,11 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Computes the two-dimensional Discrete Fourier Transform.
      *
-     * @param sizes Sizes of the transformed dimensions of the output. Will be zero-padded or trimmed to this size.
+     * @param sizes Sizes of the transformed dimensions of the output.
+     *              Will be zero-padded or trimmed to this size.
      * @param dims Dimensions over which to compute the 2D-FFT.
-     * @return The truncated or zero-padded input, transformed along the dimensions indicated by dims
+     * @return The truncated or zero-padded input,
+     * transformed along the dimensions indicated by dims
      */
     NDArray fft2(long[] sizes, long[] dims);
 
