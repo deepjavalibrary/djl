@@ -890,6 +890,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public PtNDArray atan2(NDArray other) {
+        return JniUtils.atan2(this, manager.from(other));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray sinh() {
         return JniUtils.sinh(this);
     }
@@ -1537,6 +1543,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public PtNDArray erfinv() {
         return JniUtils.erfinv(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PtNDArray erf() {
+        return JniUtils.erf(this);
     }
 
     /** {@inheritDoc} */

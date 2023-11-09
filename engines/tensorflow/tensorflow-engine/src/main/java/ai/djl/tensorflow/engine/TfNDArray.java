@@ -459,6 +459,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDArray erf() {
+        return manager.opExecutor("Erf").addInput(this).buildSingletonOrThrow();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray norm(boolean keepDims) {
         // We have to flatten first to be able to simulate "numpy.linalg.norm" whenever axis isn't
         // specified
@@ -909,6 +915,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
     @Override
     public NDArray atan() {
         return manager.opExecutor("Atan").addInput(this).buildSingletonOrThrow();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray atan2(NDArray other) {
+        return manager.opExecutor("Atan2").addInput(this).addInput(other).buildSingletonOrThrow();
     }
 
     /** {@inheritDoc} */
