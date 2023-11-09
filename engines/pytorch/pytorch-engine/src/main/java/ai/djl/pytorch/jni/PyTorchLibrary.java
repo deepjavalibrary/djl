@@ -275,6 +275,8 @@ final class PyTorchLibrary {
 
     native long torchFft2(long handle, long[] sizes, long[] dims);
 
+    native long torchIfft2(long handle, long[] sizes, long[] dims);
+
     native long torchViewAsReal(long handle);
 
     native long torchViewAsComplex(long handle);

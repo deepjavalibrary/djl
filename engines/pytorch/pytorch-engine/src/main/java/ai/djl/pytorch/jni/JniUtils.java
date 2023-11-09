@@ -1046,6 +1046,12 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchFft2(ndArray.getHandle(), sizes, dims));
     }
 
+    public static PtNDArray ifft2(PtNDArray ndArray, long[] sizes, long[] dims) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchIfft2(ndArray.getHandle(), sizes, dims));
+    }
+
     public static PtNDArray real(PtNDArray ndArray) {
         long handle = PyTorchLibrary.LIB.torchViewAsReal(ndArray.getHandle());
         if (handle == -1) {

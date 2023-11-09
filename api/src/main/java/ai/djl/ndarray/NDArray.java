@@ -3396,24 +3396,46 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Computes the two-dimensional Discrete Fourier Transform.
      *
-     * @param sizes Sizes of the transformed dimensions of the output.
-     *              Will be zero-padded or trimmed to this size.
+     * @param sizes Sizes of the transformed dimensions of the output. Will be zero-padded or
+     *     trimmed to this size.
      * @param dims Dimensions over which to compute the 2D-FFT.
-     * @return The truncated or zero-padded input,
-     * transformed along the dimensions indicated by dims
+     * @return The truncated or zero-padded input, transformed along the dimensions indicated by
+     *     dims
      */
     NDArray fft2(long[] sizes, long[] dims);
 
     /**
      * Computes the two-dimensional Discrete Fourier Transform along the last 2 dimensions.
      *
-     * @param sizes Sizes of the transformed dimensions of the output.
-     *              Will be zero-padded or trimmed to this size.
-     * @return The truncated or zero-padded input,
-     * transformed along the last two dimensions
+     * @param sizes Sizes of the transformed dimensions of the output. Will be zero-padded or
+     *     trimmed to this size.
+     * @return The truncated or zero-padded input, transformed along the last two dimensions
      */
     default NDArray fft2(long[] sizes) {
         return fft2(sizes, new long[] {-2, -1});
+    }
+
+    /**
+     * Computes the two-dimensional inverse Discrete Fourier Transform.
+     *
+     * @param sizes Sizes of the transformed dimensions of the output. Will be zero-padded or
+     *     trimmed to this size.
+     * @param dims Dimensions over which to compute the 2D-Inverse-FFT.
+     * @return The truncated or zero-padded input, transformed along the dimensions indicated by
+     *     dims
+     */
+    NDArray ifft2(long[] sizes, long[] dims);
+
+    /**
+     * Computes the two-dimensional inverse Discrete Fourier Transform along the last 2 dimensions.
+     *
+     * @param sizes Sizes of the transformed dimensions of the output. Will be zero-padded or
+     *     trimmed to this size.
+     * @return The truncated or zero-padded input, transformed along the dimensions indicated by
+     *     dims
+     */
+    default NDArray ifft2(long[] sizes) {
+        return ifft2(sizes, new long[] {-2, -1});
     }
 
     /**

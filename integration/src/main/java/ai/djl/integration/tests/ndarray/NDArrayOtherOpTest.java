@@ -1122,4 +1122,22 @@ public class NDArrayOtherOpTest {
             Assertions.assertAlmostEquals(result, expected);
         }
     }
+
+    @Test
+    public void testIfft2() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array =
+                    manager.create(
+                            new float[][] {
+                                {1f, 6.6f, 4.315f, 2.0f},
+                                {16.9f, 6.697f, 2.399f, 67.9f},
+                                {0f, 5f, 67.09f, 9.87f}
+                            });
+            long[] sizes = {3, 4};
+            long[] dims = {0, 1};
+            NDArray fft2 = array.fft2(sizes, dims);
+            NDArray result = fft2.ifft2(sizes, dims);
+            Assertions.assertAlmostEquals(result, array);
+        }
+    }
 }
