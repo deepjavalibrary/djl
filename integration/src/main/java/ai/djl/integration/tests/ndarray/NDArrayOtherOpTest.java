@@ -1137,7 +1137,10 @@ public class NDArrayOtherOpTest {
             long[] dims = {0, 1};
             NDArray fft2 = array.fft2(sizes, dims);
             NDArray result = fft2.ifft2(sizes, dims);
-            Assertions.assertAlmostEquals(result, array);
+            NDArray real = result.get(":,:,0");
+            NDArray imaginary = result.get(":,:,1");
+            Assertions.assertAlmostEquals(real, array);
+            Assertions.assertAlmostEquals(imaginary, array.zerosLike());
         }
     }
 }
