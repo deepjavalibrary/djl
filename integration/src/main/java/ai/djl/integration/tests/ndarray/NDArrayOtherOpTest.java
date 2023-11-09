@@ -876,6 +876,40 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
+    public void testErf() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            // test 1-D
+            NDArray array = manager.create(new float[] {0f, 0.4769f, Float.NEGATIVE_INFINITY});
+            NDArray expected = manager.create(new float[] {0f, 0.5f, -1f});
+            Assertions.assertAlmostEquals(NDArrays.erf(array), expected);
+            // test 3-D
+            array =
+                    manager.create(
+                                    new float[] {
+                                        Float.NEGATIVE_INFINITY,
+                                        -0.8134f,
+                                        -0.4769f,
+                                        -0.2253f,
+                                        0f,
+                                        0.2253f,
+                                        0.4769f,
+                                        0.8134f,
+                                        Float.POSITIVE_INFINITY
+                                    })
+                            .reshape(3, 1, 3);
+            expected = manager.linspace(-1.0f, 1.0f, 9).reshape(3, 1, 3);
+            Assertions.assertAlmostEquals(array.erf(), expected);
+            // test scalar
+            array = manager.create(Float.POSITIVE_INFINITY);
+            expected = manager.create(1f);
+            Assertions.assertAlmostEquals(array.erf(), expected);
+            // test zero-dim
+            array = manager.create(new Shape(2, 0));
+            Assertions.assertAlmostEquals(array.erf(), array);
+        }
+    }
+
+    @Test
     public void testInverse() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array =

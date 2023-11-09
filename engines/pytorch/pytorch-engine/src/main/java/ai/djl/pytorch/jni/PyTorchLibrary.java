@@ -332,6 +332,8 @@ final class PyTorchLibrary {
 
     native long torchAtan(long handle);
 
+    native long torchAtan2(long self, long other);
+
     native long torchSqrt(long handle);
 
     native long torchSinh(long handle);
@@ -404,6 +406,8 @@ final class PyTorchLibrary {
     native long torchHannWindow(long nfft, boolean periodic, int[] device);
 
     native long torchErfinv(long handle);
+
+    native long torchErf(long handle);
 
     native long torchInverse(long self);
 

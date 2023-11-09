@@ -1145,6 +1145,12 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.torchAtan(ndArray.getHandle()));
     }
 
+    public static PtNDArray atan2(PtNDArray self, PtNDArray other) {
+        return new PtNDArray(
+                self.getManager(),
+                PyTorchLibrary.LIB.torchAtan2(self.getHandle(), other.getHandle()));
+    }
+
     public static PtNDArray sqrt(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchSqrt(ndArray.getHandle()));
@@ -1332,6 +1338,11 @@ public final class JniUtils {
     public static PtNDArray erfinv(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchErfinv(ndArray.getHandle()));
+    }
+
+    public static PtNDArray erf(PtNDArray ndArray) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchErf(ndArray.getHandle()));
     }
 
     public static PtNDArray inverse(PtNDArray ndArray) {

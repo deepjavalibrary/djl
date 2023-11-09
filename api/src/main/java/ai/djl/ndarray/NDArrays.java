@@ -1996,4 +1996,23 @@ public final class NDArrays {
     public static NDArray erfinv(NDArray input) {
         return input.erfinv();
     }
+
+    /**
+     * Returns element-wise gauss error function of the {@code NDArray}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.create(new float[] {0f, 0.4769f, Float.NEGATIVE_INFINITY});
+     * jshell&gt; array.erf();
+     * ND: (3) cpu() float32
+     * [0., 0.5, -1]
+     * </pre>
+     *
+     * @param input The input {@code NDArray}
+     * @return The gauss error of the {@code NDArray}, element-wise
+     */
+    public static NDArray erf(NDArray input) {
+        return input.erf();
+    }
 }
