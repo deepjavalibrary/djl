@@ -38,7 +38,9 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFft2(
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray js, jlongArray jdims) {
   API_BEGIN()
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
-  const auto* result_ptr = new torch::Tensor(torch::fft_fft2(*tensor_ptr, js, jdims));
+  const std::vector<int64_t> sizes = djl::utils::jni::GetVecFromJLongArray(env, js);
+  const std::vector<int64_t> dims = djl::utils::jni::GetVecFromJLongArray(env, jdims);
+  const auto* result_ptr = new torch::Tensor(torch::fft_fft2(*tensor_ptr, sizes, dims));
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
