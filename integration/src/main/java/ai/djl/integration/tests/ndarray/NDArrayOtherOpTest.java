@@ -1087,4 +1087,25 @@ public class NDArrayOtherOpTest {
             Assertions.assertAlmostEquals(result.real().flatten(), expected);
         }
     }
+
+    @Test
+    public void testFft2() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array = manager.create(new float[][] {
+                    {1f, 6.6f, 4.315f, 2.0f},
+                    {16.9f, 6.697f, 2.399f, 67.9f},
+                    {0f, 5f, 67.09f, 9.87f}
+            });
+            NDArray result = array.fft2(new long[] {3, 4}, new long[] {0, 1});
+            result = result.real().flatten(1, 2); // flatten complex numbers
+            NDArray expected =
+                    manager.create(
+                            new float[][] {
+                                    {189.771f, 0f, -55.904f, 61.473f, -6.363f, 0f, -55.904f, -61.473f},
+                                    {-74.013f, -10.3369f, 71.7653f, -108.2964f, -1.746f, 93.1133f, -25.8063f, -33.0234f},
+                                    {-74.013f, 10.3369f, -25.8063f, 33.0234f, -1.746f, -93.1133f, 71.7653f, 108.2964f}
+                            });
+            Assertions.assertAlmostEquals(result, expected);
+        }
+    }
 }
