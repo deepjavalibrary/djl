@@ -1,4 +1,4 @@
-name: Build Triton Server and FasterTransformers
+name: Build Triton Server
 
 on:
   workflow_dispatch:
@@ -6,21 +6,7 @@ on:
       triton:
         description: 'triton branch version'
         required: true
-        default: 'r23.04'
-      fastertransformer:
-        description: 'fastertransformer branch/tag version'
-        required: true
-        default: 'main'
-      build_triton_only:
-        description: 'whether to just build triton library'
-        required: false
-        type: boolean
-        default: false
-      is_llama_build:
-        description: 'whether to build custom llama source'
-        required: false
-        type: boolean
-        default: false
+        default: 'r23.10'
 
 jobs:
   build-triton:
@@ -50,60 +36,3 @@ jobs:
           aws s3 cp build/install/lib/libtritonserver.so s3://djl-ai/publish/tritonserver/${{ github.event.inputs.triton }}/
           aws s3 cp build/install/bin/tritonserver s3://djl-ai/publish/tritonserver/${{ github.event.inputs.triton }}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tritonserver/${{ github.event.inputs.triton }}/*"
-
-  create-runner:
-    if: ${{ github.repository == 'deepjavalibrary/djl' && ! github.event.inputs.build_triton_only }}
-    runs-on: [ self-hosted, scheduler ]
-    steps:
-      - name: Create new CPU instance
-        id: create_cpu
-        run: |
-          cd /home/ubuntu/djl_benchmark_script/scripts
-          token=$( curl -X POST -H "Authorization: token ${{ secrets.ACTION_RUNNER_PERSONAL_TOKEN }}" \
-          https://api.github.com/repos/deepjavalibrary/djl/actions/runners/registration-token \
-          --fail \
-          | jq '.token' | tr -d '"' )
-          ./start_instance.sh action_cpu $token djl
-    outputs:
-      cpu_instance_id: ${{ steps.create_cpu.outputs.action_cpu_instance_id }}
-
-
-  build-fastertransformer:
-    if: ${{ github.repository == 'deepjavalibrary/djl' }}
-    runs-on: [ self-hosted, cpu ]
-    container: deepjavalibrary/djl-serving:fastertransformer-nightly
-    timeout-minutes: 60
-    needs: create-runner
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build FasterTransformers
-        run: |
-          tools/scripts/build_ft_deps.sh ${{ github.event.inputs.fastertransformer }} ${{ github.event.inputs.triton }} ${{ github.event.inputs.is_llama_build }}
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
-      - name: Copy files to S3 with the AWS CLI
-        if: github.event.inputs.is_llama_build == 'false'
-        run: |
-          aws s3 sync /tmp/binaries/ s3://djl-ai/publish/fastertransformer/${{ github.event.inputs.fastertransformer }}/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/fastertransformer/${{ github.event.inputs.fastertransformer }}/*"
-      - name: Copy files for llama build to S3 with AWS CLI
-        if: github.event.inputs.is_llama_build == 'true'
-        run: |
-          echo "pushing binaries to ft/llama"
-          aws s3 sync /tmp/binaries/ s3://djl-ai/publish/fastertransformer/llama/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/fastertransformer-llama/${{ github.event.inputs.fastertransformer }}/*"
-
-  stop-runner:
-    if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
-    runs-on: [ self-hosted, scheduler ]
-    needs: [ create-runner, build-fastertransformer]
-    steps:
-      - name: Stop all instances
-        run: |
-          cd /home/ubuntu/djl_benchmark_script/scripts
-          instance_id=${{ needs.create-runner.outputs.cpu_instance_id }}
-          ./stop_instance.sh $instance_id
