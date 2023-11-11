@@ -914,13 +914,13 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray fft2(long[] sizes, long[] dims) {
+    public NDArray fft2(long[] sizes, long[] axes) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDArray ifft2(long[] sizes, long[] dims) {
+    public NDArray ifft2(long[] sizes, long[] axes) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 

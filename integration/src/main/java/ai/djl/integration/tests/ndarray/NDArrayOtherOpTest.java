@@ -1134,9 +1134,9 @@ public class NDArrayOtherOpTest {
                                 {0f, 5f, 67.09f, 9.87f}
                             });
             long[] sizes = {3, 4};
-            long[] dims = {0, 1};
-            NDArray fft2 = array.fft2(sizes, dims);
-            NDArray actual = fft2.ifft2(sizes, dims).real();
+            long[] axes = {0, 1};
+            NDArray fft2 = array.fft2(sizes, axes);
+            NDArray actual = fft2.ifft2(sizes, axes).real();
             NDArray expected = array.toType(DataType.COMPLEX64, true).real();
             Assertions.assertAlmostEquals(expected, actual);
         }
