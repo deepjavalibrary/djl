@@ -3396,8 +3396,8 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Computes the two-dimensional Discrete Fourier Transform.
      *
-     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or
-     *     trimmed to this size.
+     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or trimmed to
+     *     this size.
      * @param axes Axes over which to compute the 2D-FFT.
      * @return The truncated or zero-padded input, transformed along the axes.
      */
@@ -3406,8 +3406,8 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Computes the two-dimensional Discrete Fourier Transform along the last 2 axes.
      *
-     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or
-     *     trimmed to this size.
+     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or trimmed to
+     *     this size.
      * @return The truncated or zero-padded input, transformed along the last two axes
      */
     default NDArray fft2(long[] sizes) {
@@ -3417,8 +3417,8 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Computes the two-dimensional inverse Discrete Fourier Transform.
      *
-     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or
-     *     trimmed to this size.
+     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or trimmed to
+     *     this size.
      * @param axes Axes over which to compute the 2D-Inverse-FFT.
      * @return The truncated or zero-padded input, transformed along the axes.
      */
@@ -3427,8 +3427,8 @@ public interface NDArray extends NDResource, BytesSupplier {
     /**
      * Computes the two-dimensional inverse Discrete Fourier Transform along the last 2 axes.
      *
-     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or
-     *     trimmed to this size.
+     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or trimmed to
+     *     this size.
      * @return The truncated or zero-padded input, transformed along the axes.
      */
     default NDArray ifft2(long[] sizes) {
