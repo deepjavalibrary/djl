@@ -34,6 +34,28 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFft(
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFft2(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlongArray js, jlongArray jaxes) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const std::vector<int64_t> sizes = djl::utils::jni::GetVecFromJLongArray(env, js);
+  const std::vector<int64_t> axes = djl::utils::jni::GetVecFromJLongArray(env, jaxes);
+  const auto* result_ptr = new torch::Tensor(torch::fft_fft2(*tensor_ptr, sizes, axes));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIfft2(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlongArray js, jlongArray jaxes) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const std::vector<int64_t> sizes = djl::utils::jni::GetVecFromJLongArray(env, js);
+  const std::vector<int64_t> axes = djl::utils::jni::GetVecFromJLongArray(env, jaxes);
+  const auto* result_ptr = new torch::Tensor(torch::fft_ifft2(*tensor_ptr, sizes, axes));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchStft(JNIEnv* env, jobject jthis, jlong jhandle,
     jlong jn_fft, jlong jhop_length, jlong jwindow, jboolean jcenter, jboolean jnormalize, jboolean jreturn_complex) {
 #ifdef V1_11_X

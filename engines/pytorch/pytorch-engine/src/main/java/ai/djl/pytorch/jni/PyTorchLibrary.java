@@ -273,6 +273,10 @@ final class PyTorchLibrary {
             boolean normalize,
             boolean returnComplex);
 
+    native long torchFft2(long handle, long[] sizes, long[] axes);
+
+    native long torchIfft2(long handle, long[] sizes, long[] axes);
+
     native long torchViewAsReal(long handle);
 
     native long torchViewAsComplex(long handle);

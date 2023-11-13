@@ -3394,6 +3394,48 @@ public interface NDArray extends NDResource, BytesSupplier {
             boolean returnComplex);
 
     /**
+     * Computes the two-dimensional Discrete Fourier Transform.
+     *
+     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or trimmed to
+     *     this size.
+     * @param axes Axes over which to compute the 2D-FFT.
+     * @return The truncated or zero-padded input, transformed along the axes.
+     */
+    NDArray fft2(long[] sizes, long[] axes);
+
+    /**
+     * Computes the two-dimensional Discrete Fourier Transform along the last 2 axes.
+     *
+     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or trimmed to
+     *     this size.
+     * @return The truncated or zero-padded input, transformed along the last two axes
+     */
+    default NDArray fft2(long[] sizes) {
+        return fft2(sizes, new long[] {-2, -1});
+    }
+
+    /**
+     * Computes the two-dimensional inverse Discrete Fourier Transform.
+     *
+     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or trimmed to
+     *     this size.
+     * @param axes Axes over which to compute the 2D-Inverse-FFT.
+     * @return The truncated or zero-padded input, transformed along the axes.
+     */
+    NDArray ifft2(long[] sizes, long[] axes);
+
+    /**
+     * Computes the two-dimensional inverse Discrete Fourier Transform along the last 2 axes.
+     *
+     * @param sizes Sizes of the transformed axes of the output. Will be zero-padded or trimmed to
+     *     this size.
+     * @return The truncated or zero-padded input, transformed along the axes.
+     */
+    default NDArray ifft2(long[] sizes) {
+        return ifft2(sizes, new long[] {-2, -1});
+    }
+
+    /**
      * Reshapes this {@code NDArray} to the given {@link Shape}.
      *
      * <p>Examples
