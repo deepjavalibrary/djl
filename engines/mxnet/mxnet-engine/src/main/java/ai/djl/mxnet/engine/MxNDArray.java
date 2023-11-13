@@ -1162,6 +1162,18 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray fft2(long[] sizes, long[] axes) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray ifft2(long[] sizes, long[] axes) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray reshape(Shape shape) {
         MxOpParams params = new MxOpParams();
         params.addParam("newshape", shape);

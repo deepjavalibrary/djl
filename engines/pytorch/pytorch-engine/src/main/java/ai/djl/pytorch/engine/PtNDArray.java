@@ -1105,6 +1105,18 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray fft2(long[] sizes, long[] axes) {
+        return JniUtils.fft2(this, sizes, axes);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray ifft2(long[] sizes, long[] axes) {
+        return JniUtils.ifft2(this, sizes, axes);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray reshape(Shape shape) {
         return JniUtils.reshape(this, shape.getShape());
     }
