@@ -1,4 +1,4 @@
 huggingface_hub
 transformers
-torch==1.11.0
+torch
 protobuf==3.20.2
