@@ -65,9 +65,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *   <li><a
  *       href="http://docs.djl.ai/docs/demos/jupyter/object_detection_with_model_zoo.html">Inference
  *       with a model zoo model</a>
- *   <li><a
- *       href="http://docs.djl.ai/docs/demos/jupyter/load_mxnet_model.html">Inference
- *       with an MXNet model</a>
+ *   <li><a href="http://docs.djl.ai/docs/demos/jupyter/load_mxnet_model.html">Inference with an
+ *       MXNet model</a>
  * </ul>
  *
  * @param <I> the input type

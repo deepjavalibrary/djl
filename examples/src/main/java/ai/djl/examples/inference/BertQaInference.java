@@ -34,9 +34,8 @@ import java.io.IOException;
  * <p>See:
  *
  * <ul>
- *   <li>the <a
- *       href="http://docs.djl.ai/docs/demos/jupyter/BERTQA.html">jupyter
- *       demo</a> with more information about BERT.
+ *   <li>the <a href="http://docs.djl.ai/docs/demos/jupyter/BERTQA.html">jupyter demo</a> with more
+ *       information about BERT.
  *   <li>the <a
  *       href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/BERT_question_and_answer.md">docs</a>
  *       for information about running this example.
