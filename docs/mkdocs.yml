@@ -153,9 +153,13 @@ nav:
       - 'docs/serving/serving/docs/inference.md'
       - 'docs/serving/serving/docs/modes.md'
       - 'docs/serving/serving/docs/console.md'
-      - 'docs/serving/serving/docs/configuration.md'
-      - 'docs/serving/serving/docs/configurations.md'
-      - 'docs/serving/serving/docs/workflows.md'
+      - Configuration:
+          - 'docs/serving/serving/docs/configuration.md'
+          - 'docs/serving/serving/docs/configurations_global.md'
+          - 'docs/serving/serving/docs/configurations.md'
+          - 'docs/serving/serving/docs/workflows.md'
+          - 'docs/serving/serving/docs/configurations_model.md'
+          - 'docs/serving/serving/docs/configurations_large_model_inference_containers.md'
       - 'docs/serving/serving/docs/architecture.md'
       - HTTP API:
           - 'docs/serving/serving/docs/inference_api.md'
