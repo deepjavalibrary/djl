@@ -1,7 +1,7 @@
 # Quick start
 
 Deep Java Library (DJL) is designed to be easy to get started with and simple to use.
-The easiest way to learn DJL is to read the [beginner tutorial](../jupyter/tutorial/README.md) or
+The easiest way to learn DJL is to read the [beginner tutorial](http://docs.djl.ai/docs/demos/jupyter/tutorial/README.md) or
 our [examples](../examples/README.md).
 
 You can also view our 1.5 hour long (in 8 x ~10 minute segments) DJL 101 tutorial video series:
@@ -22,7 +22,7 @@ See [DJL Future Labs](interactive_tool.md)
 
 ## Beginner tutorial
 
-To get started, we recommend that you follow our short [beginner tutorial](../jupyter/tutorial/README.md). It takes you through some of the basics of deep learning to create a model, train your model, and run inference using your trained model.
+To get started, we recommend that you follow our short [beginner tutorial](http://docs.djl.ai/docs/demos/jupyter/tutorial/index.html). It takes you through some of the basics of deep learning to create a model, train your model, and run inference using your trained model.
 
 ## Run examples
 
@@ -33,7 +33,7 @@ All of our examples are executed by a simple command. For detailed command line 
 - [Train your first model](../examples/docs/train_mnist_mlp.md)
 - [Single-shot Object Detection inference example](../examples/docs/object_detection.md)
 - [More examples](https://github.com/deepjavalibrary/djl/tree/master/examples)
-- [Jupyter examples](../jupyter/README.md)
+- [Jupyter examples](http://docs.djl.ai/docs/demos/jupyter/index.html)
 
 ## Other resources
 

@@ -105,7 +105,7 @@ import java.util.function.Predicate;
  * further refine these elements, use {@link Block#freezeParameters(boolean)} to unfreeze them.
  *
  * @see <a
- *     href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/tutorial/01_create_your_first_network.ipynb">this
+ *     href="http://docs.djl.ai/docs/demos/jupyter/tutorial/01_create_your_first_network.html">this
  *     tutorial on creating your first network</a>
  * @see <a href="https://d2l.djl.ai/chapter_deep-learning-computation/model-construction.html">The
  *     D2L chapter on blocks</a> and <a

@@ -61,15 +61,15 @@ nav:
       - 'docs/faq.md'
   - Tutorials:
       - Beginner Tutorial:
-          - 'jupyter/tutorial/01_create_your_first_network.ipynb'
-          - 'jupyter/tutorial/02_train_your_first_model.ipynb'
-          - 'jupyter/tutorial/03_image_classification_with_your_model.ipynb'
+          - 'docs/demos/jupyter/tutorial/01_create_your_first_network.ipynb'
+          - 'docs/demos/jupyter/tutorial/02_train_your_first_model.ipynb'
+          - 'docs/demos/jupyter/tutorial/03_image_classification_with_your_model.ipynb'
       - 'docs/d2l.md'
-      - 'jupyter/rank_classification_using_BERT_on_Amazon_Review.ipynb'
-      - 'jupyter/transfer_learning_on_cifar10.ipynb'
+      - 'docs/demos/jupyter/rank_classification_using_BERT_on_Amazon_Review.ipynb'
+      - 'docs/demos/jupyter/transfer_learning_on_cifar10.ipynb'
       - Load your own BERT:
-          - BERT with MXNet: 'jupyter/mxnet/load_your_own_mxnet_bert.ipynb'
-          - BERT with PyTorch: 'jupyter/pytorch/load_your_own_pytorch_bert.ipynb'
+          - BERT with MXNet: 'docs/demos/jupyter/mxnet/load_your_own_mxnet_bert.ipynb'
+          - BERT with PyTorch: 'docs/demos/jupyter/pytorch/load_your_own_pytorch_bert.ipynb'
   - Guides:
       - Models:
           - 'docs/load_model.md'
@@ -97,25 +97,25 @@ nav:
           - PyTorch NDArray Operators: 'docs/pytorch/pytorch-djl-ndarray-cheatsheet.md'
           - PyTorch Model Zoo: 'engines/pytorch/pytorch-model-zoo/README.md'
           - Import PyTorch Model: 'docs/pytorch/how_to_convert_your_model_to_torchscript.md'
-          - Load a PyTorch Model: 'jupyter/load_pytorch_model.ipynb'
+          - Load a PyTorch Model: 'docs/demos/jupyter/load_pytorch_model.ipynb'
       - TensorFlow:
           - Overview: 'engines/tensorflow/README.md'
           - TensorFlow Engine: 'engines/tensorflow/tensorflow-engine/README.md'
           - TensorFlow Model Zoo: 'engines/tensorflow/tensorflow-model-zoo/README.md'
           - Import TensorFlow Model: 'docs/tensorflow/how_to_import_tensorflow_models_in_DJL.md'
-          - Load a TensorFlow Model: 'jupyter/tensorflow/pneumonia_detection.ipynb'
+          - Load a TensorFlow Model: 'docs/demos/jupyter/tensorflow/pneumonia_detection.ipynb'
       - Apache MXNet:
           - Overview: 'engines/mxnet/README.md'
           - MXNet Engine: 'engines/mxnet/mxnet-engine/README.md'
           - MXNet Model Zoo: 'engines/mxnet/mxnet-model-zoo/README.md'
           - Import Gluon Model: 'docs/mxnet/how_to_convert_your_model_to_symbol.md'
-          - Load a MXNet Model: 'jupyter/load_mxnet_model.ipynb'
+          - Load a MXNet Model: 'docs/demos/jupyter/load_mxnet_model.ipynb'
           - Backend Optimizer for MXNet: 'docs/mxnet/mxnet_backend_optimizer.md'
       - Hybrid engines:
           - Hybrid engine overview: 'docs/hybrid_engine.md'
           - ONNX Runtime:
               - Overview: 'engines/onnxruntime/onnxruntime-engine/README.md'
-              - Load a ONNX Model: 'jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
+              - Load a ONNX Model: 'docs/demos/jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
           - PaddlePaddle:
               - Overview: 'engines/paddlepaddle/README.md'
               - PaddlePaddle Engine: 'engines/paddlepaddle/paddlepaddle-engine/README.md'
@@ -124,11 +124,11 @@ nav:
                   - English: 'docs/paddlepaddle/how_to_create_paddlepaddle_model.md'
                   - 中文: 'docs/paddlepaddle/how_to_create_paddlepaddle_model_zh.md'
               - Facemask detection using PaddlePaddle:
-                  - English: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
-                  - 中文: 'jupyter/paddlepaddle/face_mask_detection_paddlepaddle_zh.ipynb'
+                  - English: 'docs/demos/jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb'
+                  - 中文: 'docs/demos/jupyter/paddlepaddle/face_mask_detection_paddlepaddle_zh.ipynb'
               - PaddleOCR example:
-                  - English: 'jupyter/paddlepaddle/paddle_ocr_java.ipynb'
-                  - 中文: 'jupyter/paddlepaddle/paddle_ocr_java_zh.ipynb'
+                  - English: 'docs/demos/jupyter/paddlepaddle/paddle_ocr_java.ipynb'
+                  - 中文: 'docs/demos/jupyter/paddlepaddle/paddle_ocr_java_zh.ipynb'
           - XGBoost: 'engines/ml/xgboost/README.md'
           - LightGBM: 'engines/ml/lightgbm/README.md'
           - TensorRT: 'engines/tensorrt/README.md'

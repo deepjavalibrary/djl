@@ -157,5 +157,5 @@ predictor.predict(list);
 
 As mentioned, you need to find out what is the input for the model, like images usually interpret as NCHW (batch_size, channel, height, width).
 
-However, usage like this is really basic, you can write a `Translator` in DJL for it. You can find some code examples [here](../../jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb).
+However, usage like this is really basic, you can write a `Translator` in DJL for it. You can find some code examples [here](http://docs.djl.ai/docs/demos/jupyter/paddlepaddle/face_mask_detection_paddlepaddle.html).
 
