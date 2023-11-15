@@ -16,7 +16,7 @@ import os
 from argparse import Namespace
 from typing import List
 
-from huggingface_hub import HfApi, ModelSearchArguments
+from huggingface_hub import HfApi
 from huggingface_hub import hf_hub_download
 from huggingface_hub.hf_api import ModelInfo
 
@@ -27,7 +27,7 @@ ARCHITECTURES_2_TASK = {
     "ForMultipleChoice": "text-classification",
     "ForMaskedLM": "fill-mask",
 }
-LANGUAGES = ModelSearchArguments().language
+LANGUAGES = HfApi().get_model_tags()["language"]
 
 
 def get_lang_tags(model_info):
