@@ -44,6 +44,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     private static final Logger logger = LoggerFactory.getLogger(HuggingFaceTokenizer.class);
 
     private boolean addSpecialTokens;
+    private boolean withOverflowingTokens;
     private TruncationStrategy truncation;
     private PaddingStrategy padding;
     private int maxLength;
@@ -64,6 +65,8 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         if (options != null) {
             val = options.getOrDefault("addSpecialTokens", "true");
             addSpecialTokens = Boolean.parseBoolean(val);
+            val = options.getOrDefault("withOverflowingTokens", "false");
+            withOverflowingTokens = Boolean.parseBoolean(val);
             modelMaxLength = ArgumentsUtil.intValue(options, "modelMaxLength", 512);
             if (options.containsKey("truncation")) {
                 truncation = TruncationStrategy.fromValue(options.get("truncation"));
@@ -203,11 +206,12 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @param text the input sentence
      * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
      *     model
+     * @param withOverflowingTokens whether to return overflowing tokens
      * @return the {@code Encoding} of the input sentence
      */
-    public Encoding encode(String text, boolean addSpecialTokens) {
+    public Encoding encode(String text, boolean addSpecialTokens, boolean withOverflowingTokens) {
         long encoding = TokenizersLibrary.LIB.encode(getHandle(), text, addSpecialTokens);
-        return toEncoding(encoding);
+        return toEncoding(encoding, withOverflowingTokens);
     }
 
     /**
@@ -217,7 +221,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentence
      */
     public Encoding encode(String text) {
-        return encode(text, addSpecialTokens);
+        return encode(text, addSpecialTokens, withOverflowingTokens);
     }
 
     /**
@@ -227,12 +231,14 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @param textPair the second input sentence
      * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
      *     model
+     * @param withOverflowingTokens whether to return overflowing tokens
      * @return the {@code Encoding} of the input sentence
      */
-    public Encoding encode(String text, String textPair, boolean addSpecialTokens) {
+    public Encoding encode(
+            String text, String textPair, boolean addSpecialTokens, boolean withOverflowingTokens) {
         long encoding =
                 TokenizersLibrary.LIB.encodeDual(getHandle(), text, textPair, addSpecialTokens);
-        return toEncoding(encoding);
+        return toEncoding(encoding, withOverflowingTokens);
     }
 
     /**
@@ -243,7 +249,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentence
      */
     public Encoding encode(String text, String textPair) {
-        return encode(text, textPair, addSpecialTokens);
+        return encode(text, textPair, addSpecialTokens, withOverflowingTokens);
     }
 
     /**
@@ -252,11 +258,13 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @param inputs the input sentences
      * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
      *     model
+     * @param withOverflowingTokens whether to return overflowing tokens
      * @return the {@code Encoding} of the input sentences
      */
-    public Encoding encode(List<String> inputs, boolean addSpecialTokens) {
+    public Encoding encode(
+            List<String> inputs, boolean addSpecialTokens, boolean withOverflowingTokens) {
         String[] array = inputs.toArray(Utils.EMPTY_ARRAY);
-        return encode(array, addSpecialTokens);
+        return encode(array, addSpecialTokens, withOverflowingTokens);
     }
 
     /**
@@ -266,7 +274,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentences
      */
     public Encoding encode(List<String> inputs) {
-        return encode(inputs, addSpecialTokens);
+        return encode(inputs, addSpecialTokens, withOverflowingTokens);
     }
 
     /**
@@ -275,11 +283,13 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @param inputs the input sentences
      * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
      *     model
+     * @param withOverflowingTokens whether to return overflowing tokens
      * @return the {@code Encoding} of the input sentences
      */
-    public Encoding encode(String[] inputs, boolean addSpecialTokens) {
+    public Encoding encode(
+            String[] inputs, boolean addSpecialTokens, boolean withOverflowingTokens) {
         long encoding = TokenizersLibrary.LIB.encodeList(getHandle(), inputs, addSpecialTokens);
-        return toEncoding(encoding);
+        return toEncoding(encoding, withOverflowingTokens);
     }
 
     /**
@@ -289,7 +299,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentences
      */
     public Encoding encode(String[] inputs) {
-        return encode(inputs, addSpecialTokens);
+        return encode(inputs, addSpecialTokens, withOverflowingTokens);
     }
 
     /**
@@ -298,11 +308,13 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @param inputs the batch of input sentence
      * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
      *     model
+     * @param withOverflowingTokens whether to return overflowing tokens
      * @return the {@code Encoding} of the input sentence in batch
      */
-    public Encoding[] batchEncode(List<String> inputs, boolean addSpecialTokens) {
+    public Encoding[] batchEncode(
+            List<String> inputs, boolean addSpecialTokens, boolean withOverflowingTokens) {
         String[] array = inputs.toArray(Utils.EMPTY_ARRAY);
-        return batchEncode(array, addSpecialTokens);
+        return batchEncode(array, addSpecialTokens, withOverflowingTokens);
     }
 
     /**
@@ -312,7 +324,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentence in batch
      */
     public Encoding[] batchEncode(List<String> inputs) {
-        return batchEncode(inputs, addSpecialTokens);
+        return batchEncode(inputs, addSpecialTokens, withOverflowingTokens);
     }
 
     /**
@@ -321,13 +333,15 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @param inputs the batch of input sentence
      * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
      *     model
+     * @param withOverflowingTokens whether to return overflowing tokens
      * @return the {@code Encoding} of the input sentence in batch
      */
-    public Encoding[] batchEncode(String[] inputs, boolean addSpecialTokens) {
+    public Encoding[] batchEncode(
+            String[] inputs, boolean addSpecialTokens, boolean withOverflowingTokens) {
         long[] encodings = TokenizersLibrary.LIB.batchEncode(getHandle(), inputs, addSpecialTokens);
         Encoding[] ret = new Encoding[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
-            ret[i] = toEncoding(encodings[i]);
+            ret[i] = toEncoding(encodings[i], withOverflowingTokens);
         }
         return ret;
     }
@@ -339,7 +353,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentence in batch
      */
     public Encoding[] batchEncode(String[] inputs) {
-        return batchEncode(inputs, addSpecialTokens);
+        return batchEncode(inputs, addSpecialTokens, withOverflowingTokens);
     }
 
     /**
@@ -348,9 +362,13 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @param inputs the batch of input text pair
      * @param addSpecialTokens whether to encode the sequence with special tokens relative to their
      *     model
+     * @param withOverflowingTokens whether to return overflowing tokens
      * @return the {@code Encoding} of the input text pair in batch
      */
-    public Encoding[] batchEncode(PairList<String, String> inputs, boolean addSpecialTokens) {
+    public Encoding[] batchEncode(
+            PairList<String, String> inputs,
+            boolean addSpecialTokens,
+            boolean withOverflowingTokens) {
         String[] text = inputs.keyArray(Utils.EMPTY_ARRAY);
         String[] textPair = inputs.valueArray(Utils.EMPTY_ARRAY);
         long[] encodings =
@@ -358,7 +376,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
                         getHandle(), text, textPair, addSpecialTokens);
         Encoding[] ret = new Encoding[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
-            ret[i] = toEncoding(encodings[i]);
+            ret[i] = toEncoding(encodings[i], withOverflowingTokens);
         }
         return ret;
     }
@@ -370,7 +388,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input text pair in batch
      */
     public Encoding[] batchEncode(PairList<String, String> inputs) {
-        return batchEncode(inputs, addSpecialTokens);
+        return batchEncode(inputs, addSpecialTokens, withOverflowingTokens);
     }
 
     /**
@@ -503,7 +521,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         }
     }
 
-    private Encoding toEncoding(long encoding) {
+    private Encoding toEncoding(long encoding, boolean withOverflowingTokens) {
         long[] ids = TokenizersLibrary.LIB.getTokenIds(encoding);
         long[] typeIds = TokenizersLibrary.LIB.getTypeIds(encoding);
         String[] tokens = TokenizersLibrary.LIB.getTokens(encoding);
@@ -511,11 +529,17 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         long[] attentionMask = TokenizersLibrary.LIB.getAttentionMask(encoding);
         long[] specialTokenMask = TokenizersLibrary.LIB.getSpecialTokenMask(encoding);
         CharSpan[] charSpans = TokenizersLibrary.LIB.getTokenCharSpans(encoding);
-        long[] overflowingHandles = TokenizersLibrary.LIB.getOverflowing(encoding);
 
-        Encoding[] overflowing = new Encoding[overflowingHandles.length];
-        for (int i = 0; i < overflowingHandles.length; ++i) {
-            overflowing[i] = toEncoding(overflowingHandles[i]);
+        Encoding[] overflowing;
+        if (withOverflowingTokens) {
+            long[] overflowingHandles = TokenizersLibrary.LIB.getOverflowing(encoding);
+
+            overflowing = new Encoding[overflowingHandles.length];
+            for (int i = 0; i < overflowingHandles.length; ++i) {
+                overflowing[i] = toEncoding(overflowingHandles[i], true);
+            }
+        } else {
+            overflowing = new Encoding[0];
         }
 
         TokenizersLibrary.LIB.deleteEncoding(encoding);
@@ -648,6 +672,17 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
          */
         public Builder optAddSpecialTokens(boolean addSpecialTokens) {
             options.put("addSpecialTokens", String.valueOf(addSpecialTokens));
+            return this;
+        }
+
+        /**
+         * Sets if add special tokens.
+         *
+         * @param withOverflowingTokens true to return overflowing tokens
+         * @return this builder
+         */
+        public Builder optWithOverflowingTokens(boolean withOverflowingTokens) {
+            options.put("withOverflowingTokens", String.valueOf(withOverflowingTokens));
             return this;
         }
 
