@@ -300,6 +300,7 @@ public class HuggingFaceTokenizerTest {
                 HuggingFaceTokenizer.builder()
                         .optTokenizerName("bert-base-cased")
                         .optAddSpecialTokens(false)
+                        .optWithOverflowingTokens(true)
                         .optTruncation(true)
                         .optMaxLength(3)
                         .optStride(1)
@@ -322,6 +323,7 @@ public class HuggingFaceTokenizerTest {
                 HuggingFaceTokenizer.builder()
                         .optTokenizerName("bert-base-cased")
                         .optAddSpecialTokens(false)
+                        .optWithOverflowingTokens(true)
                         .optTruncation(true)
                         .optMaxLength(8)
                         .optStride(2)
@@ -458,13 +460,13 @@ public class HuggingFaceTokenizerTest {
             Assert.assertEquals(outputs, outputsWithSpecialTokens);
 
             // encode with special tokens, decode with special tokens
-            encodings = tokenizer.batchEncode(inputs, true);
+            encodings = tokenizer.batchEncode(inputs, true, false);
             batchIds = Arrays.stream(encodings).map(Encoding::getIds).toArray(long[][]::new);
             outputs = tokenizer.batchDecode(batchIds, false);
             Assert.assertEquals(outputs, outputsWithSpecialTokens);
 
             // encode without special tokens, decode without special tokens
-            encodings = tokenizer.batchEncode(inputs, false);
+            encodings = tokenizer.batchEncode(inputs, false, false);
             batchIds = Arrays.stream(encodings).map(Encoding::getIds).toArray(long[][]::new);
             outputs = tokenizer.batchDecode(batchIds, true);
             Assert.assertEquals(outputs, outputsWithoutSpecialTokens);
