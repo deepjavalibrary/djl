@@ -213,6 +213,7 @@ flavorNames.each { flavor ->
             }
             from file("${BINARY_ROOT}/${flavor}/${osName}")
             archiveClassifier = "${osName}-x86_64"
+            archiveBaseName = "paddlepaddle-native-${flavor}"
 
             manifest {
                 attributes("Automatic-Module-Name": "ai.djl.paddlepaddle_native_${flavor}_${osName}")

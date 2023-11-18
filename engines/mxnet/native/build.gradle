@@ -89,6 +89,7 @@ flavorNames.each { flavor ->
             }
             from file("${BINARY_ROOT}/${flavor}/${osName}")
             archiveClassifier = "${osName}-x86_64"
+            archiveBaseName = "mxnet-native-${flavor}"
 
             manifest {
                 attributes("Automatic-Module-Name": "ai.djl.mxnet_native_${flavor}_${osName}")
