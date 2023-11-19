@@ -23,7 +23,7 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl.huggingface</groupId>
     <artifactId>tokenizers</artifactId>
-    <version>0.24.0</version>
+    <version>0.25.0</version>
 </dependency>
 ```
 
