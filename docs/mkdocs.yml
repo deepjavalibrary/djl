@@ -149,6 +149,7 @@ nav:
       - DJL Benchmark: 'docs/serving/benchmark/README.md'
   - DJL Serving:
       - Why DJL Serving?: 'docs/serving/README.md'
+      - Large Model Inference: 'docs/serving/serving/docs/large_model_inference.md'
       - 'docs/serving/serving/docs/starting.md'
       - 'docs/serving/serving/docs/inference.md'
       - 'docs/serving/serving/docs/modes.md'
@@ -159,7 +160,7 @@ nav:
           - 'docs/serving/serving/docs/configurations.md'
           - 'docs/serving/serving/docs/workflows.md'
           - 'docs/serving/serving/docs/configurations_model.md'
-          - 'docs/serving/serving/docs/configurations_large_model_inference_containers.md'
+          - 'docs/serving/serving/docs/lmi/configurations_large_model_inference_containers.md'
       - 'docs/serving/serving/docs/architecture.md'
       - HTTP API:
           - 'docs/serving/serving/docs/inference_api.md'
