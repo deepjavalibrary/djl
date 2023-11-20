@@ -155,6 +155,7 @@ flavorNames.each { flavor ->
             from file("src/main/resources")
             from file("${project.buildDir}/classes/java/main")
             archiveClassifier = "${osName}"
+            archiveBaseName = "tflite-native-${flavor}"
 
             manifest {
                 attributes("Automatic-Module-Name": "ai.djl.tflite_native_${flavor}_${osName}")
