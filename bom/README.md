@@ -22,7 +22,7 @@ will need to mention the type as pom and the scope as import) as the following:
         <dependency>
             <groupId>ai.djl</groupId>
             <artifactId>bom</artifactId>
-            <version>0.24.0</version>
+            <version>0.25.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -38,7 +38,7 @@ will need to mention the type as pom and the scope as import) as the following:
         <dependency>
             <groupId>ai.djl</groupId>
             <artifactId>bom</artifactId>
-            <version>0.24.0</version>
+            <version>0.25.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -65,7 +65,7 @@ will need to mention the type as pom and the scope as import) as the following:
 - First you need add BOM into your build.gradle file as the following:
 
 ```
-    implementation platform("ai.djl:bom:0.24.0")
+    implementation platform("ai.djl:bom:0.25.0")
 ```
 
 - Then you import the desired DJL modules into to you pom.xml file (no version is needed):
