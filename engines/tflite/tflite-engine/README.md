@@ -24,13 +24,13 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 ## Installation
 You can pull the TensorFlow Lite engine from the central Maven repository by including the following dependency:
 
-- ai.djl.tflite:tflite-engine:0.24.0
+- ai.djl.tflite:tflite-engine:0.25.0
 
 ```xml
 <dependency>
     <groupId>ai.djl.tflite</groupId>
     <artifactId>tflite-engine</artifactId>
-    <version>0.24.0</version>
+    <version>0.25.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
