@@ -106,10 +106,6 @@ public final class LibUtils {
 
     private static void loadLibTorch(LibTorch libTorch) {
         Path libDir = libTorch.dir.toAbsolutePath();
-        if ("1.8.1".equals(getVersion()) && System.getProperty("os.name").startsWith("Mac")) {
-            // PyTorch 1.8.1 libtorch_cpu.dylib cannot be loaded individually
-            return;
-        }
         boolean isCuda = libTorch.flavor.contains("cu");
         List<String> deferred =
                 Arrays.asList(
@@ -120,6 +116,7 @@ public final class LibUtils {
                         System.mapLibraryName("torch_cuda_cpp"),
                         System.mapLibraryName("torch_cuda_cu"),
                         System.mapLibraryName("torch_cuda"),
+                        System.mapLibraryName("nvfuser_codegen"),
                         System.mapLibraryName("torch"));
 
         Set<String> loadLater = new HashSet<>(deferred);
