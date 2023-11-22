@@ -156,4 +156,4 @@ predictor.predict(list);
 
 在这里，你需要知道模型的输入输出格式, 比如图片经常表达成 NCHW (批大小, RGB通道, 高度, 宽度)的多维矩阵。
 
-虽然这样可以让模型跑起来, 但是最好还是结合 DJL 的 `Translator` class 使用。你可以在 [这里](../../jupyter/paddlepaddle/face_mask_detection_paddlepaddle.ipynb) 找到一些示例代码。
+虽然这样可以让模型跑起来, 但是最好还是结合 DJL 的 `Translator` class 使用。你可以在 [这里](http://docs.djl.ai/docs/demos/jupyter/paddlepaddle/face_mask_detection_paddlepaddle.html) 找到一些示例代码。

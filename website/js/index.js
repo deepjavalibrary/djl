@@ -27,7 +27,7 @@ let app = new Vue({
             },
             {
                 name: 'Tutorial',
-                url: 'https://docs.djl.ai/jupyter/tutorial/index.html'
+                url: 'https://docs.djl.ai/docs/demos/jupyter/tutorial/index.html'
             },
             {
                 name: 'Examples',

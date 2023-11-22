@@ -60,14 +60,13 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <ul>
  *   <li><a
- *       href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/tutorial/03_image_classification_with_your_model.ipynb">Inference
+ *       href="http://docs.djl.ai/docs/demos/jupyter/tutorial/03_image_classification_with_your_model.html">Inference
  *       with a custom trained model</a>
  *   <li><a
- *       href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/object_detection_with_model_zoo.ipynb">Inference
+ *       href="http://docs.djl.ai/docs/demos/jupyter/object_detection_with_model_zoo.html">Inference
  *       with a model zoo model</a>
- *   <li><a
- *       href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/load_mxnet_model.ipynb">Inference
- *       with an MXNet model</a>
+ *   <li><a href="http://docs.djl.ai/docs/demos/jupyter/load_mxnet_model.html">Inference with an
+ *       MXNet model</a>
  * </ul>
  *
  * @param <I> the input type

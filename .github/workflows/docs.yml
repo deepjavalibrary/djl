@@ -3,7 +3,6 @@ name: Docs
 on:
   pull_request:
     paths:
-      - "**.ipynb"
       - "docs/mkdocs.yml"
   # Publish docs weekly
   schedule:
@@ -38,10 +37,6 @@ jobs:
       - name: add mybinder link
         run: |
           python3 tools/scripts/add_online_runner.py
-      - name: run Notebooks
-        run: |
-          cd jupyter
-          bash test_notebook.sh
       - name: clone demos
         run: |
           cd docs
@@ -50,6 +45,10 @@ jobs:
         run: |
           cd docs
           git clone https://github.com/deepjavalibrary/djl-serving.git serving
+      - name: run Notebooks
+        run: |
+          cd docs/demos/jupyter
+          bash test_notebook.sh
       - name: build docs
         run: |
           cd docs

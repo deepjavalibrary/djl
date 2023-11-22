@@ -52,14 +52,12 @@ import java.util.function.Consumer;
  *
  * <ul>
  *   <li><a
- *       href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/tutorial/02_train_your_first_model.ipynb">Training
+ *       href="http://docs.djl.ai/docs/demos/jupyter/tutorial/02_train_your_first_model.html">Training
  *       your first model</a>
- *   <li><a
- *       href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/transfer_learning_on_cifar10.ipynb">Training
+ *   <li><a href="http://docs.djl.ai/docs/demos/jupyter/transfer_learning_on_cifar10.html">Training
  *       using transfer learning</a>
- *   <li><a
- *       href="https://github.com/deepjavalibrary/djl/blob/master/jupyter/load_mxnet_model.ipynb">Inference
- *       with an MXNet model</a>
+ *   <li><a href="http://docs.djl.ai/docs/demos/jupyter/load_mxnet_model.html">Inference with an
+ *       MXNet model</a>
  * </ul>
  *
  * @see <a href="http://docs.djl.ai/docs/development/memory_management.html">The guide on memory
