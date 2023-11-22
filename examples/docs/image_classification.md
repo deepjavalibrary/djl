@@ -6,7 +6,7 @@ In this example, you learn how to implement inference code with Deep Java Librar
 
 The image classification example code can be found at [ImageClassification.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/ImageClassification.java).
 
-You can also use the [Jupyter notebook tutorial](../../jupyter/tutorial/03_image_classification_with_your_model.ipynb).
+You can also use the [Jupyter notebook tutorial](http://docs.djl.ai/docs/demos/jupyter/tutorial/03_image_classification_with_your_model.html).
 The Jupyter notebook explains the key concepts in detail.
 
 ## Setup Guide
