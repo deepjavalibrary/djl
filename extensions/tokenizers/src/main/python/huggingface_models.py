@@ -56,6 +56,8 @@ class HuggingfaceModels:
         self.temp_dir = f"{self.output_dir}/tmp"
 
     def list_models(self, args: Namespace) -> List[dict]:
+        import_all = os.environ.get("HF_IMPORT_ALL")
+
         api = HfApi()
         if args.model_name:
             models = api.list_models(filter="pytorch",
@@ -63,15 +65,19 @@ class HuggingfaceModels:
                                      sort="downloads",
                                      direction=-1,
                                      limit=args.limit)
-            if not models:
-                logging.warning(f"no model found: {args.model_name}.")
+            import_all = True
         else:
             models = api.list_models(filter=f"{args.category},pytorch",
                                      sort="downloads",
                                      direction=-1,
                                      limit=args.limit)
-            if not models:
+        if not models:
+            if args.model_name:
+                logging.warning(f"no model found: {args.model_name}.")
+            else:
                 logging.warning(f"no model matches category: {args.category}.")
+
+            return []
 
         ret = []
         for model_info in models:
@@ -83,7 +89,7 @@ class HuggingfaceModels:
                 continue
 
             languages = get_lang_tags(model_info)
-            if "en" not in languages and not os.environ["HF_IMPORT_ALL"]:
+            if "en" not in languages and not import_all:
                 logging.warning(f"Skip non-English model: {model_id}.")
                 continue
 
@@ -93,6 +99,12 @@ class HuggingfaceModels:
                 if not args.retry_failed:
                     logging.info(f"Skip converted model: {model_id}.")
                     continue
+
+            if model_info.downloads < 50 and not import_all:
+                logging.info(
+                    f"Skip model {model_info.modelId}, downloads {model_info.downloads} < 50"
+                )
+                continue
 
             try:
                 config = hf_hub_download(repo_id=model_id,
