@@ -434,7 +434,11 @@ public interface NDArrayEx {
             if (dim == 3) {
                 result = result.expandDims(0);
             }
-            result = result.div(255.0).transpose(0, 3, 1, 2);
+            // For Apple Silicon MPS it is important not to switch to 64-bit float here
+            if (result.getDataType().equals(DataType.FLOAT32))
+                result = result.div(255.0f).transpose(0, 3, 1, 2);
+            else
+                result = result.div(255.0).transpose(0, 3, 1, 2);
             if (dim == 3) {
                 result = result.squeeze(0);
             }
