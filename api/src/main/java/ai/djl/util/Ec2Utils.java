@@ -97,7 +97,7 @@ public final class Ec2Utils {
      * @param engine the default engine name
      */
     public static void callHome(String engine) {
-        if (Boolean.getBoolean("offline")
+        if (Utils.isOfflineMode()
                 || Boolean.parseBoolean(Utils.getEnvOrSystemProperty("OPT_OUT_TRACKING"))
                 || System.currentTimeMillis() - lastCheckIn < ONE_DAY) {
             return;

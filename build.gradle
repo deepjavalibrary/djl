@@ -88,7 +88,7 @@ configure(javaProjects()) {
             systemProperty "disableProgressBar", "true"
             systemProperty "nightly", System.getProperty("nightly", "false")
             if (gradle.startParameter.offline) {
-                systemProperty "offline", "true"
+                systemProperty "ai.djl.offline", "true"
             }
             // This is used to avoid overriding on default engine for modules:
             // mxnet-engine, mxnet-model-zoo, api (MockEngine), basicdataset, fasttext, etc

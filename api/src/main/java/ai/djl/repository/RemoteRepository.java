@@ -75,7 +75,7 @@ public class RemoteRepository extends AbstractRepository {
                 Metadata metadata = JsonUtils.GSON_PRETTY.fromJson(reader, Metadata.class);
                 metadata.init(arguments);
                 Date lastUpdated = metadata.getLastUpdated();
-                if (Boolean.getBoolean("offline")
+                if (Utils.isOfflineMode()
                         || System.currentTimeMillis() - lastUpdated.getTime() < ONE_DAY) {
                     metadata.setRepositoryUri(mrlUri);
                     return metadata;
