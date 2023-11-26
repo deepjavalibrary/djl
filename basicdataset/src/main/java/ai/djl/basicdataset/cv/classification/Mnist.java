@@ -112,7 +112,9 @@ public final class Mnist extends ArrayDataset {
             }
 
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = manager.create(ByteBuffer.wrap(buf), new Shape(length, 28, 28, 1), DataType.UINT8)) {
+            try (NDArray array =
+                    manager.create(
+                            ByteBuffer.wrap(buf), new Shape(length, 28, 28, 1), DataType.UINT8)) {
                 return array.toType(DataType.FLOAT32, false);
             }
         }
@@ -124,7 +126,8 @@ public final class Mnist extends ArrayDataset {
                 throw new AssertionError("Failed skip data.");
             }
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = manager.create(ByteBuffer.wrap(buf), new Shape(buf.length), DataType.UINT8)) {
+            try (NDArray array =
+                    manager.create(ByteBuffer.wrap(buf), new Shape(buf.length), DataType.UINT8)) {
                 return array.toType(DataType.FLOAT32, false);
             }
         }

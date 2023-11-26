@@ -117,8 +117,11 @@ public final class FashionMnist extends ArrayDataset {
             }
 
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = manager.create(ByteBuffer.wrap(buf),
-                    new Shape(length, IMAGE_WIDTH, IMAGE_HEIGHT, 1), DataType.UINT8)) {
+            try (NDArray array =
+                    manager.create(
+                            ByteBuffer.wrap(buf),
+                            new Shape(length, IMAGE_WIDTH, IMAGE_HEIGHT, 1),
+                            DataType.UINT8)) {
                 return array.toType(DataType.FLOAT32, false);
             }
         }
@@ -131,7 +134,8 @@ public final class FashionMnist extends ArrayDataset {
             }
 
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = manager.create(ByteBuffer.wrap(buf), new Shape(buf.length), DataType.UINT8)) {
+            try (NDArray array =
+                    manager.create(ByteBuffer.wrap(buf), new Shape(buf.length), DataType.UINT8)) {
                 return array.toType(DataType.FLOAT32, false);
             }
         }

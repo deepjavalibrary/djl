@@ -88,11 +88,12 @@ public class Classifications implements JsonSerializable, Ensembleable<Classific
      */
     public Classifications(List<String> classNames, NDArray probabilities, int topK) {
         this.classNames = classNames;
-        if (probabilities.getDataType().equals(DataType.FLOAT32)) {
+        if (probabilities.getDataType() == DataType.FLOAT32) {
             // Avoid converting float32 to float64 as this is not supported on MPS device
             this.probabilities = new ArrayList<>();
-            for (float prob : probabilities.toFloatArray())
+            for (float prob : probabilities.toFloatArray()) {
                 this.probabilities.add((double) prob);
+            }
         } else {
             NDArray array = probabilities.toType(DataType.FLOAT64, false);
             this.probabilities =
