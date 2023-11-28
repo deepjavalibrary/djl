@@ -155,8 +155,8 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           TOKENIZERS_VERSION="$(cat gradle.properties | awk -F '=' '/tokenizers_version/ {print $2}')"
-          aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
+          /opt/homebrew/bin/aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
+          /opt/homebrew/bin/aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
   create-aarch64-runner:
     if: github.repository == 'deepjavalibrary/djl'
@@ -179,15 +179,14 @@ jobs:
     runs-on: [ self-hosted, aarch64 ]
     timeout-minutes: 30
     needs: create-aarch64-runner
-    container: centos:centos7
+    container: amazonlinux:2
     steps:
       - name: Install Environment
         run: |
           yum -y update
-          yum -y install centos-release-scl-rh epel-release perl-core
-          yum -y install devtoolset-7 git patch cmake3 libstdc++-static
+          yum -y groupinstall "Development Tools"
+          yum -y install patch perl-IPC-Cmd cmake3
           ln -s /usr/bin/cmake3 /usr/bin/cmake
-          curl https://sh.rustup.rs -sSf | sh -s -- -y
           pip3 install awscli --upgrade
       - uses: actions-rs/toolchain@v1
         with:
@@ -207,8 +206,6 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
-          source "$HOME/.cargo/env"
-          export PATH=$PATH:/opt/rh/devtoolset-7/root/usr/bin
           ./gradlew :extensions:tokenizers:compileJNI
           PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
       - name: Configure AWS Credentials
