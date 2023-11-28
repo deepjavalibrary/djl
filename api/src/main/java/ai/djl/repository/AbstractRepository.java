@@ -243,7 +243,7 @@ public abstract class AbstractRepository implements Repository {
         bis = new CloseShieldFilterInputStream(bis);
         try (TarArchiveInputStream tis = new TarArchiveInputStream(bis)) {
             TarArchiveEntry entry;
-            while ((entry = tis.getNextTarEntry()) != null) {
+            while ((entry = tis.getNextEntry()) != null) {
                 String entryName = entry.getName();
                 if (entryName.contains("..")) {
                     throw new IOException("Malicious zip entry: " + entryName);
