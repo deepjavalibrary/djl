@@ -49,9 +49,17 @@ def main():
         model_info = model["model_info"]
         converter = SUPPORTED_TASK[task]
 
-        result, reason, size = converter.save_model(model_info, args, temp_dir)
-        if not result:
-            logging.error(f"{model_info.modelId}: {reason}")
+        try:
+            result, reason, size = converter.save_model(
+                model_info, args, temp_dir)
+            if not result:
+                logging.error(f"{model_info.modelId}: {reason}")
+        except Exception as e:
+            logging.warning(f"Failed to convert model: {model_info.modelId}.")
+            logging.warning(e, exc_info=True)
+            result = False
+            reason = "Failed to convert model"
+            size = -1
 
         huggingface_models.update_progress(model_info, converter.application,
                                            result, reason, size, args.cpu_only)

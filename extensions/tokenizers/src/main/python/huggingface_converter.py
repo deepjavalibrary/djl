@@ -41,9 +41,20 @@ class HuggingfaceConverter:
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
 
-        hf_pipeline = self.load_model(model_id)
-        # Save tokenizer.json to temp dir
-        self.save_tokenizer(hf_pipeline, temp_dir)
+        try:
+            hf_pipeline = self.load_model(model_id)
+        except Exception as e:
+            logging.warning(f"Failed to load model: {model_id}.")
+            logging.warning(e, exc_info=True)
+            return False, "Failed to load model", -1
+
+        try:
+            # Save tokenizer.json to temp dir
+            self.save_tokenizer(hf_pipeline, temp_dir)
+        except Exception as e:
+            logging.warning(f"Failed to save tokenizer: {model_id}.")
+            logging.warning(e, exc_info=True)
+            return False, "Failed to save tokenizer", -1
 
         # Save config.json just for reference
         config = hf_hub_download(repo_id=model_id, filename="config.json")
@@ -112,7 +123,7 @@ class HuggingfaceConverter:
             logging.info(f"Saving torchscript model: {model_name}.pt ...")
             model_file = os.path.join(temp_dir, f"{model_name}.pt")
             script_module.save(model_file)
-        except (RuntimeError, ValueError) as e:
+        except Exception as e:
             logging.warning(f"Failed to trace model: {model_id}.")
             logging.warning(e, exc_info=True)
             return None
