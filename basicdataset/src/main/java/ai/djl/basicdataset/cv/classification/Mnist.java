@@ -30,6 +30,7 @@ import ai.djl.util.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 /**
@@ -111,8 +112,9 @@ public final class Mnist extends ArrayDataset {
             }
 
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = manager.create(new Shape(length, 28, 28, 1), DataType.UINT8)) {
-                array.set(buf);
+            try (NDArray array =
+                    manager.create(
+                            ByteBuffer.wrap(buf), new Shape(length, 28, 28, 1), DataType.UINT8)) {
                 return array.toType(DataType.FLOAT32, false);
             }
         }
@@ -123,10 +125,9 @@ public final class Mnist extends ArrayDataset {
             if (is.skip(8) != 8) {
                 throw new AssertionError("Failed skip data.");
             }
-
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = manager.create(new Shape(buf.length), DataType.UINT8)) {
-                array.set(buf);
+            try (NDArray array =
+                    manager.create(ByteBuffer.wrap(buf), new Shape(buf.length), DataType.UINT8)) {
                 return array.toType(DataType.FLOAT32, false);
             }
         }
