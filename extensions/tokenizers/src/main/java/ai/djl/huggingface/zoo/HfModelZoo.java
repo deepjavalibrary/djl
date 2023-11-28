@@ -131,8 +131,7 @@ public class HfModelZoo extends ModelZoo {
             Path file = dir.resolve("models.json");
             if (Files.exists(file)) {
                 long lastModified = Files.getLastModifiedTime(file).toMillis();
-                if (Boolean.getBoolean("offline")
-                        || System.currentTimeMillis() - lastModified < ONE_DAY) {
+                if (Utils.isOfflineMode() || System.currentTimeMillis() - lastModified < ONE_DAY) {
                     try (Reader reader = Files.newBufferedReader(file)) {
                         return JsonUtils.GSON.fromJson(reader, type);
                     }

@@ -103,21 +103,21 @@ public class ModelZooTest {
     @Test
     public void testOffLine() throws IOException {
         System.setProperty("DJL_CACHE_DIR", "build/cache");
-        System.setProperty("offline", "true");
+        System.setProperty("ai.djl.offline", "true");
         try {
             Utils.deleteQuietly(Paths.get("build/cache"));
             // static variables cannot not be initialized properly if directly use new HfModelZoo()
             ModelZoo.getModelZoo("ai.djl.huggingface.pytorch");
 
             ModelZoo zoo = new HfModelZoo();
-            Assert.assertTrue(zoo.getModelLoaders().size() > 0);
+            Assert.assertFalse(zoo.getModelLoaders().isEmpty());
 
             Set<String> engines = zoo.getSupportedEngines();
             Assert.assertEquals(engines.size(), 1);
             Assert.assertEquals(engines.iterator().next(), "PyTorch");
         } finally {
             System.clearProperty("DJL_CACHE_DIR");
-            System.clearProperty("offline");
+            System.clearProperty("ai.djl.offline");
         }
     }
 }
