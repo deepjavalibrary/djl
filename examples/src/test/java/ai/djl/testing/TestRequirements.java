@@ -14,6 +14,7 @@ package ai.djl.testing;
 
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
+import ai.djl.util.Utils;
 
 import org.testng.SkipException;
 
@@ -45,7 +46,7 @@ public final class TestRequirements {
 
     /** Requires a test not be run in offline mode. */
     public static void notOffline() {
-        if (Boolean.getBoolean("offline")) {
+        if (Utils.isOfflineMode()) {
             throw new SkipException("This test can not run while offline");
         }
     }

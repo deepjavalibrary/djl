@@ -20,5 +20,5 @@ System.setProperty("OPT_OUT_TRACKING", "true")
 Usage tracking is also disable in `offline` mode:
 
 ```java
-System.setProperty("offline", "true")
+System.setProperty("ai.djl.offline", "true")
 ```
