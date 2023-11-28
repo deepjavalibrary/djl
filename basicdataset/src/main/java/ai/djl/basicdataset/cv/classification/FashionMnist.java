@@ -30,6 +30,7 @@ import ai.djl.util.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 /**
@@ -118,8 +119,9 @@ public final class FashionMnist extends ArrayDataset {
             byte[] buf = Utils.toByteArray(is);
             try (NDArray array =
                     manager.create(
-                            new Shape(length, IMAGE_WIDTH, IMAGE_HEIGHT, 1), DataType.UINT8)) {
-                array.set(buf);
+                            ByteBuffer.wrap(buf),
+                            new Shape(length, IMAGE_WIDTH, IMAGE_HEIGHT, 1),
+                            DataType.UINT8)) {
                 return array.toType(DataType.FLOAT32, false);
             }
         }
@@ -132,8 +134,8 @@ public final class FashionMnist extends ArrayDataset {
             }
 
             byte[] buf = Utils.toByteArray(is);
-            try (NDArray array = manager.create(new Shape(buf.length), DataType.UINT8)) {
-                array.set(buf);
+            try (NDArray array =
+                    manager.create(ByteBuffer.wrap(buf), new Shape(buf.length), DataType.UINT8)) {
                 return array.toType(DataType.FLOAT32, false);
             }
         }
