@@ -67,10 +67,13 @@ class HuggingfaceModels:
             import_all = True
         else:
             all_models = api.list_models(filter=args.category,
-                                     sort="downloads",
-                                     direction=-1,
-                                     limit=args.limit)
-        models = [model for model in all_models if 'pytorch' in model.tags or 'safetensors' in model.tags]
+                                         sort="downloads",
+                                         direction=-1,
+                                         limit=args.limit)
+        models = [
+            model for model in all_models
+            if 'pytorch' in model.tags or 'safetensors' in model.tags
+        ]
         if not models:
             if args.model_name:
                 logging.warning(f"no model found: {args.model_name}.")
