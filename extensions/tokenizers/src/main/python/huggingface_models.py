@@ -60,17 +60,17 @@ class HuggingfaceModels:
 
         api = HfApi()
         if args.model_name:
-            models = api.list_models(filter="pytorch",
-                                     search=args.model_name,
-                                     sort="downloads",
-                                     direction=-1,
-                                     limit=args.limit)
+            all_models = api.list_models(search=args.model_name,
+                                         sort="downloads",
+                                         direction=-1,
+                                         limit=args.limit)
             import_all = True
         else:
-            models = api.list_models(filter=f"{args.category},pytorch",
+            all_models = api.list_models(filter=args.category,
                                      sort="downloads",
                                      direction=-1,
                                      limit=args.limit)
+        models = [model for model in all_models if 'pytorch' in model.tags or 'safetensors' in model.tags]
         if not models:
             if args.model_name:
                 logging.warning(f"no model found: {args.model_name}.")
