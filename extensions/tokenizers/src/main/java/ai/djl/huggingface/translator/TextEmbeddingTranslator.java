@@ -113,7 +113,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         long[] shape = embeddings.getShape().getShape();
         attentionMask = attentionMask.expandDims(-1).broadcast(shape);
         NDArray inputAttentionMaskSum = attentionMask.sum(AXIS);
-        NDArray clamp = inputAttentionMaskSum.clip(1e-9, 1e12);
+        NDArray clamp = inputAttentionMaskSum.clip(1e-9f, 1e12f);
         NDArray prod = embeddings.mul(attentionMask);
         NDArray sum = prod.sum(AXIS);
         if (sqrt) {
