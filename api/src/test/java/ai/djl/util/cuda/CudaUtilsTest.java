@@ -20,8 +20,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.lang.management.MemoryUsage;
-import java.util.Arrays;
-import java.util.List;
 
 public class CudaUtilsTest {
 
@@ -30,6 +28,9 @@ public class CudaUtilsTest {
     @Test
     public void testCudaUtils() {
         if (!CudaUtils.hasCuda()) {
+            Assert.assertThrows(CudaUtils::getCudaVersionString);
+            Assert.assertThrows(() -> CudaUtils.getComputeCapability(0));
+            Assert.assertThrows(() -> CudaUtils.getGpuMemory(Device.gpu()));
             return;
         }
         // Possible to have CUDA and not have a GPU.
@@ -37,16 +38,24 @@ public class CudaUtilsTest {
             return;
         }
 
-        int cudaVersion = CudaUtils.getCudaVersion();
+        String cudaVersion = CudaUtils.getCudaVersionString();
         String smVersion = CudaUtils.getComputeCapability(0);
         MemoryUsage memoryUsage = CudaUtils.getGpuMemory(Device.gpu());
 
         logger.info("CUDA runtime version: {}, sm: {}", cudaVersion, smVersion);
         logger.info("Memory usage: {}", memoryUsage);
 
-        Assert.assertTrue(cudaVersion >= 9020, "cuda 9.2+ required.");
+        Assert.assertNotNull(cudaVersion);
+        Assert.assertNotNull(smVersion);
+    }
 
-        List<String> supportedSm = Arrays.asList("37", "52", "60", "61", "70", "75");
-        Assert.assertTrue(supportedSm.contains(smVersion), "Unsupported cuda sm: " + smVersion);
+    @Test
+    public void testCudaUtilsWithFolk() {
+        System.setProperty("ai.djl.util.cuda.folk", "true");
+        try {
+            testCudaUtils();
+        } finally {
+            System.clearProperty("ai.djl.util.cuda.folk");
+        }
     }
 }
