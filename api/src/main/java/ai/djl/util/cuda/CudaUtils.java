@@ -22,7 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.MemoryUsage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -32,6 +36,8 @@ public final class CudaUtils {
     private static final Logger logger = LoggerFactory.getLogger(CudaUtils.class);
 
     private static final CudaLibrary LIB = loadLibrary();
+
+    private static String[] gpuInfo;
 
     private CudaUtils() {}
 
@@ -49,7 +55,15 @@ public final class CudaUtils {
      *
      * @return the number of GPUs available in the system
      */
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static int getGpuCount() {
+        if (Boolean.getBoolean("ai.djl.util.cuda.folk")) {
+            if (gpuInfo == null) {
+                gpuInfo = execute(-1); // NOPMD
+            }
+            return Integer.parseInt(gpuInfo[0]);
+        }
+
         if (LIB == null) {
             return 0;
         }
@@ -79,7 +93,19 @@ public final class CudaUtils {
      *
      * @return the version of CUDA runtime
      */
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static int getCudaVersion() {
+        if (Boolean.getBoolean("ai.djl.util.cuda.folk")) {
+            if (gpuInfo == null) {
+                gpuInfo = execute(-1);
+            }
+            int version = Integer.parseInt(gpuInfo[1]);
+            if (version == -1) {
+                throw new IllegalArgumentException("No cuda device found.");
+            }
+            return version;
+        }
+
         if (LIB == null) {
             throw new IllegalStateException("No cuda library is loaded.");
         }
@@ -95,9 +121,6 @@ public final class CudaUtils {
      * @return the version string of CUDA runtime
      */
     public static String getCudaVersionString() {
-        if (LIB == null) {
-            throw new IllegalStateException("No cuda library is loaded.");
-        }
         int version = getCudaVersion();
         int major = version / 1000;
         int minor = (version / 10) % 10;
@@ -111,6 +134,14 @@ public final class CudaUtils {
      * @return the CUDA compute capability
      */
     public static String getComputeCapability(int device) {
+        if (Boolean.getBoolean("ai.djl.util.cuda.folk")) {
+            String[] ret = execute(device);
+            if (ret.length != 3) {
+                throw new IllegalArgumentException(ret[0]);
+            }
+            return ret[0];
+        }
+
         if (LIB == null) {
             throw new IllegalStateException("No cuda library is loaded.");
         }
@@ -137,6 +168,16 @@ public final class CudaUtils {
             throw new IllegalArgumentException("Only GPU device is allowed.");
         }
 
+        if (Boolean.getBoolean("ai.djl.util.cuda.folk")) {
+            String[] ret = execute(device.getDeviceId());
+            if (ret.length != 3) {
+                throw new IllegalArgumentException(ret[0]);
+            }
+            long total = Long.parseLong(ret[1]);
+            long used = Long.parseLong(ret[2]);
+            return new MemoryUsage(-1, used, used, total);
+        }
+
         if (LIB == null) {
             throw new IllegalStateException("No GPU device detected.");
         }
@@ -155,8 +196,42 @@ public final class CudaUtils {
         return new MemoryUsage(-1, committed, committed, total[0]);
     }
 
+    /**
+     * The main entrypoint to get CUDA information with command line.
+     *
+     * @param args the command line arguments.
+     */
+    @SuppressWarnings("PMD.SystemPrintln")
+    public static void main(String[] args) {
+        int gpuCount = getGpuCount();
+        if (args.length == 0) {
+            if (gpuCount <= 0) {
+                System.out.println("0,-1");
+                return;
+            }
+            int cudaVersion = getCudaVersion();
+            System.out.println(gpuCount + "," + cudaVersion);
+            return;
+        }
+        try {
+            int deviceId = Integer.parseInt(args[0]);
+            if (deviceId < 0 || deviceId >= gpuCount) {
+                System.out.println("Invalid device: " + deviceId);
+                return;
+            }
+            MemoryUsage mem = getGpuMemory(Device.gpu(deviceId));
+            String cc = getComputeCapability(deviceId);
+            System.out.println(cc + ',' + mem.getMax() + ',' + mem.getUsed());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid device: " + args[0]);
+        }
+    }
+
     private static CudaLibrary loadLibrary() {
         try {
+            if (Boolean.getBoolean("ai.djl.util.cuda.folk")) {
+                return null;
+            }
             if (System.getProperty("os.name").startsWith("Win")) {
                 String path = Utils.getenv("PATH");
                 if (path == null) {
@@ -196,6 +271,33 @@ public final class CudaUtils {
             logger.warn("Access denied during loading cudart library.");
             logger.trace("", e);
             return null;
+        }
+    }
+
+    private static String[] execute(int deviceId) {
+        try {
+            String javaHome = System.getProperty("java.home");
+            String classPath = System.getProperty("java.class.path");
+            String os = System.getProperty("os.name");
+            List<String> cmd = new ArrayList<>(4);
+            if (os.startsWith("Win")) {
+                cmd.add(javaHome + "\\bin\\java.exe");
+            } else {
+                cmd.add(javaHome + "/bin/java");
+            }
+            cmd.add("-cp");
+            cmd.add(classPath);
+            cmd.add("ai.djl.util.cuda.CudaUtils");
+            if (deviceId >= 0) {
+                cmd.add(String.valueOf(deviceId));
+            }
+            Process ps = new ProcessBuilder(cmd).redirectErrorStream(true).start();
+            try (InputStream is = ps.getInputStream()) {
+                String line = Utils.toString(is).trim();
+                return line.split(",");
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Failed get GPU information", e);
         }
     }
 
