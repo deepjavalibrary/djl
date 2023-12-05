@@ -74,8 +74,11 @@ public class SecurityManagerTest {
                     }
                 };
         System.setSecurityManager(sm);
-
-        Assert.assertFalse(CudaUtils.hasCuda());
-        Assert.assertEquals(CudaUtils.getGpuCount(), 0);
+        try {
+            Assert.assertFalse(CudaUtils.hasCuda());
+            Assert.assertEquals(CudaUtils.getGpuCount(), 0);
+        } finally {
+            System.setSecurityManager(null);
+        }
     }
 }
