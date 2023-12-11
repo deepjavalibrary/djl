@@ -167,7 +167,7 @@ public abstract class Engine {
      */
     public static void registerEngine(EngineProvider provider) {
         logger.debug("Registering EngineProvider: {}", provider.getEngineName());
-        ALL_ENGINES.putIfAbsent(provider.getEngineName(), provider);
+        ALL_ENGINES.put(provider.getEngineName(), provider);
     }
 
     /**

@@ -18,7 +18,8 @@ import ai.djl.engine.EngineProvider;
 /** {@code OrtEngineProvider} is the ONNX Runtime implementation of {@link EngineProvider}. */
 public class OrtEngineProvider implements EngineProvider {
 
-    private static volatile Engine engine; // NOPMD
+    private volatile Engine engine; // NOPMD
+    private volatile boolean initialized; // NOPMD
 
     /** {@inheritDoc} */
     @Override
@@ -35,9 +36,12 @@ public class OrtEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        if (engine == null) {
+        if (!initialized) {
             synchronized (OrtEngineProvider.class) {
-                engine = OrtEngine.newInstance();
+                if (!initialized) {
+                    initialized = true;
+                    engine = OrtEngine.newInstance();
+                }
             }
         }
         return engine;

@@ -18,7 +18,8 @@ import ai.djl.engine.EngineProvider;
 /** {@code PtEngineProvider} is the PyTorch implementation of {@link EngineProvider}. */
 public class PtEngineProvider implements EngineProvider {
 
-    private static volatile Engine engine; // NOPMD
+    private volatile Engine engine; // NOPMD
+    private volatile boolean initialized; // NOPMD
 
     /** {@inheritDoc} */
     @Override
@@ -35,9 +36,12 @@ public class PtEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        if (engine == null) {
+        if (!initialized) {
             synchronized (PtEngineProvider.class) {
-                engine = PtEngine.newInstance();
+                if (!initialized) {
+                    initialized = true;
+                    engine = PtEngine.newInstance();
+                }
             }
         }
         return engine;
