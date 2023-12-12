@@ -214,7 +214,12 @@ public abstract class Engine {
         if (provider == null) {
             throw new IllegalArgumentException("Deep learning engine not found: " + engineName);
         }
-        return provider.getEngine();
+        Engine engine = provider.getEngine();
+        if (engine == null) {
+            throw new IllegalStateException(
+                    "The engine " + engineName + " was not able to initialize");
+        }
+        return engine;
     }
 
     /**
