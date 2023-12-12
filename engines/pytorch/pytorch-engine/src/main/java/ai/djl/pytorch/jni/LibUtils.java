@@ -130,7 +130,8 @@ public final class LibUtils {
                                         && name.contains("cudart")
                                         && name.contains("nvTools")) {
                                     return false;
-                                } else if (name.startsWith("libarm_compute-")) {
+                                } else if (name.startsWith("libarm_compute-")
+                                        || name.startsWith("libopenblasp")) {
                                     rank.put(path, 2);
                                     return true;
                                 } else if (name.startsWith("libarm_compute_")) {
