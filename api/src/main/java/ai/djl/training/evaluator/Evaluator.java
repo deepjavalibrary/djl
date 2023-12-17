@@ -75,12 +75,13 @@ public abstract class Evaluator {
     public abstract void addAccumulator(String key);
 
     /**
-     * Updates the evaluator with the given keys based on a {@link NDList} of labels and predictions.
+     * Updates the evaluator with the given keys based on a {@link NDList} of labels and
+     * predictions.
      *
      * <p>This is a synchronized operation. You should only call it at the end of a batch or epoch.
      *
-     * <p>This is an alternative to @{link {@link #updateAccumulator(String, NDList, NDList)}} that may
-     * be more efficient when updating multiple accumulators at once.
+     * <p>This is an alternative to @{link {@link #updateAccumulator(String, NDList, NDList)}} that
+     * may be more efficient when updating multiple accumulators at once.
      *
      * @param keys the keys of all the accumulators to update
      * @param labels a {@code NDList} of labels
