@@ -385,10 +385,18 @@ public abstract class Loss extends Evaluator {
     /** {@inheritDoc} */
     @Override
     public void updateAccumulator(String key, NDList labels, NDList predictions) {
+        updateAccumulators(new String[] {key}, labels, predictions);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void updateAccumulators(String[] keys, NDList labels, NDList predictions) {
         // this is a synchronized operation, only call it at end of batch or epoch
         float update = evaluate(labels, predictions).sum().getFloat();
-        totalInstances.compute(key, (k, v) -> v + 1);
-        totalLoss.compute(key, (k, v) -> v + update);
+        for (String key : keys) {
+            totalInstances.compute(key, (k, v) -> v + 1);
+            totalLoss.compute(key, (k, v) -> v + update);
+        }
     }
 
     /** {@inheritDoc} */

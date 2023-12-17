@@ -69,6 +69,12 @@ public class IndexEvaluator extends Evaluator {
 
     /** {@inheritDoc} */
     @Override
+    public void updateAccumulators(String[] keys, NDList labels, NDList predictions) {
+        evaluator.updateAccumulators(keys, getLabels(labels), getPredictions(predictions));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void resetAccumulator(String key) {
         evaluator.resetAccumulator(key);
     }

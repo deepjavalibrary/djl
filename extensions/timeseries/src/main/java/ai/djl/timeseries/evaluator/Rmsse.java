@@ -94,15 +94,23 @@ public class Rmsse extends Evaluator {
     /** {@inheritDoc} */
     @Override
     public void updateAccumulator(String key, NDList labels, NDList predictions) {
+        updateAccumulators(new String[] {key}, labels, predictions);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void updateAccumulators(String[] keys, NDList labels, NDList predictions) {
         Pair<Long, NDArray> update = evaluateHelper(labels, predictions);
-        totalInstances.compute(key, (k, v) -> v + update.getKey());
-        totalLoss.compute(
-                key,
-                (k, v) -> {
-                    try (NDArray array = update.getValue().sum()) {
-                        return v + array.getFloat();
-                    }
-                });
+        for (String key : keys) {
+            totalInstances.compute(key, (k, v) -> v + update.getKey());
+            totalLoss.compute(
+                    key,
+                    (k, v) -> {
+                        try (NDArray array = update.getValue().sum()) {
+                            return v + array.getFloat();
+                        }
+                    });
+        }
     }
 
     /** {@inheritDoc} */
