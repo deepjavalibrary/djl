@@ -80,10 +80,10 @@ public abstract class AbstractCompositeLoss extends Loss {
 
     /** {@inheritDoc} */
     @Override
-    public void updateAccumulator(String key, NDList labels, NDList predictions) {
+    public void updateAccumulators(String[] keys, NDList labels, NDList predictions) {
         for (int i = 0; i < components.size(); i++) {
             Pair<NDList, NDList> inputs = inputForComponent(i, labels, predictions);
-            components.get(i).updateAccumulator(key, inputs.getKey(), inputs.getValue());
+            components.get(i).updateAccumulators(keys, inputs.getKey(), inputs.getValue());
         }
     }
 
