@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fakeroot \
     dh-make \
     build-essential \
-    openjdk-11-jdk && \
+    openjdk-17-jdk && \
     apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install python3
