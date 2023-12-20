@@ -63,10 +63,18 @@ public class BoundingBoxError extends Evaluator {
     /** {@inheritDoc} */
     @Override
     public void updateAccumulator(String key, NDList labels, NDList predictions) {
+        updateAccumulators(new String[] {key}, labels, predictions);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void updateAccumulators(String[] keys, NDList labels, NDList predictions) {
         NDArray boundingBoxError = evaluate(labels, predictions);
         float update = boundingBoxError.sum().getFloat();
-        totalInstances.compute(key, (k, v) -> v + boundingBoxError.size());
-        ssdBoxPredictionError.compute(key, (k, v) -> v + update);
+        for (String key : keys) {
+            totalInstances.compute(key, (k, v) -> v + boundingBoxError.size());
+            ssdBoxPredictionError.compute(key, (k, v) -> v + update);
+        }
     }
 
     /** {@inheritDoc} */
