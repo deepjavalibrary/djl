@@ -10,13 +10,13 @@ you can use the $JAVA_HOME environment variable to control which version of Java
 For ubuntu:
 
 ```bash
-sudo apt-get install openjdk-11-jdk
+sudo apt-get install openjdk-17-jdk
 ```
 
 For centos
 
 ```bash
-sudo yum install java-11-openjdk
+sudo yum install java-17-openjdk
 ```
 
 For Mac:
@@ -24,7 +24,7 @@ For Mac:
 ```bash
 brew tap homebrew/cask-versions
 brew update
-brew install --cask temurin11
+brew install --cask zulu17
 ```
 
 You can also download and install [Oracle JDK](https://www.oracle.com/technetwork/java/javase/overview/index.html)
