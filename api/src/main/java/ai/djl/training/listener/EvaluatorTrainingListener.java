@@ -144,9 +144,7 @@ public class EvaluatorTrainingListener extends TrainingListenerAdapter {
             for (Device device : batchData.getLabels().keySet()) {
                 NDList labels = batchData.getLabels().get(device);
                 NDList predictions = batchData.getPredictions().get(device);
-                for (String accumulator : accumulators) {
-                    evaluator.updateAccumulator(accumulator, labels, predictions);
-                }
+                evaluator.updateAccumulators(accumulators, labels, predictions);
             }
         }
     }
