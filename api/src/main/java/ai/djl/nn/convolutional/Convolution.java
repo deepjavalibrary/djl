@@ -89,6 +89,7 @@ public abstract class Convolution extends AbstractBlock {
      *
      * @param builder the {@code Builder} that has the necessary configurations
      */
+    @SuppressWarnings("this-escape")
     public Convolution(ConvolutionBuilder<?> builder) {
         super(VERSION);
         kernelShape = builder.kernelShape;

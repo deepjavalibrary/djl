@@ -46,6 +46,7 @@ public class EncoderDecoder extends AbstractBlock {
      * @param encoder the {@link Encoder}
      * @param decoder the {@link Decoder}
      */
+    @SuppressWarnings("this-escape")
     public EncoderDecoder(Encoder encoder, Decoder decoder) {
         super(VERSION);
         this.encoder = addChildBlock("Encoder", encoder);

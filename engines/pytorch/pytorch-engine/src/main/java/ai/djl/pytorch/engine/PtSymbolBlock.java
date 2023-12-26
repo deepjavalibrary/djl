@@ -67,6 +67,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
      * @param manager the manager to use for the block
      * @param handle the module handle
      */
+    @SuppressWarnings("this-escape")
     public PtSymbolBlock(PtNDManager manager, long handle) {
         this(manager);
         this.handle = new AtomicReference<>(handle);

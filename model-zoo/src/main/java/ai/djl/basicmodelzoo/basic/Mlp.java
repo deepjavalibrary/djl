@@ -56,6 +56,7 @@ public class Mlp extends SequentialBlock {
      * @param hidden the sizes of all of the hidden layers
      * @param activation the activation function to use
      */
+    @SuppressWarnings("this-escape")
     public Mlp(int input, int output, int[] hidden, Function<NDList, NDList> activation) {
         add(Blocks.batchFlattenBlock(input));
         for (int hiddenSize : hidden) {

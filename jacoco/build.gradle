@@ -39,7 +39,9 @@ dependencies {
     jacocoAggregation project(":extensions:tokenizers")
     jacocoAggregation project(":extensions:tablesaw")
     jacocoAggregation project(":extensions:timeseries")
-    jacocoAggregation project(":extensions:spark")
+    if (JavaVersion.current() < JavaVersion.VERSION_19) {
+        jacocoAggregation project(":extensions:spark")
+    }
     jacocoAggregation project(":integration")
     jacocoAggregation project(":model-zoo")
 }

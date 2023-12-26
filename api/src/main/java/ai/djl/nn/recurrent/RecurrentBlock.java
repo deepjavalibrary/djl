@@ -58,6 +58,7 @@ public abstract class RecurrentBlock extends AbstractBlock {
      *
      * @param builder the {@code Builder} that has the necessary configurations
      */
+    @SuppressWarnings("this-escape")
     public RecurrentBlock(BaseBuilder<?> builder) {
         super(VERSION);
         stateSize = builder.stateSize;

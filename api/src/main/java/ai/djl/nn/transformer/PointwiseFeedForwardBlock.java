@@ -31,6 +31,7 @@ public class PointwiseFeedForwardBlock extends SequentialBlock {
      * @param activationFunction the activation function to use for the hidden layers (not applied
      *     to output)
      */
+    @SuppressWarnings("this-escape")
     public PointwiseFeedForwardBlock(
             List<Integer> hiddenSizes,
             int outputSize,

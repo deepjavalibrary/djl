@@ -62,6 +62,7 @@ public abstract class Deconvolution extends AbstractBlock {
      *
      * @param builder the {@code Builder} that has the necessary configurations
      */
+    @SuppressWarnings("this-escape")
     public Deconvolution(DeconvolutionBuilder<?> builder) {
         kernelShape = builder.kernelShape;
         stride = builder.stride;

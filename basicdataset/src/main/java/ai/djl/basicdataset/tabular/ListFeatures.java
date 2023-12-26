@@ -44,6 +44,7 @@ public class ListFeatures extends ArrayList<String> {
      *
      * @param source the source list
      */
+    @SuppressWarnings("this-escape")
     public ListFeatures(List<String> source) {
         super(source.size());
         addAll(source);

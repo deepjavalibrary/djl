@@ -53,7 +53,7 @@ public class Classifications implements JsonSerializable, Ensembleable<Classific
     @SuppressWarnings("serial")
     protected List<Double> probabilities;
 
-    private int topK;
+    protected int topK;
 
     /**
      * Constructs a {@code Classifications} using a parallel list of classNames and probabilities.

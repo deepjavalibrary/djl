@@ -66,6 +66,7 @@ public class LayerNorm extends AbstractBlock {
     protected Parameter gamma;
     protected Parameter beta;
 
+    @SuppressWarnings("this-escape")
     protected LayerNorm(Builder builder) {
         epsilon = builder.epsilon;
         scale = builder.scale;

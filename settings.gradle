@@ -34,7 +34,9 @@ include ':extensions:sentencepiece'
 include ':extensions:tokenizers'
 include ':extensions:tablesaw'
 include ':extensions:timeseries'
-include ':extensions:spark'
+if (JavaVersion.current() < JavaVersion.VERSION_21) {
+    include ':extensions:spark'
+}
 include ':integration'
 include ':model-zoo'
 include ':testing'

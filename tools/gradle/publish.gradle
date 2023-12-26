@@ -1,4 +1,4 @@
-configure([
+def projects = [
         project(':api'),
         project(':basicdataset'),
         project(':djl-zero'),
@@ -27,8 +27,13 @@ configure([
         project(':extensions:tablesaw'),
         project(':extensions:timeseries'),
         project(':extensions:tokenizers'),
-        project(':extensions:spark'),
-        project(':model-zoo')]) {
+        project(':model-zoo')
+]
+if (JavaVersion.current() < JavaVersion.VERSION_21) {
+    projects.add(project(':extensions:spark'))
+}
+
+configure(projects) {
     apply plugin: "maven-publish"
     apply plugin: "signing"
 

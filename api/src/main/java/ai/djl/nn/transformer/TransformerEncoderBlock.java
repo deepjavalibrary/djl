@@ -51,6 +51,7 @@ public class TransformerEncoderBlock extends AbstractBlock {
      * @param dropoutProbability dropout probability
      * @param activationFunction activation function
      */
+    @SuppressWarnings("this-escape")
     public TransformerEncoderBlock(
             int embeddingSize,
             int headCount,

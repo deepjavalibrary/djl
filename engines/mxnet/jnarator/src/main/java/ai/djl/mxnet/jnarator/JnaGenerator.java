@@ -276,6 +276,7 @@ public class JnaGenerator {
             writer.append("    public NativeSizeByReference() {\n");
             writer.append("        this(new NativeSize(0));\n");
             writer.append("    }\n\n");
+            writer.append("    @SuppressWarnings(\"this-escape\")\n");
             writer.append("    public NativeSizeByReference(NativeSize value) {\n");
             writer.append("        super(NativeSize.SIZE);\n");
             writer.append("        setValue(value);\n");
