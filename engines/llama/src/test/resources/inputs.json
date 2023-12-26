@@ -1,0 +1,33 @@
+{
+  "prefix": "def remove_non_ascii(s: str) -> str:",
+  "suffix": "    return result",
+  "parameters": {
+    "max_new_tokens": 2,
+    "number_keep": 2,
+    "number_probabilities": 2,
+    "top_k": 2,
+    "top_p": 2,
+    "tfs_z": 2,
+    "typical_p": 2,
+    "temperature": 2,
+    "repeat_penalty": 2,
+    "repeat_last_n": 2,
+    "frequency_penalty": 2,
+    "presence_penalty": 2,
+    "penalize_nl": true,
+    "ignore_eos": true,
+    "mirostat": 2,
+    "mirostat_tau": 2,
+    "mirostat_eta": 2,
+    "number_beams": 5,
+    "seed": 2,
+    "logit_bias": {
+      "2": 0.4,
+      "5": 0.6
+    },
+    "grammar": "root  ::= (expr \"=\" term \"\\n\")+\nexpr  ::= term ([-+*/] term)*\nterm  ::= [0-9]",
+    "anti_prompt": [
+      "User: "
+    ]
+  }
+}

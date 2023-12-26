@@ -15,38 +15,111 @@ package ai.djl.llama.jni;
 import java.util.Map;
 
 /** A class holds input parameters. */
-@SuppressWarnings("PMD.UnusedPrivateField")
+@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.UnusedAssignment"})
 public class InputParameters {
 
-    private int nPredict = -1;
+    private int nPredict;
     private int nKeep;
     private int nProbs;
-    private int topK = 40;
-    private float topP = 0.95f;
-    private float tfsZ = 1.00f;
-    private float typicalP = 1.00f;
-    private float temperature = 0.80f;
-    private float repeatPenalty = 1.10f;
-    private int repeatLastN = 64;
+    private int topK;
+    private float topP;
+    private float tfsZ;
+    private float typicalP;
+    private float temperature;
+    private float repeatPenalty;
+    private int repeatLastN;
     private float frequencyPenalty;
     private float presencePenalty;
     private boolean penalizeNl;
     private boolean ignoreEos;
     private int mirostat;
-    private float mirostatTau = 5.00f;
-    private float mirostatEta = 0.10f;
-    private int nBeams = 2;
-    private int seed = 42;
+    private float mirostatTau;
+    private float mirostatEta;
+    private int nBeams;
+    private int seed;
     private Map<Integer, Float> logitBias;
     private String grammar;
     private String[] antiPrompt;
 
     /**
-     * Returns the number of predict.
+     * Constructs new {@code InputParameters} instance.
      *
-     * @return the number of predict
+     * @param nPredict the max new tokens
+     * @param nKeep the number of keep
+     * @param nProbs the number of probabilities
+     * @param topK the top K
+     * @param topP the top P
+     * @param tfsZ the tfs Z
+     * @param typicalP the typical P
+     * @param temperature the temperature
+     * @param repeatPenalty the repeat penalty
+     * @param repeatLastN the repeat last N
+     * @param frequencyPenalty the frequency penalty
+     * @param presencePenalty the presence penalty
+     * @param penalizeNl the penalize nl
+     * @param ignoreEos the ignore EOS
+     * @param mirostat the mirostat
+     * @param mirostatTau the mirostat TAU
+     * @param mirostatEta the mirostat ETA
+     * @param nBeams the number of beams
+     * @param seed the seed
+     * @param logitBias the logit bias
+     * @param grammar the grammar
+     * @param antiPrompt the anti prompt
      */
-    public int getNumberPredict() {
+    public InputParameters(
+            int nPredict,
+            int nKeep,
+            int nProbs,
+            int topK,
+            float topP,
+            float tfsZ,
+            float typicalP,
+            float temperature,
+            float repeatPenalty,
+            int repeatLastN,
+            float frequencyPenalty,
+            float presencePenalty,
+            boolean penalizeNl,
+            boolean ignoreEos,
+            int mirostat,
+            float mirostatTau,
+            float mirostatEta,
+            int nBeams,
+            int seed,
+            Map<Integer, Float> logitBias,
+            String grammar,
+            String[] antiPrompt) {
+        this.nPredict = nPredict;
+        this.nKeep = nKeep;
+        this.nProbs = nProbs;
+        this.topK = topK;
+        this.topP = topP;
+        this.tfsZ = tfsZ;
+        this.typicalP = typicalP;
+        this.temperature = temperature;
+        this.repeatPenalty = repeatPenalty;
+        this.repeatLastN = repeatLastN;
+        this.frequencyPenalty = frequencyPenalty;
+        this.presencePenalty = presencePenalty;
+        this.penalizeNl = penalizeNl;
+        this.ignoreEos = ignoreEos;
+        this.mirostat = mirostat;
+        this.mirostatTau = mirostatTau;
+        this.mirostatEta = mirostatEta;
+        this.nBeams = nBeams;
+        this.seed = seed;
+        this.logitBias = logitBias;
+        this.grammar = grammar;
+        this.antiPrompt = antiPrompt;
+    }
+
+    /**
+     * Returns the max new tokens.
+     *
+     * @return the max new tokens
+     */
+    public int getMaxNewTokens() {
         return nPredict;
     }
 

@@ -25,7 +25,10 @@ import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Iterator;
+import java.util.Map;
 
 /** Built-in {@code Translator} that provides preprocessing and postprocessing for llama.cpp. */
 public class LlamaTranslator<I, O> implements NoBatchifyTranslator<I, O> {
@@ -63,10 +66,11 @@ public class LlamaTranslator<I, O> implements NoBatchifyTranslator<I, O> {
 
     private TokenIterator generate(String input) {
         TextGenerationInput in = JsonUtils.GSON.fromJson(input, TextGenerationInput.class);
+        InputParameters param = in.parameters.toInputParameters();
         if (in.prefix != null && in.suffix != null) {
-            LlamaLibrary.infill(handle, in.prefix, in.prefix, in.parameters);
+            LlamaLibrary.infill(handle, in.prefix, in.prefix, param);
         } else if (in.inputs != null && !in.inputs.isEmpty()) {
-            LlamaLibrary.generate(handle, in.inputs, in.parameters);
+            LlamaLibrary.generate(handle, in.inputs, param);
         } else {
             throw new IllegalArgumentException("Unsupported input format");
         }
@@ -91,15 +95,138 @@ public class LlamaTranslator<I, O> implements NoBatchifyTranslator<I, O> {
         @Override
         public BytesSupplier next() {
             Token token = it.next();
-            return BytesSupplier.wrapAsJson(token);
+            return BytesSupplier.wrap(JsonUtils.GSON.toJson(token) + "\n");
         }
     }
 
-    private static final class TextGenerationInput {
+    protected static final class TextGenerationInput {
 
         String inputs;
         String prefix;
         String suffix;
-        InputParameters parameters;
+        Parameters parameters;
+    }
+
+    protected static final class Parameters {
+
+        @SerializedName("max_new_tokens")
+        private int nPredict;
+
+        @SerializedName("number_keep")
+        private int nKeep;
+
+        @SerializedName("number_probabilities")
+        private int nProbs;
+
+        @SerializedName("top_k")
+        private int topK;
+
+        @SerializedName("top_p")
+        private float topP;
+
+        @SerializedName("tfs_z")
+        private float tfsZ;
+
+        @SerializedName("typical_p")
+        private float typicalP;
+
+        @SerializedName("temperature")
+        private float temperature;
+
+        @SerializedName("repeat_penalty")
+        private float repeatPenalty;
+
+        @SerializedName("repeat_last_n")
+        private int repeatLastN;
+
+        @SerializedName("frequency_penalty")
+        private float frequencyPenalty;
+
+        @SerializedName("presence_penalty")
+        private float presencePenalty;
+
+        @SerializedName("penalize_nl")
+        private boolean penalizeNl;
+
+        @SerializedName("ignore_eos")
+        private boolean ignoreEos;
+
+        @SerializedName("mirostat")
+        private int mirostat;
+
+        @SerializedName("mirostat_tau")
+        private float mirostatTau;
+
+        @SerializedName("mirostat_eta")
+        private float mirostatEta;
+
+        @SerializedName("number_beams")
+        private int nBeams;
+
+        @SerializedName("seed")
+        private int seed;
+
+        @SerializedName("logit_bias")
+        private Map<Integer, Float> logitBias;
+
+        @SerializedName("grammar")
+        private String grammar;
+
+        @SerializedName("anti_prompt")
+        private String[] antiPrompt;
+
+        public InputParameters toInputParameters() {
+            setDefaultValue();
+            return new InputParameters(
+                    nPredict,
+                    nKeep,
+                    nProbs,
+                    topK,
+                    topP,
+                    tfsZ,
+                    typicalP,
+                    temperature,
+                    repeatPenalty,
+                    repeatLastN,
+                    frequencyPenalty,
+                    presencePenalty,
+                    penalizeNl,
+                    ignoreEos,
+                    mirostat,
+                    mirostatTau,
+                    mirostatEta,
+                    nBeams,
+                    seed,
+                    logitBias,
+                    grammar,
+                    antiPrompt);
+        }
+
+        private void setDefaultValue() {
+            if (nPredict == 0) {
+                nPredict = -1;
+            }
+            if (topK == 0) {
+                topK = 40;
+            }
+            if (topP == 0) {
+                topP = 0.95f;
+            }
+            if (tfsZ == 0) {
+                tfsZ = 1f;
+            }
+            if (typicalP == 0) {
+                typicalP = 1f;
+            }
+            if (temperature == 0) {
+                temperature = 0.8f;
+            }
+            if (repeatPenalty == 0) {
+                repeatPenalty = 1.10f;
+            }
+            if (repeatLastN == 0) {
+                repeatLastN = 64;
+            }
+        }
     }
 }
