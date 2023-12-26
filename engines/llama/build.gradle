@@ -1,0 +1,92 @@
+group "ai.djl.llama"
+
+dependencies {
+    api project(":api")
+
+    testImplementation project(":testing")
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+}
+
+compileJava.dependsOn(processResources)
+
+processResources {
+    outputs.dir file("${project.projectDir}/build/classes/java/main/native/lib")
+    doLast {
+        def url = "https://publish.djl.ai/llama/${llamacpp_version}/jnilib/${djl_version}"
+        def files = new String[]{
+                "linux-x86_64/libdjl_llama.so",
+                "linux-x86_64/libllama.so",
+                "linux-aarch64/libdjl_llama.so",
+                "linux-aarch64/libllama.so",
+                "osx-x86_64/libdjl_llama.dylib",
+                "osx-x86_64/libllama.dylib",
+                "osx-aarch64/libdjl_llama.dylib",
+                "osx-aarch64/libllama.dylib",
+                "osx-aarch64/ggml-metal.metal",
+                "win-x86_64/djl_llama.dll",
+                "win-x86_64/llama.dll",
+        }
+        def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
+        files.each { entry ->
+            def file = new File("${jnilibDir}/${entry}")
+            if (file.exists()) {
+                project.logger.lifecycle("prebuilt or cached file found for ${entry}")
+            } else if (!project.hasProperty("jni")) {
+                project.logger.lifecycle("Downloading ${url}/${entry}")
+                file.getParentFile().mkdirs()
+                def downloadPath = new URL("${url}/${entry}")
+                downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
+            }
+        }
+        copy {
+            from jnilibDir
+            into "${project.projectDir}/build/classes/java/main/native/lib"
+        }
+
+        // write properties
+        def propFile = file("${project.projectDir}/build/classes/java/main/native/lib/llama.properties")
+        propFile.text = "version=${llamacpp_version}-${version}\n"
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                name = "DJL NLP utilities for Llama.cpp"
+                description = "Deep Java Library (DJL) NLP utilities for llama.cpp"
+                url = "http://www.djl.ai/engines/${project.name}"
+            }
+        }
+    }
+}
+
+apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
+
+tasks.register('compileJNI') {
+    doFirst {
+        if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
+                || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
+            def arch = System.properties["os.arch"] == "amd64" ? "x86_64" : System.properties["os.arch"]
+            exec {
+                commandLine "bash", "build.sh", llamacpp_version, arch
+            }
+        } else {
+            exec {
+                commandLine "${project.projectDir}/build.cmd", llamacpp_version, "x86_64"
+            }
+        }
+
+        // for ci to upload to S3
+        def ciDir = "${project.projectDir}/jnilib/${djl_version}/"
+        copy {
+            from "${project.projectDir}/build/jnilib"
+            into ciDir
+        }
+        delete System.getProperty("user.home") + "/.djl.ai/llama"
+    }
+}
+
+clean.doFirst {
+    delete System.getProperty("user.home") + "/.djl.ai/llama"
+}
