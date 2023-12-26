@@ -2,6 +2,7 @@ configure([
         project(':api'),
         project(':basicdataset'),
         project(':djl-zero'),
+        project(':engines:llama'),
         project(':engines:ml:xgboost'),
         project(':engines:ml:lightgbm'),
         project(':engines:mxnet:mxnet-engine'),
