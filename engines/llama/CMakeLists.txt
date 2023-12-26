@@ -5,14 +5,13 @@ project(djl_llama CXX)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(BUILD_SHARED_LIBS ON)
 
-include(build-args.cmake)
-
-add_subdirectory(llama.cpp)
-add_library(djl_llama SHARED src/main/native/ai_djl_llama.cpp)
-
 set(JAVA_AWT_LIBRARY NotNeeded)
 set(JAVA_AWT_INCLUDE_PATH NotNeeded)
 find_package(JNI REQUIRED)
+
+add_subdirectory(llama.cpp)
+include(build-args.cmake)
+add_library(djl_llama SHARED src/main/native/ai_djl_llama.cpp)
 
 target_include_directories(djl_llama PRIVATE
     ${JNI_INCLUDE_DIRS}

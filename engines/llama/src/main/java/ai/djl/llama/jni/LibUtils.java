@@ -42,8 +42,7 @@ public final class LibUtils {
         List<String> libs = new ArrayList<>(3);
         libs.add(LLAMA_NAME);
         libs.add(LIB_NAME);
-        if (System.getProperty("os.name").startsWith("Mac")
-                && "aarch64".equals(System.getProperty("os.arch"))) {
+        if (System.getProperty("os.name").startsWith("Mac")) {
             libs.add("ggml-metal.metal");
         }
         Path dir = copyJniLibraryFromClasspath(libs.toArray(new String[0]));

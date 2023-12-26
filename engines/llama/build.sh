@@ -26,7 +26,7 @@ cd build
 rm -rf classes
 mkdir classes
 javac -sourcepath ../src/main/java/ ../src/main/java/ai/djl/llama/jni/LlamaLibrary.java -h include -d classes
-cmake .. -DOS_NAME=$PLATFORM -DOS_ARCH=$ARCH -DLLAMA_VERSION=$VERSION
+cmake ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
 
 popd
@@ -36,9 +36,7 @@ if [[ $PLATFORM == 'darwin' ]]; then
   mkdir -p build/jnilib/osx-$ARCH
   cp -f build/libdjl_llama.dylib build/jnilib/osx-$ARCH/
   cp -f build/llama.cpp/libllama.dylib build/jnilib/osx-$ARCH/
-  if [[ $ARCH == 'aarch64' ]]; then
-    cp -f llama.cpp/ggml-metal.metal build/jnilib/osx-$ARCH/
-  fi
+  cp -f llama.cpp/ggml-metal.metal build/jnilib/osx-$ARCH/
 elif [[ $PLATFORM == 'linux' ]]; then
   mkdir -p build/jnilib/linux-$ARCH
   cp -f build/libdjl_llama.so build/jnilib/linux-$ARCH/

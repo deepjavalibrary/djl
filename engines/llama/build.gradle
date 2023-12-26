@@ -12,16 +12,19 @@ compileJava.dependsOn(processResources)
 processResources {
     outputs.dir file("${project.projectDir}/build/classes/java/main/native/lib")
     doLast {
-        def url = "https://publish.djl.ai/llama-${llamacpp_version}/jnilib/${djl_version}"
+        def url = "https://publish.djl.ai/llama/${llamacpp_version}/jnilib/${djl_version}"
         def files = new String[]{
-//                "linux-x86_64/djl_llama.so",
-//                "linux-x86_64/llama.so",
-//                "linux-aarch64/djl_llama.so",
-//                "linux-aarch64/llama.so",
-//                "osx-x86_64/djl_llama.dylib",
-//                "osx-x86_64/llama.dylib",
-//                "osx-aarch64/djl_llama.dylib",
-//                "osx-aarch64/llama.dylib",
+                "linux-x86_64/libdjl_llama.so",
+                "linux-x86_64/libllama.so",
+                "linux-aarch64/libdjl_llama.so",
+                "linux-aarch64/libllama.so",
+                "osx-x86_64/libdjl_llama.dylib",
+                "osx-x86_64/libllama.dylib",
+                "osx-aarch64/libdjl_llama.dylib",
+                "osx-aarch64/libllama.dylib",
+                "osx-aarch64/ggml-metal.metal",
+                "win-x86_64/djl_llama.dll",
+                "win-x86_64/llama.dll",
         }
         def jnilibDir = "${project.projectDir}/jnilib/${djl_version}"
         files.each { entry ->
@@ -69,7 +72,9 @@ tasks.register('compileJNI') {
                 commandLine "bash", "build.sh", llamacpp_version, arch
             }
         } else {
-            throw new IllegalStateException("Unknown Architecture " + System.properties['os.name'])
+            exec {
+                commandLine "${project.projectDir}/build.cmd", llamacpp_version, "x86_64"
+            }
         }
 
         // for ci to upload to S3
