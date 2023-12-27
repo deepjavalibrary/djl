@@ -35,6 +35,7 @@ public class LlamaTranslatorFactory implements TranslatorFactory, Serializable {
 
     static {
         SUPPORTED_TYPES.add(new Pair<>(String.class, TokenIterator.class));
+        SUPPORTED_TYPES.add(new Pair<>(LlamaInput.class, TokenIterator.class));
         SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
 
