@@ -222,15 +222,6 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         /** {@inheritDoc} */
         @Override
         public Repository newInstance(String name, URI uri) {
-            String queryString = uri.getQuery();
-            URI djlUri;
-            if (queryString != null) {
-                djlUri = URI.create("https://mlrepo.djl.ai/?" + queryString);
-            } else {
-                djlUri = URI.create("https://mlrepo.djl.ai/");
-            }
-
-            RemoteRepository repo = new RemoteRepository(name, djlUri);
             String groupId = uri.getHost();
             if (groupId == null) {
                 throw new IllegalArgumentException("Invalid djl URL: " + uri);
@@ -242,13 +233,9 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             if (artifactId.isEmpty()) {
                 throw new IllegalArgumentException("Invalid djl URL: " + uri);
             }
-            String version = null;
-            String artifactName = null;
             Matcher m = PATTERN.matcher(artifactId);
             if (m.matches()) {
                 artifactId = m.group(1);
-                version = m.group(2);
-                artifactName = m.group(4);
             }
 
             ModelZoo zoo = ModelZoo.getModelZoo(groupId);
@@ -261,10 +248,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
                 throw new IllegalArgumentException("Invalid djl URL: " + uri);
             }
 
-            MRL mrl =
-                    repo.model(loader.getApplication(), groupId, artifactId, version, artifactName);
-            repo.addResource(mrl);
-            return repo;
+            return loader.getRepository();
         }
 
         /** {@inheritDoc} */

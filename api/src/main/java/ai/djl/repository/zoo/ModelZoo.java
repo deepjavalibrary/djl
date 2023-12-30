@@ -80,6 +80,7 @@ public abstract class ModelZoo {
 
     protected final void addModel(MRL mrl) {
         modelLoaders.put(mrl.getArtifactId(), new BaseModelLoader(mrl));
+        mrl.getRepository().addResource(mrl);
     }
 
     protected final void addModel(ModelLoader loader) {

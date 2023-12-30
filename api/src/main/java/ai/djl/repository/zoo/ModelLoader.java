@@ -15,6 +15,7 @@ package ai.djl.repository.zoo;
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.repository.Artifact;
+import ai.djl.repository.Repository;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,6 +36,13 @@ public interface ModelLoader {
      * @return the application of the {@code ModelLoader}
      */
     Application getApplication();
+
+    /**
+     * Returns the repository of the {@code ModelLoader}.
+     *
+     * @return the repository of the {@code ModelLoader}
+     */
+    Repository getRepository();
 
     /**
      * Loads the model with the given criteria.

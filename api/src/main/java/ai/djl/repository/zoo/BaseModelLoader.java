@@ -21,6 +21,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.BlockFactory;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
+import ai.djl.repository.Repository;
 import ai.djl.translate.DefaultTranslatorFactory;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
@@ -71,6 +72,12 @@ public class BaseModelLoader implements ModelLoader {
     @Override
     public Application getApplication() {
         return mrl.getApplication();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Repository getRepository() {
+        return mrl.getRepository();
     }
 
     /** {@inheritDoc} */
