@@ -1,3 +1,7 @@
+# Classes for coco dataset on which yelov8 is trained
+# source config https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/datasets/coco.yaml.
+# COCO dataset website: https://cocodataset.org/#home
+# Ultralytics Coco doc page: https://docs.ultralytics.com/datasets/detect/coco/
 person
 bicycle
 car

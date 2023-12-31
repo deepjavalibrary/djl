@@ -16,27 +16,21 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.output.DetectedObjects.DetectedObject;
-import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.translator.YoloV8TranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /** An example of inference using an yolov8 model. */
 public final class Yolov8Detection {
@@ -51,82 +45,44 @@ public final class Yolov8Detection {
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        String classPath = System.getProperty("java.class.path");
-        String pathSeparator = System.getProperty("path.separator");
-        classPath = classPath.split(pathSeparator)[0];
-        Path modelPath = Paths.get(classPath + "/yolov8n.onnx");
-        Path imgPath = Paths.get(classPath + "/yolov8_test.jpg");
+        Path modelPath = Paths.get("src/test/resources/yolov8n.onnx");
+        Path imgPath = Paths.get("src/test/resources/yolov8_test.jpg");
         Image img = ImageFactory.getInstance().fromFile(imgPath);
-
-        Map<String, Object> arguments = new ConcurrentHashMap<>();
-        arguments.put("width", 640);
-        arguments.put("height", 640);
-        arguments.put("resize", "true");
-        arguments.put("toTensor", true);
-        arguments.put("applyRatio", true);
-        arguments.put("threshold", 0.6f);
-        arguments.put("synsetFileName", "yolov8_synset.txt");
-
-        YoloV8TranslatorFactory yoloV8TranslatorFactory = new YoloV8TranslatorFactory();
-        Translator<Image, DetectedObjects> translator =
-                yoloV8TranslatorFactory.newInstance(
-                        Image.class, DetectedObjects.class, null, arguments);
 
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)
                         .optModelPath(modelPath)
                         .optEngine("OnnxRuntime")
-                        .optTranslator(translator)
+                        .optArgument("width", 640)
+                        .optArgument("height", 640)
+                        .optArgument("resize", true)
+                        .optArgument("toTensor", true)
+                        .optArgument("applyRatio", true)
+                        .optArgument("threshold", 0.6f)
+                        // for performance optimization maxBox parameter can reduce number of
+                        // considered boxes from 8400
+                        .optArgument("maxBox", 1000)
+                        .optArgument("synsetFileName", "yolov8_synset.txt")
+                        .optTranslatorFactory(new YoloV8TranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
 
-        DetectedObjects detectedObjects;
-        DetectedObject detectedObject;
         try (ZooModel<Image, DetectedObjects> model = criteria.loadModel();
                 Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
-            Path outputPath = Paths.get(classPath + "/output");
+            Path outputPath = Paths.get("build/output");
             Files.createDirectories(outputPath);
 
-            detectedObjects = predictor.predict(img);
-
-            if (detectedObjects.getNumberOfObjects() > 0) {
-                List<DetectedObject> detectedObjectList = detectedObjects.items();
-                for (DetectedObject object : detectedObjectList) {
-                    detectedObject = object;
-                    BoundingBox boundingBox = detectedObject.getBoundingBox();
-                    Rectangle tectangle = boundingBox.getBounds();
-                    logger.info(
-                            detectedObject.getClassName()
-                                    + " "
-                                    + detectedObject.getProbability()
-                                    + " "
-                                    + tectangle.getX()
-                                    + " "
-                                    + tectangle.getY()
-                                    + " "
-                                    + tectangle.getWidth()
-                                    + " "
-                                    + tectangle.getHeight());
+            DetectedObjects detection = predictor.predict(img);
+            if (detection.getNumberOfObjects() > 0) {
+                img.drawBoundingBoxes(detection);
+                Path output = outputPath.resolve("yolov8_detected.png");
+                try (OutputStream os = Files.newOutputStream(output)) {
+                    img.save(os, "png");
                 }
-
-                saveBoundingBoxImage(
-                        img.resize(640, 640, false),
-                        detectedObjects,
-                        outputPath,
-                        imgPath.toFile().getName());
+                logger.info("Detected object saved in: {}", output);
             }
-
-            return detectedObjects;
+            return detection;
         }
-    }
-
-    private static void saveBoundingBoxImage(
-            Image img, DetectedObjects detectedObjects, Path outputPath, String outputFileName)
-            throws IOException {
-        img.drawBoundingBoxes(detectedObjects);
-
-        Path imagePath = outputPath.resolve(outputFileName);
-        img.save(Files.newOutputStream(imagePath), "png");
     }
 }
