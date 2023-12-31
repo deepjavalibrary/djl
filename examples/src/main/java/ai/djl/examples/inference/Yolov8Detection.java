@@ -45,14 +45,13 @@ public final class Yolov8Detection {
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        Path modelPath = Paths.get("src/test/resources/yolov8n.onnx");
         Path imgPath = Paths.get("src/test/resources/yolov8_test.jpg");
         Image img = ImageFactory.getInstance().fromFile(imgPath);
 
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optModelPath(modelPath)
+                        .optModelUrls("djl://ai.djl.onnxruntime/yolov8n")
                         .optEngine("OnnxRuntime")
                         .optArgument("width", 640)
                         .optArgument("height", 640)
@@ -63,7 +62,6 @@ public final class Yolov8Detection {
                         // for performance optimization maxBox parameter can reduce number of
                         // considered boxes from 8400
                         .optArgument("maxBox", 1000)
-                        .optArgument("synsetFileName", "yolov8_synset.txt")
                         .optTranslatorFactory(new YoloV8TranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
