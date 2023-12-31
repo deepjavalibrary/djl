@@ -17,6 +17,8 @@ import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.ArgumentsUtil;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -27,6 +29,8 @@ import java.util.Map;
  */
 public class YoloV8Translator extends YoloV5Translator {
 
+    private int maxBoxes;
+
     /**
      * Constructs an ImageTranslator with the provided builder.
      *
@@ -34,6 +38,7 @@ public class YoloV8Translator extends YoloV5Translator {
      */
     protected YoloV8Translator(Builder builder) {
         super(builder);
+        maxBoxes = builder.maxBox;
     }
 
     /**
@@ -50,41 +55,50 @@ public class YoloV8Translator extends YoloV5Translator {
         return builder;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected DetectedObjects processFromBoxOutput(NDList list) {
-        NDArray features4OneImg = list.get(0);
-        int sizeClasses = classes.size();
-        long sizeBoxes = features4OneImg.size(1);
-        ArrayList<IntermediateResult> intermediateResults = new ArrayList<>();
+        NDArray rawResult = list.get(0);
+        NDArray reshapedResult = rawResult.transpose();
+        Shape shape = reshapedResult.getShape();
+        float[] buf = reshapedResult.toFloatArray();
+        int numberRows = Math.toIntExact(shape.get(0));
+        int nClasses = Math.toIntExact(shape.get(1));
 
-        for (long b = 0; b < sizeBoxes; b++) {
-            float maxClass = 0;
-            int maxIndex = 0;
-            for (int c = 4; c < sizeClasses; c++) {
-                float classProb = features4OneImg.getFloat(c, b);
-                if (classProb > maxClass) {
-                    maxClass = classProb;
+        ArrayList<IntermediateResult> intermediateResults = new ArrayList<>();
+        // reverse order search in heap; searches through #maxBoxes for optimization when set
+        for (int i = numberRows - 1; i > numberRows - maxBoxes; --i) {
+            int index = i * nClasses;
+            float maxClassProb = -1f;
+            int maxIndex = -1;
+            for (int c = 4; c < nClasses; c++) {
+                float classProb = buf[index + c];
+                if (classProb > maxClassProb) {
+                    maxClassProb = classProb;
                     maxIndex = c;
                 }
             }
 
-            if (maxClass > threshold) {
-                float xPos = features4OneImg.getFloat(0, b); // center x
-                float yPos = features4OneImg.getFloat(1, b); // center y
-                float w = features4OneImg.getFloat(2, b);
-                float h = features4OneImg.getFloat(3, b);
+            if (maxClassProb > threshold) {
+                float xPos = buf[index]; // center x
+                float yPos = buf[index + 1]; // center y
+                float w = buf[index + 2];
+                float h = buf[index + 3];
                 Rectangle rect =
                         new Rectangle(Math.max(0, xPos - w / 2), Math.max(0, yPos - h / 2), w, h);
                 intermediateResults.add(
-                        new IntermediateResult(classes.get(maxIndex), maxClass, maxIndex, rect));
+                        new IntermediateResult(
+                                classes.get(maxIndex), maxClassProb, maxIndex, rect));
             }
         }
-
         return nms(intermediateResults);
     }
 
     /** The builder for {@link YoloV8Translator}. */
     public static class Builder extends YoloV5Translator.Builder {
+
+        private int maxBox = 8400;
+
         /**
          * Builds the translator.
          *
@@ -98,6 +112,13 @@ public class YoloV8Translator extends YoloV5Translator {
             }
             validate();
             return new YoloV8Translator(this);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void configPostProcess(Map<String, ?> arguments) {
+            super.configPostProcess(arguments);
+            maxBox = ArgumentsUtil.intValue(arguments, "maxBox", 8400);
         }
     }
 }
