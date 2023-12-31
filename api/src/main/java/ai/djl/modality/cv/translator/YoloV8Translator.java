@@ -29,8 +29,7 @@ import java.util.Map;
  */
 public class YoloV8Translator extends YoloV5Translator {
 
-
-    final int maxBoxes;
+    int maxBoxes;
 
     /**
      * Constructs an ImageTranslator with the provided builder.
@@ -39,7 +38,7 @@ public class YoloV8Translator extends YoloV5Translator {
      */
     protected YoloV8Translator(Builder builder) {
         super(builder);
-        maxBoxes= builder.maxBox;
+        maxBoxes = builder.maxBox;
     }
 
     /**
@@ -58,13 +57,13 @@ public class YoloV8Translator extends YoloV5Translator {
 
     @Override
     protected DetectedObjects processFromBoxOutput(NDList list) {
-        final NDArray rawResult = list.get(0);
-        final NDArray reshapedResult = rawResult.transpose();
-        final Shape preparedResult = reshapedResult.getShape();
-        final long numberRows = preparedResult.get(0);
-        final long sizeClasses = preparedResult.get(1);
+        NDArray rawResult = list.get(0);
+        NDArray reshapedResult = rawResult.transpose();
+        Shape preparedResult = reshapedResult.getShape();
+        long numberRows = preparedResult.get(0);
+        long sizeClasses = preparedResult.get(1);
 
-        final ArrayList<IntermediateResult> intermediateResults = new ArrayList<>();
+        ArrayList<IntermediateResult> intermediateResults = new ArrayList<>();
         // reverse order search in heap; searches through #maxBoxes for optimization when set
         for (int i = (int) numberRows - 1; i > numberRows - maxBoxes; i--) {
             final float[] row = reshapedResult.get(i).toFloatArray();
@@ -87,7 +86,8 @@ public class YoloV8Translator extends YoloV5Translator {
                 final Rectangle rect =
                         new Rectangle(Math.max(0, xPos - w / 2), Math.max(0, yPos - h / 2), w, h);
                 intermediateResults.add(
-                        new IntermediateResult(classes.get(maxIndex), maxClassProb, maxIndex, rect));
+                        new IntermediateResult(
+                                classes.get(maxIndex), maxClassProb, maxIndex, rect));
             }
         }
         return nms(intermediateResults);

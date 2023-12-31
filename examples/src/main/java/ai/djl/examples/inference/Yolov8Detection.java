@@ -65,7 +65,8 @@ public final class Yolov8Detection {
         arguments.put("toTensor", true);
         arguments.put("applyRatio", true);
         arguments.put("threshold", 0.6f);
-        // for performance optimization maxBox parameter can reduce number of considered boxes from 8400
+        // for performance optimization maxBox parameter can reduce number of considered boxes from
+        // 8400
         arguments.put("maxBox", 1000);
         arguments.put("synsetFileName", "yolov8_synset.txt");
 
