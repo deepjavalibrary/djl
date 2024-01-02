@@ -12,6 +12,8 @@
  */
 package ai.djl.llama.jni;
 
+import ai.djl.util.JsonUtils;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -80,6 +82,6 @@ public final class Token {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return text;
+        return JsonUtils.GSON.toJson(this) + '\n';
     }
 }

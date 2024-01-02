@@ -44,6 +44,8 @@ public class LlamaTranslator<I, O> implements NoBatchifyTranslator<I, O> {
     public NDList processInput(TranslatorContext ctx, I input) {
         if (input instanceof String) {
             ctx.setAttachment("out", generate((String) input));
+        } else if (input instanceof LlamaInput) {
+            ctx.setAttachment("out", generate((LlamaInput) input));
         } else if (input instanceof Input) {
             String prompt = ((Input) input).getData().getAsString();
             TokenIterator it = generate(prompt);
@@ -62,11 +64,19 @@ public class LlamaTranslator<I, O> implements NoBatchifyTranslator<I, O> {
     }
 
     private TokenIterator generate(String input) {
-        TextGenerationInput in = JsonUtils.GSON.fromJson(input, TextGenerationInput.class);
-        if (in.prefix != null && in.suffix != null) {
-            LlamaLibrary.infill(handle, in.prefix, in.prefix, in.parameters);
-        } else if (in.inputs != null && !in.inputs.isEmpty()) {
-            LlamaLibrary.generate(handle, in.inputs, in.parameters);
+        LlamaInput in = JsonUtils.GSON.fromJson(input, LlamaInput.class);
+        return generate(in);
+    }
+
+    private TokenIterator generate(LlamaInput in) {
+        InputParameters param = in.getParameters().toInputParameters();
+        String prefix = in.getPrefix();
+        String suffix = in.getSuffix();
+        String inputs = in.getInputs();
+        if (prefix != null && suffix != null) {
+            LlamaLibrary.infill(handle, prefix, prefix, param);
+        } else if (inputs != null && !inputs.isEmpty()) {
+            LlamaLibrary.generate(handle, inputs, param);
         } else {
             throw new IllegalArgumentException("Unsupported input format");
         }
@@ -91,15 +101,7 @@ public class LlamaTranslator<I, O> implements NoBatchifyTranslator<I, O> {
         @Override
         public BytesSupplier next() {
             Token token = it.next();
-            return BytesSupplier.wrapAsJson(token);
+            return BytesSupplier.wrap(JsonUtils.GSON.toJson(token) + "\n");
         }
-    }
-
-    private static final class TextGenerationInput {
-
-        String inputs;
-        String prefix;
-        String suffix;
-        InputParameters parameters;
     }
 }

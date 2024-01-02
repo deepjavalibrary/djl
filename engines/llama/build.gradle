@@ -20,6 +20,7 @@ processResources {
                 "linux-aarch64/libllama.so",
                 "osx-x86_64/libdjl_llama.dylib",
                 "osx-x86_64/libllama.dylib",
+                "osx-x86_64/ggml-metal.metal",
                 "osx-aarch64/libdjl_llama.dylib",
                 "osx-aarch64/libllama.dylib",
                 "osx-aarch64/ggml-metal.metal",
