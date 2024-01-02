@@ -44,6 +44,7 @@ configure(javaProjects()) {
         targetCompatibility = JavaVersion.VERSION_11
         options.compilerArgs << "-proc:none" << "-Xlint:all,-options,-static,-removal" << "-Werror"
     }
+    javadoc.options.addStringOption("Xdoclint:none", "-quiet")
 
     apply plugin: 'eclipse'
 
