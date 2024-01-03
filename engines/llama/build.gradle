@@ -1,3 +1,5 @@
+import java.util.zip.GZIPInputStream
+
 group "ai.djl.llama"
 
 dependencies {
@@ -47,6 +49,18 @@ processResources {
         // write properties
         def propFile = file("${project.projectDir}/build/classes/java/main/native/lib/llama.properties")
         propFile.text = "version=${llamacpp_version}-${version}\n"
+
+        url = "https://mlrepo.djl.ai/model/nlp/text_generation/ai/djl/huggingface/gguf/models.json.gz"
+        def prefix = "${project.projectDir}/build/classes/java/main/nlp/text_generation"
+        def file = new File("${prefix}/ai.djl.huggingface.gguf.json")
+        if (file.exists()) {
+            project.logger.lifecycle("gguf index file already exists")
+        } else {
+            project.logger.lifecycle("Downloading gguf index file")
+            file.getParentFile().mkdirs()
+            def downloadPath = new URL(url)
+            downloadPath.withInputStream { i -> file.withOutputStream { it << new GZIPInputStream(i) } }
+        }
     }
 }
 

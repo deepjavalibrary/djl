@@ -40,7 +40,7 @@ public class LlamaModel extends BaseModel {
     LlamaModel(String name, NDManager manager) {
         super(name);
         this.manager = manager;
-        this.manager.setName("ortModel");
+        this.manager.setName("llamaModel");
         dataType = DataType.FLOAT32;
     }
 
