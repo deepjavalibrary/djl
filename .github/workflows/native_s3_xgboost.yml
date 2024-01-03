@@ -41,7 +41,7 @@ jobs:
           cmake --version
           pip3 install awscli --upgrade
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
           java-version: 17

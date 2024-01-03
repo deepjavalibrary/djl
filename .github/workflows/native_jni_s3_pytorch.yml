@@ -117,7 +117,7 @@ jobs:
           pip3 install awscli --upgrade
       - uses: actions/checkout@v3
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
           java-version: 17
@@ -269,13 +269,13 @@ jobs:
         run: |
           yum -y update
           yum -y groupinstall "Development Tools"
-          yum -y install patch git cmake3 python3-devel java-11-amazon-corretto
+          yum -y install patch git cmake3 python3-devel java-17-amazon-corretto
           ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
       - uses: actions/checkout@v3
       - name: Release JNI prep
         run: |
-          export JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto.aarch64
+          export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto.aarch64
           export PATH=$PATH:$JAVA_HOME
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
           export PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}

@@ -53,7 +53,7 @@ jobs:
         run: |
           yum -y update
           yum -y groupinstall "Development Tools"
-          yum -y install patch cmake3 unzip which java-11-amazon-corretto
+          yum -y install patch cmake3 unzip which java-17-amazon-corretto
           ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
           pip3 install numpy --upgrade
@@ -70,7 +70,7 @@ jobs:
       - name: build package
         run: |
           cd tensorflow
-          export JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto.x86_64/
+          export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto.x86_64/
           curl -L https://github.com/bazelbuild/bazel/releases/download/3.7.2/bazel-3.7.2-installer-linux-x86_64.sh -o bazel.sh --retry 10
           bash bazel.sh
           bazel build -c opt //tensorflow/lite/java:tensorflowlitelib  //tensorflow/lite/delegates/flex:delegate
