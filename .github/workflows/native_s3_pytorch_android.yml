@@ -10,7 +10,7 @@ jobs:
       matrix:
         format: ["armeabi-v7a", "arm64-v8a", "x86" ,"x86_64"]
     env:
-      PYTORCH_VERSION: "2.0.1"
+      PYTORCH_VERSION: "2.1.1"
       NDK_VERSION: "21.1.6352462"
     steps:
       - uses: actions/checkout@v3
@@ -48,8 +48,3 @@ jobs:
         run: |
           aws s3 cp android_pytorch_tmp/build_android/${{ matrix.format }}_native.zip s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/android_native/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/android_native*"
-#      - name: Upload pytorch src
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: pytorch-src-${{ matrix.format }}
-#          path: android_pytorch_tmp
