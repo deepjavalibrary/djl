@@ -50,7 +50,7 @@ jobs:
           pip3 install awscli --upgrade
       - uses: actions/checkout@v3
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
           java-version: 17
