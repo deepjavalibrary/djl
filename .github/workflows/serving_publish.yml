@@ -74,6 +74,19 @@ jobs:
           aws s3 cp benchmark/build/distributions/*.deb s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
           aws s3 cp benchmark/build/distributions/*.zip s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-bench/${DJL_VERSION}/*"
+      - name: Copy awscurl snapshot artifacts to S3
+        if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
+        run: |
+          ./gradlew :awscurl:build
+          aws s3 cp awscurl/build/awscurl s3://djl-ai/publish/awscurl/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/awscurl/*"
+      - name: Copy awscurl staging artifacts to S3
+        if: ${{ github.event.inputs.mode == 'staging' }}
+        run: |
+          ./gradlew :awscurl:build
+          DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
+          aws s3 cp awscurl/build/awscurl s3://djl-ai/publish/${DJL_VERSION}/awscurl/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/awscurl/${DJL_VERSION}/*"
       - name: Publish to snapshot repository
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
         run: ./gradlew publish -Psnapshot --refresh-dependencies
