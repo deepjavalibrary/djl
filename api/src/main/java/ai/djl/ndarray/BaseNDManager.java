@@ -53,6 +53,7 @@ public abstract class BaseNDManager implements NDManager {
     protected AtomicBoolean closed = new AtomicBoolean(false);
     protected AtomicBoolean capped = new AtomicBoolean(false);
 
+    @SuppressWarnings("this-escape")
     protected BaseNDManager(NDManager parent, Device device) {
         this.parent = parent;
         this.device = device == null ? defaultDevice() : device;

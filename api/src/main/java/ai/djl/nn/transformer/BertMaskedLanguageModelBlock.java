@@ -46,6 +46,7 @@ public class BertMaskedLanguageModelBlock extends AbstractBlock {
      * @param bertBlock the bert block to create the task for
      * @param hiddenActivation the activation to use for the hidden layer
      */
+    @SuppressWarnings("this-escape")
     public BertMaskedLanguageModelBlock(
             BertBlock bertBlock, Function<NDArray, NDArray> hiddenActivation) {
         super(VERSION);

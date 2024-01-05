@@ -17,6 +17,11 @@ dependencies {
 checkstyleMain.source = 'src/main/java'
 pmdMain.source = 'src/main/java'
 
+compileJava {
+    options.compilerArgs.clear()
+    options.compilerArgs << "--release" << "11" << "-proc:none" << "-Xlint:all,-options,-static"
+}
+
 jar {
     manifest {
         attributes (

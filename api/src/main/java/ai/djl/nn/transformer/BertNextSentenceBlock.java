@@ -29,6 +29,7 @@ public class BertNextSentenceBlock extends AbstractBlock {
     private Linear binaryClassifier;
 
     /** Creates a next sentence block. */
+    @SuppressWarnings("this-escape")
     public BertNextSentenceBlock() {
         binaryClassifier =
                 addChildBlock(

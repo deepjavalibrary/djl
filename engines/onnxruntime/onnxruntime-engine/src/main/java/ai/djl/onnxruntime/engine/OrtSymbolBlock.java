@@ -59,6 +59,7 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
      * @param session the {@link OrtSession} contains the model information
      * @param manager the {@link NDManager} to holds the NDArray
      */
+    @SuppressWarnings("this-escape")
     public OrtSymbolBlock(OrtSession session, OrtNDManager manager) {
         this.session = session;
         this.manager = manager;

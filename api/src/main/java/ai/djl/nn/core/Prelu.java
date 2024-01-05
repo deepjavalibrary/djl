@@ -41,6 +41,7 @@ public class Prelu extends AbstractBlock {
     private Parameter alpha;
 
     /** Creates a Parametric ReLU Block. */
+    @SuppressWarnings("this-escape")
     public Prelu() {
         super(VERSION);
         alpha =

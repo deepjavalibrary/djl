@@ -29,6 +29,7 @@ public class DefaultModelZoo extends ModelZoo {
     private static final Logger logger = LoggerFactory.getLogger(DefaultModelZoo.class);
 
     /** Constructs a new {@code LocalModelZoo} instance. */
+    @SuppressWarnings("this-escape")
     public DefaultModelZoo() {
         String locations = System.getProperty("ai.djl.repository.zoo.location");
         if (locations != null) {
@@ -41,6 +42,7 @@ public class DefaultModelZoo extends ModelZoo {
      *
      * @param locations a comma separated urls where the models to be loaded from
      */
+    @SuppressWarnings("this-escape")
     public DefaultModelZoo(String locations) {
         parseLocation(locations);
     }

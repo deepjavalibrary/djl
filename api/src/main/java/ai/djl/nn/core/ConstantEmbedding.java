@@ -38,6 +38,7 @@ public class ConstantEmbedding extends AbstractBlock implements AbstractIndexedE
      *
      * @param embedding the value to return for all embeddings
      */
+    @SuppressWarnings("this-escape")
     public ConstantEmbedding(NDArray embedding) {
         this.embedding = embedding;
         freezeParameters(true);

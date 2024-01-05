@@ -62,6 +62,7 @@ public class Linear extends AbstractBlock {
     private Parameter weight;
     private Parameter bias;
 
+    @SuppressWarnings("this-escape")
     protected Linear(Builder builder) {
         super(VERSION);
         units = builder.units;
