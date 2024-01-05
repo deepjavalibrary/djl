@@ -20,7 +20,7 @@ if [[ ! -d libtorch_android/"$FLAVOR" ]]; then
     mkdir -p libtorch_android/"$FLAVOR"
     cd libtorch_android/"$FLAVOR"
     echo "Downloading https://publish.djl.ai/pytorch/$VERSION/android_native/${FLAVOR}_native.zip"
-    curl -s "https://publish.djl.ai/pytorch/$VERSION/android_native/${FLAVOR}_native.zip" | jar xv
+    curl -s "https://publish.djl.ai/pytorch/$VERSION/android_native/${FLAVOR}_native.zip" | jar xv > /dev/null
     mv install/include include
     cd -
   fi

@@ -60,11 +60,12 @@ if(USE_CUDA)
 endif()
 
 add_library(djl_torch SHARED ${SOURCE_FILES})
+set_property(TARGET djl_torch PROPERTY CXX_STANDARD 17)
+
 # build host
 if(NOT BUILD_ANDROID)
     target_link_libraries(djl_torch "${TORCH_LIBRARIES}")
     target_include_directories(djl_torch PUBLIC build/include ${JNI_INCLUDE_DIRS} ${UTILS_INCLUDE_DIR})
-    set_property(TARGET djl_torch PROPERTY CXX_STANDARD 17)
     # We have to kill the default rpath and use current dir
     set(CMAKE_SKIP_RPATH TRUE)
     if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
