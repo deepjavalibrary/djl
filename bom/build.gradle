@@ -28,6 +28,7 @@ dependencies {
         api "ai.djl.fasttext:fasttext-engine:${version}"
         api "ai.djl.hadoop:hadoop:${version}"
         api "ai.djl.huggingface:tokenizers:${version}"
+        api "ai.djl.llama:llama:${version}"
         api "ai.djl.ml.lightgbm:lightgbm:${version}"
         api "ai.djl.ml.xgboost:xgboost-gpu:${version}"
         api "ai.djl.ml.xgboost:xgboost:${version}"
