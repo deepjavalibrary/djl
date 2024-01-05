@@ -86,6 +86,7 @@ public class Trainer implements AutoCloseable {
      * @param model the model the trainer will train on
      * @param trainingConfig the configuration used by the trainer
      */
+    @SuppressWarnings("this-escape")
     public Trainer(Model model, TrainingConfig trainingConfig) {
         this.model = model;
         manager = model.getNDManager().newSubManager();

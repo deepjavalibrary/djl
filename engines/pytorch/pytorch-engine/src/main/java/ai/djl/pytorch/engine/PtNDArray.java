@@ -60,6 +60,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
      * @param manager the manager to attach the new array to
      * @param handle the pointer to the native PyTorch memory
      */
+    @SuppressWarnings("this-escape")
     public PtNDArray(PtNDManager manager, long handle) {
         super(handle);
         this.manager = manager;
@@ -76,6 +77,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
      * @param handle the pointer to the native PyTorch memory
      * @param data the direct buffer of the data
      */
+    @SuppressWarnings("this-escape")
     public PtNDArray(PtNDManager manager, long handle, ByteBuffer data) {
         super(handle);
         this.manager = manager;
@@ -93,6 +95,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
      * @param strs the string array
      * @param shape the {@link Shape} of the {@link NDArray}
      */
+    @SuppressWarnings("this-escape")
     public PtNDArray(PtNDManager manager, String[] strs, Shape shape) {
         super(-1L);
         this.manager = manager;

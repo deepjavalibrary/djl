@@ -30,6 +30,7 @@ public class NDScope implements AutoCloseable {
     private IdentityHashMap<NDArray, NDArray> resources;
 
     /** Constructs a new {@code NDScope} instance. */
+    @SuppressWarnings("this-escape")
     public NDScope() {
         resources = new IdentityHashMap<>();
         SCOPE_STACK.get().addLast(this);

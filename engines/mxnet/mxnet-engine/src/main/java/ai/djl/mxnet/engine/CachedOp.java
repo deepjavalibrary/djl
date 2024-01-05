@@ -63,6 +63,7 @@ public class CachedOp extends NativeResource<Pointer> {
      * @param dataIndices the input data names required by the model and their corresponding
      *     location
      */
+    @SuppressWarnings("this-escape")
     public CachedOp(
             Pointer handle,
             MxNDManager manager,

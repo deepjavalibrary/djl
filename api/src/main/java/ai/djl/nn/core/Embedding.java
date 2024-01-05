@@ -49,6 +49,7 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
 
     protected Parameter embedding;
 
+    @SuppressWarnings("this-escape")
     protected Embedding(BaseBuilder<T, ?> baseBuilder) {
         super(VERSION);
         embeddingSize = baseBuilder.embeddingSize;
@@ -91,6 +92,7 @@ public abstract class Embedding<T> extends AbstractBlock implements AbstractInde
      * @param embedding the embedding array
      * @param format whether to compute row sparse gradient in the backward calculation
      */
+    @SuppressWarnings("this-escape")
     protected Embedding(NDArray embedding, SparseFormat format) {
         super(VERSION);
         numEmbeddings = Math.toIntExact(embedding.getShape().get(0));

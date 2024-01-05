@@ -40,6 +40,7 @@ public class MxParameterServer extends NativeResource<Pointer> implements Parame
      *
      * @param optimizer the optimizer to use for the parameter server updates
      */
+    @SuppressWarnings("this-escape")
     public MxParameterServer(Optimizer optimizer) {
         super(createdKVStore());
         callback = new OptimizerCallback(optimizer);

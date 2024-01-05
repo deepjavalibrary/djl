@@ -62,6 +62,7 @@ public class ParallelBlock extends AbstractBlock {
      * @param function the function to define how the parallel branches are combined
      * @param blocks the blocks that form each of the parallel branches
      */
+    @SuppressWarnings("this-escape")
     public ParallelBlock(Function<List<NDList>, NDList> function, List<Block> blocks) {
         super(VERSION);
         this.function = function;
@@ -74,6 +75,7 @@ public class ParallelBlock extends AbstractBlock {
      * @param blocks the array of blocks to add
      * @return this block
      */
+    @SuppressWarnings("this-escape")
     public final ParallelBlock addAll(Block... blocks) {
         return addAll(Arrays.asList(blocks));
     }

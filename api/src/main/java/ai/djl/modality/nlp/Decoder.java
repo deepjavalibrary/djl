@@ -42,6 +42,7 @@ public abstract class Decoder extends AbstractBlock {
      * @param block the block to be used to decode
      * @param version the version to use for parameter and metadata serialization
      */
+    @SuppressWarnings("this-escape")
     public Decoder(byte version, Block block) {
         super(version);
         this.block = addChildBlock("Block", block);

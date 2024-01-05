@@ -38,6 +38,7 @@ public class TrainableTextEmbedding extends AbstractBlock implements TextEmbeddi
      *
      * @param wordEmbedding the word embedding to embed each word
      */
+    @SuppressWarnings("this-escape")
     public TrainableTextEmbedding(TrainableWordEmbedding wordEmbedding) {
         this.trainableWordEmbedding = addChildBlock("trainableWordEmbedding", wordEmbedding);
     }

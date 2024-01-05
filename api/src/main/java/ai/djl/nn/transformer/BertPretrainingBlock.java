@@ -36,6 +36,7 @@ public class BertPretrainingBlock extends AbstractBlock {
      *
      * @param builder a builder with a bert configuration
      */
+    @SuppressWarnings("this-escape")
     public BertPretrainingBlock(final BertBlock.Builder builder) {
         this.bertBlock = addChildBlock("Bert", builder.build());
         this.mlBlock =

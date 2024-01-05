@@ -48,7 +48,7 @@ public class DetectedObjects extends Classifications {
             List<String> classNames, List<Double> probabilities, List<BoundingBox> boundingBoxes) {
         super(classNames, probabilities);
         this.boundingBoxes = boundingBoxes;
-        setTopK(Integer.MAX_VALUE);
+        this.topK = Integer.MAX_VALUE;
     }
 
     /** {@inheritDoc} */

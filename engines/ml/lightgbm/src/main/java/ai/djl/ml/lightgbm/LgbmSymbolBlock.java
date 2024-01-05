@@ -46,6 +46,7 @@ public class LgbmSymbolBlock extends AbstractSymbolBlock implements AutoCloseabl
      * @param iterations the number of iterations the model was trained for
      * @param handle the Booster handle
      */
+    @SuppressWarnings("this-escape")
     public LgbmSymbolBlock(LgbmNDManager manager, int iterations, SWIGTYPE_p_p_void handle) {
         this.handle = new AtomicReference<>(handle);
         this.iterations = iterations;

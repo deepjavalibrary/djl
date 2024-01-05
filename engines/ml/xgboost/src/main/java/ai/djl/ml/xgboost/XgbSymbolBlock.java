@@ -45,6 +45,7 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
      * @param manager the manager to use for the block
      * @param handle the Booster handle
      */
+    @SuppressWarnings("this-escape")
     public XgbSymbolBlock(XgbNDManager manager, long handle) {
         this.handle = new AtomicReference<>(handle);
         this.manager = manager;
