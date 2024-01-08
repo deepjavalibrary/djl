@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class ModelZoo {
 
     private static final Map<String, ModelZoo> MODEL_ZOO_MAP = new ConcurrentHashMap<>();
+    private static ModelZooResolver resolver;
 
     private Map<String, ModelLoader> modelLoaders = new ConcurrentHashMap<>();
 
@@ -87,6 +88,15 @@ public abstract class ModelZoo {
     }
 
     /**
+     * Sets the {@code ModelZooResolver}.
+     *
+     * @param resolver the {@code ModelZooResolver}
+     */
+    public static void setModelZooResolver(ModelZooResolver resolver) {
+        ModelZoo.resolver = resolver;
+    }
+
+    /**
      * Refreshes model zoo.
      *
      * @param provider the {@code ZooProvider}
@@ -112,7 +122,14 @@ public abstract class ModelZoo {
      * @return the {@code ModelZoo} with the {@code groupId}
      */
     public static ModelZoo getModelZoo(String groupId) {
-        return MODEL_ZOO_MAP.get(groupId);
+        ModelZoo zoo = MODEL_ZOO_MAP.get(groupId);
+        if (zoo == null && resolver != null) {
+            zoo = resolver.resolve(groupId);
+            if (zoo != null) {
+                MODEL_ZOO_MAP.putIfAbsent(groupId, zoo);
+            }
+        }
+        return zoo;
     }
 
     /**
