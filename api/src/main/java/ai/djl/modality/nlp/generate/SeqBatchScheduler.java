@@ -35,15 +35,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * policy is setting several thresholds.
  */
 public abstract class SeqBatchScheduler {
+
     private static final Logger logger = LoggerFactory.getLogger(SeqBatchScheduler.class);
 
     Predictor<NDList, CausalLMOutput> predictor;
     SeqBatcher seqBatcher;
-
     NDManager manager;
-
     SearchConfig config;
-
     Map<Long, NDArray> results;
 
     /**
@@ -101,7 +99,7 @@ public abstract class SeqBatchScheduler {
      * @return the output token ids
      * @throws TranslateException if forward fails
      */
-    abstract NDArray inferenceCall() throws TranslateException;
+    protected abstract NDArray inferenceCall() throws TranslateException;
 
     /**
      * Adds new batch.

@@ -17,6 +17,7 @@ import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.repository.zoo.ModelZoo;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -47,5 +48,12 @@ public class ZooTest {
             throws ModelNotFoundException, MalformedModelException, IOException {
         Criteria<?, ?> criteria = Criteria.builder().build();
         criteria.loadModel();
+    }
+
+    @Test
+    public void testModelZooResolver() {
+        ModelZoo.setModelZooResolver(groupId -> null);
+        ModelZoo zoo = ModelZoo.getModelZoo("unknown");
+        Assert.assertNull(zoo);
     }
 }
