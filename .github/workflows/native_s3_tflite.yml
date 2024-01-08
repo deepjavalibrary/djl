@@ -53,7 +53,7 @@ jobs:
         run: |
           yum -y update
           yum -y groupinstall "Development Tools"
-          yum -y install patch cmake3 unzip which java-17-amazon-corretto
+          yum -y install patch cmake3 unzip which java-17-amazon-corretto-devel
           ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
           pip3 install numpy --upgrade
