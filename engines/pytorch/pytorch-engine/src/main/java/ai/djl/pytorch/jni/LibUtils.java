@@ -106,6 +106,17 @@ public final class LibUtils {
 
     private static void loadLibTorch(LibTorch libTorch) {
         Path libDir = libTorch.dir.toAbsolutePath();
+        if (Files.exists(libDir.resolve("libstdc++.so.6"))) {
+            String libstd = Utils.getEnvOrSystemProperty("LIBSTDCXX_LIBRARY_PATH");
+            if (libstd != null) {
+                try {
+                    logger.info("Loading libstdc++.so.6 from: {}", libstd);
+                    System.load(libstd);
+                } catch (UnsatisfiedLinkError e) {
+                    logger.warn("Failed Loading libstdc++.so.6 from: {}", libstd);
+                }
+            }
+        }
         boolean isCuda = libTorch.flavor.contains("cu");
         List<String> deferred =
                 Arrays.asList(
