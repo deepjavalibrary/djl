@@ -49,7 +49,7 @@ public class TrtTest {
         Engine engine;
         try {
             engine = Engine.getEngine("TensorRT");
-        } catch (Throwable ignore) {
+        } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
         }
         if (!engine.defaultDevice().isGpu()) {
@@ -75,7 +75,7 @@ public class TrtTest {
         Engine engine;
         try {
             engine = Engine.getEngine("TensorRT");
-        } catch (Throwable ignore) {
+        } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
         }
         if (!engine.defaultDevice().isGpu()) {
@@ -112,7 +112,7 @@ public class TrtTest {
         Engine engine;
         try {
             engine = Engine.getEngine("TensorRT");
-        } catch (Throwable ignore) {
+        } catch (Exception ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
         }
         Device device = engine.defaultDevice();

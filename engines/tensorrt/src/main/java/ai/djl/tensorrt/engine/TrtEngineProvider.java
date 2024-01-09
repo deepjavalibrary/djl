@@ -18,6 +18,9 @@ import ai.djl.engine.EngineProvider;
 /** {@code TrtEngineProvider} is the TensorRT implementation of {@link EngineProvider}. */
 public class TrtEngineProvider implements EngineProvider {
 
+    private volatile Engine engine; // NOPMD
+    private volatile boolean initialized; // NOPMD
+
     /** {@inheritDoc} */
     @Override
     public String getEngineName() {
@@ -33,10 +36,14 @@ public class TrtEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        return InstanceHolder.INSTANCE;
-    }
-
-    private static class InstanceHolder {
-        static final Engine INSTANCE = TrtEngine.newInstance();
+        if (!initialized) {
+            synchronized (TrtEngineProvider.class) {
+                if (!initialized) {
+                    initialized = true;
+                    engine = TrtEngine.newInstance();
+                }
+            }
+        }
+        return engine;
     }
 }
