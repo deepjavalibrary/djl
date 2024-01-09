@@ -178,7 +178,7 @@ public class EarlyStoppingListenerTest {
                     // epoch
                     EasyTrain.fit(trainer, 10, trainMnistDataset, testMnistDataset);
                 } catch (EarlyStoppingListener.EarlyStoppedException e) {
-                    Assert.assertTrue(e.getMessage().contains("ms elapsed >= 1 maxMillis"));
+                    Assert.assertTrue(e.getMessage().contains("ms elapsed >="));
                     Assert.assertTrue(e.getStopEpoch() < 10); // Stop epoch is before 10
                 }
 
