@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ macos-12, ubuntu-latest ]
+        operating-system: [ macos-13, ubuntu-latest ]
 
     steps:
       - uses: actions/checkout@v3
@@ -34,6 +34,9 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: check disk space
         run: df -h
+      - name: install libomp on macos
+        if: ${{ runner.os == 'macOS' }}
+        run: brew install libomp
       - name: Build with Gradle
         run: ./gradlew -Dnightly=true build :jacoco:testCodeCoverageReport
       - name: Upload test results
