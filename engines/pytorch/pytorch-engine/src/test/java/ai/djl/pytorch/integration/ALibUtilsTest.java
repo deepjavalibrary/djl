@@ -18,17 +18,21 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class LibUtilsTest {
+// Ensure this test run first
+public class ALibUtilsTest {
 
     @BeforeClass
     public void setup() {
-        System.setProperty(
-                "ai.djl.pytorch.native_helper", "ai.djl.pytorch.integration.LibUtilsTest");
+        System.setProperty("ai.djl.pytorch.native_helper", ALibUtilsTest.class.getName());
+        System.setProperty("STDCXX_LIBRARY_PATH", "/usr/lib/non-exists");
+        System.setProperty("PYTORCH_PRECXX11", "true");
     }
 
     @AfterClass
     public void teardown() {
         System.clearProperty("ai.djl.pytorch.native_helper");
+        System.clearProperty("LIBSTDCXX_LIBRARY_PATH");
+        System.clearProperty("PYTORCH_PRECXX11");
     }
 
     @Test
