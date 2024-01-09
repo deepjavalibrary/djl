@@ -185,12 +185,11 @@ public abstract class Engine {
      * @param engineName the new default engine's name
      */
     public static void setDefaultEngine(String engineName) {
-        Engine engine = getEngine(engineName);
-        if (engine != null) {
-            // Requires an engine to be loaded (without exception) before being the default
-            logger.debug("Setting new default engine: {}", engineName);
-            defaultEngine = engineName;
-        }
+        // Requires an engine to be loaded (without exception) before being the default
+        getEngine(engineName);
+
+        logger.debug("Setting new default engine: {}", engineName);
+        defaultEngine = engineName;
     }
 
     /**
