@@ -18,6 +18,9 @@ import ai.djl.engine.EngineProvider;
 /** {@code XgbEngineProvider} is the XGBoost implementation of {@link EngineProvider}. */
 public class XgbEngineProvider implements EngineProvider {
 
+    private volatile Engine engine; // NOPMD
+    private volatile boolean initialized; // NOPMD
+
     /** {@inheritDoc} */
     @Override
     public String getEngineName() {
@@ -33,10 +36,14 @@ public class XgbEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        return InstanceHolder.INSTANCE;
-    }
-
-    private static class InstanceHolder {
-        static final Engine INSTANCE = XgbEngine.newInstance();
+        if (!initialized) {
+            synchronized (XgbEngineProvider.class) {
+                if (!initialized) {
+                    initialized = true;
+                    engine = XgbEngine.newInstance();
+                }
+            }
+        }
+        return engine;
     }
 }

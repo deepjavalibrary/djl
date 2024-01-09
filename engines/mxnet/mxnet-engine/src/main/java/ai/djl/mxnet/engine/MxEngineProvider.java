@@ -18,6 +18,9 @@ import ai.djl.engine.EngineProvider;
 /** {@code MxEngineProvider} is the MXNet implementation of {@link EngineProvider}. */
 public class MxEngineProvider implements EngineProvider {
 
+    private volatile Engine engine; // NOPMD
+    private volatile boolean initialized; // NOPMD
+
     /** {@inheritDoc} */
     @Override
     public String getEngineName() {
@@ -33,10 +36,14 @@ public class MxEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        return InstanceHolder.INSTANCE;
-    }
-
-    private static class InstanceHolder {
-        static final Engine INSTANCE = MxEngine.newInstance();
+        if (!initialized) {
+            synchronized (MxEngineProvider.class) {
+                if (!initialized) {
+                    initialized = true;
+                    engine = MxEngine.newInstance();
+                }
+            }
+        }
+        return engine;
     }
 }
