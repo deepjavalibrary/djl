@@ -15,6 +15,7 @@ package ai.djl;
 import ai.djl.engine.Engine;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -162,6 +163,15 @@ public class Device {
         return Type.GPU.equals(deviceType);
     }
 
+    /**
+     * Returns the sub devices if present (such as a {@link MultiDevice}), otherwise this.
+     *
+     * @return the sub devices if present (such as a {@link MultiDevice}), otherwise this.
+     */
+    public List<Device> getDevices() {
+        return Collections.singletonList(this);
+    }
+
     /** {@inheritDoc} */
     @Override
     public String toString() {
@@ -276,11 +286,8 @@ public class Device {
             this.devices = devices;
         }
 
-        /**
-         * Returns the sub devices.
-         *
-         * @return the sub devices
-         */
+        /** {@inheritDoc} */
+        @Override
         public List<Device> getDevices() {
             return devices;
         }
