@@ -43,7 +43,9 @@ public class CategoryMask implements JsonSerializable {
                     .registerTypeAdapter(CategoryMask.class, new SegmentationSerializer())
                     .create();
 
-    private transient List<String> classes;
+    @SuppressWarnings("serial")
+    private List<String> classes;
+
     private int[][] mask;
 
     /**
