@@ -156,6 +156,7 @@ nav:
             - Tutorials:
                 - 'docs/serving/serving/docs/lmi/tutorials/seq_scheduler_tutorial.md'
                 - 'docs/serving/serving/docs/lmi/tutorials/trtllm_aot_tutorial.md'
+                - 'docs/serving/serving/docs/lmi/tutorials/trtllm_manual_convert_tutorial.md'
             - Tuning guides:
                 - 'docs/serving/serving/docs/lmi/tuning_guides/deepspeed_tuning_guide.md'
                 - 'docs/serving/serving/docs/lmi/tuning_guides/lmi_dist_tuning_guide.md'
