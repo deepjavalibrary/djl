@@ -260,6 +260,7 @@ jobs:
       aarch64_instance_id: ${{ steps.create_aarch64.outputs.action_graviton_instance_id }}
 
   build-pytorch-jni-aarch64:
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: [ self-hosted, aarch64 ]
     container: amazonlinux:2
     timeout-minutes: 30
