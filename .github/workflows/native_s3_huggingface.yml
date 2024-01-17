@@ -124,7 +124,7 @@ jobs:
 
   build-tokenizers-jni-arm64-osx:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
-    runs-on: [ self-hosted, ARM64, macOS ]
+    runs-on: macos-latest-xlarge
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
