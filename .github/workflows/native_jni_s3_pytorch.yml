@@ -206,7 +206,7 @@ jobs:
 
   build-pytorch-jni-arm64-macos:
     if: github.repository == 'deepjavalibrary/djl'
-    runs-on: [ self-hosted, ARM64, macOS ]
+    runs-on: macos-latest-xlarge
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
