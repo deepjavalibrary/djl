@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: macos-latest
     strategy:
       matrix:
