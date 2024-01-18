@@ -14,13 +14,10 @@ package ai.djl.repository;
 
 import ai.djl.util.Hex;
 import ai.djl.util.Progress;
+import ai.djl.util.TarUtils;
 import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.compress.utils.CloseShieldFilterInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,9 +209,9 @@ public abstract class AbstractRepository implements Repository {
             if ("zip".equals(extension)) {
                 ZipUtils.unzip(pis, dir);
             } else if ("tgz".equals(extension)) {
-                untar(pis, dir, true);
+                TarUtils.untar(pis, dir, true);
             } else if ("tar".equals(extension)) {
-                untar(pis, dir, false);
+                TarUtils.untar(pis, dir, false);
             } else {
                 throw new IOException("File type is not supported: " + extension);
             }
@@ -231,36 +228,6 @@ public abstract class AbstractRepository implements Repository {
             }
         }
         pis.validateChecksum(item);
-    }
-
-    private void untar(InputStream is, Path dir, boolean gzip) throws IOException {
-        InputStream bis;
-        if (gzip) {
-            bis = new GzipCompressorInputStream(new BufferedInputStream(is));
-        } else {
-            bis = new BufferedInputStream(is);
-        }
-        bis = new CloseShieldFilterInputStream(bis);
-        try (TarArchiveInputStream tis = new TarArchiveInputStream(bis)) {
-            TarArchiveEntry entry;
-            while ((entry = tis.getNextEntry()) != null) {
-                String entryName = entry.getName();
-                if (entryName.contains("..")) {
-                    throw new IOException("Malicious zip entry: " + entryName);
-                }
-                Path file = dir.resolve(entryName).toAbsolutePath();
-                if (entry.isDirectory()) {
-                    Files.createDirectories(file);
-                } else {
-                    Path parentFile = file.getParent();
-                    if (parentFile == null) {
-                        throw new AssertionError("Parent path should never be null: " + file);
-                    }
-                    Files.createDirectories(parentFile);
-                    Files.copy(tis, file, StandardCopyOption.REPLACE_EXISTING);
-                }
-            }
-        }
     }
 
     private static Map<String, String> parseQueryString(URI uri) {
