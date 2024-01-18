@@ -11,6 +11,7 @@ on:
 
 jobs:
   noResponse:
+    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
     steps:
       - uses: lee-dohm/no-response@v0.5.0
