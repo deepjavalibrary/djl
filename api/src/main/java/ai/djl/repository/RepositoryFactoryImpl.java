@@ -160,11 +160,10 @@ class RepositoryFactoryImpl implements RepositoryFactory {
 
             Path path = Paths.get(parseFilePath(uri));
             String fileName = path.toFile().getName();
-            if (!FilenameUtils.isArchiveFile(fileName)) {
-                throw new IllegalArgumentException("Only archive file is supported for res URL.");
+            if (FilenameUtils.isArchiveFile(fileName)) {
+                fileName = FilenameUtils.getNamePart(fileName);
             }
 
-            fileName = FilenameUtils.getNamePart(fileName);
             return new JarRepository(name, uri, fileName, queryString);
         }
 
