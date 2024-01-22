@@ -530,10 +530,10 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         long[] specialTokenMask = TokenizersLibrary.LIB.getSpecialTokenMask(encoding);
         CharSpan[] charSpans = TokenizersLibrary.LIB.getTokenCharSpans(encoding);
 
+        long[] overflowingHandles = TokenizersLibrary.LIB.getOverflowing(encoding);
+        boolean exceedMaxLength = overflowingHandles.length > 0;
         Encoding[] overflowing;
         if (withOverflowingTokens) {
-            long[] overflowingHandles = TokenizersLibrary.LIB.getOverflowing(encoding);
-
             overflowing = new Encoding[overflowingHandles.length];
             for (int i = 0; i < overflowingHandles.length; ++i) {
                 overflowing[i] = toEncoding(overflowingHandles[i], true);
@@ -551,6 +551,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
                 attentionMask,
                 specialTokenMask,
                 charSpans,
+                exceedMaxLength,
                 overflowing);
     }
 
