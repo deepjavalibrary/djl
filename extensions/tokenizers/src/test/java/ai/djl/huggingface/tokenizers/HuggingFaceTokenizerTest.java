@@ -330,7 +330,9 @@ public class HuggingFaceTokenizerTest {
                         .build()) {
             String text = "Hello there my friend I am happy to see you";
             String textPair = "How are you my friend";
-            Encoding[] overflowing = tokenizer.encode(text, textPair).getOverflowing();
+            Encoding encoding = tokenizer.encode(text, textPair);
+            Assert.assertTrue(encoding.exceedMaxLength());
+            Encoding[] overflowing = encoding.getOverflowing();
 
             int expectedNumberOfOverflowEncodings = 7;
             Assert.assertEquals(overflowing.length, expectedNumberOfOverflowEncodings);

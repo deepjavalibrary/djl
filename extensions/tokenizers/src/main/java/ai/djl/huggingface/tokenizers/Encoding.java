@@ -27,6 +27,7 @@ public class Encoding {
     private long[] specialTokenMask;
     private CharSpan[] charTokenSpans;
     private Encoding[] overflowing;
+    private boolean exceedMaxLength;
 
     protected Encoding(
             long[] ids,
@@ -36,6 +37,7 @@ public class Encoding {
             long[] attentionMask,
             long[] specialTokenMask,
             CharSpan[] charTokenSpans,
+            boolean exceedMaxLength,
             Encoding[] overflowing) {
         this.ids = ids;
         this.typeIds = typeIds;
@@ -44,6 +46,7 @@ public class Encoding {
         this.attentionMask = attentionMask;
         this.specialTokenMask = specialTokenMask;
         this.charTokenSpans = charTokenSpans;
+        this.exceedMaxLength = exceedMaxLength;
         this.overflowing = overflowing;
     }
 
@@ -125,6 +128,15 @@ public class Encoding {
      */
     public CharSpan[] getCharTokenSpans() {
         return charTokenSpans;
+    }
+
+    /**
+     * Returns if tokens exceed max length.
+     *
+     * @return {@code true} if tokens exceed max length
+     */
+    public boolean exceedMaxLength() {
+        return exceedMaxLength;
     }
 
     /**
