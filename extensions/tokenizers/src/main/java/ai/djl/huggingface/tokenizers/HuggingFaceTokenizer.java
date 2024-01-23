@@ -450,6 +450,53 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     /**
+     * Returns the truncation policy.
+     *
+     * @return the truncation policy
+     */
+    public String getTruncation() {
+        return truncation.name();
+    }
+
+    /**
+     * Returns the padding policy.
+     *
+     * @return the padding policy
+     */
+    public String getPadding() {
+        return padding.name();
+    }
+
+    /**
+     * Returns the max token length.
+     *
+     * @return the max token length
+     */
+    public int getMaxLength() {
+        return maxLength;
+    }
+
+    /**
+     * Returns the stride to use in overflow overlap when truncating sequences longer than the model
+     * supports.
+     *
+     * @return the stride to use in overflow overlap when truncating sequences longer than the model
+     *     supports
+     */
+    public int getStride() {
+        return stride;
+    }
+
+    /**
+     * Returns the padToMultipleOf for padding.
+     *
+     * @return the padToMultipleOf for padding
+     */
+    public int getPadToMultipleOf() {
+        return padToMultipleOf;
+    }
+
+    /**
      * Creates a builder to build a {@code HuggingFaceTokenizer}.
      *
      * @return a new builder
