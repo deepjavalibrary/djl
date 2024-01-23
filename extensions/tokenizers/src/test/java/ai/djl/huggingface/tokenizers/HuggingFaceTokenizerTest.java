@@ -41,6 +41,12 @@ public class HuggingFaceTokenizerTest {
         };
 
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
+            Assert.assertEquals(tokenizer.getTruncation(), "DO_NOT_TRUNCATE");
+            Assert.assertEquals(tokenizer.getPadding(), "DO_NOT_PAD");
+            Assert.assertEquals(tokenizer.getMaxLength(), -1);
+            Assert.assertEquals(tokenizer.getStride(), 0);
+            Assert.assertEquals(tokenizer.getPadToMultipleOf(), 0);
+
             List<String> ret = tokenizer.tokenize(input);
             Assert.assertEquals(ret.toArray(Utils.EMPTY_ARRAY), expected);
             Encoding encoding = tokenizer.encode(input);
