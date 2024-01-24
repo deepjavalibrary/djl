@@ -149,21 +149,6 @@ nav:
       - DJL Benchmark: 'docs/serving/benchmark/README.md'
   - DJL Serving:
       - Why DJL Serving?: 'docs/serving/README.md'
-      - Large Model Inference:
-            - 'docs/serving/serving/docs/large_model_inference.md'
-            - 'docs/serving/serving/docs/lmi/configurations_large_model_inference_containers.md'
-            - 'docs/serving/serving/docs/lmi/lmi_environment_variable_instruction.md'
-            - Tutorials:
-                - 'docs/serving/serving/docs/lmi/tutorials/seq_scheduler_tutorial.md'
-                - 'docs/serving/serving/docs/lmi/tutorials/trtllm_aot_tutorial.md'
-                - 'docs/serving/serving/docs/lmi/tutorials/trtllm_manual_convert_tutorial.md'
-            - Tuning guides:
-                - 'docs/serving/serving/docs/lmi/tuning_guides/deepspeed_tuning_guide.md'
-                - 'docs/serving/serving/docs/lmi/tuning_guides/lmi_dist_tuning_guide.md'
-                - 'docs/serving/serving/docs/lmi/tuning_guides/tnx_tuning_guide.md'
-                - 'docs/serving/serving/docs/lmi/tuning_guides/trtllm_tuning_guide.md'
-            - SageMaker LMI containers resources:
-                - 'docs/demos/aws/sagemaker/large-model-inference/README.md'
       - 'docs/serving/serving/docs/starting.md'
       - 'docs/serving/serving/docs/inference.md'
       - 'docs/serving/serving/docs/modes.md'
@@ -180,6 +165,22 @@ nav:
           - 'docs/serving/serving/docs/management_api.md'
       - 'docs/serving/serving/docs/plugin_management.md'
       - 'docs/serving/wlm/README.md'
+  - Large Model Inference:
+      - 'docs/serving/serving/docs/large_model_inference.md'
+      - 'docs/serving/serving/docs/lmi/configurations_large_model_inference_containers.md'
+      - 'docs/serving/serving/docs/lmi/lmi_environment_variable_instruction.md'
+      - 'docs/serving/serving/docs/lmi/lmi_input_output_schema.md'
+      - Tutorials:
+          - 'docs/serving/serving/docs/lmi/tutorials/seq_scheduler_tutorial.md'
+          - 'docs/serving/serving/docs/lmi/tutorials/trtllm_aot_tutorial.md'
+          - 'docs/serving/serving/docs/lmi/tutorials/trtllm_manual_convert_tutorial.md'
+      - Tuning guides:
+          - 'docs/serving/serving/docs/lmi/tuning_guides/deepspeed_tuning_guide.md'
+          - 'docs/serving/serving/docs/lmi/tuning_guides/lmi_dist_tuning_guide.md'
+          - 'docs/serving/serving/docs/lmi/tuning_guides/tnx_tuning_guide.md'
+          - 'docs/serving/serving/docs/lmi/tuning_guides/trtllm_tuning_guide.md'
+      - SageMaker LMI containers resources:
+          - 'docs/demos/aws/sagemaker/large-model-inference/README.md'
   - Demos:
       - Demos: 'docs/demos/README.md'
       - AWS:
