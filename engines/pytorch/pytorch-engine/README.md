@@ -163,12 +163,12 @@ installed on your GPU machine, you can use one of the following library:
 #### Linux GPU
 
 - ai.djl.pytorch:pytorch-jni:2.1.1-0.26.0
-- ai.djl.pytorch:pytorch-native-cu118:2.1.1:linux-x86_64 - CUDA 11.8
+- ai.djl.pytorch:pytorch-native-cu121:2.1.1:linux-x86_64 - CUDA 12.1
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-cu118</artifactId>
+    <artifactId>pytorch-native-cu121</artifactId>
     <classifier>linux-x86_64</classifier>
     <version>2.1.1</version>
     <scope>runtime</scope>
@@ -229,13 +229,13 @@ We also provide packages for the system like CentOS 7/Ubuntu 14.04 with GLIBC >=
 All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` in the package that contains `CXXABI_1.3.9` to use the package successfully.
 
 - ai.djl.pytorch:pytorch-jni:2.1.1-0.26.0
-- ai.djl.pytorch:pytorch-native-cu118-precxx11:2.1.1:linux-x86_64 - CUDA 11.8
+- ai.djl.pytorch:pytorch-native-cu121-precxx11:2.1.1:linux-x86_64 - CUDA 12.1
 - ai.djl.pytorch:pytorch-native-cpu-precxx11:2.1.1:linux-x86_64   - CPU
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-cu118-precxx11</artifactId>
+    <artifactId>pytorch-native-cu121-precxx11</artifactId>
     <classifier>linux-x86_64</classifier>
     <version>2.1.1</version>
     <scope>runtime</scope>
@@ -275,12 +275,12 @@ For the Windows platform, you can choose between CPU and GPU.
 #### Windows GPU
 
 - ai.djl.pytorch:pytorch-jni:2.1.1-0.26.0
-- ai.djl.pytorch:pytorch-native-cu118:2.1.1:win-x86_64 - CUDA 11.8
+- ai.djl.pytorch:pytorch-native-cu121:2.1.1:win-x86_64 - CUDA 12.1
 
 ```xml
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-cu118</artifactId>
+    <artifactId>pytorch-native-cu121</artifactId>
     <classifier>win-x86_64</classifier>
     <version>2.1.1</version>
     <scope>runtime</scope>
