@@ -243,7 +243,7 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         return ((NativeResource<?>) array).getHandle();
     }
 
-    private static void assignCurrentListener(AlgebraicListener _currentListener) {
-        currentListener = _currentListener;
+    private static void assignCurrentListener(AlgebraicListener algebraicListener) {
+        currentListener = algebraicListener;
     }
 }
