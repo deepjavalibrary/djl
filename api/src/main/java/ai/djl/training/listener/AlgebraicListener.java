@@ -56,7 +56,6 @@ public class AlgebraicListener extends TrainingListenerAdapter {
     private String outputFile;
     private AtomicInteger parametersOpCount = new AtomicInteger(0);
 
-    private long batchSize = -2;
     private int numEpoch;
 
     /**
@@ -105,7 +104,7 @@ public class AlgebraicListener extends TrainingListenerAdapter {
     /** {@inheritDoc} */
     @Override
     public void onTrainingBegin(Trainer trainer) {
-        currentListener = this;
+        assignCurrentListener(this);
     }
 
     /** {@inheritDoc} */
@@ -120,7 +119,7 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         predictions.clear();
         losses.clear();
         nodeMap.clear();
-        currentListener = null;
+        assignCurrentListener(null);
     }
 
     private void setLeaf(NDArray x, String name) {
@@ -142,7 +141,6 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         for (NDArray pred : preds) {
             String python = get(pred).toPythonFunctionBody(opCount);
             predictions.compute(python, (key, count) -> count == null ? 1 : count + 1);
-            batchSize = pred.getShape().head();
         }
     }
 
@@ -176,7 +174,10 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         }
         writer.println("");
         writer.println(String.format("# number of epochs was %s", numEpoch));
-        writer.println(String.format("# number of batches was %s", batchSize));
+        writer.println(
+                String.format(
+                        "# number of generated prediction functions is %s", predictions.size()));
+        writer.println(String.format("# number of generated loss functions is %s", losses.size()));
         writer.println("");
     }
 
@@ -240,5 +241,9 @@ public class AlgebraicListener extends TrainingListenerAdapter {
 
     private Object key(NDArray array) {
         return ((NativeResource<?>) array).getHandle();
+    }
+
+    private static void assignCurrentListener(AlgebraicListener _currentListener) {
+        currentListener = _currentListener;
     }
 }

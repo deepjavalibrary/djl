@@ -245,9 +245,9 @@ class Node {
         sb.append(
                 indent(
                         String.format(
-                                "name='%s_%s_',\n",
+                                "name='%s_%s_',",
                                 op.substring(op.lastIndexOf('.') + 1), opCount.incrementAndGet())));
-        sb.append(')');
+        sb.append("\n)");
         return sb.toString();
     }
 

@@ -3385,5 +3385,6 @@ def loss(label, prediction):
     return result
 
 # number of epochs was 1
-# number of batches was 111
+# number of generated prediction functions is 1
+# number of generated loss functions is 1
 
