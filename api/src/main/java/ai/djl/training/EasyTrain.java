@@ -127,6 +127,8 @@ public final class EasyTrain {
         time = System.nanoTime();
         batchData.getLabels().put(labels.get(0).getDevice(), labels);
         batchData.getPredictions().put(preds.get(0).getDevice(), preds);
+        batchData.getData().put(preds.get(0).getDevice(), data);
+        batchData.getLoss().put(preds.get(0).getDevice(), lossValue);
         trainer.addMetric("training-metrics", time);
         return true;
     }

@@ -107,6 +107,8 @@ public final class TrainMnist {
                 .addEvaluator(new Accuracy())
                 .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
+                .addTrainingListeners(
+                        TrainingListener.Defaults.algebraicLogging(arguments.getAlgebraicLogFile()))
                 .addTrainingListeners(listener);
     }
 
