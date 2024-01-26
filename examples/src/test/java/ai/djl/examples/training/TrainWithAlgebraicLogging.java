@@ -40,7 +40,8 @@ public class TrainWithAlgebraicLogging {
 
         Path pathActual = Paths.get("build/tmp/algebraiclog/TrainMnist.py");
         Files.createDirectories(pathActual.getParent());
-        pathActual.toFile().delete();
+        if (!pathActual.toFile().delete()) {
+        }
 
         String[] args = new String[] {"-g", "1", "-m", "2", "-a", pathActual.toFile().toString()};
 
@@ -61,7 +62,8 @@ public class TrainWithAlgebraicLogging {
 
         Path pathActual = Paths.get("build/tmp/algebraiclog/TrainResnetWithCifar10.py");
         Files.createDirectories(pathActual.getParent());
-        pathActual.toFile().delete();
+        if (!pathActual.toFile().delete()) {
+        }
 
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
