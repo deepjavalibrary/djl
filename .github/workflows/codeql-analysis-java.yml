@@ -73,3 +73,10 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+
+  publish-success-metric:
+    needs: [ analyze ]
+    if: always()
+    uses: ./.github/workflows/publish-job-success.yml
+    with:
+      metric-name: DJL-CodeQL-Failure
