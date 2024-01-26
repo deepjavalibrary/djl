@@ -1,0 +1,27 @@
+name: Publish Job Success Metric to CloudWatch
+
+on:
+  workflow_call:
+    inputs:
+      metric-name:
+        description: "The name of the job to publish a metric for"
+        type: string
+        required: true
+
+jobs:
+  publish-job-success-to-cloudwatch:
+    if: ${{ github.event_name == 'schedule' }}
+    runs-on: [ self-hosted, scheduler ]
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-west-2
+      - name: Publish Job Success Metric
+        run: |
+          [[ ${{ job.status }} == "success" ]]
+          failedBuild=$?
+          aws cloudwatch put-metric-data --namespace GithubCI \
+            --metric-name ${{ inputs.metric-name }} \
+            --value $failedBuild \
+            --unit Count

@@ -108,3 +108,10 @@ jobs:
           PADDLE_VERSION="$(cat gradle.properties | awk -F '=' '/paddlepaddle_version/ {print $2}')"
           aws s3 sync jnilib s3://djl-ai/publish/paddlepaddle-${PADDLE_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/paddlepaddle-${PADDLE_VERSION}/jnilib*"
+
+  publish-success-metric:
+    needs: [ publish ]
+    if: always()
+    uses: ./.github/workflows/publish-job-success.yml
+    with:
+      metric-name: DJL-NativeJNIPaddleS3Publish-Failure
