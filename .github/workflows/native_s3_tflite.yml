@@ -7,12 +7,12 @@ jobs:
   build-osx:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get TFLITE_VERSION
         run: |
           TFLITE_VERSION="$(cat gradle.properties | awk -F '=' '/tflite_version/ {print $2}')"
           echo "TFLITE_VERSION=${TFLITE_VERSION}" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: tensorflow/tensorflow
           ref: v${{ env.TFLITE_VERSION }}
@@ -23,7 +23,7 @@ jobs:
           distribution: 'corretto'
           java-version: 17
       - name: Set up Python3
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
       - name: install Python Dependencies
@@ -57,12 +57,12 @@ jobs:
           ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
           pip3 install numpy --upgrade
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get TFLITE_VERSION
         run: |
           TFLITE_VERSION="$(cat gradle.properties | awk -F '=' '/tflite_version/ {print $2}')"
           echo "TFLITE_VERSION=${TFLITE_VERSION}" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: tensorflow/tensorflow
           ref: v${{ env.TFLITE_VERSION }}

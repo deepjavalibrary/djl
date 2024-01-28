@@ -7,13 +7,13 @@ jobs:
   build-llamacpp-jni-osx:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: 17
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -46,7 +46,7 @@ jobs:
           yum -y install devtoolset-7 git patch cmake3 libstdc++-static
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -75,13 +75,13 @@ jobs:
       - name: Install Environment
         run: |
           choco install -y mingw
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: 17
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -110,14 +110,14 @@ jobs:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: macos-latest-xlarge
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: corretto
           architecture: aarch64
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -169,7 +169,7 @@ jobs:
           yum -y install patch perl-IPC-Cmd cmake3
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
