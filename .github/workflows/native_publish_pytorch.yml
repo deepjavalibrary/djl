@@ -13,14 +13,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: 17
       # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
