@@ -13,14 +13,14 @@ jobs:
       PYTORCH_VERSION: "2.1.1"
       NDK_VERSION: "21.1.6352462"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: 17
       - name: Set up Python3
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
       - name: clone pytorch
