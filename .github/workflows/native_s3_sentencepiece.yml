@@ -112,7 +112,7 @@ jobs:
 
   build-sentencepiece-jni-arm64-osx:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
-    runs-on: macos-latest-xlarge
+    runs-on: macos-14 #M1
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
