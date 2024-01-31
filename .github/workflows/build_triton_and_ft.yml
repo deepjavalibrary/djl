@@ -27,7 +27,7 @@ jobs:
           pip3 install requests
           python3 build.py --enable-logging --enable-metrics --enable-stats --enable-cpu-metrics --enable-gpu --endpoint http
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
