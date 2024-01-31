@@ -10,7 +10,7 @@ on:
 
 jobs:
   publish-job-success-to-cloudwatch:
-    if: ${{ github.event.workflow_run.event == "schedule" }}
+    if: ${{ github.event.workflow_run.event == 'schedule' }}
     runs-on: [ self-hosted, scheduler ]
     steps:
       - name: Configure AWS Credentials
