@@ -71,7 +71,7 @@ public class TrainWithAlgebraicLogging {
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
         String[] args = {
-            "-e", "1", "-g", "4", "-m", "1", "-b", "111", "-a", algebraicLogFile.toFile().toString()
+            "-e", "2", "-g", "4", "-m", "1", "-b", "111", "-a", algebraicLogFile.toFile().toString()
         };
 
         Engine.getInstance().setRandomSeed(SEED);

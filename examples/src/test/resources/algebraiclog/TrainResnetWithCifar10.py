@@ -1585,7 +1585,7 @@ class MyModel(tf.keras.Model):
         name='zeros_295_',
     ))
 
-## 1
+## 2
   def call(self, x):
     val1 = tf.nn.convolution(
         x, # (111, 3, 32, 32)
@@ -3364,7 +3364,7 @@ class MyModel(tf.keras.Model):
     )
     return result
 
-## 1
+## 2
 def loss(label, prediction):
     result = tf.reduce_mean(
         tf.negative(
@@ -3384,7 +3384,7 @@ def loss(label, prediction):
     )
     return result
 
-# number of epochs was 1
+# number of epochs was 2
 # number of prediction functions is 1
 # number of loss functions is 1
 
