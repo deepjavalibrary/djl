@@ -105,10 +105,3 @@ jobs:
           ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
           ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
           DJL_STAGING: ${{ github.event.inputs.repo-id }}
-
-  publish-success-metric:
-    needs: [ publish ]
-    if: always()
-    uses: ./.github/workflows/publish-job-success.yml
-    with:
-      metric-name: DJL-DJLServingPublish-Failure

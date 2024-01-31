@@ -65,10 +65,3 @@ jobs:
         run: |
           aws s3 sync ../site s3://djl-ai/documentation/nightly --delete
           aws cloudfront create-invalidation --distribution-id E733IIDCG0G5U --paths "/*"
-
-  publish-success-metric:
-    needs: [ documentation ]
-    if: always()
-    uses: ./.github/workflows/publish-job-success.yml
-    with:
-      metric-name: DJL-DocumentationPublish-Failure

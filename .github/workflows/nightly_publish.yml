@@ -255,10 +255,3 @@ jobs:
           cd /home/ubuntu/djl_benchmark_script/scripts
           instance_id=${{ needs.create-runners.outputs.gpu_1_instance_id }}
           ./stop_instance.sh $instance_id
-
-  publish-success-metric:
-    needs: [ publish, stop-runners ]
-    if: always()
-    uses: ./.github/workflows/publish-job-success.yml
-    with:
-      metric-name: DJL-NightlyIntegrationTestsPublish-Failure

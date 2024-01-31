@@ -57,10 +57,3 @@ jobs:
           file: docker/spark/Dockerfile
           build-args: DJL_VERSION=${DJL_VERSION}
           tags: deepjavalibrary/djl-spark:${{ env.DJL_VERSION }}-cpu
-
-  publish-success-metric:
-    needs: [ publish ]
-    if: always()
-    uses: ./.github/workflows/publish-job-success.yml
-    with:
-      metric-name: DJL-SparkDockerPublish-Failure
