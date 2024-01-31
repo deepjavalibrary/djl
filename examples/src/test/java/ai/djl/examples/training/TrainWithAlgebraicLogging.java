@@ -38,18 +38,20 @@ public class TrainWithAlgebraicLogging {
     public void testTrainMnist() throws ModelException, TranslateException, IOException {
         TestRequirements.engine("MXNet");
 
-        Path pathActual = Paths.get("build/tmp/algebraiclog/TrainMnist.py");
-        if (!pathActual.toFile().delete()) {
-            Files.createDirectories(pathActual.getParent());
+        Path logDir = Paths.get("build/tmp/algebraiclog");
+        Path algebraicLogFile = logDir.resolve("TrainMnist.py");
+        if (!algebraicLogFile.toFile().delete()) {
+            Files.createDirectories(logDir);
         }
 
-        String[] args = new String[] {"-g", "1", "-m", "2", "-a", pathActual.toFile().toString()};
+        String[] args =
+                new String[] {"-g", "1", "-m", "2", "-a", algebraicLogFile.toFile().toString()};
 
         TrainMnist.runExample(args);
         Path path = Paths.get("src/test/resources/algebraiclog/TrainMnist.py");
 
         try (InputStream is = Files.newInputStream(path);
-                InputStream isActual = Files.newInputStream(pathActual)) {
+                InputStream isActual = Files.newInputStream(algebraicLogFile)) {
             List<String> expected = Utils.readLines(is);
             List<String> actual = Utils.readLines(isActual);
             Assert.assertEquals(expected, actual);
@@ -60,15 +62,16 @@ public class TrainWithAlgebraicLogging {
     public void testTrainResNetImperative() throws ModelException, IOException, TranslateException {
         TestRequirements.engine("MXNet");
 
-        Path pathActual = Paths.get("build/tmp/algebraiclog/TrainResnetWithCifar10.py");
-        if (!pathActual.toFile().delete()) {
-            Files.createDirectories(pathActual.getParent());
+        Path logDir = Paths.get("build/tmp/algebraiclog");
+        Path algebraicLogFile = logDir.resolve("TrainResnetWithCifar10.py");
+        if (!algebraicLogFile.toFile().delete()) {
+            Files.createDirectories(logDir);
         }
 
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
         String[] args = {
-            "-e", "1", "-g", "4", "-m", "1", "-b", "111", "-a", pathActual.toFile().toString()
+            "-e", "1", "-g", "4", "-m", "1", "-b", "111", "-a", algebraicLogFile.toFile().toString()
         };
 
         Engine.getInstance().setRandomSeed(SEED);
@@ -78,7 +81,7 @@ public class TrainWithAlgebraicLogging {
         Path path = Paths.get("src/test/resources/algebraiclog/TrainResnetWithCifar10.py");
 
         try (InputStream is = Files.newInputStream(path);
-                InputStream isActual = Files.newInputStream(pathActual)) {
+                InputStream isActual = Files.newInputStream(algebraicLogFile)) {
             List<String> expected = Utils.readLines(is);
             List<String> actual = Utils.readLines(isActual);
             Assert.assertEquals(expected, actual);

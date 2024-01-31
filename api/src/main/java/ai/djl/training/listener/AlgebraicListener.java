@@ -104,7 +104,7 @@ public class AlgebraicListener extends TrainingListenerAdapter {
     /** {@inheritDoc} */
     @Override
     public void onTrainingBegin(Trainer trainer) {
-        assignCurrentListener(this);
+        setCurrentListener(this);
     }
 
     /** {@inheritDoc} */
@@ -119,7 +119,7 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         predictions.clear();
         losses.clear();
         nodeMap.clear();
-        assignCurrentListener(null);
+        setCurrentListener(null);
     }
 
     private void setLeaf(NDArray x, String name) {
@@ -144,8 +144,8 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         }
     }
 
-    private void writeLoss(NDArray lss, AtomicInteger opCount) {
-        String python = get(lss).toPythonFunctionBody(opCount);
+    private void writeLoss(NDArray loss, AtomicInteger opCount) {
+        String python = get(loss).toPythonFunctionBody(opCount);
         losses.compute(python, (key, count) -> count == null ? 1 : count + 1);
     }
 
@@ -174,26 +174,24 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         }
         writer.println("");
         writer.println(String.format("# number of epochs was %s", numEpoch));
-        writer.println(
-                String.format(
-                        "# number of generated prediction functions is %s", predictions.size()));
-        writer.println(String.format("# number of generated loss functions is %s", losses.size()));
+        writer.println(String.format("# number of prediction functions is %s", predictions.size()));
+        writer.println(String.format("# number of loss functions is %s", losses.size()));
         writer.println("");
     }
 
     private void writeParameters(Model model) {
-        if (parameters == null) {
-            parameters = new LinkedHashMap<>();
-            for (Pair<String, Parameter> pair : model.getBlock().getParameters()) {
-                NDArray array = pair.getValue().getArray();
-                String initialization =
-                        get(pair.getValue().getArray())
-                                        .toPythonExpression(null, parametersOpCount, false)
-                                + (pair.getValue().requiresGradient() ? "" : ", trainable = False");
-                String pythonClassVariable = "self._" + pair.getKey();
-                parameters.put(pythonClassVariable, initialization);
-                setLeaf(array, pythonClassVariable);
-            }
+        if (parameters != null) {
+            return;
+        }
+        parameters = new LinkedHashMap<>();
+        for (Pair<String, Parameter> pair : model.getBlock().getParameters()) {
+            NDArray array = pair.getValue().getArray();
+            String initialization =
+                    get(array).toPythonExpression(null, parametersOpCount, false)
+                            + (pair.getValue().requiresGradient() ? "" : ", trainable = False");
+            String pythonClassVariable = "self._" + pair.getKey();
+            parameters.put(pythonClassVariable, initialization);
+            setLeaf(array, pythonClassVariable);
         }
     }
 
@@ -243,7 +241,7 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         return ((NativeResource<?>) array).getHandle();
     }
 
-    private static void assignCurrentListener(AlgebraicListener algebraicListener) {
+    private static void setCurrentListener(AlgebraicListener algebraicListener) {
         currentListener = algebraicListener;
     }
 }
