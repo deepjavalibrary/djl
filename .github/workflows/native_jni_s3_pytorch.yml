@@ -306,10 +306,3 @@ jobs:
           cd /home/ubuntu/djl_benchmark_script/scripts
           instance_id=${{ needs.create-aarch64-runner.outputs.aarch64_instance_id }}
           ./stop_instance.sh $instance_id
-
-  publish-success-metric:
-    needs: [ build-pytorch-jni-macos, build-pytorch-jni-linux, build-pytorch-jni-precxx11, build-pytorch-jni-windows, build-pytorch-jni-arm64-macos, stop-runners ]
-    if: always()
-    uses: ./.github/workflows/publish-job-success.yml
-    with:
-      metric-name: DJL-NativeJNIPytorchS3Publish-Failure

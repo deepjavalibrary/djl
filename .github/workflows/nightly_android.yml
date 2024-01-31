@@ -31,10 +31,3 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: cd android/core && ./gradlew cAT
-
-  publish-success-metric:
-    needs: [ build ]
-    if: always()
-    uses: ./.github/workflows/publish-job-success.yml
-    with:
-      metric-name: DJL-AndroidIntegrationTests-Failure
