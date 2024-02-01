@@ -115,7 +115,7 @@ jobs:
           yum -y install devtoolset-7 rh-git218 patch cmake3
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -140,7 +140,7 @@ jobs:
           rm -rf ~/.djl.ai
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu11 -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -273,7 +273,7 @@ jobs:
           yum -y install patch git cmake3 python3-devel java-17-amazon-corretto-devel
           ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Release JNI prep
         run: |
           export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto.aarch64
@@ -284,7 +284,7 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

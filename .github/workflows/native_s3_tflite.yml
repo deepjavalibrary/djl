@@ -57,12 +57,12 @@ jobs:
           ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
           pip3 install numpy --upgrade
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Get TFLITE_VERSION
         run: |
           TFLITE_VERSION="$(cat gradle.properties | awk -F '=' '/tflite_version/ {print $2}')"
           echo "TFLITE_VERSION=${TFLITE_VERSION}" >> $GITHUB_ENV
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           repository: tensorflow/tensorflow
           ref: v${{ env.TFLITE_VERSION }}
@@ -75,7 +75,7 @@ jobs:
           bash bazel.sh
           bazel build -c opt //tensorflow/lite/java:tensorflowlitelib  //tensorflow/lite/delegates/flex:delegate
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
