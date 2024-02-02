@@ -8,14 +8,19 @@ on:
     branches:
       - master
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   publish-job-success-to-cloudwatch:
     if: ${{ github.event.workflow_run.event == 'schedule' }}
-    runs-on: [ self-hosted, scheduler ]
+    runs-on: ubuntu-latest
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
+          role-to-assume: arn:aws:iam::185921645874:role/djl-github-cloudwatch-ci-metrics
           aws-region: us-west-2
       - name: Publish Job Success Metric
         env:
