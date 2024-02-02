@@ -31,6 +31,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -45,6 +46,7 @@ public class AlgebraicListener extends TrainingListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(AlgebraicListener.class);
 
     private final Map<Object, Node> nodeMap = new ConcurrentHashMap<>();
+    private final Map<Object, Node> nodeMapForParameters = new ConcurrentHashMap<>();
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")
     private final Map<String, Integer> losses = new LinkedHashMap<>();
@@ -99,6 +101,8 @@ public class AlgebraicListener extends TrainingListenerAdapter {
                 writeLoss(loss, opCount);
             }
         }
+        nodeMap.clear();
+        nodeMap.putAll(nodeMapForParameters);
     }
 
     /** {@inheritDoc} */
@@ -119,6 +123,7 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         predictions.clear();
         losses.clear();
         nodeMap.clear();
+        nodeMapForParameters.clear();
         setCurrentListener(null);
     }
 
@@ -192,6 +197,7 @@ public class AlgebraicListener extends TrainingListenerAdapter {
             String pythonClassVariable = "self._" + pair.getKey();
             parameters.put(pythonClassVariable, initialization);
             setLeaf(array, pythonClassVariable);
+            nodeMapForParameters.put(key(array), get(array));
         }
     }
 
@@ -213,6 +219,7 @@ public class AlgebraicListener extends TrainingListenerAdapter {
     private void recordInternal(
             String name, NDArray[] src, NDArray[] dest, PairList<String, ?> param) {
         Node n = new Node(name, param);
+        n.src = new ArrayList<>(src.length);
         for (NDArray array : src) {
             Node node = get(array);
             if (node == null) {
