@@ -30,8 +30,7 @@ jobs:
         run: |
           workflow_name=$(echo "$WORKFLOW_NAME" | tr -d ' ')
           metric_name="${REPO_NAME}-${workflow_name}-Failure"
-          [[ "$CONCLUSION" == "success" ]]
-          failedBuild=$?
+          failedBuild=$([ "$CONCLUSION" == "success" ]; echo $?)
           aws cloudwatch put-metric-data --namespace GithubCI \
             --metric-name "$metric_name" \
             --value $failedBuild \
