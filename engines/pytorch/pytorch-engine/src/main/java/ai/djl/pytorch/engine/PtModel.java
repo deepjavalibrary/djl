@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -132,7 +133,8 @@ public class PtModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public void load(InputStream modelStream, Map<String, ?> options) throws IOException {
+    public void load(InputStream modelStream, Map<String, ?> options)
+            throws IOException, MalformedModelException {
         boolean mapLocation = false;
         if (options != null) {
             mapLocation = Boolean.parseBoolean((String) options.get("mapLocation"));
@@ -146,11 +148,26 @@ public class PtModel extends BaseModel {
      * @param modelStream the stream of the model file
      * @param mapLocation force load to specified device if true
      * @throws IOException model loading error
+     * @throws MalformedModelException if model file is corrupted
      */
-    public void load(InputStream modelStream, boolean mapLocation) throws IOException {
-        modelDir = Files.createTempDirectory("pt-model");
-        modelDir.toFile().deleteOnExit();
-        block = JniUtils.loadModule((PtNDManager) manager, modelStream, mapLocation, false);
+    public void load(InputStream modelStream, boolean mapLocation)
+            throws IOException, MalformedModelException {
+        wasLoaded = true;
+        if (block == null) {
+            modelDir = Files.createTempDirectory("pt-model");
+            modelDir.toFile().deleteOnExit();
+            block = JniUtils.loadModule((PtNDManager) manager, modelStream, mapLocation, false);
+
+            /*
+             * By default, the parameters are frozen, since the previous version before adding this
+             * trainParam, they were frozen due to the setting JITCallGuard guard, which disables
+             * autograd. Also, the pretrained parameters usually should not be updated too much. It
+             * is safe to freeze it. Users may unfreeze it and set their learning rate small.
+             */
+            block.freezeParameters(true);
+        } else {
+            readParameters(modelStream, Collections.emptyMap());
+        }
     }
 
     private Path findModelFile(String... prefixes) {

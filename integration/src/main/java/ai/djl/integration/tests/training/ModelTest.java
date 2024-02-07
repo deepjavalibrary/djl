@@ -27,6 +27,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class ModelTest {
@@ -37,7 +38,9 @@ public class ModelTest {
         block.add(Conv2d.builder().setKernelShape(new Shape(1, 1)).setFilters(10).build());
         block.add(BatchNorm.builder().build());
         try (Model saveModel = Model.newInstance("saveModel", TestUtils.getEngine());
-                Model loadModel = Model.newInstance("loadModel", TestUtils.getEngine())) {
+                Model loadModel = Model.newInstance("loadModel", TestUtils.getEngine());
+                Model loadStreamModel =
+                        Model.newInstance("loadStreamModel", TestUtils.getEngine()); ) {
             block.initialize(saveModel.getNDManager(), DataType.FLOAT32, new Shape(1, 3, 32, 32));
             ParameterList savedParameters = block.getParameters();
             saveModel.setBlock(block);
@@ -47,6 +50,13 @@ public class ModelTest {
             loadModel.setBlock(block);
             loadModel.load(Paths.get("build/tmp/test/models"), "saveAndLoad");
             ParameterList loadedParameters = loadModel.getBlock().getParameters();
+            compareParameters(savedParameters, loadedParameters);
+
+            loadStreamModel.setBlock(block);
+            loadStreamModel.load(
+                    Files.newInputStream(
+                            Paths.get("build/tmp/test/models/saveAndLoad-0000.params")));
+            loadedParameters = loadStreamModel.getBlock().getParameters();
             compareParameters(savedParameters, loadedParameters);
         }
     }

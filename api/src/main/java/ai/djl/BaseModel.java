@@ -339,8 +339,12 @@ public abstract class BaseModel implements Model {
     protected boolean readParameters(Path paramFile, Map<String, ?> options)
             throws IOException, MalformedModelException {
         logger.debug("Try to load model from {}", paramFile);
-        try (DataInputStream dis =
-                new DataInputStream(new BufferedInputStream(Files.newInputStream(paramFile)))) {
+        return readParameters(Files.newInputStream(paramFile), options);
+    }
+
+    protected boolean readParameters(InputStream paramStream, Map<String, ?> options)
+            throws IOException, MalformedModelException {
+        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(paramStream))) {
             byte[] buf = new byte[4];
             dis.readFully(buf);
             if (!"DJL@".equals(new String(buf, StandardCharsets.US_ASCII))) {
