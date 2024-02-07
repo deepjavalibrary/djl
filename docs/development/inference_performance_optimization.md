@@ -85,6 +85,23 @@ You can enable it by setting the environment variable:
 
 You might see an exception if a data type or operator is not supported with the oneDNN device.
 
+#### oneDNN(MKLDNN) tuning on AWS Graviton3
+AWS Graviton3(E) (e.g. c7g/m7g/r7g, c7gn and Hpc7g instances) supports BF16 format for ML acceleration. This can be enabled in oneDNN by setting the below environment variable
+```
+grep -q bf16 /proc/cpuinfo && export DNNL_DEFAULT_FPMATH_MODE=BF16
+```
+To avoid redundant primitive creation latency overhead, enable primitive caching by setting the LRU cache capacity. Please note this caching feature increases the memory footprint. It is recommended to tune the capacity to an optimal value for a given use case.
+
+```
+export LRU_CACHE_CAPACITY=1024
+```
+
+In addition to avoiding the redundant allocations, tensor memory allocation latencies can be optimized  with Linux transparent huge pages (THP). To enable THP allocations, set the following torch environment variable.
+```
+export THP_MEM_ALLOC_ENABLE=1
+```
+Please refer to [PyTorch Graviton tutorial](https://pytorch.org/tutorials/recipes/inference_tuning_on_aws_graviton.html) for more details on how to achieve the best PyTorch inference performance on AWS Graviton3 instances.
+
 #### CuDNN acceleration
 PyTorch has a special flag that is used for a CNN or related network speed up. If your input size won't change frequently,
 you may benefit from enabling this configuration in your model:
