@@ -25,14 +25,12 @@ public class ALibUtilsTest {
     public void setup() {
         System.setProperty("ai.djl.pytorch.native_helper", ALibUtilsTest.class.getName());
         System.setProperty("STDCXX_LIBRARY_PATH", "/usr/lib/non-exists");
-        System.setProperty("PYTORCH_PRECXX11", "true");
     }
 
     @AfterClass
     public void teardown() {
         System.clearProperty("ai.djl.pytorch.native_helper");
         System.clearProperty("LIBSTDCXX_LIBRARY_PATH");
-        System.clearProperty("PYTORCH_PRECXX11");
     }
 
     @Test

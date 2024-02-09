@@ -21,39 +21,25 @@ processResources {
         def files = [
                 "linux-x86_64/cpu/libdjl_torch.so",
                 "linux-x86_64/cpu-precxx11/libdjl_torch.so",
-                "osx-x86_64/cpu/libdjl_torch.dylib",
+                "linux-aarch64/cpu-precxx11/libdjl_torch.so",
+                "osx-aarch64/cpu/libdjl_torch.dylib",
                 "win-x86_64/cpu/djl_torch.dll"
         ]
-        if (ptVersion.startsWith("2.1.")) {
-            files.add("linux-aarch64/cpu-precxx11/libdjl_torch.so")
+        if (ptVersion.startsWith("2.1.") || ptVersion.startsWith("2.2.")) {
             files.add("linux-x86_64/cu121/libdjl_torch.so")
             files.add("linux-x86_64/cu121-precxx11/libdjl_torch.so")
             files.add("win-x86_64/cu121/djl_torch.dll")
-            files.add("osx-aarch64/cpu/libdjl_torch.dylib")
+            files.add("osx-x86_64/cpu/libdjl_torch.dylib")
         } else if (ptVersion.startsWith("2.0.")) {
-            files.add("linux-aarch64/cpu-precxx11/libdjl_torch.so")
             files.add("linux-x86_64/cu118/libdjl_torch.so")
             files.add("linux-x86_64/cu118-precxx11/libdjl_torch.so")
             files.add("win-x86_64/cu118/djl_torch.dll")
-            files.add("osx-aarch64/cpu/libdjl_torch.dylib")
+            files.add("osx-x86_64/cpu/libdjl_torch.dylib")
         } else if (ptVersion.startsWith("1.13.")) {
-            files.add("linux-aarch64/cpu-precxx11/libdjl_torch.so")
             files.add("linux-x86_64/cu117/libdjl_torch.so")
             files.add("linux-x86_64/cu117-precxx11/libdjl_torch.so")
             files.add("win-x86_64/cu117/djl_torch.dll")
-            files.add("osx-aarch64/cpu/libdjl_torch.dylib")
-        } else if (ptVersion.startsWith("1.12.")) {
-            files.add("linux-aarch64/cpu-precxx11/libdjl_torch.so")
-            files.add("linux-x86_64/cu116/libdjl_torch.so")
-            files.add("linux-x86_64/cu116-precxx11/libdjl_torch.so")
-            files.add("win-x86_64/cu116/djl_torch.dll")
-            files.add("osx-aarch64/cpu/libdjl_torch.dylib")
-        } else if (ptVersion.startsWith("1.11.")) {
-            files.add("linux-aarch64/cpu-precxx11/libdjl_torch.so")
-            files.add("linux-x86_64/cu113/libdjl_torch.so")
-            files.add("linux-x86_64/cu113-precxx11/libdjl_torch.so")
-            files.add("win-x86_64/cu113/djl_torch.dll")
-            files.add("osx-aarch64/cpu/libdjl_torch.dylib")
+            files.add("osx-x86_64/cpu/libdjl_torch.dylib")
         } else {
             throw new GradleException("Unsupported version: ${ptVersion}.")
         }

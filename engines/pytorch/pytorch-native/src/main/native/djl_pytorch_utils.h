@@ -14,12 +14,11 @@
 #define DJL_TORCH_DJL_PYTORCH_JNI_UTILS_H
 
 #include <c10/util/typeid.h>
-#include <c10/util/variant.h>
 #include <djl/utils.h>
 #include <jni.h>
 #include <torch/csrc/api/include/torch/enum.h>
 #include <torch/script.h>
-
+#include <variant>
 #include <iostream>
 
 #include "djl_pytorch_jni_log.h"
@@ -30,15 +29,9 @@ namespace utils {
 
 #if !defined(__ANDROID__)
 // for image interpolation
-#ifdef V1_10_X
-typedef torch::variant<torch::enumtype::kNearest, torch::enumtype::kLinear, torch::enumtype::kBilinear,
-    torch::enumtype::kBicubic, torch::enumtype::kTrilinear, torch::enumtype::kArea>
-    mode_t;
-#else
-typedef torch::variant<torch::enumtype::kNearest, torch::enumtype::kLinear, torch::enumtype::kBilinear,
+typedef std::variant<torch::enumtype::kNearest, torch::enumtype::kLinear, torch::enumtype::kBilinear,
     torch::enumtype::kBicubic, torch::enumtype::kTrilinear, torch::enumtype::kArea, torch::enumtype::kNearestExact>
     mode_t;
-#endif
 #endif
 
 inline jint GetDTypeFromScalarType(const torch::ScalarType& type) {
@@ -118,10 +111,6 @@ inline mode_t GetInterpolationMode(jint jmode) {
       return torch::kTrilinear;
     case 5:
       return torch::kArea;
-    case 6:
-#ifndef V1_10_X
-      return torch::kNearestExact;
-#endif
     default:
       throw;
   }

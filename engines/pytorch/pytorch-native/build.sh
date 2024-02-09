@@ -29,25 +29,28 @@ if [[ ! -d "libtorch" ]]; then
     fi
 
     if [[ $ARCH == 'aarch64' ]]; then
-      curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch${AARCH64_CXX11ABI}-shared-with-deps-${VERSION}-aarch64.zip | jar xv > /dev/null
+      curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch${AARCH64_CXX11ABI}-shared-with-deps-${VERSION}-aarch64.zip | jar xv >/dev/null
     else
-      curl -s https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip | jar xv > /dev/null
+      curl -s https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip | jar xv >/dev/null
     fi
-
   elif [[ $PLATFORM == 'darwin' ]]; then
-    if [[ $ARCH == 'aarch64' ]]; then
-      curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-macos-${VERSION}-aarch64.zip | jar xv > /dev/null
+    if [[ "$VERSION" =~ ^(2.2.)* ]]; then
+      if [[ $ARCH == 'aarch64' ]]; then
+        curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-arm64-${VERSION}.zip | jar xv >/dev/null
+      else
+        curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-x86_64-${VERSION}.zip | jar xv >/dev/null
+      fi
     else
-      curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip | jar xv > /dev/null
+      if [[ $ARCH == 'aarch64' ]]; then
+        curl -s https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-macos-${VERSION}-aarch64.zip | jar xv >/dev/null
+      else
+        curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip | jar xv >/dev/null
+      fi
     fi
   else
     echo "$PLATFORM is not supported."
     exit 1
   fi
-fi
-
-if [[ "$VERSION" == "1.11.0" ]]; then
-  PT_VERSION=V1_11_X
 fi
 
 if [[ "$FLAVOR" = cu* ]]; then
