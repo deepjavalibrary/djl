@@ -75,7 +75,7 @@ public class YoloV8Translator extends YoloV5Translator {
                 float classProb = buf[index + c];
                 if (classProb > maxClassProb) {
                     maxClassProb = classProb;
-                    maxIndex = c;
+                    maxIndex = c - 4;
                 }
             }
 
