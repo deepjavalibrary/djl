@@ -65,6 +65,7 @@ public final class LibUtils {
 
     private static final Pattern VERSION_PATTERN =
             Pattern.compile("(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)(-SNAPSHOT)?(-\\d+)?");
+    private static final Pattern LIB_PATTERN = Pattern.compile("(.*\\.(so(\\.\\d+)*|dll|dylib))");
 
     private static LibTorch libTorch;
 
@@ -136,7 +137,9 @@ public final class LibUtils {
             paths.filter(
                             path -> {
                                 String name = path.getFileName().toString();
-                                if (!isCuda
+                                if (!LIB_PATTERN.matcher(name).matches()) {
+                                    return false;
+                                } else if (!isCuda
                                         && name.contains("nvrtc")
                                         && name.contains("cudart")
                                         && name.contains("nvTools")) {
