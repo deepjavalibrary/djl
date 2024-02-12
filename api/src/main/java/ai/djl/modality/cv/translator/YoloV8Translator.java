@@ -64,6 +64,11 @@ public class YoloV8Translator extends YoloV5Translator {
         float[] buf = reshapedResult.toFloatArray();
         int numberRows = Math.toIntExact(shape.get(0));
         int nClasses = Math.toIntExact(shape.get(1));
+        int padding = nClasses - classes.size();
+        if (padding != 0 && padding != 4) {
+            throw new IllegalStateException(
+                    "Expected classes: " + (nClasses - 4) + ", got " + classes.size());
+        }
 
         ArrayList<IntermediateResult> intermediateResults = new ArrayList<>();
         // reverse order search in heap; searches through #maxBoxes for optimization when set
@@ -78,6 +83,7 @@ public class YoloV8Translator extends YoloV5Translator {
                     maxIndex = c;
                 }
             }
+            maxIndex -= padding;
 
             if (maxClassProb > threshold) {
                 float xPos = buf[index]; // center x
