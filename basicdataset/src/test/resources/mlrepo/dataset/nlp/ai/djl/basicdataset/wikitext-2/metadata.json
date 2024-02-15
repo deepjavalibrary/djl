@@ -20,10 +20,10 @@
       "name": "wikitext-2",
       "files": {
         "wikitext-2": {
-          "uri": "https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip",
-          "sha1Hash": "3c914d17d80b1459be871a5039ac23e752a53cbe",
+          "uri": "https://mlrepo.djl.ai/dataset/nlp/ai/djl/basicdataset/wikitext-2/1.0/wikitext-2-v1.zip",
+          "sha1Hash": "46965bdeca1d8165e688598752ca467bb5bee018",
           "name": "",
-          "size": 4475746
+          "size": 4475596
         }
       }
     }
