@@ -30,10 +30,10 @@ ONNXRuntime will extract native libraries into system default temporary-file dir
 
 ### Huggingface tokenizer
 
-If the `TOKENIZERS_CACHE` environment variable is set, Huggingface tokenizer will store cache files in it.
+If the `HF_HOME` or `HF_HUB_CACHE` environment variable is set, Huggingface tokenizer will store cache files in it.
 It is the responsibility of the user to make sure this path is correct. Otherwise, we try to use
 the default cache directory as defined for each OS:
 
-- macOS: `/Users/{user}/Library/Caches/huggingface/tokenizers`
-- linux: `/home/{user}/.cache/huggingface/tokenizers`
-- windows: `C:\Users\{user}\AppData\Local\huggingface\tokenizers`
+- macOS: `/Users/{user}/.cache/huggingface/hub`
+- linux: `/home/{user}/.cache/huggingface/hub`
+- windows: `C:\Users\{user}\.cache\huggingface\hub`
