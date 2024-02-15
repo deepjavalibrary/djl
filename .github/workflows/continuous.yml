@@ -10,6 +10,15 @@ on:
       - "**.js"
       - "**.css"
       - "android/**"
+  push:
+    paths-ignore:
+      - "**.md"
+      - "**.ipynb"
+      - "**.json"
+      - "**.html"
+      - "**.js"
+      - "**.css"
+      - "android/**"
 
 jobs:
   build:
@@ -100,6 +109,9 @@ jobs:
           files: ./jacoco/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
           fail_ci_if_error: false
           path_to_write_report: ./codecov_report.txt
+      - name: Submit Dependencies
+        if: github.event_name == 'push'
+        uses: gradle/actions/dependency-submission@v3
 
   # Windows platform for testing hybrid engines
   build-windows:
