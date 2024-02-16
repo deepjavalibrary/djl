@@ -70,6 +70,21 @@ def download_and_extract(url, path):
     :param url: The url of the tar file.
     :param path: The path to the file to download to.
     """
+
+    def is_within_directory(directory, target):
+        abs_directory = os.path.abspath(directory)
+        abs_target = os.path.abspath(target)
+        prefix = os.path.commonprefix([abs_directory, abs_target])
+        return prefix == abs_directory
+
+    def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+        for member in tar.getmembers():
+            member_path = os.path.join(path, member.name)
+            if not is_within_directory(path, member_path):
+                raise Exception("Attempted Path Traversal in Tar File")
+
+        tar.extractall(path, members, numeric_owner=numeric_owner)
+
     if not os.path.exists(path):
         os.makedirs(path)
     if not os.listdir(path):
@@ -78,9 +93,9 @@ def download_and_extract(url, path):
             if url.startswith("s3://"):
                 s3_download(url, tmp_file)
                 with tarfile.open(name=tmp_file, mode="r:gz") as t:
-                    t.extractall(path=path)
+                    safe_extract(t, path=path)
             elif url.startswith("http://") or url.startswith("https://"):
                 with urlopen(url) as response, open(tmp_file, 'wb') as f:
                     shutil.copyfileobj(response, f)
                 with tarfile.open(name=tmp_file, mode="r:gz") as t:
-                    t.extractall(path=path)
+                    safe_extract(t, path=path)
