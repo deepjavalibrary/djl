@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /** One node of the computational graph. */
 class Node {
@@ -33,17 +34,22 @@ class Node {
     PairList<String, ?> param;
     boolean isLeaf;
     Shape outputShape;
+    private static final PairList<String, ?> EMPTY_PARAM = new PairList<>();
 
     public Node(String name, PairList<String, ?> param) {
         this.name = name;
-        this.param = param;
+        this.param = param != null ? param : EMPTY_PARAM;
+    }
+
+    String toPythonExpression(Map<Node, String> locals, AtomicInteger opCount) {
+        return toPythonExpression(locals, opCount, false) + " # " + outputShape;
     }
 
     String toPythonExpression(Map<Node, String> locals, AtomicInteger opCount, boolean useLocals) {
         if (isLeaf) {
             return name;
         }
-        if (useLocals && locals.containsKey(this)) {
+        if (useLocals && locals != null && locals.containsKey(this)) {
             return locals.get(this);
         }
         switch (name) {
@@ -51,6 +57,59 @@ class Node {
                 {
                     Object[][] args = {{0}, {1, "indices"}, {"axis", "batch_dims"}};
                     return format("tf.gather", args, locals, opCount);
+                }
+            case "where":
+                {
+                    Object[][] args = {{0}, {1, "x"}, {2, "y"}};
+                    return format("tf.where", args, locals, opCount);
+                }
+            case "_npi_slice":
+                {
+                    Object[][] args = {
+                        {0}, {"begin", "begin"}, {"end", "end"}, {"step", "strides"}
+                    };
+                    return format("tf.strided_slice", args, locals, opCount);
+                }
+            case "_npi_concatenate":
+                {
+                    Object[][] args = {{-1}, {"axis", "axis"}};
+                    return format("tf.concat", args, locals, opCount);
+                }
+            case "_np_squeeze":
+                {
+                    Object[][] args = {{0}, {"axis", "axis"}};
+                    return format("tf.squeeze", args, locals, opCount);
+                }
+            case "_npi_stack":
+                {
+                    Object[][] args = {{-1}, {"axis", "axis"}};
+                    return format("tf.stack", args, locals, opCount);
+                }
+            case "_npi_split":
+                {
+                    Object[][] args = {
+                        {0}, {"axis", "axis"}, {"num_outputs", "num_or_size_splits"}
+                    };
+                    return format("tf.split", args, locals, opCount);
+                }
+            case "_npi_swapaxes":
+                {
+                    Object[][] args = {{0}, {"dim1", "axis1"}, {"dim2", "axis2"}};
+                    return format("tf.experimental.numpy.swapaxes", args, locals, opCount);
+                }
+            case "_np_repeat":
+                {
+                    Object[][] args = {{0}, {"repeats", "repeats"}, {"axis", "axis"}};
+                    return format("tf.repeat", args, locals, opCount);
+                }
+            case "_npi_copyto":
+                {
+                    return src.get(0).toPythonExpression(locals, opCount, true);
+                }
+            case "_npi_expand_dims":
+                {
+                    Object[][] args = {{0}, {"axis", "axis"}};
+                    return format("tf.expand_dims", args, locals, opCount);
                 }
             case "_npx_log_softmax":
                 {
@@ -77,6 +136,16 @@ class Node {
                     };
                     return format("tf.random.normal", args, locals, opCount);
                 }
+            case "_npi_uniform":
+                {
+                    Object[][] args = {
+                        {"low", "minval"},
+                        {"high", "maxval"},
+                        {"shape", "shape"},
+                        {"dtype", "dtype", "tf.dtypes.%s"}
+                    };
+                    return format("tf.random.uniform", args, locals, opCount);
+                }
             case "_np_reshape":
                 {
                     Object[][] args = {{0}, {"newshape", "shape"}};
@@ -90,7 +159,9 @@ class Node {
             case "_npx_activation":
                 {
                     Object[][] args = {{0}};
-                    return format("tf.nn." + this.param.get("act_type"), args, locals, opCount);
+                    String op =
+                            this.param.get("act_type").toString().replace("softrelu", "softplus");
+                    return format("tf.nn." + op, args, locals, opCount);
                 }
             case "_npx_convolution":
                 {
@@ -156,6 +227,15 @@ class Node {
                     };
                     return format("tf.compat.v1.nn.fused_batch_norm", args, locals, opCount);
                 }
+
+            case "_npx_embedding":
+                {
+                    Object[][] args = {
+                        {0, "ids"},
+                        {1, "params"}
+                    };
+                    return format("tf.nn.embedding_lookup", args, locals, opCount);
+                }
             case "_npx_fully_connected":
                 {
                     Object[][] args = {{0}, {1, "b"}, {null, "transpose_b", "True"}};
@@ -167,6 +247,21 @@ class Node {
                     Object[][] args = {{0}, {1}};
                     return addBias(
                             format("tf.matmul", args, locals, opCount), false, locals, opCount);
+                }
+            case "_npi_not_equal_scalar":
+                {
+                    Object[][] args = {{0}, {"scalar", "y"}};
+                    return format("tf.not_equal", args, locals, opCount);
+                }
+            case "_rdiv_scalar":
+                {
+                    Object[][] args = {{0}, {"scalar", "y"}};
+                    return format("tf.divide", args, locals, opCount);
+                }
+            case "_npi_add_scalar":
+                {
+                    Object[][] args = {{0}, {"scalar", "y"}};
+                    return format("tf.add", args, locals, opCount);
                 }
             case "_npi_add":
                 {
@@ -180,8 +275,43 @@ class Node {
                 }
             case "_npi_mean":
                 {
-                    Object[][] args = {{0}};
+                    Object[][] args = {{0}, {"axis", "axis"}, {"keepdims", "keepdims"}};
                     return format("tf.reduce_mean", args, locals, opCount);
+                }
+            case "gammaln":
+                {
+                    Object[][] args = {{0}};
+                    return format("tf.gammaln", args, locals, opCount);
+                }
+            case "_np_sum":
+                {
+                    Object[][] args = {{0}, {"axis", "axis"}, {"keepdims", "keepdims"}};
+                    return format("tf.reduce_sum", args, locals, opCount);
+                }
+            case "_npi_maximum_scalar":
+                {
+                    Object[][] args = {{0}, {"scalar", "y"}};
+                    return format("tf.maximum", args, locals, opCount);
+                }
+            case "_npi_multiply_scalar":
+                {
+                    Object[][] args = {{0}, {"scalar", "y"}};
+                    return format("tf.multiply", args, locals, opCount);
+                }
+            case "_npi_multiply":
+                {
+                    Object[][] args = {{0}, {1}};
+                    return format("tf.multiply", args, locals, opCount);
+                }
+            case "_npi_true_divide":
+                {
+                    Object[][] args = {{0}, {1}};
+                    return format("tf.divide", args, locals, opCount);
+                }
+            case "_npi_greater":
+                {
+                    Object[][] args = {{0}, {1}};
+                    return format("tf.greater", args, locals, opCount);
                 }
             case "_npi_negative":
                 {
@@ -193,14 +323,25 @@ class Node {
                     Object[][] args = {{0}};
                     return format("tf.abs", args, locals, opCount);
                 }
+            case "_npi_log":
+                {
+                    Object[][] args = {{0}};
+                    return format("tf.log", args, locals, opCount);
+                }
+            case "_npi_exp":
+                {
+                    Object[][] args = {{0}};
+                    return format("tf.exp", args, locals, opCount);
+                }
             default:
                 {
-                    return String.format(
-                            "%s(%s)",
-                            name,
-                            src.stream()
-                                    .map(node -> node.toPythonExpression(locals, opCount, true))
-                                    .collect(Collectors.joining(", ")));
+                    Stream<Object[]> srcStream =
+                            IntStream.range(0, src.size()).mapToObj(i -> new Object[] {i});
+                    Stream<Object[]> paramStream =
+                            param.keys().stream().map(p -> new Object[] {p, p});
+                    Object[][] args =
+                            Stream.concat(srcStream, paramStream).toArray(Object[][]::new);
+                    return format(name, args, locals, opCount);
                 }
         }
     }
@@ -225,11 +366,17 @@ class Node {
         for (Object[] arg : args) {
             String s = arg.length >= 3 ? String.valueOf(arg[2]) : "%s";
             Shape shape = arg.length >= 4 ? (Shape) arg[3] : null;
-            if (arg[0] instanceof Integer && src.size() > (int) arg[0]) {
+            if (Integer.valueOf(-1).equals(arg[0])) {
+                s =
+                        src.stream()
+                                .map(node -> node.toPythonExpression(locals, opCount, true))
+                                .map(Node::indent)
+                                .collect(Collectors.joining(",\n", "[\n", "\n]"));
+            } else if (arg[0] instanceof Integer && src.size() > (int) arg[0]) {
                 Node node = src.get((int) arg[0]);
                 s = String.format(s, node.toPythonExpression(locals, opCount, true));
                 shape = node.outputShape;
-            } else if (this.param != null && this.param.get(String.valueOf(arg[0])) != null) {
+            } else if (this.param.get(String.valueOf(arg[0])) != null) {
                 s = String.format(s, this.param.get(String.valueOf(arg[0])));
             } else if (arg[0] != null) {
                 continue; // cannot resolve index, so skip
@@ -281,7 +428,7 @@ class Node {
         usages.put(this, usages.remove(this));
     }
 
-    String toPythonFunctionBody(AtomicInteger opCount) {
+    String toPythonFunctionBody(AtomicInteger opCount, String result) {
         @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<Node, Integer> usages = new LinkedHashMap<>();
         identifyMultipleUsages(usages);
@@ -305,23 +452,17 @@ class Node {
                 statements.add(
                         String.format(
                                 "%s = %s",
-                                locals.get(node), node.toPythonExpression(locals, opCount, false)));
+                                locals.get(node), node.toPythonExpression(locals, opCount)));
             } else if ("_npx_batch_norm".equals(node.name)) {
                 statements.add(
                         String.format(
                                 "(%s, running_mean, running_var) = %s",
-                                locals.get(node), node.toPythonExpression(locals, opCount, false)));
-                statements.add(
-                        String.format(
-                                "%s.assign(running_mean)",
-                                node.src.get(3).toPythonExpression(locals, opCount, false)));
-                statements.add(
-                        String.format(
-                                "%s.assign(running_var)",
-                                node.src.get(4).toPythonExpression(locals, opCount, false)));
+                                locals.get(node), node.toPythonExpression(locals, opCount)));
+                statements.add(String.format("%s.assign(running_mean)", node.src.get(3).name));
+                statements.add(String.format("%s.assign(running_var)", node.src.get(4).name));
             }
         }
-        statements.add("result = ".concat(toPythonExpression(locals, opCount, false)));
+        statements.add(String.format("%s = %s", result, toPythonExpression(locals, opCount)));
         return statements.stream().map(Node::indent).collect(Collectors.joining("  \n"));
     }
 

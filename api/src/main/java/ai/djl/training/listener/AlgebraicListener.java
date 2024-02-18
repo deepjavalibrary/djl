@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /** {@link TrainingListener} that records algebraic operations as Python code. */
 public class AlgebraicListener extends TrainingListenerAdapter {
@@ -143,14 +144,26 @@ public class AlgebraicListener extends TrainingListenerAdapter {
     }
 
     private void writePredictions(NDList preds, AtomicInteger opCount) {
-        for (NDArray pred : preds) {
-            String python = get(pred).toPythonFunctionBody(opCount);
-            predictions.compute(python, (key, count) -> count == null ? 1 : count + 1);
-        }
+        String tuple =
+                preds.stream()
+                        .map(this::getArrayName)
+                        .collect(Collectors.joining(", ", "return tf.tuple([", "])"));
+        String python =
+                preds.stream()
+                        .map(pred -> get(pred).toPythonFunctionBody(opCount, getArrayName(pred)))
+                        .collect(Collectors.joining("\n", "", "\n" + Node.indent(tuple)));
+        predictions.compute(python, (key, count) -> count == null ? 1 : count + 1);
+    }
+
+    private String getArrayName(NDArray pred) {
+        return pred.getName() != null ? pred.getName() : "result";
     }
 
     private void writeLoss(NDArray loss, AtomicInteger opCount) {
-        String python = get(loss).toPythonFunctionBody(opCount);
+        String python =
+                get(loss).toPythonFunctionBody(opCount, "result")
+                        + "\n"
+                        + Node.indent("return result");
         losses.compute(python, (key, count) -> count == null ? 1 : count + 1);
     }
 
@@ -161,21 +174,23 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         writer.println("    super().__init__(**kwargs)");
         for (Entry<String, String> param : parameters.entrySet()) {
             writer.println(
-                    Node.indent(param.getKey() + " = tf.Variable(" + param.getValue() + ")"));
+                    Node.indent(
+                            param.getKey()
+                                    + " = tf.Variable(\n"
+                                    + Node.indent(param.getValue())
+                                    + "\n)"));
         }
         writer.println("");
         for (Entry<String, Integer> pred : predictions.entrySet()) {
             writer.println("## " + pred.getValue());
             writer.println("  def call(self, x):");
             writer.println(pred.getKey());
-            writer.println("    return result");
         }
         writer.println("");
         for (Entry<String, Integer> loss : losses.entrySet()) {
             writer.println("## " + loss.getValue());
             writer.println("def loss(label, prediction):");
             writer.println(loss.getKey());
-            writer.println("    return result");
         }
         writer.println("");
         writer.println(String.format("# number of epochs was %s", numEpoch));
@@ -192,8 +207,8 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         for (Pair<String, Parameter> pair : model.getBlock().getParameters()) {
             NDArray array = pair.getValue().getArray();
             String initialization =
-                    get(array).toPythonExpression(null, parametersOpCount, false)
-                            + (pair.getValue().requiresGradient() ? "" : ", trainable = False");
+                    get(array).toPythonExpression(null, parametersOpCount)
+                            + (pair.getValue().requiresGradient() ? "" : "\n, trainable = False");
             String pythonClassVariable = "self._" + pair.getKey();
             parameters.put(pythonClassVariable, initialization);
             setLeaf(array, pythonClassVariable);

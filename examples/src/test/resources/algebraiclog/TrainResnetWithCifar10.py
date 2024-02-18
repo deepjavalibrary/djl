@@ -1,1589 +1,2283 @@
 class MyModel(tf.keras.Model):
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
-    self._01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[64, 3, 3, 3],
-        mean=0.0,
-        stddev=0.27216554,
-        dtype=tf.dtypes.float32,
-        name='normal_1_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[64, 64, 1, 1],
-        mean=0.0,
-        stddev=0.17677669,
-        dtype=tf.dtypes.float32,
-        name='normal_2_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_3_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_4_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_5_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_6_',
-    ), trainable = False)
-    self._02ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_7_',
-    ), trainable = False)
-    self._02ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[64, 64, 3, 3],
-        mean=0.0,
-        stddev=0.058925565,
-        dtype=tf.dtypes.float32,
-        name='normal_8_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_9_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_10_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_11_',
-    ), trainable = False)
-    self._02ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_12_',
-    ), trainable = False)
-    self._02ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 64, 1, 1],
-        mean=0.0,
-        stddev=0.17677669,
-        dtype=tf.dtypes.float32,
-        name='normal_13_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_14_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_15_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_16_',
-    ))
-    self._02ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_17_',
-    ), trainable = False)
-    self._02ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_18_',
-    ), trainable = False)
-    self._02ParallelBlock_02SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 64, 1, 1],
-        mean=0.0,
-        stddev=0.17677669,
-        dtype=tf.dtypes.float32,
-        name='normal_19_',
-    ))
-    self._02ParallelBlock_02SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_20_',
-    ))
-    self._02ParallelBlock_02SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_21_',
-    ))
-    self._02ParallelBlock_02SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_22_',
-    ), trainable = False)
-    self._02ParallelBlock_02SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_23_',
-    ), trainable = False)
-    self._03ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[64, 256, 1, 1],
-        mean=0.0,
-        stddev=0.088388346,
-        dtype=tf.dtypes.float32,
-        name='normal_24_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_25_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_26_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_27_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_28_',
-    ), trainable = False)
-    self._03ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_29_',
-    ), trainable = False)
-    self._03ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[64, 64, 3, 3],
-        mean=0.0,
-        stddev=0.058925565,
-        dtype=tf.dtypes.float32,
-        name='normal_30_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_31_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_32_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_33_',
-    ), trainable = False)
-    self._03ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_34_',
-    ), trainable = False)
-    self._03ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 64, 1, 1],
-        mean=0.0,
-        stddev=0.17677669,
-        dtype=tf.dtypes.float32,
-        name='normal_35_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_36_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_37_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_38_',
-    ))
-    self._03ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_39_',
-    ), trainable = False)
-    self._03ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_40_',
-    ), trainable = False)
-    self._04ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[64, 256, 1, 1],
-        mean=0.0,
-        stddev=0.088388346,
-        dtype=tf.dtypes.float32,
-        name='normal_41_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_42_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_43_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_44_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_45_',
-    ), trainable = False)
-    self._04ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_46_',
-    ), trainable = False)
-    self._04ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[64, 64, 3, 3],
-        mean=0.0,
-        stddev=0.058925565,
-        dtype=tf.dtypes.float32,
-        name='normal_47_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_48_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_49_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_50_',
-    ), trainable = False)
-    self._04ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='ones_51_',
-    ), trainable = False)
-    self._04ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 64, 1, 1],
-        mean=0.0,
-        stddev=0.17677669,
-        dtype=tf.dtypes.float32,
-        name='normal_52_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_53_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_54_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_55_',
-    ))
-    self._04ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_56_',
-    ), trainable = False)
-    self._04ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_57_',
-    ), trainable = False)
-    self._05ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[128, 256, 1, 1],
-        mean=0.0,
-        stddev=0.088388346,
-        dtype=tf.dtypes.float32,
-        name='normal_58_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_59_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_60_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_61_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_62_',
-    ), trainable = False)
-    self._05ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_63_',
-    ), trainable = False)
-    self._05ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[128, 128, 3, 3],
-        mean=0.0,
-        stddev=0.041666668,
-        dtype=tf.dtypes.float32,
-        name='normal_64_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_65_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_66_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_67_',
-    ), trainable = False)
-    self._05ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_68_',
-    ), trainable = False)
-    self._05ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 128, 1, 1],
-        mean=0.0,
-        stddev=0.125,
-        dtype=tf.dtypes.float32,
-        name='normal_69_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_70_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_71_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_72_',
-    ))
-    self._05ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_73_',
-    ), trainable = False)
-    self._05ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_74_',
-    ), trainable = False)
-    self._05ParallelBlock_02SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 256, 1, 1],
-        mean=0.0,
-        stddev=0.088388346,
-        dtype=tf.dtypes.float32,
-        name='normal_75_',
-    ))
-    self._05ParallelBlock_02SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_76_',
-    ))
-    self._05ParallelBlock_02SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_77_',
-    ))
-    self._05ParallelBlock_02SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_78_',
-    ), trainable = False)
-    self._05ParallelBlock_02SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_79_',
-    ), trainable = False)
-    self._06ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[128, 512, 1, 1],
-        mean=0.0,
-        stddev=0.0625,
-        dtype=tf.dtypes.float32,
-        name='normal_80_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_81_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_82_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_83_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_84_',
-    ), trainable = False)
-    self._06ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_85_',
-    ), trainable = False)
-    self._06ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[128, 128, 3, 3],
-        mean=0.0,
-        stddev=0.041666668,
-        dtype=tf.dtypes.float32,
-        name='normal_86_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_87_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_88_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_89_',
-    ), trainable = False)
-    self._06ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_90_',
-    ), trainable = False)
-    self._06ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 128, 1, 1],
-        mean=0.0,
-        stddev=0.125,
-        dtype=tf.dtypes.float32,
-        name='normal_91_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_92_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_93_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_94_',
-    ))
-    self._06ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_95_',
-    ), trainable = False)
-    self._06ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_96_',
-    ), trainable = False)
-    self._07ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[128, 512, 1, 1],
-        mean=0.0,
-        stddev=0.0625,
-        dtype=tf.dtypes.float32,
-        name='normal_97_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_98_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_99_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_100_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_101_',
-    ), trainable = False)
-    self._07ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_102_',
-    ), trainable = False)
-    self._07ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[128, 128, 3, 3],
-        mean=0.0,
-        stddev=0.041666668,
-        dtype=tf.dtypes.float32,
-        name='normal_103_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_104_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_105_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_106_',
-    ), trainable = False)
-    self._07ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_107_',
-    ), trainable = False)
-    self._07ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 128, 1, 1],
-        mean=0.0,
-        stddev=0.125,
-        dtype=tf.dtypes.float32,
-        name='normal_108_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_109_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_110_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_111_',
-    ))
-    self._07ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_112_',
-    ), trainable = False)
-    self._07ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_113_',
-    ), trainable = False)
-    self._08ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[128, 512, 1, 1],
-        mean=0.0,
-        stddev=0.0625,
-        dtype=tf.dtypes.float32,
-        name='normal_114_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_115_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_116_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_117_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_118_',
-    ), trainable = False)
-    self._08ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_119_',
-    ), trainable = False)
-    self._08ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[128, 128, 3, 3],
-        mean=0.0,
-        stddev=0.041666668,
-        dtype=tf.dtypes.float32,
-        name='normal_120_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_121_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_122_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_123_',
-    ), trainable = False)
-    self._08ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='ones_124_',
-    ), trainable = False)
-    self._08ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 128, 1, 1],
-        mean=0.0,
-        stddev=0.125,
-        dtype=tf.dtypes.float32,
-        name='normal_125_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_126_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_127_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_128_',
-    ))
-    self._08ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_129_',
-    ), trainable = False)
-    self._08ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_130_',
-    ), trainable = False)
-    self._09ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 512, 1, 1],
-        mean=0.0,
-        stddev=0.0625,
-        dtype=tf.dtypes.float32,
-        name='normal_131_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_132_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_133_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_134_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_135_',
-    ), trainable = False)
-    self._09ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_136_',
-    ), trainable = False)
-    self._09ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 256, 3, 3],
-        mean=0.0,
-        stddev=0.029462783,
-        dtype=tf.dtypes.float32,
-        name='normal_137_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_138_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_139_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_140_',
-    ), trainable = False)
-    self._09ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_141_',
-    ), trainable = False)
-    self._09ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[1024, 256, 1, 1],
-        mean=0.0,
-        stddev=0.088388346,
-        dtype=tf.dtypes.float32,
-        name='normal_142_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_143_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_144_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_145_',
-    ))
-    self._09ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_146_',
-    ), trainable = False)
-    self._09ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_147_',
-    ), trainable = False)
-    self._09ParallelBlock_02SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[1024, 512, 1, 1],
-        mean=0.0,
-        stddev=0.0625,
-        dtype=tf.dtypes.float32,
-        name='normal_148_',
-    ))
-    self._09ParallelBlock_02SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_149_',
-    ))
-    self._09ParallelBlock_02SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_150_',
-    ))
-    self._09ParallelBlock_02SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_151_',
-    ), trainable = False)
-    self._09ParallelBlock_02SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_152_',
-    ), trainable = False)
-    self._10ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 1024, 1, 1],
-        mean=0.0,
-        stddev=0.044194173,
-        dtype=tf.dtypes.float32,
-        name='normal_153_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_154_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_155_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_156_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_157_',
-    ), trainable = False)
-    self._10ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_158_',
-    ), trainable = False)
-    self._10ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 256, 3, 3],
-        mean=0.0,
-        stddev=0.029462783,
-        dtype=tf.dtypes.float32,
-        name='normal_159_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_160_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_161_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_162_',
-    ), trainable = False)
-    self._10ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_163_',
-    ), trainable = False)
-    self._10ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[1024, 256, 1, 1],
-        mean=0.0,
-        stddev=0.088388346,
-        dtype=tf.dtypes.float32,
-        name='normal_164_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_165_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_166_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_167_',
-    ))
-    self._10ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_168_',
-    ), trainable = False)
-    self._10ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_169_',
-    ), trainable = False)
-    self._11ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 1024, 1, 1],
-        mean=0.0,
-        stddev=0.044194173,
-        dtype=tf.dtypes.float32,
-        name='normal_170_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_171_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_172_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_173_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_174_',
-    ), trainable = False)
-    self._11ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_175_',
-    ), trainable = False)
-    self._11ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 256, 3, 3],
-        mean=0.0,
-        stddev=0.029462783,
-        dtype=tf.dtypes.float32,
-        name='normal_176_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_177_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_178_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_179_',
-    ), trainable = False)
-    self._11ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_180_',
-    ), trainable = False)
-    self._11ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[1024, 256, 1, 1],
-        mean=0.0,
-        stddev=0.088388346,
-        dtype=tf.dtypes.float32,
-        name='normal_181_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_182_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_183_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_184_',
-    ))
-    self._11ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_185_',
-    ), trainable = False)
-    self._11ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_186_',
-    ), trainable = False)
-    self._12ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 1024, 1, 1],
-        mean=0.0,
-        stddev=0.044194173,
-        dtype=tf.dtypes.float32,
-        name='normal_187_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_188_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_189_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_190_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_191_',
-    ), trainable = False)
-    self._12ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_192_',
-    ), trainable = False)
-    self._12ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 256, 3, 3],
-        mean=0.0,
-        stddev=0.029462783,
-        dtype=tf.dtypes.float32,
-        name='normal_193_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_194_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_195_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_196_',
-    ), trainable = False)
-    self._12ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_197_',
-    ), trainable = False)
-    self._12ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[1024, 256, 1, 1],
-        mean=0.0,
-        stddev=0.088388346,
-        dtype=tf.dtypes.float32,
-        name='normal_198_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_199_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_200_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_201_',
-    ))
-    self._12ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_202_',
-    ), trainable = False)
-    self._12ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_203_',
-    ), trainable = False)
-    self._13ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 1024, 1, 1],
-        mean=0.0,
-        stddev=0.044194173,
-        dtype=tf.dtypes.float32,
-        name='normal_204_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_205_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_206_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_207_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_208_',
-    ), trainable = False)
-    self._13ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_209_',
-    ), trainable = False)
-    self._13ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 256, 3, 3],
-        mean=0.0,
-        stddev=0.029462783,
-        dtype=tf.dtypes.float32,
-        name='normal_210_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_211_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_212_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_213_',
-    ), trainable = False)
-    self._13ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_214_',
-    ), trainable = False)
-    self._13ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[1024, 256, 1, 1],
-        mean=0.0,
-        stddev=0.088388346,
-        dtype=tf.dtypes.float32,
-        name='normal_215_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_216_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_217_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_218_',
-    ))
-    self._13ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_219_',
-    ), trainable = False)
-    self._13ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_220_',
-    ), trainable = False)
-    self._14ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 1024, 1, 1],
-        mean=0.0,
-        stddev=0.044194173,
-        dtype=tf.dtypes.float32,
-        name='normal_221_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_222_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_223_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_224_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_225_',
-    ), trainable = False)
-    self._14ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_226_',
-    ), trainable = False)
-    self._14ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[256, 256, 3, 3],
-        mean=0.0,
-        stddev=0.029462783,
-        dtype=tf.dtypes.float32,
-        name='normal_227_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_228_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_229_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='zeros_230_',
-    ), trainable = False)
-    self._14ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[256],
-        dtype=tf.dtypes.float32,
-        name='ones_231_',
-    ), trainable = False)
-    self._14ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[1024, 256, 1, 1],
-        mean=0.0,
-        stddev=0.088388346,
-        dtype=tf.dtypes.float32,
-        name='normal_232_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_233_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_234_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_235_',
-    ))
-    self._14ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='zeros_236_',
-    ), trainable = False)
-    self._14ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[1024],
-        dtype=tf.dtypes.float32,
-        name='ones_237_',
-    ), trainable = False)
-    self._15ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 1024, 1, 1],
-        mean=0.0,
-        stddev=0.044194173,
-        dtype=tf.dtypes.float32,
-        name='normal_238_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_239_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_240_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_241_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_242_',
-    ), trainable = False)
-    self._15ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_243_',
-    ), trainable = False)
-    self._15ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 512, 3, 3],
-        mean=0.0,
-        stddev=0.020833334,
-        dtype=tf.dtypes.float32,
-        name='normal_244_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_245_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_246_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_247_',
-    ), trainable = False)
-    self._15ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_248_',
-    ), trainable = False)
-    self._15ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[2048, 512, 1, 1],
-        mean=0.0,
-        stddev=0.0625,
-        dtype=tf.dtypes.float32,
-        name='normal_249_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_250_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='ones_251_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_252_',
-    ))
-    self._15ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_253_',
-    ), trainable = False)
-    self._15ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='ones_254_',
-    ), trainable = False)
-    self._15ParallelBlock_02SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[2048, 1024, 1, 1],
-        mean=0.0,
-        stddev=0.044194173,
-        dtype=tf.dtypes.float32,
-        name='normal_255_',
-    ))
-    self._15ParallelBlock_02SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='ones_256_',
-    ))
-    self._15ParallelBlock_02SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_257_',
-    ))
-    self._15ParallelBlock_02SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_258_',
-    ), trainable = False)
-    self._15ParallelBlock_02SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='ones_259_',
-    ), trainable = False)
-    self._16ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 2048, 1, 1],
-        mean=0.0,
-        stddev=0.03125,
-        dtype=tf.dtypes.float32,
-        name='normal_260_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_261_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_262_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_263_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_264_',
-    ), trainable = False)
-    self._16ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_265_',
-    ), trainable = False)
-    self._16ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 512, 3, 3],
-        mean=0.0,
-        stddev=0.020833334,
-        dtype=tf.dtypes.float32,
-        name='normal_266_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_267_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_268_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_269_',
-    ), trainable = False)
-    self._16ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_270_',
-    ), trainable = False)
-    self._16ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[2048, 512, 1, 1],
-        mean=0.0,
-        stddev=0.0625,
-        dtype=tf.dtypes.float32,
-        name='normal_271_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_272_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='ones_273_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_274_',
-    ))
-    self._16ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_275_',
-    ), trainable = False)
-    self._16ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='ones_276_',
-    ), trainable = False)
-    self._17ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 2048, 1, 1],
-        mean=0.0,
-        stddev=0.03125,
-        dtype=tf.dtypes.float32,
-        name='normal_277_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_278_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_279_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_280_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_281_',
-    ), trainable = False)
-    self._17ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_282_',
-    ), trainable = False)
-    self._17ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[512, 512, 3, 3],
-        mean=0.0,
-        stddev=0.020833334,
-        dtype=tf.dtypes.float32,
-        name='normal_283_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_284_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_285_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='zeros_286_',
-    ), trainable = False)
-    self._17ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[512],
-        dtype=tf.dtypes.float32,
-        name='ones_287_',
-    ), trainable = False)
-    self._17ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(tf.random.normal(
-        shape=[2048, 512, 1, 1],
-        mean=0.0,
-        stddev=0.0625,
-        dtype=tf.dtypes.float32,
-        name='normal_288_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_289_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(tf.ones(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='ones_290_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_291_',
-    ))
-    self._17ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(tf.zeros(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='zeros_292_',
-    ), trainable = False)
-    self._17ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(tf.ones(
-        shape=[2048],
-        dtype=tf.dtypes.float32,
-        name='ones_293_',
-    ), trainable = False)
-    self._20Linear_weight = tf.Variable(tf.random.normal(
-        shape=[10, 2048],
-        mean=0.0,
-        stddev=0.03125,
-        dtype=tf.dtypes.float32,
-        name='normal_294_',
-    ))
-    self._20Linear_bias = tf.Variable(tf.zeros(
-        shape=[10],
-        dtype=tf.dtypes.float32,
-        name='zeros_295_',
-    ))
+    self._01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[64, 3, 3, 3],
+            mean=0.0,
+            stddev=0.27216554,
+            dtype=tf.dtypes.float32,
+            name='normal_1_',
+        ) # (64, 3, 3, 3)
+    )
+    self._02ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[64, 64, 1, 1],
+            mean=0.0,
+            stddev=0.17677669,
+            dtype=tf.dtypes.float32,
+            name='normal_2_',
+        ) # (64, 64, 1, 1)
+    )
+    self._02ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_3_',
+        ) # (64)
+    )
+    self._02ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_4_',
+        ) # (64)
+    )
+    self._02ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_5_',
+        ) # (64)
+    )
+    self._02ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_6_',
+        ) # (64)
+        , trainable = False
+    )
+    self._02ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_7_',
+        ) # (64)
+        , trainable = False
+    )
+    self._02ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[64, 64, 3, 3],
+            mean=0.0,
+            stddev=0.058925565,
+            dtype=tf.dtypes.float32,
+            name='normal_8_',
+        ) # (64, 64, 3, 3)
+    )
+    self._02ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_9_',
+        ) # (64)
+    )
+    self._02ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_10_',
+        ) # (64)
+    )
+    self._02ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_11_',
+        ) # (64)
+        , trainable = False
+    )
+    self._02ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_12_',
+        ) # (64)
+        , trainable = False
+    )
+    self._02ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 64, 1, 1],
+            mean=0.0,
+            stddev=0.17677669,
+            dtype=tf.dtypes.float32,
+            name='normal_13_',
+        ) # (256, 64, 1, 1)
+    )
+    self._02ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_14_',
+        ) # (256)
+    )
+    self._02ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_15_',
+        ) # (256)
+    )
+    self._02ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_16_',
+        ) # (256)
+    )
+    self._02ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_17_',
+        ) # (256)
+        , trainable = False
+    )
+    self._02ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_18_',
+        ) # (256)
+        , trainable = False
+    )
+    self._02ParallelBlock_02SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 64, 1, 1],
+            mean=0.0,
+            stddev=0.17677669,
+            dtype=tf.dtypes.float32,
+            name='normal_19_',
+        ) # (256, 64, 1, 1)
+    )
+    self._02ParallelBlock_02SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_20_',
+        ) # (256)
+    )
+    self._02ParallelBlock_02SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_21_',
+        ) # (256)
+    )
+    self._02ParallelBlock_02SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_22_',
+        ) # (256)
+        , trainable = False
+    )
+    self._02ParallelBlock_02SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_23_',
+        ) # (256)
+        , trainable = False
+    )
+    self._03ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[64, 256, 1, 1],
+            mean=0.0,
+            stddev=0.088388346,
+            dtype=tf.dtypes.float32,
+            name='normal_24_',
+        ) # (64, 256, 1, 1)
+    )
+    self._03ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_25_',
+        ) # (64)
+    )
+    self._03ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_26_',
+        ) # (64)
+    )
+    self._03ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_27_',
+        ) # (64)
+    )
+    self._03ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_28_',
+        ) # (64)
+        , trainable = False
+    )
+    self._03ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_29_',
+        ) # (64)
+        , trainable = False
+    )
+    self._03ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[64, 64, 3, 3],
+            mean=0.0,
+            stddev=0.058925565,
+            dtype=tf.dtypes.float32,
+            name='normal_30_',
+        ) # (64, 64, 3, 3)
+    )
+    self._03ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_31_',
+        ) # (64)
+    )
+    self._03ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_32_',
+        ) # (64)
+    )
+    self._03ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_33_',
+        ) # (64)
+        , trainable = False
+    )
+    self._03ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_34_',
+        ) # (64)
+        , trainable = False
+    )
+    self._03ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 64, 1, 1],
+            mean=0.0,
+            stddev=0.17677669,
+            dtype=tf.dtypes.float32,
+            name='normal_35_',
+        ) # (256, 64, 1, 1)
+    )
+    self._03ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_36_',
+        ) # (256)
+    )
+    self._03ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_37_',
+        ) # (256)
+    )
+    self._03ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_38_',
+        ) # (256)
+    )
+    self._03ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_39_',
+        ) # (256)
+        , trainable = False
+    )
+    self._03ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_40_',
+        ) # (256)
+        , trainable = False
+    )
+    self._04ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[64, 256, 1, 1],
+            mean=0.0,
+            stddev=0.088388346,
+            dtype=tf.dtypes.float32,
+            name='normal_41_',
+        ) # (64, 256, 1, 1)
+    )
+    self._04ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_42_',
+        ) # (64)
+    )
+    self._04ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_43_',
+        ) # (64)
+    )
+    self._04ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_44_',
+        ) # (64)
+    )
+    self._04ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_45_',
+        ) # (64)
+        , trainable = False
+    )
+    self._04ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_46_',
+        ) # (64)
+        , trainable = False
+    )
+    self._04ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[64, 64, 3, 3],
+            mean=0.0,
+            stddev=0.058925565,
+            dtype=tf.dtypes.float32,
+            name='normal_47_',
+        ) # (64, 64, 3, 3)
+    )
+    self._04ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_48_',
+        ) # (64)
+    )
+    self._04ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_49_',
+        ) # (64)
+    )
+    self._04ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_50_',
+        ) # (64)
+        , trainable = False
+    )
+    self._04ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='ones_51_',
+        ) # (64)
+        , trainable = False
+    )
+    self._04ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 64, 1, 1],
+            mean=0.0,
+            stddev=0.17677669,
+            dtype=tf.dtypes.float32,
+            name='normal_52_',
+        ) # (256, 64, 1, 1)
+    )
+    self._04ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_53_',
+        ) # (256)
+    )
+    self._04ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_54_',
+        ) # (256)
+    )
+    self._04ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_55_',
+        ) # (256)
+    )
+    self._04ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_56_',
+        ) # (256)
+        , trainable = False
+    )
+    self._04ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_57_',
+        ) # (256)
+        , trainable = False
+    )
+    self._05ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[128, 256, 1, 1],
+            mean=0.0,
+            stddev=0.088388346,
+            dtype=tf.dtypes.float32,
+            name='normal_58_',
+        ) # (128, 256, 1, 1)
+    )
+    self._05ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_59_',
+        ) # (128)
+    )
+    self._05ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_60_',
+        ) # (128)
+    )
+    self._05ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_61_',
+        ) # (128)
+    )
+    self._05ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_62_',
+        ) # (128)
+        , trainable = False
+    )
+    self._05ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_63_',
+        ) # (128)
+        , trainable = False
+    )
+    self._05ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[128, 128, 3, 3],
+            mean=0.0,
+            stddev=0.041666668,
+            dtype=tf.dtypes.float32,
+            name='normal_64_',
+        ) # (128, 128, 3, 3)
+    )
+    self._05ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_65_',
+        ) # (128)
+    )
+    self._05ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_66_',
+        ) # (128)
+    )
+    self._05ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_67_',
+        ) # (128)
+        , trainable = False
+    )
+    self._05ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_68_',
+        ) # (128)
+        , trainable = False
+    )
+    self._05ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 128, 1, 1],
+            mean=0.0,
+            stddev=0.125,
+            dtype=tf.dtypes.float32,
+            name='normal_69_',
+        ) # (512, 128, 1, 1)
+    )
+    self._05ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_70_',
+        ) # (512)
+    )
+    self._05ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_71_',
+        ) # (512)
+    )
+    self._05ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_72_',
+        ) # (512)
+    )
+    self._05ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_73_',
+        ) # (512)
+        , trainable = False
+    )
+    self._05ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_74_',
+        ) # (512)
+        , trainable = False
+    )
+    self._05ParallelBlock_02SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 256, 1, 1],
+            mean=0.0,
+            stddev=0.088388346,
+            dtype=tf.dtypes.float32,
+            name='normal_75_',
+        ) # (512, 256, 1, 1)
+    )
+    self._05ParallelBlock_02SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_76_',
+        ) # (512)
+    )
+    self._05ParallelBlock_02SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_77_',
+        ) # (512)
+    )
+    self._05ParallelBlock_02SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_78_',
+        ) # (512)
+        , trainable = False
+    )
+    self._05ParallelBlock_02SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_79_',
+        ) # (512)
+        , trainable = False
+    )
+    self._06ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[128, 512, 1, 1],
+            mean=0.0,
+            stddev=0.0625,
+            dtype=tf.dtypes.float32,
+            name='normal_80_',
+        ) # (128, 512, 1, 1)
+    )
+    self._06ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_81_',
+        ) # (128)
+    )
+    self._06ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_82_',
+        ) # (128)
+    )
+    self._06ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_83_',
+        ) # (128)
+    )
+    self._06ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_84_',
+        ) # (128)
+        , trainable = False
+    )
+    self._06ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_85_',
+        ) # (128)
+        , trainable = False
+    )
+    self._06ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[128, 128, 3, 3],
+            mean=0.0,
+            stddev=0.041666668,
+            dtype=tf.dtypes.float32,
+            name='normal_86_',
+        ) # (128, 128, 3, 3)
+    )
+    self._06ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_87_',
+        ) # (128)
+    )
+    self._06ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_88_',
+        ) # (128)
+    )
+    self._06ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_89_',
+        ) # (128)
+        , trainable = False
+    )
+    self._06ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_90_',
+        ) # (128)
+        , trainable = False
+    )
+    self._06ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 128, 1, 1],
+            mean=0.0,
+            stddev=0.125,
+            dtype=tf.dtypes.float32,
+            name='normal_91_',
+        ) # (512, 128, 1, 1)
+    )
+    self._06ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_92_',
+        ) # (512)
+    )
+    self._06ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_93_',
+        ) # (512)
+    )
+    self._06ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_94_',
+        ) # (512)
+    )
+    self._06ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_95_',
+        ) # (512)
+        , trainable = False
+    )
+    self._06ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_96_',
+        ) # (512)
+        , trainable = False
+    )
+    self._07ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[128, 512, 1, 1],
+            mean=0.0,
+            stddev=0.0625,
+            dtype=tf.dtypes.float32,
+            name='normal_97_',
+        ) # (128, 512, 1, 1)
+    )
+    self._07ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_98_',
+        ) # (128)
+    )
+    self._07ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_99_',
+        ) # (128)
+    )
+    self._07ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_100_',
+        ) # (128)
+    )
+    self._07ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_101_',
+        ) # (128)
+        , trainable = False
+    )
+    self._07ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_102_',
+        ) # (128)
+        , trainable = False
+    )
+    self._07ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[128, 128, 3, 3],
+            mean=0.0,
+            stddev=0.041666668,
+            dtype=tf.dtypes.float32,
+            name='normal_103_',
+        ) # (128, 128, 3, 3)
+    )
+    self._07ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_104_',
+        ) # (128)
+    )
+    self._07ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_105_',
+        ) # (128)
+    )
+    self._07ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_106_',
+        ) # (128)
+        , trainable = False
+    )
+    self._07ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_107_',
+        ) # (128)
+        , trainable = False
+    )
+    self._07ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 128, 1, 1],
+            mean=0.0,
+            stddev=0.125,
+            dtype=tf.dtypes.float32,
+            name='normal_108_',
+        ) # (512, 128, 1, 1)
+    )
+    self._07ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_109_',
+        ) # (512)
+    )
+    self._07ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_110_',
+        ) # (512)
+    )
+    self._07ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_111_',
+        ) # (512)
+    )
+    self._07ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_112_',
+        ) # (512)
+        , trainable = False
+    )
+    self._07ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_113_',
+        ) # (512)
+        , trainable = False
+    )
+    self._08ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[128, 512, 1, 1],
+            mean=0.0,
+            stddev=0.0625,
+            dtype=tf.dtypes.float32,
+            name='normal_114_',
+        ) # (128, 512, 1, 1)
+    )
+    self._08ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_115_',
+        ) # (128)
+    )
+    self._08ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_116_',
+        ) # (128)
+    )
+    self._08ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_117_',
+        ) # (128)
+    )
+    self._08ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_118_',
+        ) # (128)
+        , trainable = False
+    )
+    self._08ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_119_',
+        ) # (128)
+        , trainable = False
+    )
+    self._08ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[128, 128, 3, 3],
+            mean=0.0,
+            stddev=0.041666668,
+            dtype=tf.dtypes.float32,
+            name='normal_120_',
+        ) # (128, 128, 3, 3)
+    )
+    self._08ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_121_',
+        ) # (128)
+    )
+    self._08ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_122_',
+        ) # (128)
+    )
+    self._08ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_123_',
+        ) # (128)
+        , trainable = False
+    )
+    self._08ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='ones_124_',
+        ) # (128)
+        , trainable = False
+    )
+    self._08ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 128, 1, 1],
+            mean=0.0,
+            stddev=0.125,
+            dtype=tf.dtypes.float32,
+            name='normal_125_',
+        ) # (512, 128, 1, 1)
+    )
+    self._08ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_126_',
+        ) # (512)
+    )
+    self._08ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_127_',
+        ) # (512)
+    )
+    self._08ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_128_',
+        ) # (512)
+    )
+    self._08ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_129_',
+        ) # (512)
+        , trainable = False
+    )
+    self._08ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_130_',
+        ) # (512)
+        , trainable = False
+    )
+    self._09ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 512, 1, 1],
+            mean=0.0,
+            stddev=0.0625,
+            dtype=tf.dtypes.float32,
+            name='normal_131_',
+        ) # (256, 512, 1, 1)
+    )
+    self._09ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_132_',
+        ) # (256)
+    )
+    self._09ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_133_',
+        ) # (256)
+    )
+    self._09ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_134_',
+        ) # (256)
+    )
+    self._09ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_135_',
+        ) # (256)
+        , trainable = False
+    )
+    self._09ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_136_',
+        ) # (256)
+        , trainable = False
+    )
+    self._09ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 256, 3, 3],
+            mean=0.0,
+            stddev=0.029462783,
+            dtype=tf.dtypes.float32,
+            name='normal_137_',
+        ) # (256, 256, 3, 3)
+    )
+    self._09ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_138_',
+        ) # (256)
+    )
+    self._09ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_139_',
+        ) # (256)
+    )
+    self._09ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_140_',
+        ) # (256)
+        , trainable = False
+    )
+    self._09ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_141_',
+        ) # (256)
+        , trainable = False
+    )
+    self._09ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[1024, 256, 1, 1],
+            mean=0.0,
+            stddev=0.088388346,
+            dtype=tf.dtypes.float32,
+            name='normal_142_',
+        ) # (1024, 256, 1, 1)
+    )
+    self._09ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_143_',
+        ) # (1024)
+    )
+    self._09ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_144_',
+        ) # (1024)
+    )
+    self._09ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_145_',
+        ) # (1024)
+    )
+    self._09ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_146_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._09ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_147_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._09ParallelBlock_02SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[1024, 512, 1, 1],
+            mean=0.0,
+            stddev=0.0625,
+            dtype=tf.dtypes.float32,
+            name='normal_148_',
+        ) # (1024, 512, 1, 1)
+    )
+    self._09ParallelBlock_02SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_149_',
+        ) # (1024)
+    )
+    self._09ParallelBlock_02SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_150_',
+        ) # (1024)
+    )
+    self._09ParallelBlock_02SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_151_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._09ParallelBlock_02SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_152_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._10ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 1024, 1, 1],
+            mean=0.0,
+            stddev=0.044194173,
+            dtype=tf.dtypes.float32,
+            name='normal_153_',
+        ) # (256, 1024, 1, 1)
+    )
+    self._10ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_154_',
+        ) # (256)
+    )
+    self._10ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_155_',
+        ) # (256)
+    )
+    self._10ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_156_',
+        ) # (256)
+    )
+    self._10ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_157_',
+        ) # (256)
+        , trainable = False
+    )
+    self._10ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_158_',
+        ) # (256)
+        , trainable = False
+    )
+    self._10ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 256, 3, 3],
+            mean=0.0,
+            stddev=0.029462783,
+            dtype=tf.dtypes.float32,
+            name='normal_159_',
+        ) # (256, 256, 3, 3)
+    )
+    self._10ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_160_',
+        ) # (256)
+    )
+    self._10ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_161_',
+        ) # (256)
+    )
+    self._10ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_162_',
+        ) # (256)
+        , trainable = False
+    )
+    self._10ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_163_',
+        ) # (256)
+        , trainable = False
+    )
+    self._10ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[1024, 256, 1, 1],
+            mean=0.0,
+            stddev=0.088388346,
+            dtype=tf.dtypes.float32,
+            name='normal_164_',
+        ) # (1024, 256, 1, 1)
+    )
+    self._10ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_165_',
+        ) # (1024)
+    )
+    self._10ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_166_',
+        ) # (1024)
+    )
+    self._10ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_167_',
+        ) # (1024)
+    )
+    self._10ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_168_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._10ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_169_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._11ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 1024, 1, 1],
+            mean=0.0,
+            stddev=0.044194173,
+            dtype=tf.dtypes.float32,
+            name='normal_170_',
+        ) # (256, 1024, 1, 1)
+    )
+    self._11ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_171_',
+        ) # (256)
+    )
+    self._11ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_172_',
+        ) # (256)
+    )
+    self._11ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_173_',
+        ) # (256)
+    )
+    self._11ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_174_',
+        ) # (256)
+        , trainable = False
+    )
+    self._11ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_175_',
+        ) # (256)
+        , trainable = False
+    )
+    self._11ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 256, 3, 3],
+            mean=0.0,
+            stddev=0.029462783,
+            dtype=tf.dtypes.float32,
+            name='normal_176_',
+        ) # (256, 256, 3, 3)
+    )
+    self._11ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_177_',
+        ) # (256)
+    )
+    self._11ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_178_',
+        ) # (256)
+    )
+    self._11ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_179_',
+        ) # (256)
+        , trainable = False
+    )
+    self._11ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_180_',
+        ) # (256)
+        , trainable = False
+    )
+    self._11ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[1024, 256, 1, 1],
+            mean=0.0,
+            stddev=0.088388346,
+            dtype=tf.dtypes.float32,
+            name='normal_181_',
+        ) # (1024, 256, 1, 1)
+    )
+    self._11ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_182_',
+        ) # (1024)
+    )
+    self._11ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_183_',
+        ) # (1024)
+    )
+    self._11ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_184_',
+        ) # (1024)
+    )
+    self._11ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_185_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._11ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_186_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._12ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 1024, 1, 1],
+            mean=0.0,
+            stddev=0.044194173,
+            dtype=tf.dtypes.float32,
+            name='normal_187_',
+        ) # (256, 1024, 1, 1)
+    )
+    self._12ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_188_',
+        ) # (256)
+    )
+    self._12ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_189_',
+        ) # (256)
+    )
+    self._12ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_190_',
+        ) # (256)
+    )
+    self._12ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_191_',
+        ) # (256)
+        , trainable = False
+    )
+    self._12ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_192_',
+        ) # (256)
+        , trainable = False
+    )
+    self._12ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 256, 3, 3],
+            mean=0.0,
+            stddev=0.029462783,
+            dtype=tf.dtypes.float32,
+            name='normal_193_',
+        ) # (256, 256, 3, 3)
+    )
+    self._12ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_194_',
+        ) # (256)
+    )
+    self._12ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_195_',
+        ) # (256)
+    )
+    self._12ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_196_',
+        ) # (256)
+        , trainable = False
+    )
+    self._12ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_197_',
+        ) # (256)
+        , trainable = False
+    )
+    self._12ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[1024, 256, 1, 1],
+            mean=0.0,
+            stddev=0.088388346,
+            dtype=tf.dtypes.float32,
+            name='normal_198_',
+        ) # (1024, 256, 1, 1)
+    )
+    self._12ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_199_',
+        ) # (1024)
+    )
+    self._12ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_200_',
+        ) # (1024)
+    )
+    self._12ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_201_',
+        ) # (1024)
+    )
+    self._12ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_202_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._12ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_203_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._13ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 1024, 1, 1],
+            mean=0.0,
+            stddev=0.044194173,
+            dtype=tf.dtypes.float32,
+            name='normal_204_',
+        ) # (256, 1024, 1, 1)
+    )
+    self._13ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_205_',
+        ) # (256)
+    )
+    self._13ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_206_',
+        ) # (256)
+    )
+    self._13ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_207_',
+        ) # (256)
+    )
+    self._13ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_208_',
+        ) # (256)
+        , trainable = False
+    )
+    self._13ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_209_',
+        ) # (256)
+        , trainable = False
+    )
+    self._13ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 256, 3, 3],
+            mean=0.0,
+            stddev=0.029462783,
+            dtype=tf.dtypes.float32,
+            name='normal_210_',
+        ) # (256, 256, 3, 3)
+    )
+    self._13ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_211_',
+        ) # (256)
+    )
+    self._13ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_212_',
+        ) # (256)
+    )
+    self._13ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_213_',
+        ) # (256)
+        , trainable = False
+    )
+    self._13ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_214_',
+        ) # (256)
+        , trainable = False
+    )
+    self._13ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[1024, 256, 1, 1],
+            mean=0.0,
+            stddev=0.088388346,
+            dtype=tf.dtypes.float32,
+            name='normal_215_',
+        ) # (1024, 256, 1, 1)
+    )
+    self._13ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_216_',
+        ) # (1024)
+    )
+    self._13ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_217_',
+        ) # (1024)
+    )
+    self._13ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_218_',
+        ) # (1024)
+    )
+    self._13ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_219_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._13ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_220_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._14ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 1024, 1, 1],
+            mean=0.0,
+            stddev=0.044194173,
+            dtype=tf.dtypes.float32,
+            name='normal_221_',
+        ) # (256, 1024, 1, 1)
+    )
+    self._14ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_222_',
+        ) # (256)
+    )
+    self._14ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_223_',
+        ) # (256)
+    )
+    self._14ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_224_',
+        ) # (256)
+    )
+    self._14ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_225_',
+        ) # (256)
+        , trainable = False
+    )
+    self._14ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_226_',
+        ) # (256)
+        , trainable = False
+    )
+    self._14ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[256, 256, 3, 3],
+            mean=0.0,
+            stddev=0.029462783,
+            dtype=tf.dtypes.float32,
+            name='normal_227_',
+        ) # (256, 256, 3, 3)
+    )
+    self._14ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_228_',
+        ) # (256)
+    )
+    self._14ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_229_',
+        ) # (256)
+    )
+    self._14ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='zeros_230_',
+        ) # (256)
+        , trainable = False
+    )
+    self._14ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[256],
+            dtype=tf.dtypes.float32,
+            name='ones_231_',
+        ) # (256)
+        , trainable = False
+    )
+    self._14ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[1024, 256, 1, 1],
+            mean=0.0,
+            stddev=0.088388346,
+            dtype=tf.dtypes.float32,
+            name='normal_232_',
+        ) # (1024, 256, 1, 1)
+    )
+    self._14ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_233_',
+        ) # (1024)
+    )
+    self._14ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_234_',
+        ) # (1024)
+    )
+    self._14ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_235_',
+        ) # (1024)
+    )
+    self._14ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='zeros_236_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._14ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[1024],
+            dtype=tf.dtypes.float32,
+            name='ones_237_',
+        ) # (1024)
+        , trainable = False
+    )
+    self._15ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 1024, 1, 1],
+            mean=0.0,
+            stddev=0.044194173,
+            dtype=tf.dtypes.float32,
+            name='normal_238_',
+        ) # (512, 1024, 1, 1)
+    )
+    self._15ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_239_',
+        ) # (512)
+    )
+    self._15ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_240_',
+        ) # (512)
+    )
+    self._15ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_241_',
+        ) # (512)
+    )
+    self._15ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_242_',
+        ) # (512)
+        , trainable = False
+    )
+    self._15ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_243_',
+        ) # (512)
+        , trainable = False
+    )
+    self._15ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 512, 3, 3],
+            mean=0.0,
+            stddev=0.020833334,
+            dtype=tf.dtypes.float32,
+            name='normal_244_',
+        ) # (512, 512, 3, 3)
+    )
+    self._15ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_245_',
+        ) # (512)
+    )
+    self._15ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_246_',
+        ) # (512)
+    )
+    self._15ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_247_',
+        ) # (512)
+        , trainable = False
+    )
+    self._15ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_248_',
+        ) # (512)
+        , trainable = False
+    )
+    self._15ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[2048, 512, 1, 1],
+            mean=0.0,
+            stddev=0.0625,
+            dtype=tf.dtypes.float32,
+            name='normal_249_',
+        ) # (2048, 512, 1, 1)
+    )
+    self._15ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_250_',
+        ) # (2048)
+    )
+    self._15ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='ones_251_',
+        ) # (2048)
+    )
+    self._15ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_252_',
+        ) # (2048)
+    )
+    self._15ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_253_',
+        ) # (2048)
+        , trainable = False
+    )
+    self._15ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='ones_254_',
+        ) # (2048)
+        , trainable = False
+    )
+    self._15ParallelBlock_02SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[2048, 1024, 1, 1],
+            mean=0.0,
+            stddev=0.044194173,
+            dtype=tf.dtypes.float32,
+            name='normal_255_',
+        ) # (2048, 1024, 1, 1)
+    )
+    self._15ParallelBlock_02SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='ones_256_',
+        ) # (2048)
+    )
+    self._15ParallelBlock_02SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_257_',
+        ) # (2048)
+    )
+    self._15ParallelBlock_02SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_258_',
+        ) # (2048)
+        , trainable = False
+    )
+    self._15ParallelBlock_02SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='ones_259_',
+        ) # (2048)
+        , trainable = False
+    )
+    self._16ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 2048, 1, 1],
+            mean=0.0,
+            stddev=0.03125,
+            dtype=tf.dtypes.float32,
+            name='normal_260_',
+        ) # (512, 2048, 1, 1)
+    )
+    self._16ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_261_',
+        ) # (512)
+    )
+    self._16ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_262_',
+        ) # (512)
+    )
+    self._16ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_263_',
+        ) # (512)
+    )
+    self._16ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_264_',
+        ) # (512)
+        , trainable = False
+    )
+    self._16ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_265_',
+        ) # (512)
+        , trainable = False
+    )
+    self._16ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 512, 3, 3],
+            mean=0.0,
+            stddev=0.020833334,
+            dtype=tf.dtypes.float32,
+            name='normal_266_',
+        ) # (512, 512, 3, 3)
+    )
+    self._16ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_267_',
+        ) # (512)
+    )
+    self._16ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_268_',
+        ) # (512)
+    )
+    self._16ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_269_',
+        ) # (512)
+        , trainable = False
+    )
+    self._16ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_270_',
+        ) # (512)
+        , trainable = False
+    )
+    self._16ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[2048, 512, 1, 1],
+            mean=0.0,
+            stddev=0.0625,
+            dtype=tf.dtypes.float32,
+            name='normal_271_',
+        ) # (2048, 512, 1, 1)
+    )
+    self._16ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_272_',
+        ) # (2048)
+    )
+    self._16ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='ones_273_',
+        ) # (2048)
+    )
+    self._16ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_274_',
+        ) # (2048)
+    )
+    self._16ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_275_',
+        ) # (2048)
+        , trainable = False
+    )
+    self._16ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='ones_276_',
+        ) # (2048)
+        , trainable = False
+    )
+    self._17ParallelBlock_01SequentialBlock_01Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 2048, 1, 1],
+            mean=0.0,
+            stddev=0.03125,
+            dtype=tf.dtypes.float32,
+            name='normal_277_',
+        ) # (512, 2048, 1, 1)
+    )
+    self._17ParallelBlock_01SequentialBlock_01Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_278_',
+        ) # (512)
+    )
+    self._17ParallelBlock_01SequentialBlock_02BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_279_',
+        ) # (512)
+    )
+    self._17ParallelBlock_01SequentialBlock_02BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_280_',
+        ) # (512)
+    )
+    self._17ParallelBlock_01SequentialBlock_02BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_281_',
+        ) # (512)
+        , trainable = False
+    )
+    self._17ParallelBlock_01SequentialBlock_02BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_282_',
+        ) # (512)
+        , trainable = False
+    )
+    self._17ParallelBlock_01SequentialBlock_04Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[512, 512, 3, 3],
+            mean=0.0,
+            stddev=0.020833334,
+            dtype=tf.dtypes.float32,
+            name='normal_283_',
+        ) # (512, 512, 3, 3)
+    )
+    self._17ParallelBlock_01SequentialBlock_05BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_284_',
+        ) # (512)
+    )
+    self._17ParallelBlock_01SequentialBlock_05BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_285_',
+        ) # (512)
+    )
+    self._17ParallelBlock_01SequentialBlock_05BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='zeros_286_',
+        ) # (512)
+        , trainable = False
+    )
+    self._17ParallelBlock_01SequentialBlock_05BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[512],
+            dtype=tf.dtypes.float32,
+            name='ones_287_',
+        ) # (512)
+        , trainable = False
+    )
+    self._17ParallelBlock_01SequentialBlock_07Conv2d_weight = tf.Variable(
+        tf.random.normal(
+            shape=[2048, 512, 1, 1],
+            mean=0.0,
+            stddev=0.0625,
+            dtype=tf.dtypes.float32,
+            name='normal_288_',
+        ) # (2048, 512, 1, 1)
+    )
+    self._17ParallelBlock_01SequentialBlock_07Conv2d_bias = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_289_',
+        ) # (2048)
+    )
+    self._17ParallelBlock_01SequentialBlock_08BatchNorm_gamma = tf.Variable(
+        tf.ones(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='ones_290_',
+        ) # (2048)
+    )
+    self._17ParallelBlock_01SequentialBlock_08BatchNorm_beta = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_291_',
+        ) # (2048)
+    )
+    self._17ParallelBlock_01SequentialBlock_08BatchNorm_runningMean = tf.Variable(
+        tf.zeros(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='zeros_292_',
+        ) # (2048)
+        , trainable = False
+    )
+    self._17ParallelBlock_01SequentialBlock_08BatchNorm_runningVar = tf.Variable(
+        tf.ones(
+            shape=[2048],
+            dtype=tf.dtypes.float32,
+            name='ones_293_',
+        ) # (2048)
+        , trainable = False
+    )
+    self._20Linear_weight = tf.Variable(
+        tf.random.normal(
+            shape=[10, 2048],
+            mean=0.0,
+            stddev=0.03125,
+            dtype=tf.dtypes.float32,
+            name='normal_294_',
+        ) # (10, 2048)
+    )
+    self._20Linear_bias = tf.Variable(
+        tf.zeros(
+            shape=[10],
+            dtype=tf.dtypes.float32,
+            name='zeros_295_',
+        ) # (10)
+    )
 
 ## 2
   def call(self, x):
@@ -1599,7 +2293,7 @@ class MyModel(tf.keras.Model):
         dilations=[1, 1],
         data_format='NCHW',
         name='convolution_297_',
-    )  
+    ) # (111, 64, 32, 32)  
     (batchnorm1, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -1628,7 +2322,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_301_',
-    )  
+    ) # (111, 64, 32, 32)  
     self._02ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._02ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm2, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -1657,7 +2351,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_305_',
-    )  
+    ) # (111, 64, 32, 32)  
     self._02ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._02ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm3, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -1691,7 +2385,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_310_',
-    )  
+    ) # (111, 256, 32, 32)  
     self._02ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._02ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     (batchnorm4, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -1717,7 +2411,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_313_',
-    )  
+    ) # (111, 256, 32, 32)  
     self._02ParallelBlock_02SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._02ParallelBlock_02SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     val2 = tf.nn.relu(
@@ -1727,7 +2421,7 @@ class MyModel(tf.keras.Model):
             name='add_314_',
         ), # (111, 256, 32, 32)
         name='relu_315_',
-    )  
+    ) # (111, 256, 32, 32)  
     (batchnorm5, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -1756,7 +2450,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_319_',
-    )  
+    ) # (111, 64, 32, 32)  
     self._03ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._03ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm6, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -1785,7 +2479,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_323_',
-    )  
+    ) # (111, 64, 32, 32)  
     self._03ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._03ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm7, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -1819,7 +2513,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_328_',
-    )  
+    ) # (111, 256, 32, 32)  
     self._03ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._03ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val3 = tf.nn.relu(
@@ -1829,7 +2523,7 @@ class MyModel(tf.keras.Model):
             name='add_329_',
         ), # (111, 256, 32, 32)
         name='relu_330_',
-    )  
+    ) # (111, 256, 32, 32)  
     (batchnorm8, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -1858,7 +2552,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_334_',
-    )  
+    ) # (111, 64, 32, 32)  
     self._04ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._04ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm9, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -1887,7 +2581,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_338_',
-    )  
+    ) # (111, 64, 32, 32)  
     self._04ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._04ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm10, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -1921,7 +2615,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_343_',
-    )  
+    ) # (111, 256, 32, 32)  
     self._04ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._04ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val4 = tf.nn.relu(
@@ -1931,7 +2625,7 @@ class MyModel(tf.keras.Model):
             name='add_344_',
         ), # (111, 256, 32, 32)
         name='relu_345_',
-    )  
+    ) # (111, 256, 32, 32)  
     (batchnorm11, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -1960,7 +2654,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_349_',
-    )  
+    ) # (111, 128, 16, 16)  
     self._05ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._05ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm12, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -1989,7 +2683,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_353_',
-    )  
+    ) # (111, 128, 16, 16)  
     self._05ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._05ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm13, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2023,7 +2717,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_358_',
-    )  
+    ) # (111, 512, 16, 16)  
     self._05ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._05ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     (batchnorm14, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2049,7 +2743,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_361_',
-    )  
+    ) # (111, 512, 16, 16)  
     self._05ParallelBlock_02SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._05ParallelBlock_02SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     val5 = tf.nn.relu(
@@ -2059,7 +2753,7 @@ class MyModel(tf.keras.Model):
             name='add_362_',
         ), # (111, 512, 16, 16)
         name='relu_363_',
-    )  
+    ) # (111, 512, 16, 16)  
     (batchnorm15, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -2088,7 +2782,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_367_',
-    )  
+    ) # (111, 128, 16, 16)  
     self._06ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._06ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm16, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2117,7 +2811,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_371_',
-    )  
+    ) # (111, 128, 16, 16)  
     self._06ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._06ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm17, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2151,7 +2845,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_376_',
-    )  
+    ) # (111, 512, 16, 16)  
     self._06ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._06ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val6 = tf.nn.relu(
@@ -2161,7 +2855,7 @@ class MyModel(tf.keras.Model):
             name='add_377_',
         ), # (111, 512, 16, 16)
         name='relu_378_',
-    )  
+    ) # (111, 512, 16, 16)  
     (batchnorm18, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -2190,7 +2884,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_382_',
-    )  
+    ) # (111, 128, 16, 16)  
     self._07ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._07ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm19, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2219,7 +2913,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_386_',
-    )  
+    ) # (111, 128, 16, 16)  
     self._07ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._07ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm20, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2253,7 +2947,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_391_',
-    )  
+    ) # (111, 512, 16, 16)  
     self._07ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._07ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val7 = tf.nn.relu(
@@ -2263,7 +2957,7 @@ class MyModel(tf.keras.Model):
             name='add_392_',
         ), # (111, 512, 16, 16)
         name='relu_393_',
-    )  
+    ) # (111, 512, 16, 16)  
     (batchnorm21, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -2292,7 +2986,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_397_',
-    )  
+    ) # (111, 128, 16, 16)  
     self._08ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._08ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm22, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2321,7 +3015,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_401_',
-    )  
+    ) # (111, 128, 16, 16)  
     self._08ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._08ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm23, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2355,7 +3049,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_406_',
-    )  
+    ) # (111, 512, 16, 16)  
     self._08ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._08ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val8 = tf.nn.relu(
@@ -2365,7 +3059,7 @@ class MyModel(tf.keras.Model):
             name='add_407_',
         ), # (111, 512, 16, 16)
         name='relu_408_',
-    )  
+    ) # (111, 512, 16, 16)  
     (batchnorm24, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -2394,7 +3088,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_412_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._09ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._09ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm25, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2423,7 +3117,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_416_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._09ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._09ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm26, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2457,7 +3151,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_421_',
-    )  
+    ) # (111, 1024, 8, 8)  
     self._09ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._09ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     (batchnorm27, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2483,7 +3177,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_424_',
-    )  
+    ) # (111, 1024, 8, 8)  
     self._09ParallelBlock_02SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._09ParallelBlock_02SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     val9 = tf.nn.relu(
@@ -2493,7 +3187,7 @@ class MyModel(tf.keras.Model):
             name='add_425_',
         ), # (111, 1024, 8, 8)
         name='relu_426_',
-    )  
+    ) # (111, 1024, 8, 8)  
     (batchnorm28, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -2522,7 +3216,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_430_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._10ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._10ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm29, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2551,7 +3245,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_434_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._10ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._10ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm30, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2585,7 +3279,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_439_',
-    )  
+    ) # (111, 1024, 8, 8)  
     self._10ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._10ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val10 = tf.nn.relu(
@@ -2595,7 +3289,7 @@ class MyModel(tf.keras.Model):
             name='add_440_',
         ), # (111, 1024, 8, 8)
         name='relu_441_',
-    )  
+    ) # (111, 1024, 8, 8)  
     (batchnorm31, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -2624,7 +3318,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_445_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._11ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._11ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm32, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2653,7 +3347,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_449_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._11ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._11ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm33, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2687,7 +3381,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_454_',
-    )  
+    ) # (111, 1024, 8, 8)  
     self._11ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._11ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val11 = tf.nn.relu(
@@ -2697,7 +3391,7 @@ class MyModel(tf.keras.Model):
             name='add_455_',
         ), # (111, 1024, 8, 8)
         name='relu_456_',
-    )  
+    ) # (111, 1024, 8, 8)  
     (batchnorm34, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -2726,7 +3420,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_460_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._12ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._12ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm35, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2755,7 +3449,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_464_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._12ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._12ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm36, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2789,7 +3483,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_469_',
-    )  
+    ) # (111, 1024, 8, 8)  
     self._12ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._12ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val12 = tf.nn.relu(
@@ -2799,7 +3493,7 @@ class MyModel(tf.keras.Model):
             name='add_470_',
         ), # (111, 1024, 8, 8)
         name='relu_471_',
-    )  
+    ) # (111, 1024, 8, 8)  
     (batchnorm37, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -2828,7 +3522,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_475_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._13ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._13ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm38, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2857,7 +3551,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_479_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._13ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._13ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm39, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2891,7 +3585,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_484_',
-    )  
+    ) # (111, 1024, 8, 8)  
     self._13ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._13ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val13 = tf.nn.relu(
@@ -2901,7 +3595,7 @@ class MyModel(tf.keras.Model):
             name='add_485_',
         ), # (111, 1024, 8, 8)
         name='relu_486_',
-    )  
+    ) # (111, 1024, 8, 8)  
     (batchnorm40, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -2930,7 +3624,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_490_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._14ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._14ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm41, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2959,7 +3653,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_494_',
-    )  
+    ) # (111, 256, 8, 8)  
     self._14ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._14ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm42, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -2993,7 +3687,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_499_',
-    )  
+    ) # (111, 1024, 8, 8)  
     self._14ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._14ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val14 = tf.nn.relu(
@@ -3003,7 +3697,7 @@ class MyModel(tf.keras.Model):
             name='add_500_',
         ), # (111, 1024, 8, 8)
         name='relu_501_',
-    )  
+    ) # (111, 1024, 8, 8)  
     (batchnorm43, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -3032,7 +3726,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_505_',
-    )  
+    ) # (111, 512, 4, 4)  
     self._15ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._15ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm44, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -3061,7 +3755,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_509_',
-    )  
+    ) # (111, 512, 4, 4)  
     self._15ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._15ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm45, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -3095,7 +3789,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_514_',
-    )  
+    ) # (111, 2048, 4, 4)  
     self._15ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._15ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     (batchnorm46, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -3121,7 +3815,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_517_',
-    )  
+    ) # (111, 2048, 4, 4)  
     self._15ParallelBlock_02SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._15ParallelBlock_02SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     val15 = tf.nn.relu(
@@ -3131,7 +3825,7 @@ class MyModel(tf.keras.Model):
             name='add_518_',
         ), # (111, 2048, 4, 4)
         name='relu_519_',
-    )  
+    ) # (111, 2048, 4, 4)  
     (batchnorm47, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -3160,7 +3854,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_523_',
-    )  
+    ) # (111, 512, 4, 4)  
     self._16ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._16ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm48, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -3189,7 +3883,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_527_',
-    )  
+    ) # (111, 512, 4, 4)  
     self._16ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._16ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm49, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -3223,7 +3917,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_532_',
-    )  
+    ) # (111, 2048, 4, 4)  
     self._16ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._16ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     val16 = tf.nn.relu(
@@ -3233,7 +3927,7 @@ class MyModel(tf.keras.Model):
             name='add_533_',
         ), # (111, 2048, 4, 4)
         name='relu_534_',
-    )  
+    ) # (111, 2048, 4, 4)  
     (batchnorm50, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
         tf.nn.bias_add(
             tf.nn.convolution(
@@ -3262,7 +3956,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_538_',
-    )  
+    ) # (111, 512, 4, 4)  
     self._17ParallelBlock_01SequentialBlock_02BatchNorm_runningMean.assign(running_mean)  
     self._17ParallelBlock_01SequentialBlock_02BatchNorm_runningVar.assign(running_var)  
     (batchnorm51, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -3291,7 +3985,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_542_',
-    )  
+    ) # (111, 512, 4, 4)  
     self._17ParallelBlock_01SequentialBlock_05BatchNorm_runningMean.assign(running_mean)  
     self._17ParallelBlock_01SequentialBlock_05BatchNorm_runningVar.assign(running_var)  
     (batchnorm52, running_mean, running_var) = tf.compat.v1.nn.fused_batch_norm(
@@ -3325,7 +4019,7 @@ class MyModel(tf.keras.Model):
         exponential_avg_factor=0.9,
         data_format='NCHW',
         name='fused_batch_norm_547_',
-    )  
+    ) # (111, 2048, 4, 4)  
     self._17ParallelBlock_01SequentialBlock_08BatchNorm_runningMean.assign(running_mean)  
     self._17ParallelBlock_01SequentialBlock_08BatchNorm_runningVar.assign(running_var)  
     result = tf.reshape(
@@ -3361,8 +4055,8 @@ class MyModel(tf.keras.Model):
         ), # (111, 10)
         shape=[-1, 10],
         name='reshape_555_',
-    )
-    return result
+    ) # (111, 10)
+    return tf.tuple([result])
 
 ## 2
 def loss(label, prediction):
@@ -3381,7 +4075,7 @@ def loss(label, prediction):
             name='negative_558_',
         ), # (111, 1)
         name='reduce_mean_559_',
-    )
+    ) # ()
     return result
 
 # number of epochs was 2

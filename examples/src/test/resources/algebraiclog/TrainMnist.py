@@ -1,42 +1,54 @@
 class MyModel(tf.keras.Model):
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
-    self._02Linear_weight = tf.Variable(tf.random.normal(
-        shape=[128, 784],
-        mean=0.0,
-        stddev=0.050507627,
-        dtype=tf.dtypes.float32,
-        name='normal_1_',
-    ))
-    self._02Linear_bias = tf.Variable(tf.zeros(
-        shape=[128],
-        dtype=tf.dtypes.float32,
-        name='zeros_2_',
-    ))
-    self._04Linear_weight = tf.Variable(tf.random.normal(
-        shape=[64, 128],
-        mean=0.0,
-        stddev=0.125,
-        dtype=tf.dtypes.float32,
-        name='normal_3_',
-    ))
-    self._04Linear_bias = tf.Variable(tf.zeros(
-        shape=[64],
-        dtype=tf.dtypes.float32,
-        name='zeros_4_',
-    ))
-    self._06Linear_weight = tf.Variable(tf.random.normal(
-        shape=[10, 64],
-        mean=0.0,
-        stddev=0.17677669,
-        dtype=tf.dtypes.float32,
-        name='normal_5_',
-    ))
-    self._06Linear_bias = tf.Variable(tf.zeros(
-        shape=[10],
-        dtype=tf.dtypes.float32,
-        name='zeros_6_',
-    ))
+    self._02Linear_weight = tf.Variable(
+        tf.random.normal(
+            shape=[128, 784],
+            mean=0.0,
+            stddev=0.050507627,
+            dtype=tf.dtypes.float32,
+            name='normal_1_',
+        ) # (128, 784)
+    )
+    self._02Linear_bias = tf.Variable(
+        tf.zeros(
+            shape=[128],
+            dtype=tf.dtypes.float32,
+            name='zeros_2_',
+        ) # (128)
+    )
+    self._04Linear_weight = tf.Variable(
+        tf.random.normal(
+            shape=[64, 128],
+            mean=0.0,
+            stddev=0.125,
+            dtype=tf.dtypes.float32,
+            name='normal_3_',
+        ) # (64, 128)
+    )
+    self._04Linear_bias = tf.Variable(
+        tf.zeros(
+            shape=[64],
+            dtype=tf.dtypes.float32,
+            name='zeros_4_',
+        ) # (64)
+    )
+    self._06Linear_weight = tf.Variable(
+        tf.random.normal(
+            shape=[10, 64],
+            mean=0.0,
+            stddev=0.17677669,
+            dtype=tf.dtypes.float32,
+            name='normal_5_',
+        ) # (10, 64)
+    )
+    self._06Linear_bias = tf.Variable(
+        tf.zeros(
+            shape=[10],
+            dtype=tf.dtypes.float32,
+            name='zeros_6_',
+        ) # (10)
+    )
 
 ## 4
   def call(self, x):
@@ -80,8 +92,8 @@ class MyModel(tf.keras.Model):
         bias=self._06Linear_bias, # (10)
         data_format=None,
         name='bias_add_15_',
-    )
-    return result
+    ) # (32, 10)
+    return tf.tuple([result])
 
 ## 4
 def loss(label, prediction):
@@ -100,7 +112,7 @@ def loss(label, prediction):
             name='negative_18_',
         ), # (32, 1)
         name='reduce_mean_19_',
-    )
+    ) # ()
     return result
 
 # number of epochs was 2
