@@ -91,7 +91,7 @@ jobs:
           if [[ "$PYTORCH_VERSION" == "1.12.1" ]]; then ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu10 -Ppt_version=$PYTORCH_VERSION; fi
           if [[ "$PYTORCH_VERSION" == "1.11.0" ]]; then ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcu10 -Ppt_version=$PYTORCH_VERSION; fi
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
