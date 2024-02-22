@@ -26,7 +26,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ ubuntu-latest, macos-12 ]
+        operating-system: [ ubuntu-latest, macos-13 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -50,6 +50,9 @@ jobs:
           filters: |
             src:
               - 'extensions/sentencepiece/**'
+      - name: install libomp on macos
+        if: ${{ runner.os == 'macOS' }}
+        run: brew install libomp
       - name: Compile Sentencepiece JNI
         if: steps.sentencepiece_changes.outputs.src == 'true'
         run: ./gradlew :extensions:sentencepiece:compileJNI
