@@ -50,6 +50,9 @@ jobs:
           filters: |
             src:
               - 'extensions/sentencepiece/**'
+      - name: install libomp on macos
+        if: ${{ runner.os == 'macOS' }}
+        run: brew install libomp
       - name: Compile Sentencepiece JNI
         if: steps.sentencepiece_changes.outputs.src == 'true'
         run: ./gradlew :extensions:sentencepiece:compileJNI
