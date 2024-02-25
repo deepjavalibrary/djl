@@ -16,7 +16,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,15 +29,15 @@ import java.util.stream.Stream;
 class Node {
 
     String name;
-    List<Node> src = new ArrayList<>();
-    PairList<String, ?> param;
+    final Node[] src;
+    final PairList<String, ?> param;
     boolean isLeaf;
     Shape outputShape;
-    private static final PairList<String, ?> EMPTY_PARAM = new PairList<>();
 
-    public Node(String name, PairList<String, ?> param) {
+    public Node(String name, PairList<String, ?> param, Node... src) {
         this.name = name;
-        this.param = param != null ? param : EMPTY_PARAM;
+        this.param = param;
+        this.src = src;
     }
 
     String toPythonExpression(Map<Node, String> locals, AtomicInteger opCount) {
@@ -104,7 +103,7 @@ class Node {
                 }
             case "_npi_copyto":
                 {
-                    return src.get(0).toPythonExpression(locals, opCount, true);
+                    return src[0].toPythonExpression(locals, opCount, true);
                 }
             case "_npi_expand_dims":
                 {
@@ -165,18 +164,10 @@ class Node {
                 }
             case "_npx_convolution":
                 {
-                    int[] perm = {2, 3, 1, 0};
-                    Object[][] filtersParams = {{1}, {null, "perm", Arrays.toString(perm)}};
-                    String filters = format("tf.transpose", filtersParams, locals, opCount);
-                    Shape filtersShape =
-                            new Shape(
-                                    IntStream.of(perm)
-                                            .mapToLong(src.get(1).outputShape::get)
-                                            .toArray());
                     String padding = "(0, 0)".equals(this.param.get("pad")) ? "'VALID'" : "'SAME'";
                     Object[][] args = {
                         {0},
-                        {null, "filters", filters, filtersShape},
+                        {1, "filters"},
                         {"stride", "strides"},
                         {"pad", "padding", padding},
                         {"dilate", "dilations"},
@@ -336,9 +327,9 @@ class Node {
             default:
                 {
                     Stream<Object[]> srcStream =
-                            IntStream.range(0, src.size()).mapToObj(i -> new Object[] {i});
+                            IntStream.range(0, src.length).mapToObj(i -> new Object[] {i});
                     Stream<Object[]> paramStream =
-                            param.keys().stream().map(p -> new Object[] {p, p});
+                            param.stream().map(p -> new Object[] {p.getKey(), p.getKey()});
                     Object[][] args =
                             Stream.concat(srcStream, paramStream).toArray(Object[][]::new);
                     return format(name, args, locals, opCount);
@@ -368,12 +359,12 @@ class Node {
             Shape shape = arg.length >= 4 ? (Shape) arg[3] : null;
             if (Integer.valueOf(-1).equals(arg[0])) {
                 s =
-                        src.stream()
+                        Stream.of(src)
                                 .map(node -> node.toPythonExpression(locals, opCount, true))
                                 .map(Node::indent)
                                 .collect(Collectors.joining(",\n", "[\n", "\n]"));
-            } else if (arg[0] instanceof Integer && src.size() > (int) arg[0]) {
-                Node node = src.get((int) arg[0]);
+            } else if (arg[0] instanceof Integer && src.length > (int) arg[0]) {
+                Node node = src[(int) arg[0]];
                 s = String.format(s, node.toPythonExpression(locals, opCount, true));
                 shape = node.outputShape;
             } else if (this.param.get(String.valueOf(arg[0])) != null) {
@@ -403,7 +394,7 @@ class Node {
             boolean setChannelFirst,
             Map<Node, String> locals,
             AtomicInteger opCount) {
-        if (src.size() == 3) {
+        if (src.length == 3) {
             Object[][] args = {
                 {null, null, result, this.outputShape},
                 {2, "bias"},
@@ -458,8 +449,8 @@ class Node {
                         String.format(
                                 "(%s, running_mean, running_var) = %s",
                                 locals.get(node), node.toPythonExpression(locals, opCount)));
-                statements.add(String.format("%s.assign(running_mean)", node.src.get(3).name));
-                statements.add(String.format("%s.assign(running_var)", node.src.get(4).name));
+                statements.add(String.format("%s.assign(running_mean)", node.src[3].name));
+                statements.add(String.format("%s.assign(running_var)", node.src[4].name));
             }
         }
         statements.add(String.format("%s = %s", result, toPythonExpression(locals, opCount)));

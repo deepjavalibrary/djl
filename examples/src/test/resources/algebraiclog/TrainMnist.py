@@ -93,7 +93,7 @@ class MyModel(tf.keras.Model):
         data_format=None,
         name='bias_add_15_',
     ) # (32, 10)
-    return tf.tuple([result])
+    return result
 
 ## 4
 def loss(label, prediction):

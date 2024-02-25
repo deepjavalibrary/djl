@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Parameter;
 import ai.djl.training.Trainer;
 import ai.djl.util.NativeResource;
@@ -31,13 +32,15 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /** {@link TrainingListener} that records algebraic operations as Python code. */
 public class AlgebraicListener extends TrainingListenerAdapter {
@@ -148,6 +151,9 @@ public class AlgebraicListener extends TrainingListenerAdapter {
                 preds.stream()
                         .map(this::getArrayName)
                         .collect(Collectors.joining(", ", "return tf.tuple([", "])"));
+        if (preds.size() == 1) {
+            tuple = "return result";
+        }
         String python =
                 preds.stream()
                         .map(pred -> get(pred).toPythonFunctionBody(opCount, getArrayName(pred)))
@@ -173,12 +179,9 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         writer.println("  def __init__(self, **kwargs):");
         writer.println("    super().__init__(**kwargs)");
         for (Entry<String, String> param : parameters.entrySet()) {
-            writer.println(
-                    Node.indent(
-                            param.getKey()
-                                    + " = tf.Variable(\n"
-                                    + Node.indent(param.getValue())
-                                    + "\n)"));
+            writer.println(Node.indent(param.getKey() + " = tf.Variable("));
+            writer.println(Node.indent(Node.indent(param.getValue())));
+            writer.println(Node.indent(")"));
         }
         writer.println("");
         for (Entry<String, Integer> pred : predictions.entrySet()) {
@@ -206,13 +209,29 @@ public class AlgebraicListener extends TrainingListenerAdapter {
         parameters = new LinkedHashMap<>();
         for (Pair<String, Parameter> pair : model.getBlock().getParameters()) {
             NDArray array = pair.getValue().getArray();
-            String initialization =
-                    get(array).toPythonExpression(null, parametersOpCount)
-                            + (pair.getValue().requiresGradient() ? "" : "\n, trainable = False");
+
+            Node init = get(array);
+            String initialization;
+            if (pair.getKey().endsWith("Conv2d_weight")) {
+                int[] perm = {2, 3, 1, 0};
+                PairList<String, String> param =
+                        new PairList<>(Collections.singletonMap("axes", Arrays.toString(perm)));
+                Node transpose = new Node("_np_transpose", param, init);
+                transpose.outputShape =
+                        new Shape(IntStream.of(perm).mapToLong(init.outputShape::get).toArray());
+                initialization = transpose.toPythonExpression(null, parametersOpCount);
+                init.outputShape = transpose.outputShape;
+            } else {
+                initialization =
+                        init.toPythonExpression(null, parametersOpCount)
+                                + (pair.getValue().requiresGradient()
+                                        ? ""
+                                        : "\n, trainable = False");
+            }
             String pythonClassVariable = "self._" + pair.getKey();
             parameters.put(pythonClassVariable, initialization);
             setLeaf(array, pythonClassVariable);
-            nodeMapForParameters.put(key(array), get(array));
+            nodeMapForParameters.put(key(array), init);
         }
     }
 
@@ -233,8 +252,8 @@ public class AlgebraicListener extends TrainingListenerAdapter {
 
     private void recordInternal(
             String name, NDArray[] src, NDArray[] dest, PairList<String, ?> param) {
-        Node n = new Node(name, param);
-        n.src = new ArrayList<>(src.length);
+        Node n = new Node(name, param != null ? param : new PairList<>(), new Node[src.length]);
+        int index = 0;
         for (NDArray array : src) {
             Node node = get(array);
             if (node == null) {
@@ -243,11 +262,11 @@ public class AlgebraicListener extends TrainingListenerAdapter {
                                 array.getName() != null
                                         ? array.getName()
                                         : "UNKNOWN_ARRAY" + array.getShape(),
-                                null);
+                                new PairList<>());
                 nodeMap.put(key(array), n);
                 node.outputShape = array.getShape();
             }
-            n.src.add(node);
+            n.src[index++] = node;
         }
         for (NDArray array : dest) {
             nodeMap.put(key(array), n);
