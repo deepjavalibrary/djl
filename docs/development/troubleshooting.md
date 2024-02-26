@@ -105,11 +105,6 @@ For more information, please refer to [DJL Cache Management](cache_management.md
 It happened when you had a wrong version with DJL and Deep Engines. 
 You can check the combination [here](dependency_management.md) and use DJL BOM to solve the issue.
 
-### 1.6 Manual initialization
-
-If you are using manual engine initialization, you must both register an engine and set it as the default.
-This can be done with `Engine.registerEngine(..)` and `Engine.setDefaultEngine(..)`.
-
 ## 2. IntelliJ throws the `No Log4j 2 configuration file found.` exception.
 The following exception may appear after running the `./gradlew clean` command:
 

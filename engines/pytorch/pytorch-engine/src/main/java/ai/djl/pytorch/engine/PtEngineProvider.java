@@ -18,7 +18,7 @@ import ai.djl.engine.EngineProvider;
 /** {@code PtEngineProvider} is the PyTorch implementation of {@link EngineProvider}. */
 public class PtEngineProvider implements EngineProvider {
 
-    private volatile Engine engine; // NOPMD
+    private static volatile Engine engine; // NOPMD
 
     /** {@inheritDoc} */
     @Override

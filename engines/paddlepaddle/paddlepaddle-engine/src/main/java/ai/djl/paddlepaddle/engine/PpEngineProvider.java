@@ -18,8 +18,6 @@ import ai.djl.engine.EngineProvider;
 /** {@code PpEngineProvider} is the PaddlePaddle implementation of {@link EngineProvider}. */
 public class PpEngineProvider implements EngineProvider {
 
-    private volatile Engine engine; // NOPMD
-
     /** {@inheritDoc} */
     @Override
     public String getEngineName() {
@@ -35,13 +33,10 @@ public class PpEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        if (engine == null) {
-            synchronized (PpEngineProvider.class) {
-                if (engine == null) {
-                    engine = PpEngine.newInstance();
-                }
-            }
-        }
-        return engine;
+        return InstanceHolder.INSTANCE;
+    }
+
+    private static class InstanceHolder {
+        static final Engine INSTANCE = PpEngine.newInstance();
     }
 }

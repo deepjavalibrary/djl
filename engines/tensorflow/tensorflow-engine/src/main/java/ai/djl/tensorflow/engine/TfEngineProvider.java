@@ -18,7 +18,7 @@ import ai.djl.engine.EngineProvider;
 /** {@code TfEngineProvider} is the TensorFlow implementation of {@link EngineProvider}. */
 public class TfEngineProvider implements EngineProvider {
 
-    private volatile Engine engine; // NOPMD
+    private static volatile Engine engine; // NOPMD
 
     /** {@inheritDoc} */
     @Override
