@@ -19,7 +19,6 @@ import ai.djl.engine.EngineProvider;
 public class PpEngineProvider implements EngineProvider {
 
     private volatile Engine engine; // NOPMD
-    private volatile boolean initialized; // NOPMD
 
     /** {@inheritDoc} */
     @Override
@@ -36,10 +35,9 @@ public class PpEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        if (!initialized) {
+        if (engine == null) {
             synchronized (PpEngineProvider.class) {
-                if (!initialized) {
-                    initialized = true;
+                if (engine == null) {
                     engine = PpEngine.newInstance();
                 }
             }
