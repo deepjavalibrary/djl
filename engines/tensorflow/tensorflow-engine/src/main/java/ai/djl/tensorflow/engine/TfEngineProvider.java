@@ -18,8 +18,7 @@ import ai.djl.engine.EngineProvider;
 /** {@code TfEngineProvider} is the TensorFlow implementation of {@link EngineProvider}. */
 public class TfEngineProvider implements EngineProvider {
 
-    private volatile Engine engine; // NOPMD
-    private volatile boolean initialized; // NOPMD
+    private static volatile Engine engine; // NOPMD
 
     /** {@inheritDoc} */
     @Override
@@ -36,10 +35,9 @@ public class TfEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public Engine getEngine() {
-        if (!initialized) {
+        if (engine == null) {
             synchronized (TfEngineProvider.class) {
-                if (!initialized) {
-                    initialized = true;
+                if (engine == null) {
                     engine = TfEngine.newInstance();
                 }
             }
