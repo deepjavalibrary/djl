@@ -26,7 +26,7 @@ public class TrtEngineTest {
         try {
             Engine engine = Engine.getEngine("TensorRT");
             version = engine.getVersion();
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
             throw new SkipException("Your os configuration doesn't support TensorRT.");
         }
         Assert.assertEquals(version, "8.4.1");

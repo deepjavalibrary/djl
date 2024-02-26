@@ -59,7 +59,7 @@ public abstract class Engine {
 
     private static final Map<String, EngineProvider> ALL_ENGINES = new ConcurrentHashMap<>();
 
-    private static String defaultEngine = initEngine();
+    private static final String DEFAULT_ENGINE = initEngine();
     private static final Pattern PATTERN =
             Pattern.compile("KEY|TOKEN|PASSWORD", Pattern.CASE_INSENSITIVE);
 
@@ -69,10 +69,6 @@ public abstract class Engine {
     private Integer seed;
 
     private static synchronized String initEngine() {
-        if (Boolean.parseBoolean(Utils.getenv("DJL_ENGINE_MANUAL_INIT"))) {
-            return null;
-        }
-
         ServiceLoader<EngineProvider> loaders = ServiceLoader.load(EngineProvider.class);
         for (EngineProvider provider : loaders) {
             registerEngine(provider);
@@ -84,21 +80,21 @@ public abstract class Engine {
         }
 
         String def = System.getProperty("ai.djl.default_engine");
-        String newDefaultEngine = Utils.getenv("DJL_DEFAULT_ENGINE", def);
-        if (newDefaultEngine == null || newDefaultEngine.isEmpty()) {
+        String defaultEngine = Utils.getenv("DJL_DEFAULT_ENGINE", def);
+        if (defaultEngine == null || defaultEngine.isEmpty()) {
             int rank = Integer.MAX_VALUE;
             for (EngineProvider provider : ALL_ENGINES.values()) {
                 if (provider.getEngineRank() < rank) {
-                    newDefaultEngine = provider.getEngineName();
+                    defaultEngine = provider.getEngineName();
                     rank = provider.getEngineRank();
                 }
             }
-        } else if (!ALL_ENGINES.containsKey(newDefaultEngine)) {
-            throw new EngineException("Unknown default engine: " + newDefaultEngine);
+        } else if (!ALL_ENGINES.containsKey(defaultEngine)) {
+            throw new EngineException("Unknown default engine: " + defaultEngine);
         }
-        logger.debug("Found default engine: {}", newDefaultEngine);
-        Ec2Utils.callHome(newDefaultEngine);
-        return newDefaultEngine;
+        logger.debug("Found default engine: {}", defaultEngine);
+        Ec2Utils.callHome(defaultEngine);
+        return defaultEngine;
     }
 
     /**
@@ -128,7 +124,7 @@ public abstract class Engine {
      * @return the default Engine name
      */
     public static String getDefaultEngineName() {
-        return System.getProperty("ai.djl.default_engine", defaultEngine);
+        return System.getProperty("ai.djl.default_engine", DEFAULT_ENGINE);
     }
 
     /**
@@ -138,7 +134,7 @@ public abstract class Engine {
      * @see EngineProvider
      */
     public static Engine getInstance() {
-        if (defaultEngine == null) {
+        if (DEFAULT_ENGINE == null) {
             throw new EngineException(
                     "No deep learning engine found."
                             + System.lineSeparator()
@@ -167,29 +163,7 @@ public abstract class Engine {
      */
     public static void registerEngine(EngineProvider provider) {
         logger.debug("Registering EngineProvider: {}", provider.getEngineName());
-        ALL_ENGINES.put(provider.getEngineName(), provider);
-    }
-
-    /**
-     * Returns the default engine.
-     *
-     * @return the default engine
-     */
-    public static String getDefaultEngine() {
-        return defaultEngine;
-    }
-
-    /**
-     * Sets the default engine returned by {@link #getInstance()}.
-     *
-     * @param engineName the new default engine's name
-     */
-    public static void setDefaultEngine(String engineName) {
-        // Requires an engine to be loaded (without exception) before being the default
-        getEngine(engineName);
-
-        logger.debug("Setting new default engine: {}", engineName);
-        defaultEngine = engineName;
+        ALL_ENGINES.putIfAbsent(provider.getEngineName(), provider);
     }
 
     /**
@@ -213,12 +187,7 @@ public abstract class Engine {
         if (provider == null) {
             throw new IllegalArgumentException("Deep learning engine not found: " + engineName);
         }
-        Engine engine = provider.getEngine();
-        if (engine == null) {
-            throw new IllegalStateException(
-                    "The engine " + engineName + " was not able to initialize");
-        }
-        return engine;
+        return provider.getEngine();
     }
 
     /**
