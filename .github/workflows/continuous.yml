@@ -109,12 +109,6 @@ jobs:
           files: ./jacoco/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
           fail_ci_if_error: false
           path_to_write_report: ./codecov_report.txt
-      - name: Submit Dependencies
-        if: github.event_name == 'push'
-        uses: gradle/actions/dependency-submission@v3
-        env:
-          # Exclude dependencies that are only resolved in test classpaths
-          DEPENDENCY_GRAPH_EXCLUDE_CONFIGURATIONS: '.*[Tt]est(Compile|Runtime)Classpath'
 
   # Windows platform for testing hybrid engines
   build-windows:
