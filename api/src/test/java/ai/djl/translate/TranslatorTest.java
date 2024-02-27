@@ -83,6 +83,10 @@ public class TranslatorTest {
                 Predictor<Image[], Classifications[]> predictor = model.newPredictor()) {
             Classifications[] res = predictor.predict(inputs);
             Assert.assertEquals(res.length, 2);
+            int intValue = model.intProperty("something", -1);
+            Assert.assertEquals(intValue, -1);
+            long longValue = model.longProperty("something", -1L);
+            Assert.assertEquals(longValue, -1L);
         }
     }
 }

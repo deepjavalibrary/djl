@@ -234,6 +234,36 @@ public interface Model extends AutoCloseable {
     void setProperty(String key, String value);
 
     /**
+     * Returns the property of the model based on property name.
+     *
+     * @param key the name of the property
+     * @param defValue the default value if key not found
+     * @return the value of the property
+     */
+    default int intProperty(String key, int defValue) {
+        String value = getProperty(key);
+        if (value == null || value.isEmpty()) {
+            return defValue;
+        }
+        return Integer.parseInt(value);
+    }
+
+    /**
+     * Returns the property of the model based on property name.
+     *
+     * @param key the name of the property
+     * @param defValue the default value if key not found
+     * @return the value of the property
+     */
+    default long longProperty(String key, long defValue) {
+        String value = getProperty(key);
+        if (value == null || value.isEmpty()) {
+            return defValue;
+        }
+        return Integer.parseInt(value);
+    }
+
+    /**
      * Gets the {@link NDManager} from the model.
      *
      * @return the {@link NDManager}
