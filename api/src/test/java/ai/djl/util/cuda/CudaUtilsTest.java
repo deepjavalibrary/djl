@@ -50,12 +50,12 @@ public class CudaUtilsTest {
     }
 
     @Test
-    public void testCudaUtilsWithFolk() {
-        System.setProperty("ai.djl.util.cuda.folk", "true");
+    public void testCudaUtilsWithFork() {
+        System.setProperty("ai.djl.util.cuda.fork", "true");
         try {
             testCudaUtils();
         } finally {
-            System.clearProperty("ai.djl.util.cuda.folk");
+            System.clearProperty("ai.djl.util.cuda.fork");
         }
     }
 }

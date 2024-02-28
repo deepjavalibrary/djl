@@ -57,7 +57,7 @@ public final class CudaUtils {
      */
     @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static int getGpuCount() {
-        if (Boolean.getBoolean("ai.djl.util.cuda.folk")) {
+        if (Boolean.getBoolean("ai.djl.util.cuda.fork")) {
             if (gpuInfo == null) {
                 gpuInfo = execute(-1); // NOPMD
             }
@@ -95,7 +95,7 @@ public final class CudaUtils {
      */
     @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static int getCudaVersion() {
-        if (Boolean.getBoolean("ai.djl.util.cuda.folk")) {
+        if (Boolean.getBoolean("ai.djl.util.cuda.fork")) {
             if (gpuInfo == null) {
                 gpuInfo = execute(-1);
             }
@@ -134,7 +134,7 @@ public final class CudaUtils {
      * @return the CUDA compute capability
      */
     public static String getComputeCapability(int device) {
-        if (Boolean.getBoolean("ai.djl.util.cuda.folk")) {
+        if (Boolean.getBoolean("ai.djl.util.cuda.fork")) {
             String[] ret = execute(device);
             if (ret.length != 3) {
                 throw new IllegalArgumentException(ret[0]);
@@ -168,7 +168,7 @@ public final class CudaUtils {
             throw new IllegalArgumentException("Only GPU device is allowed.");
         }
 
-        if (Boolean.getBoolean("ai.djl.util.cuda.folk")) {
+        if (Boolean.getBoolean("ai.djl.util.cuda.fork")) {
             String[] ret = execute(device.getDeviceId());
             if (ret.length != 3) {
                 throw new IllegalArgumentException(ret[0]);
@@ -229,7 +229,7 @@ public final class CudaUtils {
 
     private static CudaLibrary loadLibrary() {
         try {
-            if (Boolean.getBoolean("ai.djl.util.cuda.folk")) {
+            if (Boolean.getBoolean("ai.djl.util.cuda.fork")) {
                 return null;
             }
             if (System.getProperty("os.name").startsWith("Win")) {
