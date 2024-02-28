@@ -61,7 +61,7 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
                     .optFilter("dataset", "cifar10")
                     .build();
 
-    ZooModel<Image, Classifications> ssd = criteria.loadModel());
+    ZooModel<Image, Classifications> ssd = criteria.loadModel();
 ```
 
 If you already know which `ModelLoader` to use, you can simply do the following:
