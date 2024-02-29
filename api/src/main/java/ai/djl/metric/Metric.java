@@ -106,6 +106,16 @@ public class Metric {
     }
 
     /**
+     * Returns a copy of the metric with a new name.
+     *
+     * @param name the new metric name
+     * @return a copy of the metric
+     */
+    public Metric copyOf(String name) {
+        return new Metric(name, value, unit, timestamp, dimensions);
+    }
+
+    /**
      * Returns the name of the {@code Metric}.
      *
      * @return the metric name
