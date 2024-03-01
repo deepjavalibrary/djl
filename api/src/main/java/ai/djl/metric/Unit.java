@@ -41,6 +41,7 @@ public enum Unit {
     GIGABITS_PER_SECOND("Gigabits/Second"),
     TERABITS_PER_SECOND("Terabits/Second"),
     COUNT_PER_SECOND("Count/Second"),
+    COUNT_PER_ITEM("Count/Item"),
     NONE("None");
 
     private static final ConcurrentHashMap<String, Unit> MAP = new ConcurrentHashMap<>();
