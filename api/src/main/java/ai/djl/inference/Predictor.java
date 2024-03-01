@@ -17,6 +17,7 @@ import ai.djl.Model;
 import ai.djl.inference.streaming.StreamingBlock;
 import ai.djl.inference.streaming.StreamingTranslator;
 import ai.djl.inference.streaming.StreamingTranslator.StreamOutput;
+import ai.djl.metric.Dimension;
 import ai.djl.metric.Metrics;
 import ai.djl.metric.Unit;
 import ai.djl.ndarray.LazyNDArray;
@@ -94,6 +95,7 @@ public class Predictor<I, O> implements AutoCloseable {
     protected Metrics metrics;
     protected Block block;
     protected ParameterStore parameterStore;
+    protected Dimension dimension;
 
     /**
      * Creates a new instance of {@code BasePredictor} with the given {@link Model} and {@link
@@ -116,6 +118,7 @@ public class Predictor<I, O> implements AutoCloseable {
         this.translator = translator;
         block = model.getBlock();
         parameterStore = new ParameterStore(manager, copy);
+        dimension = new Dimension("Model", model.getProperty("metric_dimension", "model"));
     }
 
     /**
@@ -315,7 +318,7 @@ public class Predictor<I, O> implements AutoCloseable {
             long tmp = System.nanoTime();
             long duration = (tmp - timestamp) / 1000;
             timestamp = tmp;
-            metrics.addMetric("Preprocess", duration, Unit.MICROSECONDS);
+            metrics.addMetric("Preprocess", duration, Unit.MICROSECONDS, dimension);
         }
     }
 
@@ -325,7 +328,7 @@ public class Predictor<I, O> implements AutoCloseable {
             long tmp = System.nanoTime();
             long duration = (tmp - timestamp) / 1000;
             timestamp = tmp;
-            metrics.addMetric("Inference", duration, Unit.MICROSECONDS);
+            metrics.addMetric("Inference", duration, Unit.MICROSECONDS, dimension);
         }
     }
 
@@ -334,8 +337,9 @@ public class Predictor<I, O> implements AutoCloseable {
             long tmp = System.nanoTime();
             long duration = (tmp - timestamp) / 1000;
             timestamp = tmp;
-            metrics.addMetric("Postprocess", duration, Unit.MICROSECONDS);
-            metrics.addMetric("Total", (tmp - begin) / 1000, Unit.MICROSECONDS);
+            metrics.addMetric("Postprocess", duration, Unit.MICROSECONDS, dimension);
+            long prediction = (tmp - begin) / 1000;
+            metrics.addMetric("Prediction", prediction, Unit.MICROSECONDS, dimension);
         }
     }
 
