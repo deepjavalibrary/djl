@@ -103,9 +103,10 @@ public class Metrics {
      * @param name the metric name
      * @param value the metric value
      * @param unit the metric unit
+     * @param dimensions the metric dimensions
      */
-    public void addMetric(String name, Number value, Unit unit) {
-        addMetric(new Metric(name, value, unit));
+    public void addMetric(String name, Number value, Unit unit, Dimension... dimensions) {
+        addMetric(new Metric(name, value, unit, dimensions));
     }
 
     /**
