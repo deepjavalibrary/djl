@@ -40,8 +40,6 @@ public class FaceDetectionTranslator implements Translator<Image, DetectedObject
     private double[] variance;
     private int[][] scales;
     private int[] steps;
-    private int width;
-    private int height;
 
     public FaceDetectionTranslator(
             double confThresh,
@@ -61,8 +59,10 @@ public class FaceDetectionTranslator implements Translator<Image, DetectedObject
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, Image input) {
-        width = input.getWidth();
-        height = input.getHeight();
+
+        ctx.setAttachment("width", input.getWidth());
+        ctx.setAttachment("height", input.getHeight());
+
         NDArray array = input.toNDArray(ctx.getNDManager(), Image.Flag.COLOR);
         array = array.transpose(2, 0, 1).flip(0); // HWC -> CHW RGB -> BGR
         // The network by default takes float32
@@ -78,6 +78,10 @@ public class FaceDetectionTranslator implements Translator<Image, DetectedObject
     /** {@inheritDoc} */
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
+
+        int width = (int) ctx.getAttachment("width");
+        int height = (int) ctx.getAttachment("height");
+
         NDManager manager = ctx.getNDManager();
         double scaleXY = variance[0];
         double scaleWH = variance[1];
