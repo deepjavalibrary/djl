@@ -52,6 +52,7 @@ jobs:
       - name: build docs
         run: |
           cd docs
+          export DJL_DISABLE_PROGRESS_BAR=true
           mkdocs build --site-dir ../../site
       - name: Configure AWS Credentials
         if: github.event_name != 'pull_request'

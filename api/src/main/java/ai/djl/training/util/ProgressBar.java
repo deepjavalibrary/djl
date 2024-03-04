@@ -29,10 +29,14 @@ public final class ProgressBar implements Progress {
     private long progress;
     private int currentPercent;
     private char progressChar = getProgressChar();
+    private boolean disableProgressBar;
 
     /** Creates an instance of {@code ProgressBar} with a maximum value of 1. */
     public ProgressBar() {
         max = 1;
+        disableProgressBar =
+                Boolean.parseBoolean(Utils.getEnvOrSystemProperty("DJL_DISABLE_PROGRESS_BAR"))
+                        || Boolean.getBoolean("disableProgressBar");
     }
 
     /**
@@ -43,6 +47,7 @@ public final class ProgressBar implements Progress {
      * @param max the maximum value
      */
     public ProgressBar(String message, long max) {
+        this();
         reset(message, max);
     }
 
@@ -55,6 +60,7 @@ public final class ProgressBar implements Progress {
      * @param trailingMessage the trailing message to be shown
      */
     public ProgressBar(String message, long max, String trailingMessage) {
+        this();
         reset(message, max);
         this.trailingMessage = trailingMessage;
     }
@@ -91,7 +97,7 @@ public final class ProgressBar implements Progress {
     @Override
     @SuppressWarnings("PMD.SystemPrintln")
     public void update(long progress, String additionalMessage) {
-        if (Boolean.getBoolean("disableProgressBar") || max <= 1) {
+        if (disableProgressBar || max <= 1) {
             return;
         }
 
