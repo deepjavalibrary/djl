@@ -15,7 +15,7 @@ package ai.djl.util;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.compress.utils.CloseShieldFilterInputStream;
+import org.apache.commons.io.input.CloseShieldInputStream;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public final class TarUtils {
         } else {
             bis = new BufferedInputStream(is);
         }
-        bis = new CloseShieldFilterInputStream(bis);
+        bis = CloseShieldInputStream.wrap(bis);
         try (TarArchiveInputStream tis = new TarArchiveInputStream(bis)) {
             TarArchiveEntry entry;
             while ((entry = tis.getNextEntry()) != null) {

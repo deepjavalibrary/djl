@@ -1,7 +1,9 @@
 dependencies {
     api "com.google.code.gson:gson:${gson_version}"
     api "net.java.dev.jna:jna:${jna_version}"
-    api "org.apache.commons:commons-compress:${commons_compress_version}"
+    api ("org.apache.commons:commons-compress:${commons_compress_version}") {
+        exclude group: "org.apache.commons", module: "commons-lang3"
+    }
     api "org.slf4j:slf4j-api:${slf4j_version}"
 
     testImplementation("org.testng:testng:${testng_version}") {
