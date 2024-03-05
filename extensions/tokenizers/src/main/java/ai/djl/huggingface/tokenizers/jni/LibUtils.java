@@ -72,8 +72,9 @@ public final class LibUtils {
             String nativeHelper = System.getProperty("ai.djl.huggingface.native_helper");
             if (nativeHelper != null && !nativeHelper.isEmpty()) {
                 ClassLoaderUtils.nativeLoad(nativeHelper, path);
+            } else {
+                System.load(path); // NOPMD
             }
-            System.load(path); // NOPMD
         }
     }
 
