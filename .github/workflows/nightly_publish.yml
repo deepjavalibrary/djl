@@ -123,8 +123,9 @@ jobs:
         run: |
           ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
           ./gradlew :integration:clean
-          ./gradlew :integration:test "-Dai.djl.default_engine=OnnxRuntime"
-          ./gradlew :integration:clean
+          # OnnxRuntime 1.17.1 requires GLIBC 2.27
+          # ./gradlew :integration:test "-Dai.djl.default_engine=OnnxRuntime"
+          # ./gradlew :integration:clean
 
   test-cuda-121:
     if: github.repository == 'deepjavalibrary/djl'
