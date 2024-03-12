@@ -45,7 +45,7 @@ public class JarRepositoryTest {
         URL[] url = {jarFile.toUri().toURL()};
         try {
             Thread.currentThread().setContextClassLoader(new URLClassLoader(url));
-            Repository repo = Repository.newInstance("test", "jar:///test.zip?hash=1");
+            Repository repo = Repository.newInstance("test", "jar:///test.zip");
             Assert.assertEquals("test", repo.getName());
             Assert.assertTrue(repo.isRemote());
 
@@ -55,6 +55,12 @@ public class JarRepositoryTest {
             Artifact artifact = repo.resolve(list.get(0), null);
             repo.prepare(artifact);
             Assert.assertEquals(1, artifact.getFiles().size());
+
+            repo = Repository.newInstance("test", "jar:///test.zip?ignore_real_uri=true");
+            list = repo.getResources();
+            artifact = repo.resolve(list.get(0), null);
+            Path p = repo.getResourceDirectory(artifact);
+            Assert.assertFalse(Files.exists(p));
         } finally {
             Thread.currentThread().setContextClassLoader(null);
         }
