@@ -144,7 +144,6 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         @Override
         public Repository newInstance(String name, URI uri) {
             String p = uri.getPath();
-            String queryString = uri.getRawQuery();
             if (p.startsWith("/")) {
                 p = p.substring(1);
             }
@@ -152,19 +151,22 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             if (u == null) {
                 throw new IllegalArgumentException("Resource not found: " + uri);
             }
+
+            URI realUri;
             try {
-                uri = u.toURI();
+                // resolve real uri: jar:file:/path/my_lib.jar!/model.zip
+                realUri = u.toURI();
             } catch (URISyntaxException e) {
                 throw new IllegalArgumentException("Resource not found: " + uri, e);
             }
 
-            Path path = Paths.get(parseFilePath(uri));
+            Path path = Paths.get(parseFilePath(realUri));
             String fileName = path.toFile().getName();
             if (FilenameUtils.isArchiveFile(fileName)) {
                 fileName = FilenameUtils.getNamePart(fileName);
             }
 
-            return new JarRepository(name, uri, fileName, queryString);
+            return new JarRepository(name, uri, fileName, realUri);
         }
 
         /** {@inheritDoc} */
