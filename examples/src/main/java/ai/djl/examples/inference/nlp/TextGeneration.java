@@ -59,6 +59,7 @@ public final class TextGeneration {
         SearchConfig config = new SearchConfig();
         config.setMaxSeqLength(60);
 
+        // You can use src/main/python/trace_gpt2.py to trace gpt2 model
         String url = "https://djl-misc.s3.amazonaws.com/test/models/gpt2/gpt2_pt.zip";
 
         Criteria<NDList, CausalLMOutput> criteria =
@@ -160,6 +161,20 @@ public final class TextGeneration {
         long padTokenId = 220;
         config.setPadTokenId(padTokenId);
 
+        // The model is converted optimum:
+        // https://huggingface.co/docs/optimum/main/en/exporters/onnx/usage_guides/export_a_model#exporting-a-model-using-past-keysvalues-in-the-decoder
+        /*
+         * optimum-cli export onnx --model gpt2 gpt2_onnx/
+         *
+         * from transformers import AutoTokenizer
+         * from optimum.onnxruntime import ORTModelForCausalLM
+         *
+         * tokenizer = AutoTokenizer.from_pretrained("./gpt2_onnx/")
+         * model = ORTModelForCausalLM.from_pretrained("./gpt2_onnx/")
+         * inputs = tokenizer("My name is Arthur and I live in", return_tensors="pt")
+         * gen_tokens = model.generate(**inputs)
+         * print(tokenizer.batch_decode(gen_tokens))
+         */
         String url = "https://djl-misc.s3.amazonaws.com/test/models/gpt2/gpt2_onnx.zip";
 
         Criteria<NDList, CausalLMOutput> criteria =
