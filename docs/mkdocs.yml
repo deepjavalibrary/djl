@@ -166,19 +166,29 @@ nav:
       - 'docs/serving/serving/docs/plugin_management.md'
       - 'docs/serving/wlm/README.md'
   - Large Model Inference:
-      - 'docs/serving/serving/docs/large_model_inference.md'
-      - 'docs/serving/serving/docs/lmi/configurations_large_model_inference_containers.md'
-      - 'docs/serving/serving/docs/lmi/lmi_environment_variable_instruction.md'
-      - 'docs/serving/serving/docs/lmi/lmi_input_output_schema.md'
+      - 'docs/serving/serving/docs/lmi/README.md'
+      - User Guides:
+          - 'docs/serving/serving/docs/lmi/user_guides/README.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/deepspeed_user_guide.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/lmi-dist_user_guide.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/vllm_user_guide.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/tnx_user_guide.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/trt_llm_user_guide.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/lmi_input_output_schema.md'
+      - Deployment Guides:
+          - 'docs/serving/serving/docs/lmi/deployment_guide/README.md'
+          - 'docs/serving/serving/docs/lmi/deployment_guide/model-artifacts.md'
+          - 'docs/serving/serving/docs/lmi/deployment_guide/instance-type-selection.md'
+          - 'docs/serving/serving/docs/lmi/deployment_guide/backend-selection.md'
+          - 'docs/serving/serving/docs/lmi/deployment_guide/configurations.md'
+          - 'docs/serving/serving/docs/lmi/deployment_guide/deploying-your-endpoint.md'
+          - 'docs/serving/serving/docs/lmi/deployment_guide/benchmarking-your-endpoint.md'
+          - 'docs/serving/serving/docs/lmi/deployment_guide/testing-custom-script.md'
       - Tutorials:
           - 'docs/serving/serving/docs/lmi/tutorials/seq_scheduler_tutorial.md'
           - 'docs/serving/serving/docs/lmi/tutorials/trtllm_aot_tutorial.md'
           - 'docs/serving/serving/docs/lmi/tutorials/trtllm_manual_convert_tutorial.md'
-      - Tuning guides:
-          - 'docs/serving/serving/docs/lmi/tuning_guides/deepspeed_tuning_guide.md'
-          - 'docs/serving/serving/docs/lmi/tuning_guides/lmi_dist_tuning_guide.md'
-          - 'docs/serving/serving/docs/lmi/tuning_guides/tnx_tuning_guide.md'
-          - 'docs/serving/serving/docs/lmi/tuning_guides/trtllm_tuning_guide.md'
+          - 'docs/serving/serving/docs/lmi/tutorials/tnx_aot_tutorial.md'
       - SageMaker LMI containers resources:
           - 'docs/demos/aws/sagemaker/large-model-inference/README.md'
   - Demos:
