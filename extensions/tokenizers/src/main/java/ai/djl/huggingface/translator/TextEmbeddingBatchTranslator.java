@@ -28,16 +28,19 @@ public class TextEmbeddingBatchTranslator implements NoBatchifyTranslator<String
     private Batchifier batchifier;
     private boolean normalize;
     private String pooling;
+    private boolean includeTokenTypes;
 
     TextEmbeddingBatchTranslator(
             HuggingFaceTokenizer tokenizer,
             Batchifier batchifier,
             String pooling,
-            boolean normalize) {
+            boolean normalize,
+            boolean includeTokenTypes) {
         this.tokenizer = tokenizer;
         this.batchifier = batchifier;
         this.pooling = pooling;
         this.normalize = normalize;
+        this.includeTokenTypes = includeTokenTypes;
     }
 
     /** {@inheritDoc} */
@@ -48,7 +51,7 @@ public class TextEmbeddingBatchTranslator implements NoBatchifyTranslator<String
         ctx.setAttachment("encodings", encodings);
         NDList[] batch = new NDList[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
-            batch[i] = encodings[i].toNDList(manager, false);
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
         }
         return batchifier.batchify(batch);
     }
