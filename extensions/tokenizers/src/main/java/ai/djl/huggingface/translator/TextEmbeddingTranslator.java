@@ -81,7 +81,8 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     @Override
     public TextEmbeddingBatchTranslator toBatchTranslator(Batchifier batchifier) {
         tokenizer.enableBatch();
-        return new TextEmbeddingBatchTranslator(tokenizer, batchifier, pooling, normalize, includeTokenTypes);
+        return new TextEmbeddingBatchTranslator(
+                tokenizer, batchifier, pooling, normalize, includeTokenTypes);
     }
 
     static NDArray processEmbedding(
