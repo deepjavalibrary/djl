@@ -29,13 +29,19 @@ public class FillMaskBatchTranslator implements NoBatchifyTranslator<String[], C
     private String maskToken;
     private long maskTokenId;
     private int topK;
+    private boolean includeTokenTypes;
     private Batchifier batchifier;
 
     FillMaskBatchTranslator(
-            HuggingFaceTokenizer tokenizer, String maskToken, int topK, Batchifier batchifier) {
+            HuggingFaceTokenizer tokenizer,
+            String maskToken,
+            int topK,
+            boolean includeTokenTypes,
+            Batchifier batchifier) {
         this.tokenizer = tokenizer;
         this.maskToken = maskToken;
         this.topK = topK;
+        this.includeTokenTypes = includeTokenTypes;
         this.batchifier = batchifier;
         Encoding encoding = tokenizer.encode(maskToken, false, false);
         maskTokenId = encoding.getIds()[0];
@@ -52,7 +58,7 @@ public class FillMaskBatchTranslator implements NoBatchifyTranslator<String[], C
         for (int i = 0; i < encodings.length; ++i) {
             long[] indices = encodings[i].getIds();
             maskIndices[i] = FillMaskTranslator.getMaskIndex(indices, maskToken, maskTokenId);
-            batch[i] = encodings[i].toNDList(manager, false);
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
         }
         return batchifier.batchify(batch);
     }

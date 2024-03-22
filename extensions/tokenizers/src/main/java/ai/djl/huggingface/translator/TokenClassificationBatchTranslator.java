@@ -32,11 +32,14 @@ public class TokenClassificationBatchTranslator
         implements NoBatchifyTranslator<String[], NamedEntity[][]> {
 
     private HuggingFaceTokenizer tokenizer;
+    private boolean includeTokenTypes;
     private Batchifier batchifier;
     private PretrainedConfig config;
 
-    TokenClassificationBatchTranslator(HuggingFaceTokenizer tokenizer, Batchifier batchifier) {
+    TokenClassificationBatchTranslator(
+            HuggingFaceTokenizer tokenizer, boolean includeTokenTypes, Batchifier batchifier) {
         this.tokenizer = tokenizer;
+        this.includeTokenTypes = includeTokenTypes;
         this.batchifier = batchifier;
     }
 
@@ -58,7 +61,7 @@ public class TokenClassificationBatchTranslator
         ctx.setAttachment("encodings", encodings);
         NDList[] batch = new NDList[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
-            batch[i] = encodings[i].toNDList(manager, false);
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
         }
         return batchifier.batchify(batch);
     }
