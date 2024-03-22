@@ -100,6 +100,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         super(-1L);
         this.manager = manager;
         this.strs = strs;
+        this.sparseFormat = SparseFormat.DENSE;
         this.shape = shape;
         this.dataType = DataType.STRING;
         NDScope.register(this);
@@ -225,6 +226,10 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public ByteBuffer toByteBuffer() {
+        if (getDataType() == DataType.STRING) {
+            throw new UnsupportedOperationException(
+                    "toByteBuffer is not supported for String tensor.");
+        }
         return JniUtils.getByteBuffer(this);
     }
 
@@ -428,6 +433,9 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
         }
         if (getDataType() != other.getDataType()) {
             return false;
+        }
+        if (getDataType() == DataType.STRING) {
+            return Arrays.equals(toStringArray(), other.toStringArray());
         }
         return JniUtils.contentEqual(this, manager.from(other));
     }
