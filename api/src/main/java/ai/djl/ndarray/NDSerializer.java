@@ -83,6 +83,16 @@ final class NDSerializer {
         Shape shape = array.getShape();
         dos.write(shape.getEncoded());
 
+        if (array.getDataType() == DataType.STRING) {
+            String[] data = array.toStringArray();
+            dos.writeInt(data.length);
+            for (String str : data) {
+                dos.writeUTF(str);
+            }
+            dos.flush();
+            return;
+        }
+
         ByteBuffer bb = array.toByteBuffer();
         dos.write(bb.order() == ByteOrder.BIG_ENDIAN ? '>' : '<');
         int length = bb.remaining();
@@ -166,6 +176,17 @@ final class NDSerializer {
 
         // Shape
         Shape shape = Shape.decode(bb);
+
+        if (dataType == DataType.STRING) {
+            int size = bb.getInt();
+            String[] data = new String[size];
+            for (int i = 0; i < size; ++i) {
+                data[i] = readUTF(bb);
+            }
+            NDArray array = manager.create(data, StandardCharsets.UTF_8, shape);
+            array.setName(name);
+            return array;
+        }
 
         // Data
         ByteOrder order;
