@@ -118,6 +118,8 @@ public final class LibUtils {
                 }
             }
         }
+        String libExclusion = Utils.getEnvOrSystemProperty("PYTORCH_LIBRARY_EXCLUSION", "");
+        Set<String> exclusion = new HashSet<>(Arrays.asList(libExclusion.split(",")));
         boolean isCuda = libTorch.flavor.contains("cu");
         List<String> deferred =
                 Arrays.asList(
@@ -137,7 +139,8 @@ public final class LibUtils {
             paths.filter(
                             path -> {
                                 String name = path.getFileName().toString();
-                                if (!LIB_PATTERN.matcher(name).matches()) {
+                                if (!LIB_PATTERN.matcher(name).matches()
+                                        || exclusion.contains(name)) {
                                     return false;
                                 } else if (!isCuda
                                         && name.contains("nvrtc")
