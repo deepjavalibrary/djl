@@ -13,11 +13,13 @@
 package ai.djl.training.listener;
 
 import ai.djl.Device;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.training.Trainer;
 import ai.djl.training.dataset.Batch;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@code TrainingListener} offers an interface that performs some actions when certain events have
@@ -163,6 +165,20 @@ public interface TrainingListener {
                 new TimeMeasureTrainingListener(outputDir)
             };
         }
+
+        /**
+         * Returns listener for logging algebraic operation.
+         *
+         * @param outputFile the output file to store the algebraic log. Can be null which skips
+         *     algebraic logging.
+         * @return the new set of listeners
+         */
+        static TrainingListener[] algebraicLogging(String outputFile) {
+            if (outputFile == null) {
+                return new TrainingListener[] {}; // algebraic logging disabled
+            }
+            return new TrainingListener[] {new AlgebraicListener(outputFile)};
+        }
     }
 
     /** A class to pass data from the batch into the training listeners. */
@@ -171,6 +187,8 @@ public interface TrainingListener {
         private Batch batch;
         private Map<Device, NDList> labels;
         private Map<Device, NDList> predictions;
+        private Map<Device, NDList> data;
+        private Map<Device, NDArray> loss;
 
         /**
          * Constructs a new {@link BatchData}.
@@ -183,6 +201,8 @@ public interface TrainingListener {
             this.batch = batch;
             this.labels = labels;
             this.predictions = predictions;
+            this.data = new ConcurrentHashMap<>();
+            this.loss = new ConcurrentHashMap<>();
         }
 
         /**
@@ -210,6 +230,24 @@ public interface TrainingListener {
          */
         public Map<Device, NDList> getPredictions() {
             return predictions;
+        }
+
+        /**
+         * Returns the data for each device.
+         *
+         * @return the data for each device
+         */
+        public Map<Device, NDList> getData() {
+            return data;
+        }
+
+        /**
+         * Returns the loss for each device.
+         *
+         * @return the loss for each device
+         */
+        public Map<Device, NDArray> getLoss() {
+            return loss;
         }
     }
 }

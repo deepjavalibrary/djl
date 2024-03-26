@@ -214,6 +214,8 @@ public final class TrainTimeSeries {
                 .addEvaluator(new Rmsse(distributionOutput))
                 .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
                 .optInitializer(new XavierInitializer(), Parameter.Type.WEIGHT)
+                .addTrainingListeners(
+                        TrainingListener.Defaults.algebraicLogging(arguments.getAlgebraicLogFile()))
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }

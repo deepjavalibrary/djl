@@ -38,6 +38,7 @@ public class Arguments {
     protected long limit;
     protected String modelDir;
     protected Map<String, String> criteria;
+    protected String algebraicLogFile;
 
     protected void initialize() {
         epoch = 2;
@@ -45,6 +46,7 @@ public class Arguments {
         outputDir = "build/model";
         limit = Long.MAX_VALUE;
         modelDir = null;
+        algebraicLogFile = null;
     }
 
     protected void setCmd(CommandLine cmd) {
@@ -74,6 +76,9 @@ public class Arguments {
         if (cmd.hasOption("criteria")) {
             Type type = new TypeToken<Map<String, Object>>() {}.getType();
             criteria = JsonUtils.GSON.fromJson(cmd.getOptionValue("criteria"), type);
+        }
+        if (cmd.hasOption("algebraic-log")) {
+            algebraicLogFile = cmd.getOptionValue("algebraic-log");
         }
     }
 
@@ -162,6 +167,15 @@ public class Arguments {
                         .argName("CRITERIA")
                         .desc("The criteria used for the model.")
                         .build());
+        options.addOption(
+                Option.builder("a")
+                        .longOpt("algebraic-log")
+                        .hasArg()
+                        .argName("ALGEBRAIC-LOG")
+                        .desc(
+                                "File to log algebraic operations executed during training as"
+                                        + " Python program.")
+                        .build());
         return options;
     }
 
@@ -191,6 +205,10 @@ public class Arguments {
 
     public String getOutputDir() {
         return outputDir;
+    }
+
+    public String getAlgebraicLogFile() {
+        return algebraicLogFile;
     }
 
     public long getLimit() {
