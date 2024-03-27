@@ -73,7 +73,15 @@ public final class LibUtils {
             if (nativeHelper != null && !nativeHelper.isEmpty()) {
                 ClassLoaderUtils.nativeLoad(nativeHelper, path);
             } else {
-                System.load(path); // NOPMD
+                try {
+                    System.load(path); // NOPMD
+                } catch (UnsatisfiedLinkError e) {
+                    if (e.getMessage().contains("already loaded")) {
+                        logger.warn(String.format("Library %s already loaded. System.load() ignored!", path));
+                    } else {
+                        throw e;
+                    }
+                }
             }
         }
     }
