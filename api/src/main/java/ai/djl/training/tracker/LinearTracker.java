@@ -12,7 +12,6 @@
  */
 package ai.djl.training.tracker;
 
-import ai.djl.training.tracker.WarmUpTracker.Builder;
 import ai.djl.util.Preconditions;
 
 /**
