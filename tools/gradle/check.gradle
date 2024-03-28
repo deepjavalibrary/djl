@@ -35,7 +35,7 @@ tasks.withType(Pmd) {
 
 apply plugin: "checkstyle"
 checkstyle {
-    toolVersion = "8.26"
+    toolVersion = "10.14.2"
     ignoreFailures = false
     checkstyleTest.enabled = true
     configProperties = [

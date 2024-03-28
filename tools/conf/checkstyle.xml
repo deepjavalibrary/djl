@@ -156,7 +156,6 @@
                     value="Override, Test, Before, After, BeforeClass, AfterClass"/>
         </module>
         -->
-        <module name="FinalClass"/>
         <module name="HideUtilityClassConstructor"/>
         <module name="InnerTypeLast"/>
         <!--
@@ -284,8 +283,8 @@
         <!-- Javadoc Comments -->
         <module name="AtclauseOrder"/>
         <module name="JavadocMethod">
-            <property name="allowUndeclaredRTE" value="true"/>
-            <property name="allowThrowsTagsForSubclasses" value="true"/>
+            <property name="allowMissingParamTags" value="true"/>
+            <property name="allowMissingReturnTag" value="true"/>
         </module>
         <module name="JavadocParagraph"/>
         <module name="JavadocStyle">

@@ -134,9 +134,9 @@ public class TextGenerator {
      * Generates text using beam search.
      *
      * @param inputIds input tokens ids
-     * @see <a href="https://huggingface.co/blog/how-to-generate">Beam Search</a>
      * @return the output token ids stored as NDArray and the endPosition of each sentence
      * @throws TranslateException if failed run forward
+     * @see <a href="https://huggingface.co/blog/how-to-generate">Beam Search</a>
      */
     @SuppressWarnings("try")
     public NDArray beamSearch(NDArray inputIds) throws TranslateException {
@@ -261,9 +261,9 @@ public class TextGenerator {
      * Generates text using contrastive search.
      *
      * @param inputIds input token ids
-     * @see <a href="https://huggingface.co/blog/introducing-csearch">Contrastive Search</a>
      * @return the output token ids stored as NDArray
      * @throws TranslateException if forward failed
+     * @see <a href="https://huggingface.co/blog/introducing-csearch">Contrastive Search</a>
      */
     @SuppressWarnings("try")
     public NDArray contrastiveSearch(NDArray inputIds) throws TranslateException {
