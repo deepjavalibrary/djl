@@ -58,7 +58,11 @@ public final class TfDataType {
      * @return the converted TensorFlow type value
      */
     public static int toTf(DataType dataType) {
-        return toTfMap.get(dataType);
+        Integer tfType = toTfMap.get(dataType);
+        if (tfType == null) {
+            throw new UnsupportedOperationException("Unsupported data type: " + dataType);
+        }
+        return tfType;
     }
 
     /**

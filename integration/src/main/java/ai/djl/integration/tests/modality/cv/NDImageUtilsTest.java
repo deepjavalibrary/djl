@@ -31,7 +31,7 @@ public class NDImageUtilsTest {
     @Test
     public void testNormalize() {
         // TensorFlow use channels last by default
-        TestUtils.requiresEngine("MXNet", "PyTorch");
+        TestUtils.requiresEngine("MXNet", "PyTorch", "Rust");
 
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test 3D C, H, W
@@ -69,7 +69,7 @@ public class NDImageUtilsTest {
     @Test
     public void testToTensor() {
         // TensorFlow use channels last by default
-        TestUtils.requiresEngine("MXNet", "PyTorch");
+        TestUtils.requiresEngine("MXNet", "PyTorch", "Rust");
 
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             // test 3D C, H, W

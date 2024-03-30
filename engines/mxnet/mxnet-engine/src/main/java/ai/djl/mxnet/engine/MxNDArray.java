@@ -1015,8 +1015,8 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
     @Override
     public NDArray sum() {
         // TODO current windows doesn't support boolean NDArray
+        DataType target = getDataType();
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            DataType target = getDataType();
             if (!target.isFloating()) {
                 try (NDArray thisArr = toType(DataType.FLOAT32, false)) {
                     if (target == DataType.BOOLEAN) {
@@ -1028,7 +1028,11 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
                 }
             }
         }
-        return manager.invoke("_np_sum", this, null);
+        NDArray array = manager.invoke("_np_sum", this, null);
+        if (target.isInteger()) {
+            array = array.toType(DataType.INT64, false);
+        }
+        return array;
     }
 
     /** {@inheritDoc} */

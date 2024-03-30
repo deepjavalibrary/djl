@@ -157,9 +157,9 @@ public class NDArrayElementComparisonOpTest {
             Assert.assertFalse(NDArrays.allClose(array1, array2, 0, 0, false));
             Assert.assertFalse(NDArrays.allClose(array1, array2, 0, 0, true));
 
-            // test mult-dim
+            // test multi-dim
             array1 = manager.arange(10.0f, 20.0f).reshape(2, 5);
-            array2 = array1.add(1e-5);
+            array2 = array1.add(1e-5f);
             Assert.assertTrue(array1.allClose(array2));
             Assert.assertTrue(NDArrays.allClose(array1, array2));
 
@@ -181,17 +181,17 @@ public class NDArrayElementComparisonOpTest {
     public void testGreaterThanScalar() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {1f, 0f, 2f, 2f, 4f});
-            NDArray result = NDArrays.gt(array, 2);
+            NDArray result = NDArrays.gt(array, 2f);
             NDArray expected = manager.create(new boolean[] {false, false, false, false, true});
             Assert.assertEquals(result, expected, "greater_scalar: Incorrect comparison");
-            result = NDArrays.gt(2, array);
+            result = NDArrays.gt(2f, array);
             Assert.assertTrue(result.getBoolean(0));
 
             array =
                     manager.create(
                             new float[] {2f, 3f, -5f, 2f, 5f, 10f, 20123f, -355f},
                             new Shape(2, 2, 2));
-            result = NDArrays.gt(array, 2);
+            result = NDArrays.gt(array, 2f);
             expected =
                     manager.create(
                             new boolean[] {false, true, false, false, true, true, true, false},
