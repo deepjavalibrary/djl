@@ -12,18 +12,24 @@
  */
 package ai.djl.huggingface.translator;
 
+import ai.djl.Device;
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 /** The translator for Huggingface text embedding model. */
@@ -36,24 +42,63 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     private boolean normalize;
     private String pooling;
     private boolean includeTokenTypes;
+    private String dense;
+    private String denseActivation;
+    private String layerNorm;
+    private NDList denseModel;
+    private NDList layerNormModel;
 
     TextEmbeddingTranslator(
             HuggingFaceTokenizer tokenizer,
             Batchifier batchifier,
             String pooling,
             boolean normalize,
-            boolean includeTokenTypes) {
+            boolean includeTokenTypes,
+            String dense,
+            String denseActivation,
+            String layerNorm) {
         this.tokenizer = tokenizer;
         this.batchifier = batchifier;
         this.pooling = pooling;
         this.normalize = normalize;
         this.includeTokenTypes = includeTokenTypes;
+        this.dense = dense;
+        this.denseActivation = denseActivation;
+        this.layerNorm = layerNorm;
     }
 
     /** {@inheritDoc} */
     @Override
     public Batchifier getBatchifier() {
         return batchifier;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(TranslatorContext ctx) throws Exception {
+        NDManager manager = ctx.getPredictorManager().newSubManager(Device.cpu());
+        if (dense != null) {
+            Path file = Paths.get(dense);
+            if (!file.isAbsolute()) {
+                file = ctx.getModel().getModelPath().resolve(file);
+            }
+            if (Files.exists(file)) {
+                try (InputStream is = Files.newInputStream(file)) {
+                    denseModel = NDList.decode(manager, is);
+                }
+            }
+        }
+        if (layerNorm != null) {
+            Path file = Paths.get(layerNorm);
+            if (!file.isAbsolute()) {
+                file = ctx.getModel().getModelPath().resolve(file);
+            }
+            if (Files.exists(file)) {
+                try (InputStream is = Files.newInputStream(file)) {
+                    layerNormModel = NDList.decode(manager, is);
+                }
+            }
+        }
     }
 
     /** {@inheritDoc} */
@@ -70,6 +115,25 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         Encoding encoding = (Encoding) ctx.getAttachment("encoding");
         NDManager manager = ctx.getNDManager();
         NDArray embeddings = processEmbedding(manager, list, encoding, pooling);
+        embeddings = embeddings.toDevice(Device.cpu(), false);
+        if (denseModel != null) {
+            NDArray weight = denseModel.get("linear.weight");
+            NDArray bias = denseModel.get("linear.bias");
+            embeddings = embeddings.getNDArrayInternal().linear(embeddings, weight, bias).get(0);
+            if ("Tanh".equals(denseActivation)) {
+                embeddings = embeddings.tanh();
+            }
+        }
+        if (layerNormModel != null) {
+            NDArray weight = layerNormModel.get("norm.weight");
+            NDArray bias = layerNormModel.get("norm.bias");
+            Shape shape = weight.getShape();
+            embeddings =
+                    embeddings
+                            .getNDArrayInternal()
+                            .layerNorm(embeddings, shape, weight, bias, 1e-5f)
+                            .get(0);
+        }
         if (normalize) {
             embeddings = embeddings.normalize(2, 0);
         }
@@ -176,6 +240,9 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         private boolean normalize = true;
         private String pooling = "mean";
         private boolean includeTokenTypes;
+        private String dense;
+        private String denseActivation;
+        private String layerNorm;
 
         Builder(HuggingFaceTokenizer tokenizer) {
             this.tokenizer = tokenizer;
@@ -235,6 +302,39 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         }
 
         /**
+         * Sets the dense layer model file for the {@link Translator}.
+         *
+         * @param dense path to dense layer model file
+         * @return this builder
+         */
+        public Builder optDense(String dense) {
+            this.dense = dense;
+            return this;
+        }
+
+        /**
+         * Sets the dense activation function for the {@link Translator}.
+         *
+         * @param denseActivation path to dense layer
+         * @return this builder
+         */
+        public Builder optDenseActivation(String denseActivation) {
+            this.denseActivation = denseActivation;
+            return this;
+        }
+
+        /**
+         * Sets the LayerNorm model for the {@link Translator}.
+         *
+         * @param layerNorm path to LayerNorm model
+         * @return this builder
+         */
+        public Builder optLayerNorm(String layerNorm) {
+            this.layerNorm = layerNorm;
+            return this;
+        }
+
+        /**
          * Configures the builder with the model arguments.
          *
          * @param arguments the model arguments
@@ -245,6 +345,9 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
             optNormalize(ArgumentsUtil.booleanValue(arguments, "normalize", true));
             optPoolingMode(ArgumentsUtil.stringValue(arguments, "pooling", "mean"));
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
+            optDense(ArgumentsUtil.stringValue(arguments, "dense"));
+            optDenseActivation(ArgumentsUtil.stringValue(arguments, "denseActivation"));
+            optLayerNorm(ArgumentsUtil.stringValue(arguments, "layerNorm"));
         }
 
         /**
@@ -255,7 +358,14 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
          */
         public TextEmbeddingTranslator build() throws IOException {
             return new TextEmbeddingTranslator(
-                    tokenizer, batchifier, pooling, normalize, includeTokenTypes);
+                    tokenizer,
+                    batchifier,
+                    pooling,
+                    normalize,
+                    includeTokenTypes,
+                    dense,
+                    denseActivation,
+                    layerNorm);
         }
     }
 }
