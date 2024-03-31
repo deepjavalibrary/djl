@@ -66,13 +66,17 @@ public class PtModel extends BaseModel {
             throws IOException, MalformedModelException {
         setModelDir(modelPath);
         wasLoaded = true;
-        if (prefix == null) {
+
+        Path modelFile;
+        if (prefix != null) {
+            modelFile = findModelFile(prefix);
+        } else {
+            // search for .pt file with modelName, folder name or "model.pt"
+            modelFile = findModelFile(modelName, modelDir.toFile().getName(), "model.pt");
             prefix = modelName;
         }
 
         if (block == null) {
-            // search for .pt file with prefix, folder name or "model.pt"
-            Path modelFile = findModelFile(prefix, modelDir.toFile().getName(), "model.pt");
             if (modelFile == null) {
                 String fileName = prefix.endsWith(".pt") ? prefix : prefix + ".pt";
                 throw new FileNotFoundException(fileName + " file not found in: " + modelDir);
