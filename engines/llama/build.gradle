@@ -80,15 +80,16 @@ apply from: file("${rootProject.projectDir}/tools/gradle/cpp-formatter.gradle")
 
 tasks.register('compileJNI') {
     doFirst {
+        def cp = configurations.runtimeClasspath.resolve().stream().map {f->f.toString()}.toList()
         if (System.properties['os.name'].toLowerCase(Locale.ROOT).contains("mac")
                 || System.properties['os.name'].toLowerCase(Locale.ROOT).contains("linux")) {
             def arch = System.properties["os.arch"] == "amd64" ? "x86_64" : System.properties["os.arch"]
             exec {
-                commandLine "bash", "build.sh", llamacpp_version, arch
+                commandLine "bash", "build.sh", llamacpp_version, arch, String.join(":", cp)
             }
         } else {
             exec {
-                commandLine "${project.projectDir}/build.cmd", llamacpp_version, "x86_64"
+                commandLine "${project.projectDir}/build.cmd", llamacpp_version, String.join(";", cp)
             }
         }
 
