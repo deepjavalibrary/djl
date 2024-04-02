@@ -84,13 +84,15 @@ public class OrtTest {
 
                 Model m = Model.newInstance("model", "OnnxRuntime");
                 Path path = model.getModelPath();
-                Assert.assertThrows(() -> m.load(path, null));
                 Assert.assertThrows(() -> m.load(path, "invalid.onnx"));
 
-                Path modelFile = path.resolve(model.getName() + ".onnx");
-                m.load(modelFile);
-
+                m.load(path, null);
                 m.close();
+
+                Model m2 = Model.newInstance("model", "OnnxRuntime");
+                Path modelFile = path.resolve(model.getName() + ".onnx");
+                m2.load(modelFile);
+                m2.close();
 
                 // Test load model from stream
                 Model stream = Model.newInstance("model", "OnnxRuntime");

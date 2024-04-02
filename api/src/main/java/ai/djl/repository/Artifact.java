@@ -240,15 +240,13 @@ public class Artifact {
      */
     public URI getResourceUri() {
         URI uri = metadata.getRepositoryUri();
-        if (properties != null) {
-            for (String values : properties.values()) {
-                uri = uri.resolve(values + '/');
-            }
+        if (version != null) {
+            uri = uri.resolve(version + '/');
         }
-        if (version == null) {
-            return uri;
+        if (name != null && !name.isEmpty()) {
+            uri = uri.resolve(name + '/');
         }
-        return uri.resolve(version + '/');
+        return uri;
     }
 
     /**
