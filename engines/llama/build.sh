@@ -12,6 +12,7 @@ PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 
 VERSION=$1
 ARCH=$2
+CLASSPATH=$3
 
 pushd $WORK_DIR
 if [ ! -d "llama.cpp" ]; then
@@ -25,7 +26,7 @@ cd build
 
 rm -rf classes
 mkdir classes
-javac -sourcepath ../src/main/java/ ../src/main/java/ai/djl/llama/jni/LlamaLibrary.java -h include -d classes
+javac -classpath $CLASSPATH -sourcepath ../src/main/java/:../../../api/src/main/java ../src/main/java/ai/djl/llama/jni/LlamaLibrary.java -h include -d classes
 cmake ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
 
