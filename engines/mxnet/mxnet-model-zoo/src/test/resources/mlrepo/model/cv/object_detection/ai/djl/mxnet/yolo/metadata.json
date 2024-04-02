@@ -95,7 +95,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo3_mobile_voc_320",
+      "name": "yolo3_mobilenet_voc_320",
       "properties": {
         "dataset": "voc",
         "version": "3",
@@ -120,13 +120,13 @@
         },
         "symbol": {
           "uri": "0.0.1/yolo3_mobilenet1.0_voc-320x320/yolo-symbol.json",
-          "name": "yolo3_mobile_voc_320-symbol.json",
+          "name": "yolo3_mobilenet_voc_320-symbol.json",
           "sha1Hash": "367e425d3ffa1fc06355dc88b96f5c0c408e224c",
           "size": 147800
         },
         "parameters": {
           "uri": "0.0.1/yolo3_mobilenet1.0_voc-320x320/yolo-0000.params.gz",
-          "name": "yolo3_mobile_voc_320-0000.params",
+          "name": "yolo3_mobilenet_voc_320-0000.params",
           "sha1Hash": "69f6935e53f69560ced1718bfa73935f9db7412d",
           "size": 89818905
         }
@@ -135,7 +135,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo3_mobile_voc_416",
+      "name": "yolo3_mobilenet_voc_41",
       "properties": {
         "dataset": "voc",
         "version": "3",
@@ -295,7 +295,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo3_mobile_coco_320",
+      "name": "yolo3_mobilenet_coco_320",
       "properties": {
         "dataset": "coco",
         "version": "3",
@@ -335,7 +335,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo3_mobile_coco_416",
+      "name": "yolo3_mobilenet_coco_416",
       "properties": {
         "dataset": "coco",
         "version": "3",
@@ -375,7 +375,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo3_mobile_coco_608",
+      "name": "yolo3_mobilenet_coco_608",
       "properties": {
         "dataset": "coco",
         "version": "3",
