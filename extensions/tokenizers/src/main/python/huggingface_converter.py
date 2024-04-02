@@ -10,12 +10,12 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS"
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
-
 import logging
 import os.path
 import shutil
 from argparse import Namespace
 
+import requests
 import torch
 from huggingface_hub import hf_hub_download
 from transformers import pipeline
@@ -95,6 +95,16 @@ class HuggingfaceConverter:
             if path != "tokenizer.json":
                 os.remove(os.path.join(temp_dir, path))
 
+    @staticmethod
+    def save_layer_weight(model_id: str, temp_dir: str, layer: str, name: str):
+        try:
+            file = hf_hub_download(repo_id=model_id,
+                                   filename=f"{layer}/model.safetensors")
+            shutil.copyfile(file, os.path.join(temp_dir,
+                                               f"{name}.safetensors"))
+        except requests.exceptions.HTTPError:
+            logging.debug(f"{model_id}: {layer}/model.safetensors not found.")
+
     def jit_trace_model(self, hf_pipeline, model_id: str, temp_dir: str,
                         include_types: bool):
         logging.info(
@@ -143,16 +153,25 @@ class HuggingfaceConverter:
         # Save serving.properties
         serving_file = os.path.join(temp_dir, "serving.properties")
         arguments = self.get_extra_arguments(hf_pipeline, model_id)
+        if include_types:
+            arguments["includeTokenTypes"] = "true"
+        arguments["translatorFactory"] = self.translator
+
         with open(serving_file, 'w') as f:
             f.write(f"engine=PyTorch\n"
                     f"option.modelName={model_name}\n"
-                    f"option.mapLocation=true\n"
-                    f"translatorFactory={self.translator}\n")
-            if include_types:
-                f.write(f"includeTokenTypes={include_types}\n")
+                    f"option.mapLocation=true\n")
 
             for k, v in arguments.items():
                 f.write(f"{k}={v}\n")
+
+        # Save dense layer if exists
+        if arguments.get("dense"):
+            self.save_layer_weight(model_id, temp_dir, "2_Dense", "linear")
+
+        # Save LayerNorm layer if exists
+        if arguments.get("layerNorm"):
+            self.save_layer_weight(model_id, temp_dir, "3_LayerNorm", "norm")
 
         # Save model as .zip file
         logging.info(f"Saving DJL model as zip: {model_name}.zip ...")
@@ -160,10 +179,11 @@ class HuggingfaceConverter:
         zip_dir(temp_dir, zip_file)
 
         # Save metadata.json
+        arguments["engine"] = "PyTorch"
         sha1 = sha1_sum(zip_file)
         file_size = os.path.getsize(zip_file)
-        metadata = HuggingfaceMetadata(model_info, self.application,
-                                       self.translator, sha1, file_size)
+        metadata = HuggingfaceMetadata(model_info, self.application, sha1,
+                                       file_size, arguments)
         metadata_file = os.path.join(repo_dir, "metadata.json")
         metadata.save_metadata(metadata_file)
 

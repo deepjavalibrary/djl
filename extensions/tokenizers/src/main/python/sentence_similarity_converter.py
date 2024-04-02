@@ -78,4 +78,40 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
         except requests.exceptions.HTTPError:
             logging.warning(f"{model_id}: 1_Pooling/config.json not found.")
 
+        has_dense = False
+        try:
+            file = hf_hub_download(repo_id=model_id,
+                                   filename="2_Dense/config.json")
+            with open(file, "r") as f:
+                dense = json.load(f)
+                activation = dense.get("activation_function")
+                if activation == "torch.nn.modules.activation.Tanh":
+                    args["denseActivation"] = "Tanh"
+                    has_dense = True
+                elif activation == "torch.nn.modules.linear.Identity":
+                    has_dense = True
+                else:
+                    logging.warning(
+                        f"Unexpected activation function: {activation}.")
+        except requests.exceptions.HTTPError:
+            logging.debug(f"{model_id}: 2_Dense/config.json not found.")
+
+        if has_dense:
+            try:
+                hf_hub_download(repo_id=model_id,
+                                filename="2_Dense/model.safetensors")
+                args["dense"] = "linear.safetensors"
+                args["normalize"] = "false"
+            except requests.exceptions.HTTPError:
+                logging.warning(
+                    f"{model_id}: 2_Dense/model.safetensors not found.")
+
+        try:
+            hf_hub_download(repo_id=model_id,
+                            filename="3_LayerNorm/model.safetensors")
+            args["layerNorm"] = "norm.safetensors"
+        except requests.exceptions.HTTPError:
+            logging.warning(
+                f"{model_id}: 3_LayerNorm/model.safetensors not found.")
+
         return args
