@@ -13,7 +13,7 @@ if exist "llama.cpp" (
 if exist build rd /q /s build
 md build\classes
 cd build
-javac -sourcepath ..\src\main\java\ ..\src\main\java\ai\djl\llama\jni\LlamaLibrary.java -h include -d classes
+javac -classpath "%2" -sourcepath ..\src\main\java\ ..\src\main\java\ai\djl\llama\jni\LlamaLibrary.java -h include -d classes
 cmake ..
 cmake --build . --config Release
 
