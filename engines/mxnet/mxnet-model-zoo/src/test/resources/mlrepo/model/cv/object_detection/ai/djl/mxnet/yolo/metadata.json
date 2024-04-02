@@ -55,7 +55,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo",
+      "name": "yolo3_darknet_voc_416",
       "properties": {
         "dataset": "voc",
         "version": "3",
@@ -80,11 +80,13 @@
         },
         "symbol": {
           "uri": "0.0.1/yolo3_darknet53_voc-416x416/yolo-symbol.json",
+          "name": "yolo3_darknet_voc_416-symbol.json",
           "sha1Hash": "488dfc61afdb9022901673c048e3773041a20669",
           "size": 216997
         },
         "parameters": {
           "uri": "0.0.1/yolo3_darknet53_voc-416x416/yolo-0000.params.gz",
+          "name": "yolo3_darknet_voc_416-0000.params",
           "sha1Hash": "e71611a6eda9d475b941a3c57d6e447e54e22b6d",
           "size": 228664813
         }
@@ -93,7 +95,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo",
+      "name": "yolo3_mobile_voc_320",
       "properties": {
         "dataset": "voc",
         "version": "3",
@@ -118,11 +120,13 @@
         },
         "symbol": {
           "uri": "0.0.1/yolo3_mobilenet1.0_voc-320x320/yolo-symbol.json",
+          "name": "yolo3_mobile_voc_320-symbol.json",
           "sha1Hash": "367e425d3ffa1fc06355dc88b96f5c0c408e224c",
           "size": 147800
         },
         "parameters": {
           "uri": "0.0.1/yolo3_mobilenet1.0_voc-320x320/yolo-0000.params.gz",
+          "name": "yolo3_mobile_voc_320-0000.params",
           "sha1Hash": "69f6935e53f69560ced1718bfa73935f9db7412d",
           "size": 89818905
         }
@@ -131,7 +135,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo",
+      "name": "yolo3_mobile_voc_416",
       "properties": {
         "dataset": "voc",
         "version": "3",
@@ -156,11 +160,13 @@
         },
         "symbol": {
           "uri": "0.0.1/yolo3_mobilenet1.0_voc-416x416/yolo-symbol.json",
+          "name": "yolo3_mobilenet_voc_416-symbol.json",
           "sha1Hash": "1f537495fd8ad952d4c7a3bc3160583a55269469",
           "size": 147800
         },
         "parameters": {
           "uri": "0.0.1/yolo3_mobilenet1.0_voc-416x416/yolo-0000.params.gz",
+          "name": "yolo3_mobilenet_voc_416-0000.params",
           "sha1Hash": "3a5bedb5122c970375d4ee10a78e990832fda1cb",
           "size": 89818919
         }
@@ -169,7 +175,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo",
+      "name": "yolo3_darknet_coco_320",
       "properties": {
         "dataset": "coco",
         "version": "3",
@@ -194,11 +200,13 @@
         },
         "symbol": {
           "uri": "0.0.1/yolo3_darknet53_coco-320x320/yolo-symbol.json",
+          "name": "yolo3_darknet_coco_320-symbol.json",
           "sha1Hash": "17e60b0b141d81fb5534dec02252fdf9364a1087",
           "size": 217009
         },
         "parameters": {
           "uri": "0.0.1/yolo3_darknet53_coco-320x320/yolo-0000.params.gz",
+          "name": "yolo3_darknet_coco_320-0000.params",
           "sha1Hash": "06c5ddb4c6daf1839fed15d5566e49968edf60b5",
           "size": 229889985
         }
@@ -207,7 +215,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo",
+      "name": "yolo3_darknet_coco_416",
       "properties": {
         "dataset": "coco",
         "version": "3",
@@ -232,11 +240,13 @@
         },
         "symbol": {
           "uri": "0.0.1/yolo3_darknet53_coco-416x416/yolo-symbol.json",
+          "name": "yolo3_darknet_coco_416-symbol.json",
           "sha1Hash": "ccb6cc9e479e12992059f3196ce55cda9bfb6d3e",
           "size": 217009
         },
         "parameters": {
           "uri": "0.0.1/yolo3_darknet53_coco-416x416/yolo-0000.params.gz",
+          "name": "yolo3_darknet_coco_416-0000.params",
           "sha1Hash": "b290675ce6b79eb35fc315c475d82423fa7621c1",
           "size": 229889985
         }
@@ -245,7 +255,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo",
+      "name": "yolo3_darknet_coco_608",
       "properties": {
         "dataset": "coco",
         "version": "3",
@@ -270,11 +280,13 @@
         },
         "symbol": {
           "uri": "0.0.1/yolo3_darknet53_coco-608x608/yolo-symbol.json",
+          "name": "yolo3_darknet_coco_608-symbol.json",
           "sha1Hash": "a7cb07555e06571007516298dc1f238bc90baf72",
           "size": 217009
         },
         "parameters": {
           "uri": "0.0.1/yolo3_darknet53_coco-608x608/yolo-0000.params.gz",
+          "name": "yolo3_darknet_coco_608-0000.params",
           "sha1Hash": "2efd6cd89723913d96b66642a225ea56e03e7fa2",
           "size": 229889985
         }
@@ -283,7 +295,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo",
+      "name": "yolo3_mobile_coco_320",
       "properties": {
         "dataset": "coco",
         "version": "3",
@@ -308,11 +320,13 @@
         },
         "symbol": {
           "uri": "0.0.1/yolo3_mobilenet1.0_coco-320x320/yolo-symbol.json",
+          "name": "yolo3_mobilenet_coco_320-symbol.json",
           "sha1Hash": "8ac07f8169228b5e720804f36a4dadb37817f4c3",
           "size": 147812
         },
         "parameters": {
           "uri": "0.0.1/yolo3_mobilenet1.0_coco-320x320/yolo-0000.params.gz",
+          "name": "yolo3_mobilenet_coco_320-0000.params",
           "sha1Hash": "d9fa1ad5413abb8f8df81ba729fa7a115836f833",
           "size": 91257892
         }
@@ -321,7 +335,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo",
+      "name": "yolo3_mobile_coco_416",
       "properties": {
         "dataset": "coco",
         "version": "3",
@@ -346,11 +360,13 @@
         },
         "symbol": {
           "uri": "0.0.1/yolo3_mobilenet1.0_coco-416x416/yolo-symbol.json",
+          "name": "yolo3_mobilenet_coco_416-symbol.json",
           "sha1Hash": "c6a85feca8d849fed6a82a6e70cdc351ec36027f",
           "size": 147812
         },
         "parameters": {
           "uri": "0.0.1/yolo3_mobilenet1.0_coco-416x416/yolo-0000.params.gz",
+          "name": "yolo3_mobilenet_coco_416-0000.params",
           "sha1Hash": "061e21037dcd5ac011190585437f4fbab4952a3b",
           "size": 91257867
         }
@@ -359,7 +375,7 @@
     {
       "version": "0.0.1",
       "snapshot": false,
-      "name": "yolo",
+      "name": "yolo3_mobile_coco_608",
       "properties": {
         "dataset": "coco",
         "version": "3",
@@ -384,11 +400,13 @@
         },
         "symbol": {
           "uri": "0.0.1/yolo3_mobilenet1.0_coco-608x608/yolo-symbol.json",
+          "name": "yolo3_mobilenet_coco_608-symbol.json",
           "sha1Hash": "10e47405a1744788ccb533bca20b2608770eeec3",
           "size": 147812
         },
         "parameters": {
           "uri": "0.0.1/yolo3_mobilenet1.0_coco-608x608/yolo-0000.params.gz",
+          "name": "yolo3_mobilenet_coco_608-0000.params",
           "sha1Hash": "f8fd4e8955ee90d4060d2544ed285b232c8085da",
           "size": 91257867
         }

@@ -70,12 +70,14 @@ public class OrtModel extends BaseModel {
             throw new UnsupportedOperationException("ONNX Runtime does not support dynamic blocks");
         }
 
-        if (prefix == null) {
-            prefix = modelName;
+        Path modelFile;
+        if (prefix != null) {
+            modelFile = findModelFile(prefix);
+        } else {
+            // search for .onnx file with folder name or "model.onnx"
+            modelFile = findModelFile(modelName, modelDir.toFile().getName(), "model.onnx");
         }
 
-        // search for .onnx file with prefix, folder name or "model.onnx"
-        Path modelFile = findModelFile(prefix, modelDir.toFile().getName(), "model.onnx");
         if (modelFile == null) {
             throw new FileNotFoundException(".onnx file not found in: " + modelPath);
         }
