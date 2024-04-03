@@ -16,15 +16,15 @@ from huggingface_models import get_lang_tags
 
 class HuggingfaceMetadata:
 
-    def __init__(self, model_info, application: str, translator: str,
-                 sha1: str, file_size: int):
+    def __init__(self, model_info, application: str, sha1: str, file_size: int,
+                 arguments: dict):
         self.model_info = model_info
         self.artifact_id = model_info.modelId
         self.model_name = model_info.modelId.split("/")[-1]
         self.application = application
-        self.translator = translator
         self.sha1 = sha1
         self.file_size = file_size
+        self.arguments = arguments
 
     def save_metadata(self, metadata_file: str):
         properties = get_lang_tags(self.model_info)
@@ -57,10 +57,7 @@ class HuggingfaceMetadata:
                 "snapshot": False,
                 "name": self.model_name,
                 "properties": properties,
-                "arguments": {
-                    "engine": "PyTorch",
-                    "translatorFactory": self.translator
-                },
+                "arguments": self.arguments,
                 "options": {
                     "mapLocation": True
                 },
