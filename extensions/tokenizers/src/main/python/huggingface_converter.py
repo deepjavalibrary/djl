@@ -10,7 +10,6 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS"
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
-
 import logging
 import os.path
 import shutil
@@ -142,14 +141,15 @@ class HuggingfaceConverter:
 
         # Save serving.properties
         serving_file = os.path.join(temp_dir, "serving.properties")
-        arguments = self.get_extra_arguments(hf_pipeline, model_id)
+        arguments = self.get_extra_arguments(hf_pipeline, model_id, temp_dir)
+        if include_types:
+            arguments["includeTokenTypes"] = "true"
+        arguments["translatorFactory"] = self.translator
+
         with open(serving_file, 'w') as f:
             f.write(f"engine=PyTorch\n"
                     f"option.modelName={model_name}\n"
-                    f"option.mapLocation=true\n"
-                    f"translatorFactory={self.translator}\n")
-            if include_types:
-                f.write(f"includeTokenTypes={include_types}\n")
+                    f"option.mapLocation=true\n")
 
             for k, v in arguments.items():
                 f.write(f"{k}={v}\n")
@@ -160,10 +160,11 @@ class HuggingfaceConverter:
         zip_dir(temp_dir, zip_file)
 
         # Save metadata.json
+        arguments["engine"] = "PyTorch"
         sha1 = sha1_sum(zip_file)
         file_size = os.path.getsize(zip_file)
-        metadata = HuggingfaceMetadata(model_info, self.application,
-                                       self.translator, sha1, file_size)
+        metadata = HuggingfaceMetadata(model_info, self.application, sha1,
+                                       file_size, arguments)
         metadata_file = os.path.join(repo_dir, "metadata.json")
         metadata.save_metadata(metadata_file)
 
@@ -205,7 +206,8 @@ class HuggingfaceConverter:
 
         return self.verify_jit_output(hf_pipeline, encoding, out)
 
-    def get_extra_arguments(self, hf_pipeline, model_id: str) -> dict:
+    def get_extra_arguments(self, hf_pipeline, model_id: str,
+                            temp_dir: str) -> dict:
         return {}
 
     def verify_jit_output(self, hf_pipeline, encoding, out):
