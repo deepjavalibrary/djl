@@ -56,7 +56,7 @@ public class LlamaTest {
     @Test
     public void testLlamaVersion() {
         Engine engine = Engine.getEngine("Llama");
-        Assert.assertEquals(engine.getVersion(), "b1696-" + Engine.getDjlVersion());
+        Assert.assertEquals(engine.getVersion(), "b2581-" + Engine.getDjlVersion());
         Assert.assertNotNull(engine.toString());
         Assert.assertEquals(engine.getRank(), 10);
         Assert.assertFalse(engine.hasCapability(StandardCapabilities.CUDA));

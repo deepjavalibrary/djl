@@ -23,6 +23,7 @@ public final class ModelParameters {
     private int nBatch;
     private int nGpuLayers;
     private int mainGpu;
+    private int numa;
     private float ropeFreqBase;
     private float ropeFreqScale;
     private boolean mulMatQ;
@@ -34,7 +35,6 @@ public final class ModelParameters {
     private boolean embedding;
     private boolean memoryF16;
     private boolean memTest;
-    private boolean numa;
     private boolean verbosePrompt;
     private float[] tensorSplit;
     private String loraAdapter;
@@ -54,6 +54,7 @@ public final class ModelParameters {
         ropeFreqBase = floatValue(options, "rope_freq_base");
         ropeFreqScale = floatValue(options, "ropeFreqScale");
         f16Kv = booleanValue(options, "f16_kv");
+        // unused since llamaCPP commit 3ab8b3a, left for backward compatibility, has no effect.
         mulMatQ = booleanValue(options, "mulmat_q", true);
         logitsAll = booleanValue(options, "logits_all");
         vocabOnly = booleanValue(options, "vocab_only");
@@ -62,8 +63,8 @@ public final class ModelParameters {
         embedding = booleanValue(options, "embedding");
         memoryF16 = booleanValue(options, "memory_f16", true);
         memTest = booleanValue(options, "mem_test");
-        numa = booleanValue(options, "numa");
         verbosePrompt = booleanValue(options, "verbose_prompt");
+        numa = numaValue(options, "numa");
         String val = stringValue(options, "tensor_split");
         if (val != null && !val.isEmpty()) {
             String[] tokens = val.split(",");
@@ -110,5 +111,30 @@ public final class ModelParameters {
             return null;
         }
         return value.toString();
+    }
+
+    private static int numaValue(Map<String, ?> arguments, String key) {
+        /* "disabled" -> 0, "distribute" -> 1, "isolate" -> 2, "numactl" -> 3, "mirror" -> 4 */
+        Object value = arguments.get(key);
+        if (value == null) {
+            return 0;
+        }
+        if (value.toString().contains("disabled") || value.toString().contains("false")) {
+            return 0;
+        }
+        if (value.toString().contains("distribute") || value.toString().contains("true")) {
+            /* 1 for backward compatibility ? */
+            return 1;
+        }
+        if (value.toString().contains("isolate")) {
+            return 2;
+        }
+        if (value.toString().contains("numactl")) {
+            return 3;
+        }
+        if (value.toString().contains("mirror")) {
+            return 4;
+        }
+        return 0;
     }
 }
