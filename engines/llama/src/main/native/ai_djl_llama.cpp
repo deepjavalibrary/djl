@@ -603,7 +603,7 @@ struct jllama_context {
       const int n_discard = n_left / 2;
 
       llama_kv_cache_seq_rm(ctx, 0, params.n_keep + 1, params.n_keep + n_discard + 1);
-      llama_kv_cache_seq_shift(ctx, 0, params.n_keep + 1 + n_discard, n_past, -n_discard);
+      llama_kv_cache_seq_add(ctx, 0, params.n_keep + 1 + n_discard, n_past, -n_discard); /*!TODO!*/
 
       for (size_t i = params.n_keep + 1 + n_discard; i < embd.size(); i++) {
         embd[i - n_discard] = embd[i];
@@ -762,14 +762,14 @@ static gpt_params parse_model_params(JNIEnv *env, jobject jparams, jstring java_
   params.main_gpu = env->GetIntField(jparams, f_main_gpu);
   params.rope_freq_base = env->GetFloatField(jparams, f_rope_freq_base);
   params.rope_freq_scale = env->GetFloatField(jparams, f_rope_freq_scale);
-  params.mul_mat_q = env->GetBooleanField(jparams, f_mul_mat_q);
+  // params.mul_mat_q = env->GetBooleanField(jparams, f_mul_mat_q); /*!*/
   params.embedding = env->GetBooleanField(jparams, f_embedding);
   params.escape = env->GetIntField(jparams, f_n_predict);
   params.use_mmap = env->GetBooleanField(jparams, f_use_mmap);
   params.use_mlock = env->GetBooleanField(jparams, f_use_mlock);
-  params.numa = env->GetBooleanField(jparams, f_numa);
+  params.numa = (enum ggml_numa_strategy) env->GetIntField(jparams, f_numa); 
   params.verbose_prompt = env->GetBooleanField(jparams, f_verbose_prompt);
-
+  
   if (params.model_alias == "unknown") {
     params.model_alias = params.model;
   }
@@ -871,7 +871,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_llama_jni_LlamaLibrary_loadModel(
   gpt_params params = parse_model_params(env, jparams, file_path);
 
   jllama_context *llama = new jllama_context;
-  llama_backend_init(false);
+  llama_backend_init(); /*!*/
 
   if (!llama->loadModel(params)) {
     env->ThrowNew(c_engine_exception, "could not load model from given file path");
