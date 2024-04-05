@@ -81,7 +81,7 @@ static jfieldID f_main_gpu = 0;
 static jfieldID f_tensor_split = 0;
 static jfieldID f_rope_freq_base = 0;
 static jfieldID f_rope_freq_scale = 0;
-static jfieldID f_mul_mat_q = 0;
+static jfieldID f_mul_mat_q = 0; // unused since llamaCPP commit 3ab8b3a
 static jfieldID f_f16_kv = 0;
 static jfieldID f_logits_all = 0;
 static jfieldID f_vocab_only = 0;
@@ -198,7 +198,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   f_tensor_split = env->GetFieldID(c_model_params, "tensorSplit", "[F");
   f_rope_freq_base = env->GetFieldID(c_model_params, "ropeFreqBase", "F");
   f_rope_freq_scale = env->GetFieldID(c_model_params, "ropeFreqScale", "F");
-  f_mul_mat_q = env->GetFieldID(c_model_params, "mulMatQ", "Z");
+  f_mul_mat_q = env->GetFieldID(c_model_params, "mulMatQ", "Z"); // unused since llamaCPP commit 3ab8b3a
   f_f16_kv = env->GetFieldID(c_model_params, "f16Kv", "Z");
   f_logits_all = env->GetFieldID(c_model_params, "logitsAll", "Z");
   f_vocab_only = env->GetFieldID(c_model_params, "vocabOnly", "Z");
@@ -209,7 +209,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   f_lora_base = env->GetFieldID(c_model_params, "loraBase", "Ljava/lang/String;");
   f_memory_f16 = env->GetFieldID(c_model_params, "memoryF16", "Z");
   f_mem_test = env->GetFieldID(c_model_params, "memTest", "Z");
-  f_numa = env->GetFieldID(c_model_params, "numa", "Z");
+  f_numa = env->GetFieldID(c_model_params, "numa", "I");
   f_verbose_prompt = env->GetFieldID(c_model_params, "verbosePrompt", "Z");
 
   f_utf_8 = env->GetStaticFieldID(c_standard_charsets, "UTF_8", "Ljava/nio/charset/Charset;");
@@ -762,7 +762,6 @@ static gpt_params parse_model_params(JNIEnv *env, jobject jparams, jstring java_
   params.main_gpu = env->GetIntField(jparams, f_main_gpu);
   params.rope_freq_base = env->GetFloatField(jparams, f_rope_freq_base);
   params.rope_freq_scale = env->GetFloatField(jparams, f_rope_freq_scale);
-  // params.mul_mat_q = env->GetBooleanField(jparams, f_mul_mat_q); /*!*/
   params.embedding = env->GetBooleanField(jparams, f_embedding);
   params.escape = env->GetIntField(jparams, f_n_predict);
   params.use_mmap = env->GetBooleanField(jparams, f_use_mmap);

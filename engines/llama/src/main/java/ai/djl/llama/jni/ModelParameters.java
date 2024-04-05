@@ -54,7 +54,8 @@ public final class ModelParameters {
         ropeFreqBase = floatValue(options, "rope_freq_base");
         ropeFreqScale = floatValue(options, "ropeFreqScale");
         f16Kv = booleanValue(options, "f16_kv");
-        mulMatQ = booleanValue(options, "mulmat_q", true); // used by default since #2683 ? left for backward compatibility, unused.
+        // unused since llamaCPP commit 3ab8b3a, left for backward compatibility, has no effect.
+        mulMatQ = booleanValue(options, "mulmat_q", true);
         logitsAll = booleanValue(options, "logits_all");
         vocabOnly = booleanValue(options, "vocab_only");
         useMmap = booleanValue(options, "use_mmap", true);
@@ -113,25 +114,25 @@ public final class ModelParameters {
     }
 
     private static int numaValue(Map<String, ?> arguments, String key) {
-        /* "disabled" -> 0, "distribute" -> 1, "isolate" -> 2, "numactl" -> 3, "mirror" -> 4 */ 
+        /* "disabled" -> 0, "distribute" -> 1, "isolate" -> 2, "numactl" -> 3, "mirror" -> 4 */
         Object value = arguments.get(key);
         if (value == null) {
             return 0;
         }
-        if (value.toString().contains("disabled") || value.toString().contains("0")){
+        if (value.toString().contains("disabled") || value.toString().contains("false")) {
             return 0;
         }
-        if (value.toString().contains("distribute") || value.toString().contains("1")){
+        if (value.toString().contains("distribute") || value.toString().contains("true")) {
             /* 1 for backward compatibility ? */
             return 1;
         }
-        if (value.toString().contains("isolate")){
+        if (value.toString().contains("isolate")) {
             return 2;
         }
-        if (value.toString().contains("numactl")){
+        if (value.toString().contains("numactl")) {
             return 3;
         }
-        if (value.toString().contains("mirror")){
+        if (value.toString().contains("mirror")) {
             return 4;
         }
         return 0;
