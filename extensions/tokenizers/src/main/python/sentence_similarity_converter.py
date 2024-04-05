@@ -61,6 +61,36 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
     def get_extra_arguments(self, hf_pipeline, model_id: str,
                             temp_dir: str) -> dict:
         args = {"padding": "true"}
+        for config_name in [
+                'sentence_bert_config.json', 'sentence_roberta_config.json',
+                'sentence_distilbert_config.json',
+                'sentence_camembert_config.json',
+                'sentence_albert_config.json',
+                'sentence_xlm-roberta_config.json',
+                'sentence_xlnet_config.json'
+        ]:
+            try:
+                file = hf_hub_download(repo_id=model_id, filename=config_name)
+                with open(file) as f:
+                    config = json.load(f)
+                    if config.get("max_seq_length"):
+                        args["maxLength"] = config.get("max_seq_length")
+                    if config.get("do_lower_case"):
+                        args["doLowerCase"] = config.get("do_lower_case")
+
+                break
+            except requests.exceptions.HTTPError:
+                pass
+
+        if not "maxLength" in args:
+            config = hf_pipeline.model.config
+            tokenizer = hf_pipeline.tokenizer
+            if hasattr(config, "max_position_embeddings") and hasattr(
+                    tokenizer, "model_max_length"):
+                max_seq_length = min(config.max_position_embeddings,
+                                     tokenizer.model_max_length)
+                args["maxLength"] = str(max_seq_length)
+
         pooling_path = None
         dense_path = None
         layer_norm_path = None
