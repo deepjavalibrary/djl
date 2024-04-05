@@ -603,7 +603,7 @@ struct jllama_context {
       const int n_discard = n_left / 2;
 
       llama_kv_cache_seq_rm(ctx, 0, params.n_keep + 1, params.n_keep + n_discard + 1);
-      llama_kv_cache_seq_add(ctx, 0, params.n_keep + 1 + n_discard, n_past, -n_discard); /*!TODO!*/
+      llama_kv_cache_seq_add(ctx, 0, params.n_keep + 1 + n_discard, n_past, -n_discard);
 
       for (size_t i = params.n_keep + 1 + n_discard; i < embd.size(); i++) {
         embd[i - n_discard] = embd[i];
@@ -870,7 +870,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_llama_jni_LlamaLibrary_loadModel(
   gpt_params params = parse_model_params(env, jparams, file_path);
 
   jllama_context *llama = new jllama_context;
-  llama_backend_init(); /*!*/
+  llama_backend_init();
 
   if (!llama->loadModel(params)) {
     env->ThrowNew(c_engine_exception, "could not load model from given file path");
