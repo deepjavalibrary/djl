@@ -23,7 +23,6 @@ import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class MpsTest {
@@ -73,7 +72,7 @@ public class MpsTest {
             List<String> names = Arrays.asList("First", "Second", "Third", "Fourth", "Fifth");
             NDArray tensor = manager.create(new float[] {0f, 0.125f, 1f, 0.5f, 0.25f});
             Classifications classifications = new Classifications(names, tensor);
-            Assert.assertEquals(classifications.topK(1), Collections.singletonList("Third"));
+            Assert.assertEquals(classifications.best().getClassName(), "Third");
         }
     }
 }

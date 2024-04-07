@@ -10,7 +10,7 @@ jobs:
       matrix:
         format: ["armeabi-v7a", "arm64-v8a", "x86" ,"x86_64"]
     env:
-      PYTORCH_VERSION: "2.1.1"
+      PYTORCH_VERSION: "2.1.2"
       NDK_VERSION: "21.1.6352462"
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
       - name: install Python Dependencies
         run: pip install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions
       - name: Install NDK
-        run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${NDK_VERSION}"
+        run: echo "y" | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --install "ndk;${NDK_VERSION}"
       - name: build android
         run: |
           export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}
