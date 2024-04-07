@@ -153,10 +153,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
+        shell: bash
         run: |
           TOKENIZERS_VERSION="$(cat gradle.properties | awk -F '=' '/tokenizers_version/ {print $2}')"
-          /opt/homebrew/bin/aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
-          /opt/homebrew/bin/aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
+          aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
   create-aarch64-runner:
     if: github.repository == 'deepjavalibrary/djl'
