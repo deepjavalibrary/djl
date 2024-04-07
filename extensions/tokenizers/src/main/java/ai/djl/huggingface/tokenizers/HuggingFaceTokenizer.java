@@ -56,9 +56,8 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
 
     private HuggingFaceTokenizer(long handle, Map<String, String> options) {
         super(handle);
-        String val = TokenizersLibrary.LIB.getTruncationStrategy(handle);
-        truncation = TruncationStrategy.fromValue(val);
-        val = TokenizersLibrary.LIB.getPaddingStrategy(handle);
+        truncation = TruncationStrategy.LONGEST_FIRST;
+        String val = TokenizersLibrary.LIB.getPaddingStrategy(handle);
         padding = PaddingStrategy.fromValue(val);
         maxLength = TokenizersLibrary.LIB.getMaxLength(handle);
         stride = TokenizersLibrary.LIB.getStride(handle);
