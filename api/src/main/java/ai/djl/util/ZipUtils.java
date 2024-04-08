@@ -223,7 +223,7 @@ public final class ZipUtils {
                         // Let's do some extra verification, we don't care about the
                         // performance in this situation.
                         int cenpos = end.endpos - end.cenlen;
-                        int locpos = cenpos - end.cenoff;
+                        int locpos = Math.toIntExact(cenpos - end.cenoff);
                         if (cenpos < 0
                                 || locpos < 0
                                 || bb.getInt(cenpos) != CENSIG
@@ -243,7 +243,7 @@ public final class ZipUtils {
 
                     // end64 candidate found,
                     int cenlen64 = Math.toIntExact(bb.getLong(relativePos + 40));
-                    int cenoff64 = Math.toIntExact(bb.getLong(relativePos + 48));
+                    long cenoff64 = bb.getLong(relativePos + 48);
                     // double-check
                     if (cenlen64 != end.cenlen && end.cenlen > 0
                             || cenoff64 != end.cenoff && end.cenoff > 0) {
@@ -303,7 +303,7 @@ public final class ZipUtils {
 
         private static final class End {
             int cenlen; // 4 bytes
-            int cenoff; // 4 bytes
+            long cenoff; // 4 bytes
             int endpos; // 4 bytes
         }
     }
