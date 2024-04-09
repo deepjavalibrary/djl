@@ -52,7 +52,7 @@ public final class ZipUtils {
         ZipEntry entry;
         Set<String> set = new HashSet<>();
         while ((entry = zis.getNextEntry()) != null) {
-            String name = entry.getName();
+            String name = removeLeadingFileSeparator(entry.getName());
             if (name.contains("..")) {
                 throw new IOException("Malicious zip entry: " + name);
             }
@@ -119,6 +119,16 @@ public final class ZipUtils {
             zos.putNextEntry(entry);
             Files.copy(file, zos);
         }
+    }
+
+    static String removeLeadingFileSeparator(String name) {
+        int index = 0;
+        for (; index < name.length(); index++) {
+            if (name.charAt(index) != File.separatorChar) {
+                break;
+            }
+        }
+        return name.substring(index);
     }
 
     private static final class ValidationInputStream extends FilterInputStream {
