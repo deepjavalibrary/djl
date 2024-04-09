@@ -81,7 +81,7 @@ The following pseudocode demonstrates running training:
 
 - [Documentation](docs/README.md#documentation)
 - [DJL's D2L Book](https://d2l.djl.ai/)
-- [JavaDoc API Reference](https://javadoc.djl.ai/)
+- [JavaDoc API Reference](https://djl.ai/website/javadoc.html)
 
 ## Release Notes
 
