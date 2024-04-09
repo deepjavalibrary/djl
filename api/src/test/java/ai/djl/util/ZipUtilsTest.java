@@ -46,6 +46,19 @@ public class ZipUtilsTest {
     }
 
     @Test
+    public void testOffendingTar() throws IOException {
+        Path path = Paths.get("src/test/resources/offending.tar");
+        Path output = Paths.get("build/output");
+        Path file = output.resolve("tmp/empty.txt");
+        Utils.deleteQuietly(file);
+        Files.createDirectories(output);
+        try (InputStream is = Files.newInputStream(path)) {
+            TarUtils.untar(is, output, false);
+        }
+        Assert.assertTrue(Files.exists(file));
+    }
+
+    @Test
     public void testInvalidZipFile() throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try (ZipOutputStream zos = new ZipOutputStream(bos)) {

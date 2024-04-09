@@ -48,7 +48,7 @@ public final class TarUtils {
         try (TarArchiveInputStream tis = new TarArchiveInputStream(bis)) {
             TarArchiveEntry entry;
             while ((entry = tis.getNextEntry()) != null) {
-                String entryName = entry.getName();
+                String entryName = ZipUtils.removeLeadingFileSeparator(entry.getName());
                 if (entryName.contains("..")) {
                     throw new IOException("Malicious zip entry: " + entryName);
                 }
