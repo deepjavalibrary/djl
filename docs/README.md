@@ -2,7 +2,7 @@
 
 This folder contains examples and documentation for the Deep Java Library (DJL) project.
 
-## [JavaDoc API Reference](https://javadoc.djl.ai/)
+## [JavaDoc API Reference](https://djl.ai/website/javadoc.html)
 
 Note: when searching in JavaDoc, if your access is denied, please try removing the string `undefined` in the url.
 

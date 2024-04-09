@@ -37,6 +37,6 @@ All of our examples are executed by a simple command. For detailed command line 
 
 ## Other resources
 
-- [JavaDoc API Reference](https://javadoc.djl.ai/)
+- [JavaDoc API Reference](https://djl.ai/website/javadoc.html)
 - [Contributor Documentation](development/README.md)
 - [FAQ](faq.md)
