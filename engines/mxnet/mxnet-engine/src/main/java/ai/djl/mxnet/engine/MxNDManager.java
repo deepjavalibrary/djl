@@ -23,6 +23,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.training.listener.AlgebraicListener;
 import ai.djl.util.PairList;
 
 import com.sun.jna.Pointer;
@@ -338,12 +339,15 @@ public class MxNDManager extends BaseNDManager {
     public void invoke(
             String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
         JnaUtils.op(operation).invoke(this, src, dest, params);
+        AlgebraicListener.record(operation, src, dest, params);
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
-        return new NDList(JnaUtils.op(operation).invoke(this, src.toArray(EMPTY), params));
+        NDArray[] dest = JnaUtils.op(operation).invoke(this, src.toArray(EMPTY), params);
+        AlgebraicListener.record(operation, src.toArray(EMPTY), dest, params);
+        return new NDList(dest);
     }
 
     /**
@@ -379,7 +383,9 @@ public class MxNDManager extends BaseNDManager {
      * @throws EngineException if operation failed in native engine
      */
     public NDArray invoke(String operation, NDArray[] src, PairList<String, ?> params) {
-        return JnaUtils.op(operation).invoke(this, src, params)[0];
+        NDArray[] dest = JnaUtils.op(operation).invoke(this, src, params);
+        AlgebraicListener.record(operation, src, dest, params);
+        return dest[0];
     }
 
     /**

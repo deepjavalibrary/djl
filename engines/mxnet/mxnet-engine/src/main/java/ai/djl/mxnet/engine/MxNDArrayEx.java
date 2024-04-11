@@ -287,7 +287,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.add("pool_type", "max");
         params.addParam("global_pool", true);
         try (NDArray temp = getManager().invoke("_npx_pooling", getArray(), params)) {
-            return temp.reshape(temp.getShape().size(0), temp.getShape().size(1));
+            return temp.reshape(-1, temp.getShape().size(1));
         }
     }
 
@@ -318,7 +318,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.add("pool_type", "avg");
         params.addParam("global_pool", true);
         try (NDArray temp = getManager().invoke("_npx_pooling", getArray(), params)) {
-            return temp.reshape(temp.getShape().size(0), temp.getShape().size(1));
+            return temp.reshape(-1, temp.getShape().size(1));
         }
     }
 
@@ -355,7 +355,7 @@ class MxNDArrayEx implements NDArrayEx {
         params.addParam("p_value", (int) normType);
         params.addParam("global_pool", true);
         try (NDArray temp = getManager().invoke("_npx_pooling", getArray(), params)) {
-            return temp.reshape(temp.getShape().size(0), temp.getShape().size(1));
+            return temp.reshape(-1, temp.getShape().size(1));
         }
     }
 

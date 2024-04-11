@@ -28,6 +28,7 @@ import ai.djl.training.Trainer;
 import ai.djl.training.TrainingConfig;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.initializer.TruncatedNormalInitializer;
+import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.listener.TrainingListener.Defaults;
 import ai.djl.training.optimizer.Adam;
 import ai.djl.training.optimizer.Optimizer;
@@ -109,6 +110,8 @@ public final class TrainBertOnCode {
         return new DefaultTrainingConfig(new BertPretrainingLoss())
                 .optOptimizer(optimizer)
                 .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .addTrainingListeners(
+                        TrainingListener.Defaults.algebraicLogging(arguments.getAlgebraicLogFile()))
                 .addTrainingListeners(Defaults.logging());
     }
 
