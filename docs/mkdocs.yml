@@ -169,12 +169,15 @@ nav:
       - 'docs/serving/serving/docs/lmi/README.md'
       - User Guides:
           - 'docs/serving/serving/docs/lmi/user_guides/README.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/starting-guide.md'
           - 'docs/serving/serving/docs/lmi/user_guides/deepspeed_user_guide.md'
           - 'docs/serving/serving/docs/lmi/user_guides/lmi-dist_user_guide.md'
           - 'docs/serving/serving/docs/lmi/user_guides/vllm_user_guide.md'
           - 'docs/serving/serving/docs/lmi/user_guides/tnx_user_guide.md'
           - 'docs/serving/serving/docs/lmi/user_guides/trt_llm_user_guide.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/hf_accelerate.md'
           - 'docs/serving/serving/docs/lmi/user_guides/lmi_input_output_schema.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/chat_input_output_schema.md'
       - Deployment Guides:
           - 'docs/serving/serving/docs/lmi/deployment_guide/README.md'
           - 'docs/serving/serving/docs/lmi/deployment_guide/model-artifacts.md'
@@ -189,6 +192,8 @@ nav:
           - 'docs/serving/serving/docs/lmi/tutorials/trtllm_aot_tutorial.md'
           - 'docs/serving/serving/docs/lmi/tutorials/trtllm_manual_convert_tutorial.md'
           - 'docs/serving/serving/docs/lmi/tutorials/tnx_aot_tutorial.md'
+      - Conceptual Guides:
+          - 'docs/serving/serving/docs/lmi/conceptual_guide/lmi_engine.md'
       - SageMaker LMI containers resources:
           - 'docs/demos/aws/sagemaker/large-model-inference/README.md'
   - Demos:
