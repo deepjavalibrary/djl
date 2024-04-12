@@ -7,10 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(JAVA_AWT_LIBRARY NotNeeded)
 set(JAVA_AWT_INCLUDE_PATH NotNeeded)
 find_package(JNI REQUIRED)
-#find_library(TRT_ONNX_PARSER
-#        NAMES nvonnxparser
-#        PATH_SUFFIXES lib
-#        REQUIRED)
+find_library(TRT_ONNX_PARSER
+        NAMES nvonnxparser
+        PATH_SUFFIXES lib
+        REQUIRED)
 
 find_path(UTILS_INCLUDE_DIR
         NAMES djl/utils.h
@@ -37,4 +37,4 @@ target_include_directories(djl_trt PUBLIC
         main/native
         trt/include
         build/include)
-target_link_libraries(djl_trt nvonnxparser nvparsers)
+target_link_libraries(djl_trt nvonnxparser)

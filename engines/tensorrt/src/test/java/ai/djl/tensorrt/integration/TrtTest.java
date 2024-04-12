@@ -70,7 +70,7 @@ public class TrtTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void testTrtUff() throws ModelException, IOException, TranslateException {
         Engine engine;
         try {
@@ -107,7 +107,7 @@ public class TrtTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void testSerializedEngine() throws ModelException, IOException, TranslateException {
         Engine engine;
         try {

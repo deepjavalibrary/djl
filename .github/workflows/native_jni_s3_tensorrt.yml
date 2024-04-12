@@ -6,16 +6,11 @@ on:
 jobs:
   build-tensorrt-jni-linux:
     runs-on: ubuntu-latest
-    container: deepjavalibrary/ubuntu18.04:tensorrt-cuda116
+    container: deepjavalibrary/ubuntu20.04:tensorrt-cuda122
     steps:
       - name: Install Environment
         run: pip3 install awscli --upgrade
       - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'corretto'
-          java-version: 17
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches

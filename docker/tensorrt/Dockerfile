@@ -14,15 +14,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-ARG CUDA_VERSION=11.6.2
-ARG OS_VERSION=18.04
-FROM nvidia/cuda:${CUDA_VERSION}-cudnn8-devel-ubuntu${OS_VERSION}
+ARG CUDA_VERSION=12.2.2
 
-ENV TRT_VERSION 8.4.1.5
+FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu20.04
+
+ENV NV_CUDNN_VERSION 8.9.6.50
+ENV NV_CUDNN_PACKAGE_NAME "libcudnn8"
+
+ARG CUDA_VERSION_MAJOR_MINOR=12.2
+
+ENV NV_CUDNN_PACKAGE "libcudnn8=$NV_CUDNN_VERSION-1+cuda${CUDA_VERSION_MAJOR_MINOR}"
+ENV NV_CUDNN_PACKAGE_DEV "libcudnn8-dev=$NV_CUDNN_VERSION-1+cuda${CUDA_VERSION_MAJOR_MINOR}"
+
+ENV TRT_VERSION 9.2.0.5
 SHELL ["/bin/bash", "-c"]
 RUN mkdir -p /workspace
 
-# Install Required Libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ${NV_CUDNN_PACKAGE} \
+    ${NV_CUDNN_PACKAGE_DEV} \
+    && apt-mark hold ${NV_CUDNN_PACKAGE_NAME} \
+    && rm -rf /var/lib/apt/lists/*
+
+# Setup user account
+ARG uid=1000
+ARG gid=1000
+RUN groupadd -r -f -g ${gid} djl && useradd -o -r -l -u ${uid} -g ${gid} -ms /bin/bash djl
+RUN usermod -aG sudo djl
+RUN echo 'djl:djl' | chpasswd
+RUN mkdir -p /workspace && chown djl /workspace
+
+# Required to build Ubuntu 20.04 without user prompts with DLFW container
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update CUDA signing key
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+
+# Install requried libraries
 RUN apt-get update && apt-get install -y software-properties-common
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -42,7 +70,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fakeroot \
     dh-make \
     build-essential \
-    openjdk-17-jdk && \
+    openjdk-17-jdk &&\
     apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install python3
@@ -53,17 +81,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       python3-wheel &&\
     cd /usr/local/bin &&\
     ln -s /usr/bin/python3 python &&\
-    ln -s /usr/bin/pip3 pip && \
+    ln -s /usr/bin/pip3 pip &&\
     apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install TensorRT
-RUN v="${TRT_VERSION%.*}-1+cuda${CUDA_VERSION%.*}" &&\
-    apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub &&\
-    apt-get update &&\
-    sudo apt-get install libnvinfer8=${v} libnvonnxparsers8=${v} libnvparsers8=${v} libnvinfer-plugin8=${v} \
-        libnvinfer-dev=${v} libnvonnxparsers-dev=${v} libnvparsers-dev=${v} libnvinfer-plugin-dev=${v} \
-        python3-libnvinfer=${v}; \
-    apt-get clean -y && rm -rf /var/lib/apt/lists/*
+RUN if [ "${CUDA_VERSION:0:2}" = "11" ]; then \
+    wget https://developer.nvidia.com/downloads/compute/machine-learning/tensorrt/9.2.0/tensorrt-9.2.0.5.linux.x86_64-gnu.cuda-11.8.tar.gz \
+        && tar -xf tensorrt-9.2.0.5.linux.x86_64-gnu.cuda-11.8.tar.gz \
+        && cp -a TensorRT-9.2.0.5/lib/*.so* /usr/lib/x86_64-linux-gnu \
+        && pip install TensorRT-9.2.0.5/python/tensorrt-9.2.0.post11.dev5-cp38-none-linux_x86_64.whl ;\
+elif [ "${CUDA_VERSION:0:2}" = "12" ]; then \
+    wget https://developer.nvidia.com/downloads/compute/machine-learning/tensorrt/9.2.0/tensorrt-9.2.0.5.linux.x86_64-gnu.cuda-12.2.tar.gz \
+        && tar -xf tensorrt-9.2.0.5.linux.x86_64-gnu.cuda-12.2.tar.gz \
+        && cp -a TensorRT-9.2.0.5/lib/*.so* /usr/lib/x86_64-linux-gnu \
+        && pip install TensorRT-9.2.0.5/python/tensorrt-9.2.0.post12.dev5-cp38-none-linux_x86_64.whl ;\
+else \
+    echo "Invalid CUDA_VERSION"; \
+    exit 1; \
+fi
 
 # Install Cmake
 RUN cd /tmp && \
@@ -72,19 +107,16 @@ RUN cd /tmp && \
     ./cmake-3.14.4-Linux-x86_64.sh --prefix=/usr/local --exclude-subdir --skip-license && \
     rm ./cmake-3.14.4-Linux-x86_64.sh
 
-RUN cd /usr/local/bin && \
-    wget https://ngc.nvidia.com/downloads/ngccli_cat_linux.zip && \
-    unzip ngccli_cat_linux.zip && \
-    chmod u+x ngc-cli/ngc && \
-    rm ngccli_cat_linux.zip ngc-cli.md5 && \
-    echo "no-apikey\nascii\n" | ngc-cli/ngc config set
-
+# Download NGC client
+RUN cd /usr/local/bin && wget --content-disposition https://api.ngc.nvidia.com/v2/resources/nvidia/ngc-apps/ngc_cli/versions/3.38.0/files/ngccli_linux.zip -O ngccli_linux.zip && unzip ngccli_linux.zip && chmod u+x ngc-cli/ngc && rm ngccli_linux.zip ngc-cli.md5 && echo "no-apikey\nascii\n" | ngc-cli/ngc config set
 
 # Set environment and working directory
 ENV TRT_LIBPATH /usr/lib/x86_64-linux-gnu
 ENV TRT_OSSPATH /workspace/TensorRT
 ENV PATH="${PATH}:/usr/local/bin/ngc-cli"
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${TRT_OSSPATH}/build/out:${TRT_LIBPATH}"
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 WORKDIR /workspace
 
+USER djl
 RUN ["/bin/bash"]

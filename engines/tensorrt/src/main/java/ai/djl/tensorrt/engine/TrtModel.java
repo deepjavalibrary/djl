@@ -62,7 +62,10 @@ public class TrtModel extends BaseModel {
         if (modelFile == null) {
             modelFile = findModelFile(modelDir.toFile().getName());
             if (modelFile == null) {
-                throw new FileNotFoundException(prefix + ".* file not found in: " + modelDir);
+                modelFile = findModelFile("model.onnx");
+                if (modelFile == null) {
+                    throw new FileNotFoundException(prefix + ".* file not found in: " + modelDir);
+                }
             }
         }
         String filePath = modelFile.toString();

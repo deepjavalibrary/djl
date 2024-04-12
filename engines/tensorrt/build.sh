@@ -8,7 +8,8 @@ VERSION="$(cat ../../gradle.properties | awk -F '=' '/trt_version/ {print $2}')"
 
 if [ ! -d "trt" ];
 then
-  git clone https://github.com/NVIDIA/TensorRT.git -b $VERSION trt
+  git clone --recurse-submodules https://github.com/NVIDIA/TensorRT.git -b v$VERSION trt
+  cp -f trt/parsers/onnx/NvOnnxParser.h trt/include
 fi
 
 if [ ! -d "build" ];
