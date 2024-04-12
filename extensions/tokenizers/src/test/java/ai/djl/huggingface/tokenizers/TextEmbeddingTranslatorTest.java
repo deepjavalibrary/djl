@@ -157,6 +157,16 @@ public class TextEmbeddingTranslatorTest {
             float[] res = JsonUtils.GSON.fromJson(out.getAsString(0), float[].class);
             Assert.assertEquals(res.length, 384);
             Assertions.assertAlmostEquals(res[0], 0.05103);
+
+            input = new Input();
+            Map<String, String> map = new HashMap<>();
+            map.put("inputs", text);
+            input.add(JsonUtils.GSON.toJson(map));
+            input.addProperty("Content-Type", "application/json");
+            out = predictor.predict(input);
+            res = (float[]) out.getData().getAsObject();
+            Assert.assertEquals(res.length, 384);
+            Assertions.assertAlmostEquals(res[0], 0.05103);
         }
 
         try (Model model = Model.newInstance("test")) {
@@ -237,6 +247,32 @@ public class TextEmbeddingTranslatorTest {
             float[][] res = (float[][]) out.getData().getAsObject();
             Assert.assertEquals(res[0].length, 384);
             Assertions.assertAlmostEquals(res[0][0], 0.05103);
+
+            input = new Input();
+            Map<String, String[]> map = new HashMap<>();
+            map.put("inputs", text);
+            input.add(JsonUtils.GSON.toJson(map));
+            input.addProperty("Content-Type", "application/json");
+            out = predictor.predict(input);
+            res = (float[][]) out.getData().getAsObject();
+            Assert.assertEquals(res[0].length, 384);
+            Assertions.assertAlmostEquals(res[0][0], 0.05103);
+
+            Assert.assertThrows(
+                    () -> {
+                        Input empty = new Input();
+                        empty.add(JsonUtils.GSON.toJson(new HashMap<>()));
+                        empty.addProperty("Content-Type", "application/json");
+                        predictor.predict(empty);
+                    });
+
+            Assert.assertThrows(
+                    () -> {
+                        Input empty = new Input();
+                        empty.add("{ \"invalid json\"");
+                        empty.addProperty("Content-Type", "application/json");
+                        predictor.predict(empty);
+                    });
         }
     }
 }
