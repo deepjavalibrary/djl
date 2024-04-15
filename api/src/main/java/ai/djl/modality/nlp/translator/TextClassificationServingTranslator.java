@@ -15,6 +15,7 @@ package ai.djl.modality.nlp.translator;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.modality.nlp.TextPrompt;
 import ai.djl.ndarray.BytesSupplier;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.Batchifier;
@@ -22,7 +23,6 @@ import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import ai.djl.util.JsonUtils;
 
 /**
  * A {@link Translator} that can handle generic text classification {@link Input} and {@link
@@ -57,14 +57,13 @@ public class TextClassificationServingTranslator implements NoBatchifyTranslator
             throw new TranslateException("Input data is empty.");
         }
 
-        String contentType = input.getProperty("Content-Type", null);
-        String text = input.getData().getAsString();
-        if ("application/json".equals(contentType)) {
+        TextPrompt prompt = TextPrompt.parseInput(input);
+        if (prompt.isBatch()) {
             ctx.setAttachment("batch", Boolean.TRUE);
-            String[] inputs = JsonUtils.GSON.fromJson(text, String[].class);
-            return batchTranslator.processInput(ctx, inputs);
+            return batchTranslator.processInput(ctx, prompt.getBatch());
         }
-        NDList ret = translator.processInput(ctx, text);
+
+        NDList ret = translator.processInput(ctx, prompt.getText());
         Batchifier batchifier = translator.getBatchifier();
         if (batchifier != null) {
             NDList[] batch = {ret};
