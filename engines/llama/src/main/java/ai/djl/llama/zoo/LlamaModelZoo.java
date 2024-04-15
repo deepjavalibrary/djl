@@ -13,7 +13,9 @@
 package ai.djl.llama.zoo;
 
 import ai.djl.Application;
+import ai.djl.engine.Engine;
 import ai.djl.repository.Repository;
+import ai.djl.repository.Version;
 import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.util.ClassLoaderUtils;
@@ -53,7 +55,7 @@ public class LlamaModelZoo extends ModelZoo {
 
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 
-    private final AtomicBoolean initialized = new AtomicBoolean(false);
+    private volatile boolean initialized = false;
 
     LlamaModelZoo() {}
 
@@ -84,16 +86,21 @@ public class LlamaModelZoo extends ModelZoo {
     }
 
     private void init() {
-        if (initialized.compareAndSet(false, true)) {
-            Application app = Application.NLP.TEXT_GENERATION;
-            Map<String, ModelDetail> map = listModels(app);
-            for (Map.Entry<String, ModelDetail> entry : map.entrySet()) {
-                String artifactId = entry.getKey();
-                Map<String, Object> gguf = entry.getValue().getGguf();
-                if (gguf != null) {
-                    for (String key : gguf.keySet()) {
-                        addModel(REPOSITORY.model(app, GROUP_ID, artifactId, "0.0.1", key));
+        if (!initialized) {
+            synchronized (LlamaModelZoo.class) {
+                if (!initialized) {
+                    Application app = Application.NLP.TEXT_GENERATION;
+                    Map<String, ModelDetail> map = listModels(app);
+                    for (Map.Entry<String, ModelDetail> entry : map.entrySet()) {
+                        String artifactId = entry.getKey();
+                        Map<String, Object> gguf = entry.getValue().getGguf();
+                        if (gguf != null) {
+                            for (String key : gguf.keySet()) {
+                                addModel(REPOSITORY.model(app, GROUP_ID, artifactId, "0.0.1", key));
+                            }
+                        }
                     }
+                    initialized = true;
                 }
             }
         }
