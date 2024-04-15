@@ -54,7 +54,7 @@ public class HfModelZoo extends ModelZoo {
 
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 
-    private boolean initialized;
+    private volatile boolean initialized; // NOPMD
 
     HfModelZoo() {}
 
@@ -86,13 +86,17 @@ public class HfModelZoo extends ModelZoo {
 
     private void init() {
         if (!initialized) {
-            Version version = new Version(Engine.getDjlVersion());
-            addModels(NLP.FILL_MASK, version);
-            addModels(NLP.QUESTION_ANSWER, version);
-            addModels(NLP.TEXT_CLASSIFICATION, version);
-            addModels(NLP.TEXT_EMBEDDING, version);
-            addModels(NLP.TOKEN_CLASSIFICATION, version);
-            initialized = true;
+            synchronized (HfModelZoo.class) {
+                if (!initialized) {
+                    Version version = new Version(Engine.getDjlVersion());
+                    addModels(NLP.FILL_MASK, version);
+                    addModels(NLP.QUESTION_ANSWER, version);
+                    addModels(NLP.TEXT_CLASSIFICATION, version);
+                    addModels(NLP.TEXT_EMBEDDING, version);
+                    addModels(NLP.TOKEN_CLASSIFICATION, version);
+                    initialized = true;
+                }
+            }
         }
     }
 
@@ -123,7 +127,7 @@ public class HfModelZoo extends ModelZoo {
             if (Files.notExists(dir)) {
                 Files.createDirectories(dir);
             } else if (!Files.isDirectory(dir)) {
-                logger.warn("Failed initialize cache directory: " + dir);
+                logger.warn("Failed initialize cache directory: {}", dir);
                 return Collections.emptyMap();
             }
             Type type = new TypeToken<Map<String, Map<String, Object>>>() {}.getType();

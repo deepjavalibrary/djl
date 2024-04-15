@@ -52,7 +52,7 @@ public class LlamaModelZoo extends ModelZoo {
 
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 
-    private boolean initialized;
+    private volatile boolean initialized; // NOPMD
 
     LlamaModelZoo() {}
 
@@ -84,18 +84,22 @@ public class LlamaModelZoo extends ModelZoo {
 
     private void init() {
         if (!initialized) {
-            Application app = Application.NLP.TEXT_GENERATION;
-            Map<String, ModelDetail> map = listModels(app);
-            for (Map.Entry<String, ModelDetail> entry : map.entrySet()) {
-                String artifactId = entry.getKey();
-                Map<String, Object> gguf = entry.getValue().getGguf();
-                if (gguf != null) {
-                    for (String key : gguf.keySet()) {
-                        addModel(REPOSITORY.model(app, GROUP_ID, artifactId, "0.0.1", key));
+            synchronized (LlamaModelZoo.class) {
+                if (!initialized) {
+                    Application app = Application.NLP.TEXT_GENERATION;
+                    Map<String, ModelDetail> map = listModels(app);
+                    for (Map.Entry<String, ModelDetail> entry : map.entrySet()) {
+                        String artifactId = entry.getKey();
+                        Map<String, Object> gguf = entry.getValue().getGguf();
+                        if (gguf != null) {
+                            for (String key : gguf.keySet()) {
+                                addModel(REPOSITORY.model(app, GROUP_ID, artifactId, "0.0.1", key));
+                            }
+                        }
                     }
+                    initialized = true;
                 }
             }
-            initialized = true;
         }
     }
 
@@ -106,7 +110,7 @@ public class LlamaModelZoo extends ModelZoo {
             if (Files.notExists(dir)) {
                 Files.createDirectories(dir);
             } else if (!Files.isDirectory(dir)) {
-                logger.warn("Failed initialize cache directory: " + dir);
+                logger.warn("Failed initialize cache directory: {}", dir);
                 return Collections.emptyMap();
             }
             Type type = new TypeToken<Map<String, ModelDetail>>() {}.getType();
