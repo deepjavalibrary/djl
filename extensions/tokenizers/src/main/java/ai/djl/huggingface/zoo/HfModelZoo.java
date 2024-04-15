@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
 
 /** HfModelZoo is a repository that contains HuggingFace models. */
@@ -54,7 +55,7 @@ public class HfModelZoo extends ModelZoo {
 
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 
-    private boolean initialized;
+    private final AtomicBoolean initialized = new AtomicBoolean(false);
 
     HfModelZoo() {}
 
@@ -85,14 +86,13 @@ public class HfModelZoo extends ModelZoo {
     }
 
     private void init() {
-        if (!initialized) {
+        if (initialized.compareAndSet(false, true)) {
             Version version = new Version(Engine.getDjlVersion());
             addModels(NLP.FILL_MASK, version);
             addModels(NLP.QUESTION_ANSWER, version);
             addModels(NLP.TEXT_CLASSIFICATION, version);
             addModels(NLP.TEXT_EMBEDDING, version);
             addModels(NLP.TOKEN_CLASSIFICATION, version);
-            initialized = true;
         }
     }
 

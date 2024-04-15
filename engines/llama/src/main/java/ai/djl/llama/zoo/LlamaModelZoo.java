@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
 
 /** LlamaModelZoo is a repository that contains llama.cpp models. */
@@ -52,7 +53,7 @@ public class LlamaModelZoo extends ModelZoo {
 
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 
-    private boolean initialized;
+    private final AtomicBoolean initialized = new AtomicBoolean(false);
 
     LlamaModelZoo() {}
 
@@ -83,7 +84,7 @@ public class LlamaModelZoo extends ModelZoo {
     }
 
     private void init() {
-        if (!initialized) {
+        if (initialized.compareAndSet(false, true)) {
             Application app = Application.NLP.TEXT_GENERATION;
             Map<String, ModelDetail> map = listModels(app);
             for (Map.Entry<String, ModelDetail> entry : map.entrySet()) {
@@ -95,7 +96,6 @@ public class LlamaModelZoo extends ModelZoo {
                     }
                 }
             }
-            initialized = true;
         }
     }
 
