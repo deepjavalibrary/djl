@@ -37,10 +37,14 @@ public class TextClassificationBatchTranslator
     private PretrainedConfig config;
 
     TextClassificationBatchTranslator(
-            HuggingFaceTokenizer tokenizer, boolean includeTokenTypes, Batchifier batchifier) {
+            HuggingFaceTokenizer tokenizer,
+            boolean includeTokenTypes,
+            Batchifier batchifier,
+            PretrainedConfig config) {
         this.tokenizer = tokenizer;
         this.includeTokenTypes = includeTokenTypes;
         this.batchifier = batchifier;
+        this.config = config;
     }
 
     /** {@inheritDoc} */

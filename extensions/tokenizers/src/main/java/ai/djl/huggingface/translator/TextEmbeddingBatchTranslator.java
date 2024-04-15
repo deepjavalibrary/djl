@@ -21,6 +21,8 @@ import ai.djl.translate.Batchifier;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslatorContext;
 
+import java.util.Arrays;
+
 /** The translator for Huggingface text embedding model. */
 public class TextEmbeddingBatchTranslator implements NoBatchifyTranslator<String[], float[][]> {
 
@@ -47,11 +49,11 @@ public class TextEmbeddingBatchTranslator implements NoBatchifyTranslator<String
     @Override
     public NDList processInput(TranslatorContext ctx, String[] input) {
         NDManager manager = ctx.getNDManager();
-        Encoding[] encodings = tokenizer.batchEncode(input);
+        Object[] encodings = Arrays.stream(tokenizer.batchEncode(input)).toArray();
         ctx.setAttachment("encodings", encodings);
         NDList[] batch = new NDList[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
-            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+            batch[i] = ((Encoding) encodings[i]).toNDList(manager, includeTokenTypes);
         }
         return batchifier.batchify(batch);
     }
@@ -60,13 +62,13 @@ public class TextEmbeddingBatchTranslator implements NoBatchifyTranslator<String
     @Override
     public float[][] processOutput(TranslatorContext ctx, NDList list) {
         NDList[] batch = batchifier.unbatchify(list);
-        Encoding[] encoding = (Encoding[]) ctx.getAttachment("encodings");
+        Object[] encoding = (Object[]) ctx.getAttachment("encodings");
         NDManager manager = ctx.getNDManager();
         float[][] ret = new float[batch.length][];
         for (int i = 0; i < batch.length; ++i) {
             NDArray array =
                     TextEmbeddingTranslator.processEmbedding(
-                            manager, batch[i], encoding[i], pooling);
+                            manager, batch[i], (Encoding) encoding[i], pooling);
             if (normalize) {
                 array = array.normalize(2, 0);
             }

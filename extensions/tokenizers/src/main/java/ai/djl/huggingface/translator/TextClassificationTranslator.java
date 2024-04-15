@@ -79,7 +79,8 @@ public class TextClassificationTranslator implements Translator<String, Classifi
     @Override
     public TextClassificationBatchTranslator toBatchTranslator(Batchifier batchifier) {
         tokenizer.enableBatch();
-        return new TextClassificationBatchTranslator(tokenizer, includeTokenTypes, batchifier);
+        return new TextClassificationBatchTranslator(
+                tokenizer, includeTokenTypes, batchifier, config);
     }
 
     static Classifications toClassifications(PretrainedConfig config, NDList list) {

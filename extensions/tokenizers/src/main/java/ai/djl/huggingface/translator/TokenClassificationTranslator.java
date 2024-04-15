@@ -82,7 +82,8 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
     @Override
     public TokenClassificationBatchTranslator toBatchTranslator(Batchifier batchifier) {
         tokenizer.enableBatch();
-        return new TokenClassificationBatchTranslator(tokenizer, includeTokenTypes, batchifier);
+        return new TokenClassificationBatchTranslator(
+                tokenizer, includeTokenTypes, batchifier, config);
     }
 
     /**
