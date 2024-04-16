@@ -33,16 +33,19 @@ public class TokenClassificationBatchTranslator
 
     private HuggingFaceTokenizer tokenizer;
     private boolean includeTokenTypes;
+    private boolean softmax;
     private Batchifier batchifier;
     private PretrainedConfig config;
 
     TokenClassificationBatchTranslator(
             HuggingFaceTokenizer tokenizer,
             boolean includeTokenTypes,
+            boolean softmax,
             Batchifier batchifier,
             PretrainedConfig config) {
         this.tokenizer = tokenizer;
         this.includeTokenTypes = includeTokenTypes;
+        this.softmax = softmax;
         this.batchifier = batchifier;
         this.config = config;
     }
@@ -77,7 +80,9 @@ public class TokenClassificationBatchTranslator
         Encoding[] encodings = (Encoding[]) ctx.getAttachment("encodings");
         NamedEntity[][] ret = new NamedEntity[encodings.length][];
         for (int i = 0; i < encodings.length; ++i) {
-            ret[i] = TokenClassificationTranslator.toNamedEntities(encodings[i], batch[i], config);
+            ret[i] =
+                    TokenClassificationTranslator.toNamedEntities(
+                            encodings[i], batch[i], config, softmax);
         }
         return ret;
     }

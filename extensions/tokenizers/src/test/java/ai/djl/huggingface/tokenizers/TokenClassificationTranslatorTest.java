@@ -94,6 +94,7 @@ public class TokenClassificationTranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("softmax", true)
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TokenClassificationTranslatorFactory())
                         .build();
@@ -116,6 +117,7 @@ public class TokenClassificationTranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("softmax", true)
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TokenClassificationTranslatorFactory())
                         .build();
@@ -178,6 +180,7 @@ public class TokenClassificationTranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("softmax", true)
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TokenClassificationTranslatorFactory())
                         .build();
@@ -200,6 +203,7 @@ public class TokenClassificationTranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("softmax", true)
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TokenClassificationTranslatorFactory())
                         .build();

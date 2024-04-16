@@ -72,7 +72,7 @@ public class CrossEncoderTranslator implements Translator<StringPair, float[]> {
     @Override
     public CrossEncoderBatchTranslator toBatchTranslator(Batchifier batchifier) {
         tokenizer.enableBatch();
-        return new CrossEncoderBatchTranslator(tokenizer, includeTokenTypes, batchifier);
+        return new CrossEncoderBatchTranslator(tokenizer, includeTokenTypes, sigmoid, batchifier);
     }
 
     /**
@@ -104,7 +104,7 @@ public class CrossEncoderTranslator implements Translator<StringPair, float[]> {
 
         private HuggingFaceTokenizer tokenizer;
         private boolean includeTokenTypes;
-        private boolean sigmoid;
+        private boolean sigmoid = true;
         private Batchifier batchifier = Batchifier.STACK;
 
         Builder(HuggingFaceTokenizer tokenizer) {
