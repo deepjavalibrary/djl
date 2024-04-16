@@ -16,15 +16,19 @@ from huggingface_models import get_lang_tags
 
 class HuggingfaceMetadata:
 
-    def __init__(self, model_info, application: str, sha1: str, file_size: int,
-                 arguments: dict):
+    def __init__(self, model_info, engine: str, application: str, sha1: str,
+                 file_size: int, arguments: dict):
         self.model_info = model_info
+        self.group_id = f"ai.djl.huggingface.{engine.lower()}"
         self.artifact_id = model_info.modelId
         self.model_name = model_info.modelId.split("/")[-1]
         self.application = application
         self.sha1 = sha1
         self.file_size = file_size
         self.arguments = arguments
+        self.options = {}
+        if engine == "PyTorch":
+            self.options["mapLocation"] = True
 
     def save_metadata(self, metadata_file: str):
         properties = get_lang_tags(self.model_info)
@@ -37,7 +41,7 @@ class HuggingfaceMetadata:
             "application":
             self.application,
             "groupId":
-            "ai.djl.huggingface.pytorch",
+            self.group_id,
             "artifactId":
             self.artifact_id,
             "name":
@@ -58,9 +62,7 @@ class HuggingfaceMetadata:
                 "name": self.model_name,
                 "properties": properties,
                 "arguments": self.arguments,
-                "options": {
-                    "mapLocation": True
-                },
+                "options": self.options,
                 "files": {
                     "model": {
                         "uri": f"0.0.1/{self.model_name}.zip",

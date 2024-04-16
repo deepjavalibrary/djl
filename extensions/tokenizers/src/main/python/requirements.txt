@@ -2,3 +2,4 @@ huggingface_hub
 transformers
 torch
 protobuf==3.20.2
+optimum[exporters,onnxruntime]

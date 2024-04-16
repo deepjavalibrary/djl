@@ -11,6 +11,7 @@
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
 import logging
+import os.path
 import shutil
 import sys
 
@@ -63,7 +64,8 @@ def main():
 
         huggingface_models.update_progress(model_info, converter.application,
                                            result, reason, size, args.cpu_only)
-        shutil.rmtree(temp_dir)
+        if os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
 
     logging.info("finished.")
 
