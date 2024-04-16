@@ -37,7 +37,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TextEmbeddingTranslatorTest {
@@ -157,6 +159,16 @@ public class TextEmbeddingTranslatorTest {
             float[] res = JsonUtils.GSON.fromJson(out.getAsString(0), float[].class);
             Assert.assertEquals(res.length, 384);
             Assertions.assertAlmostEquals(res[0], 0.05103);
+
+            input = new Input();
+            Map<String, String> map = new HashMap<>();
+            map.put("inputs", text);
+            input.add(JsonUtils.GSON.toJson(map));
+            input.addProperty("Content-Type", "application/json");
+            out = predictor.predict(input);
+            res = (float[]) out.getData().getAsObject();
+            Assert.assertEquals(res.length, 384);
+            Assertions.assertAlmostEquals(res[0], 0.05103);
         }
 
         try (Model model = Model.newInstance("test")) {
@@ -235,6 +247,81 @@ public class TextEmbeddingTranslatorTest {
             input.addProperty("Content-Type", "application/json");
             Output out = predictor.predict(input);
             float[][] res = (float[][]) out.getData().getAsObject();
+            Assert.assertEquals(res[0].length, 384);
+            Assertions.assertAlmostEquals(res[0][0], 0.05103);
+
+            input = new Input();
+            Map<String, String[]> map = new HashMap<>();
+            map.put("inputs", text);
+            input.add(JsonUtils.GSON.toJson(map));
+            input.addProperty("Content-Type", "application/json");
+            out = predictor.predict(input);
+            res = (float[][]) out.getData().getAsObject();
+            Assert.assertEquals(res[0].length, 384);
+            Assertions.assertAlmostEquals(res[0][0], 0.05103);
+
+            Assert.assertThrows(
+                    () -> {
+                        Input empty = new Input();
+                        empty.add(JsonUtils.GSON.toJson(new HashMap<>()));
+                        empty.addProperty("Content-Type", "application/json");
+                        predictor.predict(empty);
+                    });
+
+            Assert.assertThrows(
+                    () -> {
+                        Input empty = new Input();
+                        empty.add("{ \"invalid json\"");
+                        empty.addProperty("Content-Type", "application/json");
+                        predictor.predict(empty);
+                    });
+        }
+    }
+
+    @Test
+    public void testTextEmbeddingTranslatorServingBatch()
+            throws ModelException, IOException, TranslateException {
+        String[] text = {"This is an example sentence", "This is the second sentence"};
+
+        Block block =
+                new LambdaBlock(
+                        a -> {
+                            NDManager manager = a.getManager();
+                            NDArray arr = manager.ones(new Shape(4, 7, 384));
+                            arr.setName("last_hidden_state");
+                            return new NDList(arr);
+                        },
+                        "model");
+        Path modelDir = Paths.get("build/model");
+        Files.createDirectories(modelDir);
+
+        Criteria<Input, Output> criteria =
+                Criteria.builder()
+                        .setTypes(Input.class, Output.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<Input, Output> model = criteria.loadModel();
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            Input input1 = new Input();
+            input1.add(JsonUtils.GSON.toJson(text));
+            input1.addProperty("Content-Type", "application/json");
+
+            Input input2 = new Input();
+            Map<String, String[]> map = new HashMap<>();
+            map.put("inputs", text);
+            input2.add(JsonUtils.GSON.toJson(map));
+            input2.addProperty("Content-Type", "application/json");
+            List<Input> batchInput = Arrays.asList(input1, input2);
+
+            List<Output> batchOutput = predictor.batchPredict(batchInput);
+            Assert.assertEquals(batchOutput.size(), 2);
+            float[][] res = (float[][]) batchOutput.get(0).getData().getAsObject();
             Assert.assertEquals(res[0].length, 384);
             Assertions.assertAlmostEquals(res[0][0], 0.05103);
         }

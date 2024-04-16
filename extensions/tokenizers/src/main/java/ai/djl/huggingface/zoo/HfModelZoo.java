@@ -41,7 +41,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
 
 /** HfModelZoo is a repository that contains HuggingFace models. */
@@ -55,7 +54,7 @@ public class HfModelZoo extends ModelZoo {
 
     private static final long ONE_DAY = Duration.ofDays(1).toMillis();
 
-    private volatile boolean initialized = false;
+    private volatile boolean initialized; // NOPMD
 
     HfModelZoo() {}
 
@@ -128,7 +127,7 @@ public class HfModelZoo extends ModelZoo {
             if (Files.notExists(dir)) {
                 Files.createDirectories(dir);
             } else if (!Files.isDirectory(dir)) {
-                logger.warn("Failed initialize cache directory: " + dir);
+                logger.warn("Failed initialize cache directory: {}", dir);
                 return Collections.emptyMap();
             }
             Type type = new TypeToken<Map<String, Map<String, Object>>>() {}.getType();
