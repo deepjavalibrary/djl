@@ -37,13 +37,18 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
 
     private HuggingFaceTokenizer tokenizer;
     private boolean includeTokenTypes;
+    private boolean softmax;
     private Batchifier batchifier;
     private PretrainedConfig config;
 
     TokenClassificationTranslator(
-            HuggingFaceTokenizer tokenizer, boolean includeTokenTypes, Batchifier batchifier) {
+            HuggingFaceTokenizer tokenizer,
+            boolean includeTokenTypes,
+            boolean softmax,
+            Batchifier batchifier) {
         this.tokenizer = tokenizer;
         this.includeTokenTypes = includeTokenTypes;
+        this.softmax = softmax;
         this.batchifier = batchifier;
     }
 
@@ -75,7 +80,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
     @Override
     public NamedEntity[] processOutput(TranslatorContext ctx, NDList list) {
         Encoding encoding = (Encoding) ctx.getAttachment("encoding");
-        return toNamedEntities(encoding, list, config);
+        return toNamedEntities(encoding, list, config, softmax);
     }
 
     /** {@inheritDoc} */
@@ -83,7 +88,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
     public TokenClassificationBatchTranslator toBatchTranslator(Batchifier batchifier) {
         tokenizer.enableBatch();
         return new TokenClassificationBatchTranslator(
-                tokenizer, includeTokenTypes, batchifier, config);
+                tokenizer, includeTokenTypes, softmax, batchifier, config);
     }
 
     /**
@@ -110,12 +115,16 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
         return builder;
     }
 
-    static NamedEntity[] toNamedEntities(Encoding encoding, NDList list, PretrainedConfig config) {
-        NDArray logits = list.get(0);
+    static NamedEntity[] toNamedEntities(
+            Encoding encoding, NDList list, PretrainedConfig config, boolean softmax) {
         long[] inputIds = encoding.getIds();
         CharSpan[] offsetMapping = encoding.getCharTokenSpans();
         long[] specialTokenMasks = encoding.getSpecialTokenMask();
-        NDArray probabilities = logits.softmax(1);
+        NDArray probabilities = list.get(0);
+        if (softmax) {
+            probabilities = probabilities.softmax(1);
+        }
+
         List<NamedEntity> entities = new ArrayList<>();
 
         for (int i = 0; i < inputIds.length; ++i) {
@@ -144,6 +153,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
 
         private HuggingFaceTokenizer tokenizer;
         private boolean includeTokenTypes;
+        private boolean softmax = true;
         private Batchifier batchifier = Batchifier.STACK;
 
         Builder(HuggingFaceTokenizer tokenizer) {
@@ -158,6 +168,17 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          */
         public Builder optIncludeTokenTypes(boolean includeTokenTypes) {
             this.includeTokenTypes = includeTokenTypes;
+            return this;
+        }
+
+        /**
+         * Sets if implement softmax operation for the {@link Translator}.
+         *
+         * @param softmax true to implement softmax to model output result
+         * @return this builder
+         */
+        public Builder optSoftmax(boolean softmax) {
+            this.softmax = softmax;
             return this;
         }
 
@@ -179,6 +200,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          */
         public void configure(Map<String, ?> arguments) {
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
+            optSoftmax(ArgumentsUtil.booleanValue(arguments, "softmax", true));
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
             optBatchifier(Batchifier.fromString(batchifierStr));
         }
@@ -190,7 +212,8 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          * @throws IOException if I/O error occurs
          */
         public TokenClassificationTranslator build() throws IOException {
-            return new TokenClassificationTranslator(tokenizer, includeTokenTypes, batchifier);
+            return new TokenClassificationTranslator(
+                    tokenizer, includeTokenTypes, softmax, batchifier);
         }
     }
 }
