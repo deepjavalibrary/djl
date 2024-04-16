@@ -11,10 +11,8 @@
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
 import logging
-import os
 
 import torch
-from optimum.onnxruntime import ORTModelForTokenClassification
 
 from huggingface_converter import HuggingfaceConverter
 
@@ -80,9 +78,3 @@ class TokenClassificationConverter(HuggingfaceConverter):
         logging.error(f"Unexpected inference result: {entities[0]}")
 
         return False, "Unexpected inference result"
-
-    def export_to_onnx(self, model_id: str, temp_dir: str):
-        ort_model = ORTModelForTokenClassification.from_pretrained(model_id,
-                                                                   export=True)
-        ort_model.save_pretrained(temp_dir)
-        return os.path.join(temp_dir, "model.onnx")

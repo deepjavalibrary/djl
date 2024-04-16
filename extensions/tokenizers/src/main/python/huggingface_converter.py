@@ -37,6 +37,42 @@ class HuggingfaceConverter:
         self.outputs = None
 
     def save_model(self, model_info, args: Namespace, temp_dir: str):
+        if args.output_format == "OnnxRuntime":
+            self.save_onnx_model(model_info, args, temp_dir)
+        else:
+            self.save_pytorch_model(model_info, args, temp_dir)
+
+    def save_onnx_model(self, model_info, args: Namespace, temp_dir: str):
+        model_id = model_info.modelId
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
+
+        try:
+            hf_pipeline = self.load_model(model_id)
+        except Exception as e:
+            logging.warning(f"Failed to load model: {model_id}.")
+            logging.warning(e, exc_info=True)
+            return False, "Failed to load model", -1
+
+        model_name = model_id.split("/")[-1]
+        logging.info(f"Saving onnxruntime model: {model_name}.onnx ...")
+
+        from optimum.commands.optimum_cli import main
+
+        sys.argv = [
+            "model_zoo_importer.py", "export", "onnx", "-m", model_id, temp_dir
+        ]
+        main()
+
+        model_input_names = hf_pipeline.tokenizer.model_input_names
+        include_types = "token_type_ids" in model_input_names
+        size = self.save_to_model_zoo(model_info, args.output_dir,
+                                      "OnnxRuntime", temp_dir, hf_pipeline,
+                                      include_types)
+
+        return True, None, size
+
+    def save_pytorch_model(self, model_info, args: Namespace, temp_dir: str):
         model_id = model_info.modelId
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
@@ -63,23 +99,16 @@ class HuggingfaceConverter:
         model_input_names = hf_pipeline.tokenizer.model_input_names
         include_types = "token_type_ids" in model_input_names
 
-        if args.output_format == "OnnxRuntime":
-            model_file = self.export_to_onnx(model_id, temp_dir)
+        # Save jit traced .pt file to temp dir
+        model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
+                                          include_types)
+        if not model_file:
+            return False, "Failed to trace model", -1
 
-            if not model_file:
-                return False, "Failed to export to onnx", -1
-        else:
-            # Save jit traced .pt file to temp dir
-            model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
-                                              include_types)
-            if not model_file:
-                return False, "Failed to trace model", -1
-
-            result, reason = self.verify_jit_model(hf_pipeline, model_file,
-                                                   include_types,
-                                                   args.cpu_only)
-            if not result:
-                return False, reason, -1
+        result, reason = self.verify_jit_model(hf_pipeline, model_file,
+                                               include_types, args.cpu_only)
+        if not result:
+            return False, reason, -1
 
         size = self.save_to_model_zoo(model_info, args.output_dir,
                                       args.output_format, temp_dir,
@@ -129,13 +158,6 @@ class HuggingfaceConverter:
             return None
 
         return model_file
-
-    def export_to_onnx(self, model_id: str, temp_dir: str):
-        from optimum.onnxruntime import ORTModel
-
-        ort_model = ORTModel.from_pretrained(model_id, export=True)
-        ort_model.save_pretrained(temp_dir)
-        return os.path.join(temp_dir, "model.onnx")
 
     def save_to_model_zoo(self, model_info, output_dir: str, engine: str,
                           temp_dir: str, hf_pipeline, include_types: bool):
