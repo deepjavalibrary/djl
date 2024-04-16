@@ -304,7 +304,8 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
      */
     default int[] toIntArray() {
-        if (getDataType() != DataType.INT32) {
+        DataType dType = getDataType();
+        if (dType != DataType.INT32 && dType != DataType.UINT32) {
             throw new IllegalStateException(
                     "DataType mismatch, Required int" + " Actual " + getDataType());
         }
