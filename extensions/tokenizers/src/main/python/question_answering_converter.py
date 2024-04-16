@@ -11,8 +11,10 @@
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
 import logging
+import os
 
 import torch
+from optimum.onnxruntime import ORTModelForQuestionAnswering
 
 from huggingface_converter import HuggingfaceConverter
 
@@ -65,3 +67,9 @@ class QuestionAnsweringConverter(HuggingfaceConverter):
         return tokenizer.encode_plus(text,
                                      text_pair=text_pair,
                                      return_tensors='pt')
+
+    def export_to_onnx(self, model_id: str, temp_dir: str):
+        ort_model = ORTModelForQuestionAnswering.from_pretrained(model_id,
+                                                                 export=True)
+        ort_model.save_pretrained(temp_dir)
+        return os.path.join(temp_dir, "model.onnx")

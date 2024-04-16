@@ -18,6 +18,7 @@ from argparse import Namespace
 import torch
 from huggingface_hub import hf_hub_download
 from transformers import pipeline
+from optimum.onnxruntime import ORTModel
 
 from metadata import HuggingfaceMetadata
 from shasum import sha1_sum
@@ -59,21 +60,20 @@ class HuggingfaceConverter:
         config = hf_hub_download(repo_id=model_id, filename="config.json")
         shutil.copyfile(config, os.path.join(temp_dir, "config.json"))
 
-        # Save jit traced .pt file to temp dir
-        include_types = False
-        model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
-                                          include_types)
-        if not model_file:
-            return False, "Failed to trace model", -1
+        model_input_names = hf_pipeline.tokenizer.model_input_names
+        include_types = "token_type_ids" in model_input_names
 
-        result, reason = self.verify_jit_model(hf_pipeline, model_file,
-                                               include_types, args.cpu_only)
-        if not result:
-            include_types = True
+        if args.output_format == "onnx":
+            model_file = self.export_to_onnx(model_id, temp_dir)
+
+            if not model_file:
+                return False, "Failed to export to onnx", -1
+        else:
+            # Save jit traced .pt file to temp dir
             model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
                                               include_types)
             if not model_file:
-                return False, reason, -1
+                return False, "Failed to trace model", -1
 
             result, reason = self.verify_jit_model(hf_pipeline, model_file,
                                                    include_types,
@@ -128,6 +128,11 @@ class HuggingfaceConverter:
             return None
 
         return model_file
+
+    def export_to_onnx(self, model_id: str, temp_dir: str):
+        ort_model = ORTModel.from_pretrained(model_id, export=True)
+        ort_model.save_pretrained(temp_dir)
+        return os.path.join(temp_dir, "model.onnx")
 
     def save_to_model_zoo(self, model_info, output_dir: str, temp_dir: str,
                           hf_pipeline, include_types: bool):
