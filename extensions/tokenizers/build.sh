@@ -25,6 +25,7 @@ fi
 rm -rf build/classes
 mkdir build/classes
 javac -sourcepath src/main/java/ src/main/java/ai/djl/huggingface/tokenizers/jni/TokenizersLibrary.java -h build/include -d build/classes
+javac -sourcepath src/main/java/ src/main/java/ai/djl/engine/rust/RustLibrary.java -h build/include -d build/classes
 
 RUST_MANIFEST=rust/Cargo.toml
 cargo build --manifest-path $RUST_MANIFEST --release

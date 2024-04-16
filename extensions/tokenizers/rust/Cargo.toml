@@ -6,7 +6,9 @@ edition = "2018"
 
 [dependencies]
 jni = "0.21.1"
+candle-core = "0.4.1"
 tokenizers = { path = "../tokenizers/tokenizers", version = "*", features = ["http"] }
+half = "2.4.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = { version = "0.10", features = ["vendored"] }

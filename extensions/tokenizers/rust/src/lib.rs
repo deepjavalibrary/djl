@@ -28,6 +28,8 @@ use tk::utils::truncation::{TruncationParams, TruncationStrategy};
 use tk::Tokenizer;
 use tk::{FromPretrainedParameters, Offsets};
 
+mod ndarray;
+
 #[no_mangle]
 pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_createTokenizer<
     'local,
