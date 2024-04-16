@@ -104,7 +104,7 @@ public class CrossEncoderTranslator implements Translator<StringPair, float[]> {
 
         private HuggingFaceTokenizer tokenizer;
         private boolean includeTokenTypes;
-        private boolean sigmoid;
+        private boolean sigmoid = true;
         private Batchifier batchifier = Batchifier.STACK;
 
         Builder(HuggingFaceTokenizer tokenizer) {

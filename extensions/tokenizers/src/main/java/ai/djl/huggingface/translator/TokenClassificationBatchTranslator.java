@@ -80,7 +80,9 @@ public class TokenClassificationBatchTranslator
         Encoding[] encodings = (Encoding[]) ctx.getAttachment("encodings");
         NamedEntity[][] ret = new NamedEntity[encodings.length][];
         for (int i = 0; i < encodings.length; ++i) {
-            ret[i] = TokenClassificationTranslator.toNamedEntities(encodings[i], batch[i], config, softmax);
+            ret[i] =
+                    TokenClassificationTranslator.toNamedEntities(
+                            encodings[i], batch[i], config, softmax);
         }
         return ret;
     }

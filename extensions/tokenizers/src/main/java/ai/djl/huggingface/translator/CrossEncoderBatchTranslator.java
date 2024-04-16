@@ -35,7 +35,10 @@ public class CrossEncoderBatchTranslator implements NoBatchifyTranslator<StringP
     private Batchifier batchifier;
 
     CrossEncoderBatchTranslator(
-            HuggingFaceTokenizer tokenizer, boolean includeTokenTypes, boolean sigmoid, Batchifier batchifier) {
+            HuggingFaceTokenizer tokenizer,
+            boolean includeTokenTypes,
+            boolean sigmoid,
+            Batchifier batchifier) {
         this.tokenizer = tokenizer;
         this.includeTokenTypes = includeTokenTypes;
         this.sigmoid = sigmoid;
