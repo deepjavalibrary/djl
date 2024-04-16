@@ -116,7 +116,10 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
         long[] inputIds = encoding.getIds();
         CharSpan[] offsetMapping = encoding.getCharTokenSpans();
         long[] specialTokenMasks = encoding.getSpecialTokenMask();
-        NDArray probabilities = softmax? list.get(0).softmax(1) : list.get(0);
+        NDArray probabilities = list.get(0);
+        if (softmax) {
+            probabilities = probabilities.softmax(1);
+        }
 
         List<NamedEntity> entities = new ArrayList<>();
 
