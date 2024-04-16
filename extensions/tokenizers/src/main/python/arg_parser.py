@@ -23,7 +23,11 @@ def converter_args():
                         default=1,
                         help="Max amount of models to convert")
     parser.add_argument("-o", "--output-dir", help="Model output directory")
-    parser.add_argument("-f", "--output-format", help="Model output format")
+    parser.add_argument("-f",
+                        "--output-format",
+                        default="PyTorch",
+                        choices=["PyTorch", "OnnxRuntime"],
+                        help="Model output format")
     parser.add_argument("-r",
                         "--retry-failed",
                         action='store_true',

@@ -12,13 +12,13 @@
 # the specific language governing permissions and limitations under the License.
 import logging
 import os.path
+import sys
 import shutil
 from argparse import Namespace
 
 import torch
 from huggingface_hub import hf_hub_download
 from transformers import pipeline
-from optimum.onnxruntime import ORTModel
 
 from metadata import HuggingfaceMetadata
 from shasum import sha1_sum
@@ -63,7 +63,7 @@ class HuggingfaceConverter:
         model_input_names = hf_pipeline.tokenizer.model_input_names
         include_types = "token_type_ids" in model_input_names
 
-        if args.output_format == "onnx":
+        if args.output_format == "OnnxRuntime":
             model_file = self.export_to_onnx(model_id, temp_dir)
 
             if not model_file:
@@ -81,7 +81,8 @@ class HuggingfaceConverter:
             if not result:
                 return False, reason, -1
 
-        size = self.save_to_model_zoo(model_info, args.output_dir, temp_dir,
+        size = self.save_to_model_zoo(model_info, args.output_dir,
+                                      args.output_format, temp_dir,
                                       hf_pipeline, include_types)
 
         return True, None, size
@@ -130,16 +131,18 @@ class HuggingfaceConverter:
         return model_file
 
     def export_to_onnx(self, model_id: str, temp_dir: str):
+        from optimum.onnxruntime import ORTModel
+
         ort_model = ORTModel.from_pretrained(model_id, export=True)
         ort_model.save_pretrained(temp_dir)
         return os.path.join(temp_dir, "model.onnx")
 
-    def save_to_model_zoo(self, model_info, output_dir: str, temp_dir: str,
-                          hf_pipeline, include_types: bool):
+    def save_to_model_zoo(self, model_info, output_dir: str, engine: str,
+                          temp_dir: str, hf_pipeline, include_types: bool):
         model_id = model_info.modelId
         model_name = model_id.split("/")[-1]
-
-        repo_dir = f"{output_dir}/model/{self.application}/ai/djl/huggingface/pytorch/{model_id}"
+        group_id = f"ai/djl/huggingface/{engine.lower()}"
+        repo_dir = f"{output_dir}/model/{self.application}/{group_id}/{model_id}"
         model_dir = f"{repo_dir}/0.0.1"
         if not os.path.exists(model_dir):
             os.makedirs(model_dir)
@@ -152,9 +155,10 @@ class HuggingfaceConverter:
         arguments["translatorFactory"] = self.translator
 
         with open(serving_file, 'w') as f:
-            f.write(f"engine=PyTorch\n"
-                    f"option.modelName={model_name}\n"
-                    f"option.mapLocation=true\n")
+            f.write(f"engine={engine}\n"
+                    f"option.modelName={model_name}\n")
+            if engine == "PyTorch":
+                f.write(f"option.mapLocation=true\n")
 
             for k, v in arguments.items():
                 f.write(f"{k}={v}\n")
@@ -165,11 +169,11 @@ class HuggingfaceConverter:
         zip_dir(temp_dir, zip_file)
 
         # Save metadata.json
-        arguments["engine"] = "PyTorch"
+        arguments["engine"] = engine
         sha1 = sha1_sum(zip_file)
         file_size = os.path.getsize(zip_file)
-        metadata = HuggingfaceMetadata(model_info, self.application, sha1,
-                                       file_size, arguments)
+        metadata = HuggingfaceMetadata(model_info, engine, self.application,
+                                       sha1, file_size, arguments)
         metadata_file = os.path.join(repo_dir, "metadata.json")
         metadata.save_metadata(metadata_file)
 
