@@ -31,12 +31,14 @@ public class CrossEncoderBatchTranslator implements NoBatchifyTranslator<StringP
 
     private HuggingFaceTokenizer tokenizer;
     private boolean includeTokenTypes;
+    private boolean sigmoid;
     private Batchifier batchifier;
 
     CrossEncoderBatchTranslator(
-            HuggingFaceTokenizer tokenizer, boolean includeTokenTypes, Batchifier batchifier) {
+            HuggingFaceTokenizer tokenizer, boolean includeTokenTypes, boolean sigmoid, Batchifier batchifier) {
         this.tokenizer = tokenizer;
         this.includeTokenTypes = includeTokenTypes;
+        this.sigmoid = sigmoid;
         this.batchifier = batchifier;
     }
 
@@ -60,8 +62,10 @@ public class CrossEncoderBatchTranslator implements NoBatchifyTranslator<StringP
         NDList[] batch = batchifier.unbatchify(list);
         float[][] ret = new float[batch.length][];
         for (int i = 0; i < batch.length; ++i) {
-            NDArray logits = list.get(0);
-            NDArray result = logits.getNDArrayInternal().sigmoid();
+            NDArray result = list.get(0);
+            if (sigmoid) {
+                result = result.getNDArrayInternal().sigmoid();
+            }
             ret[i] = result.toFloatArray();
         }
         return ret;
