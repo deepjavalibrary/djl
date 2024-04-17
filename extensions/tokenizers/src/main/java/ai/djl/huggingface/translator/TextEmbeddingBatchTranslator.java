@@ -31,18 +31,27 @@ public class TextEmbeddingBatchTranslator implements NoBatchifyTranslator<String
     private boolean normalize;
     private String pooling;
     private boolean includeTokenTypes;
+    private String denseActivation;
+    private NDList denseModel;
+    private NDList layerNormModel;
 
     TextEmbeddingBatchTranslator(
             HuggingFaceTokenizer tokenizer,
             Batchifier batchifier,
             String pooling,
             boolean normalize,
-            boolean includeTokenTypes) {
+            boolean includeTokenTypes,
+            NDList denseModel,
+            String denseActivation,
+            NDList layerNormModel) {
         this.tokenizer = tokenizer;
         this.batchifier = batchifier;
         this.pooling = pooling;
         this.normalize = normalize;
         this.includeTokenTypes = includeTokenTypes;
+        this.denseModel = denseModel;
+        this.denseActivation = denseActivation;
+        this.layerNormModel = layerNormModel;
     }
 
     /** {@inheritDoc} */
@@ -68,7 +77,14 @@ public class TextEmbeddingBatchTranslator implements NoBatchifyTranslator<String
         for (int i = 0; i < batch.length; ++i) {
             NDArray array =
                     TextEmbeddingTranslator.processEmbedding(
-                            manager, batch[i], (Encoding) encoding[i], pooling);
+                            manager,
+                            batch[i],
+                            (Encoding) encoding[i],
+                            pooling,
+                            denseModel,
+                            denseActivation,
+                            layerNormModel,
+                            normalize);
             if (normalize) {
                 array = array.normalize(2, 0);
             }
