@@ -34,6 +34,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,6 +61,24 @@ public class TextEmbeddingTranslatorTest {
                         "model");
         Path modelDir = Paths.get("build/model");
         Files.createDirectories(modelDir);
+        try (NDManager manager = NDManager.newBaseManager("Rust")) {
+            NDArray weight = manager.ones(new Shape(256, 384));
+            weight.setName("linear.weight");
+            NDList linear = new NDList(weight);
+            Path file = modelDir.resolve("linear.safetensors");
+            try (OutputStream os = Files.newOutputStream(file)) {
+                linear.encode(os, NDList.Encoding.SAFETENSORS);
+            }
+            NDArray normWeight = manager.ones(new Shape(256));
+            normWeight.setName("norm.weight");
+            NDArray bias = manager.ones(new Shape(256));
+            bias.setName("norm.bias");
+            NDList norm = new NDList(normWeight, bias);
+            file = modelDir.resolve("norm.safetensors");
+            try (OutputStream os = Files.newOutputStream(file)) {
+                norm.encode(os, NDList.Encoding.SAFETENSORS);
+            }
+        }
 
         Criteria<String, float[]> criteria =
                 Criteria.builder()
@@ -137,6 +156,27 @@ public class TextEmbeddingTranslatorTest {
             float[] res = predictor.predict(text);
             Assert.assertEquals(res.length, 384);
             Assertions.assertAlmostEquals(res[0], 0.05103104);
+        }
+
+        // dense and layerNorm
+        criteria =
+                Criteria.builder()
+                        .setTypes(String.class, float[].class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("dense", "linear.safetensors")
+                        .optArgument("denseActivation", "Tanh")
+                        .optArgument("layerNorm", "norm.safetensors")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String, float[]> model = criteria.loadModel();
+                Predictor<String, float[]> predictor = model.newPredictor()) {
+            float[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 256);
         }
 
         Criteria<Input, Output> criteria2 =
