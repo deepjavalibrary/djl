@@ -183,7 +183,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
             NDArray weight = denseModel.get("linear.weight");
             NDArray bias = denseModel.get("linear.bias");
             embedding = embedding.getNDArrayInternal().linear(embedding, weight, bias).get(0);
-            if ("Tanh".equals(denseActivation)) {
+            if ("Tanh".equalsIgnoreCase(denseActivation)) {
                 embedding = embedding.tanh();
             }
         }

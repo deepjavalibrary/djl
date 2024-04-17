@@ -69,9 +69,11 @@ public class TextEmbeddingTranslatorTest {
             try (OutputStream os = Files.newOutputStream(file)) {
                 linear.encode(os, NDList.Encoding.SAFETENSORS);
             }
-            NDArray bias = manager.ones(new Shape(384));
-            NDArray normWeight = manager.ones(new Shape(384));
-            NDList norm = new NDList(bias, normWeight);
+            NDArray normWeight = manager.ones(new Shape(256));
+            normWeight.setName("norm.weight");
+            NDArray bias = manager.ones(new Shape(256));
+            bias.setName("norm.bias");
+            NDList norm = new NDList(normWeight, bias);
             file = modelDir.resolve("norm.safetensors");
             try (OutputStream os = Files.newOutputStream(file)) {
                 norm.encode(os, NDList.Encoding.SAFETENSORS);
@@ -165,8 +167,8 @@ public class TextEmbeddingTranslatorTest {
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
                         .optArgument("dense", "linear.safetensors")
-                        .optArgument("denseActivation", "tahn")
-                        .optArgument("layerNorm", "norm.sefetensors")
+                        .optArgument("denseActivation", "Tanh")
+                        .optArgument("layerNorm", "norm.safetensors")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .build();
