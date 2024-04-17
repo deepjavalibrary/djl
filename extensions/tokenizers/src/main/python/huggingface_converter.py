@@ -38,9 +38,9 @@ class HuggingfaceConverter:
 
     def save_model(self, model_info, args: Namespace, temp_dir: str):
         if args.output_format == "OnnxRuntime":
-            self.save_onnx_model(model_info, args, temp_dir)
+            return self.save_onnx_model(model_info, args, temp_dir)
         else:
-            self.save_pytorch_model(model_info, args, temp_dir)
+            return self.save_pytorch_model(model_info, args, temp_dir)
 
     def save_onnx_model(self, model_info, args: Namespace, temp_dir: str):
         model_id = model_info.modelId
