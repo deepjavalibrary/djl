@@ -19,17 +19,19 @@ import ai.djl.util.JsonUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
+import java.util.List;
+
 /** The input container for NLP text prompt. */
 public final class TextPrompt {
 
     private String text;
-    private String[] batch;
+    private List<String> batch;
 
     private TextPrompt(String text) {
         this.text = text;
     }
 
-    private TextPrompt(String[] batch) {
+    private TextPrompt(List<String> batch) {
         this.batch = batch;
     }
 
@@ -56,7 +58,7 @@ public final class TextPrompt {
      *
      * @return the batch prompt
      */
-    public String[] getBatch() {
+    public List<String> getBatch() {
         return batch;
     }
 
@@ -82,7 +84,7 @@ public final class TextPrompt {
             if (element == null) {
                 throw new TranslateException("Missing \"inputs\" in json.");
             } else if (element.isJsonArray()) {
-                String[] batch = JsonUtils.GSON.fromJson(element, String[].class);
+                List<String> batch = JsonUtils.GSON.fromJson(element, JsonUtils.LIST_TYPE);
                 return new TextPrompt(batch);
             } else {
                 return new TextPrompt(element.getAsString());

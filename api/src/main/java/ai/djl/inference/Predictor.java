@@ -34,9 +34,7 @@ import ai.djl.translate.TranslatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -162,8 +160,7 @@ public class Predictor<I, O> implements AutoCloseable {
                 translator.prepare(context);
                 prepared = true;
             }
-            Translator<I[], O[]> batchTranslator = translator.toBatchTranslator();
-            if (batchTranslator == null) {
+            if (translator.getBatchifier() == null) {
                 List<O> ret = new ArrayList<>(inputs.size());
                 for (I input : inputs) {
                     timestamp = System.nanoTime();
@@ -181,20 +178,18 @@ public class Predictor<I, O> implements AutoCloseable {
             }
 
             int batchSize = inputs.size();
-            I[] empty = (I[]) Array.newInstance(inputs.get(0).getClass(), 0);
-            I[] in = inputs.toArray(empty);
 
             timestamp = System.nanoTime();
             long begin = timestamp;
-            NDList ndList = batchTranslator.processInput(context, in);
+            NDList ndList = translator.batchProcessInput(context, inputs);
             preprocessEnd(ndList, batchSize);
 
             NDList result = predictInternal(context, ndList);
             predictEnd(result, batchSize);
 
-            O[] ret = batchTranslator.processOutput(context, result);
+            List<O> ret = translator.batchProcessOutput(context, result);
             postProcessEnd(begin, batchSize);
-            return Arrays.asList(ret);
+            return ret;
         } catch (TranslateException e) {
             throw e;
         } catch (Exception e) {

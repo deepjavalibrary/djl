@@ -31,7 +31,6 @@ import ai.djl.translate.TranslatorContext;
 public class TextClassificationServingTranslator implements NoBatchifyTranslator<Input, Output> {
 
     private Translator<String, Classifications> translator;
-    private Translator<String[], Classifications[]> batchTranslator;
 
     /**
      * Constructs a {@code TextClassificationServingTranslator} instance.
@@ -40,14 +39,12 @@ public class TextClassificationServingTranslator implements NoBatchifyTranslator
      */
     public TextClassificationServingTranslator(Translator<String, Classifications> translator) {
         this.translator = translator;
-        batchTranslator = translator.toBatchTranslator();
     }
 
     /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws Exception {
         translator.prepare(ctx);
-        batchTranslator.prepare(ctx);
     }
 
     /** {@inheritDoc} */
@@ -60,7 +57,7 @@ public class TextClassificationServingTranslator implements NoBatchifyTranslator
         TextPrompt prompt = TextPrompt.parseInput(input);
         if (prompt.isBatch()) {
             ctx.setAttachment("batch", Boolean.TRUE);
-            return batchTranslator.processInput(ctx, prompt.getBatch());
+            return translator.batchProcessInput(ctx, prompt.getBatch());
         }
 
         NDList ret = translator.processInput(ctx, prompt.getText());
@@ -78,7 +75,7 @@ public class TextClassificationServingTranslator implements NoBatchifyTranslator
         Output output = new Output();
         output.addProperty("Content-Type", "application/json");
         if (ctx.getAttachment("batch") != null) {
-            output.add(BytesSupplier.wrapAsJson(batchTranslator.processOutput(ctx, list)));
+            output.add(BytesSupplier.wrapAsJson(translator.batchProcessOutput(ctx, list)));
         } else {
             Batchifier batchifier = translator.getBatchifier();
             if (batchifier != null) {

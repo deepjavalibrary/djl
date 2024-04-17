@@ -17,13 +17,17 @@ import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.index.NDIndex;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.PairList;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /** The translator for Huggingface question answering model. */
@@ -56,22 +60,48 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
 
     /** {@inheritDoc} */
     @Override
-    public String processOutput(TranslatorContext ctx, NDList list) {
-        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
-        return decode(list, encoding, tokenizer);
+    public NDList batchProcessInput(TranslatorContext ctx, List<QAInput> inputs) {
+        NDManager manager = ctx.getNDManager();
+        PairList<String, String> pair = new PairList<>(inputs.size());
+        for (QAInput input : inputs) {
+            pair.add(input.getQuestion(), input.getParagraph());
+        }
+        Encoding[] encodings = tokenizer.batchEncode(pair);
+        ctx.setAttachment("encodings", encodings);
+        NDList[] batch = new NDList[encodings.length];
+        for (int i = 0; i < encodings.length; ++i) {
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+        }
+        return batchifier.batchify(batch);
     }
 
     /** {@inheritDoc} */
     @Override
-    public QuestionAnsweringBatchTranslator toBatchTranslator(Batchifier batchifier) {
-        tokenizer.enableBatch();
-        return new QuestionAnsweringBatchTranslator(tokenizer, includeTokenTypes, batchifier);
+    public String processOutput(TranslatorContext ctx, NDList list) {
+        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
+        return decode(list, encoding);
     }
 
-    static String decode(NDList list, Encoding encoding, HuggingFaceTokenizer tokenizer) {
-        // PyTorch InferenceMode tensor is read only, must clone it
-        NDArray startLogits = list.get(0).duplicate();
-        NDArray endLogits = list.get(1).duplicate();
+    /** {@inheritDoc} */
+    @Override
+    public List<String> batchProcessOutput(TranslatorContext ctx, NDList list) {
+        NDList[] batch = batchifier.unbatchify(list);
+        Encoding[] encodings = (Encoding[]) ctx.getAttachment("encodings");
+        List<String> ret = new ArrayList<>(batch.length);
+        for (int i = 0; i < encodings.length; ++i) {
+            ret.add(decode(batch[i], encodings[i]));
+        }
+        return ret;
+    }
+
+    private String decode(NDList list, Encoding encoding) {
+        NDArray startLogits = list.get(0);
+        NDArray endLogits = list.get(1);
+        if ("PyTorch".equals(startLogits.getManager().getEngine().getEngineName())) {
+            // PyTorch InferenceMode tensor is read only, must clone it
+            startLogits = startLogits.duplicate();
+            endLogits = endLogits.duplicate();
+        }
         // exclude <CLS>, TODO: exclude impossible ids properly and handle max answer length
         startLogits.set(new NDIndex(0), -100000);
         endLogits.set(new NDIndex(0), -100000);

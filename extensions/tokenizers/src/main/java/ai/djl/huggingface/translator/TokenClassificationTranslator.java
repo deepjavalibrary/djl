@@ -18,6 +18,7 @@ import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.djl.modality.nlp.translator.NamedEntity;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
@@ -78,17 +79,34 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
 
     /** {@inheritDoc} */
     @Override
-    public NamedEntity[] processOutput(TranslatorContext ctx, NDList list) {
-        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
-        return toNamedEntities(encoding, list, config, softmax);
+    public NDList batchProcessInput(TranslatorContext ctx, List<String> inputs) {
+        NDManager manager = ctx.getNDManager();
+        Encoding[] encodings = tokenizer.batchEncode(inputs);
+        ctx.setAttachment("encodings", encodings);
+        NDList[] batch = new NDList[encodings.length];
+        for (int i = 0; i < encodings.length; ++i) {
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+        }
+        return batchifier.batchify(batch);
     }
 
     /** {@inheritDoc} */
     @Override
-    public TokenClassificationBatchTranslator toBatchTranslator(Batchifier batchifier) {
-        tokenizer.enableBatch();
-        return new TokenClassificationBatchTranslator(
-                tokenizer, includeTokenTypes, softmax, batchifier, config);
+    public NamedEntity[] processOutput(TranslatorContext ctx, NDList list) {
+        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
+        return toNamedEntities(encoding, list);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<NamedEntity[]> batchProcessOutput(TranslatorContext ctx, NDList list) {
+        NDList[] batch = batchifier.unbatchify(list);
+        Encoding[] encodings = (Encoding[]) ctx.getAttachment("encodings");
+        List<NamedEntity[]> ret = new ArrayList<>(batch.length);
+        for (int i = 0; i < batch.length; ++i) {
+            ret.add(toNamedEntities(encodings[i], batch[i]));
+        }
+        return ret;
     }
 
     /**
@@ -115,8 +133,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
         return builder;
     }
 
-    static NamedEntity[] toNamedEntities(
-            Encoding encoding, NDList list, PretrainedConfig config, boolean softmax) {
+    private NamedEntity[] toNamedEntities(Encoding encoding, NDList list) {
         long[] inputIds = encoding.getIds();
         CharSpan[] offsetMapping = encoding.getCharTokenSpans();
         long[] specialTokenMasks = encoding.getSpecialTokenMask();

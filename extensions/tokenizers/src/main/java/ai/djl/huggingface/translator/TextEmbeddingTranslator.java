@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /** The translator for Huggingface text embedding model. */
@@ -111,46 +113,41 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
 
     /** {@inheritDoc} */
     @Override
+    public NDList batchProcessInput(TranslatorContext ctx, List<String> inputs) {
+        NDManager manager = ctx.getNDManager();
+        Encoding[] encodings = tokenizer.batchEncode(inputs);
+        ctx.setAttachment("encodings", encodings);
+        NDList[] batch = new NDList[encodings.length];
+        for (int i = 0; i < encodings.length; ++i) {
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+        }
+        return batchifier.batchify(batch);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public float[] processOutput(TranslatorContext ctx, NDList list) {
         Encoding encoding = (Encoding) ctx.getAttachment("encoding");
         NDManager manager = ctx.getNDManager();
-        NDArray embeddings =
-                processEmbedding(
-                        manager,
-                        list,
-                        encoding,
-                        pooling,
-                        denseModel,
-                        denseActivation,
-                        layerNormModel,
-                        normalize);
+        NDArray embeddings = processEmbedding(manager, list, encoding);
         return embeddings.toFloatArray();
     }
 
     /** {@inheritDoc} */
     @Override
-    public TextEmbeddingBatchTranslator toBatchTranslator(Batchifier batchifier) {
-        tokenizer.enableBatch();
-        return new TextEmbeddingBatchTranslator(
-                tokenizer,
-                batchifier,
-                pooling,
-                normalize,
-                includeTokenTypes,
-                denseModel,
-                denseActivation,
-                layerNormModel);
+    public List<float[]> batchProcessOutput(TranslatorContext ctx, NDList list) {
+        NDList[] batch = batchifier.unbatchify(list);
+        Encoding[] encodings = (Encoding[]) ctx.getAttachment("encodings");
+        NDManager manager = ctx.getNDManager();
+        List<float[]> ret = new ArrayList<>(batch.length);
+        for (int i = 0; i < batch.length; ++i) {
+            NDArray array = processEmbedding(manager, batch[i], encodings[i]);
+            ret.add(array.toFloatArray());
+        }
+        return ret;
     }
 
-    static NDArray processEmbedding(
-            NDManager manager,
-            NDList list,
-            Encoding encoding,
-            String pooling,
-            NDList denseModel,
-            String denseActivation,
-            NDList layerNormModel,
-            boolean normalize) {
+    private NDArray processEmbedding(NDManager manager, NDList list, Encoding encoding) {
         NDArray embedding = list.get("last_hidden_state");
         if (embedding == null) {
             // For Onnx model, NDArray name is not present

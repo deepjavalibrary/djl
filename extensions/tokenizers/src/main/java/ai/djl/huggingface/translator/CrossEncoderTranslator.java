@@ -16,13 +16,17 @@ import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.PairList;
 import ai.djl.util.StringPair;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /** The translator for Huggingface cross encoder model. */
@@ -60,6 +64,19 @@ public class CrossEncoderTranslator implements Translator<StringPair, float[]> {
 
     /** {@inheritDoc} */
     @Override
+    public NDList batchProcessInput(TranslatorContext ctx, List<StringPair> inputs) {
+        NDManager manager = ctx.getNDManager();
+        PairList<String, String> list = new PairList<>(inputs);
+        Encoding[] encodings = tokenizer.batchEncode(list);
+        NDList[] batch = new NDList[encodings.length];
+        for (int i = 0; i < encodings.length; ++i) {
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+        }
+        return batchifier.batchify(batch);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public float[] processOutput(TranslatorContext ctx, NDList list) {
         NDArray logits = list.get(0);
         if (sigmoid) {
@@ -70,9 +87,17 @@ public class CrossEncoderTranslator implements Translator<StringPair, float[]> {
 
     /** {@inheritDoc} */
     @Override
-    public CrossEncoderBatchTranslator toBatchTranslator(Batchifier batchifier) {
-        tokenizer.enableBatch();
-        return new CrossEncoderBatchTranslator(tokenizer, includeTokenTypes, sigmoid, batchifier);
+    public List<float[]> batchProcessOutput(TranslatorContext ctx, NDList list) {
+        NDList[] batches = batchifier.unbatchify(list);
+        List<float[]> ret = new ArrayList<>(batches.length);
+        for (NDList batch : batches) {
+            NDArray result = batch.get(0);
+            if (sigmoid) {
+                result = result.getNDArrayInternal().sigmoid();
+            }
+            ret.add(result.toFloatArray());
+        }
+        return ret;
     }
 
     /**
