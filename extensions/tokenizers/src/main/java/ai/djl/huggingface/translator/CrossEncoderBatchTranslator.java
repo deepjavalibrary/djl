@@ -65,7 +65,7 @@ public class CrossEncoderBatchTranslator implements NoBatchifyTranslator<StringP
         NDList[] batch = batchifier.unbatchify(list);
         float[][] ret = new float[batch.length][];
         for (int i = 0; i < batch.length; ++i) {
-            NDArray result = list.get(0);
+            NDArray result = batch[i].get(0);
             if (sigmoid) {
                 result = result.getNDArrayInternal().sigmoid();
             }
