@@ -114,30 +114,16 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     public float[] processOutput(TranslatorContext ctx, NDList list) {
         Encoding encoding = (Encoding) ctx.getAttachment("encoding");
         NDManager manager = ctx.getNDManager();
-        NDArray embeddings = processEmbedding(manager, list, encoding, pooling);
-        embeddings = embeddings.toDevice(Device.cpu(), false);
-        if (denseModel != null) {
-            NDArray weight = denseModel.get("linear.weight");
-            NDArray bias = denseModel.get("linear.bias");
-            embeddings = embeddings.getNDArrayInternal().linear(embeddings, weight, bias).get(0);
-            if ("Tanh".equals(denseActivation)) {
-                embeddings = embeddings.tanh();
-            }
-        }
-        if (layerNormModel != null) {
-            NDArray weight = layerNormModel.get("norm.weight");
-            NDArray bias = layerNormModel.get("norm.bias");
-            Shape shape = weight.getShape();
-            embeddings =
-                    embeddings
-                            .getNDArrayInternal()
-                            .layerNorm(embeddings, shape, weight, bias, 1e-5f)
-                            .get(0);
-        }
-        if (normalize) {
-            embeddings = embeddings.normalize(2, 0);
-        }
-
+        NDArray embeddings =
+                processEmbedding(
+                        manager,
+                        list,
+                        encoding,
+                        pooling,
+                        denseModel,
+                        denseActivation,
+                        layerNormModel,
+                        normalize);
         return embeddings.toFloatArray();
     }
 
@@ -146,11 +132,25 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     public TextEmbeddingBatchTranslator toBatchTranslator(Batchifier batchifier) {
         tokenizer.enableBatch();
         return new TextEmbeddingBatchTranslator(
-                tokenizer, batchifier, pooling, normalize, includeTokenTypes);
+                tokenizer,
+                batchifier,
+                pooling,
+                normalize,
+                includeTokenTypes,
+                denseModel,
+                denseActivation,
+                layerNormModel);
     }
 
     static NDArray processEmbedding(
-            NDManager manager, NDList list, Encoding encoding, String pooling) {
+            NDManager manager,
+            NDList list,
+            Encoding encoding,
+            String pooling,
+            NDList denseModel,
+            String denseActivation,
+            NDList layerNormModel,
+            boolean normalize) {
         NDArray embedding = list.get("last_hidden_state");
         if (embedding == null) {
             // For Onnx model, NDArray name is not present
@@ -160,18 +160,47 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         NDArray inputAttentionMask = manager.create(attentionMask).toType(DataType.FLOAT32, true);
         switch (pooling) {
             case "mean":
-                return meanPool(embedding, inputAttentionMask, false);
+                embedding = meanPool(embedding, inputAttentionMask, false);
+                break;
             case "mean_sqrt_len":
-                return meanPool(embedding, inputAttentionMask, true);
+                embedding = meanPool(embedding, inputAttentionMask, true);
+                break;
             case "max":
-                return maxPool(embedding, inputAttentionMask);
+                embedding = maxPool(embedding, inputAttentionMask);
+                break;
             case "weightedmean":
-                return weightedMeanPool(embedding, inputAttentionMask);
+                embedding = weightedMeanPool(embedding, inputAttentionMask);
+                break;
             case "cls":
-                return embedding.get(0);
+                embedding = embedding.get(0);
+                break;
             default:
                 throw new AssertionError("Unexpected pooling mode: " + pooling);
         }
+
+        embedding = embedding.toDevice(Device.cpu(), false);
+        if (denseModel != null) {
+            NDArray weight = denseModel.get("linear.weight");
+            NDArray bias = denseModel.get("linear.bias");
+            embedding = embedding.getNDArrayInternal().linear(embedding, weight, bias).get(0);
+            if ("Tanh".equals(denseActivation)) {
+                embedding = embedding.tanh();
+            }
+        }
+        if (layerNormModel != null) {
+            NDArray weight = layerNormModel.get("norm.weight");
+            NDArray bias = layerNormModel.get("norm.bias");
+            Shape shape = weight.getShape();
+            embedding =
+                    embedding
+                            .getNDArrayInternal()
+                            .layerNorm(embedding, shape, weight, bias, 1e-5f)
+                            .get(0);
+        }
+        if (normalize) {
+            embedding = embedding.normalize(2, 0);
+        }
+        return embedding;
     }
 
     private static NDArray meanPool(NDArray embeddings, NDArray attentionMask, boolean sqrt) {
