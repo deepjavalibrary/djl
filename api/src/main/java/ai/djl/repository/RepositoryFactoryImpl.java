@@ -99,7 +99,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
     /** {@inheritDoc} */
     @Override
     public Set<String> getSupportedScheme() {
-        return Collections.emptySet();
+        return REGISTRY.keySet();
     }
 
     static void registerRepositoryFactory(RepositoryFactory factory) {
