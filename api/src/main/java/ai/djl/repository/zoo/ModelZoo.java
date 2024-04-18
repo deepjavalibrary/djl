@@ -16,10 +16,28 @@ import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
+import ai.djl.repository.Repository;
+import ai.djl.util.ClassLoaderUtils;
+import ai.djl.util.JsonUtils;
+import ai.djl.util.Utils;
+
+import com.google.gson.reflect.TypeToken;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.Writer;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -27,13 +45,17 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.GZIPInputStream;
 
 /** An interface represents a collection of models. */
 public abstract class ModelZoo {
 
-    private static final Map<String, ModelZoo> MODEL_ZOO_MAP = new ConcurrentHashMap<>();
-    private static ModelZooResolver resolver;
+    private static final Logger logger = LoggerFactory.getLogger(ModelZoo.class);
 
+    private static final Map<String, ModelZoo> MODEL_ZOO_MAP = new ConcurrentHashMap<>();
+    private static final long ONE_DAY = Duration.ofDays(1).toMillis();
+
+    private static ModelZooResolver resolver;
     private Map<String, ModelLoader> modelLoaders = new ConcurrentHashMap<>();
 
     static {
@@ -225,5 +247,64 @@ public abstract class ModelZoo {
             }
         }
         return models;
+    }
+
+    protected Map<String, Map<String, Object>> listModels(Repository repo, Application app) {
+        try {
+            String groupId = getGroupId();
+            String path = "model/" + app.getPath() + '/' + groupId.replace('.', '/') + '/';
+            Path dir = Utils.getCacheDir().resolve("cache/repo/" + path);
+            if (Files.notExists(dir)) {
+                Files.createDirectories(dir);
+            } else if (!Files.isDirectory(dir)) {
+                logger.warn("Failed initialize cache directory: {}", dir);
+                return Collections.emptyMap();
+            }
+            Type type = new TypeToken<Map<String, Map<String, Object>>>() {}.getType();
+
+            Path file = dir.resolve("models.json");
+            if (Files.exists(file)) {
+                long lastModified = Files.getLastModifiedTime(file).toMillis();
+                if (Utils.isOfflineMode() || System.currentTimeMillis() - lastModified < ONE_DAY) {
+                    try (Reader reader = Files.newBufferedReader(file)) {
+                        return JsonUtils.GSON.fromJson(reader, type);
+                    }
+                }
+            }
+
+            URI uri = repo.getBaseUri().resolve(path + "models.json.gz");
+            Path tmp = Files.createTempFile(dir, "models", ".tmp");
+            try (GZIPInputStream gis = new GZIPInputStream(Utils.openUrl(uri.toURL()))) {
+                String json = Utils.toString(gis);
+                try (Writer writer = Files.newBufferedWriter(tmp)) {
+                    writer.write(json);
+                }
+                Utils.moveQuietly(tmp, file);
+                return JsonUtils.GSON.fromJson(json, type);
+            } catch (IOException e) {
+                logger.warn("Failed to download Huggingface model zoo index: {}", app);
+                if (Files.exists(file)) {
+                    try (Reader reader = Files.newBufferedReader(file)) {
+                        return JsonUtils.GSON.fromJson(reader, type);
+                    }
+                }
+
+                String resource = app.getPath() + "/" + groupId + ".json";
+                try (InputStream is = ClassLoaderUtils.getResourceAsStream(resource)) {
+                    String json = Utils.toString(is);
+                    try (Writer writer = Files.newBufferedWriter(tmp)) {
+                        writer.write(json);
+                    }
+                    Utils.moveQuietly(tmp, file);
+                    return JsonUtils.GSON.fromJson(json, type);
+                }
+            } finally {
+                Utils.deleteQuietly(tmp);
+            }
+        } catch (IOException e) {
+            logger.warn("Failed load index of models: " + app, e);
+        }
+
+        return Collections.emptyMap();
     }
 }
