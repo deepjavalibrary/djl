@@ -12,17 +12,25 @@
 # the specific language governing permissions and limitations under the License.
 import logging
 import os.path
-import sys
 import shutil
+import sys
 from argparse import Namespace
 
+import onnx
 import torch
 from huggingface_hub import hf_hub_download
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer
 
 from metadata import HuggingfaceMetadata
 from shasum import sha1_sum
 from zip_utils import zip_dir
+
+
+class PipelineHolder(object):
+
+    def __init__(self, tokenizer, model):
+        self.tokenizer = tokenizer
+        self.model = model
 
 
 class HuggingfaceConverter:
@@ -44,15 +52,9 @@ class HuggingfaceConverter:
 
     def save_onnx_model(self, model_info, args: Namespace, temp_dir: str):
         model_id = model_info.modelId
+
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
-
-        try:
-            hf_pipeline = self.load_model(model_id)
-        except Exception as e:
-            logging.warning(f"Failed to load model: {model_id}.")
-            logging.warning(e, exc_info=True)
-            return False, "Failed to load model", -1
 
         model_name = model_id.split("/")[-1]
         logging.info(f"Saving onnxruntime model: {model_name}.onnx ...")
@@ -64,8 +66,13 @@ class HuggingfaceConverter:
         ]
         main()
 
-        model_input_names = hf_pipeline.tokenizer.model_input_names
-        include_types = "token_type_ids" in model_input_names
+        model = onnx.load_model(os.path.join(temp_dir, "model.onnx"),
+                                load_external_data=False)
+        inputs = repr(model.graph.input)
+        include_types = "token_type_id" in inputs
+
+        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        hf_pipeline = PipelineHolder(model, tokenizer)
         size = self.save_to_model_zoo(model_info, args.output_dir,
                                       "OnnxRuntime", temp_dir, hf_pipeline,
                                       include_types)
@@ -96,10 +103,8 @@ class HuggingfaceConverter:
         config = hf_hub_download(repo_id=model_id, filename="config.json")
         shutil.copyfile(config, os.path.join(temp_dir, "config.json"))
 
-        model_input_names = hf_pipeline.tokenizer.model_input_names
-        include_types = "token_type_ids" in model_input_names
-
         # Save jit traced .pt file to temp dir
+        include_types = False
         model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
                                           include_types)
         if not model_file:
@@ -108,10 +113,19 @@ class HuggingfaceConverter:
         result, reason = self.verify_jit_model(hf_pipeline, model_file,
                                                include_types, args.cpu_only)
         if not result:
-            return False, reason, -1
+            include_types = True
+            model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
+                                              include_types)
+            if not model_file:
+                return False, reason, -1
 
-        size = self.save_to_model_zoo(model_info, args.output_dir,
-                                      args.output_format, temp_dir,
+            result, reason = self.verify_jit_model(hf_pipeline, model_file,
+                                                   include_types,
+                                                   args.cpu_only)
+            if not result:
+                return False, reason, -1
+
+        size = self.save_to_model_zoo(model_info, args.output_dir, temp_dir,
                                       hf_pipeline, include_types)
 
         return True, None, size

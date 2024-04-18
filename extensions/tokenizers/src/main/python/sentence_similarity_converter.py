@@ -19,15 +19,8 @@ import requests
 import torch
 from transformers import AutoTokenizer, AutoModel
 
-from huggingface_converter import HuggingfaceConverter
+from huggingface_converter import HuggingfaceConverter, PipelineHolder
 from huggingface_hub import hf_hub_download
-
-
-class PipelineHolder(object):
-
-    def __init__(self, tokenizer, model):
-        self.tokenizer = tokenizer
-        self.model = model
 
 
 class SentenceSimilarityConverter(HuggingfaceConverter):
