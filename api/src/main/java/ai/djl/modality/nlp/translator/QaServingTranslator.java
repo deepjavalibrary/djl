@@ -27,14 +27,19 @@ import ai.djl.util.PairList;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * A {@link Translator} that can handle generic question answering {@link Input} and {@link Output}.
  */
 public class QaServingTranslator implements NoBatchifyTranslator<Input, Output> {
 
+    private static final Type LIST_TYPE = new TypeToken<List<String>>() {}.getType();
+
     private Translator<QAInput, String> translator;
-    private Translator<QAInput[], String[]> batchTranslator;
 
     /**
      * Constructs a {@code QaServingTranslator} instance.
@@ -43,14 +48,12 @@ public class QaServingTranslator implements NoBatchifyTranslator<Input, Output> 
      */
     public QaServingTranslator(Translator<QAInput, String> translator) {
         this.translator = translator;
-        this.batchTranslator = translator.toBatchTranslator();
     }
 
     /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws Exception {
         translator.prepare(ctx);
-        batchTranslator.prepare(ctx);
     }
 
     /** {@inheritDoc} */
@@ -69,8 +72,8 @@ public class QaServingTranslator implements NoBatchifyTranslator<Input, Output> 
                 JsonElement element = JsonUtils.GSON.fromJson(json, JsonElement.class);
                 if (element.isJsonArray()) {
                     ctx.setAttachment("batch", Boolean.TRUE);
-                    QAInput[] inputs = JsonUtils.GSON.fromJson(json, QAInput[].class);
-                    return batchTranslator.processInput(ctx, inputs);
+                    List<QAInput> inputs = JsonUtils.GSON.fromJson(json, LIST_TYPE);
+                    return translator.batchProcessInput(ctx, inputs);
                 }
 
                 qa = JsonUtils.GSON.fromJson(json, QAInput.class);
@@ -107,7 +110,7 @@ public class QaServingTranslator implements NoBatchifyTranslator<Input, Output> 
         Output output = new Output();
         output.addProperty("Content-Type", "application/json");
         if (ctx.getAttachment("batch") != null) {
-            output.add(BytesSupplier.wrapAsJson(batchTranslator.processOutput(ctx, list)));
+            output.add(BytesSupplier.wrapAsJson(translator.batchProcessOutput(ctx, list)));
         } else {
             Batchifier batchifier = translator.getBatchifier();
             if (batchifier != null) {

@@ -70,7 +70,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
      *
      * @param list the list containing elements to be placed into this PairList
      */
-    public PairList(List<Pair<K, V>> list) {
+    public PairList(List<? extends Pair<K, V>> list) {
         this(list.size());
         for (Pair<K, V> pair : list) {
             keys.add(pair.getKey());

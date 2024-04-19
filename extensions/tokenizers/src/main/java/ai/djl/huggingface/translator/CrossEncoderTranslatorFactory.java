@@ -40,7 +40,6 @@ public class CrossEncoderTranslatorFactory implements TranslatorFactory, Seriali
 
     static {
         SUPPORTED_TYPES.add(new Pair<>(StringPair.class, float[].class));
-        SUPPORTED_TYPES.add(new Pair<>(StringPair[].class, float[][].class));
         SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
 
@@ -67,8 +66,6 @@ public class CrossEncoderTranslatorFactory implements TranslatorFactory, Seriali
                     CrossEncoderTranslator.builder(tokenizer, arguments).build();
             if (input == StringPair.class && output == float[].class) {
                 return (Translator<I, O>) translator;
-            } else if (input == StringPair[].class && output == float[][].class) {
-                return (Translator<I, O>) translator.toBatchTranslator();
             } else if (input == Input.class && output == Output.class) {
                 return (Translator<I, O>) new CrossEncoderServingTranslator(translator);
             }

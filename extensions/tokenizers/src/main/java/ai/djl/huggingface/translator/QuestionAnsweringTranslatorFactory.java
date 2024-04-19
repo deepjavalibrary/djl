@@ -40,7 +40,6 @@ public class QuestionAnsweringTranslatorFactory implements TranslatorFactory, Se
 
     static {
         SUPPORTED_TYPES.add(new Pair<>(QAInput.class, String.class));
-        SUPPORTED_TYPES.add(new Pair<>(QAInput[].class, String[].class));
         SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
 
@@ -67,8 +66,6 @@ public class QuestionAnsweringTranslatorFactory implements TranslatorFactory, Se
                     QuestionAnsweringTranslator.builder(tokenizer, arguments).build();
             if (input == QAInput.class && output == String.class) {
                 return (Translator<I, O>) translator;
-            } else if (input == QAInput[].class && output == String[].class) {
-                return (Translator<I, O>) translator.toBatchTranslator();
             } else if (input == Input.class && output == Output.class) {
                 return (Translator<I, O>) new QaServingTranslator(translator);
             }
