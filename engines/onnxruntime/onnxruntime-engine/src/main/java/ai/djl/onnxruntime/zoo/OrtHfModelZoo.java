@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,10 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.huggingface.zoo;
+package ai.djl.onnxruntime.zoo;
 
 import ai.djl.Application;
-import ai.djl.Application.NLP;
 import ai.djl.engine.Engine;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Version;
@@ -26,16 +25,16 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-/** HfModelZoo is a repository that contains HuggingFace models. */
-public class HfModelZoo extends ModelZoo {
+/** OrtHfModelZoo is a repository that contains HuggingFace models for OnnxRuntime. */
+public class OrtHfModelZoo extends ModelZoo {
 
     private static final String REPO = "https://mlrepo.djl.ai/";
     private static final Repository REPOSITORY = Repository.newInstance("Huggingface", REPO);
-    private static final String GROUP_ID = "ai.djl.huggingface.pytorch";
+    private static final String GROUP_ID = "ai.djl.huggingface.onnxruntime";
 
     private volatile boolean initialized; // NOPMD
 
-    HfModelZoo() {}
+    OrtHfModelZoo() {}
 
     /** {@inheritDoc} */
     @Override
@@ -46,7 +45,7 @@ public class HfModelZoo extends ModelZoo {
     /** {@inheritDoc} */
     @Override
     public Set<String> getSupportedEngines() {
-        return Collections.singleton("PyTorch");
+        return Collections.singleton("OnnxRuntime");
     }
 
     /** {@inheritDoc} */
@@ -65,14 +64,14 @@ public class HfModelZoo extends ModelZoo {
 
     private void init() {
         if (!initialized) {
-            synchronized (HfModelZoo.class) {
+            synchronized (OrtHfModelZoo.class) {
                 if (!initialized) {
                     Version version = new Version(Engine.getDjlVersion());
-                    addModels(NLP.FILL_MASK, version);
-                    addModels(NLP.QUESTION_ANSWER, version);
-                    addModels(NLP.TEXT_CLASSIFICATION, version);
-                    addModels(NLP.TEXT_EMBEDDING, version);
-                    addModels(NLP.TOKEN_CLASSIFICATION, version);
+                    addModels(Application.NLP.FILL_MASK, version);
+                    addModels(Application.NLP.QUESTION_ANSWER, version);
+                    addModels(Application.NLP.TEXT_CLASSIFICATION, version);
+                    addModels(Application.NLP.TEXT_EMBEDDING, version);
+                    addModels(Application.NLP.TOKEN_CLASSIFICATION, version);
                     initialized = true;
                 }
             }
