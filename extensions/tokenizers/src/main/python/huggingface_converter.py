@@ -56,8 +56,7 @@ class HuggingfaceConverter:
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
 
-        model_name = model_id.split("/")[-1]
-        logging.info(f"Saving onnxruntime model: {model_name}.onnx ...")
+        logging.info(f"Saving onnxruntime model: {model_id} ...")
 
         from optimum.commands.optimum_cli import main
 
@@ -72,7 +71,7 @@ class HuggingfaceConverter:
         include_types = "token_type_id" in inputs
 
         tokenizer = AutoTokenizer.from_pretrained(model_id)
-        hf_pipeline = PipelineHolder(model, tokenizer)
+        hf_pipeline = PipelineHolder(tokenizer, model)
         size = self.save_to_model_zoo(model_info, args.output_dir,
                                       "OnnxRuntime", temp_dir, hf_pipeline,
                                       include_types)
