@@ -15,7 +15,6 @@ package ai.djl.translate;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDList;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +88,43 @@ public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
     }
 
     /**
+     * Batch processes the inputs and converts it to NDList.
+     *
+     * @param ctx the toolkit for creating the input NDArray
+     * @param inputs a list of the input object
+     * @return the {@link NDList} after pre-processing
+     * @throws Exception if an error occurs during processing input
+     */
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    default NDList batchProcessInput(TranslatorContext ctx, List<I> inputs) throws Exception {
+        NDList[] preprocessed = new NDList[inputs.size()];
+        int index = 0;
+        for (I input : inputs) {
+            preprocessed[index++] = processInput(ctx, input);
+        }
+        return getBatchifier().batchify(preprocessed);
+    }
+
+    /**
+     * Batch processes the output NDList to the corresponding output objects.
+     *
+     * @param ctx the toolkit used for post-processing
+     * @param list the output NDList after inference, usually immutable in engines like
+     *     PyTorch. @see <a href="https://github.com/deepjavalibrary/djl/issues/1774">Issue 1774</a>
+     * @return a list of the output object of expected type
+     * @throws Exception if an error occurs during processing output
+     */
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    default List<O> batchProcessOutput(TranslatorContext ctx, NDList list) throws Exception {
+        NDList[] unbatched = getBatchifier().unbatchify(list);
+        List<O> outputs = new ArrayList<>(unbatched.length);
+        for (NDList output : unbatched) {
+            outputs.add(processOutput(ctx, output));
+        }
+        return outputs;
+    }
+
+    /**
      * Prepares the translator with the manager and model to use.
      *
      * @param ctx the context for the {@code Predictor}.
@@ -104,60 +140,5 @@ public interface Translator<I, O> extends PreProcessor<I>, PostProcessor<O> {
      */
     default TranslatorOptions getExpansions() {
         return null;
-    }
-
-    /**
-     * Returns a batch translator.
-     *
-     * @return a batch translator
-     */
-    default Translator<I[], O[]> toBatchTranslator() {
-        return toBatchTranslator(getBatchifier());
-    }
-
-    /**
-     * Returns a batch translator.
-     *
-     * @param batchifier the {@link Batchifier} to use
-     * @return a batch translator
-     */
-    default Translator<I[], O[]> toBatchTranslator(Batchifier batchifier) {
-        if (batchifier == null) {
-            return null;
-        }
-
-        return new NoBatchifyTranslator<I[], O[]>() {
-
-            /** {@inheritDoc} */
-            @Override
-            @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-            public void prepare(TranslatorContext ctx) throws Exception {
-                Translator.this.prepare(ctx);
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-            public NDList processInput(TranslatorContext ctx, I[] inputs) throws Exception {
-                NDList[] preprocessed = new NDList[inputs.length];
-                for (int i = 0; i < inputs.length; ++i) {
-                    preprocessed[i] = Translator.this.processInput(ctx, inputs[i]);
-                }
-                return batchifier.batchify(preprocessed);
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "unchecked"})
-            public O[] processOutput(TranslatorContext ctx, NDList list) throws Exception {
-                NDList[] unbatched = batchifier.unbatchify(list);
-                List<O> outputs = new ArrayList<>(unbatched.length);
-                for (NDList output : unbatched) {
-                    outputs.add(Translator.this.processOutput(ctx, output));
-                }
-                O[] type = (O[]) Array.newInstance(outputs.get(0).getClass(), 0);
-                return outputs.toArray(type);
-            }
-        };
     }
 }

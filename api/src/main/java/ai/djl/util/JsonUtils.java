@@ -16,12 +16,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 /** An interface containing Gson constants. */
 public interface JsonUtils {
 
     Gson GSON = new GsonBuilder().create();
     Gson GSON_PRETTY = builder().create();
+    Type LIST_TYPE = new TypeToken<List<String>>() {}.getType();
 
     /**
      * Returns a custom {@code GsonBuilder} instance.

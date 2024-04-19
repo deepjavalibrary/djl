@@ -27,7 +27,6 @@ import ai.djl.nn.LambdaBlock;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
-import ai.djl.translate.Batchifier;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
@@ -150,72 +149,6 @@ public class TokenClassificationTranslatorTest {
             Assert.assertThrows(
                     IllegalArgumentException.class,
                     () -> factory.newInstance(String.class, Integer.class, model, arguments));
-        }
-    }
-
-    @Test
-    public void testTokenClassificationBatchTranslator()
-            throws ModelException, IOException, TranslateException {
-        String[] text = {"My name is Wolfgang and I live in Berlin.", "My name is Wolfgang"};
-
-        Block block =
-                new LambdaBlock(
-                        a -> {
-                            NDManager manager = a.getManager();
-                            float[][] logits = new float[12][9];
-                            logits[4][3] = 1;
-                            logits[9][7] = 1;
-                            NDArray arr1 = manager.create(logits);
-                            NDArray arr2 = manager.create(logits);
-                            NDList[] list = {new NDList(arr1), new NDList(arr2)};
-                            return Batchifier.STACK.batchify(list);
-                        },
-                        "model");
-
-        Path modelDir = Paths.get("build/token_classification");
-        Criteria<String[], NamedEntity[][]> criteria =
-                Criteria.builder()
-                        .setTypes(String[].class, NamedEntity[][].class)
-                        .optModelPath(modelDir)
-                        .optBlock(block)
-                        .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-uncased")
-                        .optArgument("softmax", true)
-                        .optOption("hasParameter", "false")
-                        .optTranslatorFactory(new TokenClassificationTranslatorFactory())
-                        .build();
-
-        try (ZooModel<String[], NamedEntity[][]> model = criteria.loadModel();
-                Predictor<String[], NamedEntity[][]> predictor = model.newPredictor()) {
-            NamedEntity[][] res = predictor.predict(text);
-            Assert.assertEquals(res[0][0].getEntity(), "B-PER");
-            Assertions.assertAlmostEquals(res[0][0].getScore(), 0.2536117);
-            Assert.assertEquals(res[0][0].getIndex(), 4);
-            Assert.assertEquals(res[0][0].getWord(), "wolfgang");
-            Assert.assertEquals(res[0][0].getStart(), 11);
-            Assert.assertEquals(res[0][0].getEnd(), 19);
-        }
-
-        Criteria<Input, Output> criteria2 =
-                Criteria.builder()
-                        .setTypes(Input.class, Output.class)
-                        .optModelPath(modelDir)
-                        .optBlock(block)
-                        .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-uncased")
-                        .optArgument("softmax", true)
-                        .optOption("hasParameter", "false")
-                        .optTranslatorFactory(new TokenClassificationTranslatorFactory())
-                        .build();
-
-        try (ZooModel<Input, Output> model = criteria2.loadModel();
-                Predictor<Input, Output> predictor = model.newPredictor()) {
-            Input input = new Input();
-            input.add(JsonUtils.GSON.toJson(text));
-            input.addProperty("Content-Type", "application/json");
-            Output out = predictor.predict(input);
-            NamedEntity[][] res = (NamedEntity[][]) out.getData().getAsObject();
-            Assert.assertEquals(res[0][0].getEntity(), "B-PER");
         }
     }
 }

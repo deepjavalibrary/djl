@@ -17,6 +17,7 @@ import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
@@ -71,19 +72,34 @@ public class TextClassificationTranslator implements Translator<String, Classifi
 
     /** {@inheritDoc} */
     @Override
-    public Classifications processOutput(TranslatorContext ctx, NDList list) {
-        return toClassifications(config, list);
+    public NDList batchProcessInput(TranslatorContext ctx, List<String> inputs) {
+        NDManager manager = ctx.getNDManager();
+        Encoding[] encodings = tokenizer.batchEncode(inputs);
+        NDList[] batch = new NDList[encodings.length];
+        for (int i = 0; i < encodings.length; ++i) {
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+        }
+        return batchifier.batchify(batch);
     }
 
     /** {@inheritDoc} */
     @Override
-    public TextClassificationBatchTranslator toBatchTranslator(Batchifier batchifier) {
-        tokenizer.enableBatch();
-        return new TextClassificationBatchTranslator(
-                tokenizer, includeTokenTypes, batchifier, config);
+    public Classifications processOutput(TranslatorContext ctx, NDList list) {
+        return toClassifications(list);
     }
 
-    static Classifications toClassifications(PretrainedConfig config, NDList list) {
+    /** {@inheritDoc} */
+    @Override
+    public List<Classifications> batchProcessOutput(TranslatorContext ctx, NDList list) {
+        NDList[] batches = batchifier.unbatchify(list);
+        List<Classifications> ret = new ArrayList<>(batches.length);
+        for (NDList batch : batches) {
+            ret.add(toClassifications(batch));
+        }
+        return ret;
+    }
+
+    private Classifications toClassifications(NDList list) {
         NDArray logits = list.get(0);
         int size = config.id2label.size();
         if ("multi_label_classification".equals(config.problemType) || size == 1) {

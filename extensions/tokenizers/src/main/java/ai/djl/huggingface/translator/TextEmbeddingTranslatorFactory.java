@@ -39,7 +39,6 @@ public class TextEmbeddingTranslatorFactory implements TranslatorFactory, Serial
 
     static {
         SUPPORTED_TYPES.add(new Pair<>(String.class, float[].class));
-        SUPPORTED_TYPES.add(new Pair<>(String[].class, float[][].class));
         SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
 
@@ -66,8 +65,6 @@ public class TextEmbeddingTranslatorFactory implements TranslatorFactory, Serial
                     TextEmbeddingTranslator.builder(tokenizer, arguments).build();
             if (input == String.class && output == float[].class) {
                 return (Translator<I, O>) translator;
-            } else if (input == String[].class && output == float[][].class) {
-                return (Translator<I, O>) translator.toBatchTranslator();
             } else if (input == Input.class && output == Output.class) {
                 return (Translator<I, O>) new TextEmbeddingServingTranslator(translator);
             }
