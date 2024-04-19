@@ -31,12 +31,14 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A {@link Translator} that process the {@link Audio} into {@link String} to get a text translation
@@ -44,6 +46,7 @@ import java.util.Map;
  */
 public class WhisperTranslator implements NoBatchifyTranslator<Audio, String> {
 
+    private static final Map<Character, Byte> BYTES_DECODER = bpeDecoder();
     private List<AudioProcessor> processors;
     private Vocabulary vocabulary;
 
@@ -95,14 +98,51 @@ public class WhisperTranslator implements NoBatchifyTranslator<Audio, String> {
     @Override
     public String processOutput(TranslatorContext ctx, NDList list) throws Exception {
         NDArray result = list.singletonOrThrow();
-        List<String> sentence = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
         for (long ele : result.toLongArray()) {
-            sentence.add(vocabulary.getToken(ele));
+            sb.append(vocabulary.getToken(ele));
             if ("<|endoftext|>".equals(vocabulary.getToken(ele))) {
                 break;
             }
         }
-        String output = String.join(" ", sentence);
-        return output.replaceAll("[^a-zA-Z0-9<|> ,.!]", "");
+        byte[] buf = new byte[sb.length()];
+        for (int i = 0; i < sb.length(); ++i) {
+            char c = sb.charAt(i);
+            buf[i] = BYTES_DECODER.get(c);
+        }
+
+        return new String(buf, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Returns list of utf-8 byte and a mapping to unicode strings.
+     *
+     * <p>We specifically avoids mapping to whitespace/control characters the bpe code barfs on. The
+     * reversible bpe codes work on unicode strings. This means you need a large # of unicode
+     * characters in your vocab if you want to avoid UNKs. When you're at something like a 10B token
+     * dataset you end up needing around 5K for decent coverage. This is a significant percentage of
+     * your normal, say, 32K bpe vocab. To avoid that, we want lookup tables between utf-8 bytes and
+     * unicode strings.
+     */
+    private static Map<Character, Byte> bpeDecoder() {
+        Map<Character, Byte> map = new ConcurrentHashMap<>();
+        for (char i = '!'; i <= '~'; ++i) {
+            map.put(i, (byte) i);
+        }
+        for (char i = '¡'; i <= '¬'; ++i) {
+            map.put(i, (byte) i);
+        }
+        for (char i = '®'; i <= 'ÿ'; ++i) {
+            map.put(i, (byte) i);
+        }
+
+        int n = 0;
+        for (char i = 0; i < 256; ++i) {
+            if (!map.containsKey(i)) {
+                map.put((char) (256 + n), (byte) i);
+                ++n;
+            }
+        }
+        return map;
     }
 }
