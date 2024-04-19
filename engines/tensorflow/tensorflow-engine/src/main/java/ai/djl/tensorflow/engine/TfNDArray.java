@@ -1017,7 +1017,8 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
         // sum on all axis
         NDArray array = this;
         // tf can't sum boolean values
-        if (getDataType() == DataType.BOOLEAN) {
+        DataType type = array.getDataType();
+        if (type == DataType.BOOLEAN || type.isInteger()) {
             array = array.toType(DataType.INT64, false);
         }
         try (NDArray axes = manager.arange(getShape().dimension())) {

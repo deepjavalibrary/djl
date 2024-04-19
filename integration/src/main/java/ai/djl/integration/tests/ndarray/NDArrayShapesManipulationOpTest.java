@@ -47,6 +47,10 @@ public class NDArrayShapesManipulationOpTest {
             array = manager.arange(6f).reshape(2, 3);
             result = array.split(new long[0]);
             Assert.assertEquals(result.singletonOrThrow(), array);
+
+            array.split(new long[] {0});
+            // behavior is different between engines
+            // Assert.assertEquals(result.singletonOrThrow(), array);
         }
     }
 
@@ -137,6 +141,9 @@ public class NDArrayShapesManipulationOpTest {
             array = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2));
             expected = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 1, 2));
             Assert.assertEquals(array.expandDims(1), expected);
+
+            expected = manager.create(new float[] {1f, 2f, 3f, 4f}, new Shape(2, 2, 1));
+            Assert.assertEquals(array.expandDims(-1), expected);
 
             // scalar
             array = manager.create(4f);

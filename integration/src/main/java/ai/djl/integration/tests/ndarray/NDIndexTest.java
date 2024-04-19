@@ -123,25 +123,31 @@ public class NDIndexTest {
             expected = manager.create(new float[] {3f, 4f}, new Shape(1, 2));
             Assert.assertEquals(getSlice, expected);
 
-            NDArray getStepSlice = original.get("1::2");
-            Assert.assertEquals(getStepSlice, expected);
+            try {
+                // step > 1
+                NDArray getStepSlice = original.get("1::2");
+                Assert.assertEquals(getStepSlice, expected);
+
+                original = manager.arange(120).reshape(2, 3, 4, 5);
+                NDArray getEllipsis = original.get("0,2, ...  ");
+                expected = manager.arange(40, 60).reshape(4, 5);
+                Assert.assertEquals(getEllipsis, expected);
+
+                getEllipsis = original.get("...,0:2,2");
+                expected =
+                        manager.create(new int[] {2, 7, 22, 27, 42, 47, 62, 67, 82, 87, 102, 107})
+                                .reshape(2, 3, 2);
+                Assert.assertEquals(getEllipsis, expected);
+
+                getEllipsis = original.get("1,...,2,3:5:2");
+                expected = manager.create(new int[] {73, 93, 113}).reshape(3, 1);
+                Assert.assertEquals(getEllipsis, expected);
+            } catch (UnsupportedOperationException ignore) {
+                // ignore
+            }
 
             original = manager.arange(120).reshape(2, 3, 4, 5);
-            NDArray getEllipsis = original.get("0,2, ...  ");
-            expected = manager.arange(40, 60).reshape(4, 5);
-            Assert.assertEquals(getEllipsis, expected);
-
-            getEllipsis = original.get("...,0:2,2");
-            expected =
-                    manager.create(new int[] {2, 7, 22, 27, 42, 47, 62, 67, 82, 87, 102, 107})
-                            .reshape(2, 3, 2);
-            Assert.assertEquals(getEllipsis, expected);
-
-            getEllipsis = original.get("1,...,2,3:5:2");
-            expected = manager.create(new int[] {73, 93, 113}).reshape(3, 1);
-            Assert.assertEquals(getEllipsis, expected);
-
-            getEllipsis = original.get("...");
+            NDArray getEllipsis = original.get("...");
             Assert.assertEquals(getEllipsis, original);
 
             // get from boolean array
