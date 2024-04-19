@@ -101,7 +101,7 @@ public class ModelZooTest {
     }
 
     @Test
-    public void testOffLine() throws IOException {
+    public void testOffLine() {
         System.setProperty("DJL_CACHE_DIR", "build/cache");
         System.setProperty("ai.djl.offline", "true");
         try {
