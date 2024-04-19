@@ -86,7 +86,9 @@ public class NDArrayReductionOpTest {
     public void testSum() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 5f});
-            Assert.assertEquals(array.sum().getFloat(), 11f);
+            NDArray result = array.sum();
+            Assert.assertEquals(result.getDataType(), DataType.FLOAT32);
+            Assert.assertEquals(result.getFloat(), 11f);
 
             array = manager.create(new float[] {2f, 4f, 6f, 8f}, new Shape(2, 2));
             float sumAll = array.sum().getFloat();
@@ -98,6 +100,26 @@ public class NDArrayReductionOpTest {
             NDArray sumKeep = array.sum(new int[] {0}, true);
             expected = manager.create(new float[] {8f, 12f}, new Shape(1, 2));
             Assert.assertEquals(sumKeep, expected, "Incorrect sum keep");
+
+            array = manager.ones(new Shape(2, 2), DataType.BOOLEAN);
+            Assert.assertEquals(array.sum().getDataType(), DataType.INT64);
+
+            array = manager.ones(new Shape(2, 2), DataType.UINT8);
+            Assert.assertEquals(array.sum().getDataType(), DataType.INT64);
+
+            array = manager.ones(new Shape(2, 2), DataType.INT32);
+            Assert.assertEquals(array.sum().getDataType(), DataType.INT64);
+
+            array = manager.ones(new Shape(2, 2), DataType.FLOAT64);
+            Assert.assertEquals(array.sum().getDataType(), DataType.FLOAT64);
+
+            try {
+                // MXNet doesn't support FP16
+                array = manager.ones(new Shape(2, 2), DataType.FLOAT16);
+                Assert.assertEquals(array.sum().getDataType(), DataType.FLOAT16);
+            } catch (UnsupportedOperationException ignore) {
+                // ignore
+            }
 
             // scalar
             array = manager.create(2f);

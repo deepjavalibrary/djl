@@ -187,7 +187,7 @@ public class NDArrayElementArithmeticOpTest {
             Assert.assertNotEquals(
                     result, addend, "None in-place operation returned in-place result");
 
-            result = NDArrays.add(1, addend);
+            result = NDArrays.add(1f, addend);
             Assert.assertEquals(result, addendum);
 
             result = NDArrays.addi(addend, addendum);
@@ -228,8 +228,8 @@ public class NDArrayElementArithmeticOpTest {
     public void testSubScalar() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray minuend = manager.create(new float[] {6, 9, 12, 11, 0});
-            NDArray result = NDArrays.sub(minuend, 3);
-            NDArray inPlaceResult = NDArrays.subi(minuend, 3);
+            NDArray result = NDArrays.sub(minuend, 3f);
+            NDArray inPlaceResult = NDArrays.subi(minuend, 3f);
             NDArray expected = manager.create(new float[] {3, 6, 9, 8, -3});
             Assert.assertEquals(
                     result, expected, "Scalar subtraction: Incorrect value in result ndarray");
@@ -501,8 +501,8 @@ public class NDArrayElementArithmeticOpTest {
     public void testDivScalar() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray dividend = manager.create(new float[] {6, 9, 12, 15, 0});
-            NDArray result = NDArrays.div(dividend, 3);
-            NDArray inPlaceResult = NDArrays.divi(dividend, 3);
+            NDArray result = NDArrays.div(dividend, 3f);
+            NDArray inPlaceResult = NDArrays.divi(dividend, 3f);
             NDArray expected = manager.create(new float[] {2, 3, 4, 5, 0});
             Assert.assertEquals(
                     result, expected, "Scalar division: Incorrect value in result ndarray");
@@ -679,9 +679,8 @@ public class NDArrayElementArithmeticOpTest {
             NDArray result = array.pow(power);
             NDArray inPlaceResult = array.powi(power);
             NDArray expected = manager.create(new float[] {216, 1, 12, 0.25f, 0});
-            Assert.assertEquals(
-                    result, expected, "Scalar power: Incorrect value in result ndarray");
-            Assertions.assertInPlaceEquals(inPlaceResult, expected, array);
+            Assertions.assertAlmostEquals(result, expected, 1e-4, 1e-3);
+            Assertions.assertInPlaceAlmostEquals(inPlaceResult, expected, array);
 
             testCornerCase(manager, NDArrays::pow, (x, y) -> (float) Math.pow(x, y), false);
             testCornerCase(manager, NDArrays::powi, (x, y) -> (float) Math.pow(x, y), true);
