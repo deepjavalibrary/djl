@@ -9,8 +9,6 @@ def projects = [
         project(':engines:mxnet:mxnet-model-zoo'),
         project(':engines:onnxruntime:onnxruntime-android'),
         project(':engines:onnxruntime:onnxruntime-engine'),
-        project(':engines:paddlepaddle:paddlepaddle-engine'),
-        project(':engines:paddlepaddle:paddlepaddle-model-zoo'),
         project(':engines:pytorch:pytorch-engine'),
         project(':engines:pytorch:pytorch-jni'),
         project(':engines:pytorch:pytorch-model-zoo'),
