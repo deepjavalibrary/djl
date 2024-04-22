@@ -111,7 +111,7 @@ public class HuggingFaceTokenizerTest {
         }
 
         DownloadUtils.download(
-                "https://huggingface.co/bert-base-cased/raw/main/tokenizer.json",
+                "https://resources.djl.ai/test-models/tokenizer/bert-base-cased/tokenizer.json",
                 "build/tokenizer/tokenizer.json");
         Path path = Paths.get("build/tokenizer");
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance(path)) {
