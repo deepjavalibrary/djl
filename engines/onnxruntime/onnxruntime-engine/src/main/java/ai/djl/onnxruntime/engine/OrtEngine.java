@@ -142,10 +142,11 @@ public final class OrtEngine extends Engine {
         sb.append(getEngineName())
                 .append(':')
                 .append(getVersion())
-                .append(", capabilities: [\n\t" + StandardCapabilities.MKL + ",\n");
+                .append(", capabilities: [\n\t" + StandardCapabilities.MKL);
         if (hasCapability(StandardCapabilities.CUDA)) {
-            sb.append("\t").append(StandardCapabilities.CUDA).append(",\n"); // NOPMD
+            sb.append(",\n\t").append(StandardCapabilities.CUDA); // NOPMD
         }
+        sb.append(']');
         return sb.toString();
     }
 }
