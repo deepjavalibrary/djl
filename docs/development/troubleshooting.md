@@ -229,21 +229,3 @@ Sometimes the OOM issue will trigger the `Core Dump` error message.
 It can be the heap memory overflow and cause a chain of failure from native memory to Java.
 Try to increase the `xmx` may help to reduce this issue,
 you can also try to monitor the heap memory cost to identify if this is the root cause.
-
-
-## 11. Special character issues (PaddlePaddle)
-
-Please remember to not include special characters in your data/model path. Like "数据" or some non-asicii character.
-
-```
-C++ Traceback (most recent call last):
-Not support stack backtrace yet.
-Error Message Summary:
-NotFoundError: Cannot open file C: \Users\数据\.dil.ai\cache\repo\model\undefined\ai\dil|localmodelzoo\d4cb1b0cfc0101b98c3fec6f29568bef\.model
-please confirm whether the file is existeed!
-
-[Hint: Expected static_cast<bool>(fin.is_open()) == true, but received static_cast<bool>(fin.is_open)):0 != true:1.]
-fatal error has been detected by the Java Runtime Environment:
-```
-
-
