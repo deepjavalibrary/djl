@@ -1,9 +1,0 @@
-[
-  {
-    "name": "ai.djl.paddlepaddle.engine.PpEngineProvider",
-    "allDeclaredConstructors": true,
-    "allPublicConstructors": true,
-    "allDeclaredMethods": true,
-    "allPublicMethods": true
-  }
-]

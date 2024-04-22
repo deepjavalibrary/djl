@@ -35,8 +35,6 @@ dependencies {
         api "ai.djl.mxnet:mxnet-model-zoo:${version}"
         api "ai.djl.onnxruntime:onnxruntime-engine:${version}"
         api "ai.djl.opencv:opencv:${version}"
-        api "ai.djl.paddlepaddle:paddlepaddle-engine:${version}"
-        api "ai.djl.paddlepaddle:paddlepaddle-model-zoo:${version}"
         api "ai.djl.python:python:${version}"
         api "ai.djl.pytorch:pytorch-engine:${version}"
         api "ai.djl.pytorch:pytorch-jni:${pytorch_version}-${version}"
@@ -129,10 +127,6 @@ publishing {
                     addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cpu", "win-x86_64", "${tensorflow_version}")
                     addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cu113", "linux-x86_64", "${tensorflow_version}")
                     addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cu113", "win-x86_64", "${tensorflow_version}")
-                    addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cpu", "osx-x86_64", "${paddlepaddle_version}")
-                    addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cpu", "linux-x86_64", "${paddlepaddle_version}")
-                    addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cpu", "win-x86_64", "${paddlepaddle_version}")
-                    addDependency(dependencies, "ai.djl.paddlepaddle", "paddlepaddle-native-cu112", "linux-x86_64", "${paddlepaddle_version}")
                     addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "osx-x86_64", "${tflite_version}")
                     addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "linux-x86_64", "${tflite_version}")
                 }

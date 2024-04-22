@@ -83,15 +83,6 @@ jobs:
       - name: Compile PyTorch JNI
         if: steps.pytorch_changes.outputs.src == 'true'
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
-      - uses: dorny/paths-filter@v2
-        id: paddlepaddle_changes
-        with:
-          filters: |
-            src:
-              - 'engines/paddlepaddle/paddlepaddle-native/**'
-      - name: Compile PaddlePaddle JNI
-        if: steps.paddlepaddle_changes.outputs.src == 'true'
-        run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - name: Test ONNX Runtime
         run: |
           ./gradlew -Dai.djl.default_engine=OnnxRuntime :integration:test
@@ -149,15 +140,6 @@ jobs:
       - name: Compile PyTorch JNI
         if: steps.pytorch_changes.outputs.src == 'true'
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
-      - uses: dorny/paths-filter@v2
-        id: paddlepaddle_changes
-        with:
-          filters: |
-            src:
-              - 'engines/paddlepaddle/paddlepaddle-native/**'
-      - name: Compile PaddlePaddle JNI
-        if: steps.paddlepaddle_changes.outputs.src == 'true'
-        run: ./gradlew :engines:paddlepaddle:paddlepaddle-native:compileJNI
       - uses: dorny/paths-filter@v2
         id: tokenizers_changes
         with:
