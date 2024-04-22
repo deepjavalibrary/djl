@@ -23,7 +23,7 @@ import ai.djl.ndarray.NDManager;
 public final class RsEngine extends Engine {
 
     public static final String ENGINE_NAME = "Rust";
-    static final int RANK = 3;
+    static final int RANK = 4;
 
     private RsEngine() {}
 
