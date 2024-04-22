@@ -136,7 +136,7 @@ public class LlamaTest {
 
     private void downloadModel() throws IOException {
         String url =
-                "https://huggingface.co/TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF/resolve/main/tinyllama-1.1b-1t-openorca.Q4_K_M.gguf?download=true";
+                "https://resources.djl.ai/test-models/gguf/tinyllama-1.1b-1t-openorca.Q4_K_M.gguf";
         Path dir = Paths.get("models/tinyllama-1.1b-1t-openorca.Q4_K_M.gguf");
         DownloadUtils.download(URI.create(url).toURL(), dir, null);
     }
