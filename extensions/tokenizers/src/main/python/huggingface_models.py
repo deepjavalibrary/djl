@@ -99,7 +99,8 @@ class HuggingfaceModels:
             existing_model = self.processed_models.get(model_id)
             if existing_model:
                 existing_model["downloads"] = model_info.downloads
-                if not args.retry_failed:
+                if not args.retry_failed or existing_model[
+                        "result"] == "success":
                     logging.info(f"Skip converted model: {model_id}.")
                     continue
 
@@ -119,15 +120,22 @@ class HuggingfaceModels:
             with open(config) as f:
                 config = json.load(f)
 
-            if "sentence-similarity" in model_info.tags:
-                task = "sentence-similarity"
-            else:
-                task, architecture = self.to_supported_task(config)
-                if not task:
-                    logging.info(
-                        f"Unsupported model architecture: {architecture} for {model_id}."
-                    )
-                    continue
+            task, architecture = self.to_supported_task(config)
+            if not task:
+                if "sentence-similarity" in model_info.tags:
+                    task = "sentence-similarity"
+
+            if not task:
+                logging.info(
+                    f"Unsupported model architecture: {architecture} for {model_id}."
+                )
+                continue
+
+            if args.category and args.category != task:
+                logging.info(
+                    f"Skip {model_id}, expect task: {args.category}, detected {task}."
+                )
+                continue
 
             model = {
                 "model_info": model_info,
