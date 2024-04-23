@@ -2,16 +2,28 @@
 name = "djl"
 version = "0.1.0"
 authors = ["Frank Liu <frankfliu2000@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 jni = "0.21.1"
 candle-core = "0.4.1"
+candle-nn = "0.4.1"
+candle-transformers = "0.4.1"
+candle-flash-attn = { version = "0.4.1", optional = true }
 tokenizers = { path = "../tokenizers/tokenizers", version = "*", features = ["http"] }
 half = "2.4.0"
+tracing = "0.1.40"
+safetensors = "0.4.3"
+thiserror = "1.0.58"
+serde = { version = "1.0.198", features = ["serde_derive"] }
+serde_json = "1.0.116"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = { version = "0.10", features = ["vendored"] }
 
 [lib]
 crate_type = ["cdylib"]
+
+[features]
+cuda = ["candle-core/cuda", "candle-nn/cuda", "candle-transformers/cuda"]
+flash-attn = ["cuda", "candle-transformers/flash-attn", "dep:candle-flash-attn"]

@@ -55,6 +55,16 @@ public class RsNDManager extends BaseNDManager {
         return result;
     }
 
+    /**
+     * Constructs an RsNDArray from a native handle (internal. Use {@link NDManager} instead).
+     *
+     * @param data bytebuffer that holds the native memory
+     * @param handle the pointer to the native RsNDArray memory
+     */
+    public RsNDArray createInternal(ByteBuffer data, long handle, DataType dataType) {
+        return new RsNDArray(this, handle, dataType, data);
+    }
+
     /** {@inheritDoc} */
     @Override
     public RsNDArray create(Shape shape, DataType dataType) {
@@ -220,6 +230,12 @@ public class RsNDManager extends BaseNDManager {
         int deviceId = device.getDeviceId();
         long handle = RustLibrary.hannWindow(numPoints, deviceType, deviceId);
         return new RsNDArray(this, handle);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public RsNDManager newSubManager() {
+        return newSubManager(device);
     }
 
     /** {@inheritDoc} */
