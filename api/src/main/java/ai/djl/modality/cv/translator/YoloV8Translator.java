@@ -44,6 +44,15 @@ public class YoloV8Translator extends YoloV5Translator {
     /**
      * Creates a builder to build a {@code YoloV8Translator} with specified arguments.
      *
+     * @return a new builder
+     */
+    public static YoloV8Translator.Builder builder() {
+        return new YoloV8Translator.Builder();
+    }
+
+    /**
+     * Creates a builder to build a {@code YoloV8Translator} with specified arguments.
+     *
      * @param arguments arguments to specify builder options
      * @return a new builder
      */
