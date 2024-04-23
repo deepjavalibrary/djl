@@ -119,7 +119,6 @@ nav:
           - XGBoost: 'engines/ml/xgboost/README.md'
           - LightGBM: 'engines/ml/lightgbm/README.md'
           - TensorRT: 'engines/tensorrt/README.md'
-          - TensorFlow Lite: 'engines/tflite/tflite-engine/README.md'
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'

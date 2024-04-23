@@ -26,8 +26,6 @@ dependencies {
     jacocoAggregation project(":engines:tensorflow:tensorflow-engine")
     jacocoAggregation project(":engines:tensorflow:tensorflow-model-zoo")
     jacocoAggregation project(":engines:tensorflow:tensorflow-native")
-    jacocoAggregation project(":engines:tflite:tflite-engine")
-    jacocoAggregation project(":engines:tflite:tflite-native")
     jacocoAggregation project(":examples")
     jacocoAggregation project(":extensions:audio")
     jacocoAggregation project(":extensions:fasttext")

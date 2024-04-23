@@ -5,8 +5,9 @@
 Many of DJL engines only has limited support for NDArray operations. Here is a list of such engines:
 
 - [ONNX Runtime](../engines/onnxruntime/onnxruntime-engine/README.md)
-- [TFLite](../engines/tflite/tflite-engine/README.md)
 - [TensorRT](../engines/tensorrt/README.md)
+- [XGBoost](../engines/ml/xgboost/README.md)
+- [LightGBM](../engines/ml/lightgbm/README.md)
 
 Currently, those engines only covers the basic NDArray creation methods. To better support the
 necessary preprocessing and postprocessing, you can use one of the full Engines along with it
@@ -44,9 +45,6 @@ at runtime, you can disable this behavior by setting the following system proper
 ```
 # disable hybrid engine for OnnxRuntime
 System.setProperty("ai.djl.onnx.disable_alternative", "true");
-
-# disable hybrid engine for TensorFlow Lite
-System.setProperty("ai.djl.tflite.disable_alternative", "true");
 
 # disable hybrid engine for TensorRT
 System.setProperty("ai.djl.tensorrt.disable_alternative", "true");

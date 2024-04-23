@@ -18,10 +18,6 @@ dependencies {
     runtimeOnly project(":engines:ml:lightgbm")
     runtimeOnly project(":engines:onnxruntime:onnxruntime-engine")
     runtimeOnly project(":extensions:tokenizers")
-
-    if (System.getProperty("ai.djl.default_engine") == "TFLite") {
-        runtimeOnly project(":engines:tflite:tflite-engine")
-    }
 }
 
 java {

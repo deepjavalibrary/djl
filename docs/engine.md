@@ -29,7 +29,6 @@ Currently, the engines that are supported by DJL are:
 - [PyTorch](../engines/pytorch/README.md) - full support
 - [TensorFlow](../engines/tensorflow/README.md) - supports inference and NDArray operations
 - [ONNX Runtime](../engines/onnxruntime/onnxruntime-engine/README.md) - supports basic inference
-- [TFLite](../engines/tflite/tflite-engine/README.md) - supports basic inference
 - [TensorRT](../engines/tensorrt/README.md) - supports basic inference
 - [XGBoost](../engines/ml/xgboost/README.md) - supports basic inference
 - [LightGBM](../engines/ml/lightgbm/README.md) - supports basic inference
