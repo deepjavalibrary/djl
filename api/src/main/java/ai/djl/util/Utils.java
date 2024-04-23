@@ -22,6 +22,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
@@ -494,10 +495,28 @@ public final class Utils {
      * @throws IOException if an I/O exception occurs
      */
     public static InputStream openUrl(URL url) throws IOException {
+        return openUrl(url, Collections.emptyMap());
+    }
+
+    /**
+     * Opens a connection to this URL and returns an InputStream for reading from that connection.
+     *
+     * @param url the url to open
+     * @param headers the HTTP headers
+     * @return an input stream for reading from the URL connection.
+     * @throws IOException if an I/O exception occurs
+     */
+    public static InputStream openUrl(URL url, Map<String, String> headers) throws IOException {
         String protocol = url.getProtocol();
-        if (isOfflineMode()
-                && ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol))) {
-            throw new IOException("Offline model is enabled.");
+        if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
+            if (isOfflineMode()) {
+                throw new IOException("Offline model is enabled.");
+            }
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                conn.addRequestProperty(entry.getKey(), entry.getValue());
+            }
+            return conn.getInputStream();
         }
         return new BufferedInputStream(url.openStream());
     }
