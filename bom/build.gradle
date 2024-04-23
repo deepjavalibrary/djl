@@ -49,7 +49,6 @@ dependencies {
         api "ai.djl.tensorflow:tensorflow-engine:${version}"
         api "ai.djl.tensorflow:tensorflow-model-zoo:${version}"
         api "ai.djl.tensorrt:tensorrt:${version}"
-        api "ai.djl.tflite:tflite-engine:${version}"
         api "ai.djl.timeseries:timeseries:${version}"
         api "com.microsoft.onnxruntime:onnxruntime:${onnxruntime_version}"
         api "com.microsoft.onnxruntime:onnxruntime_gpu:${onnxruntime_version}"
@@ -127,8 +126,6 @@ publishing {
                     addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cpu", "win-x86_64", "${tensorflow_version}")
                     addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cu113", "linux-x86_64", "${tensorflow_version}")
                     addDependency(dependencies, "ai.djl.tensorflow", "tensorflow-native-cu113", "win-x86_64", "${tensorflow_version}")
-                    addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "osx-x86_64", "${tflite_version}")
-                    addDependency(dependencies, "ai.djl.tflite", "tflite-native-cpu", "linux-x86_64", "${tflite_version}")
                 }
             }
         }

@@ -12,7 +12,6 @@ following models out of the box:
 You can install extra extensions to enable the following models:
 
 - ONNX model
-- TFLite model
 - XGBoost model
 - LightGBM model
 - Sentencepiece model

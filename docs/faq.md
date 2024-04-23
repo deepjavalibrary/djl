@@ -20,7 +20,6 @@ support the following models:
 - ONNX model
 - TensorRT model
 - Python script model
-- TFLite model
 - XGBoost model
 - LightGBM model
 - Sentencepiece model
