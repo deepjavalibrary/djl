@@ -20,6 +20,14 @@ public final class RustLibrary {
 
     private RustLibrary() {}
 
+    public static native boolean hasCapability();
+
+    public static native long loadModel(String modelPath, int dtype);
+
+    public static native String[] getInputNames(long handle);
+
+    public static native long runInference(long handle, long[] inputHandles);
+
     public static native long tensorOf(
             ByteBuffer buf, long[] shape, int dataType, String deviceType, int deviceId);
 
