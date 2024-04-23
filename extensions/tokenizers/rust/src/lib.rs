@@ -795,12 +795,13 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_hasCapability<'local>
     mut env: JNIEnv,
     _: JObject,
 ) -> jboolean {
-    if cfg!(feature = "cuda") {
-        match get_runtime_compute_cap() {
-            75 | 80 | 86..=90 => JNI_TRUE,
-            _ => JNI_FALSE,
-        }
-    } else {
+    #[cfg(feature = "cuda")]
+    match get_runtime_compute_cap() {
+        75 | 80 | 86..=90 => JNI_TRUE,
+        _ => JNI_FALSE,
+    }
+    #[cfg(not(feature = "cuda"))]
+    {
         JNI_TRUE
     }
 }
