@@ -17,7 +17,7 @@ import shutil
 
 import requests
 import torch
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel, AutoConfig
 
 from huggingface_converter import HuggingfaceConverter, PipelineHolder
 from huggingface_hub import hf_hub_download
@@ -76,7 +76,10 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
                 pass
 
         if not "maxLength" in args:
-            config = hf_pipeline.model.config
+            if hasattr(hf_pipeline.model, "config"):
+                config = hf_pipeline.model.config
+            else:
+                config = AutoConfig.from_pretrained(model_id)
             tokenizer = hf_pipeline.tokenizer
             if hasattr(config, "max_position_embeddings") and hasattr(
                     tokenizer, "model_max_length"):
