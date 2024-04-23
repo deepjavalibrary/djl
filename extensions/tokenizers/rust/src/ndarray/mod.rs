@@ -261,7 +261,7 @@ fn as_shape<'local>(env: &mut JNIEnv, shape: &JLongArray<'local>) -> Shape {
     Shape::from_dims(&shape)
 }
 
-fn as_data_type(data_type: i32) -> Result<DType> {
+pub fn as_data_type(data_type: i32) -> Result<DType> {
     match data_type {
         0 => Ok(DType::F32),
         1 => Ok(DType::F64),

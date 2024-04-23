@@ -15,7 +15,7 @@ package ai.djl.engine.rust;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineProvider;
 
-/** {@code PtEngineProvider} is the Rust implementation of {@link EngineProvider}. */
+/** {@code RsEngineProvider} is the Rust implementation of {@link EngineProvider}. */
 public class RsEngineProvider implements EngineProvider {
 
     /** {@inheritDoc} */

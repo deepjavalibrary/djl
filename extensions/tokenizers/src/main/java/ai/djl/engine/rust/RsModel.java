@@ -37,7 +37,7 @@ public class RsModel extends BaseModel {
         super(name);
         manager = RsNDManager.getSystemManager().newSubManager(device);
         manager.setName("RsModel");
-        dataType = DataType.FLOAT32;
+        dataType = DataType.FLOAT16;
     }
 
     /** {@inheritDoc} */
@@ -49,5 +49,7 @@ public class RsModel extends BaseModel {
                     "Model directory doesn't exist: " + modelPath.toAbsolutePath());
         }
         modelDir = modelPath.toAbsolutePath();
+        long handle = RustLibrary.loadModel(modelDir.toString(), dataType.ordinal());
+        block = new RsSymbolBlock((RsNDManager) manager, handle);
     }
 }

@@ -28,7 +28,11 @@ javac -sourcepath src/main/java/ src/main/java/ai/djl/huggingface/tokenizers/jni
 javac -sourcepath src/main/java/ src/main/java/ai/djl/engine/rust/RustLibrary.java -h build/include -d build/classes
 
 RUST_MANIFEST=rust/Cargo.toml
-cargo build --manifest-path $RUST_MANIFEST --release
+if [ -x "$(command -v nvcc)" ]; then
+  cargo build --manifest-path $RUST_MANIFEST --release --features cuda,flash-attn
+else
+  cargo build --manifest-path $RUST_MANIFEST --release
+fi
 
 # for nightly ci
 if [[ $PLATFORM == 'darwin' ]]; then
