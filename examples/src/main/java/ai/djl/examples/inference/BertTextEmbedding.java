@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 /** An example of inference using Bert Text Embedding. */
 public final class BertTextEmbedding {
@@ -40,21 +41,21 @@ public final class BertTextEmbedding {
     }
 
     public static float[][] predict() throws IOException, TranslateException, ModelException {
-        String[] input = {"What is Deep Learning?", "The movie got Oscar this year"};
-        Criteria<String[], float[][]> criteria =
+        List<String> input =
+                Arrays.asList("What is Deep Learning?", "The movie got Oscar this year");
+        Criteria<String, float[]> criteria =
                 Criteria.builder()
                         .optModelUrls(
                                 "https://alpha-djl-demos.s3.amazonaws.com/model/examples/bge-base-en-v1.5.zip")
-                        .setTypes(String[].class, float[][].class)
+                        .setTypes(String.class, float[].class)
                         .optEngine("Rust")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<String[], float[][]> model = criteria.loadModel()) {
-            try (Predictor<String[], float[][]> predictor = model.newPredictor()) {
-                return predictor.predict(input);
-            }
+        try (ZooModel<String, float[]> model = criteria.loadModel();
+                Predictor<String, float[]> predictor = model.newPredictor()) {
+            return predictor.batchPredict(input).toArray(new float[0][]);
         }
     }
 }
