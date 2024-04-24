@@ -76,7 +76,10 @@ public final class PtGradientCollector implements GradientCollector {
         NDManager systemManager = PtNDManager.getSystemManager();
         for (NDArray array : systemManager.getManagedArrays()) {
             if (array.hasGradient()) {
-                array.getGradient().subi(array.getGradient());
+                // To prevent memory leak we must close gradient after use.
+                try (NDArray gradient = array.getGradient()) {
+                    gradient.subi(gradient);
+                }
             }
         }
     }
