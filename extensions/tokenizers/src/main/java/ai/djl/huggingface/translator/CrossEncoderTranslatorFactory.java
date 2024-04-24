@@ -31,7 +31,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/** A {@link TranslatorFactory} that creates a {@link CrossEncoderTranslatorFactory} instance. */
+/**
+ * A {@link TranslatorFactory} that creates a {@link CrossEncoderTranslatorFactory} instance.
+ */
 public class CrossEncoderTranslatorFactory implements TranslatorFactory, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,19 +45,30 @@ public class CrossEncoderTranslatorFactory implements TranslatorFactory, Seriali
         SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<Pair<Type, Type>> getSupportedTypes() {
         return SUPPORTED_TYPES;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SuppressWarnings("unchecked")
     public <I, O> Translator<I, O> newInstance(
             Class<I> input, Class<O> output, Model model, Map<String, ?> arguments)
             throws TranslateException {
         Path modelPath = model.getModelPath();
+        if (arguments != null && arguments.containsKey("tokenizerPath")) {
+            if (arguments.get("tokenizerPath") instanceof Path) {
+                modelPath = (Path) arguments.get("tokenizerPath");
+            }else{
+                throw new IllegalArgumentException("Only support java.nio.file.Path type for tokenizerPath!");
+            }
+        }
         try {
             HuggingFaceTokenizer tokenizer =
                     HuggingFaceTokenizer.builder(arguments)

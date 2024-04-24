@@ -55,6 +55,13 @@ public class TextEmbeddingTranslatorFactory implements TranslatorFactory, Serial
             Class<I> input, Class<O> output, Model model, Map<String, ?> arguments)
             throws TranslateException {
         Path modelPath = model.getModelPath();
+        if (arguments != null && arguments.containsKey("tokenizerPath")) {
+            if (arguments.get("tokenizerPath") instanceof Path) {
+                modelPath = (Path) arguments.get("tokenizerPath");
+            }else{
+                throw new IllegalArgumentException("Only support java.nio.file.Path type for tokenizerPath!");
+            }
+        }
         try {
             HuggingFaceTokenizer tokenizer =
                     HuggingFaceTokenizer.builder(arguments)
