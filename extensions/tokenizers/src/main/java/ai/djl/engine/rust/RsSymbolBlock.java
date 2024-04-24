@@ -57,14 +57,13 @@ public class RsSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         if (inputNames.size() != inputs.size()) {
             throw new IllegalArgumentException("Input size mismatch, requires: " + inputNames);
         }
-        try (RsNDManager sub = manager.newSubManager()) {
+        try (RsNDManager sub = (RsNDManager) manager.newSubManager()) {
             long[] inputHandles = new long[inputs.size()];
             for (int i = 0; i < inputs.size(); i++) {
                 inputHandles[i] = sub.from(inputs.get(i)).getHandle();
             }
             long outputHandle = RustLibrary.runInference(handle.get(), inputHandles);
-            RsNDArray output =
-                    manager.createInternal(null, outputHandle, inputs.head().getDataType());
+            RsNDArray output = new RsNDArray(manager, outputHandle, inputs.head().getDataType());
             output.attach(inputs.head().getManager());
             return new NDList(output);
         }

@@ -1,7 +1,7 @@
 use candle_core::{DType, Tensor};
-use jni::JNIEnv;
 use jni::objects::{JIntArray, JObject, ReleaseMode};
 use jni::sys::{jboolean, jdouble, jint, jlong, JNI_TRUE};
+use jni::JNIEnv;
 
 use crate::cast_handle;
 use crate::ndarray::return_handle;
