@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -703,7 +704,6 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     /** The builder for creating huggingface tokenizer. */
     public static final class Builder {
 
-        private Path tokenizerPath;
         private NDManager manager;
         private Map<String, String> options;
 
@@ -741,7 +741,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
          * @return this builder
          */
         public Builder optTokenizerPath(Path tokenizerPath) {
-            this.tokenizerPath = tokenizerPath;
+            options.putIfAbsent("tokenizerPath", tokenizerPath.toString());
             return this;
         }
 
@@ -911,9 +911,11 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
             if (tokenizerName != null) {
                 return managed(HuggingFaceTokenizer.newInstance(tokenizerName, options));
             }
-            if (tokenizerPath == null) {
+            String path = options.get("tokenizerPath");
+            if (path == null) {
                 throw new IllegalArgumentException("Missing tokenizer path.");
             }
+            Path tokenizerPath = Paths.get(path);
             if (Files.isDirectory(tokenizerPath)) {
                 Path tokenizerFile = tokenizerPath.resolve("tokenizer.json");
                 if (Files.exists(tokenizerFile)) {
