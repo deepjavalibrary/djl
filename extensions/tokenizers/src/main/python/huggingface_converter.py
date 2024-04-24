@@ -17,9 +17,10 @@ import sys
 from argparse import Namespace
 
 import onnx
+import safetensors_convert
 import torch
-from huggingface_hub import hf_hub_download
-from transformers import pipeline, AutoTokenizer
+from huggingface_hub import hf_hub_download, HfApi
+from transformers import pipeline, AutoTokenizer, AutoConfig
 
 from metadata import HuggingfaceMetadata
 from shasum import sha1_sum
@@ -33,6 +34,12 @@ class PipelineHolder(object):
         self.model = model
 
 
+class ModelHolder(object):
+
+    def __init__(self, config):
+        self.config = config
+
+
 class HuggingfaceConverter:
 
     def __init__(self):
@@ -43,10 +50,13 @@ class HuggingfaceConverter:
         self.translator = None
         self.inputs = None
         self.outputs = None
+        self.api = HfApi()
 
     def save_model(self, model_info, args: Namespace, temp_dir: str):
         if args.output_format == "OnnxRuntime":
             return self.save_onnx_model(model_info, args, temp_dir)
+        elif args.output_format == "Rust":
+            return self.save_rust_model(model_info, args, temp_dir)
         else:
             return self.save_pytorch_model(model_info, args, temp_dir)
 
@@ -71,10 +81,64 @@ class HuggingfaceConverter:
         include_types = "token_type_id" in inputs
 
         tokenizer = AutoTokenizer.from_pretrained(model_id)
-        hf_pipeline = PipelineHolder(tokenizer, model)
+        config = AutoConfig.from_pretrained(model_id)
+        hf_pipeline = PipelineHolder(tokenizer, ModelHolder(config))
         size = self.save_to_model_zoo(model_info, args.output_dir,
                                       "OnnxRuntime", temp_dir, hf_pipeline,
                                       include_types)
+
+        return True, None, size
+
+    def save_rust_model(self, model_info, args: Namespace, temp_dir: str):
+        model_id = model_info.modelId
+
+        config = AutoConfig.from_pretrained(model_id)
+        if hasattr(config, "model_type"):
+            if config.model_type == "bert":
+                include_types = True
+            elif config.model_type == "distilbert":
+                include_types = False
+            else:
+                return False, f"Unsupported model_type: {config.model_type}", -1
+
+        logging.info(f"Saving rust model: {model_id} ...")
+
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
+
+        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        hf_pipeline = PipelineHolder(tokenizer, ModelHolder(config))
+        try:
+            # Save tokenizer.json to temp dir
+            self.save_tokenizer(hf_pipeline, temp_dir)
+        except Exception as e:
+            logging.warning(f"Failed to save tokenizer: {model_id}.")
+            logging.warning(e, exc_info=True)
+            return False, "Failed to save tokenizer", -1
+
+        target = os.path.join(temp_dir, "model.safetensors")
+        model = self.api.model_info(model_id, files_metadata=True)
+        has_sf_file = False
+        has_pt_file = False
+        for sibling in model.siblings:
+            if sibling.rfilename == "model.safetensors":
+                has_sf_file = True
+            elif sibling.rfilename == "pytorch_model.bin":
+                has_pt_file = True
+
+        if has_sf_file:
+            file = hf_hub_download(repo_id=model_id,
+                                   filename="model.safetensors")
+            shutil.copyfile(file, target)
+        elif has_pt_file:
+            file = hf_hub_download(repo_id=model_id,
+                                   filename="pytorch_model.bin")
+            safetensors_convert.convert_file(file, target)
+        else:
+            return False, f"No model file found for: {model_id}", -1
+
+        size = self.save_to_model_zoo(model_info, args.output_dir, "Rust",
+                                      temp_dir, hf_pipeline, include_types)
 
         return True, None, size
 
@@ -134,7 +198,7 @@ class HuggingfaceConverter:
         hf_pipeline.tokenizer.save_pretrained(temp_dir)
         # only keep tokenizer.json file
         for path in os.listdir(temp_dir):
-            if path != "tokenizer.json":
+            if path != "tokenizer.json" and path != "tokenizer_config.json":
                 os.remove(os.path.join(temp_dir, path))
 
     def jit_trace_model(self, hf_pipeline, model_id: str, temp_dir: str,
