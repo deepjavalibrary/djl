@@ -358,6 +358,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      */
     public Encoding[] batchEncode(
             String[] inputs, boolean addSpecialTokens, boolean withOverflowingTokens) {
+        enableBatch();
         if (doLowerCase != null) {
             for (int i = 0; i < inputs.length; ++i) {
                 inputs[i] = inputs[i].toLowerCase(doLowerCase);
@@ -394,6 +395,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
             PairList<String, String> inputs,
             boolean addSpecialTokens,
             boolean withOverflowingTokens) {
+        enableBatch();
         String[] text = inputs.keyArray(Utils.EMPTY_ARRAY);
         String[] textPair = inputs.valueArray(Utils.EMPTY_ARRAY);
         if (doLowerCase != null) {
