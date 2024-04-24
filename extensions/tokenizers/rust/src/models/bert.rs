@@ -1,5 +1,5 @@
 use crate::models::Model;
-use candle_core::{DType, Device, Result, Tensor};
+use candle_core::{Device, Result, Tensor};
 use candle_nn::{embedding, Embedding, Module, VarBuilder};
 use candle_transformers::models::with_tracing::{layer_norm, linear, LayerNorm, Linear};
 use serde::Deserialize;
@@ -23,7 +23,7 @@ impl HiddenActLayer {
         Self { act, span }
     }
 
-    fn forward(&self, xs: &Tensor) -> candle_core::Result<Tensor> {
+    fn forward(&self, xs: &Tensor) -> Result<Tensor> {
         let _enter = self.span.enter();
         match self.act {
             // https://github.com/huggingface/transformers/blob/cd4584e3c809bb9e1392ccd3fe38b40daba5519a/src/transformers/activations.py#L213
@@ -519,19 +519,23 @@ impl Model for BertModel {
     }
 
     fn get_input_names(&self) -> Vec<String> {
-        return vec!["input_ids".to_string(),
-                    "attention_mask".to_string(),
-                    "token_type_ids".to_string()];
+        return vec![
+            "input_ids".to_string(),
+            "attention_mask".to_string(),
+            "token_type_ids".to_string(),
+        ];
     }
 
     fn forward(
         &self,
         input_ids: &Tensor,
-        attention_mask: &Tensor,
+        _attention_mask: &Tensor,
         token_type_ids: Option<&Tensor>,
     ) -> Result<Tensor> {
         let _enter = self.span.enter();
-        let embedding_output = self.embeddings.forward(input_ids, token_type_ids.unwrap())?;
+        let embedding_output = self
+            .embeddings
+            .forward(input_ids, token_type_ids.unwrap())?;
         let sequence_output = self.encoder.forward(&embedding_output)?;
         Ok(sequence_output)
     }

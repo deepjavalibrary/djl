@@ -25,12 +25,15 @@ use crate::compute_cap::get_runtime_compute_cap;
 
 use std::str::FromStr;
 
+use jni::errors::Error;
 use jni::objects::{
     JClass, JLongArray, JMethodID, JObject, JObjectArray, JString, JValue, ReleaseMode,
 };
-use jni::sys::{jboolean, jint, jlong, jobjectArray, jsize, jvalue, JNI_FALSE, JNI_TRUE};
+#[cfg(feature = "cuda")]
+use jni::sys::JNI_FALSE;
+
+use jni::sys::{jboolean, jint, jlong, jobjectArray, jsize, jvalue, JNI_TRUE};
 use jni::JNIEnv;
-use jni::errors::Error;
 use tk::models::bpe::BPE;
 use tk::tokenizer::{EncodeInput, Encoding};
 use tk::utils::padding::{PaddingParams, PaddingStrategy};
@@ -791,8 +794,8 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 }
 
 #[no_mangle]
-pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_hasCapability<'local>(
-    mut env: JNIEnv,
+pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_isCudaAvailable<'local>(
+    _: JNIEnv,
     _: JObject,
 ) -> jboolean {
     #[cfg(feature = "cuda")]
@@ -825,19 +828,11 @@ fn drop_handle<T: 'static>(handle: jlong) {
 }
 
 fn to_string_array(env: &mut JNIEnv, data: Vec<String>) -> Result<jobjectArray, Error> {
-    let arr = env.new_object_array(
-        data.len() as i32,
-        "java/lang/String",
-        JObject::null(),
-    )?;
+    let arr = env.new_object_array(data.len() as i32, "java/lang/String", JObject::null())?;
 
     for (i, val) in data.into_iter().enumerate() {
         let s = env.new_string(val)?;
-        env.set_object_array_element(
-            &arr,
-            i as i32,
-            s,
-        )?;
+        env.set_object_array_element(&arr, i as i32, s)?;
     }
 
     Ok(arr.into_raw())

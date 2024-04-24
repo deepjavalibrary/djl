@@ -1,8 +1,9 @@
-use crate::models::Model;
 use candle_core::{DType, Device, Result, Tensor};
 use candle_nn::{Embedding, Module, VarBuilder};
 use candle_transformers::models::with_tracing::{layer_norm, linear, LayerNorm, Linear};
 use serde::Deserialize;
+
+use crate::models::Model;
 
 fn masked_fill(on_false: &Tensor, mask: &Tensor, on_true: f32) -> Result<Tensor> {
     let shape = mask.shape();
@@ -31,7 +32,7 @@ impl HiddenActLayer {
 }
 
 impl Module for HiddenActLayer {
-    fn forward(&self, xs: &Tensor) -> candle_core::Result<Tensor> {
+    fn forward(&self, xs: &Tensor) -> Result<Tensor> {
         let _enter = self.span.enter();
         match self.act {
             // https://github.com/huggingface/transformers/blob/cd4584e3c809bb9e1392ccd3fe38b40daba5519a/src/transformers/activations.py#L213
@@ -376,7 +377,7 @@ impl Model for DistilBertModel {
         &self,
         input_ids: &Tensor,
         attention_mask: &Tensor,
-        token_type_ids: Option<&Tensor>,
+        _token_type_ids: Option<&Tensor>,
     ) -> Result<Tensor> {
         let _enter = self.span.enter();
         let embedding_output = self.embeddings.forward(input_ids)?;

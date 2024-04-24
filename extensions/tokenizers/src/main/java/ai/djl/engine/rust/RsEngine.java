@@ -16,6 +16,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
+import ai.djl.engine.StandardCapabilities;
 import ai.djl.huggingface.tokenizers.jni.LibUtils;
 import ai.djl.ndarray.NDManager;
 
@@ -66,7 +67,12 @@ public final class RsEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public boolean hasCapability(String capability) {
-        return RustLibrary.hasCapability();
+        if (StandardCapabilities.MKL.equals(capability)) {
+            return true;
+        } else if (StandardCapabilities.CUDA.equals(capability)) {
+            return RustLibrary.isCudaAvailable();
+        }
+        return false;
     }
 
     /** {@inheritDoc} */
@@ -85,5 +91,21 @@ public final class RsEngine extends Engine {
     @Override
     public NDManager newBaseManager(Device device) {
         return RsNDManager.getSystemManager().newSubManager(device);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append(getEngineName()).append(':').append(getVersion()).append(", ");
+        sb.append(getEngineName())
+                .append(':')
+                .append(getVersion())
+                .append(", capabilities: [\n\t" + StandardCapabilities.MKL);
+        if (hasCapability(StandardCapabilities.CUDA)) {
+            sb.append(",\n\t").append(StandardCapabilities.CUDA); // NOPMD
+        }
+        sb.append(']');
+        return sb.toString();
     }
 }
