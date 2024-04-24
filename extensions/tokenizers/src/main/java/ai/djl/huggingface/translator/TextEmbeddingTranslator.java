@@ -175,7 +175,6 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
                 throw new AssertionError("Unexpected pooling mode: " + pooling);
         }
 
-        embedding = embedding.toDevice(Device.cpu(), false);
         if (denseModel != null) {
             NDArray weight = denseModel.get("linear.weight");
             NDArray bias = denseModel.get("linear.bias");
