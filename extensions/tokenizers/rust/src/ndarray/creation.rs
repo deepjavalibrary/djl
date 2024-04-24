@@ -87,11 +87,11 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_full<'local>(
             DType::U8 => {
                 let tmp = value as i64;
                 Tensor::full(tmp as u8, &shape, &device)
-            },
+            }
             DType::U32 => {
                 let tmp = value as i64;
                 Tensor::full(tmp as u32, &shape, &device)
-            },
+            }
             DType::I64 => Tensor::full(value as i64, &shape, &device),
             DType::BF16 => Tensor::full(bf16::from_f32(value), &shape, &device),
             DType::F16 => Tensor::full(f16::from_f32(value), &shape, &device),

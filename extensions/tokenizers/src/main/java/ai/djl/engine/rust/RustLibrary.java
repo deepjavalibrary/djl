@@ -20,7 +20,7 @@ public final class RustLibrary {
 
     private RustLibrary() {}
 
-    public static native boolean hasCapability();
+    public static native boolean isCudaAvailable();
 
     public static native long loadModel(String modelPath, int dtype);
 

@@ -3,14 +3,14 @@ mod distilbert;
 
 use crate::ndarray::as_data_type;
 use crate::{cast_handle, to_handle, to_string_array};
+use bert::{BertConfig, BertModel};
 use candle_core::DType;
+use candle_core::{Device, Result, Tensor};
+use candle_nn::VarBuilder;
+use distilbert::{DistilBertConfig, DistilBertModel};
 use jni::objects::{JLongArray, JObject, JString, ReleaseMode};
 use jni::sys::{jint, jlong, jobjectArray};
 use jni::JNIEnv;
-use bert::{BertConfig, BertModel};
-use distilbert::{DistilBertConfig, DistilBertModel};
-use candle_core::{Device, Result, Tensor};
-use candle_nn::VarBuilder;
 use serde::Deserialize;
 use std::path::PathBuf;
 
@@ -21,9 +21,9 @@ pub(crate) trait Model {
 
     fn forward(
         &self,
-        input_ids: &Tensor,
-        attention_mask: &Tensor,
-        token_type_ids: Option<&Tensor>,
+        _input_ids: &Tensor,
+        _attention_mask: &Tensor,
+        _token_type_ids: Option<&Tensor>,
     ) -> Result<Tensor> {
         candle_core::bail!("`forward` is not implemented for this model");
     }
@@ -73,7 +73,9 @@ fn load_model<'local>(
     let use_flash_attn = cfg!(feature = "cuda")
         && cfg!(feature = "flash-attn")
         && dtype == DType::F16
-        && std::env::var("USE_FLASH_ATTENTION").ok().map_or(true, |v| v.parse().unwrap_or(true));
+        && std::env::var("USE_FLASH_ATTENTION")
+            .ok()
+            .map_or(true, |v| v.parse().unwrap_or(true));
 
     let model: Result<Box<dyn Model>> = match (config, &device) {
         #[cfg(not(feature = "cuda"))]
@@ -138,9 +140,8 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_runInference<'local>(
     input_handles: JLongArray<'local>,
 ) -> jlong {
     let model = cast_handle::<Box<dyn Model>>(handle);
-    let input_handles = unsafe {
-        env.get_array_elements(&input_handles, ReleaseMode::NoCopyBack)
-    }.unwrap();
+    let input_handles =
+        unsafe { env.get_array_elements(&input_handles, ReleaseMode::NoCopyBack) }.unwrap();
 
     let mut input_vec: Vec<&Tensor> = Vec::new();
     for &i in input_handles.iter() {
@@ -148,9 +149,11 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_runInference<'local>(
         input_vec.push(tensor);
     }
 
-    let result = model.forward(input_vec.get(0).unwrap(),
-                               input_vec.get(1).unwrap(),
-                               input_vec.get(2).map(|&x| x));
+    let result = model.forward(
+        input_vec.get(0).unwrap(),
+        input_vec.get(1).unwrap(),
+        input_vec.get(2).map(|&x| x),
+    );
 
     match result {
         Ok(output) => to_handle(output),
