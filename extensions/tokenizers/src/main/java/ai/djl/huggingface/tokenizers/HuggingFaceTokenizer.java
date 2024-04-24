@@ -57,14 +57,13 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     private HuggingFaceTokenizer(long handle, Map<String, String> options) {
         super(handle);
         truncation = TruncationStrategy.LONGEST_FIRST;
-        String val = TokenizersLibrary.LIB.getPaddingStrategy(handle);
-        padding = PaddingStrategy.fromValue(val);
+        padding = PaddingStrategy.LONGEST;
         maxLength = TokenizersLibrary.LIB.getMaxLength(handle);
         stride = TokenizersLibrary.LIB.getStride(handle);
         padToMultipleOf = TokenizersLibrary.LIB.getPadToMultipleOf(handle);
 
         if (options != null) {
-            val = options.getOrDefault("addSpecialTokens", "true");
+            String val = options.getOrDefault("addSpecialTokens", "true");
             addSpecialTokens = Boolean.parseBoolean(val);
             val = options.getOrDefault("withOverflowingTokens", "false");
             withOverflowingTokens = Boolean.parseBoolean(val);
@@ -464,22 +463,6 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      */
     public String[] batchDecode(long[][] batchIds) {
         return batchDecode(batchIds, !addSpecialTokens);
-    }
-
-    /** Sets padding and truncation to true for batching. */
-    public void enableBatch() {
-        boolean changed = false;
-        if (padding == PaddingStrategy.DO_NOT_PAD) {
-            changed = true;
-            padding = PaddingStrategy.LONGEST;
-        }
-        if (truncation == TruncationStrategy.DO_NOT_TRUNCATE) {
-            changed = true;
-            truncation = TruncationStrategy.LONGEST_FIRST;
-        }
-        if (changed) {
-            updateTruncationAndPadding();
-        }
     }
 
     /**
