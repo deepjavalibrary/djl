@@ -26,7 +26,7 @@ def converter_args():
     parser.add_argument("-f",
                         "--output-format",
                         default="PyTorch",
-                        choices=["PyTorch", "OnnxRuntime"],
+                        choices=["PyTorch", "OnnxRuntime", "Rust"],
                         help="Model output format")
     parser.add_argument("-r",
                         "--retry-failed",
