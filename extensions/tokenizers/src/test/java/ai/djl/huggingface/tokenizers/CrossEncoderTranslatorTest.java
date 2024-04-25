@@ -64,6 +64,7 @@ public class CrossEncoderTranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-cased")
+                        .optArgument("tokenizerPath", modelDir)
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new CrossEncoderTranslatorFactory())
                         .build();
