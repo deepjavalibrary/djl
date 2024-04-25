@@ -16,7 +16,6 @@ import ai.djl.BaseModel;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
-import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Block;
 import ai.djl.tensorflow.engine.javacpp.JavacppUtils;
 import ai.djl.util.Utils;
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** {@code TfModel} is the TensorFlow implementation of {@link Model}. */
 public class TfModel extends BaseModel {
@@ -150,28 +150,15 @@ public class TfModel extends BaseModel {
 
     /** {@inheritDoc} */
     @Override
-    public Block getBlock() {
-        return block;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void setBlock(Block block) {
         throw new UnsupportedOperationException("Not supported for TensorFlow Engine");
     }
 
     /** {@inheritDoc} */
     @Override
-    public NDManager getNDManager() {
-        return manager;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public String[] getArtifactNames() {
-        try {
-            List<Path> files =
-                    Files.walk(modelDir).filter(Files::isRegularFile).collect(Collectors.toList());
+        try (Stream<Path> stream = Files.walk(modelDir)) {
+            List<Path> files = stream.filter(Files::isRegularFile).collect(Collectors.toList());
             List<String> ret = new ArrayList<>(files.size());
             for (Path path : files) {
                 String fileName = path.toFile().getName();

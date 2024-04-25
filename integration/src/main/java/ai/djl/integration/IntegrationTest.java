@@ -50,6 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class IntegrationTest {
@@ -219,20 +220,25 @@ public class IntegrationTest {
 
         Path classPath = Paths.get(url.toURI());
         if (Files.isDirectory(classPath)) {
-            Collection<Path> files =
-                    Files.walk(classPath)
-                            .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
-                            .collect(Collectors.toList());
-            for (Path file : files) {
-                Path p = classPath.relativize(file);
-                String className = p.toString();
-                className = className.substring(0, className.lastIndexOf('.'));
-                className = className.replace(File.separatorChar, '.');
-                if (className.startsWith(arguments.getPackageName()) && !className.contains("$")) {
-                    try {
-                        classList.add(Class.forName(className));
-                    } catch (ExceptionInInitializerError ignore) {
-                        // ignore
+            try (Stream<Path> stream = Files.walk(classPath)) {
+                Collection<Path> files =
+                        stream.filter(
+                                        p ->
+                                                Files.isRegularFile(p)
+                                                        && p.toString().endsWith(".class"))
+                                .collect(Collectors.toList());
+                for (Path file : files) {
+                    Path p = classPath.relativize(file);
+                    String className = p.toString();
+                    className = className.substring(0, className.lastIndexOf('.'));
+                    className = className.replace(File.separatorChar, '.');
+                    if (className.startsWith(arguments.getPackageName())
+                            && !className.contains("$")) {
+                        try {
+                            classList.add(Class.forName(className));
+                        } catch (ExceptionInInitializerError ignore) {
+                            // ignore
+                        }
                     }
                 }
             }

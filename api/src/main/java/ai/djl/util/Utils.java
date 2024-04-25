@@ -42,6 +42,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** A class containing utility methods. */
 public final class Utils {
@@ -105,17 +106,15 @@ public final class Utils {
      * @param dir the directory to be removed
      */
     public static void deleteQuietly(Path dir) {
-        try {
-            Files.walk(dir)
-                    .sorted(Comparator.reverseOrder())
-                    .forEach(
-                            path -> {
-                                try {
-                                    Files.deleteIfExists(path);
-                                } catch (IOException ignore) {
-                                    // ignore
-                                }
-                            });
+        try (Stream<Path> stream = Files.walk(dir)) {
+            List<Path> list = stream.sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+            for (Path path : list) {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException ignore) {
+                    // ignore
+                }
+            }
         } catch (IOException ignore) {
             // ignore
         }
@@ -255,23 +254,24 @@ public final class Utils {
      */
     public static int getCurrentEpoch(Path modelDir, String modelName) throws IOException {
         final Pattern pattern = Pattern.compile(Pattern.quote(modelName) + "-(\\d{4}).params");
-        List<Integer> checkpoints =
-                Files.walk(modelDir, 1, FileVisitOption.FOLLOW_LINKS)
-                        .map(
-                                p -> {
-                                    Matcher m = pattern.matcher(p.toFile().getName());
-                                    if (m.matches()) {
-                                        return Integer.parseInt(m.group(1));
-                                    }
-                                    return null;
-                                })
-                        .filter(Objects::nonNull)
-                        .sorted()
-                        .collect(Collectors.toList());
-        if (checkpoints.isEmpty()) {
-            return -1;
+        try (Stream<Path> stream = Files.walk(modelDir, 1, FileVisitOption.FOLLOW_LINKS)) {
+            List<Integer> checkpoints =
+                    stream.map(
+                                    p -> {
+                                        Matcher m = pattern.matcher(p.toFile().getName());
+                                        if (m.matches()) {
+                                            return Integer.parseInt(m.group(1));
+                                        }
+                                        return null;
+                                    })
+                            .filter(Objects::nonNull)
+                            .sorted()
+                            .collect(Collectors.toList());
+            if (checkpoints.isEmpty()) {
+                return -1;
+            }
+            return checkpoints.get(checkpoints.size() - 1);
         }
-        return checkpoints.get(checkpoints.size() - 1);
     }
 
     /**
@@ -380,11 +380,10 @@ public final class Utils {
      */
     public static Path getNestedModelDir(Path modelDir) {
         if (Files.isDirectory(modelDir)) {
-            try {
+            try (Stream<Path> stream = Files.list(modelDir)) {
                 // handle actual model directory is subdirectory case
                 List<Path> files =
-                        Files.list(modelDir)
-                                .filter(p -> !p.getFileName().toString().startsWith("."))
+                        stream.filter(p -> !p.getFileName().toString().startsWith("."))
                                 .collect(Collectors.toList());
                 if (files.size() == 1 && Files.isDirectory(files.get(0))) {
                     return files.get(0);

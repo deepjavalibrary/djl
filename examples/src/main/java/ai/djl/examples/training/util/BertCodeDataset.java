@@ -38,6 +38,7 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /** An example code dataset using the code within the DJL path. */
 public class BertCodeDataset implements Dataset {
@@ -94,9 +95,8 @@ public class BertCodeDataset implements Dataset {
     }
 
     private static List<Path> listSourceFiles(Path root) {
-        try {
-            return Files.walk(root)
-                    .filter(Files::isRegularFile)
+        try (Stream<Path> stream = Files.walk(root)) {
+            return stream.filter(Files::isRegularFile)
                     .filter(path -> path.toString().toLowerCase().endsWith(".java"))
                     .collect(Collectors.toList());
         } catch (IOException ioe) {
