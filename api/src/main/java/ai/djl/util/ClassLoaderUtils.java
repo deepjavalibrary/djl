@@ -62,10 +62,11 @@ public final class ClassLoaderUtils {
             // we only consider .class files and skip .java files
             List<Path> jarFiles;
             if (Files.isDirectory(path)) {
-                jarFiles =
-                        Files.list(path)
-                                .filter(p -> p.toString().endsWith(".jar"))
-                                .collect(Collectors.toList());
+                try (Stream<Path> stream = Files.list(path)) {
+                    jarFiles = stream
+                            .filter(p -> p.toString().endsWith(".jar"))
+                            .collect(Collectors.toList());
+                }
             } else {
                 jarFiles = Collections.emptyList();
             }
@@ -111,10 +112,12 @@ public final class ClassLoaderUtils {
             logger.trace("Directory not exists: {}", dir);
             return null;
         }
-        Collection<Path> files =
-                Files.walk(dir)
-                        .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
-                        .collect(Collectors.toList());
+        Collection<Path> files;
+        try (Stream<Path> stream = Files.walk(dir)) {
+            files = stream
+                    .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
+                    .collect(Collectors.toList());
+        }
         for (Path file : files) {
             Path p = dir.relativize(file);
             String className = p.toString();
