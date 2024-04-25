@@ -26,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -62,10 +61,11 @@ public final class ClassLoaderUtils {
             // we only consider .class files and skip .java files
             List<Path> jarFiles;
             if (Files.isDirectory(path)) {
-                jarFiles =
-                        Files.list(path)
-                                .filter(p -> p.toString().endsWith(".jar"))
-                                .collect(Collectors.toList());
+                try (Stream<Path> stream = Files.list(path)) {
+                    jarFiles =
+                            stream.filter(p -> p.toString().endsWith(".jar"))
+                                    .collect(Collectors.toList());
+                }
             } else {
                 jarFiles = Collections.emptyList();
             }
@@ -111,18 +111,19 @@ public final class ClassLoaderUtils {
             logger.trace("Directory not exists: {}", dir);
             return null;
         }
-        Collection<Path> files =
-                Files.walk(dir)
-                        .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
-                        .collect(Collectors.toList());
-        for (Path file : files) {
-            Path p = dir.relativize(file);
-            String className = p.toString();
-            className = className.substring(0, className.lastIndexOf('.'));
-            className = className.replace(File.separatorChar, '.');
-            T implemented = initClass(cl, type, className);
-            if (implemented != null) {
-                return implemented;
+        try (Stream<Path> stream = Files.walk(dir)) {
+            List<Path> files =
+                    stream.filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
+                            .collect(Collectors.toList());
+            for (Path file : files) {
+                Path p = dir.relativize(file);
+                String className = p.toString();
+                className = className.substring(0, className.lastIndexOf('.'));
+                className = className.replace(File.separatorChar, '.');
+                T implemented = initClass(cl, type, className);
+                if (implemented != null) {
+                    return implemented;
+                }
             }
         }
         return null;

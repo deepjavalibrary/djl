@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "PMD.TestClassWithoutTestCases"})
 public final class CoverageUtils {
@@ -125,20 +126,24 @@ public final class CoverageUtils {
 
         Path classPath = Paths.get(url.toURI());
         if (Files.isDirectory(classPath)) {
-            Collection<Path> files =
-                    Files.walk(classPath)
-                            .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
-                            .collect(Collectors.toList());
-            for (Path file : files) {
-                Path p = classPath.relativize(file);
-                String className = p.toString();
-                className = className.substring(0, className.lastIndexOf('.'));
-                className = className.replace(File.separatorChar, '.');
+            try (Stream<Path> stream = Files.walk(classPath)) {
+                Collection<Path> files =
+                        stream.filter(
+                                        p ->
+                                                Files.isRegularFile(p)
+                                                        && p.toString().endsWith(".class"))
+                                .collect(Collectors.toList());
+                for (Path file : files) {
+                    Path p = classPath.relativize(file);
+                    String className = p.toString();
+                    className = className.substring(0, className.lastIndexOf('.'));
+                    className = className.replace(File.separatorChar, '.');
 
-                try {
-                    classList.add(Class.forName(className, true, cl));
-                } catch (Throwable ignore) {
-                    // ignore
+                    try {
+                        classList.add(Class.forName(className, true, cl));
+                    } catch (Throwable ignore) {
+                        // ignore
+                    }
                 }
             }
         } else if (path.toLowerCase().endsWith(".jar")) {
