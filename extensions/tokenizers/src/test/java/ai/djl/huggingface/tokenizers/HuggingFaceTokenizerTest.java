@@ -42,13 +42,10 @@ public class HuggingFaceTokenizerTest {
         };
 
         try (HuggingFaceTokenizer tokenizer =
-                HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
-                        .optTruncation(false)
-                        .build()) {
-            Assert.assertEquals(tokenizer.getTruncation(), "DO_NOT_TRUNCATE");
-            Assert.assertEquals(tokenizer.getPadding(), "DO_NOT_PAD");
-            Assert.assertEquals(tokenizer.getMaxLength(), -1);
+                HuggingFaceTokenizer.builder().optTokenizerName("bert-base-cased").build()) {
+            Assert.assertEquals(tokenizer.getTruncation(), "LONGEST_FIRST");
+            Assert.assertEquals(tokenizer.getPadding(), "LONGEST");
+            Assert.assertEquals(tokenizer.getMaxLength(), 512);
             Assert.assertEquals(tokenizer.getStride(), 0);
             Assert.assertEquals(tokenizer.getPadToMultipleOf(), 0);
 
@@ -124,7 +121,7 @@ public class HuggingFaceTokenizerTest {
             batch.add("Hi, you all", "I'm fine.");
             Encoding[] encodings = tokenizer.batchEncode(batch);
             Assert.assertEquals(encodings.length, 2);
-            Assert.assertEquals(encodings[0].getIds(), ids);
+            Assert.assertEquals(encodings[0].getIds().length, 12);
         }
 
         Assert.assertThrows(
@@ -251,6 +248,7 @@ public class HuggingFaceTokenizerTest {
         Map<String, String> options = new ConcurrentHashMap<>();
         options.put("tokenizer", "bert-base-cased");
         options.put("truncation", "false");
+        options.put("padding", "false");
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.builder(options).build()) {
             int[] expectedNumberOfIdsNoTruncationNoPadding = new int[] {numRepeats * 2 + 2, 7};
             Encoding[] encodings = tokenizer.batchEncode(inputs);
@@ -261,21 +259,21 @@ public class HuggingFaceTokenizerTest {
         }
 
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
-            int[] expectedSize = new int[] {512, 7};
             Encoding[] encodings = tokenizer.batchEncode(inputs);
-            for (int i = 0; i < encodings.length; ++i) {
-                Assert.assertEquals(encodings[i].getIds().length, expectedSize[i]);
+            for (Encoding encoding : encodings) {
+                Assert.assertEquals(encoding.getIds().length, 512);
             }
         }
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
                         .optTokenizerName("bert-base-cased")
-                        .optPadding(true)
+                        .optPadding(false)
                         .build()) {
+            int[] expectedSize = new int[] {512, 7};
             Encoding[] encodings = tokenizer.batchEncode(inputs);
-            for (Encoding encoding : encodings) {
-                Assert.assertEquals(encoding.getIds().length, 512);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(encodings[i].getIds().length, expectedSize[i]);
             }
         }
     }
@@ -286,20 +284,20 @@ public class HuggingFaceTokenizerTest {
             "Hello, y'all! How are you?", "Today is a sunny day. Good weather I'd say", "I am happy"
         };
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
-            int[] expectedSize = {12, 14, 5};
-            Encoding[] encodings = tokenizer.batchEncode(inputs);
-            for (int i = 0; i < encodings.length; ++i) {
-                Assert.assertEquals(encodings[i].getIds().length, expectedSize[i]);
+            int expectedSize = 14;
+            for (Encoding encoding : tokenizer.batchEncode(inputs)) {
+                Assert.assertEquals(encoding.getIds().length, expectedSize);
             }
         }
 
         Map<String, String> options = new ConcurrentHashMap<>();
         options.put("tokenizer", "bert-base-cased");
-        options.put("padding", "true");
+        options.put("padding", "false");
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.builder(options).build()) {
-            int expectedSize = 14;
-            for (Encoding encoding : tokenizer.batchEncode(inputs)) {
-                Assert.assertEquals(encoding.getIds().length, expectedSize);
+            int[] expectedSize = {12, 14, 5};
+            Encoding[] encodings = tokenizer.batchEncode(inputs);
+            for (int i = 0; i < encodings.length; ++i) {
+                Assert.assertEquals(encodings[i].getIds().length, expectedSize[i]);
             }
         }
 
@@ -347,6 +345,7 @@ public class HuggingFaceTokenizerTest {
                         .optAddSpecialTokens(false)
                         .optWithOverflowingTokens(true)
                         .optTruncation(true)
+                        .optPadding(false)
                         .optMaxLength(3)
                         .optStride(1)
                         .build()) {
@@ -370,6 +369,7 @@ public class HuggingFaceTokenizerTest {
                         .optAddSpecialTokens(false)
                         .optWithOverflowingTokens(true)
                         .optTruncation(true)
+                        .optPadding(false)
                         .optMaxLength(8)
                         .optStride(2)
                         .build()) {
@@ -498,7 +498,10 @@ public class HuggingFaceTokenizerTest {
                     "I am Happy!"
                 };
         try (HuggingFaceTokenizer tokenizer =
-                HuggingFaceTokenizer.builder().optTokenizerName("bert-base-cased").build()) {
+                HuggingFaceTokenizer.builder()
+                        .optTokenizerName("bert-base-cased")
+                        .optPadding(false)
+                        .build()) {
 
             // default tokenizer with special tokens included
             Encoding[] encodings = tokenizer.batchEncode(inputs);
