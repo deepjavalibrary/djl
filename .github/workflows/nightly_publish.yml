@@ -38,13 +38,15 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         run: brew install libomp
       - name: Build with Gradle
-        run: ./gradlew -Dnightly=true build :jacoco:testCodeCoverageReport
+        run: ./gradlew -Dnightly=true build :jacoco:testCodeCoverageReport --stacktrace
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
         with:
           name: reports
-          path: ${{ github.workspace }}/**/build/reports/**/*
+          path: |
+            ${{ github.workspace }}/**/build/reports/**/*
+            !${{ github.workspace }}/**/build/reports/jacoco/*
 
   test-pytorch:
     if: github.repository == 'deepjavalibrary/djl'
