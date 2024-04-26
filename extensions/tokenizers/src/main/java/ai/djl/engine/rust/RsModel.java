@@ -49,6 +49,14 @@ public class RsModel extends BaseModel {
                     "Model directory doesn't exist: " + modelPath.toAbsolutePath());
         }
         modelDir = modelPath.toAbsolutePath();
+        Path config = modelDir.resolve("config.json");
+        if (!Files.isRegularFile(config)) {
+            throw new FileNotFoundException("config.json file not found");
+        }
+        Path file = modelDir.resolve("model.safetensors");
+        if (!Files.isRegularFile(file)) {
+            throw new FileNotFoundException("model.safetensors file not found");
+        }
         long handle = RustLibrary.loadModel(modelDir.toString(), dataType.ordinal());
         block = new RsSymbolBlock((RsNDManager) manager, handle);
     }

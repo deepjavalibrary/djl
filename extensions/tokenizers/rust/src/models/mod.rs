@@ -4,7 +4,7 @@ mod distilbert;
 use crate::ndarray::as_data_type;
 use crate::{cast_handle, to_handle, to_string_array};
 use bert::{BertConfig, BertModel};
-use candle_core::DType;
+use candle_core::{DType, Error};
 use candle_core::{Device, Result, Tensor};
 use candle_nn::VarBuilder;
 use distilbert::{DistilBertConfig, DistilBertModel};
@@ -43,7 +43,10 @@ fn load_model<'local>(
 
     // Load config
     let config: String = std::fs::read_to_string(model_path.join("config.json"))?;
-    let config: Config = serde_json::from_str(&config).unwrap();
+    let config: Config = match serde_json::from_str(&config) {
+        Ok(conf) => conf,
+        Err(err) => return Err(Error::wrap(err)),
+    };
 
     // Get candle device
     let device = if candle_core::utils::cuda_is_available() {
@@ -55,7 +58,7 @@ fn load_model<'local>(
     }?;
 
     // Get candle dtype
-    let dtype = as_data_type(dtype).unwrap();
+    let dtype = as_data_type(dtype)?;
 
     let safetensors_path = model_path.join("model.safetensors");
     let vb = if safetensors_path.exists() {

@@ -295,22 +295,30 @@ fn as_device<'local>(env: &mut JNIEnv<'local>, device_type: JString, _: usize) -
     match device_type.as_str() {
         "cpu" => Ok(Device::Cpu),
         "gpu" => {
-            let mut device = CUDA_DEVICE.lock().unwrap();
-            if let Some(device) = device.as_ref() {
-                return Ok(device.clone());
-            };
-            let d = Device::new_cuda(0).unwrap();
-            *device = Some(d.clone());
-            Ok(d)
+            if candle_core::utils::cuda_is_available() {
+                let mut device = CUDA_DEVICE.lock().unwrap();
+                if let Some(device) = device.as_ref() {
+                    return Ok(device.clone());
+                };
+                let d = Device::new_cuda(0).unwrap();
+                *device = Some(d.clone());
+                Ok(d)
+            } else {
+                Err(Error::Msg(String::from("CUDA is not available.")))
+            }
         }
         "mps" => {
-            let mut device = METAL_DEVICE.lock().unwrap();
-            if let Some(device) = device.as_ref() {
-                return Ok(device.clone());
-            };
-            let d = Device::new_metal(0).unwrap();
-            *device = Some(d.clone());
-            Ok(d)
+            if candle_core::utils::metal_is_available() {
+                let mut device = METAL_DEVICE.lock().unwrap();
+                if let Some(device) = device.as_ref() {
+                    return Ok(device.clone());
+                };
+                let d = Device::new_metal(0).unwrap();
+                *device = Some(d.clone());
+                Ok(d)
+            } else {
+                Err(Error::Msg(String::from("metal is not available.")))
+            }
         }
         _ => Err(Error::Msg(format!("Invalid device type: {}", device_type))),
     }
