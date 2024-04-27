@@ -16,10 +16,9 @@ import ai.djl.Application;
 import ai.djl.Model;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
-import ai.djl.modality.cv.translator.ImageClassificationTranslator;
-import ai.djl.modality.cv.translator.ImageServingTranslator;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Pair;
+import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +28,7 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,32 +55,33 @@ public class ServingTranslatorFactory implements TranslatorFactory {
 
         Path modelDir = model.getModelPath();
         String factoryClass = ArgumentsUtil.stringValue(arguments, "translatorFactory");
-        if (factoryClass != null && !factoryClass.isEmpty()) {
-            TranslatorFactory factory = loadTranslatorFactory(factoryClass);
-            if (factory != null && factory.isSupported(input, output)) {
-                logger.info("Using TranslatorFactory: {}", factory.getClass().getName());
-                return factory.newInstance(input, output, model, arguments);
+        if (factoryClass != null) {
+            Translator<Input, Output> translator =
+                    getServingTranslator(factoryClass, model, arguments);
+            if (translator != null) {
+                return (Translator<I, O>) translator;
             }
+            throw new TranslateException("Failed to load translatorFactory: " + factoryClass);
         }
 
         String className = (String) arguments.get("translator");
-
         Path libPath = modelDir.resolve("libs");
         if (!Files.isDirectory(libPath)) {
             libPath = modelDir.resolve("lib");
             if (!Files.isDirectory(libPath) && className == null) {
-                return (Translator<I, O>) loadDefaultTranslator(arguments);
+                return (Translator<I, O>) loadDefaultTranslator(model, arguments);
             }
         }
-        ServingTranslator translator = findTranslator(libPath, className);
-        if (translator != null) {
-            translator.setArguments(arguments);
-            logger.info("Using translator: {}", translator.getClass().getName());
-            return (Translator<I, O>) translator;
+        ServingTranslator servingTranslator = findTranslator(libPath, className);
+        if (servingTranslator != null) {
+            servingTranslator.setArguments(arguments);
+            logger.info("Using translator: {}", servingTranslator.getClass().getName());
+            return (Translator<I, O>) servingTranslator;
         } else if (className != null) {
             throw new TranslateException("Failed to load translator: " + className);
         }
-        return (Translator<I, O>) loadDefaultTranslator(arguments);
+
+        return (Translator<I, O>) loadDefaultTranslator(model, arguments);
     }
 
     private ServingTranslator findTranslator(Path path, String className) {
@@ -101,19 +102,56 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         return null;
     }
 
-    private Translator<Input, Output> loadDefaultTranslator(Map<String, ?> arguments) {
-        String appName = ArgumentsUtil.stringValue(arguments, "application");
-        if (appName != null) {
-            Application application = Application.of(appName);
-            if (application == Application.CV.IMAGE_CLASSIFICATION) {
-                return getImageClassificationTranslator(arguments);
-            }
+    private Translator<Input, Output> loadDefaultTranslator(Model model, Map<String, ?> arguments)
+            throws TranslateException {
+        String factoryClass = detectTranslatorFactory(arguments);
+        Translator<Input, Output> translator = getServingTranslator(factoryClass, model, arguments);
+        if (translator != null) {
+            return translator;
         }
+
         NoopServingTranslatorFactory factory = new NoopServingTranslatorFactory();
         return factory.newInstance(Input.class, Output.class, null, arguments);
     }
 
-    private Translator<Input, Output> getImageClassificationTranslator(Map<String, ?> arguments) {
-        return new ImageServingTranslator(ImageClassificationTranslator.builder(arguments).build());
+    private String detectTranslatorFactory(Map<String, ?> arguments) {
+        Application application;
+        String app = ArgumentsUtil.stringValue(arguments, "application");
+        if (app != null) {
+            application = Application.of(app);
+        } else {
+            String task = Utils.getEnvOrSystemProperty("HF_TASK");
+            task = ArgumentsUtil.stringValue(arguments, "task", task);
+            if (task != null) {
+                task = task.replace("-", "_").toLowerCase(Locale.ROOT);
+                application = Application.of(task);
+            } else {
+                application = Application.UNDEFINED;
+            }
+        }
+        if (application == Application.CV.IMAGE_CLASSIFICATION) {
+            return "ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory";
+        } else if (application == Application.NLP.FILL_MASK) {
+            return "ai.djl.huggingface.translator.FillMaskTranslatorFactory";
+        } else if (application == Application.NLP.QUESTION_ANSWER) {
+            return "ai.djl.huggingface.translator.QuestionAnsweringTranslatorFactory";
+        } else if (application == Application.NLP.TEXT_CLASSIFICATION) {
+            return "ai.djl.huggingface.translator.TextClassificationTranslatorFactory";
+        } else if (application == Application.NLP.TEXT_EMBEDDING) {
+            return "ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory";
+        } else if (application == Application.NLP.TOKEN_CLASSIFICATION) {
+            return "ai.djl.huggingface.translator.TokenClassificationTranslatorFactory";
+        }
+        return null;
+    }
+
+    private Translator<Input, Output> getServingTranslator(
+            String factoryClass, Model model, Map<String, ?> arguments) throws TranslateException {
+        TranslatorFactory factory = loadTranslatorFactory(factoryClass);
+        if (factory != null && factory.isSupported(Input.class, Output.class)) {
+            logger.info("Using TranslatorFactory: {}", factoryClass);
+            return factory.newInstance(Input.class, Output.class, model, arguments);
+        }
+        return null;
     }
 }
