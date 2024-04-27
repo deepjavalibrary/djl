@@ -13,6 +13,7 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
+import ai.djl.examples.inference.cv.BigGAN;
 import ai.djl.modality.cv.Image;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;

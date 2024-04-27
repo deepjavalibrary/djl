@@ -13,7 +13,6 @@
 package ai.djl.examples.inference.nlp;
 
 import ai.djl.MalformedModelException;
-import ai.djl.examples.inference.ImageClassification;
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.inference.Predictor;
@@ -38,7 +37,7 @@ import java.io.IOException;
 
 public final class TextGeneration {
 
-    private static final Logger logger = LoggerFactory.getLogger(ImageClassification.class);
+    private static final Logger logger = LoggerFactory.getLogger(TextGeneration.class);
 
     private TextGeneration() {}
 

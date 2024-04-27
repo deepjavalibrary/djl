@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
@@ -40,7 +40,7 @@ public final class Yolov8Detection {
     private Yolov8Detection() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        DetectedObjects detection = Yolov8Detection.predict();
+        DetectedObjects detection = predict();
         logger.info("{}", detection);
     }
 
@@ -48,6 +48,8 @@ public final class Yolov8Detection {
         Path imgPath = Paths.get("src/test/resources/yolov8_test.jpg");
         Image img = ImageFactory.getInstance().fromFile(imgPath);
 
+        // Use DJL OnnxRuntime model zoo model, model can be found:
+        // https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/onnxruntime/yolov8n/0.0.1/yolov8n.zip
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)

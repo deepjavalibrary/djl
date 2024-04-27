@@ -6,7 +6,7 @@ In this example, you learn how to implement inference code with Deep Java Librar
 
 The following is the semantic segmentation example source code:
 
-[SemanticSegmentation.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/SemanticSegmentation.java).
+[SemanticSegmentation.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/cv/SemanticSegmentation.java).
 
 
 ## Setup guide
@@ -24,7 +24,7 @@ You can find the image used in this example in project test resource folder: `sr
 
 ```sh
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.SemanticSegmentation
+./gradlew run -Dmain=ai.djl.examples.inference.cv.SemanticSegmentation
 ```
 
 This should produce the following output
@@ -57,7 +57,7 @@ Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
 
 ```sh
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.InstanceSegmentation
+./gradlew run -Dmain=ai.djl.examples.inference.cv.SemanticSegmentation
 ```
 
 This should produce the following output

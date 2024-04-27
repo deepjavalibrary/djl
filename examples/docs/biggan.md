@@ -5,7 +5,7 @@ They consist of 2 neural networks that act as adversaries, the Generator and the
 
 In this example, you will learn how to use a [BigGAN](https://deepmind.com/research/open-source/biggan) generator to create images, using the generator directly from the [ModelZoo](../../docs/model-zoo.md).
 
-The source code for this example can be found at [BigGAN.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/BigGAN.java).
+The source code for this example can be found at [BigGAN.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/cv/BigGAN.java).
 
 ## Setup guide
 
@@ -30,7 +30,7 @@ Use the following commands to run the project:
 
 ```sh
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.BigGAN
+./gradlew run -Dmain=ai.djl.examples.inference.cv.BigGAN
 ```
 
 ### Output

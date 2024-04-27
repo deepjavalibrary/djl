@@ -22,7 +22,7 @@ dependencies {
 }
 
 application {
-    mainClass = System.getProperty("main", "ai.djl.examples.inference.ObjectDetection")
+    mainClass = System.getProperty("main", "ai.djl.examples.inference.cv.ObjectDetection")
 }
 
 run {

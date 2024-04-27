@@ -4,7 +4,7 @@ Pose estimation is a computer vision technique for determining the pose of an ob
 
 In this example, you learn how to implement inference code with a [ModelZoo model](../../docs/model-zoo.md) to detect people and their joints in an image.
 
-The source code can be found at [PoseEstimation.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/PoseEstimation.java).
+The source code can be found at [PoseEstimation.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/cv/PoseEstimation.java).
 
 ## Setup guide
 
@@ -22,7 +22,7 @@ Use the following command to run the project:
 
 ```sh
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.PoseEstimation
+./gradlew run -Dmain=ai.djl.examples.inference.cv.PoseEstimation
 ```
 
 Your output should look like the following:

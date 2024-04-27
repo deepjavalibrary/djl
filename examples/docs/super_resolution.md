@@ -3,7 +3,7 @@
 [Generative Adversarial Networks](https://en.wikipedia.org/wiki/Generative_adversarial_network) (GANs) are a branch of deep learning used for generative modeling. 
 They consist of 2 neural networks that act as adversaries, the Generator and the Discriminator. The Generator is assigned to generate fake images that look real, and the Discriminator needs to correctly identify the fake ones.
 
-In this example, you will learn how to use a [ESRGAN](https://deepmind.com/research/open-source/biggan) generator to upscale images x4 better than any upscaling algorithm like bicubic or bilinear, using the [generator](https://tfhub.dev/captain-pool/esrgan-tf2/1) available on TensorFlow Hub. ESRGAN is short for Enhanced Super-Resolution Generative Adversarial Networks.
+In this example, you will learn how to use a [ESRGAN](https://esrgan.readthedocs.io/en/latest/) generator to upscale images x4 better than any upscaling algorithm like bicubic or bilinear, using the [generator](https://tfhub.dev/captain-pool/esrgan-tf2/1) available on TensorFlow Hub. ESRGAN is short for Enhanced Super-Resolution Generative Adversarial Networks.
 
 The source code for this example can be found in the [examples/sr](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/sr/) package.
 

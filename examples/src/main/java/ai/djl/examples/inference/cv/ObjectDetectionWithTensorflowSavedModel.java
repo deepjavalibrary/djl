@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
 import ai.djl.Application;
 import ai.djl.ModelException;
@@ -71,7 +71,7 @@ public final class ObjectDetectionWithTensorflowSavedModel {
     private ObjectDetectionWithTensorflowSavedModel() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        DetectedObjects detection = ObjectDetectionWithTensorflowSavedModel.predict();
+        DetectedObjects detection = predict();
         logger.info("{}", detection);
     }
 

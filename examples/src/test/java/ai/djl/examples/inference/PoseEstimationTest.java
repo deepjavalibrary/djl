@@ -13,6 +13,7 @@
 package ai.djl.examples.inference;
 
 import ai.djl.ModelException;
+import ai.djl.examples.inference.cv.PoseEstimation;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;

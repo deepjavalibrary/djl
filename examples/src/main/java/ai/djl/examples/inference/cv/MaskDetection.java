@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,14 +10,14 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
-import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.translator.YoloV5TranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
@@ -32,55 +32,61 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * An example of inference using an instance segmentation model.
+ * An example of inference using an object detection model.
  *
  * <p>See this <a
- * href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/instance_segmentation.md">doc</a>
+ * href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/mask_detection.md">doc</a>
  * for information about this example.
  */
-public final class InstanceSegmentation {
+public final class MaskDetection {
 
-    private static final Logger logger = LoggerFactory.getLogger(InstanceSegmentation.class);
+    private static final Logger logger = LoggerFactory.getLogger(MaskDetection.class);
 
-    private InstanceSegmentation() {}
+    private MaskDetection() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        DetectedObjects detection = InstanceSegmentation.predict();
+        DetectedObjects detection = MaskDetection.predict();
         logger.info("{}", detection);
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        Path imageFile = Paths.get("src/test/resources/segmentation.jpg");
-        Image img = ImageFactory.getInstance().fromFile(imageFile);
+        // To feed in local image, use ImageFactory.getInstance().fromFile(...)
+        String imageUrl = "https://resources.djl.ai/images/face_mask_detection/face_mask.png";
+        Image img = ImageFactory.getInstance().fromUrl(imageUrl);
 
+        // modelUrl can be replaced to local onnx model file
+        String modelUrl = "https://resources.djl.ai/demo/onnxruntime/face_mask_detection.zip";
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
-                        .optApplication(Application.CV.INSTANCE_SEGMENTATION)
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optFilter("backbone", "resnet18")
-                        .optFilter("flavor", "v1b")
-                        .optFilter("dataset", "coco")
+                        .optModelUrls(modelUrl)
+                        .optEngine("OnnxRuntime")
+                        .optTranslatorFactory(new YoloV5TranslatorFactory())
                         .optProgress(new ProgressBar())
+                        .optArgument("optApplyRatio", true) // post process
+                        .optArgument("rescale", true) // post process
                         .build();
 
         try (ZooModel<Image, DetectedObjects> model = criteria.loadModel()) {
             try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
                 DetectedObjects detection = predictor.predict(img);
-                saveBoundingBoxImage(img, detection);
+                String outputDir = "build/output";
+                saveBoundingBoxImage(img, detection, outputDir);
                 return detection;
             }
         }
     }
 
-    private static void saveBoundingBoxImage(Image img, DetectedObjects detection)
+    private static void saveBoundingBoxImage(Image img, DetectedObjects detection, String outputDir)
             throws IOException {
-        Path outputDir = Paths.get("build/output");
-        Files.createDirectories(outputDir);
+        Path outputPath = Paths.get(outputDir);
+        Files.createDirectories(outputPath);
 
         img.drawBoundingBoxes(detection);
 
-        Path imagePath = outputDir.resolve("instances.png");
+        Path imagePath = outputPath.resolve("face_mask_result.png");
+        // OpenJDK can't save jpg with alpha channel
         img.save(Files.newOutputStream(imagePath), "png");
-        logger.info("Segmentation result image has been saved in: {}", imagePath);
+        logger.info("Detected objects image has been saved in: {}", imagePath);
     }
 }

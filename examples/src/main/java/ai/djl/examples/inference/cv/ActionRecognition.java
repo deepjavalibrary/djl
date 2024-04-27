@@ -10,9 +10,8 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
-import ai.djl.Application;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -44,7 +43,7 @@ public final class ActionRecognition {
     private ActionRecognition() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        Classifications classification = ActionRecognition.predict();
+        Classifications classification = predict();
         logger.info("{}", classification);
     }
 
@@ -52,20 +51,19 @@ public final class ActionRecognition {
         Path imageFile = Paths.get("src/test/resources/action_discus_throw.png");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
+        // Use DJL MXNet model zoo model
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
-                        .optApplication(Application.CV.ACTION_RECOGNITION)
                         .setTypes(Image.class, Classifications.class)
-                        .optFilter("backbone", "inceptionv3")
-                        .optFilter("dataset", "ucf101")
+                        .optModelUrls(
+                                "djl://ai.djl.mxnet/action_recognition/0.0.1/inceptionv3_ucf101")
                         .optEngine("MXNet")
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<Image, Classifications> inception = criteria.loadModel()) {
-            try (Predictor<Image, Classifications> action = inception.newPredictor()) {
-                return action.predict(img);
-            }
+        try (ZooModel<Image, Classifications> inception = criteria.loadModel();
+                Predictor<Image, Classifications> action = inception.newPredictor()) {
+            return action.predict(img);
         }
     }
 }

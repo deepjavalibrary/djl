@@ -6,7 +6,7 @@ In this example, you learn how to implement inference code with Deep Java Librar
 
 The following is the instance segmentation example source code:
 
-[InstanceSegmentation.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/InstanceSegmentation.java).
+[InstanceSegmentation.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/cv/InstanceSegmentation.java).
 
 
 ## Setup guide
@@ -24,7 +24,7 @@ You can find the image used in this example in project test resource folder: `sr
 
 ```sh
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.InstanceSegmentation
+./gradlew run -Dmain=ai.djl.examples.inference.cv.InstanceSegmentation
 ```
 
 This should produce the following output

@@ -4,7 +4,7 @@ Image classification refers to the task of extracting information classes from a
 
 In this example, you learn how to implement inference code with Deep Java Library (DJL) to recognize handwritten digits from an image.
 
-The image classification example code can be found at [ImageClassification.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/ImageClassification.java).
+The image classification example code can be found at [ImageClassification.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/cv/ImageClassification.java).
 
 You can also use the [Jupyter notebook tutorial](http://docs.djl.ai/docs/demos/jupyter/tutorial/03_image_classification_with_your_model.html).
 The Jupyter notebook explains the key concepts in detail.
@@ -32,7 +32,7 @@ Run the project by using the following command:
 
 ```sh
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.ImageClassification
+./gradlew run -Dmain=ai.djl.examples.inference.cv.ImageClassification
 ```
 
 Your output should look like the following:
