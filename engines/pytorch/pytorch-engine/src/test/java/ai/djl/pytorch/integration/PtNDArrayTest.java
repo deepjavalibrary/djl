@@ -45,4 +45,145 @@ public class PtNDArrayTest {
             Assert.assertThrows(EngineException.class, array::toByteArray);
         }
     }
+
+    @Test
+    public static void testPtTensorToLongArray() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            // Initialize a 10x10 array with values
+            final long[][] data = new long[10][10];
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    data[i][j] = i * 10 + j;
+                }
+            }
+
+            // Create an NDArray from the 2D long array
+            final NDArray array = manager.create(data);
+
+            // Convert the NDArray to a 1D long array
+            final long[] result = array.toLongArray();
+
+            // Assert that the original data matches the data in the NDArray
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    Assert.assertEquals(
+                            result[i * data.length + j],
+                            data[i][j],
+                            "The data in the NDArray does not match the original data.");
+                }
+            }
+        }
+    }
+
+    @Test
+    public static void testPtTensorToDoubleArray() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            final double[][] data = new double[10][10];
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    data[i][j] = i * 10.0 + j;
+                }
+            }
+            final NDArray array = manager.create(data);
+            final double[] result = array.toDoubleArray();
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    Assert.assertEquals(
+                            result[i * data.length + j],
+                            data[i][j],
+                            0.0001,
+                            "The data in the NDArray does not match the original data.");
+                }
+            }
+        }
+    }
+
+    @Test
+    public static void testPtTensorToFloatArray() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            final float[][] data = new float[10][10];
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    data[i][j] = (float) (i * 10.0 + j);
+                }
+            }
+            final NDArray array = manager.create(data);
+            final float[] result = array.toFloatArray();
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    Assert.assertEquals(
+                            result[i * data.length + j],
+                            data[i][j],
+                            0.0001,
+                            "The data in the NDArray does not match the original data.");
+                }
+            }
+        }
+    }
+
+    @Test
+    public static void testPtTensorToIntArray() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            final int[][] data = new int[10][10];
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    data[i][j] = i * 10 + j;
+                }
+            }
+            final NDArray array = manager.create(data);
+            final int[] result = array.toIntArray();
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    Assert.assertEquals(
+                            result[i * data.length + j],
+                            data[i][j],
+                            "The data in the NDArray does not match the original data.");
+                }
+            }
+        }
+    }
+
+    @Test
+    public static void testPtTensorToByteArray() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            final byte[][] data = new byte[10][10];
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    data[i][j] = (byte) (i * 10 + j);
+                }
+            }
+            final NDArray array = manager.create(data);
+            final byte[] result = array.toByteArray();
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    Assert.assertEquals(
+                            result[i * data.length + j],
+                            data[i][j],
+                            "The data in the NDArray does not match the original data.");
+                }
+            }
+        }
+    }
+
+    @Test
+    public static void testPtTensorToBooleanArray() {
+        try (NDManager manager = NDManager.newBaseManager()) {
+            final boolean[][] data = new boolean[10][10];
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    data[i][j] = (i * 10 + j) % 2 == 0; // Alternately setting true and false
+                }
+            }
+            final NDArray array = manager.create(data);
+            final boolean[] result = array.toBooleanArray();
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data[i].length; j++) {
+                    Assert.assertEquals(
+                            result[i * data.length + j],
+                            data[i][j],
+                            "The data in the NDArray does not match the original data.");
+                }
+            }
+        }
+    }
 }

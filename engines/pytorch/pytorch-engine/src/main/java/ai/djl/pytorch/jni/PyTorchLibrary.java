@@ -50,6 +50,12 @@ final class PyTorchLibrary {
 
     native byte[] torchDataPtr(long handle);
 
+    native ByteBuffer torchDirectByteBuffer(long handle);
+
+    native boolean torchIsContiguous(long handle);
+
+    native long torchToContiguous(long handle);
+
     native int torchDType(long handle);
 
     native int[] torchDevice(long handle);

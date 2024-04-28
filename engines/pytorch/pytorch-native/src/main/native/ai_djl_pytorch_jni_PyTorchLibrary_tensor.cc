@@ -319,6 +319,54 @@ JNIEXPORT jbyteArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDataPtr
   API_END_RETURN()
 }
 
+JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDirectByteBuffer(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  // Check if the tensor is sparse or optimized by MKL-DNN, if so, throw an exception
+  if (tensor_ptr->is_sparse() || tensor_ptr->is_mkldnn()) {
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, "torchDirectByteBuffer() is not supported for sparse or MKL-DNN tensors");
+    return nullptr;
+  }
+  // Check if the tensor is contiguous, if not, throw an exception
+  if (!tensor_ptr->is_contiguous()) {
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, "torchDirectByteBuffer() requires the tensor to be contiguous");
+    return nullptr;
+  }
+  size_t nbytes = tensor_ptr->nbytes();
+  // todo indeed, we can remove it in future!
+  if (nbytes > 0x7fffffff) {
+    env->ThrowNew(ENGINE_EXCEPTION_CLASS, "torchDirectByteBuffer() is not supported for large tensor");
+    return nullptr;
+  }
+  // Use tensor.data_ptr() to obtain the data pointer, and create a direct ByteBuffer using NewDirectByteBuffer
+  void* data_ptr = tensor_ptr->data_ptr();
+  jobject directBuffer = env->NewDirectByteBuffer(data_ptr, nbytes);
+  return directBuffer;
+  API_END_RETURN()
+}
+
+JNIEXPORT jboolean JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIsContiguous(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  bool is_contiguous = tensor_ptr->is_contiguous();
+  return static_cast<jboolean>(is_contiguous);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchToContiguous(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  // sparse and mkldnn are required to be converted to dense to access data ptr
+  auto tensor = (tensor_ptr->is_sparse() || tensor_ptr->is_mkldnn()) ? tensor_ptr->to_dense() : *tensor_ptr;
+  tensor = (tensor.is_contiguous()) ? tensor : tensor.contiguous();
+  const auto* result_ptr = new torch::Tensor(tensor);
+  return reinterpret_cast<jlong>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDeleteTensor(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()

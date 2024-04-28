@@ -22,10 +22,17 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.pytorch.jni.JniUtils;
+import ai.djl.util.Float16Utils;
 import ai.djl.util.NativeResource;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -221,6 +228,369 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public NDArray stopGradient() {
         return JniUtils.detachGradient(this);
+    }
+
+    /**
+     * Converts this {@code NDArray} to a double array.
+     *
+     * @return a double array
+     * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
+     */
+    @Override
+    public double[] toDoubleArray() {
+        if (getDataType() != DataType.FLOAT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required double" + " Actual " + getDataType());
+        }
+
+        if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+            try (final PtNDArray ptNDArray = toContiguous()) {
+                return toDoubleArray(ptNDArray);
+            }
+        } else {
+            return toDoubleArray(this);
+        }
+    }
+
+    private double[] toDoubleArray(PtNDArray array) {
+        DoubleBuffer db = array.toDirectByteBuffer().asDoubleBuffer();
+        double[] ret = new double[db.remaining()];
+        db.get(ret);
+        return ret;
+    }
+
+    /**
+     * Converts this {@code NDArray} to a float array.
+     *
+     * @return a float array
+     * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
+     */
+    @Override
+    public float[] toFloatArray() {
+        if (getDataType() == DataType.FLOAT16) {
+            if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+                try (final PtNDArray ptNDArray = toContiguous()) {
+                    return Float16Utils.fromByteBuffer(ptNDArray.toDirectByteBuffer());
+                }
+            } else {
+                return Float16Utils.fromByteBuffer(toDirectByteBuffer());
+            }
+        } else if (getDataType() != DataType.FLOAT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required float, Actual " + getDataType());
+        }
+
+        if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+            try (final PtNDArray ptNDArray = toContiguous()) {
+                return toFloatArray(ptNDArray);
+            }
+        } else {
+            return toFloatArray(this);
+        }
+    }
+
+    private float[] toFloatArray(PtNDArray array) {
+        FloatBuffer db = array.toDirectByteBuffer().asFloatBuffer();
+        float[] ret = new float[db.remaining()];
+        db.get(ret);
+        return ret;
+    }
+
+    /**
+     * Converts this {@code NDArray} to an short array.
+     *
+     * @return an int array
+     * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
+     */
+    @Override
+    public short[] toShortArray() {
+        if (getDataType() != DataType.INT16) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required int" + " Actual " + getDataType());
+        }
+
+        if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+            try (final PtNDArray ptNDArray = toContiguous()) {
+                return toShortArray(ptNDArray);
+            }
+        } else {
+            return toShortArray(this);
+        }
+    }
+
+    private short[] toShortArray(PtNDArray array) {
+        ShortBuffer db = array.toDirectByteBuffer().asShortBuffer();
+        short[] ret = new short[db.remaining()];
+        db.get(ret);
+        return ret;
+    }
+
+    /**
+     * Converts this {@code NDArray} to an short array.
+     *
+     * @return an int array
+     * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
+     */
+    @Override
+    public int[] toUnsignedShortArray() {
+        if (getDataType() != DataType.UINT16) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required int" + " Actual " + getDataType());
+        }
+
+        if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+            try (final PtNDArray ptNDArray = toContiguous()) {
+                return toUnsignedShortArray(ptNDArray);
+            }
+        } else {
+            return toUnsignedShortArray(this);
+        }
+    }
+
+    private int[] toUnsignedShortArray(PtNDArray array) {
+        ShortBuffer db = array.toDirectByteBuffer().asShortBuffer();
+        int[] ret = new int[db.remaining()];
+        for (int i = 0; i < ret.length; ++i) {
+            ret[i] = db.get() & 0xffff;
+        }
+        return ret;
+    }
+
+    /**
+     * Converts this {@code NDArray} to an int array.
+     *
+     * @return an int array
+     * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
+     */
+    @Override
+    public int[] toIntArray() {
+        DataType dType = getDataType();
+        if (dType != DataType.INT32 && dType != DataType.UINT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required int" + " Actual " + getDataType());
+        }
+
+        if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+            try (final PtNDArray ptNDArray = toContiguous()) {
+                return toIntArray(ptNDArray);
+            }
+        } else {
+            return toIntArray(this);
+        }
+    }
+
+    private int[] toIntArray(PtNDArray array) {
+        IntBuffer ib = array.toDirectByteBuffer().asIntBuffer();
+        int[] ret = new int[ib.remaining()];
+        ib.get(ret);
+        return ret;
+    }
+
+    /**
+     * Converts this {@code NDArray} to an unsigned int array.
+     *
+     * @return a long array
+     * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
+     */
+    @Override
+    public long[] toUnsignedIntArray() {
+        if (getDataType() != DataType.UINT32) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required int" + " Actual " + getDataType());
+        }
+
+        if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+            try (final PtNDArray ptNDArray = toContiguous()) {
+                return toUnsignedIntArray(ptNDArray);
+            }
+        } else {
+            return toUnsignedIntArray(this);
+        }
+    }
+
+    private long[] toUnsignedIntArray(PtNDArray array) {
+        IntBuffer ib = array.toDirectByteBuffer().asIntBuffer();
+        long[] ret = new long[ib.remaining()];
+        for (int i = 0; i < ret.length; ++i) {
+            ret[i] = ib.get() & 0X00000000FFFFFFFFL;
+        }
+        return ret;
+    }
+
+    /**
+     * Converts this {@code NDArray} to a long array.
+     *
+     * @return a long array
+     * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
+     */
+    @Override
+    public long[] toLongArray() {
+        if (getDataType() != DataType.INT64) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required long" + " Actual " + getDataType());
+        }
+
+        if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+            try (final PtNDArray ptNDArray = toContiguous()) {
+                return toLongArray(ptNDArray);
+            }
+        } else {
+            return toLongArray(this);
+        }
+    }
+
+    private long[] toLongArray(PtNDArray array) {
+        LongBuffer lb = array.toDirectByteBuffer().asLongBuffer();
+        long[] ret = new long[lb.remaining()];
+        lb.get(ret);
+        return ret;
+    }
+
+    /**
+     * Converts this {@code NDArray} to a byte array.
+     *
+     * @return a byte array
+     * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
+     */
+    @Override
+    public byte[] toByteArray() {
+        if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+            try (final PtNDArray ptNDArray = toContiguous()) {
+                return toByteArray(ptNDArray);
+            }
+        } else {
+            return toByteArray(this);
+        }
+    }
+
+    private byte[] toByteArray(PtNDArray array) {
+        ByteBuffer bb = array.toDirectByteBuffer();
+        byte[] buf = new byte[bb.remaining()];
+        bb.get(buf);
+        return buf;
+    }
+
+    /**
+     * Converts this {@code NDArray} to a uint8 array.
+     *
+     * @return a uint8 array
+     * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
+     */
+    @Override
+    public int[] toUint8Array() {
+        if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+            try (final PtNDArray ptNDArray = toContiguous()) {
+                return toUint8Array(ptNDArray);
+            }
+        } else {
+            return toUint8Array(this);
+        }
+    }
+
+    private int[] toUint8Array(PtNDArray array) {
+        ByteBuffer bb = array.toDirectByteBuffer();
+        int[] buf = new int[bb.remaining()];
+        for (int i = 0; i < buf.length; ++i) {
+            buf[i] = bb.get() & 0xff;
+        }
+        return buf;
+    }
+
+    /**
+     * Converts this {@code NDArray} to a boolean array.
+     *
+     * @return a boolean array
+     * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
+     */
+    @Override
+    public boolean[] toBooleanArray() {
+        if (getDataType() != DataType.BOOLEAN) {
+            throw new IllegalStateException(
+                    "DataType mismatch, Required boolean" + " Actual " + getDataType());
+        }
+
+        if (isSparse() || JniUtils.getLayout(this) == 2 || !isContiguous()) {
+            try (final PtNDArray ptNDArray = toContiguous()) {
+                return toBooleanArray(ptNDArray);
+            }
+        } else {
+            return toBooleanArray(this);
+        }
+    }
+
+    private boolean[] toBooleanArray(PtNDArray array) {
+        ByteBuffer bb = array.toDirectByteBuffer();
+        boolean[] ret = new boolean[bb.remaining()];
+        for (int i = 0; i < ret.length; ++i) {
+            ret[i] = bb.get() != 0;
+        }
+        return ret;
+    }
+
+    private ByteBuffer toDirectByteBuffer() {
+        // Check if the tensor's data type is STRING, if so, throw an exception
+        if (getDataType() == DataType.STRING) {
+            throw new UnsupportedOperationException(
+                    "toDirectByteBuffer is not supported for String tensor.");
+        }
+        // Check if the tensor is sparse, if so, throw an exception
+        if (isSparse()) {
+            throw new UnsupportedOperationException(
+                    "toDirectByteBuffer is not supported for sparse tensors.");
+        }
+        // Check if the tensor is not contiguous, if so, throw an exception
+        if (!isContiguous()) {
+            throw new UnsupportedOperationException(
+                    "toDirectByteBuffer requires the tensor to be contiguous.");
+        }
+        // Obtain a direct ByteBuffer from the tensor, set it to read-only, and ensure it uses the
+        // native byte order
+        return JniUtils.getDirectByteBuffer(this).asReadOnlyBuffer().order(ByteOrder.nativeOrder());
+    }
+
+    /**
+     * Checks if the current {@code NDArray} is contiguous.
+     *
+     * <p>If the data type of the {@code NDArray} is a string ({@code DataType.STRING}), this
+     * operation is not supported, and an {@code UnsupportedOperationException} exception is thrown.
+     *
+     * <p>For non-string types of {@code NDArray}, it calls the {@code JniUtils.isContiguous} method
+     * to determine if it is contiguous. A contiguous {@code NDArray} is stored continuously in
+     * memory, which may have performance advantages for certain operations.
+     *
+     * @return {@code true} if the {@code NDArray} is contiguous; otherwise, {@code false}.
+     * @throws UnsupportedOperationException if the data type of the {@code NDArray} is a string, as
+     *     this operation is not supported.
+     */
+    public boolean isContiguous() {
+        if (getDataType() == DataType.STRING) {
+            throw new UnsupportedOperationException(
+                    "isContiguous is not supported for String tensor.");
+        }
+
+        return JniUtils.isContiguous(this);
+    }
+
+    /**
+     * Converts the current {@code NDArray} to a contiguous format.
+     *
+     * <p>This method checks if the {@code NDArray} is already contiguous, not sparse, and not
+     * having a layout of 2. If these conditions are met, it simply duplicates the current {@code
+     * NDArray} to avoid unnecessary operations. Otherwise, it utilizes {@code
+     * JniUtils.toContiguous} to convert the {@code NDArray} into a contiguous format.
+     *
+     * <p>A contiguous {@code NDArray} is stored continuously in memory, which may have performance
+     * advantages for certain operations.
+     *
+     * @return A new {@code PtNDArray} that is guaranteed to be contiguous.
+     */
+    public PtNDArray toContiguous() {
+        // todo need to check here!
+        if (!isSparse() && (JniUtils.getLayout(this) != 2) && isContiguous()) {
+            return (PtNDArray) duplicate();
+        }
+
+        return JniUtils.toContiguous(this);
     }
 
     /** {@inheritDoc} */
