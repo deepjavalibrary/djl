@@ -62,7 +62,8 @@ public abstract class BaseNDManager implements NDManager {
         uid = UUID.randomUUID().toString();
         Engine engine = getEngine().getAlternativeEngine();
         if (engine != null) {
-            alternativeManager = engine.newBaseManager(Device.cpu());
+            // Use the default device
+            alternativeManager = engine.newBaseManager();
         }
     }
 
