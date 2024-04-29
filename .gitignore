@@ -15,6 +15,15 @@ libs
 *.dll
 *.class
 *.log
+*.onnx
+*.pt
+*.safetensors
+*.pb
+*.trt
+*.uff
+*.gguf
+*.xgb
+*.bin
 
 # Eclipse
 .settings
