@@ -51,44 +51,64 @@ public class Application {
             case "cv":
                 return CV.ANY;
             case "cv/image_classification":
+            case "image_classification":
                 return CV.IMAGE_CLASSIFICATION;
             case "cv/object_detection":
+            case "object_detection":
                 return CV.OBJECT_DETECTION;
             case "cv/semantic_segmentation":
+            case "semantic_segmentation":
                 return CV.SEMANTIC_SEGMENTATION;
             case "cv/instance_segmentation":
+            case "instance_segmentation":
                 return CV.INSTANCE_SEGMENTATION;
             case "cv/pose_estimation":
+            case "pose_estimation":
                 return CV.POSE_ESTIMATION;
             case "cv/action_recognition":
+            case "action_recognition":
                 return CV.ACTION_RECOGNITION;
             case "cv/word_recognition":
+            case "word_recognition":
                 return CV.WORD_RECOGNITION;
             case "cv/image_generation":
+            case "image_generation":
                 return CV.IMAGE_GENERATION;
             case "cv/image_enhancement":
+            case "image_enhancement":
                 return CV.IMAGE_ENHANCEMENT;
             case "nlp":
                 return NLP.ANY;
             case "nlp/fill_mask":
+            case "fill_mask":
                 return NLP.FILL_MASK;
             case "nlp/machine_translation":
+            case "machine_translation":
                 return NLP.MACHINE_TRANSLATION;
             case "nlp/multiple_choice":
+            case "multiple_choice":
                 return NLP.MULTIPLE_CHOICE;
             case "nlp/question_answer":
+            case "question_answering":
                 return NLP.QUESTION_ANSWER;
             case "nlp/sentiment_analysis":
+            case "sentiment_analysis":
                 return NLP.SENTIMENT_ANALYSIS;
             case "nlp/text_classification":
+            case "text_classification":
                 return NLP.TEXT_CLASSIFICATION;
             case "nlp/text_embedding":
+            case "text_embedding":
+            case "sentence_similarity":
                 return NLP.TEXT_EMBEDDING;
             case "nlp/token_classification":
+            case "token_classification":
                 return NLP.TOKEN_CLASSIFICATION;
             case "nlp/word_embedding":
+            case "word_embedding":
                 return NLP.WORD_EMBEDDING;
             case "nlp/text_generation":
+            case "text_generation":
                 return NLP.TEXT_GENERATION;
             case "tabular":
                 return Tabular.ANY;
