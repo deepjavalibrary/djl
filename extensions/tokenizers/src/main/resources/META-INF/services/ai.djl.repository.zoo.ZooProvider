@@ -1,1 +1,2 @@
 ai.djl.huggingface.zoo.HfZooProvider
+ai.djl.engine.rust.zoo.RsZooProvider

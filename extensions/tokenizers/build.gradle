@@ -59,11 +59,25 @@ processResources {
         for (String task : tasks) {
             def file = new File("${prefix}/${task}/ai.djl.huggingface.pytorch.json")
             if (file.exists()) {
-                project.logger.lifecycle("model zoo metadata alrady exists: ${task}")
+                project.logger.lifecycle("PyTorch model zoo metadata alrady exists: ${task}")
             } else {
-                project.logger.lifecycle("Downloading model zoo metadata: ${task}")
+                project.logger.lifecycle("Downloading PyTorch model zoo metadata: ${task}")
                 file.getParentFile().mkdirs()
                 def downloadPath = new URL("${url}/${task}/ai/djl/huggingface/pytorch/models.json.gz")
+                downloadPath.withInputStream { i -> file.withOutputStream { it << new GZIPInputStream(i) } }
+            }
+
+            if ("text_embedding" != task) {
+                continue
+            }
+
+            file = new File("${prefix}/${task}/ai.djl.huggingface.rust.json")
+            if (file.exists()) {
+                project.logger.lifecycle("Rust model zoo metadata alrady exists: ${task}")
+            } else {
+                project.logger.lifecycle("Downloading Rust model zoo metadata: ${task}")
+                file.getParentFile().mkdirs()
+                def downloadPath = new URL("${url}/${task}/ai/djl/huggingface/rust/models.json.gz")
                 downloadPath.withInputStream { i -> file.withOutputStream { it << new GZIPInputStream(i) } }
             }
         }
