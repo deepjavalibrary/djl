@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * {@code PtModel} is the PyTorch implementation of {@link Model}.
@@ -50,7 +51,7 @@ public class PtModel extends BaseModel {
     /**
      * Constructs a new Model on a given device.
      *
-     * @param name the model name
+     * @param name   the model name
      * @param device the device the model should be located on
      */
     PtModel(String name, Device device) {
@@ -60,7 +61,9 @@ public class PtModel extends BaseModel {
         dataType = DataType.FLOAT32;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void load(Path modelPath, String prefix, Map<String, ?> options)
             throws IOException, MalformedModelException {
@@ -78,8 +81,18 @@ public class PtModel extends BaseModel {
 
         if (block == null) {
             if (modelFile == null) {
-                String fileName = prefix.endsWith(".pt") ? prefix : prefix + ".pt";
-                throw new FileNotFoundException(fileName + " file not found in: " + modelDir);
+                /*
+                last chance to load model
+                This is the last attempt to load the model. If no specific model file has been successfully identified
+                by previous steps, this call attempts to find any .pt file within the model directory.
+                If exactly one .pt file is found, it will be used as the model file.
+                If there are none or more than one .pt files, an exception will be thrown or null will be returned,
+                */
+                modelFile = findAnyModelFile(modelDir);
+                if (modelFile == null) {
+                    String fileName = prefix.endsWith(".pt") ? prefix : prefix + ".pt";
+                    throw new FileNotFoundException(fileName + " file not found in: " + modelDir);
+                }
             }
             String[] extraFileKeys = Utils.EMPTY_ARRAY;
             String[] extraFileValues = Utils.EMPTY_ARRAY;
@@ -135,7 +148,43 @@ public class PtModel extends BaseModel {
         }
     }
 
-    /** {@inheritDoc} */
+
+    /**x
+     * Searches for any .pt file within the specified directory.
+     * If more than one .pt file is found or none are found, an exception is thrown.
+     *
+     * @param modelDir The path of the directory to search in.
+     * @return The path of the found .pt file. If none or more than one are found, an exception is thrown.
+     * @throws IOException If an I/O error occurs while reading the directory.
+     */
+    private Path findAnyModelFile(Path modelDir) throws IOException {
+        if (!Files.exists(modelDir) || !Files.isDirectory(modelDir)) {
+            return null;
+        }
+        try (Stream<Path> paths = Files.walk(modelDir)) {
+            final List<Path> pathList = paths
+                    .filter(Files::isRegularFile) // Ensure it's a file
+                    .filter(path -> path.toString().endsWith(".pt")) // Filter for .pt files
+                    .collect(Collectors.toList()); // Collect results
+
+            if (pathList.isEmpty()) {
+                return null;
+            }
+
+            if (pathList.size() > 1) {
+                // If the number of .pt files found is not exactly one, throw an exception
+                throw new IllegalStateException("Expected a single .pt file, but found " + pathList.size());
+            }
+            return pathList.get(0); // Return the found .pt file
+        } catch (IOException e) {
+            // Re-throw IOException with additional context
+            throw new IOException("Error reading the directory: " + modelDir, e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void load(InputStream modelStream, Map<String, ?> options)
             throws IOException, MalformedModelException {
@@ -151,7 +200,7 @@ public class PtModel extends BaseModel {
      *
      * @param modelStream the stream of the model file
      * @param mapLocation force load to specified device if true
-     * @throws IOException model loading error
+     * @throws IOException             model loading error
      * @throws MalformedModelException if model file is corrupted
      */
     public void load(InputStream modelStream, boolean mapLocation)
@@ -201,7 +250,9 @@ public class PtModel extends BaseModel {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Trainer newTrainer(TrainingConfig trainingConfig) {
         PairList<Initializer, Predicate<Parameter>> initializer = trainingConfig.getInitializers();
@@ -224,7 +275,9 @@ public class PtModel extends BaseModel {
         return new Trainer(this, trainingConfig);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String[] getArtifactNames() {
         try {
