@@ -10,11 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
-import ai.djl.Application;
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
@@ -33,49 +31,41 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * An example of inference using an object detection model.
+ * An example of inference using an instance segmentation model.
  *
  * <p>See this <a
- * href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/object_detection.md">doc</a>
+ * href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/instance_segmentation.md">doc</a>
  * for information about this example.
  */
-public final class ObjectDetection {
+public final class InstanceSegmentation {
 
-    private static final Logger logger = LoggerFactory.getLogger(ObjectDetection.class);
+    private static final Logger logger = LoggerFactory.getLogger(InstanceSegmentation.class);
 
-    private ObjectDetection() {}
+    private InstanceSegmentation() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        DetectedObjects detection = ObjectDetection.predict();
+        DetectedObjects detection = predict();
         logger.info("{}", detection);
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
+        Path imageFile = Paths.get("src/test/resources/segmentation.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
-
-        String backbone;
-        if ("TensorFlow".equals(Engine.getDefaultEngineName())) {
-            backbone = "mobilenet_v2";
-        } else {
-            backbone = "resnet50";
-        }
 
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
-                        .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optFilter("backbone", backbone)
-                        .optEngine(Engine.getDefaultEngineName())
+                        .optModelUrls(
+                                "djl://ai.djl.mxnet/mask_rcnn/0.0.1/mask_rcnn_resnet18_v1b_coco")
+                        .optEngine("MXNet")
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel()) {
-            try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
-                DetectedObjects detection = predictor.predict(img);
-                saveBoundingBoxImage(img, detection);
-                return detection;
-            }
+        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel();
+                Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
+            DetectedObjects detection = predictor.predict(img);
+            saveBoundingBoxImage(img, detection);
+            return detection;
         }
     }
 
@@ -86,9 +76,8 @@ public final class ObjectDetection {
 
         img.drawBoundingBoxes(detection);
 
-        Path imagePath = outputDir.resolve("detected-dog_bike_car.png");
-        // OpenJDK can't save jpg with alpha channel
+        Path imagePath = outputDir.resolve("instances.png");
         img.save(Files.newOutputStream(imagePath), "png");
-        logger.info("Detected objects image has been saved in: {}", imagePath);
+        logger.info("Segmentation result image has been saved in: {}", imagePath);
     }
 }

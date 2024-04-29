@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 public final class StyleTransfer {
 
@@ -48,6 +49,14 @@ public final class StyleTransfer {
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
         Artist artist = Artist.MONET;
+        if (args.length == 1) {
+            for (Artist a : Artist.values()) {
+                if (a.name().equalsIgnoreCase(args[0])) {
+                    artist = a;
+                    break;
+                }
+            }
+        }
         String imagePath = "src/test/resources/mountains.png";
         Image input = ImageFactory.getInstance().fromFile(Paths.get(imagePath));
         Image output = transfer(input, artist);
@@ -61,11 +70,11 @@ public final class StyleTransfer {
     public static Image transfer(Image image, Artist artist)
             throws IOException, ModelNotFoundException, MalformedModelException,
                     TranslateException {
-        String modelName = "style_" + artist.toString().toLowerCase() + ".zip";
-        String modelUrl =
-                "https://mlrepo.djl.ai/model/cv/image_generation/ai/djl/pytorch/cyclegan/0.0.1/"
-                        + modelName;
+        // Use DJL PyTorch model zoo model, model can be found:
+        // https://mlrepo.djl.ai/model/cv/image_generation/ai/djl/pytorch/cyclegan/0.0.1/style_xxxx.zip
 
+        String modelName = "style_" + artist.toString().toLowerCase(Locale.ROOT);
+        String modelUrl = "djl://ai.djl.pytorch/cyclegan/0.0.1/" + modelName;
         Criteria<Image, Image> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_GENERATION)

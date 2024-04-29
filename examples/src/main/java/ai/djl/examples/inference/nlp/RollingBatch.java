@@ -13,7 +13,6 @@
 package ai.djl.examples.inference.nlp;
 
 import ai.djl.MalformedModelException;
-import ai.djl.examples.inference.ImageClassification;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.nlp.generate.CausalLMOutput;
@@ -36,7 +35,7 @@ import java.util.Map;
 
 public final class RollingBatch {
 
-    private static final Logger logger = LoggerFactory.getLogger(ImageClassification.class);
+    private static final Logger logger = LoggerFactory.getLogger(RollingBatch.class);
 
     private RollingBatch() {}
 

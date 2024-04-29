@@ -10,9 +10,8 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
-import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
@@ -52,7 +51,7 @@ public final class PoseEstimation {
     private PoseEstimation() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        List<Joints> joints = PoseEstimation.predict();
+        List<Joints> joints = predict();
         logger.info("{}", joints);
     }
 
@@ -76,21 +75,16 @@ public final class PoseEstimation {
 
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
-                        .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optFilter("size", "512")
-                        .optFilter("backbone", "resnet50")
-                        .optFilter("flavor", "v1")
-                        .optFilter("dataset", "voc")
+                        .optModelUrls("djl://ai.djl.mxnet/ssd/0.0.1/ssd_512_resnet50_v1_voc")
                         .optEngine("MXNet")
                         .optProgress(new ProgressBar())
                         .build();
 
         DetectedObjects detectedObjects;
-        try (ZooModel<Image, DetectedObjects> ssd = criteria.loadModel()) {
-            try (Predictor<Image, DetectedObjects> predictor = ssd.newPredictor()) {
-                detectedObjects = predictor.predict(img);
-            }
+        try (ZooModel<Image, DetectedObjects> ssd = criteria.loadModel();
+                Predictor<Image, DetectedObjects> predictor = ssd.newPredictor()) {
+            detectedObjects = predictor.predict(img);
         }
 
         List<DetectedObjects.DetectedObject> items = detectedObjects.items();
@@ -115,13 +109,14 @@ public final class PoseEstimation {
             throws MalformedModelException, ModelNotFoundException, IOException,
                     TranslateException {
 
+        // Use DJL MXNet model zoo model, model can be found:
+        // https://mlrepo.djl.ai/model/cv/pose_estimation/ai/djl/mxnet/simple_pose/0.0.1/simple_pose_resnet18_v1b-0000.params.gz
+        // https://mlrepo.djl.ai/model/cv/pose_estimation/ai/djl/mxnet/simple_pose/0.0.1/simple_pose_resnet18_v1b-symbol.json
         Criteria<Image, Joints> criteria =
                 Criteria.builder()
-                        .optApplication(Application.CV.POSE_ESTIMATION)
                         .setTypes(Image.class, Joints.class)
-                        .optFilter("backbone", "resnet18")
-                        .optFilter("flavor", "v1b")
-                        .optFilter("dataset", "imagenet")
+                        .optModelUrls(
+                                "djl://ai.djl.mxnet/simple_pose/0.0.1/simple_pose_resnet18_v1b")
                         .build();
 
         List<Joints> allJoints = new ArrayList<>();

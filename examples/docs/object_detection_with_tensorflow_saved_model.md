@@ -7,7 +7,7 @@ In this example we will use pre-trained model from [tensorflow model zoo](https:
 The following code has been tested with EfficientDet, SSD MobileNet V2, Faster RCNN Inception Resnet V2,
 but should work with most of tensorflow object detection models.
 
-The source code can be found at [ObjectDetectionWithTensorflowSavedModel.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/ObjectDetectionWithTensorflowSavedModel.java).
+The source code can be found at [ObjectDetectionWithTensorflowSavedModel.java](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/cv/ObjectDetectionWithTensorflowSavedModel.java).
 
 ## Setup guide
 
@@ -45,7 +45,7 @@ Use the following command to run the project:
 
 ```sh
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.ObjectDetectionWithTensorflowSavedModel
+./gradlew run -Dmain=ai.djl.examples.inference.cv.ObjectDetectionWithTensorflowSavedModel
 ```
 
 Your output should look like the following:

@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
@@ -48,7 +48,7 @@ public final class ImageClassification {
     private ImageClassification() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        Classifications classifications = ImageClassification.predict();
+        Classifications classifications = predict();
         logger.info("{}", classifications);
     }
 

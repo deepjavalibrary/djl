@@ -134,7 +134,7 @@ Before you run any examples in IntelliJ, configure your Application template as 
 3. Change the "Working directory:" value to: "$MODULE_WORKING_DIR$".
 4. Select "OK" to save the template.
 
-Navigate to the 'examples' module. Open the class that you want to execute (e.g. ai.djl.examples.inference.ObjectDetection).
+Navigate to the 'examples' module. Open the class that you want to execute (e.g. ai.djl.examples.inference.cv.ObjectDetection).
 Select the triangle at the class declaration line. A popup menu appears with 3 items:
 
 - Run 'ObjectDetection.main()'

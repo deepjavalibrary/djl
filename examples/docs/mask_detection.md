@@ -5,7 +5,7 @@ YOLOv5 is a powerful model for object detection tasks. With the transfer learnin
 In this example, we apply it on the [Face Mask Detection dataset](https://www.kaggle.com/datasets/andrewmvd/face-mask-detection?select=images). We first train the YOLOv5s model in Python, with the help of [ATLearn](https://github.com/awslabs/atlearn/blob/main/examples/docs/face_mask_detection.md), a python transfer learning toolkit.
 Then, the model is saved as an ONNX model, which is then imported into DJL for inference. We apply it on the mask wearing detection task. 
 
-The source code can be found at [MaskDetectionOnnx.java](../src/main/java/ai/djl/examples/inference/MaskDetection.java)
+The source code can be found at [MaskDetectionOnnx.java](../src/main/java/ai/djl/examples/inference/cv/MaskDetection.java)
 
 ## The training part in ATLearn
 
@@ -13,7 +13,7 @@ We initially attempted to import a pretrained YOLOv5 into DJL, and fine-tune it 
 
 The retraining of YOLOv5 can be found in an example in ATLearn: `examples/docs/face_mask_detection.md`. In this example, the YOLOv5 layers near the input are frozen while those near the output are fine-tuned with the customized data. This follows the transfer learning idea.
 
-In this example, the trained model is first exported to ONNX file, eg. `mask.onnx` and then imported in  [MaskDetectionOnnx.java](../src/main/java/ai/djl/examples/inference/MaskDetection.java).
+In this example, the trained model is first exported to ONNX file, eg. `mask.onnx` and then imported in  [MaskDetectionOnnx.java](../src/main/java/ai/djl/examples/inference/cv/MaskDetection.java).
 This ONNX model file can also be used for inference in python, which will serve as a benchmark. See the [tutorial doc](https://github.com/awslabs/atlearn/blob/main/examples/docs/face_mask_detection.md). 
 
 ## Setup guide
@@ -32,7 +32,7 @@ Use the following command to run the project:
 
 ```sh
 cd examples
-./gradlew run -Dmain=ai.djl.examples.inference.MaskDetection
+./gradlew run -Dmain=ai.djl.examples.inference.cv.MaskDetection
 ```
 
 Your output should look like the following:

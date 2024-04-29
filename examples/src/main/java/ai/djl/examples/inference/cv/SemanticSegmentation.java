@@ -10,7 +10,7 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
@@ -54,13 +54,12 @@ public final class SemanticSegmentation {
         ImageFactory factory = ImageFactory.getInstance();
         Image img = factory.fromFile(imageFile);
 
-        String url =
-                "https://mlrepo.djl.ai/model/cv/semantic_segmentation/ai/djl/pytorch/deeplabv3/0.0.1/deeplabv3.zip";
-
+        // Use DJL PyTorch model zoo model, model can be found:
+        // https://mlrepo.djl.ai/model/cv/semantic_segmentation/ai/djl/pytorch/deeplabv3/0.0.1/deeplabv3.zip
         Criteria<Image, CategoryMask> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, CategoryMask.class)
-                        .optModelUrls(url)
+                        .optModelUrls("djl://ai.djl.pytorch/deeplabv3")
                         .optTranslatorFactory(new SemanticSegmentationTranslatorFactory())
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())

@@ -13,7 +13,7 @@
 package ai.djl.examples.training;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.ImageClassification;
+import ai.djl.examples.inference.cv.ImageClassification;
 import ai.djl.modality.Classifications;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
