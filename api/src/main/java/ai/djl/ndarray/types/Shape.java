@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -534,5 +536,65 @@ public class Shape {
             }
         }
         return max == ans;
+    }
+
+    /**
+     * Parses a string representation of shapes for NDList.
+     *
+     * @param value a string representation of shapes for NDList
+     * @return a list of Shape and datatype pairs
+     */
+    public static PairList<DataType, Shape> parseShapes(String value) {
+        PairList<DataType, Shape> inputShapes = new PairList<>();
+        if (value != null) {
+            if (value.contains("(")) {
+                Pattern pattern = Pattern.compile("\\((\\s*(\\d+)([,\\s]+\\d+)*\\s*)\\)(\\w?)");
+                Matcher matcher = pattern.matcher(value);
+                while (matcher.find()) {
+                    String[] tokens = matcher.group(1).split(",");
+                    long[] array = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
+                    DataType dataType;
+                    String dataTypeStr = matcher.group(4);
+                    if (dataTypeStr == null || dataTypeStr.isEmpty()) {
+                        dataType = DataType.FLOAT32;
+                    } else {
+                        switch (dataTypeStr) {
+                            case "s":
+                                dataType = DataType.FLOAT16;
+                                break;
+                            case "d":
+                                dataType = DataType.FLOAT64;
+                                break;
+                            case "u":
+                                dataType = DataType.UINT8;
+                                break;
+                            case "b":
+                                dataType = DataType.INT8;
+                                break;
+                            case "i":
+                                dataType = DataType.INT32;
+                                break;
+                            case "l":
+                                dataType = DataType.INT64;
+                                break;
+                            case "B":
+                                dataType = DataType.BOOLEAN;
+                                break;
+                            case "f":
+                                dataType = DataType.FLOAT32;
+                                break;
+                            default:
+                                throw new IllegalArgumentException("Invalid input-shape: " + value);
+                        }
+                    }
+                    inputShapes.add(dataType, new Shape(array));
+                }
+            } else {
+                String[] tokens = value.split(",");
+                long[] shapes = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
+                inputShapes.add(DataType.FLOAT32, new Shape(shapes));
+            }
+        }
+        return inputShapes;
     }
 }

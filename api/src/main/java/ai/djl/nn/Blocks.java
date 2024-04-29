@@ -14,8 +14,11 @@ package ai.djl.nn;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,6 +88,31 @@ public final class Blocks {
      */
     public static Block identityBlock() {
         return new LambdaBlock(x -> x, "identity");
+    }
+
+    /**
+     * Creates a {@link LambdaBlock} that return all-ones NDList.
+     *
+     * @return an all-ones {@link Block}
+     */
+    public static Block onesBlock(PairList<DataType, Shape> shapes, String[] names) {
+        return new LambdaBlock(
+                a -> {
+                    NDManager manager = a.getManager();
+                    NDList list = new NDList(shapes.size());
+                    int index = 0;
+                    for (Pair<DataType, Shape> pair : shapes) {
+                        DataType dataType = pair.getKey();
+                        Shape shape = pair.getValue();
+                        NDArray arr = manager.ones(shape, dataType);
+                        if (names.length == list.size()) {
+                            arr.setName(names[index++]);
+                        }
+                        list.add(arr);
+                    }
+                    return list;
+                },
+                "ones");
     }
 
     /**
