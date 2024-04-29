@@ -21,14 +21,18 @@ import ai.djl.modality.Output;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
+import ai.djl.nn.Blocks;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.PairList;
+import ai.djl.util.Utils;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -50,15 +54,6 @@ public class TextEmbeddingTranslatorTest {
             throws ModelException, IOException, TranslateException {
         String text = "This is an example sentence";
 
-        Block block =
-                new LambdaBlock(
-                        a -> {
-                            NDManager manager = a.getManager();
-                            NDArray arr = manager.ones(new Shape(1, 7, 384));
-                            arr.setName("last_hidden_state");
-                            return new NDList(arr);
-                        },
-                        "model");
         Path modelDir = Paths.get("build/model");
         Files.createDirectories(modelDir);
         try (NDManager manager = NDManager.newBaseManager("Rust")) {
@@ -84,8 +79,10 @@ public class TextEmbeddingTranslatorTest {
                 Criteria.builder()
                         .setTypes(String.class, float[].class)
                         .optModelPath(modelDir)
-                        .optBlock(block)
                         .optEngine("PyTorch")
+                        .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                        .optArgument("block_shapes", "(1,7,384)")
+                        .optArgument("block_names", "last_hidden_state")
                         .optArgument("tokenizer", "bert-base-uncased")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
@@ -103,7 +100,9 @@ public class TextEmbeddingTranslatorTest {
                 Criteria.builder()
                         .setTypes(String.class, float[].class)
                         .optModelPath(modelDir)
-                        .optBlock(block)
+                        .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                        .optArgument("block_shapes", "(1,7,384)")
+                        .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
                         .optArgument("pooling", "max")
@@ -123,7 +122,9 @@ public class TextEmbeddingTranslatorTest {
                 Criteria.builder()
                         .setTypes(String.class, float[].class)
                         .optModelPath(modelDir)
-                        .optBlock(block)
+                        .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                        .optArgument("block_shapes", "(1,7,384)")
+                        .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
                         .optArgument("pooling", "mean_sqrt_len")
@@ -143,7 +144,9 @@ public class TextEmbeddingTranslatorTest {
                 Criteria.builder()
                         .setTypes(String.class, float[].class)
                         .optModelPath(modelDir)
-                        .optBlock(block)
+                        .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                        .optArgument("block_shapes", "(1,7,384)")
+                        .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
                         .optArgument("pooling", "weightedmean")
@@ -163,7 +166,9 @@ public class TextEmbeddingTranslatorTest {
                 Criteria.builder()
                         .setTypes(String.class, float[].class)
                         .optModelPath(modelDir)
-                        .optBlock(block)
+                        .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                        .optArgument("block_shapes", "(1,7,384)")
+                        .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
                         .optArgument("dense", "linear.safetensors")
@@ -183,7 +188,9 @@ public class TextEmbeddingTranslatorTest {
                 Criteria.builder()
                         .setTypes(Input.class, Output.class)
                         .optModelPath(modelDir)
-                        .optBlock(block)
+                        .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                        .optArgument("block_shapes", "(1,7,384)")
+                        .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
                         .optArgument("pooling", "cls")
@@ -212,7 +219,9 @@ public class TextEmbeddingTranslatorTest {
         }
 
         try (Model model = Model.newInstance("test")) {
-            model.setBlock(block);
+            PairList<DataType, Shape> pairs = new PairList<>();
+            pairs.add(DataType.FLOAT32, new Shape(1, 7, 384));
+            model.setBlock(Blocks.onesBlock(pairs, Utils.EMPTY_ARRAY));
             Map<String, String> options = new HashMap<>();
             options.put("hasParameter", "false");
             model.load(modelDir, "test", options);
