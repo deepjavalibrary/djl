@@ -100,6 +100,8 @@ class HuggingfaceConverter:
                 include_types = False
             else:
                 return False, f"Unsupported model_type: {config.model_type}", -1
+        else:
+            return False, f"Unknown model_type: {model_id}", -1
 
         logging.info(f"Saving rust model: {model_id} ...")
 
@@ -115,6 +117,10 @@ class HuggingfaceConverter:
             logging.warning(f"Failed to save tokenizer: {model_id}.")
             logging.warning(e, exc_info=True)
             return False, "Failed to save tokenizer", -1
+
+        # Save config.json
+        config_file = hf_hub_download(repo_id=model_id, filename="config.json")
+        shutil.copyfile(config_file, os.path.join(temp_dir, "config.json"))
 
         target = os.path.join(temp_dir, "model.safetensors")
         model = self.api.model_info(model_id, files_metadata=True)
@@ -188,14 +194,17 @@ class HuggingfaceConverter:
             if not result:
                 return False, reason, -1
 
-        size = self.save_to_model_zoo(model_info, args.output_dir, temp_dir,
-                                      hf_pipeline, include_types)
+        size = self.save_to_model_zoo(model_info, args.output_dir, "PyTorch",
+                                      temp_dir, hf_pipeline, include_types)
 
         return True, None, size
 
     @staticmethod
     def save_tokenizer(hf_pipeline, temp_dir: str):
         hf_pipeline.tokenizer.save_pretrained(temp_dir)
+        if not os.path.exists(os.path.join(temp_dir, "tokenizer.json")):
+            raise ValueError("no fast tokenizer found.")
+
         # only keep tokenizer.json file
         for path in os.listdir(temp_dir):
             if path != "tokenizer.json" and path != "tokenizer_config.json":
