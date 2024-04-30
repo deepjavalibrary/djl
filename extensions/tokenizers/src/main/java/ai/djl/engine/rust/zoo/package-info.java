@@ -10,5 +10,5 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-/** Contains the built-in {@link ai.djl.huggingface.zoo.RsModelZoo}. */
+/** Contains the built-in {@link ai.djl.engine.rust.zoo.RsModelZoo}. */
 package ai.djl.engine.rust.zoo;
