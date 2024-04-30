@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * {@code PtModel} is the PyTorch implementation of {@link Model}.
@@ -227,9 +228,8 @@ public class PtModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public String[] getArtifactNames() {
-        try {
-            List<Path> files =
-                    Files.walk(modelDir).filter(Files::isRegularFile).collect(Collectors.toList());
+        try (Stream<Path> stream = Files.walk(modelDir)) {
+            List<Path> files = stream.filter(Files::isRegularFile).collect(Collectors.toList());
             List<String> ret = new ArrayList<>(files.size());
             for (Path path : files) {
                 String fileName = path.toFile().getName();
