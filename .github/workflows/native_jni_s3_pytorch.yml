@@ -12,7 +12,7 @@ on:
 jobs:
   build-pytorch-jni-macos:
     if: github.repository == 'deepjavalibrary/djl'
-    runs-on: macos-latest
+    runs-on: macos-13
 
     steps:
       - uses: actions/checkout@v4
