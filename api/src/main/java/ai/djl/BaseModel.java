@@ -234,6 +234,28 @@ public abstract class BaseModel implements Model {
         this.modelDir = Utils.getNestedModelDir(modelDir);
     }
 
+    protected void loadBlock(String prefix, Map<String, ?> options)
+            throws IOException, MalformedModelException {
+        boolean hasParameter = true;
+        if (options != null) {
+            String paramOption = (String) options.get("hasParameter");
+            if (paramOption != null) {
+                hasParameter = Boolean.parseBoolean(paramOption);
+            }
+        }
+        if (hasParameter) {
+            Path paramFile = paramPathResolver(prefix, options);
+            if (paramFile == null) {
+                throw new IOException(
+                        "Parameter file not found in: "
+                                + modelDir
+                                + ". If you only specified model path, make sure path name"
+                                + " match your saved model file name.");
+            }
+            readParameters(paramFile, options);
+        }
+    }
+
     /** {@inheritDoc} */
     @Override
     public void save(Path modelPath, String newModelName) throws IOException {
