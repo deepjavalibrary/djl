@@ -6,7 +6,7 @@ on:
 jobs:
   build-sentencepiece-jni-osx:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
