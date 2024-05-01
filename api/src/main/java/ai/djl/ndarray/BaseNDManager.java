@@ -14,6 +14,7 @@ package ai.djl.ndarray;
 
 import ai.djl.Device;
 import ai.djl.engine.Engine;
+import ai.djl.engine.StandardCapabilities;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
@@ -62,8 +63,13 @@ public abstract class BaseNDManager implements NDManager {
         uid = UUID.randomUUID().toString();
         Engine engine = getEngine().getAlternativeEngine();
         if (engine != null) {
-            // Use the default device
-            alternativeManager = engine.newBaseManager();
+            // Use the same device if possible for efficiency
+            if (this.device.isGpu() && engine.hasCapability(StandardCapabilities.CUDA)) {
+                alternativeManager = engine.newBaseManager(this.device);
+            } else {
+                // Use the default device
+                alternativeManager = engine.newBaseManager();
+            }
         }
     }
 
