@@ -311,7 +311,7 @@ public class IntegrationTest {
                 }
                 return true;
             } catch (InvocationTargetException | IllegalAccessException e) {
-                logger.error("", e.getCause());
+                logExceptionCause(e);
             }
             return false;
         }
@@ -322,7 +322,7 @@ public class IntegrationTest {
                     method.invoke(object);
                 }
             } catch (InvocationTargetException | IllegalAccessException e) {
-                logger.error("", e.getCause());
+                logExceptionCause(e);
             }
         }
 
@@ -333,7 +333,7 @@ public class IntegrationTest {
                 }
                 return true;
             } catch (InvocationTargetException | IllegalAccessException e) {
-                logger.error("", e.getCause());
+                logExceptionCause(e);
             }
             return false;
         }
@@ -344,7 +344,7 @@ public class IntegrationTest {
                     method.invoke(object);
                 }
             } catch (InvocationTargetException | IllegalAccessException e) {
-                logger.error("", e.getCause());
+                logExceptionCause(e);
             }
         }
 
@@ -374,7 +374,7 @@ public class IntegrationTest {
                     result = TestResult.UNSUPPORTED;
                 } else {
                     logger.error("Test {}.{} FAILED", getName(), method.getName());
-                    logger.error("", e.getCause());
+                    logExceptionCause(e);
                     result = TestResult.FAILED;
                 }
             } finally {
@@ -403,6 +403,14 @@ public class IntegrationTest {
                 }
             }
             return false;
+        }
+
+        private void logExceptionCause(Exception e) {
+            if (e.getCause() != null) {
+                logger.error("", e.getCause());
+            } else {
+                logger.error("", e);
+            }
         }
     }
 
