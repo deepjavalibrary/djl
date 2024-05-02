@@ -60,7 +60,7 @@ public final class BertClassification {
 
         Classifications[] results = predict(inputs);
         for (int i = 0; i < inputs.size(); i++) {
-            logger.info("Prediction for: " + inputs.get(i) + "\n" + results[i].toString());
+            logger.info("Prediction for: {}\n{}", inputs.get(i), results[i]);
         }
     }
 

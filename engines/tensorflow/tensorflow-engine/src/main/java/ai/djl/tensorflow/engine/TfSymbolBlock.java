@@ -75,17 +75,14 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         } else {
             Set<String> keys = signatureDefMap.keySet();
             logger.warn(
-                    "SignatureDefKey: "
-                            + signatureDefKey
-                            + "not found in Saved Model Bundle."
-                            + "Available keys: "
-                            + String.join(" ", keys)
-                            + "Please use .optOption(\"SignatureDefKey\", \"value\") with"
-                            + " Criteria.builder to load the model.Normally the value is"
-                            + " \"default\" for TF1.x models and \"serving_default\" for TF2.x"
-                            + " models. Refer to:"
-                            + " https://www.tensorflow.org/guide/saved_modelLoading the model using"
-                            + " next available key.");
+                    "SignatureDefKey: {} not found in Saved Model Bundle.Available keys: {} Please"
+                        + " use .optOption(\"SignatureDefKey\", \"value\") with Criteria.builder to"
+                        + " load the model.Normally the value is \"default\" for TF1.x models and"
+                        + " \"serving_default\" for TF2.x models. Refer to:"
+                        + " https://www.tensorflow.org/guide/saved_modelLoading the model using"
+                        + " next available key.",
+                    signatureDefKey,
+                    String.join(" ", keys));
             servingDefault = signatureDefMap.get(keys.iterator().next());
         }
         describeInput();

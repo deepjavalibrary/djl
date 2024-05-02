@@ -302,7 +302,7 @@ public abstract class ModelZoo {
                 Utils.deleteQuietly(tmp);
             }
         } catch (IOException e) {
-            logger.warn("Failed load index of models: " + app, e);
+            logger.warn("Failed load index of models: {}", app, e);
         }
 
         return Collections.emptyMap();

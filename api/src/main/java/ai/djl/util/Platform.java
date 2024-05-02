@@ -305,7 +305,7 @@ public final class Platform {
                         <= Integer.parseInt(system.flavor.substring(2, 5))) {
             return true;
         }
-        logger.warn("The bundled library: " + this + " doesn't match system: " + system);
+        logger.warn("The bundled library: {}} doesn't match system: {}", this, system);
         return false;
     }
 

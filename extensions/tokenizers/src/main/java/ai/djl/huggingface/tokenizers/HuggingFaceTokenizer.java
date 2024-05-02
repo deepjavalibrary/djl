@@ -547,12 +547,12 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         if (padding == PaddingStrategy.MAX_LENGTH || isTruncate) {
             if (maxLength == -1) {
                 logger.warn(
-                        "maxLength is not explicitly specified, use modelMaxLength: "
-                                + modelMaxLength);
+                        "maxLength is not explicitly specified, use modelMaxLength: {}",
+                        modelMaxLength);
                 maxLength = modelMaxLength;
             } else if (maxLength > modelMaxLength) {
                 logger.warn(
-                        "maxLength is greater then modelMaxLength, change to: " + modelMaxLength);
+                        "maxLength is greater then modelMaxLength, change to: {}", modelMaxLength);
                 maxLength = modelMaxLength;
             }
 
@@ -564,12 +564,11 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
                         newMaxLength -= padToMultipleOf;
                     }
                     logger.warn(
-                            "maxLength ("
-                                    + maxLength
-                                    + ") is not a multiple of padToMultipleOf ("
-                                    + padToMultipleOf
-                                    + "), change to: "
-                                    + newMaxLength);
+                            "maxLength ({}) is not a multiple of padToMultipleOf ({}), change to:"
+                                    + " {}",
+                            maxLength,
+                            padToMultipleOf,
+                            newMaxLength);
                     maxLength = newMaxLength;
                 }
             }
