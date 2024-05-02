@@ -44,6 +44,7 @@ public final class MobileNetV2 {
     public static final int MULTILENGTH = 7;
 
     private MobileNetV2() {}
+
     /**
      * Builds a {@link Block} that represent an inverted residual Unit used in the implementation of
      * the MobileNetV2 Model.

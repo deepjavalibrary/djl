@@ -197,6 +197,7 @@ public abstract class Deconvolution extends AbstractBlock {
         return input.getNDArrayInternal()
                 .deconvolution(input, weight, bias, stride, padding, outPadding, dilation, groups);
     }
+
     /**
      * A builder that can build any {@code Deconvolution} block.
      *
@@ -246,6 +247,7 @@ public abstract class Deconvolution extends AbstractBlock {
             this.padding = padding;
             return self();
         }
+
         /**
          * Sets the out_padding along each dimension. Defaults to 0 along each dimension.
          *
@@ -256,6 +258,7 @@ public abstract class Deconvolution extends AbstractBlock {
             this.outPadding = outPadding;
             return self();
         }
+
         /**
          * Sets the dilation along each dimension. Defaults to 1 along each dimension.
          *

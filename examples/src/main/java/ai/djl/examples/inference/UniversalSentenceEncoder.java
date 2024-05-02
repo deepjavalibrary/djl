@@ -61,7 +61,9 @@ public final class UniversalSentenceEncoder {
     }
 
     public static float[][] predict(List<String> inputs)
-            throws MalformedModelException, ModelNotFoundException, IOException,
+            throws MalformedModelException,
+                    ModelNotFoundException,
+                    IOException,
                     TranslateException {
         String modelUrl =
                 "https://storage.googleapis.com/tfhub-modules/google/universal-sentence-encoder/4.tar.gz";

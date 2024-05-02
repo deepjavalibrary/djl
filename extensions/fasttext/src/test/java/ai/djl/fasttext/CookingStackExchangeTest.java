@@ -81,7 +81,9 @@ public class CookingStackExchangeTest {
 
     @Test
     public void testTextClassification()
-            throws IOException, MalformedModelException, ModelNotFoundException,
+            throws IOException,
+                    MalformedModelException,
+                    ModelNotFoundException,
                     TranslateException {
         Criteria<String, Classifications> criteria =
                 Criteria.builder()

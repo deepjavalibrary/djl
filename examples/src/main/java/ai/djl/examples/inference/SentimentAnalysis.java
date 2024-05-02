@@ -49,7 +49,9 @@ public final class SentimentAnalysis {
     }
 
     public static Classifications predict()
-            throws MalformedModelException, ModelNotFoundException, IOException,
+            throws MalformedModelException,
+                    ModelNotFoundException,
+                    IOException,
                     TranslateException {
         String input = "I like DJL. DJL is the best DL framework!";
         logger.info("input Sentence: {}", input);

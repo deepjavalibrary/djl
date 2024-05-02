@@ -40,14 +40,18 @@ public final class RollingBatch {
     private RollingBatch() {}
 
     public static void main(String[] args)
-            throws ModelNotFoundException, MalformedModelException, IOException,
+            throws ModelNotFoundException,
+                    MalformedModelException,
+                    IOException,
                     TranslateException {
         String[] ret = seqBatchSchedulerWithPyTorchContrastive();
         logger.info("{}", ret[0]);
     }
 
     public static String[] seqBatchSchedulerWithPyTorchContrastive()
-            throws ModelNotFoundException, MalformedModelException, IOException,
+            throws ModelNotFoundException,
+                    MalformedModelException,
+                    IOException,
                     TranslateException {
         String url = "https://djl-misc.s3.amazonaws.com/test/models/gpt2/gpt2_pt.zip";
 

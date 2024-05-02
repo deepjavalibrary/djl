@@ -283,6 +283,7 @@ public final class BertBlock extends AbstractBlock {
         float hiddenDropoutProbability = 0.1f;
         // float attentionDropoutProbability = 0.1f;
         int maxSequenceLength = 512;
+
         // float initializerRange = 0.02f;
 
         private Builder() {}

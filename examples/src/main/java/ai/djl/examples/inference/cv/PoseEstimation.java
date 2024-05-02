@@ -70,7 +70,9 @@ public final class PoseEstimation {
     }
 
     private static List<Image> predictPeopleInImage(Image img)
-            throws MalformedModelException, ModelNotFoundException, IOException,
+            throws MalformedModelException,
+                    ModelNotFoundException,
+                    IOException,
                     TranslateException {
 
         Criteria<Image, DetectedObjects> criteria =
@@ -106,7 +108,9 @@ public final class PoseEstimation {
     }
 
     private static List<Joints> predictJointsForPeople(List<Image> people)
-            throws MalformedModelException, ModelNotFoundException, IOException,
+            throws MalformedModelException,
+                    ModelNotFoundException,
+                    IOException,
                     TranslateException {
 
         // Use DJL MXNet model zoo model, model can be found:

@@ -63,13 +63,19 @@ public final class TrainWithOptimizers {
     private TrainWithOptimizers() {}
 
     public static void main(String[] args)
-            throws IOException, ParseException, ModelNotFoundException, MalformedModelException,
+            throws IOException,
+                    ParseException,
+                    ModelNotFoundException,
+                    MalformedModelException,
                     TranslateException {
         TrainWithOptimizers.runExample(args);
     }
 
     public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, ModelNotFoundException, MalformedModelException,
+            throws IOException,
+                    ParseException,
+                    ModelNotFoundException,
+                    MalformedModelException,
                     TranslateException {
         OptimizerArguments arguments =
                 (OptimizerArguments) new OptimizerArguments().parseArgs(args);

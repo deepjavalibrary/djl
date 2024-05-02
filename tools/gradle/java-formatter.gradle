@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.google.googlejavaformat:google-java-format:1.15.0'
+        classpath 'com.google.googlejavaformat:google-java-format:1.22.0'
     }
 }
 

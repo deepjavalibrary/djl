@@ -30,7 +30,9 @@ public class StyleTransferTest {
 
     @Test
     public void testStyleTransfer()
-            throws IOException, ModelNotFoundException, MalformedModelException,
+            throws IOException,
+                    ModelNotFoundException,
+                    MalformedModelException,
                     TranslateException {
         TestRequirements.engine("PyTorch");
 
