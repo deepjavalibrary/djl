@@ -14,6 +14,7 @@
 package ai.djl.huggingface.tokenizers;
 
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import ai.djl.util.PairList;
 import ai.djl.util.Utils;
@@ -539,6 +540,19 @@ public class HuggingFaceTokenizerTest {
                 "<s>", "▁", "test", "▁sentence", "</s>", "<pad>", "<pad>", "<pad>"
             };
             Assert.assertEquals(tokens, expected);
+        }
+    }
+
+    @Test
+    public void testAuthToken() {
+        TestRequirements.notOffline();
+        System.setProperty("HF_TOKEN", "test_token");
+        try {
+            HuggingFaceTokenizer.newInstance("mistralai/Mixtral-8x7B-v0.1");
+        } catch (RuntimeException ignore) {
+            // access denied
+        } finally {
+            System.clearProperty("HF_TOKEN");
         }
     }
 }

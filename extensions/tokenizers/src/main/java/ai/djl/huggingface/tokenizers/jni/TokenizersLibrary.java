@@ -20,7 +20,7 @@ public final class TokenizersLibrary {
 
     private TokenizersLibrary() {}
 
-    public native long createTokenizer(String identifier);
+    public native long createTokenizer(String identifier, String authToken);
 
     public native long createTokenizerFromString(String json);
 

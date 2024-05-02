@@ -112,8 +112,12 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     public static HuggingFaceTokenizer newInstance(String identifier, Map<String, String> options) {
         Ec2Utils.callHome("Huggingface");
         LibUtils.checkStatus();
+        String autoToken = Utils.getEnvOrSystemProperty("HF_TOKEN");
+        if (options != null) {
+            autoToken = options.getOrDefault("hf_token", autoToken);
+        }
 
-        long handle = TokenizersLibrary.LIB.createTokenizer(identifier);
+        long handle = TokenizersLibrary.LIB.createTokenizer(identifier, autoToken);
         return new HuggingFaceTokenizer(handle, options);
     }
 
