@@ -42,7 +42,9 @@ public final class TextGeneration {
     private TextGeneration() {}
 
     public static void main(String[] args)
-            throws ModelNotFoundException, MalformedModelException, IOException,
+            throws ModelNotFoundException,
+                    MalformedModelException,
+                    IOException,
                     TranslateException {
         String ret1 = generateTextWithPyTorchGreedy();
         logger.info("{}", ret1);
@@ -53,7 +55,9 @@ public final class TextGeneration {
     }
 
     public static String generateTextWithPyTorchGreedy()
-            throws ModelNotFoundException, MalformedModelException, IOException,
+            throws ModelNotFoundException,
+                    MalformedModelException,
+                    IOException,
                     TranslateException {
         SearchConfig config = new SearchConfig();
         config.setMaxSeqLength(60);
@@ -88,7 +92,9 @@ public final class TextGeneration {
     }
 
     public static String[] generateTextWithPyTorchContrastive()
-            throws ModelNotFoundException, MalformedModelException, IOException,
+            throws ModelNotFoundException,
+                    MalformedModelException,
+                    IOException,
                     TranslateException {
         SearchConfig config = new SearchConfig();
         config.setMaxSeqLength(60);
@@ -120,7 +126,9 @@ public final class TextGeneration {
     }
 
     public static String[] generateTextWithPyTorchBeam()
-            throws ModelNotFoundException, MalformedModelException, IOException,
+            throws ModelNotFoundException,
+                    MalformedModelException,
+                    IOException,
                     TranslateException {
         SearchConfig config = new SearchConfig();
         config.setMaxSeqLength(60);
@@ -153,7 +161,9 @@ public final class TextGeneration {
     }
 
     public static String[] generateTextWithOnnxRuntimeBeam()
-            throws ModelNotFoundException, MalformedModelException, IOException,
+            throws ModelNotFoundException,
+                    MalformedModelException,
+                    IOException,
                     TranslateException {
         SearchConfig config = new SearchConfig();
         config.setMaxSeqLength(60);

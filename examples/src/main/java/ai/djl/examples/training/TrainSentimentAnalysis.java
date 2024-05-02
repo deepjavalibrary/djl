@@ -76,13 +76,17 @@ public final class TrainSentimentAnalysis {
     private TrainSentimentAnalysis() {}
 
     public static void main(String[] args)
-            throws IOException, ModelNotFoundException, MalformedModelException,
+            throws IOException,
+                    ModelNotFoundException,
+                    MalformedModelException,
                     TranslateException {
         TrainSentimentAnalysis.runExample(args);
     }
 
     public static TrainingResult runExample(String[] args)
-            throws IOException, ModelNotFoundException, MalformedModelException,
+            throws IOException,
+                    ModelNotFoundException,
+                    MalformedModelException,
                     TranslateException {
         Arguments arguments = new Arguments().parseArgs(args);
         if (arguments == null) {

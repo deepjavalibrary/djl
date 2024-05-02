@@ -35,6 +35,7 @@ public class EpochTrainingListener extends TrainingListenerAdapter {
         epochTime = System.nanoTime();
         numEpochs++;
     }
+
     /** {@inheritDoc} */
     @Override
     public void onTrainingBegin(Trainer trainer) {

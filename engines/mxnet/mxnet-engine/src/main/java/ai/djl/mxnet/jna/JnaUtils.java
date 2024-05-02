@@ -908,6 +908,7 @@ public final class JnaUtils {
         REFS.recycle(ref);
         return pointer;
     }
+
     /*
     int MXNDArraySetGradState(Pointer handle, int state);
 

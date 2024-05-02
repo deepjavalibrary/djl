@@ -43,7 +43,9 @@ public class ProfilerTest {
 
     @Test
     public void testProfiler()
-            throws MalformedModelException, ModelNotFoundException, IOException,
+            throws MalformedModelException,
+                    ModelNotFoundException,
+                    IOException,
                     TranslateException {
         try (NDManager manager = NDManager.newBaseManager()) {
             ImageClassificationTranslator translator =

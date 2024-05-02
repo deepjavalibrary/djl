@@ -65,7 +65,9 @@ public final class BertClassification {
     }
 
     public static Classifications[] predict(List<String> inputs)
-            throws MalformedModelException, ModelNotFoundException, IOException,
+            throws MalformedModelException,
+                    ModelNotFoundException,
+                    IOException,
                     TranslateException {
         // refer to
         // https://medium.com/delvify/bert-rest-inference-from-the-fine-tuned-model-499997b32851 and
