@@ -115,24 +115,7 @@ public class PtModel extends BaseModel {
              */
             block.freezeParameters(!trainParam);
         } else {
-            boolean hasParameter = true;
-            if (options != null) {
-                String paramOption = (String) options.get("hasParameter");
-                if (paramOption != null) {
-                    hasParameter = Boolean.parseBoolean(paramOption);
-                }
-            }
-            if (hasParameter) {
-                Path paramFile = paramPathResolver(prefix, options);
-                if (paramFile == null) {
-                    throw new IOException(
-                            "Parameter file not found in: "
-                                    + modelDir
-                                    + ". If you only specified model path, make sure path name"
-                                    + " match your saved model file name.");
-                }
-                readParameters(paramFile, options);
-            }
+            loadBlock(prefix, options);
         }
     }
 

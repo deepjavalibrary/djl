@@ -98,13 +98,19 @@ public final class Blocks {
     public static Block onesBlock(PairList<DataType, Shape> shapes, String[] names) {
         return new LambdaBlock(
                 a -> {
+                    Shape[] inShapes = a.getShapes();
                     NDManager manager = a.getManager();
                     NDList list = new NDList(shapes.size());
                     int index = 0;
                     for (Pair<DataType, Shape> pair : shapes) {
+                        long[] shape = pair.getValue().getShape().clone();
+                        for (int i = 0; i < shape.length; ++i) {
+                            if (shape[i] == -1) {
+                                shape[i] = inShapes[index].get(i);
+                            }
+                        }
                         DataType dataType = pair.getKey();
-                        Shape shape = pair.getValue();
-                        NDArray arr = manager.ones(shape, dataType);
+                        NDArray arr = manager.ones(new Shape(shape), dataType);
                         if (names.length == list.size()) {
                             arr.setName(names[index++]);
                         }

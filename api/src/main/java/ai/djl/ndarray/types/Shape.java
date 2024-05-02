@@ -548,7 +548,8 @@ public class Shape {
         PairList<DataType, Shape> inputShapes = new PairList<>();
         if (value != null) {
             if (value.contains("(")) {
-                Pattern pattern = Pattern.compile("\\((\\s*(\\d+)([,\\s]+\\d+)*\\s*)\\)(\\w?)");
+                Pattern pattern =
+                        Pattern.compile("\\((\\s*([-\\d]+)([,\\s]+[-\\d]+)*\\s*)\\)(\\w?)");
                 Matcher matcher = pattern.matcher(value);
                 while (matcher.find()) {
                     String[] tokens = matcher.group(1).split(",");
