@@ -144,7 +144,7 @@ public class HdfsRepository extends AbstractRepository {
                 return Collections.singletonList(mrl);
             }
         } catch (IOException e) {
-            logger.warn("Failed to scan: " + uri.toString(), e);
+            logger.warn("Failed to scan: {}", uri, e);
         }
         return Collections.emptyList();
     }
@@ -157,7 +157,7 @@ public class HdfsRepository extends AbstractRepository {
         resolved = true;
         Artifact artifact = listFiles();
         if (artifact == null) {
-            logger.debug("No object found in hdfs: " + uri);
+            logger.debug("No object found in hdfs: {}", uri);
             return null;
         }
 

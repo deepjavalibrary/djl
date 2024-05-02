@@ -124,11 +124,9 @@ public class CachedOp extends NativeResource<Pointer> {
                 String key = pair.getKey();
                 if (!"prob_label".equals(key) && !"softmax_label".equals(key)) {
                     logger.warn(
-                            "Input "
-                                    + key
-                                    + " not found, set NDArray to Shape("
-                                    + batchSize
-                                    + ") by default");
+                            "Input {} not found, set NDArray to Shape({}) by default",
+                            key,
+                            batchSize);
                 }
                 allInputsNDArray[pair.getValue()] =
                         (MxNDArray) inputManager.create(new Shape(batchSize));

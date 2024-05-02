@@ -147,7 +147,7 @@ public class S3Repository extends AbstractRepository {
                 return Collections.singletonList(mrl);
             }
         } catch (IOException e) {
-            logger.warn("Failed to scan S3: " + bucket, e);
+            logger.warn("Failed to scan S3: {}", bucket, e);
         }
         return Collections.emptyList();
     }

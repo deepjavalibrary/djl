@@ -56,7 +56,7 @@ public final class UniversalSentenceEncoder {
 
         float[][] embeddings = UniversalSentenceEncoder.predict(inputs);
         for (int i = 0; i < inputs.size(); i++) {
-            logger.info("Embedding for: " + inputs.get(i) + "\n" + Arrays.toString(embeddings[i]));
+            logger.info("Embedding for: {}\n{}", inputs.get(i), Arrays.toString(embeddings[i]));
         }
     }
 

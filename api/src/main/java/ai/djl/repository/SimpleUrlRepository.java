@@ -90,7 +90,7 @@ public class SimpleUrlRepository extends AbstractRepository {
                 return Collections.singletonList(mrl);
             }
         } catch (IOException e) {
-            logger.warn("Failed to connect URL: " + uri, e);
+            logger.warn("Failed to connect URL: {}", uri, e);
         }
         return Collections.emptyList();
     }
@@ -141,7 +141,7 @@ public class SimpleUrlRepository extends AbstractRepository {
                 conn.setRequestMethod("HEAD");
                 int code = conn.getResponseCode();
                 if (code != 200) {
-                    logger.info("request error: " + code);
+                    logger.info("request error: {}", code);
                     return -1;
                 }
                 return conn.getContentLength();

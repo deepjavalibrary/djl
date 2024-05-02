@@ -373,8 +373,7 @@ public class IntegrationTest {
                     logger.trace("", e.getCause());
                     result = TestResult.UNSUPPORTED;
                 } else {
-                    logger.error("Test {}.{} FAILED", getName(), method.getName());
-                    logger.error("", e.getCause());
+                    logger.error("Test {}.{} FAILED", getName(), method.getName(), e.getCause());
                     result = TestResult.FAILED;
                 }
             } finally {
