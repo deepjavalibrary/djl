@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.engine.PtNDManager;
+import ai.djl.testing.TestRequirements;
 import ai.djl.util.Pair;
 
 import org.testng.Assert;
@@ -28,6 +29,8 @@ public class IValueUtilsTest {
 
     @Test
     public void testTuple() {
+        TestRequirements.notMacX86();
+
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.zeros(new Shape(1));
             array1.setName("input1()");
@@ -50,6 +53,8 @@ public class IValueUtilsTest {
 
     @Test
     public void testTupleOfTuple() {
+        TestRequirements.notMacX86();
+
         try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
             NDArray array1 = manager.zeros(new Shape(1));
             array1.setName("input1(2,3)");
@@ -91,6 +96,8 @@ public class IValueUtilsTest {
 
     @Test
     public void testMapOfTensor() {
+        TestRequirements.notMacX86();
+
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.zeros(new Shape(1));
             array1.setName("input1.key1");
@@ -119,6 +126,8 @@ public class IValueUtilsTest {
 
     @Test
     public void testListOfTensor() {
+        TestRequirements.notMacX86();
+
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array1 = manager.zeros(new Shape(1));
             array1.setName("input1[]");

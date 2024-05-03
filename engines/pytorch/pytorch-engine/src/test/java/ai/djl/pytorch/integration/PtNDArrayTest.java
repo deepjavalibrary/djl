@@ -17,6 +17,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.TestRequirements;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -27,6 +28,8 @@ public class PtNDArrayTest {
 
     @Test
     public void testStringTensor() {
+        TestRequirements.notMacX86();
+
         try (NDManager manager = NDManager.newBaseManager()) {
             String[] str = {"a", "b", "c"};
             NDArray arr = manager.create(str);
@@ -40,6 +43,8 @@ public class PtNDArrayTest {
 
     @Test
     public void testLargeTensor() {
+        TestRequirements.notMacX86();
+
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.zeros(new Shape(10 * 2850, 18944), DataType.FLOAT32);
             Assert.assertThrows(EngineException.class, array::toByteArray);

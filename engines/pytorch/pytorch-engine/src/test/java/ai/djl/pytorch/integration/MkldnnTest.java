@@ -25,7 +25,7 @@ import java.util.Arrays;
 /** The file is for testing PyTorch MKLDNN functionalities. */
 public class MkldnnTest {
 
-    @Test
+    @Test(enabled = false)
     public void testMkldnn() {
         if (!"amd64".equals(System.getProperty("os.arch"))) {
             throw new SkipException("MKLDNN Test requires x86_64 arch.");

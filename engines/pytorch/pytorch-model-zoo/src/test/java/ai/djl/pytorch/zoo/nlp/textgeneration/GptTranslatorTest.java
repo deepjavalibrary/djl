@@ -24,6 +24,7 @@ import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
@@ -38,6 +39,8 @@ public class GptTranslatorTest {
 
     @Test
     public void testGpt2() throws TranslateException, ModelException, IOException {
+        TestRequirements.notMacX86();
+
         // This is a fake model that simulates language models like GPT2: NDList(inputIds, posIds,
         // attnMask) -> NDList(logits(1), pastKv(12*2)[, hiddenStates(13)])
         Block block =

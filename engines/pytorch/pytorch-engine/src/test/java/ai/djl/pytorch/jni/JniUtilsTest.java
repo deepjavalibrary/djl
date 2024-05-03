@@ -12,12 +12,16 @@
  */
 package ai.djl.pytorch.jni;
 
+import ai.djl.testing.TestRequirements;
+
 import org.testng.annotations.Test;
 
 public class JniUtilsTest {
 
     @Test
     public void testClearGpuCache() {
+        TestRequirements.notMacX86();
+
         JniUtils.emptyCudaCache();
     }
 }

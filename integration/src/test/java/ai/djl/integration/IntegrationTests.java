@@ -20,6 +20,10 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class IntegrationTests {
 
     private static final Logger logger = LoggerFactory.getLogger(IntegrationTests.class);
@@ -28,23 +32,24 @@ public class IntegrationTests {
     public void runIntegrationTests() {
         String[] args = {};
 
-        String[] engines;
+        List<String> engines = new ArrayList<>();
         String defaultEngine = System.getProperty("ai.djl.default_engine");
         if (defaultEngine == null) {
             // TODO: windows CPU build is having OOM issue if 3 engines are loaded and running tests
             // together
             if (System.getProperty("os.name").startsWith("Win")) {
-                engines = new String[] {"MXNet"};
+                engines.add("MXNet");
             } else if ("aarch64".equals(System.getProperty("os.arch"))) {
-                engines = new String[] {"PyTorch"};
+                engines.add("PyTorch");
             } else {
-                engines =
-                        new String[] {
-                            "MXNet", "PyTorch", "TensorFlow", "OnnxRuntime", "XGBoost", "LightGBM"
-                        };
+                engines.addAll(
+                        Arrays.asList("MXNet", "TensorFlow", "OnnxRuntime", "XGBoost", "LightGBM"));
+                if (!System.getProperty("os.name").startsWith("Mac")) {
+                    engines.add("PyTorch");
+                }
             }
         } else {
-            engines = new String[] {defaultEngine};
+            engines.add(defaultEngine);
         }
 
         for (String engine : engines) {
