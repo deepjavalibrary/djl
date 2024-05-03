@@ -22,6 +22,8 @@ import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Progress;
 
+import com.google.gson.Gson;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -347,7 +349,8 @@ public class Criteria<I, O> {
             sb.append("\tFilter: ").append(JsonUtils.GSON.toJson(filters)).append('\n');
         }
         if (arguments != null) {
-            sb.append("\tArguments: ").append(JsonUtils.GSON.toJson(arguments)).append('\n');
+            Gson gson = JsonUtils.builder().excludeFieldsWithoutExposeAnnotation().create();
+            sb.append("\tArguments: ").append(gson.toJson(arguments)).append('\n');
         }
         if (options != null) {
             sb.append("\tOptions: ").append(JsonUtils.GSON.toJson(options)).append('\n');
