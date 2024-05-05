@@ -23,7 +23,7 @@ public class TrainBertOnGoemotionsTest {
 
     @Test
     public void testTrainBert() throws IOException, TranslateException {
-        TestRequirements.engine("MXNet", "PyTorch");
+        TestRequirements.linux();
 
         String[] args = new String[] {"-g", "1", "-m", "1", "-e", "1"};
         TrainBertOnGoemotions.runExample(args);

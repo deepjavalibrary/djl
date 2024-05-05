@@ -28,8 +28,7 @@ public class InstanceSegmentationTest {
 
     @Test
     public void testInstanceSegmentation() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("MXNet");
-        TestRequirements.nightly();
+        TestRequirements.linux();
 
         DetectedObjects result = InstanceSegmentation.predict();
         Classifications.Classification best = result.best();

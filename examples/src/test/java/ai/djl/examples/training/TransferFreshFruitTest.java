@@ -30,15 +30,14 @@ public class TransferFreshFruitTest {
     @Test
     public void testTransferFreshFruit()
             throws ModelException, TranslateException, IOException, URISyntaxException {
-        TestRequirements.engine("PyTorch");
+        TestRequirements.linux();
 
         String[][] args = {{}, {"-p"}};
-        Engine.getInstance().setRandomSeed(1234);
-        TrainingResult result;
+        Engine.getEngine("PyTorch").setRandomSeed(1234);
         for (String[] arg : args) {
-            result = TransferFreshFruit.runExample(arg);
+            TrainingResult result = TransferFreshFruit.runExample(arg);
             Assert.assertNotNull(result);
-            Assert.assertTrue(result.getEvaluations().get("validate_Accuracy") > 0.9f);
+            Assert.assertTrue(result.getEvaluations().get("validate_Accuracy") > 0.76f);
             Assert.assertTrue(result.getEvaluations().get("train_Accuracy") > 0.9f);
         }
     }

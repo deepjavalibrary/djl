@@ -25,7 +25,7 @@ public class BertQaTest {
 
     @Test
     public void testBertQa() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("MXNet", "PyTorch");
+        TestRequirements.linux();
 
         String result = BertQaInference.predict();
         Assert.assertEquals(result, "december 2004");

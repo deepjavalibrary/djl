@@ -25,8 +25,8 @@ public class TextGenerationTest {
 
     @Test
     public void testTextGeneration() throws TranslateException, ModelException, IOException {
+        TestRequirements.linux();
         TestRequirements.weekly();
-        TestRequirements.engine("PyTorch");
 
         // Beam with Ort
         String[] output0 = TextGeneration.generateTextWithOnnxRuntimeBeam();
@@ -91,8 +91,8 @@ public class TextGenerationTest {
 
     @Test
     public void testSeqBatchScheduler() throws TranslateException, ModelException, IOException {
+        TestRequirements.linux();
         TestRequirements.weekly();
-        TestRequirements.engine("PyTorch");
         String[] output = RollingBatch.seqBatchSchedulerWithPyTorchContrastive();
         Assert.assertEquals(
                 output[0],

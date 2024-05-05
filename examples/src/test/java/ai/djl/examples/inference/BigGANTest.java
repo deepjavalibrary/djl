@@ -27,7 +27,7 @@ public class BigGANTest {
 
     @Test
     public void testBigGAN() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("PyTorch");
+        TestRequirements.linux();
 
         Image[] generatedImages = BigGAN.generate();
 

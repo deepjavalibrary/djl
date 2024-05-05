@@ -25,9 +25,10 @@ public class TrainMnistWithLSTMTest {
 
     @Test
     public void testTrainMnistWithLSTM() throws IOException, TranslateException {
-        TestRequirements.engine("MXNet", "PyTorch");
+        TestRequirements.linux();
 
-        String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2"};
+        // TODO: PyTorch -- cuDNN error: CUDNN_STATUS_VERSION_MISMATCH
+        String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2", "--engine", "MXNet"};
         TrainingResult result = TrainMnistWithLSTM.runExample(args);
         Assert.assertNotNull(result);
     }

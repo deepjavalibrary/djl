@@ -16,7 +16,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.PikachuDetection;
 import ai.djl.basicmodelzoo.cv.object_detection.yolo.YOLOV3;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -50,7 +49,7 @@ public final class TrainPikachuWithYOLOV3 {
             return null;
         }
 
-        try (Model model = Model.newInstance("pikachu-yolov3")) {
+        try (Model model = Model.newInstance("pikachu-yolov3", arguments.getEngine())) {
             model.setBlock(YOLOV3.builder().setNumClasses(1).build());
             RandomAccessDataset trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);
             RandomAccessDataset validateSet = getDataset(Dataset.Usage.TEST, arguments);
@@ -106,7 +105,7 @@ public final class TrainPikachuWithYOLOV3 {
                                 .setInputShape(new Shape(256, 256))
                                 .setAnchorsArray(anchorsArray)
                                 .build())
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .addTrainingListeners(TrainingListener.Defaults.basic())
                 .addTrainingListeners(listener);
     }

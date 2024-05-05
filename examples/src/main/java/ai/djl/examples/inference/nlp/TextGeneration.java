@@ -13,6 +13,7 @@
 package ai.djl.examples.inference.nlp;
 
 import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.inference.Predictor;
@@ -161,10 +162,7 @@ public final class TextGeneration {
     }
 
     public static String[] generateTextWithOnnxRuntimeBeam()
-            throws ModelNotFoundException,
-                    MalformedModelException,
-                    IOException,
-                    TranslateException {
+            throws ModelException, IOException, TranslateException {
         SearchConfig config = new SearchConfig();
         config.setMaxSeqLength(60);
         long padTokenId = 220;

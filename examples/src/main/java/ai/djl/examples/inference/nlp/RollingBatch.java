@@ -12,7 +12,7 @@
  */
 package ai.djl.examples.inference.nlp;
 
-import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.nlp.generate.CausalLMOutput;
@@ -22,7 +22,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.DeferredTranslatorFactory;
 import ai.djl.translate.TranslateException;
@@ -39,20 +38,13 @@ public final class RollingBatch {
 
     private RollingBatch() {}
 
-    public static void main(String[] args)
-            throws ModelNotFoundException,
-                    MalformedModelException,
-                    IOException,
-                    TranslateException {
+    public static void main(String[] args) throws ModelException, IOException, TranslateException {
         String[] ret = seqBatchSchedulerWithPyTorchContrastive();
         logger.info("{}", ret[0]);
     }
 
     public static String[] seqBatchSchedulerWithPyTorchContrastive()
-            throws ModelNotFoundException,
-                    MalformedModelException,
-                    IOException,
-                    TranslateException {
+            throws ModelException, IOException, TranslateException {
         String url = "https://djl-misc.s3.amazonaws.com/test/models/gpt2/gpt2_pt.zip";
 
         Criteria<NDList, CausalLMOutput> criteria =

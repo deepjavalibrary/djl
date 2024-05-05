@@ -30,7 +30,7 @@ public class RetinaFaceDetectionTest {
 
     @Test
     public void testRetinaFaceDetection() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("PyTorch");
+        TestRequirements.linux();
         TestRequirements.nightly();
         DetectedObjects result = RetinaFaceDetection.predict();
 

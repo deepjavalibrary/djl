@@ -14,9 +14,9 @@ package ai.djl.examples.training;
 
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.Mnist;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
@@ -53,7 +53,7 @@ public final class TrainMnistWithLSTM {
             return null;
         }
 
-        try (Model model = Model.newInstance("lstm")) {
+        try (Model model = Model.newInstance("lstm", arguments.getEngine())) {
             model.setBlock(getLSTMModel());
 
             // get training and validation dataset
@@ -119,7 +119,7 @@ public final class TrainMnistWithLSTM {
 
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }
@@ -129,6 +129,7 @@ public final class TrainMnistWithLSTM {
         Mnist mnist =
                 Mnist.builder()
                         .optUsage(usage)
+                        .optManager(NDManager.newBaseManager(arguments.getEngine()))
                         .setSampling(arguments.getBatchSize(), false, true)
                         .optLimit(arguments.getLimit())
                         .build();

@@ -30,11 +30,12 @@ public class TrainResNetTest {
 
     @Test
     public void testTrainResNet() throws ModelException, IOException, TranslateException {
-        TestRequirements.engine("MXNet");
+        TestRequirements.linux();
 
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
-        String[] args = {"-e", "2", "-g", "4", "-m", "10", "-s", "-p"};
+        // only MXNet support symbolic model
+        String[] args = {"-e", "2", "-g", "4", "-m", "10", "-s", "-p", "--engine", "MXNet"};
 
         TrainingResult result = TrainResnetWithCifar10.runExample(args);
         Assert.assertNotNull(result);
@@ -45,13 +46,14 @@ public class TrainResNetTest {
             throws ModelException, IOException, TranslateException {
         TestRequirements.engine("MXNet");
         TestRequirements.nightly();
-        TestRequirements.gpu();
+        TestRequirements.gpu("MXNet");
 
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
-        String[] args = {"-e", "10", "-g", "4", "-s", "-p"};
+        // only MXNet support symbolic model
+        String[] args = {"-e", "10", "-g", "4", "-s", "-p", "--engine", "MXNet"};
 
-        Engine.getInstance().setRandomSeed(SEED);
+        Engine.getEngine("MXNet").setRandomSeed(SEED);
         TrainingResult result = TrainResnetWithCifar10.runExample(args);
         Assert.assertNotNull(result);
 
@@ -64,13 +66,13 @@ public class TrainResNetTest {
     public void testTrainResNetImperativeNightly()
             throws ModelException, IOException, TranslateException {
         TestRequirements.nightly();
-        TestRequirements.gpu();
+        TestRequirements.gpu("MXNet");
 
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
-        String[] args = {"-e", "10", "-g", "4"};
+        String[] args = {"-e", "10", "-g", "4", "--engine", "MXNet"};
 
-        Engine.getInstance().setRandomSeed(SEED);
+        Engine.getEngine("MXNet").setRandomSeed(SEED);
         TrainingResult result = TrainResnetWithCifar10.runExample(args);
         Assert.assertNotNull(result);
 

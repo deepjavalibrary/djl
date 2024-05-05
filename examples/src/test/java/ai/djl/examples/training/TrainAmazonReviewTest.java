@@ -28,11 +28,11 @@ public class TrainAmazonReviewTest {
     @Test
     public void testRankTraining()
             throws ModelException, TranslateException, IOException, URISyntaxException {
-        TestRequirements.engine("MXNet", "PyTorch");
-        TestRequirements.nightly();
+        TestRequirements.linux();
+        TestRequirements.weekly();
 
         String[] args;
-        if (Engine.getInstance().getGpuCount() > 0) {
+        if (Engine.getEngine("PyTorch").getGpuCount() > 0) {
             args = new String[] {"-e", "1", "-g", "1"};
         } else {
             args = new String[] {"-e", "1", "-m", "2"};

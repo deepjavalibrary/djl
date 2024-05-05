@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.training.util;
 
+import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.util.JsonUtils;
 
@@ -38,10 +39,10 @@ public class Arguments {
     protected long limit;
     protected String modelDir;
     protected Map<String, String> criteria;
+    protected String engine;
 
     protected void initialize() {
         epoch = 2;
-        maxGpus = Engine.getInstance().getGpuCount();
         outputDir = "build/model";
         limit = Long.MAX_VALUE;
         modelDir = null;
@@ -52,7 +53,7 @@ public class Arguments {
             epoch = Integer.parseInt(cmd.getOptionValue("epoch"));
         }
         if (cmd.hasOption("max-gpus")) {
-            maxGpus = Math.min(Integer.parseInt(cmd.getOptionValue("max-gpus")), maxGpus);
+            maxGpus = Integer.parseInt(cmd.getOptionValue("max-gpus"));
         }
         if (cmd.hasOption("batch-size")) {
             batchSize = Integer.parseInt(cmd.getOptionValue("batch-size"));
@@ -74,6 +75,11 @@ public class Arguments {
         if (cmd.hasOption("criteria")) {
             Type type = new TypeToken<Map<String, Object>>() {}.getType();
             criteria = JsonUtils.GSON.fromJson(cmd.getOptionValue("criteria"), type);
+        }
+        if (cmd.hasOption("engine")) {
+            engine = cmd.getOptionValue("engine");
+        } else {
+            engine = "PyTorch";
         }
     }
 
@@ -162,6 +168,13 @@ public class Arguments {
                         .argName("CRITERIA")
                         .desc("The criteria used for the model.")
                         .build());
+        options.addOption(
+                Option.builder()
+                        .longOpt("engine")
+                        .hasArg()
+                        .argName("ENGINE")
+                        .desc("The engine for the model.")
+                        .build());
         return options;
     }
 
@@ -173,8 +186,8 @@ public class Arguments {
         return epoch;
     }
 
-    public int getMaxGpus() {
-        return maxGpus;
+    public Device[] getMaxGpus() {
+        return Engine.getEngine(engine).getDevices(maxGpus);
     }
 
     public boolean isSymbolic() {
@@ -199,6 +212,10 @@ public class Arguments {
 
     public Map<String, String> getCriteria() {
         return criteria;
+    }
+
+    public String getEngine() {
+        return engine;
     }
 
     private void printHelp(String msg, Options options) {

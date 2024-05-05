@@ -12,11 +12,10 @@
  */
 package ai.djl.examples.inference;
 
-import ai.djl.MalformedModelException;
+import ai.djl.ModelException;
 import ai.djl.examples.inference.cv.StyleTransfer;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
@@ -29,12 +28,8 @@ import java.nio.file.Paths;
 public class StyleTransferTest {
 
     @Test
-    public void testStyleTransfer()
-            throws IOException,
-                    ModelNotFoundException,
-                    MalformedModelException,
-                    TranslateException {
-        TestRequirements.engine("PyTorch");
+    public void testStyleTransfer() throws IOException, ModelException, TranslateException {
+        TestRequirements.linux();
 
         String imagePath = "src/test/resources/mountains.png";
         Image input = ImageFactory.getInstance().fromFile(Paths.get(imagePath));

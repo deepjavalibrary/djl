@@ -132,7 +132,7 @@ private static DefaultTrainingConfig setupTrainingConfig(Block baseBlock) {
 
     DefaultTrainingConfig config = new DefaultTrainingConfig(new SoftmaxCrossEntropy("SoftmaxCrossEntropy"))
             .addEvaluator(new Accuracy())
-            .optDevices(Engine.getInstance().getDevices(1))
+            .optDevices(Engine.getEngine("PyTorch").getDevices(1))
             .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
             .addTrainingListeners(listener);
      ...

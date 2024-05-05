@@ -14,8 +14,8 @@
 package ai.djl.examples.inference;
 
 import ai.djl.Application;
+import ai.djl.Device;
 import ai.djl.ModelException;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.repository.zoo.Criteria;
@@ -68,14 +68,14 @@ public final class BertQaInference {
                         .optApplication(Application.NLP.QUESTION_ANSWER)
                         .setTypes(QAInput.class, String.class)
                         .optFilter("backbone", "bert")
-                        .optEngine(Engine.getDefaultEngineName())
+                        .optEngine("PyTorch")
+                        .optDevice(Device.cpu())
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<QAInput, String> model = criteria.loadModel()) {
-            try (Predictor<QAInput, String> predictor = model.newPredictor()) {
-                return predictor.predict(input);
-            }
+        try (ZooModel<QAInput, String> model = criteria.loadModel();
+                Predictor<QAInput, String> predictor = model.newPredictor()) {
+            return predictor.predict(input);
         }
     }
 }
