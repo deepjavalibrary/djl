@@ -37,6 +37,7 @@ public interface JsonUtils {
         return new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                 .setPrettyPrinting()
+                .serializeSpecialFloatingPointValues()
                 .registerTypeAdapter(
                         Double.class,
                         (JsonSerializer<Double>)
