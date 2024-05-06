@@ -26,9 +26,10 @@ public class TrainTimeSeriesTest {
 
     @Test
     public void testTrainTimeSeries() throws TranslateException, IOException {
-        TestRequirements.engine("MXNet");
+        TestRequirements.linux();
 
-        String[] args = new String[] {"-g", "1", "-e", "5", "-b", "32"};
+        // TODO: PyTorch -- cuDNN error: CUDNN_STATUS_VERSION_MISMATCH
+        String[] args = new String[] {"-g", "1", "-e", "5", "-b", "32", "--engine", "MXNet"};
         TrainingResult result = TrainTimeSeries.runExample(args);
         Assert.assertNotNull(result);
         float loss = result.getTrainLoss();

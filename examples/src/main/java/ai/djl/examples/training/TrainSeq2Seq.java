@@ -18,7 +18,6 @@ import ai.djl.basicdataset.nlp.TextDataset;
 import ai.djl.basicdataset.utils.TextData.Configuration;
 import ai.djl.basicmodelzoo.nlp.SimpleTextDecoder;
 import ai.djl.basicmodelzoo.nlp.SimpleTextEncoder;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.nlp.EncoderDecoder;
@@ -29,6 +28,7 @@ import ai.djl.modality.nlp.preprocess.PunctuationSeparator;
 import ai.djl.modality.nlp.preprocess.SimpleTokenizer;
 import ai.djl.modality.nlp.preprocess.TextTerminator;
 import ai.djl.modality.nlp.preprocess.TextTruncator;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.recurrent.LSTM;
@@ -66,7 +66,7 @@ public final class TrainSeq2Seq {
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(8);
-        try (Model model = Model.newInstance("seq2seqMTEn-Fr")) {
+        try (Model model = Model.newInstance("seq2seqMTEn-Fr", arguments.getEngine())) {
             // get training and validation dataset
             TextDataset trainingSet = getDataset(Dataset.Usage.TRAIN, arguments, null, null);
             // Fetch TextEmbedding from dataset
@@ -151,7 +151,7 @@ public final class TrainSeq2Seq {
 
         return new DefaultTrainingConfig(new MaskedSoftmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy("Accuracy", 2))
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .optExecutorService(executorService)
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
@@ -179,6 +179,7 @@ public final class TrainSeq2Seq {
                                         .addPad(0, 0, (m) -> m.ones(new Shape(1)), 10)
                                         .build())
                         .optUsage(usage)
+                        .optManager(NDManager.newBaseManager(arguments.getEngine()))
                         .optPrefetchNumber(8)
                         .optLimit(limit);
         Configuration sourceConfig =

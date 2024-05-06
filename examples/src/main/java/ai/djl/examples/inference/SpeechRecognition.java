@@ -13,6 +13,7 @@
 
 package ai.djl.examples.inference;
 
+import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.audio.Audio;
@@ -56,6 +57,7 @@ public final class SpeechRecognition {
                 Criteria.builder()
                         .setTypes(Audio.class, String.class)
                         .optModelUrls(url)
+                        .optDevice(Device.cpu()) // torchscript model only support CPU
                         .optTranslatorFactory(new SpeechRecognitionTranslatorFactory())
                         .optModelName("wav2vec2.ptl")
                         .optEngine("PyTorch")

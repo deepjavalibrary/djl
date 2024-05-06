@@ -27,8 +27,8 @@ public class ClipModelTest {
 
     @Test
     public void testClipFeature() throws ModelException, IOException, TranslateException {
+        TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.engine("PyTorch");
 
         try (ClipModel model = new ClipModel()) {
             String input = "This is a nice day";
@@ -44,8 +44,8 @@ public class ClipModelTest {
 
     @Test
     public void testClipComparison() throws ModelException, IOException, TranslateException {
+        TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.engine("PyTorch");
 
         String text = "A photo of cats";
         String text2 = "A photo of dogs";

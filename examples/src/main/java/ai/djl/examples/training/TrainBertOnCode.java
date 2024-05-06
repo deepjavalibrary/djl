@@ -13,7 +13,6 @@
 package ai.djl.examples.training;
 
 import ai.djl.Model;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.BertCodeDataset;
 import ai.djl.ndarray.types.Shape;
@@ -59,7 +58,7 @@ public final class TrainBertOnCode {
         dataset.prepare();
 
         // Create model & trainer
-        try (Model model = createBertPretrainingModel(dataset.getVocabularySize())) {
+        try (Model model = createBertPretrainingModel(arguments, dataset.getVocabularySize())) {
 
             TrainingConfig config = createTrainingConfig(arguments);
             try (Trainer trainer = model.newTrainer(config)) {
@@ -74,7 +73,7 @@ public final class TrainBertOnCode {
         }
     }
 
-    private static Model createBertPretrainingModel(long vocabularySize) {
+    private static Model createBertPretrainingModel(Arguments arguments, long vocabularySize) {
         Block block =
                 new BertPretrainingBlock(
                         BertBlock.builder()
@@ -82,7 +81,7 @@ public final class TrainBertOnCode {
                                 .setTokenDictionarySize(Math.toIntExact(vocabularySize)));
         block.setInitializer(new TruncatedNormalInitializer(0.02f), Parameter.Type.WEIGHT);
 
-        Model model = Model.newInstance("Bert Pretraining");
+        Model model = Model.newInstance("Bert Pretraining", arguments.getEngine());
         model.setBlock(block);
         return model;
     }
@@ -108,7 +107,7 @@ public final class TrainBertOnCode {
                         .build();
         return new DefaultTrainingConfig(new BertPretrainingLoss())
                 .optOptimizer(optimizer)
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .addTrainingListeners(Defaults.logging());
     }
 

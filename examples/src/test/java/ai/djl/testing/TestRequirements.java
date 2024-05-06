@@ -14,7 +14,6 @@ package ai.djl.testing;
 
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
-import ai.djl.util.Utils;
 
 import org.testng.SkipException;
 
@@ -44,13 +43,6 @@ public final class TestRequirements {
         }
     }
 
-    /** Requires a test not be run in offline mode. */
-    public static void notOffline() {
-        if (Utils.isOfflineMode()) {
-            throw new SkipException("This test can not run while offline");
-        }
-    }
-
     /**
      * Requires a test only with the allowed engine(s).
      *
@@ -73,31 +65,20 @@ public final class TestRequirements {
     }
 
     /**
-     * Requires a test have any engines except for those listed.
+     * Requires a test have runs on Linux.
      *
-     * @param engines the engine(s) to not run the test on
+     * <p>Avoid running multiple engines on Windows and PyTorch on macos x86_64 machine
      */
-    public static void notEngine(String... engines) {
-        String engineName = Engine.getDefaultEngineName();
-        for (String e : engines) {
-            if (engineName.equals(e)) {
-                throw new SkipException(
-                        "This test requires not using the engines: " + Arrays.toString(engines));
-            }
+    public static void linux() {
+        if (!System.getProperty("os.name").toLowerCase().startsWith("linux")) {
+            throw new SkipException("This test requires a Linux os.");
         }
     }
 
     /** Requires a test have at least one gpu. */
-    public static void gpu() {
-        if (Engine.getInstance().getGpuCount() == 0) {
+    public static void gpu(String engine) {
+        if (Engine.getEngine(engine).getGpuCount() == 0) {
             throw new SkipException("This test requires a GPU to run");
-        }
-    }
-
-    /** Requires that the test runs on OSX or linux, not windows. */
-    public static void notWindows() {
-        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-            throw new SkipException("This test requires a non-windows os.");
         }
     }
 }

@@ -17,7 +17,6 @@ import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.tabular.utils.Feature;
-import ai.djl.engine.Engine;
 import ai.djl.examples.inference.timeseries.M5ForecastingDeepAR;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
@@ -83,9 +82,8 @@ public final class TrainTimeSeries {
     }
 
     public static TrainingResult runExample(String[] args) throws IOException, TranslateException {
-
         Arguments arguments = new Arguments().parseArgs(args);
-        try (Model model = Model.newInstance("deepar")) {
+        try (Model model = Model.newInstance("deepar", arguments.getEngine())) {
             // specify the model distribution output, for M5 case, NegativeBinomial best describe it
             DistributionOutput distributionOutput = new NegativeBinomialOutput();
             DefaultTrainingConfig config = setupTrainingConfig(arguments, distributionOutput);
@@ -212,7 +210,7 @@ public final class TrainTimeSeries {
 
         return new DefaultTrainingConfig(new DistributionLoss("Loss", distributionOutput))
                 .addEvaluator(new Rmsse(distributionOutput))
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .optInitializer(new XavierInitializer(), Parameter.Type.WEIGHT)
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);

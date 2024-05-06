@@ -33,8 +33,8 @@ public class ObjectDetectionWithTensorflowSavedModelTest {
     public void testObjectDetection() throws ModelException, TranslateException, IOException {
         // Only run nightly, this example download the synset file from github, this can cause
         // throttling and will fail the test.
+        TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.engine("TensorFlow");
 
         DetectedObjects result = ObjectDetectionWithTensorflowSavedModel.predict();
 

@@ -57,7 +57,7 @@ public final class ImageClassification {
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
         String modelName = "mlp";
-        try (Model model = Model.newInstance(modelName)) {
+        try (Model model = Model.newInstance(modelName, "PyTorch")) {
             model.setBlock(new Mlp(28 * 28, 10, new int[] {128, 64}));
 
             // Assume you have run TrainMnist.java example, and saved model in build/model folder.

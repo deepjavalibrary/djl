@@ -13,13 +13,11 @@
 package ai.djl.examples.training.transferlearning;
 
 import ai.djl.Application;
-import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.cv.classification.Cifar10;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -29,6 +27,7 @@ import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
+import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.Blocks;
@@ -36,7 +35,6 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
@@ -114,15 +112,15 @@ public final class TrainResnetWithCifar10 {
                 Path modelPath = Paths.get("build/model");
                 model.save(modelPath, "resnetv1");
 
-                Classifications classifications = testSaveParameters(model.getBlock(), modelPath);
+                Classifications classifications =
+                        testSaveParameters(model.getBlock(), modelPath, arguments);
                 logger.info("Predict result: {}", classifications.topK(3));
                 return result;
             }
         }
     }
 
-    private static Model getModel(Arguments arguments)
-            throws IOException, ModelNotFoundException, MalformedModelException {
+    private static Model getModel(Arguments arguments) throws IOException, ModelException {
         boolean isSymbolic = arguments.isSymbolic();
         boolean preTrained = arguments.isPreTrained();
         Map<String, String> options = arguments.getCriteria();
@@ -130,6 +128,7 @@ public final class TrainResnetWithCifar10 {
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(Image.class, Classifications.class)
+                        .optEngine(arguments.getEngine())
                         .optProgress(new ProgressBar())
                         .optArtifactId("resnet");
         if (isSymbolic) {
@@ -170,7 +169,7 @@ public final class TrainResnetWithCifar10 {
             return builder.build().loadModel();
         } else {
             // construct new ResNet50 without pre-trained weights
-            Model model = Model.newInstance("resnetv1");
+            Model model = Model.newInstance("resnetv1", arguments.getEngine());
             Block resNet50 =
                     ResNetV1.builder()
                             .setImageShape(new Shape(3, 32, 32))
@@ -182,7 +181,7 @@ public final class TrainResnetWithCifar10 {
         }
     }
 
-    private static Classifications testSaveParameters(Block block, Path path)
+    private static Classifications testSaveParameters(Block block, Path path, Arguments arguments)
             throws IOException, ModelException, TranslateException {
         String synsetUrl =
                 "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset_cifar10.txt";
@@ -200,6 +199,7 @@ public final class TrainResnetWithCifar10 {
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
                         .optModelPath(path)
+                        .optEngine(arguments.getEngine())
                         .optTranslator(translator)
                         .optBlock(block)
                         .optModelName("resnetv1")
@@ -214,7 +214,7 @@ public final class TrainResnetWithCifar10 {
     private static DefaultTrainingConfig setupTrainingConfig(Arguments arguments) {
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .addTrainingListeners(TrainingListener.Defaults.logging(arguments.getOutputDir()));
     }
 
@@ -227,6 +227,7 @@ public final class TrainResnetWithCifar10 {
         Cifar10 cifar10 =
                 Cifar10.builder()
                         .optUsage(usage)
+                        .optManager(NDManager.newBaseManager(arguments.getEngine()))
                         .setSampling(arguments.getBatchSize(), true)
                         .optLimit(arguments.getLimit())
                         .optPipeline(pipeline)

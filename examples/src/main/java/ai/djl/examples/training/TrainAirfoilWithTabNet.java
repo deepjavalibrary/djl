@@ -18,7 +18,6 @@ import ai.djl.basicdataset.tabular.ListFeatures;
 import ai.djl.basicdataset.tabular.TabularDataset;
 import ai.djl.basicdataset.tabular.TabularResults;
 import ai.djl.basicmodelzoo.tabular.TabNet;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -55,7 +54,7 @@ public final class TrainAirfoilWithTabNet {
         // Construct a tabNet instance
         Block tabNet = TabNet.builder().setInputDim(5).setOutDim(1).build();
 
-        try (Model model = Model.newInstance("tabNet")) {
+        try (Model model = Model.newInstance("tabNet", arguments.getEngine())) {
             model.setBlock(tabNet);
 
             // get the training and validation dataset
@@ -103,13 +102,12 @@ public final class TrainAirfoilWithTabNet {
                 });
 
         return new DefaultTrainingConfig(new TabNetRegressionLoss())
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }
 
-    private static TabularDataset getDataset(Arguments arguments)
-            throws IOException, TranslateException {
+    private static TabularDataset getDataset(Arguments arguments) throws IOException {
         AirfoilRandomAccess.Builder airfoilBuilder = AirfoilRandomAccess.builder();
 
         // only train dataset is available, so we get train dataset and split them

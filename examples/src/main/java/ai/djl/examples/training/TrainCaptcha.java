@@ -15,7 +15,6 @@ package ai.djl.examples.training;
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.CaptchaDataset;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.ndarray.NDArray;
@@ -63,7 +62,7 @@ public final class TrainCaptcha {
             return null;
         }
 
-        try (Model model = Model.newInstance("captcha")) {
+        try (Model model = Model.newInstance("captcha", arguments.getEngine())) {
             model.setBlock(getBlock());
 
             // get training and validation dataset
@@ -107,7 +106,7 @@ public final class TrainCaptcha {
 
         DefaultTrainingConfig config =
                 new DefaultTrainingConfig(loss)
-                        .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                        .optDevices(arguments.getMaxGpus())
                         .addEvaluators(loss.getComponents())
                         .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                         .addTrainingListeners(listener);

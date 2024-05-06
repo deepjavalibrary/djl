@@ -28,7 +28,7 @@ public class PoseEstimationTest {
 
     @Test
     public void testPoseEstimation() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("MXNet");
+        TestRequirements.linux();
 
         List<Joints> result = PoseEstimation.predict();
         Assert.assertTrue(result.get(0).getJoints().get(0).getConfidence() > 0.6d);

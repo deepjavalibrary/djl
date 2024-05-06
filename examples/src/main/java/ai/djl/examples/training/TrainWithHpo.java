@@ -15,7 +15,6 @@ package ai.djl.examples.training;
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.Mnist;
 import ai.djl.basicmodelzoo.basic.Mlp;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -83,7 +82,7 @@ public final class TrainWithHpo {
 
             return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                     .addEvaluator(new Accuracy())
-                    .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                    .optDevices(arguments.getMaxGpus())
                     .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                     .addTrainingListeners(listener);
         }
@@ -116,7 +115,7 @@ public final class TrainWithHpo {
 
             Block block =
                     new Mlp(Mnist.IMAGE_HEIGHT * Mnist.IMAGE_WIDTH, Mnist.NUM_CLASSES, hidden);
-            Model model = Model.newInstance("mlp");
+            Model model = Model.newInstance("mlp", arguments.getEngine());
             model.setBlock(block);
             return model;
         }

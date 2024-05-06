@@ -231,7 +231,7 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
     /** {@inheritDoc} */
     @Override
     public Shape[] getOutputShapes(Shape[] inputShapes, DataType[] dataTypes) {
-        try (NDManager manager = NDManager.newBaseManager()) {
+        try (NDManager manager = NDManager.newBaseManager("PyTorch")) {
             NDList list = new NDList();
             for (int i = 0; i < inputShapes.length; i++) {
                 list.add(

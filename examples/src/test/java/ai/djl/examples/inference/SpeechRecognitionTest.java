@@ -22,15 +22,12 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-import javax.sound.sampled.UnsupportedAudioFileException;
-
 public class SpeechRecognitionTest {
 
     @Test
-    public void testSpeechRecognition()
-            throws ModelException, TranslateException, IOException, UnsupportedAudioFileException {
+    public void testSpeechRecognition() throws ModelException, TranslateException, IOException {
+        TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.engine("PyTorch");
 
         try {
             String result = SpeechRecognition.predict();
@@ -40,7 +37,7 @@ public class SpeechRecognitionTest {
                             + " DOOR TO YOU SHALL I CALL ON HIM AS I PASS ");
         } catch (EngineException e) {
             // wav2vec2.ptl model requires avx2
-            if (!"Unknown qengine".equals(e.getMessage())) {
+            if (!"Unknown engine".equals(e.getMessage())) {
                 throw e;
             }
         }
