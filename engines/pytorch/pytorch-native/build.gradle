@@ -15,22 +15,8 @@ boolean isPrecxx11 = project.hasProperty("precxx11")
 boolean isAarch64 = project.hasProperty("aarch64") || System.properties["os.arch"] == "aarch64"
 
 String FLAVOR = "cpu"
-if (project.hasProperty("cu11")) {
-    if (VERSION.startsWith("1.11.")) {
-        FLAVOR = "cu113"
-    } else if (VERSION.startsWith("1.12.")) {
-        FLAVOR = "cu116"
-    } else if (VERSION.startsWith("1.13.")) {
-        FLAVOR = "cu117"
-    } else if (VERSION.startsWith("2.0.")) {
-        FLAVOR = "cu118"
-    } else if (VERSION.startsWith("2.1.")) {
-        FLAVOR = "cu121"
-    } else {
-        throw new GradleException("Unsupported PyTorch version: ${VERSION}")
-    }
-} else if (project.hasProperty("cu10")) {
-    FLAVOR = "cu102"
+if (project.hasProperty("cuda")) {
+    FLAVOR = project.property("cuda")
 }
 String BINARY_ROOT = "${project.buildDir}/download"
 
@@ -90,24 +76,12 @@ def prepareNativeLib(String binaryRoot, String ver) {
 
     def officialPytorchUrl = "https://download.pytorch.org/libtorch"
     def aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
-    String cuda
-    if (ver.startsWith("1.11.")) {
-        cuda = "cu113"
-    } else if (ver.startsWith("1.12.")) {
-        cuda = "cu116"
-    } else if (ver.startsWith("1.13.")) {
-        cuda = "cu117"
-    } else if (ver.startsWith("2.0.")) {
-        cuda = "cu118"
-    } else if (ver.startsWith("2.1.")) {
-        cuda = "cu121"
-    } else {
-        throw new GradleException("Unsupported PyTorch version: ${ver}")
-    }
+    String cuda = "cu121"
 
     def files = [
             "cpu/libtorch-cxx11-abi-shared-with-deps-${ver}%2Bcpu.zip"        : "cpu/linux-x86_64",
-            "cpu/libtorch-macos-${ver}.zip"                                   : "cpu/osx-x86_64",
+            "cpu/libtorch-macos-x86_64-${ver}.zip"                            : "cpu/osx-x86_64",
+            "cpu/libtorch-macos-arm64-${ver}.zip"                             : "cpu/osx-aarch64",
             "cpu/libtorch-win-shared-with-deps-${ver}%2Bcpu.zip"              : "cpu/win-x86_64",
             "${cuda}/libtorch-cxx11-abi-shared-with-deps-${ver}%2B${cuda}.zip": "${cuda}/linux-x86_64",
             "${cuda}/libtorch-win-shared-with-deps-${ver}%2B${cuda}.zip"      : "${cuda}/win-x86_64",
@@ -117,7 +91,6 @@ def prepareNativeLib(String binaryRoot, String ver) {
 
     def aarch64Files = [
             "${ver}/libtorch-shared-with-deps-${ver}-aarch64.zip": "cpu-precxx11/linux-aarch64",
-            "${ver}/libtorch-macos-${ver}-aarch64.zip"           : "cpu/osx-aarch64"
     ]
 
     copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
@@ -128,6 +101,12 @@ def prepareNativeLib(String binaryRoot, String ver) {
     }
     exec {
         commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-x86_64/native/lib/libtorch.dylib"
+    }
+    exec {
+        commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib"
+    }
+    exec {
+        commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-aarch64/native/lib/libtorch.dylib"
     }
 }
 
@@ -147,7 +126,7 @@ def copyNativeLibToOutputDir(Map<String, String> fileStoreMap, String binaryRoot
 
         copy {
             from("${outputDir}/libtorch/lib/") {
-                include "libarm_compute*", "libc10_cuda.so", "libc10.*", "libcaffe2_nvrtc.so", "libcu*", "libgfortran-*", "libgomp*", "libiomp*", "libnv*", "libopenblasp-*", "libtorch_cpu.*", "libtorch_cuda*.so", "libtorch.*", "asmjit.dll", "c10_cuda.dll", "c10.dll", "caffe2_nvrtc.dll", "cu*.dll", "fbgemm.dll", "nv*.dll", "torch_cpu.dll", "torch_cuda*.dll", "torch.dll", "uv.dll", "zlibwapi.dll"
+                include "libarm_compute*", "libc10_cuda.so", "libc10.*", "libcaffe2_nvrtc.so", "libcu*", "libgfortran-*", "libgomp*", "libiomp*", "libomp-*", "libnv*", "libopenblasp-*", "libtorch_cpu.*", "libtorch_cuda*.so", "libtorch.*", "asmjit.dll", "c10_cuda.dll", "c10.dll", "caffe2_nvrtc.dll", "cu*.dll", "fbgemm.dll", "nv*.dll", "torch_cpu.dll", "torch_cuda*.dll", "torch.dll", "uv.dll", "zlibwapi.dll"
             }
             into("${outputDir}/native/lib")
         }
@@ -163,6 +142,14 @@ def copyNativeLibToOutputDir(Map<String, String> fileStoreMap, String binaryRoot
                 i -> libstd.withOutputStream { it << i }
             }
         }
+        if (entry.value.contains("osx-aarch64")) {
+            def libomp = new File("${outputDir}/native/lib/libomp.dylib")
+            def ompUrl = "https://publish.djl.ai/extra/macos-arm64/libomp.dylib"
+            new URL(ompUrl).withInputStream {
+                i -> libomp.withOutputStream { it << i }
+            }
+        }
+
         delete(file)
         delete("${outputDir}/libtorch")
     }
