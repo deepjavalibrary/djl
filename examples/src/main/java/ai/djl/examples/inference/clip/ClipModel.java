@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.inference.clip;
 
+import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
@@ -45,6 +46,7 @@ public class ClipModel implements AutoCloseable {
                         .optModelUrls("https://resources.djl.ai/demo/pytorch/clip.zip")
                         .optTranslator(new NoopTranslator())
                         .optEngine("PyTorch")
+                        .optDevice(Device.cpu()) // torchscript model only support CPU
                         .build();
         clip = criteria.loadModel();
         imageFeatureExtractor = clip.newPredictor(new ImageTranslator());

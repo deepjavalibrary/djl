@@ -402,6 +402,7 @@ public class RsNDArrayEx implements NDArrayEx {
             NDArray input, Shape normalizedShape, NDArray gamma, NDArray beta, float eps) {
         throw new UnsupportedOperationException("Not implemented");
     }
+
     /** {@inheritDoc} */
     @Override
     public NDList batchNorm(

@@ -26,8 +26,8 @@ public class SentimentAnalysisTest {
 
     @Test
     public void testSentimentAnalysis() throws ModelException, TranslateException, IOException {
+        TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.engine("PyTorch");
 
         Classifications result = SentimentAnalysis.predict();
         Assert.assertEquals(result.best().getClassName(), "Positive");

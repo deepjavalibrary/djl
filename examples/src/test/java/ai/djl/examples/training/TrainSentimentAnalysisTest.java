@@ -25,11 +25,11 @@ public class TrainSentimentAnalysisTest {
     @Test
     public void testTrainSentimentAnalysis()
             throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("MXNet");
+        TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.gpu();
+        TestRequirements.gpu("MXNet");
 
-        String[] args = new String[] {"-e", "1", "-g", "1"};
+        String[] args = new String[] {"-e", "1", "-g", "1", "--engine", "MXNet"};
         TrainSentimentAnalysis.runExample(args);
     }
 }

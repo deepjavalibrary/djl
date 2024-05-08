@@ -28,7 +28,7 @@ public class TrainMnistTest {
 
     @Test
     public void testTrainMnist() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("MXNet", "PyTorch");
+        TestRequirements.linux();
 
         double expectedProb;
         if (Boolean.getBoolean("nightly")) {

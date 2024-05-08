@@ -25,9 +25,10 @@ public class TrainCaptchaTest {
 
     @Test
     public void testTrainCaptcha() throws IOException, TranslateException {
-        TestRequirements.engine("MXNet");
+        TestRequirements.linux();
 
-        String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2"};
+        // TODO: PyTorch -- cuDNN error: CUDNN_STATUS_VERSION_MISMATCH
+        String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2", "--engine", "MXNet"};
         TrainingResult result = TrainCaptcha.runExample(args);
         Assert.assertNotNull(result);
     }

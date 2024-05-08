@@ -177,7 +177,7 @@ public class MemoryTrainingListener extends TrainingListenerAdapter {
                     metrics.addMetric("rss", rss, Unit.BYTES);
                 }
             } catch (IOException e) {
-                logger.error("Failed execute cmd: " + cmd, e);
+                logger.error("Failed execute cmd: {}", cmd, e);
             }
         }
     }

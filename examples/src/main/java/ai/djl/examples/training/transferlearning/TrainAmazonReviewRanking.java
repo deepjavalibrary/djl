@@ -19,7 +19,6 @@ import ai.djl.basicdataset.tabular.CsvDataset;
 import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
 import ai.djl.basicdataset.tabular.utils.Feature;
 import ai.djl.basicdataset.tabular.utils.Featurizer.DataFeaturizer;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.nlp.DefaultVocabulary;
@@ -39,7 +38,6 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
-import ai.djl.training.ParameterStore;
 import ai.djl.training.Trainer;
 import ai.djl.training.TrainingResult;
 import ai.djl.training.dataset.RandomAccessDataset;
@@ -74,24 +72,21 @@ public final class TrainAmazonReviewRanking {
             return null;
         }
 
-        // MXNet base model
-        String modelUrls = "https://resources.djl.ai/test-models/distilbert.zip";
-        if ("PyTorch".equals(Engine.getDefaultEngineName())) {
-            modelUrls =
-                    "https://resources.djl.ai/test-models/traced_distilbert_wikipedia_uncased.zip";
-        }
+        String engine = arguments.getEngine();
+        String modelUrls =
+                "https://resources.djl.ai/test-models/traced_distilbert_wikipedia_uncased.zip";
 
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .optApplication(Application.NLP.WORD_EMBEDDING)
                         .setTypes(NDList.class, NDList.class)
                         .optModelUrls(modelUrls)
-                        .optEngine(Engine.getDefaultEngineName())
+                        .optEngine(engine)
                         .optProgress(new ProgressBar())
                         .optOption("trainParam", "true")
                         .build();
         int maxTokenLength = 64;
-        try (Model model = Model.newInstance("AmazonReviewRatingClassification");
+        try (Model model = Model.newInstance("AmazonReviewRatingClassification", engine);
                 ZooModel<NDList, NDList> embedding = criteria.loadModel()) {
             // Prepare the vocabulary
             DefaultVocabulary vocabulary =
@@ -148,42 +143,22 @@ public final class TrainAmazonReviewRanking {
     private static Block getBlock(Block embedder) {
         SequentialBlock classifier = new SequentialBlock();
         // text embedding layer
-        if ("PyTorch".equals(Engine.getDefaultEngineName())) {
-            LambdaBlock lambda =
-                    new LambdaBlock(
-                            ndList -> {
-                                NDArray data = ndList.singletonOrThrow();
-                                NDList inputs = new NDList();
-                                inputs.add(data.toType(DataType.INT64, false));
-                                inputs.add(
-                                        data.getManager().full(data.getShape(), 1, DataType.INT64));
-                                inputs.add(
-                                        data.getManager()
-                                                .arange(data.getShape().get(1)) // maxLen
-                                                .toType(DataType.INT64, false)
-                                                .broadcast(data.getShape()));
-                                return inputs;
-                            });
-            classifier.add(lambda);
-            classifier.add(embedder);
-        } else {
-            // MXNet
-            LambdaBlock lambda =
-                    new LambdaBlock(
-                            ndList -> {
-                                NDArray data = ndList.singletonOrThrow();
-                                long batchSize = data.getShape().get(0);
-                                float maxLength = data.getShape().get(1);
-                                return embedder.forward(
-                                        new ParameterStore(),
-                                        new NDList(
-                                                data,
-                                                data.getManager()
-                                                        .full(new Shape(batchSize), maxLength)),
-                                        true);
-                            });
-            classifier.add(lambda);
-        }
+        LambdaBlock lambda =
+                new LambdaBlock(
+                        ndList -> {
+                            NDArray data = ndList.singletonOrThrow();
+                            NDList inputs = new NDList();
+                            inputs.add(data.toType(DataType.INT64, false));
+                            inputs.add(data.getManager().full(data.getShape(), 1, DataType.INT64));
+                            inputs.add(
+                                    data.getManager()
+                                            .arange(data.getShape().get(1)) // maxLen
+                                            .toType(DataType.INT64, false)
+                                            .broadcast(data.getShape()));
+                            return inputs;
+                        });
+        classifier.add(lambda);
+        classifier.add(embedder);
         // Classification layers
         classifier
                 .add(Linear.builder().setUnits(768).build()) // pre classifier
@@ -207,7 +182,7 @@ public final class TrainAmazonReviewRanking {
                 });
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .optDevices(Engine.getInstance().getDevices(1))
+                .optDevices(arguments.getMaxGpus())
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }

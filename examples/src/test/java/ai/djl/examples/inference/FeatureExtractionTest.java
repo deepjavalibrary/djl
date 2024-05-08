@@ -30,7 +30,7 @@ public class FeatureExtractionTest {
 
     @Test
     public void testFeatureComparison() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("PyTorch");
+        TestRequirements.linux();
 
         Path imageFile = Paths.get("src/test/resources/kana1.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);

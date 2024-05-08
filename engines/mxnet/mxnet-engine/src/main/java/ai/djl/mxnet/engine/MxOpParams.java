@@ -23,6 +23,7 @@ public class MxOpParams extends PairList<String, Object> {
 
     // mxnet cpu take index
     private static final String MXNET_CPU = "cpu(0)";
+
     /**
      * Sets the Shape parameter.
      *

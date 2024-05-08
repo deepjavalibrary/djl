@@ -31,7 +31,7 @@ public class SuperResolutionTest {
 
     @Test
     public void testSuperResolution() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("TensorFlow");
+        TestRequirements.linux();
 
         String imagePath = "src/test/resources/";
         Image fox = ImageFactory.getInstance().fromFile(Paths.get(imagePath + "fox.png"));

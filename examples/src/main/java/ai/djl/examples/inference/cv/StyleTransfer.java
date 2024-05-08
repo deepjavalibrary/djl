@@ -68,7 +68,9 @@ public final class StyleTransfer {
     }
 
     public static Image transfer(Image image, Artist artist)
-            throws IOException, ModelNotFoundException, MalformedModelException,
+            throws IOException,
+                    ModelNotFoundException,
+                    MalformedModelException,
                     TranslateException {
         // Use DJL PyTorch model zoo model, model can be found:
         // https://mlrepo.djl.ai/model/cv/image_generation/ai/djl/pytorch/cyclegan/0.0.1/style_xxxx.zip

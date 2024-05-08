@@ -12,12 +12,11 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.ModelException;
 import ai.djl.basicdataset.cv.classification.Cifar10;
 import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
@@ -31,7 +30,6 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.SymbolBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
@@ -63,14 +61,12 @@ public final class TrainWithOptimizers {
     private TrainWithOptimizers() {}
 
     public static void main(String[] args)
-            throws IOException, ParseException, ModelNotFoundException, MalformedModelException,
-                    TranslateException {
+            throws IOException, ParseException, ModelException, TranslateException {
         TrainWithOptimizers.runExample(args);
     }
 
     public static TrainingResult runExample(String[] args)
-            throws IOException, ParseException, ModelNotFoundException, MalformedModelException,
-                    TranslateException {
+            throws IOException, ParseException, ModelException, TranslateException {
         OptimizerArguments arguments =
                 (OptimizerArguments) new OptimizerArguments().parseArgs(args);
 
@@ -100,14 +96,14 @@ public final class TrainWithOptimizers {
         }
     }
 
-    private static Model getModel(Arguments arguments)
-            throws IOException, ModelNotFoundException, MalformedModelException {
+    private static Model getModel(Arguments arguments) throws IOException, ModelException {
         boolean isSymbolic = arguments.isSymbolic();
         boolean preTrained = arguments.isPreTrained();
         Map<String, String> options = arguments.getCriteria();
         Criteria.Builder<Image, Classifications> builder =
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
+                        .optEngine(arguments.getEngine())
                         .optProgress(new ProgressBar())
                         .optArtifactId("resnet");
         if (isSymbolic) {
@@ -149,7 +145,7 @@ public final class TrainWithOptimizers {
             return builder.build().loadModel();
         } else {
             // construct new ResNet50 without pre-trained weights
-            Model model = Model.newInstance("resnetv1");
+            Model model = Model.newInstance("resnetv1", arguments.getEngine());
             Block resNet50 =
                     ResNetV1.builder()
                             .setImageShape(new Shape(3, Cifar10.IMAGE_HEIGHT, Cifar10.IMAGE_WIDTH))
@@ -176,7 +172,7 @@ public final class TrainWithOptimizers {
         return new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
                 .optOptimizer(setupOptimizer(arguments))
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }

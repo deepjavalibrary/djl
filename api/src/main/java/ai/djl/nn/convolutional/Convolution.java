@@ -285,6 +285,7 @@ public abstract class Convolution extends AbstractBlock {
         return input.getNDArrayInternal()
                 .convolution(input, weight, bias, stride, padding, dilation, groups);
     }
+
     /**
      * A builder that can build any {@code Convolution} block.
      *

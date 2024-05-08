@@ -138,7 +138,9 @@ public class ResnetTest {
 
     @Test
     public void testLoadPredict()
-            throws IOException, ModelNotFoundException, TranslateException,
+            throws IOException,
+                    ModelNotFoundException,
+                    TranslateException,
                     MalformedModelException {
         try (ZooModel<Image, Classifications> model = getModel()) {
             NoopTranslator translator = new NoopTranslator(Batchifier.STACK);

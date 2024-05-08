@@ -28,7 +28,7 @@ public class Yolov8DetectionTest {
 
     @Test
     public void testYolov8Detection() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("MXNet", "PyTorch");
+        TestRequirements.linux();
 
         DetectedObjects result = Yolov8Detection.predict();
 

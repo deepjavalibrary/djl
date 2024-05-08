@@ -60,12 +60,14 @@ public final class BertClassification {
 
         Classifications[] results = predict(inputs);
         for (int i = 0; i < inputs.size(); i++) {
-            logger.info("Prediction for: " + inputs.get(i) + "\n" + results[i].toString());
+            logger.info("Prediction for: {}\n{}", inputs.get(i), results[i]);
         }
     }
 
     public static Classifications[] predict(List<String> inputs)
-            throws MalformedModelException, ModelNotFoundException, IOException,
+            throws MalformedModelException,
+                    ModelNotFoundException,
+                    IOException,
                     TranslateException {
         // refer to
         // https://medium.com/delvify/bert-rest-inference-from-the-fine-tuned-model-499997b32851 and

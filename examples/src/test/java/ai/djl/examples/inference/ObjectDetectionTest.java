@@ -34,7 +34,7 @@ public class ObjectDetectionTest {
 
     @Test
     public void testObjectDetection() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("MXNet", "PyTorch", "TensorFlow");
+        TestRequirements.linux();
 
         DetectedObjects result = ObjectDetection.predict();
         logger.info("{}", result);

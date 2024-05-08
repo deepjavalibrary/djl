@@ -31,14 +31,19 @@ public class TransformerEncoderBlock extends AbstractBlock {
 
     /** The attention mechanism. */
     private ScaledDotProductAttentionBlock selfAttentionBlock;
+
     /** Dropout before residual & layer normalization. */
     private Dropout selfAttentionDropout;
+
     /** Normalization of attention output and residual. */
     private BatchNorm attentionNorm;
+
     /** Fully connected pointwise block for output projection. */
     private PointwiseFeedForwardBlock pointWisefullyConnected;
+
     /** Dropout after fully connected and before last residual & layer normalization. */
     private Dropout fullyConnectedDropout;
+
     /** Another normalization for the output and residual. */
     private BatchNorm outputNorm;
 

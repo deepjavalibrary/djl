@@ -31,7 +31,8 @@ public class FeatureComparisonTest {
 
     @Test
     public void testFeatureComparison() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("PyTorch");
+        TestRequirements.linux();
+
         TestRequirements.nightly();
 
         Path imageFile1 = Paths.get("src/test/resources/kana1.jpg");

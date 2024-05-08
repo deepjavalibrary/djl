@@ -13,12 +13,11 @@
 package ai.djl.examples.training;
 
 import ai.djl.Application;
-import ai.djl.MalformedModelException;
 import ai.djl.Model;
+import ai.djl.ModelException;
 import ai.djl.basicdataset.nlp.StanfordMovieReview;
 import ai.djl.basicdataset.utils.FixedBucketSampler;
 import ai.djl.basicdataset.utils.TextData;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -39,7 +38,6 @@ import ai.djl.nn.SequentialBlock;
 import ai.djl.nn.core.Linear;
 import ai.djl.nn.recurrent.LSTM;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
@@ -75,15 +73,12 @@ public final class TrainSentimentAnalysis {
 
     private TrainSentimentAnalysis() {}
 
-    public static void main(String[] args)
-            throws IOException, ModelNotFoundException, MalformedModelException,
-                    TranslateException {
+    public static void main(String[] args) throws IOException, ModelException, TranslateException {
         TrainSentimentAnalysis.runExample(args);
     }
 
     public static TrainingResult runExample(String[] args)
-            throws IOException, ModelNotFoundException, MalformedModelException,
-                    TranslateException {
+            throws IOException, ModelException, TranslateException {
         Arguments arguments = new Arguments().parseArgs(args);
         if (arguments == null) {
             return null;
@@ -95,10 +90,11 @@ public final class TrainSentimentAnalysis {
                         .optApplication(Application.NLP.WORD_EMBEDDING)
                         .setTypes(String.class, NDList.class)
                         .optArtifactId("glove")
+                        .optEngine(arguments.getEngine())
                         .optFilter("dimensions", "50")
                         .build();
 
-        try (Model model = Model.newInstance("stanfordSentimentAnalysis");
+        try (Model model = Model.newInstance("sentimentAnalysis", arguments.getEngine());
                 ZooModel<String, NDList> embedding = criteria.loadModel()) {
             ModelZooTextEmbedding modelZooTextEmbedding = new ModelZooTextEmbedding(embedding);
             // get training and validation dataset
@@ -182,7 +178,7 @@ public final class TrainSentimentAnalysis {
 
         return new DefaultTrainingConfig(new SoftmaxCrossEntropyLoss())
                 .addEvaluator(new Accuracy())
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .optExecutorService(executorService)
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);

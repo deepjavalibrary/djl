@@ -48,8 +48,12 @@ public class RsModel extends BaseModel {
             throw new FileNotFoundException(
                     "Model directory doesn't exist: " + modelPath.toAbsolutePath());
         }
-        modelDir = modelPath.toAbsolutePath();
-        long handle = RustLibrary.loadModel(modelDir.toString(), dataType.ordinal());
-        block = new RsSymbolBlock((RsNDManager) manager, handle);
+        setModelDir(modelPath);
+        if (block == null) {
+            long handle = RustLibrary.loadModel(modelDir.toString(), dataType.ordinal());
+            block = new RsSymbolBlock((RsNDManager) manager, handle);
+        } else {
+            loadBlock(prefix, options);
+        }
     }
 }

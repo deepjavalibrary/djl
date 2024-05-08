@@ -62,6 +62,7 @@ public class RsNDArray extends NativeResource<Long> implements NDArray {
     RsNDArray(RsNDManager manager, long handle, DataType dataType) {
         this(manager, handle, dataType, null);
     }
+
     /**
      * Constructs a Rust {@code NDArray} from a native handle (internal. Use {@link NDManager}
      * instead) with the data that is hold on Java side.

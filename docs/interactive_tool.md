@@ -74,16 +74,3 @@ Inspired by Spencer Park’s [IJava project](https://github.com/SpencerPark/IJav
 For more information on the simple setup, follow the instructions in [DJL Jupyter notebooks](http://docs.djl.ai/docs/demos/jupyter/index.html#setup).
 After that, use the Jupyter Notebook freely in your hosted server. You can do all kinds of work, like block building and plotting a graph.
 There are [tutorials and instructions](http://docs.djl.ai/docs/demos/jupyter/index.html#djl---jupyter-notebooks) to guide you how you can run training and/or inference with Java.
-
-## About Future Lab
-
-Future lab is an incubator for future DJL features. We are trying to create a better toolkit/library for Java Developers
-getting close to deep learning. We are looking for contributors/testers to explore our latest features.
-
-Here is a list of our ongoing projects (keep updating):
-
-- D2L Java: We are creating a Java implementation for https://d2l.ai book.
-- NLP Word Embedding: We are looking for more word embedding portal that can be used to encode/decode.
-
-If you are interested, please feel free to let us know on Slack or simply file an issue saying you are interested to participate.
-We will send bi-weekly updates to you for the feature we are working-in-progress.

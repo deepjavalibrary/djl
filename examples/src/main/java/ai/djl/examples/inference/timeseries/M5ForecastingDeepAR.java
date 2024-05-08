@@ -18,7 +18,6 @@ import ai.djl.ModelException;
 import ai.djl.basicdataset.BasicDatasets;
 import ai.djl.basicdataset.tabular.utils.DynamicBuffer;
 import ai.djl.basicdataset.tabular.utils.Feature;
-import ai.djl.engine.Engine;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
@@ -63,7 +62,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -82,9 +80,7 @@ public final class M5ForecastingDeepAR {
 
     public static Map<String, Float> predict()
             throws IOException, TranslateException, ModelException {
-        Engine engine = Engine.getInstance();
-        NDManager manager = engine.newBaseManager();
-        String engineName = engine.getEngineName().toLowerCase(Locale.ROOT);
+        NDManager manager = NDManager.newBaseManager("MXNet");
 
         // To use local dataset, users can load data as follows
         // Repository repository = Repository.newInstance("local_dataset",
@@ -102,12 +98,13 @@ public final class M5ForecastingDeepAR {
         // https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008#file-m5torch-py
 
         // Here you can also use local file: modelUrl = "LOCAL_PATH/deepar.pt";
-        String modelUrl = "djl://ai.djl." + engineName + "/deepar/0.0.1/m5forecast";
+        String modelUrl = "djl://ai.djl.mxnet/deepar/0.0.1/m5forecast";
         int predictionLength = 4;
         Criteria<TimeSeriesData, Forecast> criteria =
                 Criteria.builder()
                         .setTypes(TimeSeriesData.class, Forecast.class)
                         .optModelUrls(modelUrl)
+                        .optEngine("MXNet")
                         .optTranslatorFactory(new DeepARTranslatorFactory())
                         .optArgument("prediction_length", predictionLength)
                         .optArgument("freq", "W")

@@ -30,8 +30,7 @@ public class LightFaceDetectionTest {
 
     @Test
     public void testLightFaceDetection() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("PyTorch");
-        TestRequirements.nightly();
+        TestRequirements.linux();
 
         DetectedObjects result = LightFaceDetection.predict();
 

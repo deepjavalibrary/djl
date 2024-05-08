@@ -72,16 +72,22 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
 
     /** Size of the Word-/Token-embeddings we use the attention on. */
     private int embeddingSize;
+
     /** Number of attention heads. */
     private int headCount;
+
     /** Pointwise Linear projection of the keys. */
     private Linear keyProjection;
+
     /** Pointwise Linear projection of the queries. */
     private Linear queryProjection;
+
     /** Pointwise Linear projection of the values. */
     private Linear valueProjection;
+
     /** Pointwise Linear projection of the results. */
     private Linear resultProjection;
+
     /** Dropout operation to be applied after probability calculation. */
     private Dropout attentionProbsDropout;
 
@@ -119,6 +125,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
     public Linear getKeyProjection() {
         return keyProjection;
     }
+
     /**
      * Pointwise Linear projection of the queries.
      *
@@ -127,6 +134,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
     public Linear getQueryProjection() {
         return queryProjection;
     }
+
     /**
      * Pointwise Linear projection of the values.
      *
@@ -135,6 +143,7 @@ public final class ScaledDotProductAttentionBlock extends AbstractBlock {
     public Linear getValueProjection() {
         return valueProjection;
     }
+
     /**
      * Pointwise Linear projection of the results.
      *

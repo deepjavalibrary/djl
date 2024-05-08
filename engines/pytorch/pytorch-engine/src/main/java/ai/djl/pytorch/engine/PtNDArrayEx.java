@@ -437,6 +437,7 @@ public class PtNDArrayEx implements NDArrayEx {
                         manager.from(beta),
                         eps));
     }
+
     /** {@inheritDoc} */
     @Override
     public NDList batchNorm(

@@ -49,7 +49,9 @@ public final class SentimentAnalysis {
     }
 
     public static Classifications predict()
-            throws MalformedModelException, ModelNotFoundException, IOException,
+            throws MalformedModelException,
+                    ModelNotFoundException,
+                    IOException,
                     TranslateException {
         String input = "I like DJL. DJL is the best DL framework!";
         logger.info("input Sentence: {}", input);
@@ -58,6 +60,7 @@ public final class SentimentAnalysis {
                 Criteria.builder()
                         .optApplication(Application.NLP.SENTIMENT_ANALYSIS)
                         .setTypes(String.class, Classifications.class)
+                        .optEngine("PyTorch")
                         // This model was traced on CPU and can only run on CPU
                         .optDevice(Device.cpu())
                         .optProgress(new ProgressBar())

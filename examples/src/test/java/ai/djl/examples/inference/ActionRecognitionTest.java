@@ -27,7 +27,7 @@ public class ActionRecognitionTest {
 
     @Test
     public void testActionRecognition() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("MXNet");
+        TestRequirements.linux();
 
         Classifications result = ActionRecognition.predict();
         Classifications.Classification best = result.best();

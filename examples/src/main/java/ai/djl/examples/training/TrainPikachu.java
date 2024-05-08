@@ -16,7 +16,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.PikachuDetection;
 import ai.djl.basicmodelzoo.cv.object_detection.ssd.SingleShotDetection;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
 import ai.djl.metric.Metrics;
@@ -77,7 +76,7 @@ public final class TrainPikachu {
             return null;
         }
 
-        try (Model model = Model.newInstance("pikachu-ssd")) {
+        try (Model model = Model.newInstance("pikachu-ssd", arguments.getEngine())) {
             model.setBlock(getSsdTrainBlock());
             RandomAccessDataset trainingSet = getDataset(Dataset.Usage.TRAIN, arguments);
             RandomAccessDataset validateSet = getDataset(Dataset.Usage.TEST, arguments);
@@ -99,7 +98,7 @@ public final class TrainPikachu {
 
     public static int predict(String outputDir, String imageFile)
             throws IOException, MalformedModelException, TranslateException {
-        try (Model model = Model.newInstance("pikachu-ssd")) {
+        try (Model model = Model.newInstance("pikachu-ssd", "PyTorch")) {
             float detectionThreshold = 0.6f;
             // load parameters back to original training block
             model.setBlock(getSsdTrainBlock());
@@ -156,7 +155,7 @@ public final class TrainPikachu {
         return new DefaultTrainingConfig(new SingleShotDetectionLoss())
                 .addEvaluator(new SingleShotDetectionAccuracy("classAccuracy"))
                 .addEvaluator(new BoundingBoxError("boundingBoxError"))
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .addTrainingListeners(TrainingListener.Defaults.logging(outputDir))
                 .addTrainingListeners(listener);
     }

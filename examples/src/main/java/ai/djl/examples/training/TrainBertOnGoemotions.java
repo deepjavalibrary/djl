@@ -14,7 +14,6 @@ package ai.djl.examples.training;
 
 import ai.djl.Model;
 import ai.djl.basicdataset.nlp.GoEmotions;
-import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.examples.training.util.BertGoemotionsDataset;
 import ai.djl.modality.nlp.embedding.EmbeddingException;
@@ -67,7 +66,7 @@ public final class TrainBertOnGoemotions {
         dataset.prepare();
 
         // Create model & trainer
-        try (Model model = createBertPretrainingModel(dataset.getVocabularySize())) {
+        try (Model model = createBertPretrainingModel(arguments, dataset.getVocabularySize())) {
             TrainingConfig config = createTrainingConfig(arguments);
             try (Trainer trainer = model.newTrainer(config)) {
                 // Initialize training
@@ -105,11 +104,11 @@ public final class TrainBertOnGoemotions {
                         .build();
         return new DefaultTrainingConfig(new BertPretrainingLoss())
                 .optOptimizer(optimizer)
-                .optDevices(Engine.getInstance().getDevices(arguments.getMaxGpus()))
+                .optDevices(arguments.getMaxGpus())
                 .addTrainingListeners(TrainingListener.Defaults.logging());
     }
 
-    private static Model createBertPretrainingModel(long vocabularySize) {
+    private static Model createBertPretrainingModel(Arguments arguments, long vocabularySize) {
         Block block =
                 new BertPretrainingBlock(
                         BertBlock.builder()
@@ -117,7 +116,7 @@ public final class TrainBertOnGoemotions {
                                 .setTokenDictionarySize(Math.toIntExact(vocabularySize)));
         block.setInitializer(new TruncatedNormalInitializer(0.02f), Parameter.Type.WEIGHT);
 
-        Model model = Model.newInstance("Bert Pretraining");
+        Model model = Model.newInstance("Bert Pretraining", arguments.getEngine());
         model.setBlock(block);
         return model;
     }

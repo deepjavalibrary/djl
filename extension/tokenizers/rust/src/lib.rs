@@ -48,13 +48,18 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     mut env: JNIEnv<'local>,
     _: JObject,
     input: JString,
+    hf_token: JString,
 ) -> jlong {
     let identifier: String = env
         .get_string(&input)
         .expect("Couldn't get java string!")
         .into();
 
-    let parameters = FromPretrainedParameters::default();
+    let mut parameters = FromPretrainedParameters::default();
+    if !hf_token.is_null() {
+        let hf_token: String = env.get_string(&hf_token).unwrap().into();
+        parameters.auth_token = Some(hf_token);
+    }
     let tokenizer = Tokenizer::from_pretrained(identifier, Some(parameters));
 
     match tokenizer {

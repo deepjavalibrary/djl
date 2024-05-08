@@ -34,7 +34,7 @@ public class MaskDetectionTest {
 
     @Test
     public void testMaskDetection() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("OnnxRuntime");
+        TestRequirements.linux();
 
         DetectedObjects result = MaskDetection.predict();
         logger.info("{}", result);

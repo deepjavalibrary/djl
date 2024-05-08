@@ -18,8 +18,6 @@ You can also view our 1.5 hour long (in 8 x ~10 minute segments) DJL 101 tutoria
 We developed several interactive toolkits for you to experience DJL.
 You can start from here to run inference online and download starter template with DJL.
 
-See [DJL Future Labs](interactive_tool.md)
-
 ## Beginner tutorial
 
 To get started, we recommend that you follow our short [beginner tutorial](http://docs.djl.ai/docs/demos/jupyter/tutorial/index.html). It takes you through some of the basics of deep learning to create a model, train your model, and run inference using your trained model.

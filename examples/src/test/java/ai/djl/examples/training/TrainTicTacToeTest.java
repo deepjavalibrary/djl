@@ -25,11 +25,12 @@ public class TrainTicTacToeTest {
 
     @Test
     public void testTrainTicTacToe() throws IOException {
-        TestRequirements.engine("MXNet", "PyTorch");
+        TestRequirements.linux();
 
-        if (Boolean.getBoolean("nightly") && Engine.getInstance().getGpuCount() > 0) {
+        Engine engine = Engine.getEngine("PyTorch");
+        if (Boolean.getBoolean("nightly") && engine.getGpuCount() > 0) {
             String[] args = new String[] {"-g", "1", "-e", "6"};
-            Engine.getInstance().setRandomSeed(1234);
+            engine.setRandomSeed(1234);
 
             TrainingResult result = TrainTicTacToe.runExample(args);
             Assert.assertNotNull(result);
