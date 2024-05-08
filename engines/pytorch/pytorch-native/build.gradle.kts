@@ -19,17 +19,10 @@ val isPrecxx11 = project.hasProperty("precxx11")
 val isAarch64 = project.hasProperty("aarch64") || arch == "aarch64"
 
 val FLAVOR = when {
-    project.hasProperty("cu11") -> when {
-        VERSION.startsWith("1.11.") -> "cu113"
-        VERSION.startsWith("1.12.") -> "cu116"
-        VERSION.startsWith("1.13.") -> "cu117"
-        VERSION.startsWith("2.0.") -> "cu118"
-        VERSION.startsWith("2.1.") -> "cu121"
-        else -> throw GradleException("Unsupported PyTorch version: $VERSION")
-    }
-    project.hasProperty("cu10") -> "cu102"
+    project.hasProperty("cuda") -> project.property("cuda").toString()
     else -> "cpu"
 }
+
 val BINARY_ROOT = layout.buildDirectory / "download"
 
 version = VERSION + if (isRelease) "" else "-SNAPSHOT"
@@ -78,25 +71,18 @@ fun prepareNativeLib(binaryRoot: String, ver: String) {
 
     val officialPytorchUrl = "https://download.pytorch.org/libtorch"
     val aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
-    val cuda = when {
-        ver.startsWith("1.11.") -> "cu113"
-        ver.startsWith("1.12.") -> "cu116"
-        ver.startsWith("1.13.") -> "cu117"
-        ver.startsWith("2.0.") -> "cu118"
-        ver.startsWith("2.1.") -> "cu121"
-        else -> throw GradleException("Unsupported PyTorch version: $ver")
-    }
+    val cuda = "cu121"
     // @formatter:off
     val files = mapOf("cpu/libtorch-cxx11-abi-shared-with-deps-$ver%2Bcpu.zip"     to "cpu/linux-x86_64",
                       "cpu/libtorch-macos-$ver.zip"                                to "cpu/osx-x86_64",
+                      "cpu/libtorch-macos-arm64-$ver.zip"                          to "cpu/osx-aarch64",
                       "cpu/libtorch-win-shared-with-deps-$ver%2Bcpu.zip"           to "cpu/win-x86_64",
                       "$cuda/libtorch-cxx11-abi-shared-with-deps-$ver%2B$cuda.zip" to "$cuda/linux-x86_64",
                       "$cuda/libtorch-win-shared-with-deps-$ver%2B$cuda.zip"       to "$cuda/win-x86_64",
                       "cpu/libtorch-shared-with-deps-$ver%2Bcpu.zip"               to "cpu-precxx11/linux-x86_64",
                       "$cuda/libtorch-shared-with-deps-$ver%2B$cuda.zip"           to "$cuda-precxx11/linux-x86_64")
 
-    val aarch64Files = mapOf("$ver/libtorch-shared-with-deps-$ver-aarch64.zip" to "cpu-precxx11/linux-aarch64",
-                             "$ver/libtorch-macos-$ver-aarch64.zip"            to "cpu/osx-aarch64")
+    val aarch64Files = mapOf("$ver/libtorch-shared-with-deps-$ver-aarch64.zip" to "cpu-precxx11/linux-aarch64")
     // @formatter:on
     copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
     copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
@@ -106,6 +92,12 @@ fun prepareNativeLib(binaryRoot: String, ver: String) {
     }
     exec {
         commandLine("install_name_tool", "-add_rpath", "@loader_path", "$binaryRoot/cpu/osx-x86_64/native/lib/libtorch.dylib")
+    }
+    exec {
+        commandLine("install_name_tool", "-add_rpath", "@loader_path", "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib")
+    }
+    exec {
+        commandLine("install_name_tool", "-add_rpath", "@loader_path", "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch.dylib")
     }
 }
 
@@ -136,6 +128,11 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
                 else -> "https://publish.djl.ai/extra/libstdc%2B%2B.so.6"
             }
             URL(stdcUrl) into libstd
+        }
+        if ("osx-aarch64" in value) {
+            val libomp = outputDir / "native/lib/libomp.dylib"
+            val ompUrl = "https://publish.djl.ai/extra/macos-arm64/libomp.dylib"
+            URL(ompUrl) into libomp
         }
         delete(file)
         delete(outputDir / "libtorch")
