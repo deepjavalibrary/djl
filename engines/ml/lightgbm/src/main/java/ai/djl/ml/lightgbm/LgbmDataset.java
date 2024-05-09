@@ -148,7 +148,7 @@ public class LgbmDataset extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer toByteBuffer() {
+    public ByteBuffer toByteBuffer(boolean tryDirect) {
         throw new UnsupportedOperationException("Not supported by the LgbmDataset yet");
     }
 

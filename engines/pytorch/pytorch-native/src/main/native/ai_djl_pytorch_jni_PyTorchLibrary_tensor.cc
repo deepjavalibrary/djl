@@ -341,8 +341,7 @@ JNIEXPORT jobject JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDirectByte
   }
   // Use tensor.data_ptr() to obtain the data pointer, and create a direct ByteBuffer using NewDirectByteBuffer
   void* data_ptr = tensor_ptr->data_ptr();
-  jobject directBuffer = env->NewDirectByteBuffer(data_ptr, nbytes);
-  return directBuffer;
+  return env->NewDirectByteBuffer(data_ptr, nbytes);
   API_END_RETURN()
 }
 

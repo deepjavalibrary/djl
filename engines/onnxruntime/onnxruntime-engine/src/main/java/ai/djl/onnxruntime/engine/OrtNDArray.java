@@ -117,7 +117,7 @@ public class OrtNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer toByteBuffer() {
+    public ByteBuffer toByteBuffer(boolean tryDirect) {
         if (getDataType() == DataType.STRING) {
             throw new IllegalArgumentException("Please use toStringArray() for String NDArray.");
         }

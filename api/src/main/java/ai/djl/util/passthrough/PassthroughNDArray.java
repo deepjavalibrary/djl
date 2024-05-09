@@ -74,17 +74,17 @@ public class PassthroughNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer toByteBuffer() {
+    public ByteBuffer toByteBuffer(boolean tryDirect) {
         if (object instanceof ByteBuffer) {
             return (ByteBuffer) object;
         }
-        throw new UnsupportedOperationException("Operation not supported for FastText");
+        throw new UnsupportedOperationException("Operation not supported for PassthroughNDArray");
     }
 
     /** {@inheritDoc} */
     @Override
     public void intern(NDArray replaced) {
-        throw new UnsupportedOperationException("Operation not supported for FastText");
+        throw new UnsupportedOperationException("Operation not supported for PassthroughNDArray");
     }
 
     /** {@inheritDoc} */

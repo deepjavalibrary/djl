@@ -1671,41 +1671,27 @@ public final class JniUtils {
         return new Shape(PyTorchLibrary.LIB.torchSizes(ndArray.getHandle()));
     }
 
-    public static ByteBuffer getByteBuffer(PtNDArray ndArray) {
+    public static ByteBuffer getByteBuffer(PtNDArray ndArray, boolean tryDirect) {
         // Operation is CPU only
         if (!ndArray.getDevice().equals(Device.cpu())) {
             ndArray = ndArray.toDevice(Device.cpu(), false);
+        }
+        if (tryDirect) {
+            if (ndArray.isSparse()
+                    || getLayout(ndArray) == 2
+                    || !PyTorchLibrary.LIB.torchIsContiguous(ndArray.getHandle())) {
+                // keep the same lifecycle as origin NDArray
+                ndArray =
+                        new PtNDArray(
+                                ndArray.getManager(),
+                                PyTorchLibrary.LIB.torchToContiguous(ndArray.getHandle()));
+            }
+            return PyTorchLibrary.LIB
+                    .torchDirectByteBuffer(ndArray.getHandle())
+                    .order(ByteOrder.nativeOrder());
         }
         return ByteBuffer.wrap(PyTorchLibrary.LIB.torchDataPtr(ndArray.getHandle()))
                 .order(ByteOrder.nativeOrder());
-    }
-
-    public static ByteBuffer getDirectByteBuffer(PtNDArray ndArray) {
-        // Operation is CPU only
-        if (!ndArray.getDevice().equals(Device.cpu())) {
-            ndArray = ndArray.toDevice(Device.cpu(), false);
-        }
-        return PyTorchLibrary.LIB
-                .torchDirectByteBuffer(ndArray.getHandle())
-                .order(ByteOrder.nativeOrder());
-    }
-
-    public static boolean isContiguous(PtNDArray ndArray) {
-        // Operation is CPU only
-        if (!ndArray.getDevice().equals(Device.cpu())) {
-            ndArray = ndArray.toDevice(Device.cpu(), false);
-        }
-        return PyTorchLibrary.LIB.torchIsContiguous(ndArray.getHandle());
-    }
-
-    public static PtNDArray toContiguous(PtNDArray ndArray) {
-        // Operation is CPU only
-        if (!ndArray.getDevice().equals(Device.cpu())) {
-            ndArray = ndArray.toDevice(Device.cpu(), false);
-        }
-
-        return new PtNDArray(
-                ndArray.getManager(), PyTorchLibrary.LIB.torchToContiguous(ndArray.getHandle()));
     }
 
     public static void deleteNDArray(long handle) {
