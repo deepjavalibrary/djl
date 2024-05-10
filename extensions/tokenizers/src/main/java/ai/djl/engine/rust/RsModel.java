@@ -23,11 +23,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /** {@code RsModel} is the Rust implementation of {@link Model}. */
 public class RsModel extends BaseModel {
 
-    private long handle = -1;
+    private final AtomicReference<Long> handle;
 
     /**
      * Constructs a new Model on a given device.
@@ -40,6 +41,7 @@ public class RsModel extends BaseModel {
         manager = RsNDManager.getSystemManager().newSubManager(device);
         manager.setName("RsModel");
         dataType = DataType.FLOAT16;
+        handle = new AtomicReference<>();
     }
 
     /** {@inheritDoc} */
@@ -52,8 +54,8 @@ public class RsModel extends BaseModel {
         }
         setModelDir(modelPath);
         if (block == null) {
-            handle = RustLibrary.loadModel(modelDir.toString(), dataType.ordinal());
-            block = new RsSymbolBlock((RsNDManager) manager, handle);
+            handle.set(RustLibrary.loadModel(modelDir.toString(), dataType.ordinal()));
+            block = new RsSymbolBlock((RsNDManager) manager, handle.get());
         } else {
             loadBlock(prefix, options);
         }
@@ -62,9 +64,9 @@ public class RsModel extends BaseModel {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        if (handle != -1) {
-            RustLibrary.deleteModel(handle);
-            handle = -1;
+        Long pointer = handle.getAndSet(null);
+        if (pointer != null) {
+            RustLibrary.deleteModel(pointer);
         }
         super.close();
     }
