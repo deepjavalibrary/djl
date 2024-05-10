@@ -24,6 +24,8 @@ public final class RustLibrary {
 
     public static native long loadModel(String modelPath, int dtype);
 
+    public static native long deleteModel(long handle);
+
     public static native String[] getInputNames(long handle);
 
     public static native long runInference(long handle, long[] inputHandles);
