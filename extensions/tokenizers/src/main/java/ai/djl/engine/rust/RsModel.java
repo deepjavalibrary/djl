@@ -27,6 +27,8 @@ import java.util.Map;
 /** {@code RsModel} is the Rust implementation of {@link Model}. */
 public class RsModel extends BaseModel {
 
+    private long handle = -1;
+
     /**
      * Constructs a new Model on a given device.
      *
@@ -50,10 +52,20 @@ public class RsModel extends BaseModel {
         }
         setModelDir(modelPath);
         if (block == null) {
-            long handle = RustLibrary.loadModel(modelDir.toString(), dataType.ordinal());
+            handle = RustLibrary.loadModel(modelDir.toString(), dataType.ordinal());
             block = new RsSymbolBlock((RsNDManager) manager, handle);
         } else {
             loadBlock(prefix, options);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        if (handle != -1) {
+            RustLibrary.deleteModel(handle);
+            handle = -1;
+        }
+        super.close();
     }
 }
