@@ -39,8 +39,8 @@ public class LgbmNDArray extends NDArrayAdapter {
 
     private AtomicReference<SWIGTYPE_p_void> handle;
     private int typeConstant;
-    private SWIGTYPE_p_float floatData;
-    private SWIGTYPE_p_double doubleData;
+    private AtomicReference<SWIGTYPE_p_float> floatDataRef;
+    private AtomicReference<SWIGTYPE_p_double> doubleDataRef;
 
     LgbmNDArray(
             NDManager manager,
@@ -53,6 +53,8 @@ public class LgbmNDArray extends NDArrayAdapter {
         this.format = SparseFormat.DENSE;
         manager.attachInternal(uid, this);
         handle = new AtomicReference<>();
+        floatDataRef = new AtomicReference<>();
+        doubleDataRef = new AtomicReference<>();
     }
 
     /** {@inheritDoc} */
@@ -82,19 +84,19 @@ public class LgbmNDArray extends NDArrayAdapter {
             if (getDataType() == DataType.FLOAT32) {
                 typeConstant = lightgbmlibConstants.C_API_DTYPE_FLOAT32;
                 FloatBuffer d1 = toByteBuffer().asFloatBuffer();
-                floatData = lightgbmlib.new_floatArray(size);
+                floatDataRef.set(lightgbmlib.new_floatArray(size));
                 for (int i = 0; i < size; i++) {
-                    lightgbmlib.floatArray_setitem(floatData, i, d1.get(i));
+                    lightgbmlib.floatArray_setitem(floatDataRef.get(), i, d1.get(i));
                 }
-                handle.set(lightgbmlib.float_to_voidp_ptr(floatData));
+                handle.set(lightgbmlib.float_to_voidp_ptr(floatDataRef.get()));
             } else if (getDataType() == DataType.FLOAT64) {
                 typeConstant = lightgbmlibConstants.C_API_DTYPE_FLOAT64;
                 DoubleBuffer d1 = toByteBuffer().asDoubleBuffer();
-                doubleData = lightgbmlib.new_doubleArray(size);
+                doubleDataRef.set(lightgbmlib.new_doubleArray(size));
                 for (int i = 0; i < size; i++) {
-                    lightgbmlib.doubleArray_setitem(doubleData, i, d1.get(i));
+                    lightgbmlib.doubleArray_setitem(doubleDataRef.get(), i, d1.get(i));
                 }
-                handle.set(lightgbmlib.double_to_voidp_ptr(doubleData));
+                handle.set(lightgbmlib.double_to_voidp_ptr(doubleDataRef.get()));
             } else {
                 throw new IllegalArgumentException(
                         "The LightGBM operation can only be performed with a Float32 or Float64"
@@ -151,18 +153,21 @@ public class LgbmNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public void intern(NDArray replaced) {
+        LgbmNDArray array = (LgbmNDArray) replaced;
+
+        final SWIGTYPE_p_float floatData =
+                floatDataRef.getAndSet(array.floatDataRef.getAndSet(null));
         if (floatData != null) {
             lightgbmlib.delete_floatArray(floatData);
         }
+        final SWIGTYPE_p_double doubleData =
+                doubleDataRef.getAndSet(array.doubleDataRef.getAndSet(null));
         if (doubleData != null) {
             lightgbmlib.delete_doubleArray(doubleData);
         }
-        LgbmNDArray array = (LgbmNDArray) replaced;
+        handle.set(array.handle.getAndSet(null));
         data = array.data;
-        handle = array.handle;
         format = array.format;
-        floatData = array.floatData;
-        doubleData = array.doubleData;
         typeConstant = array.typeConstant;
         shape = array.shape;
         dataType = array.dataType;
@@ -180,11 +185,15 @@ public class LgbmNDArray extends NDArrayAdapter {
     @Override
     public void close() {
         super.close();
+        final SWIGTYPE_p_float floatData = floatDataRef.getAndSet(null);
         if (floatData != null) {
             lightgbmlib.delete_floatArray(floatData);
         }
+        final SWIGTYPE_p_double doubleData = doubleDataRef.getAndSet(null);
         if (doubleData != null) {
             lightgbmlib.delete_doubleArray(doubleData);
         }
+        handle.set(null);
+        data = null;
     }
 }

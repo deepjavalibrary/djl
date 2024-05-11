@@ -356,7 +356,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchAtan(JNIEnv*
 }
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchAtan2(
-JNIEnv* env, jobject jthis, jlong jself, jlong jother) {
+    JNIEnv* env, jobject jthis, jlong jself, jlong jother) {
   API_BEGIN()
   const auto* self_ptr = reinterpret_cast<torch::Tensor*>(jself);
   const auto* other_ptr = reinterpret_cast<torch::Tensor*>(jother);
