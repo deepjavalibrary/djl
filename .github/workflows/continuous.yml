@@ -93,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: reports
+          name: reports-${{ matrix.operating-system }}
           path: |
             ${{ github.workspace }}/**/build/reports/**/*
             !${{ github.workspace }}/**/build/reports/jacoco/*
