@@ -155,13 +155,11 @@ public class LgbmNDArray extends NDArrayAdapter {
     public void intern(NDArray replaced) {
         LgbmNDArray array = (LgbmNDArray) replaced;
 
-        final SWIGTYPE_p_float floatData =
-                floatDataRef.getAndSet(array.floatDataRef.getAndSet(null));
+        SWIGTYPE_p_float floatData = floatDataRef.getAndSet(array.floatDataRef.getAndSet(null));
         if (floatData != null) {
             lightgbmlib.delete_floatArray(floatData);
         }
-        final SWIGTYPE_p_double doubleData =
-                doubleDataRef.getAndSet(array.doubleDataRef.getAndSet(null));
+        SWIGTYPE_p_double doubleData = doubleDataRef.getAndSet(array.doubleDataRef.getAndSet(null));
         if (doubleData != null) {
             lightgbmlib.delete_doubleArray(doubleData);
         }
@@ -185,11 +183,11 @@ public class LgbmNDArray extends NDArrayAdapter {
     @Override
     public void close() {
         super.close();
-        final SWIGTYPE_p_float floatData = floatDataRef.getAndSet(null);
+        SWIGTYPE_p_float floatData = floatDataRef.getAndSet(null);
         if (floatData != null) {
             lightgbmlib.delete_floatArray(floatData);
         }
-        final SWIGTYPE_p_double doubleData = doubleDataRef.getAndSet(null);
+        SWIGTYPE_p_double doubleData = doubleDataRef.getAndSet(null);
         if (doubleData != null) {
             lightgbmlib.delete_doubleArray(doubleData);
         }
