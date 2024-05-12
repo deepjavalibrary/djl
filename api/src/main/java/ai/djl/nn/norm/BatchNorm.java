@@ -274,6 +274,51 @@ public class BatchNorm extends AbstractBlock {
     }
 
     /**
+     * Returns axis the axis in which channel is specified.
+     *
+     * @return axis the axis in which channel is specified
+     */
+    public int getAxis() {
+        return axis;
+    }
+
+    /**
+     * Returns the epsilon value to prevent division by 0.
+     *
+     * @return the epsilon value to prevent division by 0
+     */
+    public float getEpsilon() {
+        return epsilon;
+    }
+
+    /**
+     * Returns the momentum for moving average.
+     *
+     * @return the momentum for moving average
+     */
+    public float getMomentum() {
+        return momentum;
+    }
+
+    /**
+     * Returns offset of `beta` to add to normalized tensor.
+     *
+     * @return offset of `beta` to add to normalized tensor
+     */
+    public boolean getCenter() {
+        return center;
+    }
+
+    /**
+     * Whether multiply result by `gamma`.
+     *
+     * @return whether multiply result by `gamma`.
+     */
+    public boolean getScale() {
+        return scale;
+    }
+
+    /**
      * Creates a builder to build a {@code BatchNorm}.
      *
      * @return a new builder
