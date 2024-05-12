@@ -34,6 +34,10 @@ You can pull the module from the central Maven repository by including the follo
 If you are trying to convert a complete HuggingFace (transformers) model,
 you can try to use our all-in-one conversion solution to convert to Java:
 
+
+
+#### Convert Huggingface model to torchscript
+
 ```bash
 python3 -m pip install -r src/main/python/requirements.txt
 python3 src/main/python/model_zoo_importer.py -m deepset/bert-base-cased-squad2
@@ -43,6 +47,32 @@ This will generate a zip file into your local folder:
 
 ```
 model/nlp/question_answer/ai/djl/huggingface/pytorch/deepset/bert-base-cased-squad2/0.0.1/bert-base-cased-squad2.zip
+```
+
+#### Convert Huggingface model to OnnxRuntime
+
+```bash
+python3 -m pip install -r src/main/python/requirements.txt
+python3 src/main/python/model_zoo_importer.py -m deepset/bert-base-cased-squad2 -f OnnxRuntime
+```
+
+#### Convert Huggingface model to Rust
+
+```bash
+python3 -m pip install -r src/main/python/requirements.txt
+python3 src/main/python/model_zoo_importer.py -m deepset/bert-base-cased-squad2 -f Rust
+```
+#### Use command line
+You can also use install djl-converter from source and use it as commandline:
+
+```bash
+cd djl/extensions/tokenizers/src/main/python
+python3 -m pip install -e .
+# convert a single model to TorchScript, Onnxruntime or Rust
+djl-convert --help
+
+# import models as DJL Model Zoo
+djl-import --help
 ```
 
 Then, all you need to do, is to load this model in DJL:
@@ -76,7 +106,7 @@ tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/msmarco-distilb
 Java
 
 ```java
-HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("sentence-transformers/msmarco-distilbert-dot-v5")
+HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("sentence-transformers/msmarco-distilbert-dot-v5");
 ```
 
 This way requires network connection to huggingface repo.
@@ -101,7 +131,7 @@ From your local directory, you will find a `tokenizer.json` file.
 Java
 
 ```java
-HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance(Paths.get("./tokenizer.json"))
+HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance(Paths.get("./tokenizer.json"));
 ```
 
 ### From pretrained json file

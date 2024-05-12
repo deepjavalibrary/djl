@@ -52,15 +52,18 @@ class HuggingfaceConverter:
         self.outputs = None
         self.api = HfApi()
 
-    def save_model(self, model_info, args: Namespace, temp_dir: str):
+    def save_model(self, model_info, args: Namespace, temp_dir: str,
+                   model_zoo: bool):
         if args.output_format == "OnnxRuntime":
-            return self.save_onnx_model(model_info, args, temp_dir)
+            return self.save_onnx_model(model_info, args, temp_dir, model_zoo)
         elif args.output_format == "Rust":
-            return self.save_rust_model(model_info, args, temp_dir)
+            return self.save_rust_model(model_info, args, temp_dir, model_zoo)
         else:
-            return self.save_pytorch_model(model_info, args, temp_dir)
+            return self.save_pytorch_model(model_info, args, temp_dir,
+                                           model_zoo)
 
-    def save_onnx_model(self, model_info, args: Namespace, temp_dir: str):
+    def save_onnx_model(self, model_info, args: Namespace, temp_dir: str,
+                        model_zoo: bool):
         model_id = model_info.modelId
 
         if not os.path.exists(temp_dir):
@@ -70,9 +73,17 @@ class HuggingfaceConverter:
 
         from optimum.commands.optimum_cli import main
 
-        sys.argv = [
-            "model_zoo_importer.py", "export", "onnx", "-m", model_id, temp_dir
-        ]
+        sys.argv = ["model_zoo_importer.py", "export", "onnx", "-m", model_id]
+        if args.optimize:
+            sys.argv.extend(["--optimize", args.optimize])
+        if args.device:
+            sys.argv.extend(["--device", args.device])
+        if args.dtype:
+            sys.argv.extend(["--dtype", args.dtype])
+        if args.trust_remote_code:
+            sys.argv.append("--trust-remote-code")
+        sys.argv.append(temp_dir)
+
         main()
 
         model = onnx.load_model(os.path.join(temp_dir, "model.onnx"),
@@ -83,13 +94,19 @@ class HuggingfaceConverter:
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         config = AutoConfig.from_pretrained(model_id)
         hf_pipeline = PipelineHolder(tokenizer, ModelHolder(config))
-        size = self.save_to_model_zoo(model_info, args.output_dir,
-                                      "OnnxRuntime", temp_dir, hf_pipeline,
-                                      include_types)
+        arguments = self.save_serving_properties(model_info, "OnnxRuntime",
+                                                 temp_dir, hf_pipeline,
+                                                 include_types)
+        if model_zoo:
+            size = self.save_to_model_zoo(model_info, args.output_dir,
+                                          "OnnxRuntime", temp_dir, arguments)
+        else:
+            size = -1
 
         return True, None, size
 
-    def save_rust_model(self, model_info, args: Namespace, temp_dir: str):
+    def save_rust_model(self, model_info, args: Namespace, temp_dir: str,
+                        model_zoo: bool):
         model_id = model_info.modelId
 
         config = AutoConfig.from_pretrained(model_id)
@@ -143,12 +160,18 @@ class HuggingfaceConverter:
         else:
             return False, f"No model file found for: {model_id}", -1
 
-        size = self.save_to_model_zoo(model_info, args.output_dir, "Rust",
-                                      temp_dir, hf_pipeline, include_types)
+        arguments = self.save_serving_properties(model_info, "Rust", temp_dir,
+                                                 hf_pipeline, include_types)
+        if model_zoo:
+            size = self.save_to_model_zoo(model_info, args.output_dir, "Rust",
+                                          temp_dir, arguments)
+        else:
+            size = -1
 
         return True, None, size
 
-    def save_pytorch_model(self, model_info, args: Namespace, temp_dir: str):
+    def save_pytorch_model(self, model_info, args: Namespace, temp_dir: str,
+                           model_zoo: bool):
         model_id = model_info.modelId
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
@@ -194,8 +217,14 @@ class HuggingfaceConverter:
             if not result:
                 return False, reason, -1
 
-        size = self.save_to_model_zoo(model_info, args.output_dir, "PyTorch",
-                                      temp_dir, hf_pipeline, include_types)
+        arguments = self.save_serving_properties(model_info, "PyTorch",
+                                                 temp_dir, hf_pipeline,
+                                                 include_types)
+        if model_zoo:
+            size = self.save_to_model_zoo(model_info, args.output_dir,
+                                          "PyTorch", temp_dir, arguments)
+        else:
+            size = -1
 
         return True, None, size
 
@@ -245,17 +274,11 @@ class HuggingfaceConverter:
 
         return model_file
 
-    def save_to_model_zoo(self, model_info, output_dir: str, engine: str,
-                          temp_dir: str, hf_pipeline, include_types: bool):
+    def save_serving_properties(self, model_info, engine: str, temp_dir: str,
+                                hf_pipeline, include_types: bool) -> dict:
         model_id = model_info.modelId
         model_name = model_id.split("/")[-1]
-        group_id = f"ai/djl/huggingface/{engine.lower()}"
-        repo_dir = f"{output_dir}/model/{self.application}/{group_id}/{model_id}"
-        model_dir = f"{repo_dir}/0.0.1"
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
 
-        # Save serving.properties
         serving_file = os.path.join(temp_dir, "serving.properties")
         arguments = self.get_extra_arguments(hf_pipeline, model_id, temp_dir)
         if include_types:
@@ -271,13 +294,25 @@ class HuggingfaceConverter:
             for k, v in arguments.items():
                 f.write(f"{k}={v}\n")
 
+        arguments["engine"] = engine
+        return arguments
+
+    def save_to_model_zoo(self, model_info, output_dir: str, engine: str,
+                          temp_dir: str, arguments: dict):
+        model_id = model_info.modelId
+        model_name = model_id.split("/")[-1]
+        group_id = f"ai/djl/huggingface/{engine.lower()}"
+        repo_dir = f"{output_dir}/model/{self.application}/{group_id}/{model_id}"
+        model_dir = f"{repo_dir}/0.0.1"
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir)
+
         # Save model as .zip file
         logging.info(f"Saving DJL model as zip: {model_name}.zip ...")
         zip_file = os.path.join(model_dir, f"{model_name}.zip")
         zip_dir(temp_dir, zip_file)
 
         # Save metadata.json
-        arguments["engine"] = engine
         sha1 = sha1_sum(zip_file)
         file_size = os.path.getsize(zip_file)
         metadata = HuggingfaceMetadata(model_info, engine, self.application,

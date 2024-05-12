@@ -17,15 +17,16 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
-from djl_converter.arg_parser import converter_args
+from djl_converter.arg_parser import importer_args
 
 
 def main():
     logging.basicConfig(stream=sys.stdout,
                         format="%(message)s",
                         level=logging.INFO)
-    args = converter_args()
+    args = importer_args()
 
+    # import transformer takes a long time
     from djl_converter.huggingface_models import HuggingfaceModels, SUPPORTED_TASKS
 
     huggingface_models = HuggingfaceModels(args.output_dir)
@@ -42,7 +43,7 @@ def main():
 
         try:
             result, reason, size = converter.save_model(
-                model_info, args, temp_dir)
+                model_info, args, temp_dir, True)
             if not result:
                 logging.error(f"{model_info.modelId}: {reason}")
         except Exception as e:
