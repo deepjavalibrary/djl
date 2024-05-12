@@ -1,4 +1,2 @@
 __pycache__
-model/
-tmp/
-models.json
+*.egg-info/

@@ -19,6 +19,12 @@ from typing import List
 from huggingface_hub import HfApi
 from huggingface_hub import hf_hub_download
 from huggingface_hub.hf_api import ModelInfo
+from djl_converter.fill_mask_converter import FillMaskConverter
+from djl_converter.metadata import get_lang_tags
+from djl_converter.question_answering_converter import QuestionAnsweringConverter
+from djl_converter.sentence_similarity_converter import SentenceSimilarityConverter
+from djl_converter.text_classification_converter import TextClassificationConverter
+from djl_converter.token_classification_converter import TokenClassificationConverter
 
 ARCHITECTURES_2_TASK = {
     "ForQuestionAnswering": "question-answering",
@@ -27,19 +33,13 @@ ARCHITECTURES_2_TASK = {
     "ForMultipleChoice": "text-classification",
     "ForMaskedLM": "fill-mask",
 }
-LANGUAGES = HfApi().get_model_tags()["language"]
-
-
-def get_lang_tags(model_info):
-    tags = {}
-    for tag in model_info.tags:
-        if tag in LANGUAGES:
-            tags[tag] = "true"
-
-    if not tags:
-        tags["en"] = "true"
-
-    return tags
+SUPPORTED_TASKS = {
+    "fill-mask": FillMaskConverter(),
+    "question-answering": QuestionAnsweringConverter(),
+    "sentence-similarity": SentenceSimilarityConverter(),
+    "text-classification": TextClassificationConverter(),
+    "token-classification": TokenClassificationConverter(),
+}
 
 
 class HuggingfaceModels:

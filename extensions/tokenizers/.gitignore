@@ -1,3 +1,6 @@
 Cargo.lock
 /tokenizers
 /jnilib
+model/
+tmp/
+models.json

@@ -17,14 +17,14 @@ import sys
 from argparse import Namespace
 
 import onnx
-import safetensors_convert
+from djl_converter.safetensors_convert import convert_file
 import torch
 from huggingface_hub import hf_hub_download, HfApi
 from transformers import pipeline, AutoTokenizer, AutoConfig
 
-from metadata import HuggingfaceMetadata
-from shasum import sha1_sum
-from zip_utils import zip_dir
+from djl_converter.metadata import HuggingfaceMetadata
+from djl_converter.shasum import sha1_sum
+from djl_converter.zip_utils import zip_dir
 
 
 class PipelineHolder(object):
@@ -139,7 +139,7 @@ class HuggingfaceConverter:
         elif has_pt_file:
             file = hf_hub_download(repo_id=model_id,
                                    filename="pytorch_model.bin")
-            safetensors_convert.convert_file(file, target)
+            convert_file(file, target)
         else:
             return False, f"No model file found for: {model_id}", -1
 
