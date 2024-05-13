@@ -6,6 +6,10 @@ on:
       pt_version:
         description: 'pytorch version'
         required: false
+      cuda:
+        description: 'CUDA version'
+        required: true
+        default: 'cu121'
   schedule:
     - cron: '0 5 * * *'
 
@@ -83,7 +87,8 @@ jobs:
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
           export TORCH_CUDA_ARCH_LIST="8.0 8.6 8.9 9.0"
-          ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcuda=cu121 -Ppt_version=$PYTORCH_VERSION
+          CUDA_VERSION=${{ github.event.inputs.cuda }}
+          ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcuda=$CUDA_VERSION -Ppt_version=$PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -134,7 +139,8 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
           rm -rf ~/.djl.ai
           export TORCH_CUDA_ARCH_LIST="8.0 8.6 8.9 9.0"
-          ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcuda=cu121 -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
+          CUDA_VERSION=${{ github.event.inputs.cuda }}
+          ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcuda=$CUDA_VERSION -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -185,7 +191,7 @@ jobs:
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
           set "CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.7"
           set "PATH=%CUDA_PATH%\bin;%CUDA_PATH%\libnvvp;%PATH%"
-          gradlew :engines:pytorch:pytorch-native:cleanJNI :engines:pytorch:pytorch-native:compileJNI -Pcuda=cu121 -Ppt_version=${{ github.event.inputs.pt_version }}
+          gradlew :engines:pytorch:pytorch-native:cleanJNI :engines:pytorch:pytorch-native:compileJNI -Pcuda=${{ github.event.inputs.cuda }} -Ppt_version=${{ github.event.inputs.pt_version }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
