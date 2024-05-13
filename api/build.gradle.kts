@@ -1,10 +1,7 @@
 plugins {
-    //    embeddedKotlin("jvm")
     ai.djl.javaProject
     ai.djl.publish
 }
-
-//kotlin { jvmToolchain(11) }
 
 dependencies {
     api(libs.google.gson)
