@@ -15,7 +15,7 @@ import math
 
 import torch
 
-from huggingface_converter import HuggingfaceConverter
+from djl_converter.huggingface_converter import HuggingfaceConverter
 
 
 class TextClassificationConverter(HuggingfaceConverter):

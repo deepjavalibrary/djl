@@ -11,25 +11,13 @@
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
 import logging
-import os.path
+import os
 import shutil
 import sys
 
-from arg_parser import converter_args
-from fill_mask_converter import FillMaskConverter
-from huggingface_models import HuggingfaceModels
-from question_answering_converter import QuestionAnsweringConverter
-from sentence_similarity_converter import SentenceSimilarityConverter
-from text_classification_converter import TextClassificationConverter
-from token_classification_converter import TokenClassificationConverter
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
-SUPPORTED_TASK = {
-    "fill-mask": FillMaskConverter(),
-    "question-answering": QuestionAnsweringConverter(),
-    "sentence-similarity": SentenceSimilarityConverter(),
-    "text-classification": TextClassificationConverter(),
-    "token-classification": TokenClassificationConverter(),
-}
+from djl_converter.arg_parser import converter_args
 
 
 def main():
@@ -37,6 +25,8 @@ def main():
                         format="%(message)s",
                         level=logging.INFO)
     args = converter_args()
+
+    from djl_converter.huggingface_models import HuggingfaceModels, SUPPORTED_TASKS
 
     huggingface_models = HuggingfaceModels(args.output_dir)
     temp_dir = f"{args.output_dir}/tmp"
@@ -48,7 +38,7 @@ def main():
     for model in models:
         task = model["task"]
         model_info = model["model_info"]
-        converter = SUPPORTED_TASK[task]
+        converter = SUPPORTED_TASKS[task]
 
         try:
             result, reason, size = converter.save_model(

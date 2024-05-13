@@ -11,7 +11,22 @@
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
 import json
-from huggingface_models import get_lang_tags
+
+from huggingface_hub import HfApi
+
+LANGUAGES = HfApi().get_model_tags()["language"]
+
+
+def get_lang_tags(model_info):
+    tags = {}
+    for tag in model_info.tags:
+        if tag in LANGUAGES:
+            tags[tag] = "true"
+
+    if not tags:
+        tags["en"] = "true"
+
+    return tags
 
 
 class HuggingfaceMetadata:
