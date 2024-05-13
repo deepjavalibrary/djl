@@ -20,7 +20,11 @@
 #include <torch/script.h>
 
 #include <iostream>
+#ifdef V1_13_X
+#include <c10/util/variant.h>
+#else
 #include <variant>
+#endif
 
 #include "djl_pytorch_jni_log.h"
 
@@ -30,9 +34,15 @@ namespace utils {
 
 #if !defined(__ANDROID__)
 // for image interpolation
+#ifdef V1_13_X
+typedef torch::variant<torch::enumtype::kNearest, torch::enumtype::kLinear, torch::enumtype::kBilinear,
+    torch::enumtype::kBicubic, torch::enumtype::kTrilinear, torch::enumtype::kArea, torch::enumtype::kNearestExact>
+    mode_t;
+#else
 typedef std::variant<torch::enumtype::kNearest, torch::enumtype::kLinear, torch::enumtype::kBilinear,
     torch::enumtype::kBicubic, torch::enumtype::kTrilinear, torch::enumtype::kArea, torch::enumtype::kNearestExact>
     mode_t;
+#endif
 #endif
 
 inline jint GetDTypeFromScalarType(const torch::ScalarType& type) {
