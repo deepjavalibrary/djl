@@ -15,13 +15,13 @@ import os.path
 import shutil
 import sys
 
-from arg_parser import converter_args
-from fill_mask_converter import FillMaskConverter
-from huggingface_models import HuggingfaceModels
-from question_answering_converter import QuestionAnsweringConverter
-from sentence_similarity_converter import SentenceSimilarityConverter
-from text_classification_converter import TextClassificationConverter
-from token_classification_converter import TokenClassificationConverter
+from djl_converter.arg_parser import converter_args
+from djl_converter.fill_mask_converter import FillMaskConverter
+from djl_converter.huggingface_models import HuggingfaceModels
+from djl_converter.question_answering_converter import QuestionAnsweringConverter
+from djl_converter.sentence_similarity_converter import SentenceSimilarityConverter
+from djl_converter.text_classification_converter import TextClassificationConverter
+from djl_converter.token_classification_converter import TokenClassificationConverter
 
 SUPPORTED_TASK = {
     "fill-mask": FillMaskConverter(),

@@ -11,7 +11,7 @@
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
 import json
-from huggingface_models import get_lang_tags
+from djl_converter.huggingface_models import get_lang_tags
 
 
 class HuggingfaceMetadata:

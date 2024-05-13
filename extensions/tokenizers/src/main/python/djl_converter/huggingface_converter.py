@@ -12,19 +12,20 @@
 # the specific language governing permissions and limitations under the License.
 import logging
 import os.path
+import glob
 import shutil
 import sys
 from argparse import Namespace
 
 import onnx
-import safetensors_convert
 import torch
 from huggingface_hub import hf_hub_download, HfApi
 from transformers import pipeline, AutoTokenizer, AutoConfig
 
-from metadata import HuggingfaceMetadata
-from shasum import sha1_sum
-from zip_utils import zip_dir
+from djl_converter import safetensors_convert
+from djl_converter.metadata import HuggingfaceMetadata
+from djl_converter.shasum import sha1_sum
+from djl_converter.zip_utils import zip_dir
 
 
 class PipelineHolder(object):
@@ -71,7 +72,9 @@ class HuggingfaceConverter:
         from optimum.commands.optimum_cli import main
 
         sys.argv = [
-            "model_zoo_importer.py", "export", "onnx", "-m", model_id, temp_dir
+            "model_zoo_importer.py", "export", "onnx", "-m", model_id,
+            "--optimize", "O2" if args.cpu_only else "O4", "--device",
+            "cpu" if args.cpu_only else "cuda", temp_dir
         ]
         main()
 
@@ -83,9 +86,14 @@ class HuggingfaceConverter:
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         config = AutoConfig.from_pretrained(model_id)
         hf_pipeline = PipelineHolder(tokenizer, ModelHolder(config))
-        size = self.save_to_model_zoo(model_info, args.output_dir,
-                                      "OnnxRuntime", temp_dir, hf_pipeline,
-                                      include_types)
+        size = None
+        if args.save_to_model_zoo:
+            size = self.save_to_model_zoo(model_info, args.output_dir,
+                                          "OnnxRuntime", temp_dir, hf_pipeline,
+                                          include_types)
+        else:
+            self.save_to_output_dir(model_info, args.output_dir, "OnnxRuntime",
+                                    temp_dir, hf_pipeline, include_types)
 
         return True, None, size
 
@@ -286,6 +294,33 @@ class HuggingfaceConverter:
         metadata.save_metadata(metadata_file)
 
         return file_size
+
+    def save_to_output_dir(self, model_info, output_dir: str, engine: str,
+                           temp_dir: str, hf_pipeline, include_types: bool):
+        model_id = model_info.modelId
+        model_name = model_id.split("/")[-1]
+
+        # Save serving.properties
+        serving_file = os.path.join(temp_dir, "serving.properties")
+        arguments = self.get_extra_arguments(hf_pipeline, model_id, temp_dir)
+        if include_types:
+            arguments["includeTokenTypes"] = "true"
+        arguments["translatorFactory"] = self.translator
+
+        with open(serving_file, 'w') as f:
+            f.write(f"engine={engine}\n"
+                    f"option.modelName={model_name}\n")
+            if engine == "PyTorch":
+                f.write(f"option.mapLocation=true\n")
+
+            for k, v in arguments.items():
+                f.write(f"{k}={v}\n")
+
+        # Save model as .zip file
+        logging.info(f"Saving DJL model to output_dir: {output_dir} ...")
+        files_to_copy = glob.glob(temp_dir + '/*')
+        for f in files_to_copy:
+            shutil.copy(f, output_dir)
 
     def verify_jit_model(self, hf_pipeline, model_file: str,
                          include_types: bool, cpu_only: bool):

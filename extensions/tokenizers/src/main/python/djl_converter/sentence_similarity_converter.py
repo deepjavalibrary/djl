@@ -19,7 +19,7 @@ import requests
 import torch
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 
-from huggingface_converter import HuggingfaceConverter, PipelineHolder
+from djl_converter.huggingface_converter import HuggingfaceConverter, PipelineHolder
 from huggingface_hub import hf_hub_download
 
 

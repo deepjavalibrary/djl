@@ -35,7 +35,11 @@ def converter_args():
     parser.add_argument("-u",
                         "--cpu-only",
                         action='store_true',
-                        help="Only validate jit traced model on CPU")
+                        help="Only on CPU")
+    parser.add_argument("-s",
+                        "--save-to-model-zoo",
+                        action='store_true',
+                        help="Save to Model Zoo")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "-c",
