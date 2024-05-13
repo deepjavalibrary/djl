@@ -55,7 +55,7 @@ public class TrtNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer toByteBuffer() {
+    public ByteBuffer toByteBuffer(boolean tryDirect) {
         data.rewind();
         return data;
     }

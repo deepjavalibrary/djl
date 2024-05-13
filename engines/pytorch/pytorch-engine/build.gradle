@@ -39,8 +39,4 @@ publishing {
     }
 }
 
-clean.doFirst {
-    delete fileTree(System.getProperty("user.home") + "/.djl.ai/pytorch/") {
-        include '**/*djl_torch.*'
-    }
-}
+clean.dependsOn ":engines:pytorch:pytorch-jni:clean"

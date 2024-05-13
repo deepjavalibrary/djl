@@ -288,7 +288,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer toByteBuffer() {
+    public ByteBuffer toByteBuffer(boolean tryDirect) {
         if (getSparseFormat() != SparseFormat.DENSE) {
             throw new IllegalStateException("Require Dense NDArray, actual " + getSparseFormat());
         }
