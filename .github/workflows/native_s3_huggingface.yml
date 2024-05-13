@@ -49,7 +49,7 @@ jobs:
           yum -y install devtoolset-7 git patch cmake3 libstdc++-static
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           curl https://sh.rustup.rs -sSf | sh -s -- -y
-          pip3 install awscli --upgrade
+          pip3 install awscli wheel setuptools --upgrade
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -71,6 +71,9 @@ jobs:
           export PATH=$PATH:/opt/rh/devtoolset-7/root/usr/bin
           ./gradlew :extensions:tokenizers:compileJNI
           PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
+      - name: Build djl-converter wheel
+        working-directory: extensions/tokenizers/src/main/python/
+        run: ./setup.py bdist_wheel
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -82,6 +85,8 @@ jobs:
           TOKENIZERS_VERSION="$(cat gradle.properties | awk -F '=' '/tokenizers_version/ {print $2}')"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
+          aws s3 cp extensions/tokenizers/src/main/python/dist/djl_converter-*.whl s3://djl-ai/publish/djl_converter/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl_converter/*"
 
   build-tokenizer-jni-windows:
     runs-on: windows-latest

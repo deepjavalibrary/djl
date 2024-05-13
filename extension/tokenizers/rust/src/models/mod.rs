@@ -2,7 +2,7 @@ mod bert;
 mod distilbert;
 
 use crate::ndarray::as_data_type;
-use crate::{cast_handle, to_handle, to_string_array};
+use crate::{cast_handle, drop_handle, to_handle, to_string_array};
 use bert::{BertConfig, BertModel};
 use candle_core::DType;
 use candle_core::{Device, Result, Tensor};
@@ -119,6 +119,15 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_loadModel<'local>(
             0
         }
     }
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_deleteModel<'local>(
+    mut env: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) {
+    drop_handle::<Box<dyn Model>>(handle);
 }
 
 #[no_mangle]

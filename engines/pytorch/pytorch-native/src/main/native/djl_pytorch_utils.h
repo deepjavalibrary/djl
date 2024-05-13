@@ -18,8 +18,9 @@
 #include <jni.h>
 #include <torch/csrc/api/include/torch/enum.h>
 #include <torch/script.h>
-#include <variant>
+
 #include <iostream>
+#include <variant>
 
 #include "djl_pytorch_jni_log.h"
 
