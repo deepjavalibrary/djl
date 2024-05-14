@@ -29,9 +29,12 @@ dependencies {
 tasks {
     compileJava {
         // need to use `project` as receiver otherwise something else will be picked up
-        javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(11) }
+//        javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(11) }
         // you cant remove from `options.compilerArgs`, just assign a new value to it
-        options.apply { compilerArgs = compilerArgs - listOf("--release", "8") }
+        options.apply {
+            release = 11
+            compilerArgs = compilerArgs - listOf("--release", "8")
+        }
         doFirst { println(options.compilerArgs) }
         doLast { println(options.compilerArgs) }
     }
@@ -69,5 +72,5 @@ application {
 }
 
 // manual help for the missing accessor
-val JavaCompile.javaToolchains: JavaToolchainService
-    get() = (project as ExtensionAware).extensions.getByName<JavaToolchainService>("javaToolchains")
+//val JavaCompile.javaToolchains: JavaToolchainService
+//    get() = (project as ExtensionAware).extensions.getByName<JavaToolchainService>("javaToolchains")

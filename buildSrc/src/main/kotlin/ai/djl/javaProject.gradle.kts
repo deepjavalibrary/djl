@@ -16,15 +16,17 @@ plugins {
 
 tasks {
     compileJava {
-        javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(8) }
+//        javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(8) }
         options.apply {
+            release = 8
             encoding = "UTF-8"
             compilerArgs = listOf("--release", "8", "-proc:none", "-Xlint:all,-options,-static", "-Werror")
         }
     }
     compileTestJava {
-        javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(11) }
+//        javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(11) }
         options.apply {
+            release = 11
             encoding = "UTF-8"
             compilerArgs = listOf("-proc:none", "-Xlint:all,-options,-static,-removal", "-Werror")
         }
