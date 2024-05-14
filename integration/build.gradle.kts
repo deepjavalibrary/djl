@@ -13,7 +13,10 @@ dependencies {
     implementation(project(":model-zoo"))
     implementation(project(":testing"))
 
-    runtimeOnly(project(":engines:mxnet:mxnet-model-zoo"))
+    // Don't use MXNet for aarch64
+    if (arch != "aarch64")
+        runtimeOnly(project(":engines:mxnet:mxnet-model-zoo"))
+
     runtimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
     runtimeOnly(project(":engines:pytorch:pytorch-jni"))
     runtimeOnly(project(":engines:tensorflow:tensorflow-model-zoo"))
@@ -28,7 +31,7 @@ tasks {
         // need to use `project` as receiver otherwise something else will be picked up
         javaCompiler = project.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(11) }
         // you cant remove from `options.compilerArgs`, just assign a new value to it
-        options.apply { compilerArgs = compilerArgs - listOf("--release", "8")}
+        options.apply { compilerArgs = compilerArgs - listOf("--release", "8") }
     }
 
     register<Copy>("copyDependencies") {
