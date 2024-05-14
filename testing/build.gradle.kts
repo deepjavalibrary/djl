@@ -10,5 +10,5 @@ dependencies {
 
 tasks.compileJava {
     javaCompiler = project.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(11) }
-    options.compilerArgs = listOf("--release", "8")
+    options.apply { compilerArgs = compilerArgs - listOf("--release", "8") }
 }

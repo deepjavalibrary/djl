@@ -22,10 +22,6 @@ tasks {
         options.apply {
             encoding = "UTF-8"
             compilerArgs = listOf("--release", "8", "-proc:none", "-Xlint:all,-options,-static", "-Werror")
-//            println(compilerArgs)
-//            compilerArgs = emptyList()
-////            compilerArgs.clear()
-//            println(compilerArgs)
         }
     }
     compileTestJava {
