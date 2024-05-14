@@ -15,6 +15,7 @@ use serde::Deserialize;
 use std::path::PathBuf;
 
 pub(crate) trait Model {
+    #[allow(dead_code)]
     fn is_padded(&self) -> bool;
 
     fn get_input_names(&self) -> Vec<String>;
@@ -123,8 +124,7 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_loadModel<'local>(
 
 #[no_mangle]
 pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_deleteModel<'local>(
-    mut env: JNIEnv,
-    _: JObject,
+    _env: JObject,
     handle: jlong,
 ) {
     drop_handle::<Box<dyn Model>>(handle);
