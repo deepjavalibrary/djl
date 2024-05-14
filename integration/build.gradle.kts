@@ -32,6 +32,8 @@ tasks {
         javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(11) }
         // you cant remove from `options.compilerArgs`, just assign a new value to it
         options.apply { compilerArgs = compilerArgs - listOf("--release", "8") }
+        doFirst { println(options.compilerArgs) }
+        doLast { println(options.compilerArgs) }
     }
 
     register<Copy>("copyDependencies") {
