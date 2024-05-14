@@ -53,9 +53,6 @@ def converter_args():
     if args.output_dir is None:
         args.output_dir = "."
 
-    if not os.path.exists(args.output_dir):
-        raise ValueError(f"Invalid output directory: {args.output_dir}.")
-
     return args
 
 

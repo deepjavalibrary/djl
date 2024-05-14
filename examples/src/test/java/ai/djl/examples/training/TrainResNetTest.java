@@ -44,7 +44,7 @@ public class TrainResNetTest {
     @Test
     public void testTrainResNetSymbolicNightly()
             throws ModelException, IOException, TranslateException {
-        TestRequirements.engine("MXNet");
+        TestRequirements.linux();
         TestRequirements.nightly();
         TestRequirements.gpu("MXNet");
 
@@ -65,6 +65,7 @@ public class TrainResNetTest {
     @Test
     public void testTrainResNetImperativeNightly()
             throws ModelException, IOException, TranslateException {
+        TestRequirements.linux();
         TestRequirements.nightly();
         TestRequirements.gpu("MXNet");
 
