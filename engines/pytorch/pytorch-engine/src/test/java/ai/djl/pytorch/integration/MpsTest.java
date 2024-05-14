@@ -17,9 +17,9 @@ import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.testing.TestRequirements;
 
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -27,12 +27,9 @@ import java.util.List;
 
 public class MpsTest {
 
-    @Test
+    @Test(enabled = false)
     public void testMps() {
-        if (!"aarch64".equals(System.getProperty("os.arch"))
-                || !System.getProperty("os.name").startsWith("Mac")) {
-            throw new SkipException("MPS test requires M1 macOS.");
-        }
+        TestRequirements.macosM1();
 
         Device device = Device.of("mps", -1);
         try (NDManager manager = NDManager.newBaseManager(device)) {
@@ -41,16 +38,9 @@ public class MpsTest {
         }
     }
 
-    private static boolean checkMpsCompatible() {
-        return "aarch64".equals(System.getProperty("os.arch"))
-                && System.getProperty("os.name").startsWith("Mac");
-    }
-
-    @Test
+    @Test(enabled = false)
     public void testToTensorMPS() {
-        if (!checkMpsCompatible()) {
-            throw new SkipException("MPS toTensor test requires Apple Silicon macOS.");
-        }
+        TestRequirements.macosM1();
 
         // Test that toTensor does not fail on MPS (e.g. due to use of float64 for division)
         try (NDManager manager = NDManager.newBaseManager(Device.fromName("mps"))) {
@@ -60,11 +50,9 @@ public class MpsTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void testClassificationsMPS() {
-        if (!checkMpsCompatible()) {
-            throw new SkipException("MPS classification test requires Apple Silicon macOS.");
-        }
+        TestRequirements.macosM1();
 
         // Test that classifications do not fail on MPS (e.g. due to conversion of probabilities to
         // float64)

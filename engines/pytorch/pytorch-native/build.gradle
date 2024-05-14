@@ -80,7 +80,6 @@ def prepareNativeLib(String binaryRoot, String ver) {
 
     def files = [
             "cpu/libtorch-cxx11-abi-shared-with-deps-${ver}%2Bcpu.zip"        : "cpu/linux-x86_64",
-            "cpu/libtorch-macos-x86_64-${ver}.zip"                            : "cpu/osx-x86_64",
             "cpu/libtorch-macos-arm64-${ver}.zip"                             : "cpu/osx-aarch64",
             "cpu/libtorch-win-shared-with-deps-${ver}%2Bcpu.zip"              : "cpu/win-x86_64",
             "${cuda}/libtorch-cxx11-abi-shared-with-deps-${ver}%2B${cuda}.zip": "${cuda}/linux-x86_64",
@@ -96,12 +95,6 @@ def prepareNativeLib(String binaryRoot, String ver) {
     copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
     copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
 
-    exec {
-        commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-x86_64/native/lib/libtorch_cpu.dylib"
-    }
-    exec {
-        commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-x86_64/native/lib/libtorch.dylib"
-    }
     exec {
         commandLine 'install_name_tool', '-add_rpath', '@loader_path', "${binaryRoot}/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib"
     }
@@ -269,7 +262,6 @@ tasks.register('uploadS3') {
         def uploadDirs = [
                 "${BINARY_ROOT}/cpu/linux-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu/osx-aarch64/native/lib/",
-                "${BINARY_ROOT}/cpu/osx-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu/win-x86_64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-aarch64/native/lib/",
                 "${BINARY_ROOT}/cpu-precxx11/linux-x86_64/native/lib/",

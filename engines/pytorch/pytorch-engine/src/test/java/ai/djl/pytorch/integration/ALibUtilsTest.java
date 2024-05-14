@@ -13,6 +13,7 @@
 package ai.djl.pytorch.integration;
 
 import ai.djl.engine.Engine;
+import ai.djl.testing.TestRequirements;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -23,6 +24,8 @@ public class ALibUtilsTest {
 
     @BeforeClass
     public void setup() {
+        TestRequirements.notMacX86();
+
         System.setProperty("ai.djl.pytorch.native_helper", ALibUtilsTest.class.getName());
         System.setProperty("STDCXX_LIBRARY_PATH", "/usr/lib/non-exists");
     }
