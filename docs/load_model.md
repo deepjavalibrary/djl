@@ -152,7 +152,7 @@ You may want to create additional model zoos using other protocols such as:
 DJL is highly extensible and our API allows you to create your own URL protocol handling by extending `Repository` class:
 
 - Create a class that implements `RepositoryFactory` interface
-    make sure `getSupportedScheme()` returns URI schemes that you what to handle
+    make sure `getSupportedScheme()` returns URI schemes that you want to handle
 - Create a class that implements `Repository` interface.
 - DJL use ServiceLoader to automatically register your `RepositoryFactory`. You need add a file `META-INF/services/ai.djl.repository.RepositoryFactory`
     See [java ServiceLoader](https://docs.oracle.com/javase/9/docs/api/java/util/ServiceLoader.html) for more detail.
