@@ -15,8 +15,8 @@ dependencies {
         exclude("junit", "junit")
     }
     testImplementation(libs.slf4j.simple)
-    testRuntimeOnly(projects.engines.pytorch.pytorchModelZoo)
-    testRuntimeOnly(projects.engines.pytorch.pytorchJni)
+    testRuntimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
+    testRuntimeOnly(project(":engines:pytorch:pytorch-jni"))
 }
 
 tasks {

@@ -14,7 +14,7 @@ allows the user to run inference with a plain java object.
 
 We provide engine agnostic `ZooModel`s in basic model zoo package. They can be used on any DJL backend engine.
 
-## [Huggingface model zoo](../extension/tokenizers/README.md)
+## [Huggingface model zoo](../extensions/tokenizers/README.md)
 
 We created a Huggingface model zoo to make it easy for users to consume them.
 

@@ -63,16 +63,16 @@ Note: when searching in JavaDoc, if your access is denied, please try removing t
 ## Extensions and utilities
 
 - [Android support](../android/README.md)
-- [Audio support](../extension/audio/README.md)
-- [AWS S3 support](../extension/aws-ai/README.md)
-- [NLP support with fastText](../extension/fasttext/README.md)
-- [Hadoop support](../extension/hadoop/README.md)
-- [Image support with OpenCV](../extension/opencv/README.md)
-- [NLP support with SentencePiece](../extension/sentencepiece/README.md)
-- [Spark Support](../extension/spark/README.md)
-- [Tabular Dataset Support](../extension/tablesaw/README.md)
-- [TimeSeries support](../extension/timeseries/README.md)
-- [NLP support with Huggingface Tokenizers](../extension/tokenizers/README.md)
+- [Audio support](../extensions/audio/README.md)
+- [AWS S3 support](../extensions/aws-ai/README.md)
+- [NLP support with fastText](../extensions/fasttext/README.md)
+- [Hadoop support](../extensions/hadoop/README.md)
+- [Image support with OpenCV](../extensions/opencv/README.md)
+- [NLP support with SentencePiece](../extensions/sentencepiece/README.md)
+- [Spark Support](../extensions/spark/README.md)
+- [Tabular Dataset Support](../extensions/tablesaw/README.md)
+- [TimeSeries support](../extensions/timeseries/README.md)
+- [NLP support with Huggingface Tokenizers](../extensions/tokenizers/README.md)
 
 ## [Contributor Documentation](development/README.md)
 

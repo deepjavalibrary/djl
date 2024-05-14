@@ -6,7 +6,7 @@ plugins {
 group = "ai.djl.android"
 
 dependencies {
-    api(projects.engines.onnxruntime.onnxruntimeEngine) {
+    api(project(":engines:onnxruntime:onnxruntime-engine")) {
         exclude("com.microsoft.onnxruntime", "onnxruntime")
     }
     api(libs.onnxruntimeAndroid)

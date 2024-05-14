@@ -9,10 +9,10 @@ plugins {
 group = "ai.djl.fasttext"
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
 
-    testImplementation(projects.basicdataset)
-    testImplementation(projects.testing)
+    testImplementation(project(":basicdataset"))
+    testImplementation(project(":testing"))
     testImplementation(libs.slf4j.simple)
 }
 

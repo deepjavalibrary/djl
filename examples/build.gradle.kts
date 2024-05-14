@@ -8,16 +8,16 @@ plugins {
 dependencies {
     implementation(libs.commons.cli)
     implementation(libs.apache.log4j.slf4j)
-    implementation(projects.basicdataset)
-    implementation(projects.modelZoo)
-    implementation(projects.extension.timeseries)
-    implementation(projects.extension.tokenizers)
-    implementation(projects.extension.audio)
+    implementation(project(":basicdataset"))
+    implementation(project(":model-zoo"))
+    implementation(project(":extensions:timeseries"))
+    implementation(project(":extensions:tokenizers"))
+    implementation(project(":extensions:audio"))
 
-    runtimeOnly(projects.engines.pytorch.pytorchModelZoo)
-    runtimeOnly(projects.engines.tensorflow.tensorflowModelZoo)
-    runtimeOnly(projects.engines.mxnet.mxnetModelZoo)
-    runtimeOnly(projects.engines.onnxruntime.onnxruntimeEngine)
+    runtimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
+    runtimeOnly(project(":engines:tensorflow:tensorflow-model-zoo"))
+    runtimeOnly(project(":engines:mxnet:mxnet-model-zoo"))
+    runtimeOnly(project(":engines:onnxruntime:onnxruntime-engine"))
 
     testImplementation(libs.testng) {
         exclude("junit", "junit")

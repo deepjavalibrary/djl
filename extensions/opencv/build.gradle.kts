@@ -6,14 +6,14 @@ plugins {
 group = "ai.djl.opencv"
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
     api(libs.openpnp.opencv)
 
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
     testRuntimeOnly(libs.apache.log4j.slf4j)
 
-    testRuntimeOnly(projects.engines.pytorch.pytorchModelZoo)
-    testRuntimeOnly(projects.engines.pytorch.pytorchJni)
+    testRuntimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
+    testRuntimeOnly(project(":engines:pytorch:pytorch-jni"))
 }
 
 publishing {

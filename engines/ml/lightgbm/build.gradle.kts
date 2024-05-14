@@ -6,10 +6,10 @@ plugins {
 group = "ai.djl.ml.lightgbm"
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
     api("com.microsoft.ml.lightgbm:lightgbmlib:${libs.versions.lightgbm.get()}")
 
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
 
     testRuntimeOnly(libs.slf4j.simple)
 }

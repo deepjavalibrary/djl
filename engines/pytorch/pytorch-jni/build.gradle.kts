@@ -63,7 +63,7 @@ tasks {
                     } else if (!project.hasProperty("jni")) {
                         project.logger.lifecycle("Downloading $url/$entry")
                         file.parentFile.mkdirs()
-                        URL("$url/$entry") into file
+                        "$url/$entry".url into file
                     }
                 }
             }

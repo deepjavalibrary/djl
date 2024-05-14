@@ -6,7 +6,7 @@ plugins {
 group = "ai.djl.hadoop"
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
     api(libs.apache.hadoop.client) {
         exclude("ch.qos.reload4j", "reload4j")
         exclude("org.slf4j", "slf4j-reload4j")
@@ -27,7 +27,7 @@ dependencies {
 
     testImplementation(libs.apache.hadoop.minicluster)
     testImplementation(libs.mockito)
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
 
     testRuntimeOnly(libs.junit) // hadoop-client test depends on junit
 }

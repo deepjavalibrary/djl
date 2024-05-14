@@ -1,5 +1,6 @@
 import org.gradle.api.file.DirectoryProperty
 import java.io.File
+import java.net.URI
 import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -34,3 +35,6 @@ val osName = System.getProperty("os.name")
 val os = osName.lowercase()
 val arch = System.getProperty("os.arch")
 val home = System.getProperty("user.home")
+
+val String.url: URL
+    get() = URI(this).toURL()

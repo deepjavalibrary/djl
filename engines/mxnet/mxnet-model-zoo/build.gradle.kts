@@ -8,12 +8,12 @@ plugins {
 group = "ai.djl.mxnet"
 
 dependencies {
-    api(projects.api)
-    api(projects.engines.mxnet.mxnetEngine)
+    api(project(":api"))
+    api(project(":engines:mxnet:mxnet-engine"))
 
-    testImplementation(projects.basicdataset)
-    testImplementation(projects.modelZoo)
-    testImplementation(projects.testing)
+    testImplementation(project(":basicdataset"))
+    testImplementation(project(":model-zoo"))
+    testImplementation(project(":testing"))
 
     testImplementation(libs.slf4j.simple)
 }

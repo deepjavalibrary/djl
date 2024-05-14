@@ -4,12 +4,12 @@ plugins {
 }
 
 dependencies {
-    api(projects.api)
-    api(projects.basicdataset)
-    api(projects.modelZoo)
+    api(project(":api"))
+    api(project(":basicdataset"))
+    api(project(":model-zoo"))
     testImplementation(libs.slf4j.simple)
 
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
     testImplementation(libs.testng) {
         exclude("junit", "junit")
     }
@@ -20,6 +20,6 @@ dependencies {
     // runtimeOnly project(":engines:tensorflow:tensorflow-engine")
     // runtimeOnly project(":engines:onnxruntime:onnxruntime-engine")
     // runtimeOnly "com.microsoft.onnxruntime:onnxruntime:${onnxruntime_version}"
-    runtimeOnly(projects.engines.mxnet.mxnetEngine)
-    runtimeOnly(projects.engines.mxnet.mxnetModelZoo)
+    runtimeOnly(project(":engines:mxnet:mxnet-engine"))
+    runtimeOnly(project(":engines:mxnet:mxnet-model-zoo"))
 }

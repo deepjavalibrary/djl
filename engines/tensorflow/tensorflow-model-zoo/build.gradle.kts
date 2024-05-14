@@ -8,9 +8,9 @@ plugins {
 group = "ai.djl.tensorflow"
 
 dependencies {
-    api(projects.engines.tensorflow.tensorflowEngine)
+    api(project(":engines:tensorflow:tensorflow-engine"))
 
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
     testImplementation(libs.slf4j.simple)
 }
 

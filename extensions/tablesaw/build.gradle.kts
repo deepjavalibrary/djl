@@ -6,18 +6,18 @@ plugins {
 group = "ai.djl.tablesaw"
 
 dependencies {
-    api(projects.api)
-    api(projects.basicdataset)
+    api(project(":api"))
+    api(project(":basicdataset"))
     api(libs.tablesaw.core)
 
     testImplementation(libs.slf4j.simple)
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
 
     testRuntimeOnly(libs.tablesaw.excel)
     testRuntimeOnly(libs.tablesaw.html)
     testRuntimeOnly(libs.tablesaw.json)
-    testRuntimeOnly(projects.engines.pytorch.pytorchEngine)
-    testRuntimeOnly(projects.engines.pytorch.pytorchJni)
+    testRuntimeOnly(project(":engines:pytorch:pytorch-engine"))
+    testRuntimeOnly(project(":engines:pytorch:pytorch-jni"))
 }
 
 publishing {

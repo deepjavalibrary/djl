@@ -12,7 +12,7 @@ val XGB_FLAVOR = if (isGpu) "-gpu" else ""
 val exclusion by configurations.registering
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
     api("commons-logging:commons-logging:${libs.versions.commonsLogging.get()}")
     api("ml.dmlc:xgboost4j${XGB_FLAVOR}_2.12:${libs.versions.xgboost.get()}") {
         // get rid of the unused XGBoost Dependencies
@@ -29,9 +29,9 @@ dependencies {
         exclude("org.scala-lang", "scala-library")
     }
 
-    exclusion(projects.api)
+    exclusion(project(":api"))
     exclusion(libs.commons.logging)
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
 
     testRuntimeOnly(libs.slf4j.simple)
     if (isGpu)

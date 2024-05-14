@@ -8,7 +8,7 @@ plugins {
 group = "ai.djl.pytorch"
 
 dependencies {
-    api(projects.engines.pytorch.pytorchEngine)
+    api(project(":engines:pytorch:pytorch-engine"))
 
     testImplementation(libs.testng) {
         exclude("junit", "junit")

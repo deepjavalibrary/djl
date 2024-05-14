@@ -73,10 +73,10 @@ tasks {
                     val metaInf = BINARY_ROOT / flavor / osName / "META-INF"
                     metaInf.mkdirs()
                     val licenseFile = metaInf / "LICENSE"
-                    licenseFile.text = URL("https://raw.githubusercontent.com/apache/incubator-mxnet/master/LICENSE").text
+                    licenseFile.text = "https://raw.githubusercontent.com/apache/incubator-mxnet/master/LICENSE".url.text
 
                     val binaryLicenseFile = metaInf / "LICENSE.binary.dependencies"
-                    binaryLicenseFile.text = URL("https://raw.githubusercontent.com/apache/incubator-mxnet/master/tools/dependencies/LICENSE.binary.dependencies").text
+                    binaryLicenseFile.text = "https://raw.githubusercontent.com/apache/incubator-mxnet/master/tools/dependencies/LICENSE.binary.dependencies".url.text
 
                     from("src/main/resources")
                 }
@@ -198,7 +198,7 @@ tasks {
                 project.logger.lifecycle("Downloading $url/$key")
                 val file = BINARY_ROOT / value
                 file.parentFile.mkdirs()
-                URL("$url/$key") gzipInto file
+                "$url/$key".url gzipInto file
             }
 
             copy {

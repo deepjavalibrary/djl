@@ -8,9 +8,9 @@ group = "ai.djl.aws"
 dependencies {
     api(platform(libs.awssdk.bom))
     api(libs.awssdk.s3)
-    api(projects.api)
+    api(project(":api"))
 
-    testImplementation(projects.engines.pytorch.pytorchModelZoo)
+    testImplementation(project(":engines:pytorch:pytorch-model-zoo"))
 
     testImplementation(libs.testng) {
         exclude("junit", "junit")

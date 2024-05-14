@@ -9,18 +9,18 @@ plugins {
 dependencies {
     implementation(libs.commons.cli)
     implementation(libs.apache.log4j.slf4j)
-    implementation(projects.basicdataset)
-    implementation(projects.modelZoo)
-    implementation(projects.testing)
+    implementation(project(":basicdataset"))
+    implementation(project(":model-zoo"))
+    implementation(project(":testing"))
 
-    runtimeOnly(projects.engines.mxnet.mxnetModelZoo)
-    runtimeOnly(projects.engines.pytorch.pytorchModelZoo)
-    runtimeOnly(projects.engines.pytorch.pytorchJni)
-    runtimeOnly(projects.engines.tensorflow.tensorflowModelZoo)
-    runtimeOnly(projects.engines.ml.xgboost)
-    runtimeOnly(projects.engines.ml.lightgbm)
-    runtimeOnly(projects.engines.onnxruntime.onnxruntimeEngine)
-    runtimeOnly(projects.extension.tokenizers)
+    runtimeOnly(project(":engines:mxnet:mxnet-model-zoo"))
+    runtimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
+    runtimeOnly(project(":engines:pytorch:pytorch-jni"))
+    runtimeOnly(project(":engines:tensorflow:tensorflow-model-zoo"))
+    runtimeOnly(project(":engines:ml:xgboost"))
+    runtimeOnly(project(":engines:ml:lightgbm"))
+    runtimeOnly(project(":engines:onnxruntime:onnxruntime-engine"))
+    runtimeOnly(project(":extensions:tokenizers"))
 }
 
 tasks {

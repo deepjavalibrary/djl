@@ -8,12 +8,12 @@ plugins {
 group = "ai.djl.onnxruntime"
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
     api(libs.onnxruntime)
 
-    testImplementation(projects.testing)
-    testImplementation(projects.engines.pytorch.pytorchEngine)
-    testImplementation(projects.extension.tokenizers)
+    testImplementation(project(":testing"))
+    testImplementation(project(":engines:pytorch:pytorch-engine"))
+    testImplementation(project(":extensions:tokenizers"))
 
     testRuntimeOnly(libs.slf4j.simple)
 }
@@ -36,7 +36,7 @@ tasks {
                 else {
                     project.logger.lifecycle("Downloading model zoo metadata: $task")
                     file.parentFile.mkdirs()
-                    URL("$url/$task/ai/djl/huggingface/onnxruntime/models.json.gz") gzipInto file
+                    "$url/$task/ai/djl/huggingface/onnxruntime/models.json.gz".url gzipInto file
                 }
             }
         }

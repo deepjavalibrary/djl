@@ -6,8 +6,8 @@ plugins {
 group = "ai.djl.audio"
 
 dependencies {
-    api(projects.api)
-    api(projects.basicdataset)
+    api(project(":api"))
+    api(project(":basicdataset"))
     api(libs.bytedeco.javacv) {
         exclude("org.bytedeco", "opencv")
         exclude("org.bytedeco", "openblas")
@@ -32,10 +32,10 @@ dependencies {
     runtimeOnly(libs.bytedeco.ffmpeg) { artifact { classifier = "macosx-arm64" } }
     runtimeOnly(libs.bytedeco.ffmpeg) { artifact { classifier = "linux-arm64" } }
 
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
     testRuntimeOnly(libs.apache.log4j.slf4j)
-    testRuntimeOnly(projects.engines.pytorch.pytorchEngine)
-    testRuntimeOnly(projects.engines.pytorch.pytorchJni)
+    testRuntimeOnly(project(":engines:pytorch:pytorch-engine"))
+    testRuntimeOnly(project(":engines:pytorch:pytorch-jni"))
 }
 
 publishing {

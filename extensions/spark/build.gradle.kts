@@ -10,17 +10,17 @@ if (JavaVersion.current() < JavaVersion.VERSION_21)
     apply(plugin = "ai.djl.publish")
 
 dependencies {
-    api(projects.api)
-    api(projects.extension.tokenizers)
-    api(projects.extension.audio)
+    api(project(":api"))
+    api(project(":extensions:tokenizers"))
+    api(project(":extensions:audio"))
     api(libs.spark.core)
     api(libs.spark.sql)
     api(libs.spark.mllib)
 
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
     testRuntimeOnly(libs.apache.log4j.slf4j)
 
-    testRuntimeOnly(projects.engines.pytorch.pytorchModelZoo)
+    testRuntimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
 }
 
 tasks {

@@ -6,15 +6,15 @@ plugins {
 group = "ai.djl.timeseries"
 
 dependencies {
-    api(projects.api)
-    api(projects.basicdataset)
+    api(project(":api"))
+    api(project(":basicdataset"))
     api(libs.tablesaw.core)
     api(libs.tablesaw.jsplot)
 
     testImplementation(libs.slf4j.simple)
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
 
-    testRuntimeOnly(projects.engines.mxnet.mxnetModelZoo)
+    testRuntimeOnly(project(":engines:mxnet:mxnet-model-zoo"))
 }
 
 publishing {

@@ -133,10 +133,10 @@ ZooModel<Image, Classifications> model = criteria.loadModel();
 You can customize the artifactId and modelName the same way as loading model from the local file system.
 
 ### Load model from AWS S3 bucket
-DJL supports loading a model from an S3 bucket using `s3://` URL and the AWS plugin. See [here](../extension/aws-ai/README.md) for details.
+DJL supports loading a model from an S3 bucket using `s3://` URL and the AWS plugin. See [here](../extensions/aws-ai/README.md) for details.
 
 ### Load model from Hadoop HDFS
-DJL supports loading a model from a Hadoop HDFS file system using `hdfs://` URL and the Hadoop plugin. See [here](../extension/hadoop/README.md) for details.
+DJL supports loading a model from a Hadoop HDFS file system using `hdfs://` URL and the Hadoop plugin. See [here](../extensions/hadoop/README.md) for details.
 
 ### Implement your own Repository
 You may want to create additional model zoos using other protocols such as:
@@ -157,7 +157,7 @@ DJL is highly extensible and our API allows you to create your own URL protocol 
 - DJL use ServiceLoader to automatically register your `RepositoryFactory`. You need add a file `META-INF/services/ai.djl.repository.RepositoryFactory`
     See [java ServiceLoader](https://docs.oracle.com/javase/9/docs/api/java/util/ServiceLoader.html) for more detail.
 
-You can refer to [AWS S3 Repostory](../extension/aws-ai/README.md) for an example.
+You can refer to [AWS S3 Repostory](../extensions/aws-ai/README.md) for an example.
 
 ## Configure model zoo search path
 

@@ -9,9 +9,9 @@ plugins {
 group = "ai.djl.sentencepiece"
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
 
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
     testImplementation(libs.slf4j.simple)
 }
 

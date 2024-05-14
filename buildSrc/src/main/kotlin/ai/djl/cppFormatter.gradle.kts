@@ -1,32 +1,28 @@
 package ai.djl
 
 import div
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByName
 import os
 import text
-import java.net.URL
-import java.util.*
+import url
 
 fun checkClang(clang: File) {
-    val url = "https://djl-ai.s3.amazonaws.com/build-tools/osx/clang-format"
+    val url = "https://djl-ai.s3.amazonaws.com/build-tools/osx/clang-format".url
     if (!clang.exists()) {
         // create the folder and download the executable
         clang.parentFile.mkdirs()
         // TODO original method was appending
         //clang.append(new URL(url).openStream())
-        clang.writeBytes(URL(url).openStream().use { it.readAllBytes() })
+        clang.writeBytes(url.openStream().use { it.readAllBytes() })
         clang.setExecutable(true)
     }
 }
 
-fun formatCpp(f: File, clang: File): String {
-    if (!f.name.endsWith(".cc") && !f.name.endsWith(".cpp") && !f.name.endsWith(".h"))
-        return ""
-    return ProcessBuilder(clang.absolutePath,
-                          "-style={BasedOnStyle: Google, IndentWidth: 2, ColumnLimit: 120, AlignAfterOpenBracket: DontAlign, SpaceAfterCStyleCast: true}",
-                          f.absolutePath)
-            .start().inputStream.use { it.readAllBytes().decodeToString() }
+fun formatCpp(f: File, clang: File): String = when {
+    !f.name.endsWith(".cc") && !f.name.endsWith(".cpp") && !f.name.endsWith(".h") -> ""
+    else -> ProcessBuilder(clang.absolutePath,
+                           "-style={BasedOnStyle: Google, IndentWidth: 2, ColumnLimit: 120, AlignAfterOpenBracket: DontAlign, SpaceAfterCStyleCast: true}",
+                           f.absolutePath)
+        .start().inputStream.use { it.readAllBytes().decodeToString() }
 }
 
 interface FormatterConfig {

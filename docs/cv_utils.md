@@ -16,7 +16,7 @@ Image img = BufferedImageFactory.getInstance().fromUrl(url);
 
 ## Using opencv extension for high performance image process
 
-The [DJL OpenCV extension](../extension/opencv/README.md) provides better performance compare to
+The [DJL OpenCV extension](../extensions/opencv/README.md) provides better performance compare to
 java's built-in ImageIO. You only need to add it into your project and DJL will automatically
 pick it up:
 

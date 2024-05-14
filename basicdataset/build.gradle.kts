@@ -6,15 +6,15 @@ plugins {
 }
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
     api(libs.apache.commons.csv)
 
     // Add following dependency to your project for COCO dataset
     // runtimeOnly(libs.twelvemonkeys.imageio)
     testImplementation(libs.slf4j.simple)
 
-    testImplementation(projects.testing)
-    testImplementation(projects.engines.pytorch.pytorchEngine)
+    testImplementation(project(":testing"))
+    testImplementation(project(":engines:pytorch:pytorch-engine"))
 }
 
 tasks.register<Exec>("syncS3") {

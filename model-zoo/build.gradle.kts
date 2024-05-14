@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
 
     testImplementation(libs.testng) {
         exclude("junit", "junit")

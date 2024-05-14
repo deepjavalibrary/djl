@@ -10,10 +10,10 @@ plugins {
 group = "ai.djl.huggingface"
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
 
-    testImplementation(projects.engines.pytorch.pytorchEngine)
-    testImplementation(projects.testing)
+    testImplementation(project(":engines:pytorch:pytorch-engine"))
+    testImplementation(project(":testing"))
     testImplementation(libs.slf4j.simple)
 }
 

@@ -9,9 +9,9 @@ plugins {
 group = "ai.djl.llama"
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
 
-    testImplementation(projects.testing)
+    testImplementation(project(":testing"))
     testImplementation(libs.slf4j.simple)
 }
 
@@ -44,7 +44,7 @@ tasks {
                 else if (!project.hasProperty("jni")) {
                     project.logger.lifecycle("Downloading $url/$it")
                     file.parentFile.mkdirs()
-                    URL("$url/$it") into file
+                    "$url/$it".url into file
                 }
             }
             copy {
@@ -64,7 +64,7 @@ tasks {
             else {
                 project.logger.lifecycle("Downloading gguf index file")
                 file.parentFile.mkdirs()
-                URL(url) gzipInto file
+                url.url gzipInto file
             }
         }
     }

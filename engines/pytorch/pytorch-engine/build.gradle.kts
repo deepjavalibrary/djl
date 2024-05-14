@@ -6,14 +6,14 @@ plugins {
 group = "ai.djl.pytorch"
 
 dependencies {
-    api(projects.api)
+    api(project(":api"))
 
     testImplementation(libs.testng) {
         exclude("junit", "junit")
     }
     testImplementation(libs.slf4j.simple)
-    testRuntimeOnly(projects.engines.pytorch.pytorchModelZoo)
-    testRuntimeOnly(projects.engines.pytorch.pytorchJni)
+    testRuntimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
+    testRuntimeOnly(project(":engines:pytorch:pytorch-jni"))
 }
 
 tasks {
@@ -33,13 +33,7 @@ tasks {
         environment("PATH" to "src/test/bin:${environment["PATH"]}")
     }
 
-    clean {
-        doFirst {
-            delete(fileTree("$home/.djl.ai/pytorch/") {
-                include("**/*djl_torch.*")
-            })
-        }
-    }
+    clean { dependsOn(":engines:pytorch:pytorch-jni:clean") }
 }
 
 publishing {
