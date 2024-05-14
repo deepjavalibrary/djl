@@ -24,15 +24,15 @@ dependencies {
 tasks {
     register("uploadTensorflowNativeLibs") {
         doLast {
-            delete(layout.buildDirectory / "download")
-            delete(layout.buildDirectory / "native")
+            delete(buildDirectory / "download")
+            delete(buildDirectory / "native")
 
             copy {
                 from(download)
-                into(layout.buildDirectory / "download")
+                into(buildDirectory / "download")
             }
 
-            fileTree(layout.buildDirectory / "download").forEach { f ->
+            fileTree(buildDirectory / "download").forEach { f ->
                 copy {
                     from(zipTree(f)) {
                         exclude("**/pom.xml",
@@ -42,44 +42,44 @@ tasks {
                                 "**/*.cmake",
                                 "META-INF/**")
                     }
-                    into(layout.buildDirectory / "native")
+                    into(buildDirectory / "native")
                     includeEmptyDirs = false
                 }
             }
 
             exec {
-                commandLine("sh", "-c", "find ${layout.buildDirectory}/native -type f | xargs gzip")
+                commandLine("sh", "-c", "find $buildDirectory/native -type f | xargs gzip")
             }
 
-            val tfUnzipDir = layout.buildDirectory / "native/org/tensorflow/internal/c_api"
+            val tfUnzipDir = buildDirectory / "native/org/tensorflow/internal/c_api"
 
             ant.withGroovyBuilder {
-                "move"("file" to "$tfUnzipDir/linux-x86_64/", "toFile" to "${layout.buildDirectory}/native/linux/cpu/")
-                "move"("file" to "$tfUnzipDir/linux-x86_64-gpu/", "toFile" to "${layout.buildDirectory}/native/linux/cu113/")
-                "move"("file" to "$tfUnzipDir/macosx-x86_64/", "toFile" to "${layout.buildDirectory}/native/osx/cpu/")
-                "move"("file" to "$tfUnzipDir/windows-x86_64/", "toFile" to "${layout.buildDirectory}/native/win/cpu/")
-                "move"("file" to "$tfUnzipDir/windows-x86_64-gpu/", "toFile" to "${layout.buildDirectory}/native/win/cu113/")
+                "move"("file" to "$tfUnzipDir/linux-x86_64/", "toFile" to "$buildDirectory/native/linux/cpu/")
+                "move"("file" to "$tfUnzipDir/linux-x86_64-gpu/", "toFile" to "$buildDirectory/native/linux/cu113/")
+                "move"("file" to "$tfUnzipDir/macosx-x86_64/", "toFile" to "$buildDirectory/native/osx/cpu/")
+                "move"("file" to "$tfUnzipDir/windows-x86_64/", "toFile" to "$buildDirectory/native/win/cpu/")
+                "move"("file" to "$tfUnzipDir/windows-x86_64-gpu/", "toFile" to "$buildDirectory/native/win/cu113/")
             }
 
-            (layout.buildDirectory / "native/files.txt").text = buildString {
-                val uploadDirs = listOf(layout.buildDirectory / "native/linux/cpu/",
-                                        layout.buildDirectory / "native/linux/cu113/",
-                                        layout.buildDirectory / "native/osx/cpu/",
-                                        layout.buildDirectory / "native/win/cpu/",
-                                        layout.buildDirectory / "native/win/cu113/")
+            (buildDirectory / "native/files.txt").text = buildString {
+                val uploadDirs = listOf(buildDirectory / "native/linux/cpu/",
+                                        buildDirectory / "native/linux/cu113/",
+                                        buildDirectory / "native/osx/cpu/",
+                                        buildDirectory / "native/win/cpu/",
+                                        buildDirectory / "native/win/cu113/")
                 for (item in uploadDirs)
                     fileTree(item).files.map { it.name }.forEach {
-                        val out = item.relativeTo(layout.buildDirectory / "native/").absolutePath
+                        val out = item.relativeTo(buildDirectory / "native/").absolutePath
                         appendLine(out + it)
                     }
             }
-            delete(layout.buildDirectory / "native/org/",
-                   layout.buildDirectory / "native/com/",
-                   layout.buildDirectory / "native/google/",
-                   layout.buildDirectory / "native/module-info.class.gz")
+            delete(buildDirectory / "native/org/",
+                   buildDirectory / "native/com/",
+                   buildDirectory / "native/google/",
+                   buildDirectory / "native/module-info.class.gz")
 
             exec {
-                commandLine("aws", "s3", "sync", "${layout.buildDirectory}/native/", "s3://djl-ai/publish/tensorflow-${libs.versions.tensorflow.get()}/")
+                commandLine("aws", "s3", "sync", "$buildDirectory/native/", "s3://djl-ai/publish/tensorflow-${libs.versions.tensorflow.get()}/")
             }
         }
     }
@@ -90,7 +90,7 @@ tasks {
         // when there is no java code inside src/main
         outputs.dir("build/libs")
         doFirst {
-            val dir = layout.buildDirectory / "classes/java/main/native/lib"
+            val dir = buildDirectory / "classes/java/main/native/lib"
             dir.mkdirs()
             val propFile = dir / "tensorflow.properties"
             var versionName = project.version.toString()
@@ -118,7 +118,7 @@ signing {
     sign(publishing.publications["maven"])
 }
 
-val BINARY_ROOT = layout.buildDirectory / "download"
+val BINARY_ROOT = buildDirectory / "download"
 val flavorNames = BINARY_ROOT.list() ?: emptyArray()
 for (flavor in flavorNames) {
 

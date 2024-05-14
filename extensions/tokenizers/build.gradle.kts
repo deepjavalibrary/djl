@@ -21,7 +21,7 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.dir(layout.buildDirectory / "classes/java/main/native/lib")
+        outputs.dir(buildDirectory / "classes/java/main/native/lib")
         doLast {
             var url = "https://publish.djl.ai/tokenizers"
             val (tokenizers, djl) = libs.versions.tokenizers.get() to libs.versions.djl.get()
@@ -47,11 +47,11 @@ tasks {
             }
             copy {
                 from(jnilibDir)
-                into(layout.buildDirectory / "classes/java/main/native/lib")
+                into(buildDirectory / "classes/java/main/native/lib")
             }
 
             // write properties
-            val propFile = layout.buildDirectory / "classes/java/main/native/lib/tokenizers.properties"
+            val propFile = buildDirectory / "classes/java/main/native/lib/tokenizers.properties"
             propFile.text = "version=$tokenizers-$version\n"
 
             url = "https://mlrepo.djl.ai/model/nlp"
@@ -60,7 +60,7 @@ tasks {
                                "text_classification",
                                "text_embedding",
                                "token_classification")
-            val prefix = layout.buildDirectory / "classes/java/main/nlp"
+            val prefix = buildDirectory / "classes/java/main/nlp"
             for (task in tasks) {
                 var file = prefix / task / "ai.djl.huggingface.pytorch.json"
                 if (file.exists())
@@ -103,7 +103,7 @@ tasks {
             // for ci to upload to S3
             val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/"
             copy {
-                from(layout.buildDirectory / "jnilib")
+                from(buildDirectory / "jnilib")
                 into(ciDir)
             }
             delete("$home/.djl.ai/tokenizers")

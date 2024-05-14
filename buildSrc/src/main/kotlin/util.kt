@@ -1,3 +1,5 @@
+import org.gradle.api.Project
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import java.io.File
 import java.net.URI
@@ -7,7 +9,7 @@ import java.time.format.DateTimeFormatter
 import java.util.zip.GZIPInputStream
 
 operator fun File.div(other: String) = File(this, other)
-operator fun DirectoryProperty.div(other: String): File = file(other).get().asFile
+operator fun Directory.div(other: String): File = file(other).asFile
 
 val nowFormatted
     get() = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
@@ -38,3 +40,6 @@ val home = System.getProperty("user.home")
 
 val String.url: URL
     get() = URI(this).toURL()
+
+val Project.buildDirectory
+    get() = layout.buildDirectory.get()

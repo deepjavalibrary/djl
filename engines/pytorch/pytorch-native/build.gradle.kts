@@ -23,7 +23,7 @@ val FLAVOR = when {
     else -> "cpu"
 }
 
-val BINARY_ROOT = layout.buildDirectory / "download"
+val BINARY_ROOT = buildDirectory / "download"
 
 version = VERSION + if (isRelease) "" else "-SNAPSHOT"
 
@@ -44,7 +44,7 @@ fun downloadBuild(ver: String, os: String, flavor: String, isPrecxx11: Boolean =
     val maybePrecxx11 = if (isPrecxx11) "-precxx11" else ""
     val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/$classifier/$flavor$maybePrecxx11"
     copy {
-        val tree = fileTree(layout.buildDirectory)
+        val tree = fileTree(buildDirectory)
         tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
         from(tree.files)
         into(ciDir)
@@ -58,10 +58,10 @@ fun downloadBuildAndroid(ver: String) {
         }
         val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/android/$abi"
         copy {
-            from(layout.buildDirectory / "libdjl_torch.so")
+            from(buildDirectory / "libdjl_torch.so")
             into(ciDir)
         }
-        delete("${layout.buildDirectory}/")
+        delete("$buildDirectory/")
     }
 }
 
@@ -173,7 +173,7 @@ tasks {
 
     // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
     jar {
-        val placeholder = layout.buildDirectory / "placeholder"
+        val placeholder = buildDirectory / "placeholder"
         // this line is to enforce gradle to build the jar
         // otherwise it doesn't generate the placeholder jar at times
         // when there is no java code inside src/main

@@ -19,7 +19,7 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.dir(layout.buildDirectory / "classes/java/main/native/lib")
+        outputs.dir(buildDirectory / "classes/java/main/native/lib")
         doLast {
             val url = "https://publish.djl.ai/sentencepiece-${libs.versions.sentencepiece.get()}/jnilib/${libs.versions.djl.get()}"
             val files = mapOf("win-x86_64" to "sentencepiece_native.dll",
@@ -41,11 +41,11 @@ tasks {
             }
             copy {
                 from(jnilibDir)
-                into(layout.buildDirectory / "classes/java/main/native/lib")
+                into(buildDirectory / "classes/java/main/native/lib")
             }
 
             // write properties
-            val propFile = layout.buildDirectory / "classes/java/main/native/lib/sentencepiece.properties"
+            val propFile = buildDirectory / "classes/java/main/native/lib/sentencepiece.properties"
             propFile.text = "version=${libs.versions.sentencepiece.get()}-$version\n"
         }
     }
@@ -67,7 +67,7 @@ tasks {
             // for ci to upload to S3
             val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/"
             copy {
-                from(layout.buildDirectory / "jnilib")
+                from(buildDirectory / "jnilib")
                 into(ciDir)
             }
             delete("$home/.djl.ai/sentencepiece")

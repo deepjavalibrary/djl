@@ -15,7 +15,7 @@ version = VERSION + if (isRelease) "" else "-SNAPSHOT"
 tasks {
     // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
     jar {
-        val placeholder = layout.buildDirectory / "placeholder"
+        val placeholder = buildDirectory / "placeholder"
         // this line is to enforce gradle to build the jar otherwise it doesn't generate the placeholder jar at times
         // when there is no java code inside src/main
         outputs.dir("build/libs")
@@ -41,7 +41,7 @@ tasks {
         sign(publishing.publications)
     }
 
-    val BINARY_ROOT = layout.buildDirectory / "download"
+    val BINARY_ROOT = buildDirectory / "download"
     val flavorNames = file(BINARY_ROOT).list() ?: emptyArray()
     for (flavor in flavorNames) {
 

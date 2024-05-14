@@ -27,7 +27,7 @@ sourceSets.main {
 tasks {
     processResources {
         doFirst {
-            val classesDir = layout.buildDirectory / "classes/java/main/"
+            val classesDir = buildDirectory / "classes/java/main/"
             classesDir.mkdirs()
             val file = classesDir / "mxnet-engine.properties"
             file.text = "djl_version=${libs.versions.djl.get()}\nmxnet_version=" + libs.versions.mxnet.get()
@@ -40,7 +40,7 @@ tasks {
     val jnarator by registering {
         val jnaratorJar = project(":engines:mxnet:jnarator").tasks.jar
         dependsOn(jnaratorJar)
-        outputs.dir(layout.buildDirectory / "generated-src")
+        outputs.dir(buildDirectory / "generated-src")
         doLast {
             val jnaGenerator = jnaratorJar.get().outputs.files.singleFile
             javaexec {
@@ -51,7 +51,7 @@ tasks {
                      "-p",
                      "ai.djl.mxnet.jna",
                      "-o",
-                     "${layout.buildDirectory}/generated-src",
+                     "$buildDirectory/generated-src",
                      "-m",
                      "${project.projectDir}/src/main/jna/mapping.properties",
                      "-f",
@@ -77,7 +77,7 @@ tasks {
     }
 
     register("checkHeaderFile") {
-        outputs.files(layout.buildDirectory / "mxnet_c_api.h", layout.buildDirectory / "nnvm_c_api.h")
+        outputs.files(buildDirectory / "mxnet_c_api.h", buildDirectory / "nnvm_c_api.h")
         doFirst {
             if (gradle.startParameter.isOffline) {
                 logger.warn("""[\033[31mWARN\033[0m ] Ignore header validation in offline mode.""")

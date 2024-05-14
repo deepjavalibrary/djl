@@ -20,7 +20,7 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.dir(layout.buildDirectory / "classes/java/main/native/lib")
+        outputs.dir(buildDirectory / "classes/java/main/native/lib")
         doLast {
             val url = "https://publish.djl.ai/fasttext-${libs.versions.fasttext.get()}/jnilib/${libs.versions.djl.get()}"
             val files = mapOf("linux-x86_64" to "libjni_fasttext.so",
@@ -40,11 +40,11 @@ tasks {
             }
             copy {
                 from(jnilibDir)
-                into(layout.buildDirectory / "classes/java/main/native/lib")
+                into(buildDirectory / "classes/java/main/native/lib")
             }
 
             // write properties
-            val propFile = layout.buildDirectory / "classes/java/main/native/lib/fasttext.properties"
+            val propFile = buildDirectory / "classes/java/main/native/lib/fasttext.properties"
             propFile.text = "version=${libs.versions.fasttext.get()}-${version}\n"
         }
     }
@@ -59,7 +59,7 @@ tasks {
             // for ci to upload to S3
             val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}"
             copy {
-                from(layout.buildDirectory / "jnilib")
+                from(buildDirectory / "jnilib")
                 into(ciDir)
             }
             delete("$home/.djl.ai/fasttext")

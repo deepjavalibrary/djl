@@ -15,7 +15,7 @@ dependencies {
 
 tasks.processResources {
     doFirst {
-        val classesDir = layout.buildDirectory / "classes/java/main/"
+        val classesDir = buildDirectory / "classes/java/main/"
         classesDir.mkdirs()
         val file = classesDir / "tensorflow-engine.properties"
         file.text = "djl_version=${libs.versions.djl.get()}\ntensorflow_version=${libs.versions.tensorflow.get()}"

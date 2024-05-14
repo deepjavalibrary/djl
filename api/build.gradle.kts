@@ -23,9 +23,9 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.file(layout.buildDirectory / "classes/java/main/ai/djl/engine/api.properties")
+        outputs.file(buildDirectory / "classes/java/main/ai/djl/engine/api.properties")
         doFirst {
-            val classesDir = file("${layout.buildDirectory}/classes/java/main/ai/djl/engine/")
+            val classesDir = file("$buildDirectory/classes/java/main/ai/djl/engine/")
             classesDir.mkdirs()
             val propFile = File(classesDir, "api.properties")
             propFile.text = "djl_version=${project.version}"

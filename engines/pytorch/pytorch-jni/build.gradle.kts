@@ -21,7 +21,7 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.dir(layout.buildDirectory / "classes/java/main/jnilib")
+        outputs.dir(buildDirectory / "classes/java/main/jnilib")
         doFirst {
             val url = "https://publish.djl.ai/pytorch/$ptVersion/jnilib/${libs.versions.djl.get()}"
             val files = listOf("linux-x86_64/cpu/libdjl_torch.so",
@@ -69,11 +69,11 @@ tasks {
             }
             copy {
                 from(jnilibDir)
-                into(layout.buildDirectory / "classes/java/main/jnilib")
+                into(buildDirectory / "classes/java/main/jnilib")
             }
 
             // write properties
-            val propFile = layout.buildDirectory / "classes/java/main/jnilib/pytorch.properties"
+            val propFile = buildDirectory / "classes/java/main/jnilib/pytorch.properties"
             propFile.text = "jni_version=" + project.version
         }
     }

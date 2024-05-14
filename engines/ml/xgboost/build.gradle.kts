@@ -42,7 +42,7 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        val jnilibDir = layout.buildDirectory / "classes/java/main/lib/linux/aarch64/"
+        val jnilibDir = buildDirectory / "classes/java/main/lib/linux/aarch64/"
         outputs.dir(jnilibDir)
         doLast {
             val url = "https://publish.djl.ai/xgboost/${libs.versions.xgboost.get()}/jnilib/linux/aarch64/libxgboost4j.so"
