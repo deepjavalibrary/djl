@@ -3,5 +3,5 @@ transformers
 sentence_transformers
 torch
 protobuf==3.20.2
-optimum[exporters]
+optimum[exporters,onnxruntime]
 safetensors
