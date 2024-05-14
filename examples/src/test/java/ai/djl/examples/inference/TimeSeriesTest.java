@@ -55,7 +55,7 @@ public class TimeSeriesTest {
 
     @Test
     public void testAirPassenger() throws ModelException, TranslateException, IOException {
-        TestRequirements.engine("MXNet");
+        TestRequirements.linux();
 
         float[] result = AirPassengersDeepAR.predict();
         logger.info("{}", result);
