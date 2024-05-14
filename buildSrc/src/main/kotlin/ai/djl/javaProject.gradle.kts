@@ -20,7 +20,7 @@ tasks {
         options.apply {
             release = 8
             encoding = "UTF-8"
-            compilerArgs = listOf("--release", "8", "-proc:none", "-Xlint:all,-options,-static", "-Werror")
+            compilerArgs = listOf(/*"--release", "8", */"-proc:none", "-Xlint:all,-options,-static", "-Werror")
         }
     }
     compileTestJava {

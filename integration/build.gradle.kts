@@ -33,7 +33,7 @@ tasks {
         // you cant remove from `options.compilerArgs`, just assign a new value to it
         options.apply {
             release = 11
-            compilerArgs = compilerArgs - listOf("--release", "8")
+//            compilerArgs = compilerArgs - listOf("--release", "8")
         }
         doFirst { println(options.compilerArgs) }
         doLast { println(options.compilerArgs) }
