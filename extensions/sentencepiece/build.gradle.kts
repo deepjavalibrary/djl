@@ -52,7 +52,7 @@ tasks {
 
     register("compileJNI") {
         doFirst {
-            if ("win" in osName)
+            if ("win" in os)
                 exec {
                     commandLine("${project.projectDir}/build.cmd", "v${libs.versions.sentencepiece.get()}")
                 }
