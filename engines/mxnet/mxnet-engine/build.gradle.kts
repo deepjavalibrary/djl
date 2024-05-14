@@ -66,7 +66,7 @@ tasks {
     }
 
     fun checkForUpdate(path: String, url: String) {
-        val expected = URL(url).text
+        val expected = url.url.text
         val actual = project.projectDir.resolve("src/main/include/$path").text
         if (actual != expected) {
             val fileName = path.replace("[/\\\\]", "_")
@@ -86,7 +86,7 @@ tasks {
 
             val mxnetUrl = "https://raw.githubusercontent.com/apache/incubator-mxnet/v1.7.x/"
             checkForUpdate("mxnet/c_api.h", "$mxnetUrl/include/mxnet/c_api.h")
-            val content = URL("https://github.com/apache/incubator-mxnet/tree/v1.7.x/3rdparty").text
+            val content = "https://github.com/apache/incubator-mxnet/tree/v1.7.x/3rdparty".url.text
 
             val pattern = Pattern.compile("href=\"/apache/incubator-tvm/tree/([a-z0-9]+)\"")
             val m = pattern.matcher(content)

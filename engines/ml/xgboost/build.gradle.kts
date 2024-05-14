@@ -49,7 +49,7 @@ tasks {
             val file = jnilibDir / "libxgboost4j.so"
             if (!file.exists()) {
                 project.logger.lifecycle("Downloading $url")
-                URL(url) into file
+                url.url into file
             }
         }
     }

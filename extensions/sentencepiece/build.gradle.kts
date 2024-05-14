@@ -35,7 +35,7 @@ tasks {
                 else if (!project.hasProperty("jni")) {
                     project.logger.lifecycle("Downloading $url/$key")
                     file.parentFile.mkdirs()
-                    val downloadPath = URL("$url/$key/$value")
+                    val downloadPath = "$url/$key/$value".url
                     downloadPath into file
                 }
             }

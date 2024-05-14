@@ -107,7 +107,7 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
         val outputDir = File("$binaryRoot/$value")
         val file = outputDir / "libtorch.zip"
         file.parentFile.mkdirs()
-        URL("$url/$key") into file
+        "$url/$key".url into file
         copy {
             from(zipTree(file))
             into(outputDir)
@@ -127,12 +127,12 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
                 "aarch64" in value -> "https://publish.djl.ai/extra/aarch64/libstdc%2B%2B.so.6"
                 else -> "https://publish.djl.ai/extra/libstdc%2B%2B.so.6"
             }
-            URL(stdcUrl) into libstd
+            stdcUrl.url into libstd
         }
         if ("osx-aarch64" in value) {
             val libomp = outputDir / "native/lib/libomp.dylib"
             val ompUrl = "https://publish.djl.ai/extra/macos-arm64/libomp.dylib"
-            URL(ompUrl) into libomp
+            ompUrl.url into libomp
         }
         delete(file)
         delete(outputDir / "libtorch")
@@ -300,14 +300,14 @@ for (flavor in flavorNames) {
                 val metaInf = BINARY_ROOT / flavor / osName / "META-INF"
                 metaInf.mkdirs()
                 val licenseFile = metaInf / "LICENSE"
-                licenseFile.text = URL("https://raw.githubusercontent.com/pytorch/pytorch/master/LICENSE").text
+                licenseFile.text = "https://raw.githubusercontent.com/pytorch/pytorch/master/LICENSE".url.text
 
                 val binaryLicenseFile = metaInf / "NOTICE"
-                binaryLicenseFile.text = URL("https://raw.githubusercontent.com/pytorch/pytorch/master/NOTICE").text
+                binaryLicenseFile.text = "https://raw.githubusercontent.com/pytorch/pytorch/master/NOTICE".url.text
 
                 if ("-precxx11" in flavor) {
                     val libstd = metaInf / "ATTRIBUTION"
-                    libstd.text = URL("https://publish.djl.ai/extra/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt").text
+                    libstd.text = "https://publish.djl.ai/extra/THIRD-PARTY-LICENSES_qHnMKgbdWa.txt".url.text
                 }
             }
             from(BINARY_ROOT / flavor / osName / "/native/lib") {

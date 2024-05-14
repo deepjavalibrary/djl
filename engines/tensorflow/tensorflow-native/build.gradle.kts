@@ -369,7 +369,7 @@ tasks.register("downloadTensorflowNativeLib") {
             project.logger.lifecycle("Downloading $url/$key")
             val file = BINARY_ROOT / value
             file.parentFile.mkdirs()
-            URL("$url/$key") gzipInto file
+            "$url/$key".url gzipInto file
         }
     }
 }

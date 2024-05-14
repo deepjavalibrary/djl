@@ -41,7 +41,7 @@ tasks {
                 else if ("extra" == value || !project.hasProperty("jni")) {
                     project.logger.lifecycle("Downloading $url/$value/$key")
                     file.parentFile.mkdirs()
-                    val downloadPath = URL("$url/$value/$key")
+                    val downloadPath = "$url/$value/$key".url
                     downloadPath into file
                 }
             }
@@ -68,7 +68,7 @@ tasks {
                 else {
                     project.logger.lifecycle("Downloading PyTorch model zoo metadata: $task")
                     file.parentFile.mkdirs()
-                    val downloadPath = URL("$url/$task/ai/djl/huggingface/pytorch/models.json.gz")
+                    val downloadPath = "$url/$task/ai/djl/huggingface/pytorch/models.json.gz".url
                     downloadPath gzipInto file
                 }
 
@@ -81,7 +81,7 @@ tasks {
                 else {
                     project.logger.lifecycle("Downloading Rust model zoo metadata: $task")
                     file.parentFile.mkdirs()
-                    val downloadPath = URL("$url/$task/ai/djl/huggingface/rust/models.json.gz")
+                    val downloadPath = "$url/$task/ai/djl/huggingface/rust/models.json.gz".url
                     downloadPath gzipInto file
                 }
             }

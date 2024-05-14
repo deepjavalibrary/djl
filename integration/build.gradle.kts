@@ -27,12 +27,8 @@ tasks {
     compileJava {
         // need to use `project` as receiver otherwise something else will be picked up
         javaCompiler = project.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(11) }
-        // TODO, cant remove from `options.compilerArgs`
-        //        println(options.compilerArgs)
-        //        println(options.compilerArgs::class.java)
-        //        val args = options.compilerArgs as MutableList<String>
-        //        args.removeAll(listOf("--release", "8"))
-        //        args.clear()
+        // you cant remove from `options.compilerArgs`, just assign a new value to it
+        options.apply { compilerArgs = compilerArgs - listOf("--release", "8")}
     }
 
     register<Copy>("copyDependencies") {
