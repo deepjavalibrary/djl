@@ -10,7 +10,10 @@ dependencies {
     implementation project(":model-zoo")
     implementation project(":testing")
 
-    runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
+    // Don't use MXNet for aarch64
+    if (System.properties['os.arch'] != "aarch64") {
+        runtimeOnly project(":engines:mxnet:mxnet-model-zoo")
+    }
     runtimeOnly project(":engines:pytorch:pytorch-model-zoo")
     runtimeOnly project(":engines:pytorch:pytorch-jni")
     runtimeOnly project(":engines:tensorflow:tensorflow-model-zoo")
