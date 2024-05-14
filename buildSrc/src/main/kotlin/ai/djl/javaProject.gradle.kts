@@ -2,8 +2,6 @@
 
 package ai.djl
 
-import gradle.kotlin.dsl.accessors._47a1ba74e6c64ebd766d5f51da1685d2.*
-import gradle.kotlin.dsl.accessors._47a1ba74e6c64ebd766d5f51da1685d2.javaToolchains
 import org.gradle.kotlin.dsl.attributes
 import org.gradle.kotlin.dsl.`java-library`
 import org.gradle.kotlin.dsl.systemProperties
