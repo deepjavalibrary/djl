@@ -39,6 +39,10 @@ class JavaFormatterPlugin implements Plugin<Project> {
         }
 
         project.task('verifyJava') {
+            def resultFilePath = "build/verifyJava-result.txt"
+            inputs.files(project.sourceSets*.allSource)
+            inputs.files(project.fileTree('generated-src'))
+            outputs.file(project.file(resultFilePath))
             doLast {
                 Main formatter = new Main(new PrintWriter(System.out, true), new PrintWriter(System.err, true), System.in)
                 for (item in project.sourceSets) {
@@ -55,6 +59,7 @@ class JavaFormatterPlugin implements Plugin<Project> {
                         }
                     }
                 }
+                project.file(resultFilePath).write('Success')
             }
         }
     }

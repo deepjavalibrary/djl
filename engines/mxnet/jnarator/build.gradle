@@ -33,3 +33,5 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 }
+
+generateGrammarSource.finalizedBy verifyJava

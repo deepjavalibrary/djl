@@ -32,6 +32,7 @@ pmdMain.source = 'src/main/java'
 
 tasks.register('jnarator') {
     dependsOn ":engines:mxnet:jnarator:jar"
+    finalizedBy verifyJava
     outputs.dir "${project.buildDir}/generated-src"
     doLast {
         File jnaGenerator = project(":engines:mxnet:jnarator").jar.outputs.files.singleFile
