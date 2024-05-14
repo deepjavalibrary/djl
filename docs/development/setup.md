@@ -22,9 +22,7 @@ sudo yum install java-17-openjdk
 For Mac:
 
 ```bash
-brew tap homebrew/cask-versions
-brew update
-brew install --cask zulu17
+brew install --cask zulu@17
 ```
 
 You can also download and install [Oracle JDK](https://www.oracle.com/technetwork/java/javase/overview/index.html)
