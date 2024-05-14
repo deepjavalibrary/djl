@@ -35,7 +35,7 @@ if __name__ == '__main__':
     version = detect_version()
 
     requirements = [
-        'huggingface_hub', 'transformers', 'onnx', 'sentence_transformers',
+        'huggingface_hub', 'transformers', 'sentence_transformers', 'torch',
         'optimum[exporters,onnxruntime]', 'safetensors'
     ]
 
@@ -52,7 +52,8 @@ if __name__ == '__main__':
           install_requires=requirements,
           entry_points={
               'console_scripts': [
-                  'djl-converter=djl_converter.model_zoo_importer:main',
+                  'djl-import=djl_converter.model_zoo_importer:main',
+                  'djl-convert=djl_converter.model_converter:main',
               ]
           },
           include_package_data=True,

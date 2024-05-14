@@ -118,9 +118,12 @@ public class TextGenerator {
 
             // Termination Criteria
             long[] outputIdsArray = searchState.getNextInputIds().toLongArray();
-            for (int i = 0; i < outputIdsArray.length; i++) {
-                if (outputIdsArray[i] == config.getEosTokenId()) {
-                    endPosition[i] = searchState.getPastOutputIds().getShape().get(1) + 1;
+            for (int i = 0; i < endPosition.length; ++i) {
+                for (long tokenId : outputIdsArray) {
+                    if (tokenId == config.getEosTokenId()) {
+                        endPosition[i] = searchState.getPastOutputIds().getShape().get(1) + 1;
+                        break;
+                    }
                 }
             }
             if (searchState.getPastOutputIds().getShape().get(1) + 1 >= config.getMaxSeqLength()) {
@@ -240,9 +243,12 @@ public class TextGenerator {
 
             // Termination Criteria
             long[] outputIdsArray = searchState.getNextInputIds().toLongArray();
-            for (int i = 0; i < outputIdsArray.length; i++) {
-                if (outputIdsArray[i] == config.getEosTokenId()) {
-                    endPosition[i] = searchState.getPastOutputIds().getShape().get(1) + 1;
+            for (int i = 0; i < endPosition.length; ++i) {
+                for (long tokenId : outputIdsArray) {
+                    if (tokenId == config.getEosTokenId()) {
+                        endPosition[i] = searchState.getPastOutputIds().getShape().get(1) + 1;
+                        break;
+                    }
                 }
             }
             if (searchState.getPastOutputIds().getShape().getLastDimension() + 1
@@ -366,9 +372,12 @@ public class TextGenerator {
 
             // Termination Criteria
             long[] outputIdsArray = searchState.getPastOutputIds().toLongArray();
-            for (int i = 0; i < outputIdsArray.length; i++) {
-                if (outputIdsArray[i] == config.getEosTokenId()) {
-                    endPosition[i] = searchState.getPastOutputIds().getShape().get(1);
+            for (int i = 0; i < endPosition.length; ++i) {
+                for (long tokenId : outputIdsArray) {
+                    if (tokenId == config.getEosTokenId()) {
+                        endPosition[i] = searchState.getPastOutputIds().getShape().get(1);
+                        break;
+                    }
                 }
             }
             if (searchState.getPastOutputIds().getShape().get(1) >= config.getMaxSeqLength()) {

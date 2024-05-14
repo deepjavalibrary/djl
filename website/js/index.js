@@ -19,7 +19,7 @@ let app = new Vue({
             },
             {
                 name: 'Demos',
-                url: 'https://djl.ai/website/demo.html'
+                url: 'https://github.com/deepjavalibrary/djl-demo?tab=readme-ov-file#deep-java-library-examples'
             },
             {
                 name: 'Blogs',

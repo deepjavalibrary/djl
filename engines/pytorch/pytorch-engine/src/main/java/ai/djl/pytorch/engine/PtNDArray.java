@@ -225,12 +225,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer toByteBuffer() {
+    public ByteBuffer toByteBuffer(boolean tryDirect) {
         if (getDataType() == DataType.STRING) {
             throw new UnsupportedOperationException(
                     "toByteBuffer is not supported for String tensor.");
         }
-        return JniUtils.getByteBuffer(this);
+        return JniUtils.getByteBuffer(this, tryDirect);
     }
 
     /** {@inheritDoc} */

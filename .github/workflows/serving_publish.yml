@@ -79,13 +79,13 @@ jobs:
         run: |
           ./gradlew :awscurl:jar
           aws s3 cp awscurl/build/awscurl s3://djl-ai/publish/awscurl/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/awscurl/*"
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/awscurl/awscurl"
       - name: Copy awscurl staging artifacts to S3
         if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
           ./gradlew :awscurl:jar
           DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
-          aws s3 cp awscurl/build/awscurl s3://djl-ai/publish/${DJL_VERSION}/awscurl/
+          aws s3 cp awscurl/build/awscurl s3://djl-ai/publish/awscurl/${DJL_VERSION}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/awscurl/${DJL_VERSION}/*"
       - name: Publish to snapshot repository
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}

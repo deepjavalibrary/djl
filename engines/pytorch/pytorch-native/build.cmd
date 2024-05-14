@@ -19,8 +19,17 @@ if exist %FILEPATH% (
     echo Finished downloading libtorch
 )
 
-if "%VERSION%" == "1.11.0" (
-    set PT_VERSION=V1_11_X
+if "%VERSION%" == "1.13.1" (
+    set PT_VERSION=V1_13_X
+)
+if "%VERSION%" == "2.0.1" (
+    set PT_VERSION=V1_13_X
+)
+if "%VERSION%" == "2.1.1" (
+    set PT_VERSION=V1_13_X
+)
+if "%VERSION%" == "2.1.2" (
+    set PT_VERSION=V1_13_X
 )
 
 if /i "%2:~0,2%" == "cu" (

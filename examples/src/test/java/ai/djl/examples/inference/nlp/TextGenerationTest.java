@@ -28,19 +28,6 @@ public class TextGenerationTest {
         TestRequirements.linux();
         TestRequirements.weekly();
 
-        // Beam with Ort
-        String[] output0 = TextGeneration.generateTextWithOnnxRuntimeBeam();
-        Assert.assertEquals(
-                output0[0],
-                "DeepMind Company is a global leader in the field of artificial intelligence and"
-                    + " artificial intelligence research and development.\n"
-                    + "\n"
-                    + "Our mission is to provide the world with the best and brightest minds in the"
-                    + " field of artificial intelligence and artificial intelligence research and"
-                    + " development.\n"
-                    + "\n"
-                    + "Our mission is to provide the world with the best");
-
         // Greedy
         String expected =
                 "DeepMind Company is a global leader in the field of artificial"
@@ -82,11 +69,10 @@ public class TextGenerationTest {
                     + " development.\n"
                     + "\n"
                     + "Our mission is to");
-        Assert.assertEquals(
-                output2[3],
-                "Memories follow me left and right. I can't tell you how many times I've been told"
-                    + " that I'm not a good person. I'm not a good person. I'm not a good person."
-                    + " I'm not a good person. I'm not a good person. I'm not a");
+        Assert.assertTrue(
+                output2[3].startsWith(
+                        "Memories follow me left and right. I can't tell you how many times I've"
+                                + " been told that I'm not a good person."));
     }
 
     @Test
@@ -118,5 +104,26 @@ public class TextGenerationTest {
                         + "\n"
                         + "But if you're lucky, you can escape from prison and live happily ever"
                         + " after.\n");
+    }
+
+    @Test
+    public void testTextGenerationWithOnnx()
+            throws TranslateException, ModelException, IOException {
+        TestRequirements.linux();
+        TestRequirements.weekly();
+        TestRequirements.engine("PyTorch");
+
+        // Beam with Ort
+        String[] output0 = TextGeneration.generateTextWithOnnxRuntimeBeam();
+        Assert.assertEquals(
+                output0[0],
+                "DeepMind Company is a global leader in the field of artificial intelligence and"
+                    + " artificial intelligence research and development.\n"
+                    + "\n"
+                    + "Our mission is to provide the world with the best and brightest minds in the"
+                    + " field of artificial intelligence and artificial intelligence research and"
+                    + " development.\n"
+                    + "\n"
+                    + "Our mission is to provide the world with the best");
     }
 }

@@ -202,7 +202,7 @@ public class RsNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer toByteBuffer() {
+    public ByteBuffer toByteBuffer(boolean tryDirect) {
         ByteBuffer bb = RustLibrary.getByteBuffer(getHandle());
         bb.order(ByteOrder.nativeOrder());
         return bb;

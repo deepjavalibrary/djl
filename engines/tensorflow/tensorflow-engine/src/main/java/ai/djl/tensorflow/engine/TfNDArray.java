@@ -179,7 +179,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer toByteBuffer() {
+    public ByteBuffer toByteBuffer(boolean tryDirect) {
         if (getDataType() == DataType.STRING) {
             throw new IllegalArgumentException("Please use toStringArray() for String NDArray.");
         }

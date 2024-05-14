@@ -34,7 +34,7 @@ if [[ ! -d "libtorch" ]]; then
       curl -s https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip | jar xv >/dev/null
     fi
   elif [[ $PLATFORM == 'darwin' ]]; then
-    if [[ "$VERSION" =~ ^(2.2.)* ]]; then
+    if [[ "$VERSION" =~ ^(2.[2-9].*)$ ]]; then
       if [[ $ARCH == 'aarch64' ]]; then
         curl -s https://download.pytorch.org/libtorch/cpu/libtorch-macos-arm64-${VERSION}.zip | jar xv >/dev/null
       else
@@ -51,6 +51,10 @@ if [[ ! -d "libtorch" ]]; then
     echo "$PLATFORM is not supported."
     exit 1
   fi
+fi
+
+if [[ "$VERSION" == "1.13.1" || "$VERSION" == "2.0.1" || "$VERSION" =~ ^(2.1.*)$ ]]; then
+  PT_VERSION=V1_13_X
 fi
 
 if [[ "$FLAVOR" = cu* ]]; then

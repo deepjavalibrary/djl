@@ -77,7 +77,7 @@ public class XgbNDArray extends NDArrayAdapter {
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer toByteBuffer() {
+    public ByteBuffer toByteBuffer(boolean tryDirect) {
         if (data == null) {
             throw new UnsupportedOperationException("Cannot obtain value from DMatrix");
         }

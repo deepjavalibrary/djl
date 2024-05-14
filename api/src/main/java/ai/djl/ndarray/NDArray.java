@@ -225,6 +225,25 @@ public interface NDArray extends NDResource, BytesSupplier {
         return getShape().size();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    default ByteBuffer toByteBuffer() {
+        return toByteBuffer(false);
+    }
+
+    /**
+     * Returns the {@code ByteBuffer} presentation of the object.
+     *
+     * <p>If returned ByteBuffer is a DirectByteBuffer, it shared the same native memory as the
+     * NDArray. The native memory will be deleted when NDArray is closed.
+     *
+     * <p>Not all the engine support return DirectByteBuffer.
+     *
+     * @param tryDirect use DirectBuffer if possible
+     * @return the {@code ByteBuffer} presentation of the object
+     */
+    ByteBuffer toByteBuffer(boolean tryDirect);
+
     /**
      * Converts this {@code NDArray} to a double array.
      *
@@ -236,7 +255,7 @@ public interface NDArray extends NDResource, BytesSupplier {
             throw new IllegalStateException(
                     "DataType mismatch, Required double" + " Actual " + getDataType());
         }
-        DoubleBuffer db = toByteBuffer().asDoubleBuffer();
+        DoubleBuffer db = toByteBuffer(true).asDoubleBuffer();
         double[] ret = new double[db.remaining()];
         db.get(ret);
         return ret;
@@ -255,7 +274,7 @@ public interface NDArray extends NDResource, BytesSupplier {
             throw new IllegalStateException(
                     "DataType mismatch, Required float, Actual " + getDataType());
         }
-        FloatBuffer fb = toByteBuffer().asFloatBuffer();
+        FloatBuffer fb = toByteBuffer(true).asFloatBuffer();
         float[] ret = new float[fb.remaining()];
         fb.get(ret);
         return ret;
@@ -272,7 +291,7 @@ public interface NDArray extends NDResource, BytesSupplier {
             throw new IllegalStateException(
                     "DataType mismatch, Required int" + " Actual " + getDataType());
         }
-        ShortBuffer ib = toByteBuffer().asShortBuffer();
+        ShortBuffer ib = toByteBuffer(true).asShortBuffer();
         short[] ret = new short[ib.remaining()];
         ib.get(ret);
         return ret;
@@ -289,7 +308,7 @@ public interface NDArray extends NDResource, BytesSupplier {
             throw new IllegalStateException(
                     "DataType mismatch, Required int" + " Actual " + getDataType());
         }
-        ShortBuffer ib = toByteBuffer().asShortBuffer();
+        ShortBuffer ib = toByteBuffer(true).asShortBuffer();
         int[] ret = new int[ib.remaining()];
         for (int i = 0; i < ret.length; ++i) {
             ret[i] = ib.get() & 0xffff;
@@ -309,7 +328,7 @@ public interface NDArray extends NDResource, BytesSupplier {
             throw new IllegalStateException(
                     "DataType mismatch, Required int" + " Actual " + getDataType());
         }
-        IntBuffer ib = toByteBuffer().asIntBuffer();
+        IntBuffer ib = toByteBuffer(true).asIntBuffer();
         int[] ret = new int[ib.remaining()];
         ib.get(ret);
         return ret;
@@ -326,7 +345,7 @@ public interface NDArray extends NDResource, BytesSupplier {
             throw new IllegalStateException(
                     "DataType mismatch, Required int" + " Actual " + getDataType());
         }
-        IntBuffer ib = toByteBuffer().asIntBuffer();
+        IntBuffer ib = toByteBuffer(true).asIntBuffer();
         long[] ret = new long[ib.remaining()];
         for (int i = 0; i < ret.length; ++i) {
             ret[i] = ib.get() & 0X00000000FFFFFFFFL;
@@ -345,7 +364,7 @@ public interface NDArray extends NDResource, BytesSupplier {
             throw new IllegalStateException(
                     "DataType mismatch, Required long" + " Actual " + getDataType());
         }
-        LongBuffer lb = toByteBuffer().asLongBuffer();
+        LongBuffer lb = toByteBuffer(true).asLongBuffer();
         long[] ret = new long[lb.remaining()];
         lb.get(ret);
         return ret;
@@ -358,7 +377,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
      */
     default byte[] toByteArray() {
-        ByteBuffer bb = toByteBuffer();
+        ByteBuffer bb = toByteBuffer(true);
         if (bb.hasArray() && bb.remaining() == bb.array().length) {
             return bb.array();
         }
@@ -374,7 +393,7 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @throws IllegalStateException when {@link DataType} of this {@code NDArray} mismatches
      */
     default int[] toUint8Array() {
-        ByteBuffer bb = toByteBuffer();
+        ByteBuffer bb = toByteBuffer(true);
         int[] buf = new int[bb.remaining()];
         for (int i = 0; i < buf.length; ++i) {
             buf[i] = bb.get() & 0xff;
@@ -393,7 +412,7 @@ public interface NDArray extends NDResource, BytesSupplier {
             throw new IllegalStateException(
                     "DataType mismatch, Required boolean" + " Actual " + getDataType());
         }
-        ByteBuffer bb = toByteBuffer();
+        ByteBuffer bb = toByteBuffer(true);
         boolean[] ret = new boolean[bb.remaining()];
         for (int i = 0; i < ret.length; ++i) {
             ret[i] = bb.get() != 0;
