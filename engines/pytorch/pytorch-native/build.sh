@@ -53,7 +53,7 @@ if [[ ! -d "libtorch" ]]; then
   fi
 fi
 
-if [[ "$VERSION" == "1.13.1" ]]; then
+if [[ "$VERSION" == "1.13.1" || "$VERSION" == "2.0.1" || "$VERSION" =~ ^(2.1.*)$ ]]; then
   PT_VERSION=V1_13_X
 fi
 
