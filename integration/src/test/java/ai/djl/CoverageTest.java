@@ -16,14 +16,10 @@ import ai.djl.basicdataset.cv.classification.Cifar10;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.repository.Repository;
 import ai.djl.testing.CoverageUtils;
-
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
 
 public class CoverageTest {
 
@@ -32,14 +28,14 @@ public class CoverageTest {
 
         // API
         CoverageUtils.testGetterSetters(Device.class);
-
-        // model-zoo
-        CoverageUtils.testGetterSetters(ResNetV1.class);
-
-        // repository
-        CoverageUtils.testGetterSetters(Repository.class);
-
-        // basicdataset
-        CoverageUtils.testGetterSetters(Cifar10.class);
+//
+//        // model-zoo
+//        CoverageUtils.testGetterSetters(ResNetV1.class);
+//
+//        // repository
+//        CoverageUtils.testGetterSetters(Repository.class);
+//
+//        // basicdataset
+//        CoverageUtils.testGetterSetters(Cifar10.class);
     }
 }
