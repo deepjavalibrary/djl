@@ -14,7 +14,8 @@ dependencies {
 }
 
 processResources {
-    outputs.dir file("${projectDir}/build/classes/java/main/nlp")
+    def baseResourcePath = "${project.projectDir}/build/resources/main"
+    outputs.dir file("${baseResourcePath}/nlp")
     doLast {
         def url = "https://mlrepo.djl.ai/model/nlp"
         def tasks = [
@@ -24,7 +25,7 @@ processResources {
                 "text_embedding",
                 "token_classification",
         ]
-        def prefix = "${projectDir}/build/classes/java/main/nlp"
+        def prefix = "${baseResourcePath}/nlp"
         for (String task : tasks) {
             def file = new File("${prefix}/${task}/ai.djl.huggingface.onnxruntime.json")
             if (file.exists()) {

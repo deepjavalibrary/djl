@@ -17,12 +17,8 @@ dependencies {
 compileJava.dependsOn(processResources)
 
 processResources {
-    outputs.file file("${project.buildDir}/classes/java/main/ai/djl/engine/api.properties")
-    doFirst {
-        def classesDir = file("${project.buildDir}/classes/java/main/ai/djl/engine/")
-        classesDir.mkdirs()
-        def propFile = new File(classesDir, "api.properties");
-        propFile.text = "djl_version=${project.version}"
+    filesMatching("**/api.properties") {
+        expand projectVersion: project.version
     }
 }
 

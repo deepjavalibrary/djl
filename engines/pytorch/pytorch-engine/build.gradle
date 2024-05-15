@@ -14,12 +14,8 @@ dependencies {
 compileJava.dependsOn(processResources)
 
 processResources {
-    outputs.file file("${project.buildDir}/classes/java/main/pytorch-engine.properties")
-    doFirst {
-        def classesDir = file("${project.buildDir}/classes/java/main/")
-        classesDir.mkdirs()
-        def propFile = new File(classesDir, "pytorch-engine.properties");
-        propFile.text = "djl_version=${djl_version}\npytorch_version=${pytorch_version}"
+    filesMatching("**/pytorch-engine.properties") {
+        expand projectVersion: djl_version, pytorchVersion: pytorch_version
     }
 }
 

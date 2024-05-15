@@ -9,11 +9,8 @@ dependencies {
 }
 
 processResources {
-    doFirst {
-        def classesDir = file("${project.buildDir}/classes/java/main/")
-        classesDir.mkdirs()
-        def file = new File(classesDir, "tensorflow-engine.properties")
-        file.text = "djl_version=${djl_version}\ntensorflow_version=${tensorflow_version}"
+    filesMatching("**/tensorflow-engine.properties") {
+        expand projectVersion: djl_version, tensorflowVersion: tensorflow_version
     }
 }
 

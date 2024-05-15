@@ -12,7 +12,8 @@ dependencies {
 compileJava.dependsOn(processResources)
 
 processResources {
-    outputs.dir file("${project.projectDir}/build/classes/java/main/native/lib")
+    def baseResourcePath = "${project.projectDir}/build/resources/main"
+    outputs.dirs file("${baseResourcePath}/native/lib"), file("${baseResourcePath}/nlp")
     doLast {
         def url = "https://publish.djl.ai/llama/${llamacpp_version}/jnilib/${djl_version}"
         def files = new String[]{
@@ -43,15 +44,15 @@ processResources {
         }
         copy {
             from jnilibDir
-            into "${project.projectDir}/build/classes/java/main/native/lib"
+            into "${baseResourcePath}/native/lib"
         }
 
         // write properties
-        def propFile = file("${project.projectDir}/build/classes/java/main/native/lib/llama.properties")
+        def propFile = file(baseResourcePath + "/native/lib/llama.properties")
         propFile.text = "version=${llamacpp_version}-${version}\n"
 
         url = "https://mlrepo.djl.ai/model/nlp/text_generation/ai/djl/huggingface/gguf/models.json.gz"
-        def prefix = "${project.projectDir}/build/classes/java/main/nlp/text_generation"
+        def prefix = "${baseResourcePath}/nlp/text_generation"
         def file = new File("${prefix}/ai.djl.huggingface.gguf.json")
         if (file.exists()) {
             project.logger.lifecycle("gguf index file already exists")

@@ -11,7 +11,8 @@ dependencies {
 compileJava.dependsOn(processResources)
 
 processResources {
-    outputs.dir file("${project.buildDir}/classes/java/main/native/lib")
+    def baseResourcePath = "${project.projectDir}/build/resources/main"
+    outputs.dir file("${baseResourcePath}/native/lib")
     doLast {
         def url = "https://publish.djl.ai/fasttext-${fasttext_version}/jnilib/${djl_version}"
         def files = [
@@ -33,11 +34,11 @@ processResources {
         }
         copy {
             from jnilibDir
-            into "${project.buildDir}/classes/java/main/native/lib"
+            into "${baseResourcePath}/native/lib"
         }
 
         // write properties
-        def propFile = file("${project.buildDir}/classes/java/main/native/lib/fasttext.properties")
+        def propFile = file("${baseResourcePath}/native/lib/fasttext.properties")
         propFile.text = "version=${fasttext_version}-${version}\n"
     }
 }
