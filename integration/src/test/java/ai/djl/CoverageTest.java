@@ -21,11 +21,15 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 
 public class CoverageTest {
 
     @Test
     public void test() throws IOException, ReflectiveOperationException, URISyntaxException {
+
         // API
         CoverageUtils.testGetterSetters(Device.class);
 

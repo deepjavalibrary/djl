@@ -2,9 +2,6 @@ package ai.djl
 
 import com.github.spotbugs.snom.SpotBugsExtension
 import com.github.spotbugs.snom.SpotBugsTask
-import gradle.kotlin.dsl.accessors._24fc70e46420bbb29842a362e3e3b354.checkstyle
-import gradle.kotlin.dsl.accessors._24fc70e46420bbb29842a362e3e3b354.jacoco
-import gradle.kotlin.dsl.accessors._24fc70e46420bbb29842a362e3e3b354.pmd
 import org.gradle.kotlin.dsl.*
 
 plugins {
@@ -73,9 +70,6 @@ tasks {
     }
 }
 
-jacoco {
-    toolVersion = "0.8.8"
-}
 tasks {
     val jacocoTestReport = named<JacocoReport>("jacocoTestReport") {
         reports {

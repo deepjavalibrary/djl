@@ -35,8 +35,6 @@ tasks {
             release = 11
 //            compilerArgs = compilerArgs - listOf("--release", "8")
         }
-        doFirst { println(options.compilerArgs) }
-        doLast { println(options.compilerArgs) }
     }
 
     register<Copy>("copyDependencies") {
@@ -63,6 +61,10 @@ tasks {
         systemProperties["ai.djl.logging.level"] = "debug"
         mainClass = "ai.djl.integration.util.DebugEnvironment"
     }
+
+//    test {
+//        this.classpath.forEach { println(it) }
+//    }
 
     distTar { enabled = false }
 }

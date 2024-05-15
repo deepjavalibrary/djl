@@ -22,6 +22,12 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
 }
 
+//println(JavaVersion.current())
+//java {
+//    toolchain { languageVersion = JavaLanguageVersion.of(17) }
+//}
+//println(JavaVersion.current())
+
 //idea {
 //    module {
 //        outputDir = file("build/classes/java/main")
