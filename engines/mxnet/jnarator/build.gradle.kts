@@ -22,13 +22,18 @@ tasks {
     compileJava {
         // this crashes the build, because probably the returned object is a (copy of a) `List`
 //        options.compilerArgs.clear()
-        options.compilerArgs = listOf("--release", "11", "-proc:none", "-Xlint:all,-options,-static")
+        options.apply {
+            release = 11
+            compilerArgs = listOf(/*"--release", "11",*/ "-proc:none", "-Xlint:all,-options,-static")
+        }
     }
 
     jar {
         manifest {
-            attributes("Main-Class" to "ai.djl.mxnet.jnarator.Main",
-                       "Multi-Release" to true)
+            attributes(
+                "Main-Class" to "ai.djl.mxnet.jnarator.Main",
+                "Multi-Release" to true
+            )
         }
         includeEmptyDirs = false
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
