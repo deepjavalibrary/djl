@@ -45,7 +45,8 @@ tasks {
         val jnilibDir = buildDirectory / "classes/java/main/lib/linux/aarch64/"
         outputs.dir(jnilibDir)
         doLast {
-            val url = "https://publish.djl.ai/xgboost/${libs.versions.xgboost.get()}/jnilib/linux/aarch64/libxgboost4j.so"
+            val url =
+                "https://publish.djl.ai/xgboost/${libs.versions.xgboost.get()}/jnilib/linux/aarch64/libxgboost4j.so"
             val file = jnilibDir / "libxgboost4j.so"
             if (!file.exists()) {
                 project.logger.lifecycle("Downloading $url")
@@ -55,22 +56,22 @@ tasks {
     }
 
     jar {
-        from((configurations.compileClasspath.get() - exclusion.get()).map {
-            if (it.isDirectory())
-                emptyList()
-            else
-                zipTree(it).matching {
-                    include("lib/**",
-                            "ml/dmlc/xgboost4j/java/DMatrix*",
-                            "ml/dmlc/xgboost4j/java/NativeLibLoader*",
-                            "ml/dmlc/xgboost4j/java/XGBoost*",
-                            "ml/dmlc/xgboost4j/java/Column*",
-                            "ml/dmlc/xgboost4j/java/util/*",
-                            "ml/dmlc/xgboost4j/gpu/java/*",
-                            "ml/dmlc/xgboost4j/LabeledPoint.*",
-                            "xgboost4j-version.properties")
-                }
-        })
+        val retained = configurations.compileClasspath.get() - exclusion.get()
+        for (file in retained)
+            if (file.isFile)
+                from(zipTree(file).matching {
+                    include(
+                        "lib/**",
+                        "ml/dmlc/xgboost4j/java/DMatrix*",
+                        "ml/dmlc/xgboost4j/java/NativeLibLoader*",
+                        "ml/dmlc/xgboost4j/java/XGBoost*",
+                        "ml/dmlc/xgboost4j/java/Column*",
+                        "ml/dmlc/xgboost4j/java/util/*",
+                        "ml/dmlc/xgboost4j/gpu/java/*",
+                        "ml/dmlc/xgboost4j/LabeledPoint.*",
+                        "xgboost4j-version.properties"
+                    )
+                })
     }
 
     publishing {
