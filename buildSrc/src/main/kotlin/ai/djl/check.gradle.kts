@@ -15,22 +15,19 @@ if (JavaVersion.current() < JavaVersion.VERSION_19) {
     spotbugs {
         excludeFilter = file("${rootProject.projectDir}/tools/conf/findbugs-exclude.xml")
         ignoreFailures = false
-        //        spotbugsTest.enabled = true
     }
     tasks {
         named<SpotBugsTask>("spotbugsMain") {
             reports {
-                // project ':api': Tasks collecting failure
-                // Caused by: org.gradle.api.UnknownDomainObjectException: SpotBugsReport with name 'xml' not found
-                //named("xml") { enabled = false }
-                //named("html") { enabled = true }
+                register("xml") { enabled = false }
+                register("html") { enabled = true }
             }
         }
         named<SpotBugsTask>("spotbugsTest") {
             enabled = true
             reports {
-                named("xml") { enabled = false }
-                named("html") { enabled = true }
+                register("xml") { enabled = false }
+                register("html") { enabled = true }
             }
         }
     }
@@ -62,15 +59,13 @@ tasks {
     named<Checkstyle>("checkstyleMain") {
         classpath += configurations["compileClasspath"]
     }
-    tasks.withType<Checkstyle> {
+    withType<Checkstyle> {
         reports {
             xml.required = false
             html.required = true
         }
     }
-}
 
-tasks {
     val jacocoTestReport = named<JacocoReport>("jacocoTestReport") {
         reports {
             xml.required = true
@@ -79,7 +74,6 @@ tasks {
     }
     named("test") { finalizedBy(jacocoTestReport) }
     named("build") { dependsOn(named("javadoc")) }
-
 }
 
 fun spotbugs(configure: SpotBugsExtension.() -> Unit) {
