@@ -125,7 +125,6 @@ to import source project into eclipse
 # for Linux/macOS:
 ./gradlew eclipse
 
-
 # for Windows:
 gradlew eclipse
 
