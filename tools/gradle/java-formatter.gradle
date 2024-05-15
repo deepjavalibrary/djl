@@ -43,6 +43,8 @@ class JavaFormatterPlugin implements Plugin<Project> {
             inputs.files(project.sourceSets*.allSource)
             inputs.files(project.fileTree('generated-src'))
             outputs.file(project.file(resultFilePath))
+            //is always cacheable if inputs are the same
+            outputs.cacheIf { true }
             doLast {
                 Main formatter = new Main(new PrintWriter(System.out, true), new PrintWriter(System.err, true), System.in)
                 for (item in project.sourceSets) {
