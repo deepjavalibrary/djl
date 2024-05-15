@@ -23,6 +23,7 @@ import ai.djl.pytorch.engine.PtSymbolBlock;
 import ai.djl.pytorch.jni.IValue;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.ProgressBar;
 
 import org.testng.Assert;
@@ -37,6 +38,8 @@ public class IValueTest {
 
     @Test
     public void testIValue() {
+        TestRequirements.notMacX86();
+
         try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
             PtNDArray array1 = (PtNDArray) manager.zeros(new Shape(1));
             PtNDArray array2 = (PtNDArray) manager.ones(new Shape(1));
@@ -199,6 +202,8 @@ public class IValueTest {
 
     @Test
     public void testIValueModel() throws IOException, ModelException {
+        TestRequirements.notMacX86();
+
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)

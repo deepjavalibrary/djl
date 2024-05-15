@@ -11,7 +11,7 @@ import java.util.zip.GZIPInputStream
 operator fun File.div(other: String) = File(this, other)
 operator fun Directory.div(other: String): File = file(other).asFile
 
-val nowFormatted
+val nowFormatted: String
     get() = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 
 infix fun URL.into(file: File) {
@@ -41,5 +41,7 @@ val home = System.getProperty("user.home")
 val String.url: URL
     get() = URI(this).toURL()
 
-val Project.buildDirectory
+
+// provide directly a Directory instead of a DirectoryProperty
+val Project.buildDirectory: Directory
     get() = layout.buildDirectory.get()

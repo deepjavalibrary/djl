@@ -58,6 +58,22 @@ public final class TestRequirements {
         }
     }
 
+    /** Requires that the test runs on macOS M1. */
+    public static void macosM1() {
+        if (!System.getProperty("os.name").toLowerCase().startsWith("mac")
+                || !"aarch64".equals(System.getProperty("os.arch"))) {
+            throw new SkipException("This test requires a macOS M1.");
+        }
+    }
+
+    /** Requires that the test runs on macOS M1, Linux or Windows, not mac x86_64. */
+    public static void notMacX86() {
+        if (System.getProperty("os.name").toLowerCase().startsWith("mac")
+                && "x86_64".equals(System.getProperty("os.arch"))) {
+            throw new SkipException("macOS x86_64 is not supported.");
+        }
+    }
+
     /** Requires that the test runs on OSX or linux, not windows. */
     public static void notWindows() {
         if (System.getProperty("os.name").toLowerCase().startsWith("win")) {

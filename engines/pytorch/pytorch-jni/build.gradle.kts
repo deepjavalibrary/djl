@@ -29,6 +29,10 @@ tasks {
                                "linux-aarch64/cpu-precxx11/libdjl_torch.so",
                                "osx-aarch64/cpu/libdjl_torch.dylib",
                                "win-x86_64/cpu/djl_torch.dll") + when {
+                            ptVersion.startsWith("2.3.") -> listOf(
+                                "linux-x86_64/cu121/libdjl_torch.so",
+                                "linux-x86_64/cu121-precxx11/libdjl_torch.so",
+                                "win-x86_64/cu121/djl_torch.dll")
                             ptVersion.startsWith("2.1.") || ptVersion.startsWith("2.2.") -> listOf(
                                 "linux-x86_64/cu121/libdjl_torch.so",
                                 "linux-x86_64/cu121-precxx11/libdjl_torch.so",

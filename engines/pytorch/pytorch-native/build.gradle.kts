@@ -74,7 +74,6 @@ fun prepareNativeLib(binaryRoot: String, ver: String) {
     val cuda = "cu121"
     // @formatter:off
     val files = mapOf("cpu/libtorch-cxx11-abi-shared-with-deps-$ver%2Bcpu.zip"     to "cpu/linux-x86_64",
-                      "cpu/libtorch-macos-$ver.zip"                                to "cpu/osx-x86_64",
                       "cpu/libtorch-macos-arm64-$ver.zip"                          to "cpu/osx-aarch64",
                       "cpu/libtorch-win-shared-with-deps-$ver%2Bcpu.zip"           to "cpu/win-x86_64",
                       "$cuda/libtorch-cxx11-abi-shared-with-deps-$ver%2B$cuda.zip" to "$cuda/linux-x86_64",
@@ -87,12 +86,6 @@ fun prepareNativeLib(binaryRoot: String, ver: String) {
     copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
     copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
 
-    exec {
-        commandLine("install_name_tool", "-add_rpath", "@loader_path", "$binaryRoot/cpu/osx-x86_64/native/lib/libtorch_cpu.dylib")
-    }
-    exec {
-        commandLine("install_name_tool", "-add_rpath", "@loader_path", "$binaryRoot/cpu/osx-x86_64/native/lib/libtorch.dylib")
-    }
     exec {
         commandLine("install_name_tool", "-add_rpath", "@loader_path", "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib")
     }
@@ -216,7 +209,6 @@ tasks {
             (BINARY_ROOT / "files.txt").text = buildString {
                 val uploadDirs = listOf(BINARY_ROOT / "cpu/linux-x86_64/native/lib/",
                                         BINARY_ROOT / "cpu/osx-aarch64/native/lib/",
-                                        BINARY_ROOT / "cpu/osx-x86_64/native/lib/",
                                         BINARY_ROOT / "cpu/win-x86_64/native/lib/",
                                         BINARY_ROOT / "cpu-precxx11/linux-aarch64/native/lib/",
                                         BINARY_ROOT / "cpu-precxx11/linux-x86_64/native/lib/",

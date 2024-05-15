@@ -24,6 +24,7 @@ import ai.djl.pytorch.engine.PtSymbolBlock;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 
@@ -42,6 +43,8 @@ public class TorchScriptTest {
 
     @Test
     public void testDictInput() throws ModelException, IOException, TranslateException {
+        TestRequirements.notMacX86();
+
         try (NDManager manager = NDManager.newBaseManager()) {
             Criteria<NDList, NDList> criteria =
                     Criteria.builder()
@@ -76,6 +79,8 @@ public class TorchScriptTest {
 
     @Test
     public void testInputOutput() throws IOException, ModelException {
+        TestRequirements.notMacX86();
+
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
@@ -99,6 +104,8 @@ public class TorchScriptTest {
 
     @Test
     public void testGetMethodNames() throws ModelException, IOException {
+        TestRequirements.notMacX86();
+
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)

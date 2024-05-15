@@ -14,6 +14,7 @@ dependencies {
         exclude("junit", "junit")
     }
     testImplementation(libs.slf4j.simple)
+    testImplementation(project(":testing"))
 }
 
 tasks.register<Exec>("syncS3") {
