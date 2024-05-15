@@ -85,7 +85,7 @@ jobs:
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
       - name: Test ONNX Runtime
         run: |
-          ./gradlew -Dai.djl.default_engine=OnnxRuntime :integration:test
+          ./gradlew -Dai.djl.default_engine=OnnxRuntime :integration:test --stacktrace
           ./gradlew :integration:clean
       - name: Build with Gradle
         run: ./gradlew build :jacoco:testCodeCoverageReport --stacktrace
