@@ -41,7 +41,11 @@ class JavaFormatterPlugin implements Plugin<Project> {
         project.task('verifyJava') {
             def resultFilePath = "build/verifyJava-result.txt"
             inputs.files(project.sourceSets*.allSource)
+                    .withPathSensitivity(PathSensitivity.RELATIVE)
+                    .withPropertyName('sourceFiles')
             inputs.files(project.fileTree('generated-src'))
+                    .withPropertyName('generatedSourceFiles')
+                    .withPathSensitivity(PathSensitivity.RELATIVE)
             outputs.file(project.file(resultFilePath))
             //is always cacheable if inputs are the same
             outputs.cacheIf { true }
