@@ -38,11 +38,8 @@ checkstyle {
     toolVersion = "10.14.2"
     ignoreFailures = false
     checkstyleTest.enabled = true
-    configProperties = [
-            "checkstyle.suppressions.file" : file("${rootProject.projectDir}/tools/conf/suppressions.xml"),
-            "checkstyle.licenseHeader.file": file("${rootProject.projectDir}/tools/conf/licenseHeader.java")
-    ]
-    configFile = file("${rootProject.projectDir}/tools/conf/checkstyle.xml")
+    //use relative paths to ensure build caching works across different locations
+    configDirectory = file(relativePath(file("${rootProject.projectDir}/tools/conf")))
 }
 checkstyleMain {
     classpath += configurations.compileClasspath

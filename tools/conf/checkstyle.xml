@@ -15,13 +15,13 @@
     -->
 
     <module name="SuppressionFilter">
-        <property name="file" value="${checkstyle.suppressions.file}"/>
+        <property name="file" value="${config_loc}/suppressions.xml"/>
     </module>
     <module name="SuppressWarningsFilter"/>
 
     <!-- Headers -->
     <module name="Header">
-        <property name="headerFile" value="${checkstyle.licenseHeader.file}"/>
+        <property name="headerFile" value="${config_loc}/licenseHeader.java"/>
         <property name="fileExtensions" value="java"/>
         <property name="ignoreLines" value="2"/>
         <property name="id" value="header"/>
