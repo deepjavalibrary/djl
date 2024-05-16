@@ -33,7 +33,13 @@ pmdMain.source = 'src/main/java'
 tasks.register('jnarator') {
     dependsOn ":engines:mxnet:jnarator:jar"
     finalizedBy verifyJava
+    inputs.file("${project.projectDir}/src/main/jna/mapping.properties")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
     outputs.dir "${project.buildDir}/generated-src"
+
+    //always cacheable if inputs are the same
+    outputs.cacheIf { true }
+
     doLast {
         File jnaGenerator = project(":engines:mxnet:jnarator").jar.outputs.files.singleFile
         javaexec {
