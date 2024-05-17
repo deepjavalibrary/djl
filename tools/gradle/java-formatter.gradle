@@ -39,6 +39,7 @@ class JavaFormatterPlugin implements Plugin<Project> {
         }
 
         project.task('verifyJava') {
+            //declare normalized inputs and outputs to allow Gradle to cache the task or skip it if inputs do not change
             def resultFilePath = "build/verifyJava-result.txt"
             inputs.files(project.sourceSets*.allSource)
                     .withPathSensitivity(PathSensitivity.RELATIVE)
@@ -47,8 +48,7 @@ class JavaFormatterPlugin implements Plugin<Project> {
                     .withPropertyName('generatedSourceFiles')
                     .withPathSensitivity(PathSensitivity.RELATIVE)
             outputs.file(project.file(resultFilePath))
-            //is always cacheable if inputs are the same
-            outputs.cacheIf { true }
+
             doLast {
                 Main formatter = new Main(new PrintWriter(System.out, true), new PrintWriter(System.err, true), System.in)
                 for (item in project.sourceSets) {
