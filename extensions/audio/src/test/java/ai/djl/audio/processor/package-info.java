@@ -11,6 +11,5 @@
  * and limitations under the License.
  */
 
-
 /** Contains tests for the processor module. */
 package ai.djl.audio.processor;

@@ -16,6 +16,7 @@ import ai.djl.basicdataset.cv.classification.Cifar10;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.repository.Repository;
 import ai.djl.testing.CoverageUtils;
+
 import org.testng.annotations.Test;
 
 import java.io.IOException;
