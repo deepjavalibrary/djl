@@ -4,7 +4,6 @@ plugins {
 
 dependencies {
     api(project(":api"))
-    // TODO Could not resolve org.testng:testng:7.9.0.
     api(libs.testng) { exclude("junit", "junit") }
 }
 

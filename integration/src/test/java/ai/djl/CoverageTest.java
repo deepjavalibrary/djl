@@ -28,14 +28,14 @@ public class CoverageTest {
 
         // API
         CoverageUtils.testGetterSetters(Device.class);
-//
-//        // model-zoo
-//        CoverageUtils.testGetterSetters(ResNetV1.class);
-//
-//        // repository
-//        CoverageUtils.testGetterSetters(Repository.class);
-//
-//        // basicdataset
-//        CoverageUtils.testGetterSetters(Cifar10.class);
+
+        // model-zoo
+        CoverageUtils.testGetterSetters(ResNetV1.class);
+
+        // repository
+        CoverageUtils.testGetterSetters(Repository.class);
+
+        // basicdataset
+        CoverageUtils.testGetterSetters(Cifar10.class);
     }
 }

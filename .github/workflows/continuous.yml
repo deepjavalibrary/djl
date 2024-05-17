@@ -83,10 +83,10 @@ jobs:
       - name: Compile PyTorch JNI
         if: steps.pytorch_changes.outputs.src == 'true'
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
-#      - name: Test ONNX Runtime
-#        run: |
-#          ./gradlew -Dai.djl.default_engine=OnnxRuntime :integration:test --stacktrace
-#          ./gradlew :integration:clean
+      - name: Test ONNX Runtime
+        run: |
+          ./gradlew -Dai.djl.default_engine=OnnxRuntime :integration:test --stacktrace
+          ./gradlew :integration:clean
       - name: Build with Gradle
         run: ./gradlew build :jacoco:testCodeCoverageReport --stacktrace
       - name: Upload test results

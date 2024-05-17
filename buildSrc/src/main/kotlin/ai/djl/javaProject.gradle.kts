@@ -50,7 +50,8 @@ tasks {
             events("passed", "skipped", "failed", "standardOut", "standardError")
         }
 
-        doFirst {
+        // this is configuration, doFirst looks out of place
+//        doFirst {
             jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
             systemProperties = System.getProperties().toMap() as Map<String, Any>
             systemProperties.remove("user.dir")
@@ -66,7 +67,7 @@ tasks {
             // mxnet-engine, mxnet-model-zoo, api (MockEngine), basicdataset, fasttext, etc
             if (project.name != "integration" && project.name != "examples")
                 systemProperties.remove("ai.djl.default_engine")
-        }
+//        }
     }
     jar {
         manifest {
