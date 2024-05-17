@@ -25,6 +25,7 @@ import ai.djl.onnxruntime.zoo.tabular.softmax_regression.IrisFlower;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.Utils;
 import ai.onnxruntime.OrtException;
 
 import org.testng.Assert;
@@ -38,7 +39,8 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class OrtTest {
 
@@ -51,12 +53,17 @@ public class OrtTest {
     @Test
     public void testOrtVersion() throws IOException {
         Engine engine = Engine.getEngine("OnnxRuntime");
-        Properties prop = new Properties();
-        Path path = Paths.get("../../../gradle.properties");
-        try (InputStream is = Files.newInputStream(path)) {
-            prop.load(is);
-            Assert.assertEquals(engine.getVersion(), prop.get("onnxruntime_version"));
+        Path path = Paths.get("../../../gradle/libs.versions.toml");
+        String version = null;
+        Pattern pattern = Pattern.compile("onnxruntime = \"([\\d.]+)\"");
+        for (String line : Utils.readLines(path)) {
+            Matcher m = pattern.matcher(line);
+            if (m.matches()) {
+                version = m.group(1);
+                break;
+            }
         }
+        Assert.assertEquals(engine.getVersion(), version);
     }
 
     @Test
