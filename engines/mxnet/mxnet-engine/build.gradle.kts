@@ -99,7 +99,10 @@ tasks {
         }
     }
 
-    sourcesJar { dependsOn(jnarator) }
+    sourcesJar {
+        duplicatesStrategy = DuplicatesStrategy.WARN
+        dependsOn(jnarator)
+    }
     compileJava { dependsOn(jnarator) }
     javadoc { dependsOn(jnarator) }
 
