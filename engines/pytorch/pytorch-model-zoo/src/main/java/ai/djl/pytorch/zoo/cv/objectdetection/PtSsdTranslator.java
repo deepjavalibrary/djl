@@ -232,7 +232,7 @@ public class PtSsdTranslator extends ObjectDetectionTranslator {
         /** {@inheritDoc} */
         @Override
         protected Builder self() {
-            return null;
+            return this;
         }
 
         /** {@inheritDoc} */
