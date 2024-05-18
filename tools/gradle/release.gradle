@@ -39,8 +39,8 @@ tasks.register('increaseBuildVersion') {
         file.text = file.text.replaceAll("<version>.+-SNAPSHOT</version>",
                 "<version>${targetVersion}-SNAPSHOT</version>")
 
-        file = new File("gradle.properties")
-        file.text = file.text.replaceAll("djl_version=[0-9.]+", "djl_version=${targetVersion}")
+        file = new File("gradle/libs.versions.toml")
+        file.text = file.text.replaceAll("djl = \"[0-9.]+\"", "djl = \"${targetVersion}\"")
 
         file = new File("api/README.md")
         file.text = file.text.replaceAll("<version>.+-SNAPSHOT</version>",

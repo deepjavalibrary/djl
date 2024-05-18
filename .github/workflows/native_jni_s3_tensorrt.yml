@@ -32,6 +32,6 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          TRT_VERSION="$(cat gradle.properties | awk -F '=' '/trt_version/ {print $2}')"
+          TRT_VERSION="$(awk -F '=' '/tensorrt/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync engines/tensorrt/jnilib s3://djl-ai/publish/tensorrt/${TRT_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tensorrt/${TRT_VERSION}/jnilib*"

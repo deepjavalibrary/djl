@@ -32,7 +32,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          SENTENCEPIECE_VERSION="$(cat gradle.properties | awk -F '=' '/sentencepiece_version/ {print $2}')"
+          SENTENCEPIECE_VERSION="$(awk -F '=' '/sentencepiece/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"
 
@@ -73,7 +73,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          SENTENCEPIECE_VERSION="$(cat gradle.properties | awk -F '=' '/sentencepiece_version/ {print $2}')"
+          SENTENCEPIECE_VERSION="$(awk -F '=' '/sentencepiece/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"
 
@@ -106,7 +106,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         shell: bash
         run: |
-          SENTENCEPIECE_VERSION="$(cat gradle.properties | awk -F '=' '/sentencepiece_version/ {print $2}')"
+          SENTENCEPIECE_VERSION="$(awk -F '=' '/sentencepiece/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"
 
@@ -142,7 +142,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          SENTENCEPIECE_VERSION="$(cat gradle.properties | awk -F '=' '/sentencepiece_version/ {print $2}')"
+          SENTENCEPIECE_VERSION="$(awk -F '=' '/sentencepiece/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"
 
@@ -189,7 +189,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          SENTENCEPIECE_VERSION="$(cat gradle.properties | awk -F '=' '/sentencepiece_version/ {print $2}')"
+          SENTENCEPIECE_VERSION="$(awk -F '=' '/sentencepiece/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/sentencepiece/jnilib s3://djl-ai/publish/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/sentencepiece-${SENTENCEPIECE_VERSION}/jnilib/*"
 

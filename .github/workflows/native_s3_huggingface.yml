@@ -34,7 +34,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          TOKENIZERS_VERSION="$(cat gradle.properties | awk -F '=' '/tokenizers_version/ {print $2}')"
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
@@ -82,7 +82,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          TOKENIZERS_VERSION="$(cat gradle.properties | awk -F '=' '/tokenizers_version/ {print $2}')"
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
           aws s3 cp extensions/tokenizers/src/main/python/dist/djl_converter-*.whl s3://djl-ai/publish/djl_converter/
@@ -123,7 +123,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         shell: bash
         run: |
-          TOKENIZERS_VERSION="$(cat gradle.properties | awk -F '=' '/tokenizers_version/ {print $2}')"
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
@@ -160,7 +160,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         shell: bash
         run: |
-          TOKENIZERS_VERSION="$(cat gradle.properties | awk -F '=' '/tokenizers_version/ {print $2}')"
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
@@ -222,7 +222,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          TOKENIZERS_VERSION="$(cat gradle.properties | awk -F '=' '/tokenizers_version/ {print $2}')"
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 

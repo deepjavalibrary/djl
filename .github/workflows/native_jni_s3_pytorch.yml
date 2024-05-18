@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
@@ -49,7 +49,7 @@ jobs:
         shell: bash
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
 
@@ -81,7 +81,7 @@ jobs:
         shell: bash
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
@@ -99,7 +99,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
 
@@ -131,7 +131,7 @@ jobs:
         run: |
           source scl_source enable devtoolset-9 rh-git218 || true
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           export PYTORCH_PRECXX11=true
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
@@ -150,7 +150,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
 
@@ -202,7 +202,7 @@ jobs:
         shell: bash
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
 
@@ -227,7 +227,7 @@ jobs:
         shell: bash
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
@@ -241,7 +241,7 @@ jobs:
         shell: bash
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
 
@@ -286,7 +286,7 @@ jobs:
           export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto.aarch64
           export PATH=$PATH:$JAVA_HOME/bin
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
@@ -299,7 +299,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          PYTORCH_VERSION=${PYTORCH_VERSION:-$(cat gradle.properties | awk -F '=' '/pytorch_version/ {print $2}')}
+          PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
 

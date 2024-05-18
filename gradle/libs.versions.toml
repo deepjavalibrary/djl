@@ -30,6 +30,7 @@ tablesaw = "0.43.1"
 tensorflow = "2.10.1"
 tokenizers = "0.19.1"
 xgboost = "2.0.3"
+tensorrt = "8.4.1"
 
 [libraries]
 google-gson = "com.google.code.gson:gson:2.10.1"

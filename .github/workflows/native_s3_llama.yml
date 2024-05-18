@@ -31,7 +31,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          LLAMACPP_VERSION="$(cat gradle.properties | awk -F '=' '/llamacpp_version/ {print $2}')"
+          LLAMACPP_VERSION="$(awk -F '=' '/llamacpp/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync engines/llama/jnilib s3://djl-ai/publish/llama/${LLAMACPP_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/llama/${LLAMACPP_VERSION}/jnilib/*"
 
@@ -65,7 +65,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          LLAMACPP_VERSION="$(cat gradle.properties | awk -F '=' '/llamacpp_version/ {print $2}')"
+          LLAMACPP_VERSION="$(awk -F '=' '/llamacpp/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync engines/llama/jnilib s3://djl-ai/publish/llama/${LLAMACPP_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/llama/${LLAMACPP_VERSION}/jnilib/*"
 
@@ -102,7 +102,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         shell: bash
         run: |
-          LLAMACPP_VERSION="$(cat gradle.properties | awk -F '=' '/llamacpp_version/ {print $2}')"
+          LLAMACPP_VERSION="$(awk -F '=' '/llamacpp/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync engines/llama/jnilib s3://djl-ai/publish/llama/${LLAMACPP_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/llama/${LLAMACPP_VERSION}/jnilib/*"
 
@@ -135,7 +135,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          LLAMACPP_VERSION="$(cat gradle.properties | awk -F '=' '/llamacpp_version/ {print $2}')"
+          LLAMACPP_VERSION="$(awk -F '=' '/llamacpp/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync engines/llama/jnilib s3://djl-ai/publish/llama/${LLAMACPP_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/llama/${LLAMACPP_VERSION}/jnilib/*"
 
@@ -188,7 +188,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          LLAMACPP_VERSION="$(cat gradle.properties | awk -F '=' '/llamacpp_version/ {print $2}')"
+          LLAMACPP_VERSION="$(awk -F '=' '/llamacpp/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync engines/llama/jnilib s3://djl-ai/publish/llama/${LLAMACPP_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/llama/${LLAMACPP_VERSION}/jnilib/*"
 
