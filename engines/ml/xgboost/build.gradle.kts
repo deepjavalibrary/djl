@@ -13,7 +13,7 @@ val exclusion by configurations.registering
 
 dependencies {
     api(project(":api"))
-    api("commons-logging:commons-logging:${libs.versions.commonsLogging.get()}")
+    api(libs.commons.logging)
     api("ml.dmlc:xgboost4j${XGB_FLAVOR}_2.12:${libs.versions.xgboost.get()}") {
         // get rid of the unused XGBoost Dependencies
         exclude("org.apache.hadoop", "hadoop-hdfs")

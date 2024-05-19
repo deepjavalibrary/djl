@@ -2,66 +2,68 @@
 format.version = "1.1"
 
 [versions]
-antlr = "4.11.1"
-awssdk = "2.25.45"
-commonsCli = "1.7.0"
-commonsLogging = "1.3.1"
 djl = "0.28.0"
+pytorch = "2.2.2"
+tensorflow = "2.10.1"
+tensorflow_core = "0.5.0"
+mxnet = "1.9.1"
+onnxruntime = "1.17.1"
+xgboost = "2.0.3"
+lightgbm = "3.2.110"
+tensorrt = "8.4.1"
+llamacpp = "b1696"
 fasttext = "0.9.2"
+sentencepiece = "0.2.0"
+tokenizers = "0.19.1"
+
+slf4j = "1.7.36"
+log4j_slf4j = "2.23.1"
+gson = "2.10.1"
+jna = "5.14.0"
+commons_cli = "1.7.0"
+commons_compress = "1.26.1"
+commons_csv = "1.11.0"
+commons_logging = "1.3.1"
+
+awssdk = "2.25.45"
 ffmpeg = "6.0-1.5.9"
 hadoop = "3.4.0"
 javacpp = "1.5.9"
 javacv = "1.5.9"
-junit = "4.13.2"
-lightgbm = "3.2.110"
-llamacpp = "b1696"
-log4jSlf4j = "2.23.1"
-mockito = "5.11.0"
-mxnet = "1.9.1"
-onnxruntime = "1.17.1"
-openpnpOpencv = "4.9.0-0"
-pytorch = "2.2.2"
-protobuf = "3.25.3"
-rapis = "22.12.0"
-sentencepiece = "0.2.0"
-slf4j = "1.7.36"
+openpnp_opencv = "4.9.0-0"
 spark = "3.3.2"
 tablesaw = "0.43.1"
-tensorflow = "2.10.1"
-tokenizers = "0.19.1"
-xgboost = "2.0.3"
-tensorrt = "8.4.1"
+rapis = "22.12.0"
+protobuf = "3.25.3"
+jackson = "2.12.7.1"
+twelvemonkeys = "3.5"
+jtransforms = "3.1"
+
+antlr = "4.11.1"
+testng = "7.10.2"
+junit = "4.13.2"
+mockito = "5.11.0"
 
 [libraries]
-google-gson = "com.google.code.gson:gson:2.10.1"
-jna = "net.java.dev.jna:jna:5.14.0"
-apache-commons-compress = "org.apache.commons:commons-compress:1.26.1"
-apache-commons-csv = "org.apache.commons:commons-csv:1.11.0"
-apache-hadoop-client = { module = "org.apache.hadoop:hadoop-client", version.ref = "hadoop" }
-apache-hadoop-minicluster = { module = "org.apache.hadoop:hadoop-minicluster", version.ref = "hadoop" }
-apache-log4j-slf4j = { module = "org.apache.logging.log4j:log4j-slf4j-impl", version.ref = "log4jSlf4j" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
-twelvemonkeys-imageio-jpeg = "com.twelvemonkeys.imageio:imageio-jpeg:3.5"
-commons-logging = { module = "commons-logging:commons-logging", version.ref = "commonsLogging" }
-commons-cli = { module = "commons-cli:commons-cli", version.ref = "commonsCli" }
-ai-rapids-cudf = { module = "ai.rapids:cudf", version.ref = "rapis" }
-antlr = { module = "org.antlr:antlr4", version.ref = "antlr" }
-antlrRuntime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
+google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
+commons-logging = { module = "commons-logging:commons-logging", version.ref = "commons_logging" }
+commons-cli = { module = "commons-cli:commons-cli", version.ref = "commons_cli" }
+apache-commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons_compress" }
+apache-commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commons_csv" }
+apache-hadoop-client = { module = "org.apache.hadoop:hadoop-client", version.ref = "hadoop" }
+apache-hadoop-minicluster = { module = "org.apache.hadoop:hadoop-minicluster", version.ref = "hadoop" }
+apache-log4j-slf4j = { module = "org.apache.logging.log4j:log4j-slf4j-impl", version.ref = "log4j_slf4j" }
 onnxruntime = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref = "onnxruntime" }
 onnxruntimeAndroid = { module = "com.microsoft.onnxruntime:onnxruntime-android", version.ref = "onnxruntime" }
 bytedeco-javacpp = { module = "org.bytedeco:javacpp", version.ref = "javacpp" }
 bytedeco-javacv = { module = "org.bytedeco:javacv", version.ref = "javacv" }
 bytedeco-ffmpeg = { module = "org.bytedeco:ffmpeg", version.ref = "ffmpeg" }
-google-protobuf = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
-tensorflow = "org.tensorflow:tensorflow-core-api:0.5.0"
-wendykierp-jTransforms = "com.github.wendykierp:JTransforms:3.1"
 awssdk-bom = { module = "software.amazon.awssdk:bom", version.ref = "awssdk" }
 awssdk-s3 = { module = "software.amazon.awssdk:s3" }
-jackson-core = "com.fasterxml.jackson.core:jackson-databind:2.12.7.1"
-mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
-junit = { module = "junit:junit", version.ref = "junit" }
-openpnp-opencv = { module = "org.openpnp:opencv", version.ref = "openpnpOpencv" }
+openpnp-opencv = { module = "org.openpnp:opencv", version.ref = "openpnp_opencv" }
 spark-core = { module = "org.apache.spark:spark-core_2.12", version.ref = "spark" }
 spark-sql = { module = "org.apache.spark:spark-sql_2.12", version.ref = "spark" }
 spark-mllib = { module = "org.apache.spark:spark-mllib_2.12", version.ref = "spark" }
@@ -71,9 +73,18 @@ tablesaw-html = { module = "tech.tablesaw:tablesaw-html", version.ref = "tablesa
 tablesaw-json = { module = "tech.tablesaw:tablesaw-json", version.ref = "tablesaw" }
 tablesaw-jsplot = { module = "tech.tablesaw:tablesaw-jsplot", version.ref = "tablesaw" }
 
-testng = "org.testng:testng:7.10.2"
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+ai-rapids-cudf = { module = "ai.rapids:cudf", version.ref = "rapis" }
+google-protobuf = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
+twelvemonkeys-imageio-jpeg = { module = "com.twelvemonkeys.imageio:imageio-jpeg", version.ref = "twelvemonkeys" }
+tensorflow-core = { module = "org.tensorflow:tensorflow-core-api", version.ref = "tensorflow_core" }
+wendykierp-jTransforms = { module = "com.github.wendykierp:JTransforms", version.ref = "jtransforms" }
 
-antlr-antlr = { group = "antlr", name = "antlr", version = "2.7.7" }
+antlr = { module = "org.antlr:antlr4", version.ref = "antlr" }
+antlrRuntime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
+testng = { module = "org.testng:testng", version.ref = "testng" }
+junit = { module = "junit:junit", version.ref = "junit" }
+mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 
 [bundles]
 #fiji = ["fiji-fiji", "fiji-3dBlobSegmentation", "fiji-3dObjectsCounter", "fiji-3dViewer", "fiji-analyzeskeleton", "fiji-anisotropicDiffusion2d", "fiji-archipelagoPlugins", "fiji-arrow", "fiji-autoLocalThreshold", "fiji-autoThreshold", "fiji-balloonsegmentation", "fiji-bugSubmitter", "fiji-cpuMeter", "fiji-calculatorPlus", "fiji-cellCounter", "fiji-colocalisationAnalysis", "fiji-colorHistogram", "fiji-colorInspector3d", "fiji-colourDeconvolution", "fiji-correctbleach", "fiji-correct3dDrift", "fiji-descriptorBasedRegistration", "fiji-dichromacy", "fiji-directionality", "fiji-fsAlignTrakem2", "fiji-featureDetection", "fiji-archipelago", "fiji-developer", "fiji-packageMaker", "fiji-plugins", "fiji-filamentdetector", "fiji-flowj", "fiji-graphCut", "fiji-grayMorphology", "fiji-hdf5Vibez", "fiji-helmholtzAnalysis", "fiji-ijRobot", "fiji-io", "fiji-image5d", "fiji-imageExpressionParser", "fiji-interactive3dSurfacePlot", "fiji-isodataClassifier", "fiji-kappa", "fiji-kuwaharaFilter", "fiji-kymographbuilder", "fiji-lsmReader", "fiji-lsmToolbox", "fiji-lassoAndBlowTool", "fiji-linearKuwahara", "fiji-localthickness", "fiji-mtrack2", "fiji-mIP", "fiji-manualTracking", "fiji-multiKymograph", "fiji-omevisual", "fiji-pivAnalyser", "fiji-quickpalm", "fiji-rats", "fiji-reconstructReader", "fiji-spimOpener", "fiji-spimRegistration", "fiji-samples", "fiji-seriesLabeler", "fiji-sioxSegmentation", "fiji-skeletonize3d", "fiji-splinedeformationgenerator", "fiji-stackManipulation", "fiji-statisticalRegionMerging", "fiji-stitching", "fiji-syncWin", "fiji-threadKiller", "fiji-timeLapse", "fiji-timeStamper", "fiji-toast", "fiji-topoj", "fiji-trainableSegmentation", "fiji-trakem2Archipelago", "fiji-vibLib", "fiji-vib", "fiji-vaa3dReader", "fiji-vaa3dWriter", "fiji-videoEditing", "fiji-view5d", "fiji-volumeCalculator", "fiji-volumeViewer", "fiji-bunwarpj", "fiji-bij", "fiji-blockmatching", "fiji-lib", "fiji-legacyImglib1", "fiji-levelSets", "fiji-palOptimization", "fiji-panorama", "fiji-registerVirtualStackSlices", "fiji-registration3d", "fiji-weaveJy2java", "fiji-bigwarpFiji", "fiji-trakem2Tps", "fiji-zSpacing", "fiji-bigdataviewerCore", "fiji-bigdataviewerServer", "fiji-bigdataviewerVistools", "fiji-bigdataviewerFiji", "fiji-spimData", "fiji-trackmate", "fiji-trackmateCellpose", "fiji-trackmateCsvimporter", "fiji-trackmateExtrack", "fiji-trackmateIlastik", "fiji-trackmateMorpholibj", "fiji-trackmateOneat", "fiji-trackmateSkeleton", "fiji-trackmateStardist", "fiji-trackmateWeka", "fiji-t2Nit", "fiji-t2Treelinegraph", "fiji-trakem2", "fiji-vectorstring", "fiji-trakem2Transform", "fiji-mamut", "fiji-labkitPixelClassification", "fiji-labkitUi"]
