@@ -14,8 +14,8 @@ dependencies {
 }
 
 processResources {
-    def baseResourcePath = "${project.projectDir}/build/resources/main"
-    outputs.dir file("${baseResourcePath}/nlp")
+    def basePath = "${project.projectDir}/build/resources/main/nlp"
+    outputs.dir file(basePath)
     doLast {
         def url = "https://mlrepo.djl.ai/model/nlp"
         def tasks = [
@@ -25,9 +25,9 @@ processResources {
                 "text_embedding",
                 "token_classification",
         ]
-        def prefix = "${baseResourcePath}/nlp"
+
         for (String task : tasks) {
-            def file = new File("${prefix}/${task}/ai.djl.huggingface.onnxruntime.json")
+            def file = new File("${basePath}/${task}/ai.djl.huggingface.onnxruntime.json")
             if (file.exists()) {
                 project.logger.lifecycle("model zoo metadata alrady exists: ${task}")
             } else {
