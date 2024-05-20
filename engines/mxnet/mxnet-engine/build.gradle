@@ -19,8 +19,9 @@ sourceSets {
 }
 
 processResources {
+    inputs.properties("djlVersion": djl_version, "mxnetVersion": mxnet_version)
     filesMatching("**/mxnet-engine.properties") {
-        expand projectVersion: djl_version, mxnetVersion: mxnet_version
+        expand djlVersion: djl_version, mxnetVersion: mxnet_version
     }
 }
 
@@ -33,6 +34,7 @@ tasks.register('jnarator') {
     //declare inputs and outputs to allow Gradle to cache the task or skip it if inputs do not change
     inputs.file("${project.projectDir}/src/main/jna/mapping.properties")
         .withPathSensitivity(PathSensitivity.RELATIVE)
+        .withPropertyName("jna/mapping.properties file")
     outputs.dir "${project.buildDir}/generated-src"
 
     doLast {

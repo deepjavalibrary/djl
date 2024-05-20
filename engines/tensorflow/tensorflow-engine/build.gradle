@@ -9,6 +9,7 @@ dependencies {
 }
 
 processResources {
+    inputs.properties "projectVersion": djl_version, "tensorflowVersion": tensorflow_version
     filesMatching("**/tensorflow-engine.properties") {
         expand projectVersion: djl_version, tensorflowVersion: tensorflow_version
     }

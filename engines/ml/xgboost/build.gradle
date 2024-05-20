@@ -40,6 +40,7 @@ compileJava.dependsOn(processResources)
 
 processResources {
     def jnilibDir = "${project.buildDir}/resources/main/lib/linux/aarch64/"
+    inputs.property "xgboost_version", xgboost_version
     outputs.dir file(jnilibDir)
     doLast {
         def url = "https://publish.djl.ai/xgboost/${xgboost_version}/jnilib/linux/aarch64/libxgboost4j.so"

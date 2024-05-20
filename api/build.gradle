@@ -17,6 +17,7 @@ dependencies {
 compileJava.dependsOn(processResources)
 
 processResources {
+    inputs.property "projectVersion", project.version
     filesMatching("**/api.properties") {
         expand projectVersion: project.version
     }

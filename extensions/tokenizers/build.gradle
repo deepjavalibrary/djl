@@ -13,6 +13,7 @@ dependencies {
 compileJava.dependsOn(processResources)
 
 processResources {
+    inputs.properties "projectVersion": djl_version, "tokenizersVersion": tokenizers_version, "version": version
     def baseResourcePath = "${project.projectDir}/build/resources/main"
     outputs.dirs file("${baseResourcePath}/native/lib"), file("${baseResourcePath}/nlp")
     doLast {

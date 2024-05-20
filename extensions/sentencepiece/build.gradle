@@ -10,6 +10,7 @@ dependencies {
 compileJava.dependsOn(processResources)
 
 processResources {
+    inputs.properties "projectVersion": djl_version, "sentencepieceVersion": sentencepiece_version, "version": version
     def baseResourcePath = "${project.projectDir}/build/resources/main"
     outputs.dir file("${baseResourcePath}/native/lib")
     doLast {

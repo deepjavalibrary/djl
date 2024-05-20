@@ -13,6 +13,7 @@ compileJava.dependsOn(processResources)
 
 processResources {
     def baseResourcePath = "${project.projectDir}/build/resources/main"
+    inputs.properties('llamacpp_version': llamacpp_version, 'djl_version': djl_version)
     outputs.dirs file("${baseResourcePath}/native/lib"), file("${baseResourcePath}/nlp")
     doLast {
         def url = "https://publish.djl.ai/llama/${llamacpp_version}/jnilib/${djl_version}"

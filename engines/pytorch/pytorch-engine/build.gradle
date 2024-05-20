@@ -14,6 +14,7 @@ dependencies {
 compileJava.dependsOn(processResources)
 
 processResources {
+    inputs.properties "projectVersion": djl_version, "pytorchVersion": pytorch_version
     filesMatching("**/pytorch-engine.properties") {
         expand projectVersion: djl_version, pytorchVersion: pytorch_version
     }
