@@ -16,8 +16,8 @@ dependencies {
 }
 
 tasks {
-    checkstyleMain { source("src/main/java") }
-    pmdMain { source("src/main/java") }
+    checkstyleMain { exclude("ai/djl/mxnet/jnarator/parser/*") }
+    pmdMain { exclude("ai/djl/mxnet/jnarator/parser/*") }
 
     compileJava {
         // this crashes the build, because probably the returned object is a (copy of a) `List`

@@ -34,8 +34,8 @@ tasks {
         }
     }
 
-    checkstyleMain { source("src/main/java") }
-    pmdMain { source("src/main/java") }
+    checkstyleMain { exclude("ai/djl/mxnet/jna/*") }
+    pmdMain { exclude("ai/djl/mxnet/jna/*") }
 
     val jnarator by registering {
         val jnaratorJar = project(":engines:mxnet:jnarator").tasks.jar

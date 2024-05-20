@@ -5,7 +5,7 @@ format.version = "1.1"
 djl = "0.28.0"
 pytorch = "2.2.2"
 tensorflow = "2.10.1"
-tensorflow_core = "0.5.0"
+tensorflowCore = "0.5.0"
 mxnet = "1.9.1"
 onnxruntime = "1.17.1"
 xgboost = "2.0.3"
@@ -20,17 +20,17 @@ slf4j = "1.7.36"
 log4j_slf4j = "2.23.1"
 gson = "2.10.1"
 jna = "5.14.0"
-commons_cli = "1.7.0"
-commons_compress = "1.26.1"
-commons_csv = "1.11.0"
-commons_logging = "1.3.1"
+commonCli = "1.7.0"
+commonsCompress = "1.26.1"
+commonsCsv = "1.11.0"
+commonsLogging = "1.3.1"
 
 awssdk = "2.25.45"
 ffmpeg = "6.0-1.5.9"
 hadoop = "3.4.0"
 javacpp = "1.5.9"
 javacv = "1.5.9"
-openpnp_opencv = "4.9.0-0"
+openpnpOpencv = "4.9.0-0"
 spark = "3.3.2"
 tablesaw = "0.43.1"
 rapis = "22.12.0"
@@ -49,10 +49,10 @@ slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
-commons-logging = { module = "commons-logging:commons-logging", version.ref = "commons_logging" }
-commons-cli = { module = "commons-cli:commons-cli", version.ref = "commons_cli" }
-apache-commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons_compress" }
-apache-commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commons_csv" }
+commons-logging = { module = "commons-logging:commons-logging", version.ref = "commonsLogging" }
+commons-cli = { module = "commons-cli:commons-cli", version.ref = "commonCli" }
+apache-commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commonsCompress" }
+apache-commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commonsCsv" }
 apache-hadoop-client = { module = "org.apache.hadoop:hadoop-client", version.ref = "hadoop" }
 apache-hadoop-minicluster = { module = "org.apache.hadoop:hadoop-minicluster", version.ref = "hadoop" }
 apache-log4j-slf4j = { module = "org.apache.logging.log4j:log4j-slf4j-impl", version.ref = "log4j_slf4j" }
@@ -63,7 +63,7 @@ bytedeco-javacv = { module = "org.bytedeco:javacv", version.ref = "javacv" }
 bytedeco-ffmpeg = { module = "org.bytedeco:ffmpeg", version.ref = "ffmpeg" }
 awssdk-bom = { module = "software.amazon.awssdk:bom", version.ref = "awssdk" }
 awssdk-s3 = { module = "software.amazon.awssdk:s3" }
-openpnp-opencv = { module = "org.openpnp:opencv", version.ref = "openpnp_opencv" }
+openpnp-opencv = { module = "org.openpnp:opencv", version.ref = "openpnpOpencv" }
 spark-core = { module = "org.apache.spark:spark-core_2.12", version.ref = "spark" }
 spark-sql = { module = "org.apache.spark:spark-sql_2.12", version.ref = "spark" }
 spark-mllib = { module = "org.apache.spark:spark-mllib_2.12", version.ref = "spark" }
@@ -77,7 +77,7 @@ jackson-core = { module = "com.fasterxml.jackson.core:jackson-databind", version
 ai-rapids-cudf = { module = "ai.rapids:cudf", version.ref = "rapis" }
 google-protobuf = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
 twelvemonkeys-imageio-jpeg = { module = "com.twelvemonkeys.imageio:imageio-jpeg", version.ref = "twelvemonkeys" }
-tensorflow-core = { module = "org.tensorflow:tensorflow-core-api", version.ref = "tensorflow_core" }
+tensorflow-core = { module = "org.tensorflow:tensorflow-core-api", version.ref = "tensorflowCore" }
 wendykierp-jTransforms = { module = "com.github.wendykierp:JTransforms", version.ref = "jtransforms" }
 
 antlr = { module = "org.antlr:antlr4", version.ref = "antlr" }

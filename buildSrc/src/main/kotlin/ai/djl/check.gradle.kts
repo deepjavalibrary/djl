@@ -1,6 +1,6 @@
 package ai.djl
 
-import com.github.spotbugs.snom.SpotBugsExtension
+import buildDirectory
 import com.github.spotbugs.snom.SpotBugsTask
 import org.gradle.kotlin.dsl.*
 
@@ -8,27 +8,25 @@ plugins {
     pmd
     checkstyle
     jacoco
+    id("com.github.spotbugs")
 }
 
-if (JavaVersion.current() < JavaVersion.VERSION_19) {
-    apply(plugin = "com.github.spotbugs")
-    spotbugs {
-        excludeFilter = file("${rootProject.projectDir}/tools/conf/findbugs-exclude.xml")
-        ignoreFailures = false
-    }
-    tasks {
-        named<SpotBugsTask>("spotbugsMain") {
-            reports {
-                register("xml") { enabled = false }
-                register("html") { enabled = true }
-            }
+spotbugs {
+    excludeFilter = file("${rootProject.projectDir}/tools/conf/findbugs-exclude.xml")
+    ignoreFailures = false
+}
+tasks {
+    named<SpotBugsTask>("spotbugsMain") {
+        reports.create("html") {
+            required = true
+            outputLocation = file("$buildDirectory/reports/spotbugs.html")
         }
-        named<SpotBugsTask>("spotbugsTest") {
-            enabled = true
-            reports {
-                register("xml") { enabled = false }
-                register("html") { enabled = true }
-            }
+    }
+    named<SpotBugsTask>("spotbugsTest") {
+        enabled = true
+        reports.create("html") {
+            required = true
+            outputLocation = file("$buildDirectory/reports/spotbugs.html")
         }
     }
 }
@@ -52,7 +50,8 @@ checkstyle {
     tasks["checkstyleTest"].enabled = true
     configProperties = mapOf(
         "checkstyle.suppressions.file" to file("${rootProject.projectDir}/tools/conf/suppressions.xml"),
-        "checkstyle.licenseHeader.file" to file("${rootProject.projectDir}/tools/conf/licenseHeader.java"))
+        "checkstyle.licenseHeader.file" to file("${rootProject.projectDir}/tools/conf/licenseHeader.java")
+    )
     configFile = file("${rootProject.projectDir}/tools/conf/checkstyle.xml")
 }
 tasks {
@@ -74,9 +73,4 @@ tasks {
     }
     named("test") { finalizedBy(jacocoTestReport) }
     named("build") { dependsOn(named("javadoc")) }
-}
-
-fun spotbugs(configure: SpotBugsExtension.() -> Unit) {
-    val ext = extensions["spotbugs"] as SpotBugsExtension
-    ext.configure()
 }

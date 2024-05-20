@@ -10,7 +10,7 @@ val exclusion by configurations.registering
 dependencies {
     api(libs.bytedeco.javacpp)
     api(libs.google.protobuf)
-    api(libs.tensorflow)
+    api(libs.tensorflow.core)
 
     exclusion(libs.bytedeco.javacpp)
     exclusion(libs.google.protobuf)
