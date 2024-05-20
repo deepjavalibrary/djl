@@ -1,5 +1,3 @@
-import java.net.URL
-
 plugins {
     ai.djl.javaProject
     `maven-publish`
@@ -73,10 +71,12 @@ tasks {
                     val metaInf = BINARY_ROOT / flavor / osName / "META-INF"
                     metaInf.mkdirs()
                     val licenseFile = metaInf / "LICENSE"
-                    licenseFile.text = "https://raw.githubusercontent.com/apache/incubator-mxnet/master/LICENSE".url.text
+                    licenseFile.text =
+                        "https://raw.githubusercontent.com/apache/incubator-mxnet/master/LICENSE".url.text
 
                     val binaryLicenseFile = metaInf / "LICENSE.binary.dependencies"
-                    binaryLicenseFile.text = "https://raw.githubusercontent.com/apache/incubator-mxnet/master/tools/dependencies/LICENSE.binary.dependencies".url.text
+                    binaryLicenseFile.text =
+                        "https://raw.githubusercontent.com/apache/incubator-mxnet/master/tools/dependencies/LICENSE.binary.dependencies".url.text
 
                     from("src/main/resources")
                 }

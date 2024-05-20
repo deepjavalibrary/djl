@@ -9,22 +9,19 @@ import org.gradle.kotlin.dsl.systemProperties
 plugins {
     id("ai.djl.javaBase")
     `java-library`
-    //    eclipse
     id("ai.djl.javaFormatter")
     id("ai.djl.check")
 }
 
 tasks {
     compileJava {
-//        javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(8) }
         options.apply {
             release = 8
             encoding = "UTF-8"
-            compilerArgs = listOf(/*"--release", "8", */"-proc:none", "-Xlint:all,-options,-static", "-Werror")
+            compilerArgs = listOf("-proc:none", "-Xlint:all,-options,-static", "-Werror")
         }
     }
     compileTestJava {
-//        javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(11) }
         options.apply {
             release = 11
             encoding = "UTF-8"
@@ -50,41 +47,30 @@ tasks {
             events("passed", "skipped", "failed", "standardOut", "standardError")
         }
 
-        // this is configuration, doFirst looks out of place
-//        doFirst {
-            jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
-            systemProperties = System.getProperties().toMap() as Map<String, Any>
-            systemProperties.remove("user.dir")
-            // systemProperty "ai.djl.logging.level", "debug"
-            systemProperties("org.slf4j.simpleLogger.defaultLogLevel" to "debug",
-                             "org.slf4j.simpleLogger.log.org.mortbay.log" to "warn",
-                             "org.slf4j.simpleLogger.log.org.testng" to "info",
-                             "disableProgressBar" to "true",
-                             "nightly" to System.getProperty("nightly", "false"))
-            if (gradle.startParameter.isOffline)
-                systemProperty("ai.djl.offline", "true")
-            // This is used to avoid overriding on default engine for modules:
-            // mxnet-engine, mxnet-model-zoo, api (MockEngine), basicdataset, fasttext, etc
-            if (project.name != "integration" && project.name != "examples")
-                systemProperties.remove("ai.djl.default_engine")
-//        }
+        jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
+        systemProperties = System.getProperties().toMap() as Map<String, Any>
+        systemProperties.remove("user.dir")
+        // systemProperty "ai.djl.logging.level", "debug"
+        systemProperties(
+            "org.slf4j.simpleLogger.defaultLogLevel" to "debug",
+            "org.slf4j.simpleLogger.log.org.mortbay.log" to "warn",
+            "org.slf4j.simpleLogger.log.org.testng" to "info",
+            "disableProgressBar" to "true",
+            "nightly" to System.getProperty("nightly", "false")
+        )
+        if (gradle.startParameter.isOffline)
+            systemProperty("ai.djl.offline", "true")
+        // This is used to avoid overriding on default engine for modules:
+        // mxnet-engine, mxnet-model-zoo, api (MockEngine), basicdataset, fasttext, etc
+        if (project.name != "integration" && project.name != "examples")
+            systemProperties.remove("ai.djl.default_engine")
     }
     jar {
         manifest {
-            attributes("Automatic-Module-Name" to "ai.djl.${project.name.replace('-', '_')}",
-                       "Specification-Version" to "${project.version}")
+            attributes(
+                "Automatic-Module-Name" to "ai.djl.${project.name.replace('-', '_')}",
+                "Specification-Version" to "${project.version}"
+            )
         }
     }
 }
-
-//eclipse {
-//    jdt.file.withProperties {
-//        setProperty("org.eclipse.jdt.core.circularClasspath", "warning")
-//    }
-//    classpath {
-//        sourceSets.first { it.name == "test" }.java {
-//            srcDirs("src/test/java")
-//            exclude("**/package-info.java")
-//        }
-//    }
-//}

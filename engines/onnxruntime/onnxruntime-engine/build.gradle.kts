@@ -23,11 +23,13 @@ tasks {
         outputs.dir(projectDir / "build/classes/java/main/nlp")
         doLast {
             val url = "https://mlrepo.djl.ai/model/nlp"
-            val tasks = listOf("fill_mask",
-                               "question_answer",
-                               "text_classification",
-                               "text_embedding",
-                               "token_classification")
+            val tasks = listOf(
+                "fill_mask",
+                "question_answer",
+                "text_classification",
+                "text_embedding",
+                "token_classification"
+            )
             val prefix = projectDir / "build/classes/java/main/nlp"
             for (task in tasks) {
                 val file = prefix / task / "ai.djl.huggingface.onnxruntime.json"

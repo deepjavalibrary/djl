@@ -1,4 +1,3 @@
-import java.net.URL
 import java.util.regex.Pattern
 
 plugins {
@@ -45,18 +44,20 @@ tasks {
             val jnaGenerator = jnaratorJar.get().outputs.files.singleFile
             javaexec {
                 mainClass = "-jar"
-                args(jnaGenerator.absolutePath,
-                     "-l",
-                     "mxnet",
-                     "-p",
-                     "ai.djl.mxnet.jna",
-                     "-o",
-                     "$buildDirectory/generated-src",
-                     "-m",
-                     "${project.projectDir}/src/main/jna/mapping.properties",
-                     "-f",
-                     "src/main/include/mxnet/c_api.h",
-                     "src/main/include/nnvm/c_api.h")
+                args(
+                    jnaGenerator.absolutePath,
+                    "-l",
+                    "mxnet",
+                    "-p",
+                    "ai.djl.mxnet.jna",
+                    "-o",
+                    "$buildDirectory/generated-src",
+                    "-m",
+                    "${project.projectDir}/src/main/jna/mapping.properties",
+                    "-f",
+                    "src/main/include/mxnet/c_api.h",
+                    "src/main/include/nnvm/c_api.h"
+                )
             }
         }
     }

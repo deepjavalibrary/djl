@@ -8,8 +8,6 @@ import org.gradle.kotlin.dsl.the
 
 plugins {
     java
-    // this is probably not needed
-    //    idea
 }
 
 group = "ai.djl"
@@ -21,17 +19,3 @@ repositories {
     mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
 }
-
-//println(JavaVersion.current())
-//java {
-//    toolchain { languageVersion = JavaLanguageVersion.of(17) }
-//}
-//println(JavaVersion.current())
-
-//idea {
-//    module {
-//        outputDir = file("build/classes/java/main")
-//        testOutputDir = file("build/classes/java/test")
-//        // inheritOutputDirs = true
-//    }
-//}

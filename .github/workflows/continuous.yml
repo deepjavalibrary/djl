@@ -39,7 +39,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: check disk space
@@ -119,7 +119,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - uses: dorny/paths-filter@v2

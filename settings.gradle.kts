@@ -4,13 +4,12 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
-include(":bom")
 include(":api")
 include(":basicdataset")
 include(":djl-zero")
 include(":engines:llama")
-include(":engines:ml:xgboost")
 include(":engines:ml:lightgbm")
+include(":engines:ml:xgboost")
 include(":engines:mxnet:jnarator")
 include(":engines:mxnet:mxnet-engine")
 include(":engines:mxnet:mxnet-model-zoo")
@@ -33,15 +32,17 @@ include(":extensions:fasttext")
 include(":extensions:hadoop")
 include(":extensions:opencv")
 include(":extensions:sentencepiece")
-include(":extensions:tokenizers")
 include(":extensions:tablesaw")
 include(":extensions:timeseries")
-if (JavaVersion.current() < JavaVersion.VERSION_21)
-    include(":extensions:spark")
+include(":extensions:tokenizers")
 include(":integration")
+include(":jacoco")
 include(":model-zoo")
 include(":testing")
-include(":jacoco")
+
+if (JavaVersion.current() < JavaVersion.VERSION_21) {
+    include(":extensions:spark")
+}
 
 dependencyResolutionManagement {
     repositories {

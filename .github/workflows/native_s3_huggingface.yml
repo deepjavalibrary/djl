@@ -19,7 +19,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
@@ -34,7 +34,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
@@ -62,7 +62,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
@@ -82,7 +82,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
           aws s3 cp extensions/tokenizers/src/main/python/dist/djl_converter-*.whl s3://djl-ai/publish/djl_converter/
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release CPU JNI
@@ -123,7 +123,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         shell: bash
         run: |
-          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
@@ -144,7 +144,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
@@ -160,7 +160,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         shell: bash
         run: |
-          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
@@ -207,7 +207,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
@@ -222,7 +222,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)"
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 

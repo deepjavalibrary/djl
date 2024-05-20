@@ -1,4 +1,3 @@
-import java.net.URL
 import java.net.URLDecoder
 
 plugins {
@@ -25,14 +24,16 @@ tasks {
         doLast {
             var url = "https://publish.djl.ai/tokenizers"
             val (tokenizers, djl) = libs.versions.tokenizers.get() to libs.versions.djl.get()
-            val files = mapOf("win-x86_64/libwinpthread-1.dll" to "extra",
-                              "win-x86_64/libgcc_s_seh-1.dll" to "extra",
-                              "win-x86_64/libstdc%2B%2B-6.dll" to "extra",
-                              "win-x86_64/tokenizers.dll" to "$tokenizers/jnilib/$djl",
-                              "linux-x86_64/libtokenizers.so" to "$tokenizers/jnilib/$djl",
-                              "linux-aarch64/libtokenizers.so" to "$tokenizers/jnilib/$djl",
-                              "osx-x86_64/libtokenizers.dylib" to "$tokenizers/jnilib/$djl",
-                              "osx-aarch64/libtokenizers.dylib" to "$tokenizers/jnilib/$djl")
+            val files = mapOf(
+                "win-x86_64/libwinpthread-1.dll" to "extra",
+                "win-x86_64/libgcc_s_seh-1.dll" to "extra",
+                "win-x86_64/libstdc%2B%2B-6.dll" to "extra",
+                "win-x86_64/tokenizers.dll" to "$tokenizers/jnilib/$djl",
+                "linux-x86_64/libtokenizers.so" to "$tokenizers/jnilib/$djl",
+                "linux-aarch64/libtokenizers.so" to "$tokenizers/jnilib/$djl",
+                "osx-x86_64/libtokenizers.dylib" to "$tokenizers/jnilib/$djl",
+                "osx-aarch64/libtokenizers.dylib" to "$tokenizers/jnilib/$djl"
+            )
             val jnilibDir = project.projectDir / "jnilib/$djl"
             for ((key, value) in files) {
                 val file = jnilibDir / URLDecoder.decode(key, "UTF-8")
@@ -55,11 +56,13 @@ tasks {
             propFile.text = "version=$tokenizers-$version\n"
 
             url = "https://mlrepo.djl.ai/model/nlp"
-            val tasks = listOf("fill_mask",
-                               "question_answer",
-                               "text_classification",
-                               "text_embedding",
-                               "token_classification")
+            val tasks = listOf(
+                "fill_mask",
+                "question_answer",
+                "text_classification",
+                "text_embedding",
+                "token_classification"
+            )
             val prefix = buildDirectory / "classes/java/main/nlp"
             for (task in tasks) {
                 var file = prefix / task / "ai.djl.huggingface.pytorch.json"

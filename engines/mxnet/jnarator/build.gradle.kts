@@ -19,15 +19,6 @@ tasks {
     checkstyleMain { exclude("ai/djl/mxnet/jnarator/parser/*") }
     pmdMain { exclude("ai/djl/mxnet/jnarator/parser/*") }
 
-    compileJava {
-        // this crashes the build, because probably the returned object is a (copy of a) `List`
-//        options.compilerArgs.clear()
-        options.apply {
-            release = 11
-            compilerArgs = listOf(/*"--release", "11",*/ "-proc:none", "-Xlint:all,-options,-static")
-        }
-    }
-
     jar {
         manifest {
             attributes(

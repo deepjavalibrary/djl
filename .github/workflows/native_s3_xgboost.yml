@@ -48,7 +48,7 @@ jobs:
       - name: Release JNI prep
         run: |
           XGBOOST_VERSION=${{ github.event.inputs.xgb_version }}
-          XGBOOST_VERSION=${XGBOOST_VERSION:-$(awk -F '=' '/xgboost/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)}
+          XGBOOST_VERSION=${XGBOOST_VERSION:-$(awk -F '=' '/xgboost/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           git clone https://github.com/dmlc/xgboost --recursive -b v"$XGBOOST_VERSION"
           export PATH=$PATH:/opt/rh/devtoolset-8/root/usr/bin
           cd xgboost/jvm-packages
@@ -63,7 +63,7 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         run: |
           XGBOOST_VERSION=${{ github.event.inputs.xgb_version }}
-          XGBOOST_VERSION=${XGBOOST_VERSION:-$(awk -F '=' '/xgboost/ {gsub(/"/, "", $2); print $2}' gradle/libs.versions.toml)')}
+          XGBOOST_VERSION=${XGBOOST_VERSION:-$(awk -F '=' '/xgboost/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)')}
           aws s3 cp xgboost/lib/libxgboost4j.so s3://djl-ai/publish/xgboost/${XGBOOST_VERSION}/jnilib/linux/aarch64/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/xgboost/${XGBOOST_VERSION}/jnilib*"
 

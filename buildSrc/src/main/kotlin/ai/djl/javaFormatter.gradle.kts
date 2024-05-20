@@ -27,11 +27,13 @@ tasks {
                     if (!file.name.endsWith(".java") || "generated-src" in file.absolutePath)
                         continue
                     if (formatter.format("-a", "-n", "--set-exit-if-changed", file.absolutePath) != 0)
-                        throw GradleException("File not formatted: " + file.absolutePath
-                                              + System.lineSeparator()
-                                              + "In order to reformat your code, run './gradlew formatJava' (or './gradlew fJ' for short)"
-                                              + System.lineSeparator()
-                                              + "See https://github.com/deepjavalibrary/djl/blob/master/docs/development/development_guideline.md#coding-conventions for more details")
+                        throw GradleException(
+                            "File not formatted: " + file.absolutePath
+                                    + System.lineSeparator()
+                                    + "In order to reformat your code, run './gradlew formatJava' (or './gradlew fJ' for short)"
+                                    + System.lineSeparator()
+                                    + "See https://github.com/deepjavalibrary/djl/blob/master/docs/development/development_guideline.md#coding-conventions for more details"
+                        )
                 }
         }
     }

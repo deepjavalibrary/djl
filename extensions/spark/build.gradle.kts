@@ -6,8 +6,7 @@ plugins {
 
 group = "ai.djl.spark"
 
-if (JavaVersion.current() < JavaVersion.VERSION_21)
-    apply(plugin = "ai.djl.publish")
+if (JavaVersion.current() < JavaVersion.VERSION_21) apply(plugin = "ai.djl.publish")
 
 dependencies {
     api(project(":api"))

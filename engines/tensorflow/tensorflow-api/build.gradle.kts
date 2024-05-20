@@ -1,3 +1,5 @@
+import org.w3c.dom.Element
+
 plugins {
     ai.djl.javaProject
     ai.djl.publish
@@ -32,12 +34,16 @@ publishing {
                 url = "http://www.djl.ai/engines/tensorflow/${project.name}"
 
                 withXml {
-                    val pomNode = asNode()
-//                    pomNode.dependencies."*".findAll() {
-//                        it.artifactId.text().startsWith("tensorflow-") || it.artifactId.text().startsWith("ndarray")
-//                    }.each() {
-//                        it.parent().remove(it)
-//                    }
+                    val pomNode = asElement()
+                    val nl = pomNode.getElementsByTagName("dependency")
+                    for (i in 0 until nl.length) {
+                        val node = nl.item(i) as Element
+                        val artifactId = node.getElementsByTagName("artifactId").item(0)
+                        if (artifactId.textContent.startsWith("tensorflow-") || artifactId.textContent.startsWith("ndarray")) {
+                            val dependencies = node.parentNode
+                            dependencies.removeChild(node)
+                        }
+                    }
                 }
             }
         }

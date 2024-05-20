@@ -53,9 +53,10 @@ tasks {
     val testCodeCoverageReport by getting(JacocoReport::class) {
         classDirectories.setFrom(files(classDirectories.files.map {
             fileTree(it) {
-                exclude("org/tensorflow/lite/**",
-                        "ai/djl/integration/**",
-                        "ai/djl/examples/**")
+                exclude(
+                    "ai/djl/integration/**",
+                    "ai/djl/examples/**"
+                )
             }
         }))
     }

@@ -11,7 +11,6 @@ fun checkClang(clang: File) {
         // create the folder and download the executable
         clang.parentFile.mkdirs()
         // TODO original method was appending
-        //clang.append(new URL(url).openStream())
         clang.writeBytes(url.openStream().use { it.readAllBytes() })
         clang.setExecutable(true)
     }
@@ -19,9 +18,11 @@ fun checkClang(clang: File) {
 
 fun formatCpp(f: File, clang: File): String = when {
     !f.name.endsWith(".cc") && !f.name.endsWith(".cpp") && !f.name.endsWith(".h") -> ""
-    else -> ProcessBuilder(clang.absolutePath,
-                           "-style={BasedOnStyle: Google, IndentWidth: 2, ColumnLimit: 120, AlignAfterOpenBracket: DontAlign, SpaceAfterCStyleCast: true}",
-                           f.absolutePath)
+    else -> ProcessBuilder(
+        clang.absolutePath,
+        "-style={BasedOnStyle: Google, IndentWidth: 2, ColumnLimit: 120, AlignAfterOpenBracket: DontAlign, SpaceAfterCStyleCast: true}",
+        f.absolutePath
+    )
         .start().inputStream.use { it.readAllBytes().decodeToString() }
 }
 

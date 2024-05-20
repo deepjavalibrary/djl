@@ -28,12 +28,8 @@ dependencies {
 
 tasks {
     compileJava {
-        // need to use `project` as receiver otherwise something else will be picked up
-//        javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(11) }
-        // you cant remove from `options.compilerArgs`, just assign a new value to it
         options.apply {
             release = 11
-//            compilerArgs = compilerArgs - listOf("--release", "8")
         }
     }
 
@@ -68,7 +64,3 @@ tasks {
 application {
     mainClass = System.getProperty("main", "ai.djl.integration.IntegrationTest")
 }
-
-// manual help for the missing accessor
-//val JavaCompile.javaToolchains: JavaToolchainService
-//    get() = (project as ExtensionAware).extensions.getByName<JavaToolchainService>("javaToolchains")

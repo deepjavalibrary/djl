@@ -15,7 +15,11 @@ dependencies {
 }
 
 tasks.register<Exec>("syncS3") {
-    commandLine("sh", "-c", "find . -name .DS_Store | xargs rm && aws s3 sync src/test/resources/mlrepo s3://djl-ai/mlrepo --acl public-read")
+    commandLine(
+        "sh",
+        "-c",
+        "find . -name .DS_Store | xargs rm && aws s3 sync src/test/resources/mlrepo s3://djl-ai/mlrepo --acl public-read"
+    )
 
     standardOutput = ByteArrayOutputStream()
     ext["output"] = { standardOutput.toString() }

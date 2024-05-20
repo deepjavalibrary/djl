@@ -1,5 +1,3 @@
-import java.net.URL
-
 plugins {
     ai.djl.javaProject
     ai.djl.cppFormatter
@@ -24,18 +22,20 @@ tasks {
             val llamacpp = libs.versions.llamacpp.get()
             val djl = libs.versions.djl.get()
             var url = "https://publish.djl.ai/llama/$llamacpp/jnilib/$djl"
-            val files = listOf("linux-x86_64/libdjl_llama.so",
-                               "linux-x86_64/libllama.so",
-                               "linux-aarch64/libdjl_llama.so",
-                               "linux-aarch64/libllama.so",
-                               "osx-x86_64/libdjl_llama.dylib",
-                               "osx-x86_64/libllama.dylib",
-                               "osx-x86_64/ggml-metal.metal",
-                               "osx-aarch64/libdjl_llama.dylib",
-                               "osx-aarch64/libllama.dylib",
-                               "osx-aarch64/ggml-metal.metal",
-                               "win-x86_64/djl_llama.dll",
-                               "win-x86_64/llama.dll")
+            val files = listOf(
+                "linux-x86_64/libdjl_llama.so",
+                "linux-x86_64/libllama.so",
+                "linux-aarch64/libdjl_llama.so",
+                "linux-aarch64/libllama.so",
+                "osx-x86_64/libdjl_llama.dylib",
+                "osx-x86_64/libllama.dylib",
+                "osx-x86_64/ggml-metal.metal",
+                "osx-aarch64/libdjl_llama.dylib",
+                "osx-aarch64/libllama.dylib",
+                "osx-aarch64/ggml-metal.metal",
+                "win-x86_64/djl_llama.dll",
+                "win-x86_64/llama.dll"
+            )
             val jnilibDir = project.projectDir / "jnilib/$djl"
             files.forEach {
                 val file = jnilibDir / it

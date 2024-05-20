@@ -1,6 +1,5 @@
 package ai.djl
 
-import gradle.kotlin.dsl.accessors._d127c8cf8be369f13d50127c4af720c5.java
 import gradle.kotlin.dsl.accessors._d127c8cf8be369f13d50127c4af720c5.javadoc
 import gradle.kotlin.dsl.accessors._d127c8cf8be369f13d50127c4af720c5.publishing
 import gradle.kotlin.dsl.accessors._d127c8cf8be369f13d50127c4af720c5.signing
@@ -11,39 +10,6 @@ plugins {
     `maven-publish`
     signing
 }
-
-//def projects = [
-//        project(':engines:ml:xgboost'),
-//        project(':engines:ml:lightgbm'),
-//        project(':engines:mxnet:mxnet-engine'),
-//        project(':engines:mxnet:mxnet-model-zoo'),
-//        project(':engines:onnxruntime:onnxruntime-android'),
-//        project(':engines:onnxruntime:onnxruntime-engine'),
-//        project(':engines:pytorch:pytorch-engine'),
-//        project(':engines:pytorch:pytorch-jni'),
-//        project(':engines:pytorch:pytorch-model-zoo'),
-//        project(':engines:tensorflow:tensorflow-api'),
-//        project(':engines:tensorflow:tensorflow-engine'),
-//        project(':engines:tensorflow:tensorflow-model-zoo'),
-//        project(':engines:tensorrt'),
-//        project(':extensions:audio'),
-//        project(':extensions:aws-ai'),
-//        project(':extensions:fasttext'),
-//        project(':extensions:hadoop'),
-//        project(':extensions:opencv'),
-//        project(':extensions:sentencepiece'),
-//        project(':extensions:tablesaw'),
-//        project(':extensions:timeseries'),
-//        project(':extensions:tokenizers'),
-//        project(':model-zoo')
-//]
-//if (JavaVersion.current() < JavaVersion.VERSION_21) {
-//    projects.add(project(':extensions:spark'))
-//}
-//
-//configure(projects) {
-//    apply plugin: "maven-publish"
-//    apply plugin: "signing"
 
 tasks {
     withType<GenerateModuleMetadata> { enabled = false }
@@ -56,7 +22,8 @@ tasks {
             overview = "src/main/javadoc/overview.html"
 
             addBooleanOption("-allow-script-in-comments", true)
-            header = "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>"
+            header =
+                "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>"
         }
     }
 
@@ -133,7 +100,6 @@ tasks {
         sign(publishing.publications["maven"])
     }
 }
-
 
 java {
     withJavadocJar()

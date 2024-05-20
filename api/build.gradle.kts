@@ -39,10 +39,12 @@ tasks {
 
     jar {
         manifest {
-            attributes("Notice" to "DJL will collect telemetry to help us better understand our users’" +
-                               " needs, diagnose issues, and deliver additional features. If you would" +
-                               " like to learn more or opt-out please go to: " +
-                               "https://docs.djl.ai/docs/telemetry.html for more information.")
+            attributes(
+                "Notice" to "DJL will collect telemetry to help us better understand our users’" +
+                        " needs, diagnose issues, and deliver additional features. If you would" +
+                        " like to learn more or opt-out please go to: " +
+                        "https://docs.djl.ai/docs/telemetry.html for more information."
+            )
         }
     }
 }

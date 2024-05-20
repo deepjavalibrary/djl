@@ -1,4 +1,3 @@
-import java.net.URL
 import java.net.URLEncoder
 
 plugins {
@@ -87,10 +86,20 @@ fun prepareNativeLib(binaryRoot: String, ver: String) {
     copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
 
     exec {
-        commandLine("install_name_tool", "-add_rpath", "@loader_path", "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib")
+        commandLine(
+            "install_name_tool",
+            "-add_rpath",
+            "@loader_path",
+            "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib"
+        )
     }
     exec {
-        commandLine("install_name_tool", "-add_rpath", "@loader_path", "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch.dylib")
+        commandLine(
+            "install_name_tool",
+            "-add_rpath",
+            "@loader_path",
+            "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch.dylib"
+        )
     }
 }
 
@@ -110,7 +119,33 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
 
         copy {
             from("$outputDir/libtorch/lib/") {
-                include("libarm_compute*", "libc10_cuda.so", "libc10.*", "libcaffe2_nvrtc.so", "libcu*", "libgfortran-*", "libgomp*", "libiomp*", "libnv*", "libopenblasp-*", "libtorch_cpu.*", "libtorch_cuda*.so", "libtorch.*", "asmjit.dll", "c10_cuda.dll", "c10.dll", "caffe2_nvrtc.dll", "cu*.dll", "fbgemm.dll", "nv*.dll", "torch_cpu.dll", "torch_cuda*.dll", "torch.dll", "uv.dll", "zlibwapi.dll")
+                include(
+                    "libarm_compute*",
+                    "libc10_cuda.so",
+                    "libc10.*",
+                    "libcaffe2_nvrtc.so",
+                    "libcu*",
+                    "libgfortran-*",
+                    "libgomp*",
+                    "libiomp*",
+                    "libnv*",
+                    "libopenblasp-*",
+                    "libtorch_cpu.*",
+                    "libtorch_cuda*.so",
+                    "libtorch.*",
+                    "asmjit.dll",
+                    "c10_cuda.dll",
+                    "c10.dll",
+                    "caffe2_nvrtc.dll",
+                    "cu*.dll",
+                    "fbgemm.dll",
+                    "nv*.dll",
+                    "torch_cpu.dll",
+                    "torch_cuda*.dll",
+                    "torch.dll",
+                    "uv.dll",
+                    "zlibwapi.dll"
+                )
             }
             into("$outputDir/native/lib")
         }
@@ -142,9 +177,9 @@ tasks {
     register("cleanJNI") {
         doFirst {
             delete(project.projectDir / "build",
-                   project.projectDir / "libtorch",
-                   project.projectDir / "libtorch_android",
-                   fileTree(project.projectDir) { include("**.zip") })
+                project.projectDir / "libtorch",
+                project.projectDir / "libtorch_android",
+                fileTree(project.projectDir) { include("**.zip") })
         }
     }
 
@@ -207,14 +242,16 @@ tasks {
             }
 
             (BINARY_ROOT / "files.txt").text = buildString {
-                val uploadDirs = listOf(BINARY_ROOT / "cpu/linux-x86_64/native/lib/",
-                                        BINARY_ROOT / "cpu/osx-aarch64/native/lib/",
-                                        BINARY_ROOT / "cpu/win-x86_64/native/lib/",
-                                        BINARY_ROOT / "cpu-precxx11/linux-aarch64/native/lib/",
-                                        BINARY_ROOT / "cpu-precxx11/linux-x86_64/native/lib/",
-                                        BINARY_ROOT / "cu121/linux-x86_64/native/lib/",
-                                        BINARY_ROOT / "cu121/win-x86_64/native/lib/",
-                                        BINARY_ROOT / "cu121-precxx11/linux-x86_64/native/lib/")
+                val uploadDirs = listOf(
+                    BINARY_ROOT / "cpu/linux-x86_64/native/lib/",
+                    BINARY_ROOT / "cpu/osx-aarch64/native/lib/",
+                    BINARY_ROOT / "cpu/win-x86_64/native/lib/",
+                    BINARY_ROOT / "cpu-precxx11/linux-aarch64/native/lib/",
+                    BINARY_ROOT / "cpu-precxx11/linux-x86_64/native/lib/",
+                    BINARY_ROOT / "cu121/linux-x86_64/native/lib/",
+                    BINARY_ROOT / "cu121/win-x86_64/native/lib/",
+                    BINARY_ROOT / "cu121-precxx11/linux-x86_64/native/lib/"
+                )
                 for (item in uploadDirs)
                     fileTree(item).files.map { it.name }.forEach {
                         val out = item.relativeTo(File("${BINARY_ROOT}/")).absolutePath

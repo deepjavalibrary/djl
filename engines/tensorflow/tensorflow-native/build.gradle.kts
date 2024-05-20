@@ -1,5 +1,3 @@
-import java.net.URL
-
 plugins {
     ai.djl.javaProject
     ai.djl.publish
@@ -35,12 +33,14 @@ tasks {
             fileTree(buildDirectory / "download").forEach { f ->
                 copy {
                     from(zipTree(f)) {
-                        exclude("**/pom.xml",
-                                "**/*.properties",
-                                "**/*.h",
-                                "**/*.hpp",
-                                "**/*.cmake",
-                                "META-INF/**")
+                        exclude(
+                            "**/pom.xml",
+                            "**/*.properties",
+                            "**/*.h",
+                            "**/*.hpp",
+                            "**/*.cmake",
+                            "META-INF/**"
+                        )
                     }
                     into(buildDirectory / "native")
                     includeEmptyDirs = false
@@ -62,24 +62,34 @@ tasks {
             }
 
             (buildDirectory / "native/files.txt").text = buildString {
-                val uploadDirs = listOf(buildDirectory / "native/linux/cpu/",
-                                        buildDirectory / "native/linux/cu113/",
-                                        buildDirectory / "native/osx/cpu/",
-                                        buildDirectory / "native/win/cpu/",
-                                        buildDirectory / "native/win/cu113/")
+                val uploadDirs = listOf(
+                    buildDirectory / "native/linux/cpu/",
+                    buildDirectory / "native/linux/cu113/",
+                    buildDirectory / "native/osx/cpu/",
+                    buildDirectory / "native/win/cpu/",
+                    buildDirectory / "native/win/cu113/"
+                )
                 for (item in uploadDirs)
                     fileTree(item).files.map { it.name }.forEach {
                         val out = item.relativeTo(buildDirectory / "native/").absolutePath
                         appendLine(out + it)
                     }
             }
-            delete(buildDirectory / "native/org/",
-                   buildDirectory / "native/com/",
-                   buildDirectory / "native/google/",
-                   buildDirectory / "native/module-info.class.gz")
+            delete(
+                buildDirectory / "native/org/",
+                buildDirectory / "native/com/",
+                buildDirectory / "native/google/",
+                buildDirectory / "native/module-info.class.gz"
+            )
 
             exec {
-                commandLine("aws", "s3", "sync", "$buildDirectory/native/", "s3://djl-ai/publish/tensorflow-${libs.versions.tensorflow.get()}/")
+                commandLine(
+                    "aws",
+                    "s3",
+                    "sync",
+                    "$buildDirectory/native/",
+                    "s3://djl-ai/publish/tensorflow-${libs.versions.tensorflow.get()}/"
+                )
             }
         }
     }
@@ -101,14 +111,12 @@ tasks {
     }
 
     withType<GenerateModuleMetadata> { enabled = false }
-
 }
 
 java {
     withJavadocJar()
     withSourcesJar()
 }
-
 
 signing {
     isRequired = project.hasProperty("staging") || project.hasProperty("snapshot")
@@ -139,7 +147,7 @@ for (flavor in flavorNames) {
                 propFile.text = buildString {
                     append("version=$versionName\nclassifier=$flavor-$osName-x86_64\nlibraries=")
                     var first = true
-                    for (name in dir.list().sorted()) {
+                    for (name in dir.list()!!.sorted()) {
                         if (first)
                             first = false
                         else
@@ -219,7 +227,7 @@ tasks {
     withType<Sign> {
         for (flavor in flavorNames) {
             val platformNames = (BINARY_ROOT / flavor).list() ?: emptyArray()
-            for(osName in platformNames)
+            for (osName in platformNames)
                 dependsOn("$flavor-${osName}Jar")
         }
     }
@@ -365,7 +373,7 @@ tasks.register("downloadTensorflowNativeLib") {
                 "win/cu113/vcruntime140_1.dll.gz"                            to "cu113/win/native/lib/vcruntime140_1.dll",
                 "win/cu113/vcruntime140.dll.gz"                              to "cu113/win/native/lib/vcruntime140.dll")
         // @formatter:on
-        for((key, value) in files) {
+        for ((key, value) in files) {
             project.logger.lifecycle("Downloading $url/$key")
             val file = BINARY_ROOT / value
             file.parentFile.mkdirs()
