@@ -22,7 +22,9 @@ compileJava {
     options.compilerArgs << "--release" << "11" << "-proc:none" << "-Xlint:all,-options,-static"
 }
 
+
 jar {
+    dependsOn generateGrammarSource
     manifest {
         attributes (
             "Main-Class" : "ai.djl.mxnet.jnarator.Main",
@@ -34,4 +36,6 @@ jar {
     from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 }
 
-generateGrammarSource.finalizedBy verifyJava
+verifyJava.dependsOn generateGrammarSource
+verifyJava.dependsOn generateTestGrammarSource
+

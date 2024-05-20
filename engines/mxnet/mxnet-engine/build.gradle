@@ -30,7 +30,6 @@ pmdMain.source = 'src/main/java'
 
 tasks.register('jnarator') {
     dependsOn ":engines:mxnet:jnarator:jar"
-    finalizedBy verifyJava
     //declare inputs and outputs to allow Gradle to cache the task or skip it if inputs do not change
     inputs.file("${project.projectDir}/src/main/jna/mapping.properties")
         .withPathSensitivity(PathSensitivity.RELATIVE)
@@ -58,6 +57,8 @@ tasks.register('jnarator') {
         }
     }
 }
+
+verifyJava.dependsOn jnarator
 
 test {
     environment "PATH", "src/test/bin:${environment.PATH}"
