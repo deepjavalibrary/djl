@@ -57,8 +57,8 @@ public final class ObjectDetection {
                 Criteria.builder()
                         .optApplication(Application.CV.OBJECT_DETECTION)
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optFilter("backbone", "mobilenet_v2")
-                        .optEngine("TensorFlow")
+                        .optArgument("threshold", 0.5)
+                        .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
                         .build();
 
