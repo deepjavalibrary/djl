@@ -1,8 +1,6 @@
 plugins {
-    id ("com.github.spotbugs")/* version "5.1.3"*/ apply false
+    id ("com.github.spotbugs") apply false
+    ai.djl.release
 }
 
-defaultTasks("build")
-
-//apply from: file("${rootProject.projectDir}/tools/gradle/release.gradle")
 //apply from: file("${rootProject.projectDir}/tools/gradle/stats.gradle")
