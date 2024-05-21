@@ -85,14 +85,14 @@ The following pseudocode demonstrates running training:
 
 ## Release Notes
 
+* [0.28.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.28.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.28.0))
 * [0.27.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.27.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.27.0))
 * [0.26.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.26.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.26.0))
 * [0.25.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.25.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.25.0))
 * [0.24.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.24.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.24.0))
-* [0.23.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.23.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.23.0))
-* [+23 releases](https://github.com/deepjavalibrary/djl/releases)
+* [+24 releases](https://github.com/deepjavalibrary/djl/releases)
 
-The release of DJL 0.28.0 is planned for May 2024.
+The release of DJL 0.29.0 is planned for July 2024.
 
 ## Building From Source
 
@@ -124,7 +124,6 @@ to import source project into eclipse
 ```sh
 # for Linux/macOS:
 ./gradlew eclipse
-
 
 # for Windows:
 gradlew eclipse
