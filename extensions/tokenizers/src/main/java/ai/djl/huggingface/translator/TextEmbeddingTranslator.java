@@ -12,7 +12,6 @@
  */
 package ai.djl.huggingface.translator;
 
-import ai.djl.Device;
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.ndarray.NDArray;
