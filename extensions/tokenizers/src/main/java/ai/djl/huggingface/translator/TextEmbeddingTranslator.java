@@ -12,7 +12,6 @@
  */
 package ai.djl.huggingface.translator;
 
-import ai.djl.Device;
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.ndarray.NDArray;
@@ -78,7 +77,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws Exception {
-        NDManager manager = ctx.getPredictorManager().newSubManager(Device.cpu());
+        NDManager manager = ctx.getPredictorManager().newSubManager();
         if (dense != null) {
             Path file = Paths.get(dense);
             if (!file.isAbsolute()) {
