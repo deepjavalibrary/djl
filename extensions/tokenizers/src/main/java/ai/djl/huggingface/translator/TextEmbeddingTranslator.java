@@ -78,7 +78,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws Exception {
-        NDManager manager = ctx.getPredictorManager().newSubManager(Device.cpu());
+        NDManager manager = ctx.getPredictorManager().newSubManager();
         if (dense != null) {
             Path file = Paths.get(dense);
             if (!file.isAbsolute()) {
