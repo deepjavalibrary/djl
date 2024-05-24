@@ -23,6 +23,9 @@ import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtLoggingLevel;
 import ai.onnxruntime.OrtSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The {@code OrtEngine} is an implementation of the {@link Engine} based on the <a
  * href="https://microsoft.github.io/onnxruntime/">ONNX Runtime Deep Learning Library</a>.
@@ -31,6 +34,8 @@ import ai.onnxruntime.OrtSession;
  * Engine#getEngine(String)} with the Engine name "OnnxRuntime".
  */
 public final class OrtEngine extends Engine {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrtEngine.class);
 
     public static final String ENGINE_NAME = "OnnxRuntime";
     static final int RANK = 10;
@@ -110,6 +115,7 @@ public final class OrtEngine extends Engine {
                 sessionOptions.addCUDA();
                 return true;
             } catch (OrtException e) {
+                logger.warn("CUDA is not supported OnnxRuntime engine: " + e.getMessage());
                 return false;
             }
         }
