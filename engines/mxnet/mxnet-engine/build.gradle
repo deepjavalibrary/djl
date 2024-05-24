@@ -35,6 +35,8 @@ tasks.register('jnarator') {
         .withPathSensitivity(PathSensitivity.RELATIVE)
         .withPropertyName("jna/mapping.properties file")
     outputs.dir "${project.buildDir}/generated-src"
+    //there is no reason not to cache the task if Gradle needs to, so enable it
+    outputs.cacheIf { true }
 
     doLast {
         File jnaGenerator = project(":engines:mxnet:jnarator").jar.outputs.files.singleFile
