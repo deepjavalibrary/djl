@@ -36,7 +36,7 @@ import java.util.Map;
 /** The translator for Huggingface text embedding model. */
 public class TextEmbeddingTranslator implements Translator<String, float[]> {
 
-    private static final int[] AXIS = {1};
+    private static final int[] AXIS = {-2};
 
     private HuggingFaceTokenizer tokenizer;
     private Batchifier batchifier;
