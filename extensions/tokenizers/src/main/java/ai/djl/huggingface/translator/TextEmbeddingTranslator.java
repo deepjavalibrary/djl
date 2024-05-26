@@ -212,7 +212,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
                             .get(0);
         }
         if (normalize) {
-            embedding = embedding.normalize(2, 1);
+            embedding = embedding.normalize(2, -2);
         }
         return embedding;
     }
