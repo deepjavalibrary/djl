@@ -11,6 +11,5 @@
  * and limitations under the License.
  */
 
-
 /** Contains tests for the dataset module. */
 package ai.djl.audio.dataset;

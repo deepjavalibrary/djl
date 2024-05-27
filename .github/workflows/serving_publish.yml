@@ -37,7 +37,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Configure AWS Credentials
@@ -50,14 +50,14 @@ jobs:
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
         run: |
           ./gradlew :serving:createDeb -Psnapshot
-          DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
+          DJL_VERSION=$(cat gradle/libs.versions.toml | awk -F '=' '/djl/ {gsub(/ ?"/, "", $2); print $2}')
           aws s3 cp serving/build/distributions/*.deb s3://djl-ai/publish/djl-serving/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/djl-serving_${DJL_VERSION}*"
       - name: Copy serving release artifacts to S3
         if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
           ./gradlew :serving:dZ :serving:createDeb -Pstaging
-          DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
+          DJL_VERSION=$(cat gradle/libs.versions.toml | awk -F '=' '/djl/ {gsub(/ ?"/, "", $2); print $2}')
           aws s3 cp serving/build/distributions/*.deb s3://djl-ai/publish/djl-serving/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/djl-serving_${DJL_VERSION}*"
           if [[ $(aws s3 ls s3://djl-ai/publish/djl-serving/serving-$DJL_VERSION.tar | wc -l) -eq 0 ]]; \
@@ -69,7 +69,7 @@ jobs:
         if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
           ./gradlew :benchmark:dZ :benchmark:createDeb -Pstaging
-          DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
+          DJL_VERSION=$(cat gradle/libs.versions.toml | awk -F '=' '/djl/ {gsub(/ ?"/, "", $2); print $2}')
           aws s3 cp benchmark/build/distributions/*.tar s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
           aws s3 cp benchmark/build/distributions/*.deb s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
           aws s3 cp benchmark/build/distributions/*.zip s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
@@ -84,7 +84,7 @@ jobs:
         if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
           ./gradlew :awscurl:jar
-          DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
+          DJL_VERSION=$(cat gradle/libs.versions.toml | awk -F '=' '/djl/ {gsub(/ ?"/, "", $2); print $2}')
           aws s3 cp awscurl/build/awscurl s3://djl-ai/publish/awscurl/${DJL_VERSION}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/awscurl/${DJL_VERSION}/*"
       - name: Publish to snapshot repository

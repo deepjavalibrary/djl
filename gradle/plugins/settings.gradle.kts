@@ -1,0 +1,3 @@
+dependencyResolutionManagement {
+    repositories.gradlePluginPortal()
+}

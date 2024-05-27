@@ -16,7 +16,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
@@ -31,7 +31,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          FASTTEXT_VERSION="$(cat gradle.properties | awk -F '=' '/fasttext_version/ {print $2}')"
+          FASTTEXT_VERSION="$(awk -F '=' '/fasttext/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/fasttext/jnilib s3://djl-ai/publish/fasttext-${FASTTEXT_VERSION}/jnilib/
 
   build-fasttext-jni-linux:
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
@@ -70,7 +70,7 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          FASTTEXT_VERSION="$(cat gradle.properties | awk -F '=' '/fasttext_version/ {print $2}')"
+          FASTTEXT_VERSION="$(awk -F '=' '/fasttext/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/fasttext/jnilib s3://djl-ai/publish/fasttext-${FASTTEXT_VERSION}/jnilib/
 
   build-fasttext-jni-arm64-osx:
@@ -87,7 +87,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
@@ -102,5 +102,5 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          FASTTEXT_VERSION="$(cat gradle.properties | awk -F '=' '/fasttext_version/ {print $2}')"
+          FASTTEXT_VERSION="$(awk -F '=' '/fasttext/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/fasttext/jnilib s3://djl-ai/publish/fasttext-${FASTTEXT_VERSION}/jnilib/

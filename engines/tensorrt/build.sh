@@ -4,7 +4,7 @@ set -e
 WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export WORK_DIR
 
-VERSION="$(cat ../../gradle.properties | awk -F '=' '/trt_version/ {print $2}')"
+VERSION="$(awk -F '=' '/tensorrt/ {gsub(/ ?"/, "", $2); print $2}' ../../gradle/libs.versions.toml)"
 
 if [ ! -d "trt" ];
 then

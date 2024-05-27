@@ -36,7 +36,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Set variables
         run: |
-          DJL_VERSION=$(cat gradle.properties | awk -F '=' '/djl_version/ {print $2}')
+          DJL_VERSION=$(awk -F '=' '/djl/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
           echo "DJL_VERSION=$DJL_VERSION" >> $GITHUB_ENV
       - name: Build djl_spark wheel
         working-directory: extensions/spark/setup/

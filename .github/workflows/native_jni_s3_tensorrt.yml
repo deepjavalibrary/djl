@@ -10,28 +10,28 @@ jobs:
     steps:
       - name: Install Environment
         run: pip3 install awscli --upgrade
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
           java-version: 17
-      - uses: actions/cache@v4
+      - uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: ./gradlew :engines:tensorrt:compileJNI
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
-          TRT_VERSION="$(cat gradle.properties | awk -F '=' '/trt_version/ {print $2}')"
+          TRT_VERSION="$(awk -F '=' '/tensorrt/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync engines/tensorrt/jnilib s3://djl-ai/publish/tensorrt/${TRT_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tensorrt/${TRT_VERSION}/jnilib*"

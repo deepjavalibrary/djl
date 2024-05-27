@@ -16,12 +16,12 @@ from setuptools import setup, find_packages
 
 
 def detect_version():
-    with open("../../../../../gradle.properties", "r") as f:
+    with open("../../../../../gradle/libs.versions.toml", "r") as f:
         for line in f:
             if not line.startswith('#'):
                 prop = line.split('=')
-                if prop[0] == "djl_version":
-                    return prop[1].strip()
+                if prop[0].strip() == "djl":
+                    return prop[1].strip().strip('\"')
     return None
 
 

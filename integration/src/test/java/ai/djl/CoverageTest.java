@@ -26,6 +26,7 @@ public class CoverageTest {
 
     @Test
     public void test() throws IOException, ReflectiveOperationException, URISyntaxException {
+
         // API
         CoverageUtils.testGetterSetters(Device.class);
 
