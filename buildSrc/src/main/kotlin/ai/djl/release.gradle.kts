@@ -7,7 +7,7 @@ import text
 
 val libs = the<LibrariesForLibs>()
 
-project.tasks {
+tasks {
     register("increaseBuildVersion") {
         doLast {
             if (!project.hasProperty("targetVersion")) {
