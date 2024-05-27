@@ -1,6 +1,7 @@
 package ai.djl
 
 import org.gradle.kotlin.dsl.support.serviceOf
+import org.gradle.tooling.events.FinishEvent
 import org.gradle.tooling.events.OperationCompletionListener
 import java.util.*
 import kotlin.time.Duration
@@ -32,21 +33,23 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
                                    OperationCompletionListener, AutoCloseable {
 
     interface Parameters : BuildServiceParameters {
-        var testsResults: TreeMap<Duration, String>
+//        var testsResults: TreeMap<Duration, String>
     }
 
+    override fun onFinish(event: FinishEvent) {}
+
     override fun close() {
-        if ("build" in gradle.startParameter.taskNames && parameters.testsResults.isNotEmpty()) {
+//        if ("build" in gradle.startParameter.taskNames/* && parameters.testsResults.isNotEmpty()*/) {
             println("========== Test duration ==========")
-            for ((value, key) in parameters.testsResults.entries.take(5))
-                println("\t$value:\t${key}s")
-        }
+//            for ((value, key) in parameters.testsResults.entries.take(5))
+//                println("\t$value:\t${key}s")
+//        }
     }
 }
 
 gradle.taskGraph.whenReady {
     val demoListener = gradle.sharedServices.registerIfAbsent("demoListener ", StatisticsService::class) {
-        parameters.testsResults = testsResults
+//        parameters.testsResults = testsResults
     }
     gradle.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(demoListener)
 }
