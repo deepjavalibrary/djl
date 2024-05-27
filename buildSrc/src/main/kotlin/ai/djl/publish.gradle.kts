@@ -1,8 +1,5 @@
 package ai.djl
 
-import gradle.kotlin.dsl.accessors._d127c8cf8be369f13d50127c4af720c5.javadoc
-import gradle.kotlin.dsl.accessors._d127c8cf8be369f13d50127c4af720c5.publishing
-import gradle.kotlin.dsl.accessors._d127c8cf8be369f13d50127c4af720c5.signing
 import org.gradle.kotlin.dsl.*
 
 plugins {
