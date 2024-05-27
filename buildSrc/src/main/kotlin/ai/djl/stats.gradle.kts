@@ -33,7 +33,7 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
                                    OperationCompletionListener, AutoCloseable {
 
     interface Parameters : BuildServiceParameters {
-//        var testsResults: TreeMap<Duration, String>
+        var testsResults: TreeMap<Duration, String>
     }
 
     override fun onFinish(event: FinishEvent) {}
@@ -49,7 +49,7 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
 
 gradle.taskGraph.whenReady {
     val demoListener = gradle.sharedServices.registerIfAbsent("demoListener ", StatisticsService::class) {
-//        parameters.testsResults = testsResults
+        parameters.testsResults = testsResults
     }
     gradle.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(demoListener)
 }
