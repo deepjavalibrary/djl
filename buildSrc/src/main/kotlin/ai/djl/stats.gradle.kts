@@ -1,5 +1,6 @@
 package ai.djl
 
+import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.tooling.events.OperationCompletionListener
 import java.util.*
 import kotlin.time.Duration
@@ -41,6 +42,13 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
                 println("\t$value:\t${key}s")
         }
     }
+}
+
+gradle.taskGraph.whenReady {
+    val demoListener = gradle.sharedServices.registerIfAbsent("demoListener ", StatisticsService::class) {
+        parameters.testsResults = testsResults
+    }
+    gradle.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(demoListener)
 }
 
 //gradle.buildFinished {
