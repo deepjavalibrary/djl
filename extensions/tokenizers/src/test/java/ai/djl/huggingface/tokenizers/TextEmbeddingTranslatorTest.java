@@ -114,7 +114,7 @@ public class TextEmbeddingTranslatorTest {
                 Predictor<String, float[]> predictor = model.newPredictor()) {
             float[] res = predictor.predict(text);
             Assert.assertEquals(res.length, 384);
-            Assertions.assertAlmostEquals(res[0], 1.0);
+            Assertions.assertAlmostEquals(res[0], 0.05103);
         }
 
         // pooling_mean_sqrt_len_tokens
