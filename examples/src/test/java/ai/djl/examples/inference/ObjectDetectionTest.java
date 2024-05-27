@@ -42,7 +42,7 @@ public class ObjectDetectionTest {
         Assert.assertTrue(result.getNumberOfObjects() >= 3);
         Classifications.Classification obj = result.best();
         String className = obj.getClassName();
-        List<String> objects = Arrays.asList("dog", "Cat", "car");
+        List<String> objects = Arrays.asList("dog", "bicycle", "car");
         Assert.assertTrue(objects.contains(className));
         Assert.assertTrue(obj.getProbability() > 0.6);
     }

@@ -12,13 +12,12 @@
  */
 package ai.djl.huggingface.translator;
 
-import ai.djl.Device;
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
@@ -37,7 +36,7 @@ import java.util.Map;
 /** The translator for Huggingface text embedding model. */
 public class TextEmbeddingTranslator implements Translator<String, float[]> {
 
-    private static final int[] AXIS = {0};
+    private static final int[] AXIS = {-2};
 
     private HuggingFaceTokenizer tokenizer;
     private Batchifier batchifier;
@@ -78,7 +77,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws Exception {
-        NDManager manager = ctx.getPredictorManager().newSubManager(Device.cpu());
+        NDManager manager = ctx.getPredictorManager().newSubManager();
         if (dense != null) {
             Path file = Paths.get(dense);
             if (!file.isAbsolute()) {
@@ -106,9 +105,17 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, String input) {
+        NDManager manager = ctx.getNDManager();
         Encoding encoding = tokenizer.encode(input);
-        ctx.setAttachment("encoding", encoding);
-        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes);
+        NDList list = new NDList();
+        list.add(manager.create(encoding.getIds()));
+        NDArray inputAttentionMask = manager.create(encoding.getAttentionMask());
+        list.add(inputAttentionMask);
+        ctx.setAttachment("attentionMask", inputAttentionMask);
+        if (includeTokenTypes) {
+            list.add(manager.create(encoding.getTypeIds()));
+        }
+        return list;
     }
 
     /** {@inheritDoc} */
@@ -116,60 +123,71 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     public NDList batchProcessInput(TranslatorContext ctx, List<String> inputs) {
         NDManager manager = ctx.getNDManager();
         Encoding[] encodings = tokenizer.batchEncode(inputs);
-        ctx.setAttachment("encodings", encodings);
-        NDList[] batch = new NDList[encodings.length];
-        for (int i = 0; i < encodings.length; ++i) {
-            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+        long[][] ids = new long[encodings.length][];
+        long[][] attentionMask = new long[encodings.length][];
+        long[][] typeIds = new long[encodings.length][];
+        for (int i = 0; i < encodings.length; i++) {
+            ids[i] = encodings[i].getIds();
+            attentionMask[i] = encodings[i].getAttentionMask();
+            if (includeTokenTypes) {
+                typeIds[i] = encodings[i].getTypeIds();
+            }
         }
-        return batchifier.batchify(batch);
+        NDList list = new NDList();
+        list.add(manager.create(ids));
+        NDArray inputAttentionMask = manager.create(attentionMask);
+        list.add(inputAttentionMask);
+        ctx.setAttachment("attentionMask", inputAttentionMask);
+        if (includeTokenTypes) {
+            list.add(manager.create(typeIds));
+        }
+        return list;
     }
 
     /** {@inheritDoc} */
     @Override
     public float[] processOutput(TranslatorContext ctx, NDList list) {
-        Encoding encoding = (Encoding) ctx.getAttachment("encoding");
-        NDManager manager = ctx.getNDManager();
-        NDArray embeddings = processEmbedding(manager, list, encoding);
+        NDArray inputAttentionMask = (NDArray) ctx.getAttachment("attentionMask");
+        NDArray embeddings = processEmbedding(list, inputAttentionMask);
         return embeddings.toFloatArray();
     }
 
     /** {@inheritDoc} */
     @Override
     public List<float[]> batchProcessOutput(TranslatorContext ctx, NDList list) {
-        NDList[] batch = batchifier.unbatchify(list);
-        Encoding[] encodings = (Encoding[]) ctx.getAttachment("encodings");
-        NDManager manager = ctx.getNDManager();
-        List<float[]> ret = new ArrayList<>(batch.length);
-        for (int i = 0; i < batch.length; ++i) {
-            NDArray array = processEmbedding(manager, batch[i], encodings[i]);
+        int batchSize = Math.toIntExact(list.head().size(0));
+        NDArray attentionMask = (NDArray) ctx.getAttachment("attentionMask");
+        NDArray output = processEmbedding(list, attentionMask);
+        List<float[]> ret = new ArrayList<>(batchSize);
+        NDList splitList = output.split(batchSize);
+        for (int i = 0; i < batchSize; i++) {
+            NDArray array = splitList.get(i);
             ret.add(array.toFloatArray());
         }
         return ret;
     }
 
-    private NDArray processEmbedding(NDManager manager, NDList list, Encoding encoding) {
+    private NDArray processEmbedding(NDList list, NDArray attentionMask) {
         NDArray embedding = list.get("last_hidden_state");
         if (embedding == null) {
             // For Onnx model, NDArray name is not present
             embedding = list.head();
         }
-        long[] attentionMask = encoding.getAttentionMask();
-        NDArray inputAttentionMask = manager.create(attentionMask).toType(DataType.FLOAT32, true);
         switch (pooling) {
             case "mean":
-                embedding = meanPool(embedding, inputAttentionMask, false);
+                embedding = meanPool(embedding, attentionMask, false);
                 break;
             case "mean_sqrt_len":
-                embedding = meanPool(embedding, inputAttentionMask, true);
+                embedding = meanPool(embedding, attentionMask, true);
                 break;
             case "max":
-                embedding = maxPool(embedding, inputAttentionMask);
+                embedding = maxPool(embedding, attentionMask);
                 break;
             case "weightedmean":
-                embedding = weightedMeanPool(embedding, inputAttentionMask);
+                embedding = weightedMeanPool(embedding, attentionMask);
                 break;
             case "cls":
-                embedding = embedding.get(0);
+                embedding = embedding.get(new NDIndex(":, 0"));
                 break;
             default:
                 throw new AssertionError("Unexpected pooling mode: " + pooling);
@@ -194,7 +212,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
                             .get(0);
         }
         if (normalize) {
-            embedding = embedding.normalize(2, 0);
+            embedding = embedding.normalize(2, -1);
         }
         return embedding;
     }
@@ -219,7 +237,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         embeddings = embeddings.duplicate();
         embeddings.set(inputAttentionMask, -1e9); // Set padding tokens to large negative value
 
-        return embeddings.max(AXIS, true);
+        return embeddings.max(AXIS, false);
     }
 
     private static NDArray weightedMeanPool(NDArray embeddings, NDArray attentionMask) {
