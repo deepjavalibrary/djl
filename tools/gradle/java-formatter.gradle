@@ -48,7 +48,6 @@ class JavaFormatterPlugin implements Plugin<Project> {
                     .withPropertyName('generatedSourceFiles')
                     .withPathSensitivity(PathSensitivity.RELATIVE)
             outputs.file(project.file(resultFilePath))
-            //there is no reason not to cache the task if Gradle needs to, so enable it
             outputs.cacheIf { true }
 
             doLast {
