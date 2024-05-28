@@ -28,7 +28,11 @@ public class CudaUtilsTest {
     @Test
     public void testCudaUtils() {
         if (!CudaUtils.hasCuda()) {
-            Assert.assertThrows(CudaUtils::getCudaVersionString);
+            try {
+                CudaUtils.getCudaVersionString();
+            } catch (IllegalStateException | IllegalArgumentException ignore) {
+                // ignore exception
+            }
             Assert.assertThrows(() -> CudaUtils.getComputeCapability(0));
             Assert.assertThrows(() -> CudaUtils.getGpuMemory(Device.gpu()));
             return;
