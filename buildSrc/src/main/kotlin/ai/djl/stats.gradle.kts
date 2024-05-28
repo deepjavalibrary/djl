@@ -64,7 +64,5 @@ gradle.taskGraph.whenReady {
 
 @ExperimentalTime
 var Task.startTime: TimeSource.Monotonic.ValueTimeMark
-    get() = extensions.getByName<TimeSource.Monotonic.ValueTimeMark>("starTime")
-    set(value) {
-        extensions.add("startTime", value)
-    }
+    get() = property("starTime") as TimeSource.Monotonic.ValueTimeMark
+    set(value) = setProperty("startTime", value)
