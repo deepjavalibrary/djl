@@ -1,5 +1,6 @@
 package ai.djl
 
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.tooling.events.FinishEvent
 import org.gradle.tooling.events.OperationCompletionListener
@@ -64,5 +65,8 @@ gradle.taskGraph.whenReady {
 
 @ExperimentalTime
 var Task.startTime: TimeSource.Monotonic.ValueTimeMark
-    get() = property("starTime") as TimeSource.Monotonic.ValueTimeMark
-    set(value) = setProperty("startTime", value)
+    get() = ext.get("starTime") as TimeSource.Monotonic.ValueTimeMark
+    set(value) = ext.set("startTime", value)
+
+val Task.ext: ExtraPropertiesExtension
+    get() = (this as ExtensionAware).extensions.getByName<ExtraPropertiesExtension>("ext")
