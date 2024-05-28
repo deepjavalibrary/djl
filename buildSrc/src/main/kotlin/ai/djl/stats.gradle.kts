@@ -39,7 +39,7 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
             println("========== Test duration ========== ")
             for ((key, value) in parameters.testsResults.entries.sortedByDescending { it.key }.take(6))
                 // `.inWholeSeconds.seconds` truncate to integer units, without decimals
-                println("\t$value:\t${key.inWholeSeconds.seconds}s")
+                println("\t$value:\t${key.inWholeSeconds.seconds}")
         }
     }
 }
