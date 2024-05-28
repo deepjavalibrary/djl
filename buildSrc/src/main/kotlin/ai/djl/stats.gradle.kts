@@ -17,9 +17,12 @@ val timeSource = TimeSource.Monotonic
 //val testsResults = TreeMap<Duration, String>(Comparator.reverseOrder())
 val testsResults = mutableMapOf<Duration, String>()
 
+val demoListener = gradle.sharedServices.registerIfAbsent("demoListener ", StatisticsService::class) {
+    parameters.testsResults = testsResults
+}
+
 tasks.test {
     doFirst {
-
         @OptIn(ExperimentalTime::class)
         startTime = timeSource.markNow()
     }
@@ -27,9 +30,7 @@ tasks.test {
         @OptIn(ExperimentalTime::class)
         if (state.didWork)
 //            testsResults[startTime - timeSource.markNow()] = project.name
-            gradle.sharedServices.registrations.named<StatisticsService>("demoListener") {
-                parameters.testsResults[startTime - timeSource.markNow()] = project.name
-            }
+            demoListener.get().parameters.testsResults[startTime - timeSource.markNow()] = project.name
     }
 }
 
@@ -53,9 +54,6 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
 }
 
 gradle.taskGraph.whenReady {
-    val demoListener = gradle.sharedServices.registerIfAbsent("demoListener ", StatisticsService::class) {
-        parameters.testsResults = testsResults
-    }
     gradle.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(demoListener)
 }
 
