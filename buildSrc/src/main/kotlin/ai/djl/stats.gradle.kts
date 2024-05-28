@@ -19,13 +19,17 @@ val testsResults = mutableMapOf<Duration, String>()
 
 tasks.test {
     doFirst {
+
         @OptIn(ExperimentalTime::class)
         startTime = timeSource.markNow()
     }
     doLast {
         @OptIn(ExperimentalTime::class)
         if (state.didWork)
-            testsResults[startTime - timeSource.markNow()] = project.name
+//            testsResults[startTime - timeSource.markNow()] = project.name
+            gradle.sharedServices.registrations.named<StatisticsService>("demoListener") {
+                parameters.testsResults[startTime - timeSource.markNow()] = project.name
+            }
     }
 }
 
