@@ -14,7 +14,6 @@ plugins {
 
 @ExperimentalTime
 val timeSource = TimeSource.Monotonic
-//val testsResults = TreeMap<Duration, String>(Comparator.reverseOrder())
 val testsResults = mutableMapOf<Duration, String>()
 
 val demoListener = gradle.sharedServices.registerIfAbsent("demoListener ", StatisticsService::class) {
@@ -35,11 +34,11 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
     override fun onFinish(event: FinishEvent) {}
 
     override fun close() {
-        //        if (/*"build" in gradle.startParameter.taskNames && */parameters.testsResults.isNotEmpty()) {
-        println("========== Test duration ========== " + parameters.testsResults.size)
-        for ((key, value) in parameters.testsResults.entries.sortedByDescending { it.key }.take(6))
-            println("\t$value:\t${key}s")
-        //        }
+        if (/*"build" in gradle.startParameter.taskNames && */parameters.testsResults.isNotEmpty()) {
+            println("========== Test duration ========== ")
+            for ((key, value) in parameters.testsResults.entries.sortedByDescending { it.key }.take(6))
+                println("\t$value:\t${key.inWholeSeconds}s")
+        }
     }
 }
 
@@ -51,18 +50,9 @@ tasks.test {
     doLast {
         @OptIn(ExperimentalTime::class)
         if (state.didWork)
-//            testsResults[startTime - timeSource.markNow()] = project.name
             demoListener.get().parameters.testsResults[timeSource.markNow() - startTime] = project.name
     }
 }
-
-//gradle.buildFinished {
-//    if ("build" in gradle!!.startParameter.taskNames && testsResults.isNotEmpty()) {
-//        println("========== Test duration ==========")
-//        for ((value, key) in testsResults.entries.take(5))
-//            println("\t$value:\t${key}s")
-//    }
-//}
 
 @ExperimentalTime
 var Task.startTime: TimeSource.Monotonic.ValueTimeMark
