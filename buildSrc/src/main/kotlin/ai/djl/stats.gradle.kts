@@ -21,19 +21,9 @@ val demoListener = gradle.sharedServices.registerIfAbsent("demoListener ", Stati
     parameters.testsResults = testsResults
 }
 
-tasks.test {
-    doFirst {
-        @OptIn(ExperimentalTime::class)
-        startTime = timeSource.markNow()
-    }
-    doLast {
-        @OptIn(ExperimentalTime::class)
-        if (state.didWork)
-//            testsResults[startTime - timeSource.markNow()] = project.name
-            demoListener.get().parameters.testsResults[startTime - timeSource.markNow()] = project.name
-    }
+gradle.taskGraph.whenReady {
+    gradle.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(demoListener)
 }
-
 
 abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
                                    OperationCompletionListener, AutoCloseable {
@@ -45,16 +35,25 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
     override fun onFinish(event: FinishEvent) {}
 
     override fun close() {
-//        if (/*"build" in gradle.startParameter.taskNames && */parameters.testsResults.isNotEmpty()) {
-            println("========== Test duration ========== " + parameters.testsResults.size)
-            for ((value, key) in parameters.testsResults.entries.sortedByDescending { it.key }.take(5))
-                println("\t$value:\t${key}s")
-//        }
+        //        if (/*"build" in gradle.startParameter.taskNames && */parameters.testsResults.isNotEmpty()) {
+        println("========== Test duration ========== " + parameters.testsResults.size)
+        for ((value, key) in parameters.testsResults.entries.sortedByDescending { it.key }.take(6))
+            println("\t$value:\t${key}s")
+        //        }
     }
 }
 
-gradle.taskGraph.whenReady {
-    gradle.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(demoListener)
+tasks.test {
+    doFirst {
+        @OptIn(ExperimentalTime::class)
+        startTime = timeSource.markNow()
+    }
+    doLast {
+        @OptIn(ExperimentalTime::class)
+        if (state.didWork)
+//            testsResults[startTime - timeSource.markNow()] = project.name
+            demoListener.get().parameters.testsResults[timeSource.markNow() - startTime] = project.name
+    }
 }
 
 //gradle.buildFinished {
