@@ -11,6 +11,7 @@ plugins {
     `java-library`
     id("ai.djl.javaFormatter")
     id("ai.djl.check")
+    id("ai.djl.stats")
 }
 
 tasks {

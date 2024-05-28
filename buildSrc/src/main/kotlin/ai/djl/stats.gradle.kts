@@ -3,7 +3,6 @@ package ai.djl
 import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.tooling.events.FinishEvent
 import org.gradle.tooling.events.OperationCompletionListener
-import java.util.*
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
@@ -40,11 +39,11 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
     override fun onFinish(event: FinishEvent) {}
 
     override fun close() {
-        if (/*"build" in gradle.startParameter.taskNames && */parameters.testsResults.isNotEmpty()) {
-            println("========== Test duration ==========")
+//        if (/*"build" in gradle.startParameter.taskNames && */parameters.testsResults.isNotEmpty()) {
+            println("========== Test duration ========== " + parameters.testsResults.size)
             for ((value, key) in parameters.testsResults.entries.sortedByDescending { it.key }.take(5))
                 println("\t$value:\t${key}s")
-        }
+//        }
     }
 }
 
