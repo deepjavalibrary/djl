@@ -26,7 +26,7 @@ gradle.taskGraph.whenReady {
 }
 
 abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
-                                   OperationCompletionListener, AutoCloseable {
+    OperationCompletionListener, AutoCloseable {
 
     interface Parameters : BuildServiceParameters {
         var testsResults: MutableMap<Duration, String>
@@ -35,11 +35,12 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
     override fun onFinish(event: FinishEvent) {}
 
     override fun close() {
-        if (/*"build" in gradle.startParameter.taskNames && */parameters.testsResults.isNotEmpty()) {
+        if (parameters.testsResults.isNotEmpty()) {
             println("========== Test duration ========== ")
-            for ((key, value) in parameters.testsResults.entries.sortedByDescending { it.key }.take(6))
+            for ((key, value) in parameters.testsResults.entries.sortedByDescending { it.key }.take(6)) {
                 // `.inWholeSeconds.seconds` truncate to integer units, without decimals
                 println("\t$value:\t${key.inWholeSeconds.seconds}")
+            }
         }
     }
 }

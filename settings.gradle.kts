@@ -1,7 +1,7 @@
 rootProject.name = "djl"
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
+    id("org.gradle.toolchains.foojay-resolver-convention") version ("0.8.0")
 }
 
 include(":api")
@@ -45,6 +45,7 @@ if (JavaVersion.current() < JavaVersion.VERSION_21) {
 }
 
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositories {
         mavenCentral()
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
