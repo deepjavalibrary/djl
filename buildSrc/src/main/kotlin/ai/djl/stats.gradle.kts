@@ -14,7 +14,8 @@ plugins {
 
 @ExperimentalTime
 val timeSource = TimeSource.Monotonic
-val testsResults = TreeMap<Duration, String>(Comparator.reverseOrder())
+//val testsResults = TreeMap<Duration, String>(Comparator.reverseOrder())
+val testsResults = mutableMapOf<Duration, String>()
 
 tasks.test {
     doFirst {
@@ -33,7 +34,7 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
                                    OperationCompletionListener, AutoCloseable {
 
     interface Parameters : BuildServiceParameters {
-        var testsResults: TreeMap<Duration, String>
+        var testsResults: MutableMap<Duration, String>
     }
 
     override fun onFinish(event: FinishEvent) {}
