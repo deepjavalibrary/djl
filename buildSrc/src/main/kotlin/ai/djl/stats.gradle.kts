@@ -5,6 +5,7 @@ import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.tooling.events.FinishEvent
 import org.gradle.tooling.events.OperationCompletionListener
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
@@ -37,7 +38,8 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
         if (/*"build" in gradle.startParameter.taskNames && */parameters.testsResults.isNotEmpty()) {
             println("========== Test duration ========== ")
             for ((key, value) in parameters.testsResults.entries.sortedByDescending { it.key }.take(6))
-                println("\t$value:\t${key.inWholeSeconds}s")
+                // `.inWholeSeconds.seconds` truncate to integer units, without decimals
+                println("\t$value:\t${key.inWholeSeconds.seconds}s")
         }
     }
 }
