@@ -1,6 +1,5 @@
 plugins {
-    id ("com.github.spotbugs") apply false
+    id("com.github.spotbugs") apply false
     ai.djl.release
+    ai.djl.stats
 }
-
-//apply from: file("${rootProject.projectDir}/tools/gradle/stats.gradle")
