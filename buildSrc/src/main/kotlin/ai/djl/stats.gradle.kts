@@ -40,11 +40,11 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
     override fun onFinish(event: FinishEvent) {}
 
     override fun close() {
-//        if ("build" in gradle.startParameter.taskNames/* && parameters.testsResults.isNotEmpty()*/) {
+        if (/*"build" in gradle.startParameter.taskNames && */parameters.testsResults.isNotEmpty()) {
             println("========== Test duration ==========")
-//            for ((value, key) in parameters.testsResults.entries.take(5))
-//                println("\t$value:\t${key}s")
-//        }
+            for ((value, key) in parameters.testsResults.entries.sortedByDescending { it.key }.take(5))
+                println("\t$value:\t${key}s")
+        }
     }
 }
 
