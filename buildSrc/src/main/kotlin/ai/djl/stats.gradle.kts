@@ -37,7 +37,7 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
     override fun close() {
         //        if (/*"build" in gradle.startParameter.taskNames && */parameters.testsResults.isNotEmpty()) {
         println("========== Test duration ========== " + parameters.testsResults.size)
-        for ((value, key) in parameters.testsResults.entries.sortedByDescending { it.key }.take(6))
+        for ((key, value) in parameters.testsResults.entries.sortedByDescending { it.key }.take(6))
             println("\t$value:\t${key}s")
         //        }
     }
