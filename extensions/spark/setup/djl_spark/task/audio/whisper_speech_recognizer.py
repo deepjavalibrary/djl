@@ -18,7 +18,6 @@ import librosa
 import pandas as pd
 from typing import Iterator, Optional
 from transformers import pipeline
-from ...util import files_util, dependency_util
 
 TASK = "automatic-speech-recognition"
 APPLICATION = "audio/automatic_speech_recognition"
@@ -30,7 +29,6 @@ class WhisperSpeechRecognizer:
     def __init__(self,
                  input_col: str,
                  output_col: str,
-                 model_url: Optional[str] = None,
                  hf_model_id: Optional[str] = None,
                  engine: Optional[str] = "PyTorch",
                  batch_size: Optional[int] = 10):
@@ -39,14 +37,12 @@ class WhisperSpeechRecognizer:
 
         :param input_col: The input column
         :param output_col: The output column
-        :param model_url: The model URL
         :param hf_model_id: The Huggingface model ID
         :param engine: The engine. Currently only PyTorch is supported.
         :param batch_size: The batch size
         """
         self.input_col = input_col
         self.output_col = output_col
-        self.model_url = model_url
         self.hf_model_id = hf_model_id
         self.engine = engine
         self.batch_size = batch_size
@@ -63,23 +59,14 @@ class WhisperSpeechRecognizer:
         if self.engine is None or self.engine.lower() != "pytorch":
             raise ValueError("Only PyTorch engine is supported.")
 
-        if self.model_url:
-            cache_dir = files_util.get_cache_dir(APPLICATION, GROUP_ID,
-                                                 self.model_url)
-            files_util.download_and_extract(self.model_url, cache_dir)
-            dependency_util.install(cache_dir)
-            model_id_or_path = cache_dir
-        elif self.hf_model_id:
-            model_id_or_path = self.hf_model_id
-        else:
-            raise ValueError(
-                "Either model_url or hf_model_id must be provided.")
+        if not self.hf_model_id:
+            raise ValueError("hf_model_id must be provided.")
 
         @pandas_udf(StringType())
         def predict_udf(iterator: Iterator[pd.Series]) -> Iterator[pd.Series]:
             pipe = pipeline(TASK,
                             generate_kwargs=generate_kwargs,
-                            model=model_id_or_path,
+                            model=self.hf_model_id,
                             batch_size=self.batch_size,
                             chunk_length_s=30,
                             **kwargs)
