@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   publish-job-success-to-cloudwatch:
-    if: ${{ github.event.workflow_run.event == 'schedule' }}
+    if: ${{ github.repository == 'deepjavalibrary/djl' && github.event.workflow_run.event == 'schedule' }}
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS Credentials
