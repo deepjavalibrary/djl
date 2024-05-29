@@ -104,6 +104,16 @@ public class LgbmNDManager extends BaseNDManager {
         return new NDList(new LgbmDataset(this, null, path));
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        super.close();
+        if (alternativeManager != null) {
+            alternativeManager.close();
+            alternativeManager = null;
+        }
+    }
+
     /** The SystemManager is the root {@link LgbmNDManager} of which all others are children. */
     private static final class SystemManager extends LgbmNDManager implements SystemNDManager {
 

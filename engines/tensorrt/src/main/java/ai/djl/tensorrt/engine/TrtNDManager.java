@@ -126,6 +126,16 @@ public class TrtNDManager extends BaseNDManager {
         return create(bb, shape, dataType);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        super.close();
+        if (alternativeManager != null) {
+            alternativeManager.close();
+            alternativeManager = null;
+        }
+    }
+
     /** The SystemManager is the root {@link TrtNDManager} of which all others are children. */
     private static final class SystemManager extends TrtNDManager implements SystemNDManager {
 

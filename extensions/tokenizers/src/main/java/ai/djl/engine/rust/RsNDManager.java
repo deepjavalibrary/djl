@@ -256,6 +256,16 @@ public class RsNDManager extends BaseNDManager {
         }
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        super.close();
+        if (alternativeManager != null) {
+            alternativeManager.close();
+            alternativeManager = null;
+        }
+    }
+
     /** The SystemManager is the root {@link RsNDManager} of which all others are children. */
     private static final class SystemManager extends RsNDManager implements SystemNDManager {
 
