@@ -21,7 +21,10 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.dir(buildDirectory / "classes/java/main/native/lib")
+        inputs.properties(mapOf("djlVersion" to libs.versions.djl, "trtVersion" to libs.versions.tensorrt.get(),
+            "version" to version))
+        val baseResourcePath = "${project.projectDir}/build/resources/main"
+        outputs.dir(file("${baseResourcePath}/native/lib"))
         doLast {
             val trtVersion = libs.versions.tensorrt.get()
             val djlVersion = libs.versions.djl.get()
@@ -41,12 +44,12 @@ tasks {
 
             copy {
                 from(jnilibDir)
-                into(buildDirectory / "classes/java/main/native/lib")
+                into("$baseResourcePath/native/lib")
             }
 
-            // write properties
-            val propFile = buildDirectory / "classes/java/main/native/lib/tensorrt.properties"
-            propFile.text = "version=${trtVersion}-${version}\n"
+            filesMatching("**/tensorrt.properties") {
+                expand(mapOf("trtVersion" to libs.versions.tensorrt.get(), "version" to version))
+            }
         }
     }
 

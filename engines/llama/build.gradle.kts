@@ -17,7 +17,9 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.dir(project.projectDir / "build/classes/java/main/native/lib")
+        var path = "${project.projectDir}/build/resources/main"
+        inputs.properties(mapOf("djl_version" to libs.versions.djl.get(), "llamacpp_version" to libs.versions.llamacpp.get()))
+        outputs.dir("$path/native/lib")
         doLast {
             val llamacpp = libs.versions.llamacpp.get()
             val djl = libs.versions.djl.get()
@@ -49,15 +51,15 @@ tasks {
             }
             copy {
                 from(jnilibDir)
-                into(project.projectDir / "build/classes/java/main/native/lib")
+                into("$path/native/lib")
             }
 
             // write properties
-            val propFile = project.projectDir / "build/classes/java/main/native/lib/llama.properties"
+            val propFile = file("$path/native/lib/llama.properties")
             propFile.text = "version=$llamacpp-$version\n"
 
             url = "https://mlrepo.djl.ai/model/nlp/text_generation/ai/djl/huggingface/gguf/models.json.gz"
-            val prefix = project.projectDir / "build/classes/java/main/nlp/text_generation"
+            val prefix = File("$path/nlp/text_generation")
             val file = prefix / "ai.djl.huggingface.gguf.json"
             if (file.exists())
                 project.logger.lifecycle("gguf index file already exists")

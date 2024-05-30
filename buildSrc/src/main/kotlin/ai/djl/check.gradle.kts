@@ -53,6 +53,7 @@ checkstyle {
         "checkstyle.licenseHeader.file" to file("${rootProject.projectDir}/tools/conf/licenseHeader.java")
     )
     configFile = file("${rootProject.projectDir}/tools/conf/checkstyle.xml")
+    
 }
 tasks {
     named<Checkstyle>("checkstyleMain") {

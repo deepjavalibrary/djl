@@ -20,7 +20,12 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.dir(buildDirectory / "classes/java/main/native/lib")
+        inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(),
+            "tokenizersVersion" to libs.versions.tokenizers.get(),
+            "version" to version))
+        val baseResourcePath = "${project.projectDir}/build/resources/main"
+        outputs.dirs(File("${baseResourcePath}/native/lib"), File("${baseResourcePath}/nlp"))
+
         doLast {
             var url = "https://publish.djl.ai/tokenizers"
             val (tokenizers, djl) = libs.versions.tokenizers.get() to libs.versions.djl.get()
@@ -48,13 +53,12 @@ tasks {
             }
             copy {
                 from(jnilibDir)
-                into(buildDirectory / "classes/java/main/native/lib")
+                into("$baseResourcePath/native/lib")
             }
 
-            // write properties
-            val propFile = buildDirectory / "classes/java/main/native/lib/tokenizers.properties"
-            propFile.text = "version=$tokenizers-$version\n"
-
+            filesMatching("**/tokenizers.properties") {
+                expand(mapOf("tokenizersVersion" to tokenizers, "version" to version))
+            }
             url = "https://mlrepo.djl.ai/model/nlp"
             val tasks = listOf(
                 "fill_mask",
@@ -63,7 +67,7 @@ tasks {
                 "text_embedding",
                 "token_classification"
             )
-            val prefix = buildDirectory / "classes/java/main/nlp"
+            val prefix = File("$baseResourcePath/nlp")
             for (task in tasks) {
                 var file = prefix / task / "ai.djl.huggingface.pytorch.json"
                 if (file.exists())

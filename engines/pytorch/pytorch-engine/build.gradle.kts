@@ -21,12 +21,9 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.file(buildDirectory / "classes/java/main/pytorch-engine.properties")
-        doFirst {
-            val classesDir = buildDirectory / "classes/java/main/"
-            classesDir.mkdirs()
-            val propFile = classesDir / "pytorch-engine.properties"
-            propFile.text = "djl_version=${libs.versions.djl.get()}\npytorch_version=${libs.versions.pytorch.get()}"
+        inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(), "pytorchVersion" to libs.versions.pytorch.get()))
+        filesMatching("**/pytorch-engine.properties") {
+            expand(mapOf("djlVersion" to libs.versions.djl.get(), "pytorchVersion" to libs.versions.pytorch.get()))
         }
     }
 
