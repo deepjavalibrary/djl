@@ -13,6 +13,7 @@
 package ai.djl.util.cuda;
 
 import ai.djl.Device;
+import ai.djl.engine.EngineException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,15 +31,11 @@ public class CudaUtilsTest {
         if (!CudaUtils.hasCuda()) {
             try {
                 CudaUtils.getCudaVersionString();
-            } catch (IllegalStateException | IllegalArgumentException ignore) {
+            } catch (IllegalStateException | IllegalArgumentException | EngineException ignore) {
                 // ignore exception
             }
             Assert.assertThrows(() -> CudaUtils.getComputeCapability(0));
             Assert.assertThrows(() -> CudaUtils.getGpuMemory(Device.gpu()));
-            return;
-        }
-        // Possible to have CUDA and not have a GPU.
-        if (CudaUtils.getGpuCount() == 0) {
             return;
         }
 
