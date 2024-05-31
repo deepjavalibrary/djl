@@ -61,7 +61,11 @@ public final class CudaUtils {
             if (gpuInfo == null) {
                 gpuInfo = execute(-1); // NOPMD
             }
-            return Integer.parseInt(gpuInfo[0]);
+            try {
+                return Integer.parseInt(gpuInfo[0]);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
         }
 
         if (LIB == null) {
