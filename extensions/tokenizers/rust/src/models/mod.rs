@@ -124,7 +124,8 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_loadModel<'local>(
 
 #[no_mangle]
 pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_deleteModel<'local>(
-    _env: JObject,
+    _: JNIEnv,
+    _: JObject,
     handle: jlong,
 ) {
     drop_handle::<Box<dyn Model>>(handle);
