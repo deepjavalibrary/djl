@@ -180,6 +180,16 @@ public class XgbNDManager extends BaseNDManager {
         return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.CSR);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void close() {
+        super.close();
+        if (alternativeManager != null) {
+            alternativeManager.close();
+            alternativeManager = null;
+        }
+    }
+
     /** The SystemManager is the root {@link XgbNDManager} of which all others are children. */
     private static final class SystemManager extends XgbNDManager implements SystemNDManager {
 
