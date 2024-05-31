@@ -49,9 +49,6 @@ tasks {
         }
 
         jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
-        systemProperties = System.getProperties().toMap() as Map<String, Any>
-        systemProperties.remove("user.dir")
-        // systemProperty "ai.djl.logging.level", "debug"
         systemProperties(
             "org.slf4j.simpleLogger.defaultLogLevel" to "debug",
             "org.slf4j.simpleLogger.log.org.mortbay.log" to "warn",
