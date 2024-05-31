@@ -9,6 +9,7 @@ group = "ai.djl.tensorflow"
 
 val exclusion by configurations.registering
 
+@Suppress("UnstableApiUsage")
 dependencies {
     api(libs.bytedeco.javacpp)
     api(libs.google.protobuf)

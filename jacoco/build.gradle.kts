@@ -35,13 +35,14 @@ dependencies {
     jacocoAggregation(project(":extensions:tokenizers"))
     jacocoAggregation(project(":extensions:tablesaw"))
     jacocoAggregation(project(":extensions:timeseries"))
-    if (JavaVersion.current() < JavaVersion.VERSION_19)
-        jacocoAggregation(project(":extensions:spark"))
     jacocoAggregation(project(":integration"))
     jacocoAggregation(project(":model-zoo"))
+//    if (JavaVersion.current() < JavaVersion.VERSION_19)
+//        jacocoAggregation(project(":extensions:spark"))
 }
 
 reporting {
+    @Suppress("UnstableApiUsage")
     reports {
         register<JacocoCoverageReport>("testCodeCoverageReport") {
             testType = TestSuiteType.UNIT_TEST

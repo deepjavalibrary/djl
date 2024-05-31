@@ -11,6 +11,7 @@ version = libs.versions.tensorflow.get() + if (isRelease) "" else "-SNAPSHOT"
 
 val download by configurations.registering
 
+@Suppress("UnstableApiUsage")
 dependencies {
     download("org.tensorflow:tensorflow-core-api:0.5.0:linux-x86_64-gpu")
     download("org.tensorflow:tensorflow-core-api:0.5.0:linux-x86_64")
@@ -127,7 +128,7 @@ signing {
 }
 
 val BINARY_ROOT = buildDirectory / "download"
-val flavorNames = BINARY_ROOT.list() ?: emptyArray()
+val flavorNames: Array<String> = BINARY_ROOT.list() ?: emptyArray()
 for (flavor in flavorNames) {
 
     val platformNames = (BINARY_ROOT / flavor).list() ?: emptyArray()
