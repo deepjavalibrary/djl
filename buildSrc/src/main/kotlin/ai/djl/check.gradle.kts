@@ -26,7 +26,7 @@ tasks {
         enabled = true
         reports.create("html") {
             required = true
-            outputLocation = file("$buildDirectory/reports/spotbugs.html")
+            outputLocation = file("$buildDirectory/reports/test/spotbugs.html")
         }
     }
 }
