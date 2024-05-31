@@ -298,7 +298,7 @@ publishing.repositories {
     }
 }
 
-val flavorNames = file(BINARY_ROOT).list() ?: emptyArray()
+val flavorNames: Array<String> = file(BINARY_ROOT).list() ?: emptyArray()
 for (flavor in flavorNames) {
 
     val platformNames = BINARY_ROOT.resolve(flavor).list() ?: emptyArray()
