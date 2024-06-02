@@ -17,7 +17,9 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.dir(buildDirectory / "classes/java/main/native/lib")
+        val baseResourcePath = "${project.projectDir}/build/resources/main"
+        inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(), "sentencepieceVersion" to libs.versions.sentencepiece.get()))
+        outputs.dir("$baseResourcePath/native/lib")
         doLast {
             val url =
                 "https://publish.djl.ai/sentencepiece-${libs.versions.sentencepiece.get()}/jnilib/${libs.versions.djl.get()}"
@@ -42,12 +44,12 @@ tasks {
             }
             copy {
                 from(jnilibDir)
-                into(buildDirectory / "classes/java/main/native/lib")
+                into("$baseResourcePath/native/lib")
             }
+        }
 
-            // write properties
-            val propFile = buildDirectory / "classes/java/main/native/lib/sentencepiece.properties"
-            propFile.text = "version=${libs.versions.sentencepiece.get()}-$version\n"
+        filesMatching("**/sentencepiece.properties") {
+            expand(mapOf("sentencepieceVersion" to libs.versions.sentencepiece.get(), "version" to version))
         }
     }
 

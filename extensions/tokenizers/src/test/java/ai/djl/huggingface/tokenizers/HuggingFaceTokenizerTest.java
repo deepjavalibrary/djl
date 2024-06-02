@@ -13,6 +13,7 @@
 
 package ai.djl.huggingface.tokenizers;
 
+import ai.djl.engine.Engine;
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
@@ -32,6 +33,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class HuggingFaceTokenizerTest {
+
+    @Test
+    public void testVersion() {
+        try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
+            String djlVersion = Engine.getDjlVersion();
+            Assert.assertEquals(tokenizer.getVersion(), "0.19.1-" + djlVersion);
+        }
+    }
 
     @Test
     public void testTokenizer() throws IOException {

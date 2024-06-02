@@ -13,6 +13,7 @@
 
 package ai.djl.sentencepiece;
 
+import ai.djl.engine.Engine;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 
@@ -45,6 +46,8 @@ public class SpTokenizerTest {
         Path modelPath = Paths.get("build/test/sp_model/sp_model.model");
         byte[] bytes = Files.readAllBytes(modelPath);
         try (SpTokenizer tokenizer = new SpTokenizer(bytes)) {
+            String djlVersion = Engine.getDjlVersion();
+            Assert.assertEquals(tokenizer.getProcessor().getVersion(), "0.2.0-" + djlVersion);
             String original = "Hello World";
             List<String> tokens = tokenizer.tokenize(original);
             List<String> expected = Arrays.asList("▁He", "ll", "o", "▁", "W", "or", "l", "d");

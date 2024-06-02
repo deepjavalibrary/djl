@@ -1,5 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
-
 plugins {
     ai.djl.javaProject
     application
@@ -32,22 +30,28 @@ tasks {
 
     run.configure {
         environment("TF_CPP_MIN_LOG_LEVEL" to "1") // turn off TensorFlow print out
-        // @Niels Doucet
-        // Just a heads-up: gradle support warned me about systemProperties System.getProperties(). It's really
-        // dangerous to just copy over all system properties to a task invocation. You should really be specific about
-        // the properties you'd like to expose inside the task, or you might get very strange issues.
-        systemProperties = System.getProperties().toMap() as Map<String, Any>
-        systemProperties.remove("user.dir")
-        systemProperty("file.encoding", "UTF-8")
+        for (prop in System.getProperties().iterator()) {
+            val key = prop.key.toString()
+            if (key.startsWith("ai.djl.")) {
+                systemProperty(key, prop.value)
+            }
+        }
     }
 
     register<JavaExec>("listmodels") {
-        systemProperties(System.getProperties() as Map<String, Any>)
-        systemProperties.remove("user.dir")
-        systemProperty("file.encoding", "UTF-8")
+        for (prop in System.getProperties().iterator()) {
+            val key = prop.key.toString()
+            if (key.startsWith("ai.djl.")) {
+                systemProperty(key, prop.value)
+            }
+        }
+        if (!systemProperties.containsKey("ai.djl.logging.level")) {
+            systemProperty("ai.djl.logging.level", "debug")
+        }
         classpath = sourceSets.main.get().runtimeClasspath
         mainClass = "ai.djl.examples.inference.ListModels"
     }
+
     distTar { enabled = false }
     distZip { enabled = false }
 }

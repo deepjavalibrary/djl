@@ -20,7 +20,11 @@ import com.google.googlejavaformat.java.RemoveUnusedImports
 
 class JavaFormatterPlugin implements Plugin<Project> {
     void apply(Project project) {
-        project.task('formatJava') {
+        tasks.register('formatJava') {
+            def resultFilePath = "build/formatJava-result.txt"
+            inputs.files(project.sourceSets*.allSource)
+            inputs.files(project.fileTree('generated-src'))
+            outputs.file(project.file(resultFilePath))
             doLast {
                 if (project.getRootProject() == project) {
                     return
@@ -35,6 +39,7 @@ class JavaFormatterPlugin implements Plugin<Project> {
                     }
                 }
             }
+            project.file(resultFilePath).write('Success')
         }
     }
 }

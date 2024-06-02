@@ -20,6 +20,7 @@ tasks {
     pmdMain { exclude("ai/djl/mxnet/jnarator/parser/*") }
 
     jar {
+        dependsOn(generateGrammarSource)
         manifest {
             attributes(
                 "Main-Class" to "ai.djl.mxnet.jnarator.Main",
@@ -30,4 +31,13 @@ tasks {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory()) it else zipTree(it) })
     }
+
+    generateGrammarSource {
+        dependsOn(verifyJava)
+    }
+
+    generateTestGrammarSource {
+        dependsOn(verifyJava)
+    }
+
 }

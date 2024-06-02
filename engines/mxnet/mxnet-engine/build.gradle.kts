@@ -25,11 +25,9 @@ sourceSets.main {
 
 tasks {
     processResources {
-        doFirst {
-            val classesDir = buildDirectory / "classes/java/main/"
-            classesDir.mkdirs()
-            val file = classesDir / "mxnet-engine.properties"
-            file.text = "djl_version=${libs.versions.djl.get()}\nmxnet_version=" + libs.versions.mxnet.get()
+        inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(), "mxnetVersion" to libs.versions.mxnet.get()))
+        filesMatching("**/mxnet-engine.properties") {
+            expand(mapOf("djlVersion" to libs.versions.djl.get(), "mxnetVersion" to libs.versions.mxnet.get()))
         }
     }
 
@@ -39,7 +37,11 @@ tasks {
     val jnarator by registering {
         val jnaratorJar = project(":engines:mxnet:jnarator").tasks.jar
         dependsOn(jnaratorJar)
+        inputs.file("${project.projectDir}/src/main/jna/mapping.properties")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+            .withPropertyName("jna/mapping.properties file")
         outputs.dir(buildDirectory / "generated-src")
+        outputs.cacheIf { true }
         doLast {
             val jnaGenerator = jnaratorJar.get().outputs.files.singleFile
             javaexec {
@@ -106,6 +108,7 @@ tasks {
     }
     compileJava { dependsOn(jnarator) }
     javadoc { dependsOn(jnarator) }
+    verifyJava { dependsOn(jnarator) }
 
     publishing {
         publications {

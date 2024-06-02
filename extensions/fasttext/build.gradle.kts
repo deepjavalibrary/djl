@@ -18,7 +18,11 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        outputs.dir(buildDirectory / "classes/java/main/native/lib")
+        inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(),
+            "fasttextVersion" to libs.versions.fasttext.get(),
+            "version" to version))
+        val baseResourcePath = "${project.projectDir}/build/resources/main"
+        outputs.dir("$baseResourcePath/native/lib")
         doLast {
             val url =
                 "https://publish.djl.ai/fasttext-${libs.versions.fasttext.get()}/jnilib/${libs.versions.djl.get()}"
@@ -41,12 +45,12 @@ tasks {
             }
             copy {
                 from(jnilibDir)
-                into(buildDirectory / "classes/java/main/native/lib")
+                into("$baseResourcePath/native/lib")
             }
+        }
 
-            // write properties
-            val propFile = buildDirectory / "classes/java/main/native/lib/fasttext.properties"
-            propFile.text = "version=${libs.versions.fasttext.get()}-${version}\n"
+        filesMatching("**/fasttext.properties") {
+            expand(mapOf("fasttextVersion" to libs.versions.fasttext.get(), "version" to version))
         }
     }
 

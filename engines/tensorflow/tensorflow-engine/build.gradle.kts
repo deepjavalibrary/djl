@@ -14,11 +14,9 @@ dependencies {
 }
 
 tasks.processResources {
-    doFirst {
-        val classesDir = buildDirectory / "classes/java/main/"
-        classesDir.mkdirs()
-        val file = classesDir / "tensorflow-engine.properties"
-        file.text = "djl_version=${libs.versions.djl.get()}\ntensorflow_version=${libs.versions.tensorflow.get()}"
+    inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(), "tensorflowVersion" to libs.versions.tensorflow.get()))
+    filesMatching("**/tensorflow-engine.properties") {
+        expand(mapOf("djlVersion" to libs.versions.djl.get(), "tensorflowVersion" to libs.versions.tensorflow.get()))
     }
 }
 
