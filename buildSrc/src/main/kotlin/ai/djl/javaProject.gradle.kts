@@ -49,12 +49,18 @@ tasks {
         }
 
         jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
+        for (prop in System.getProperties().iterator()) {
+            val key = prop.key.toString()
+            if (key.startsWith("ai.djl.")) {
+                systemProperty(key, prop.value)
+            }
+        }
         systemProperties(
             "org.slf4j.simpleLogger.defaultLogLevel" to "debug",
             "org.slf4j.simpleLogger.log.org.mortbay.log" to "warn",
             "org.slf4j.simpleLogger.log.org.testng" to "info",
             "disableProgressBar" to "true",
-            "nightly" to System.getProperty("nightly", "false")
+            "nightly" to System.getProperty("nightly", "false"),
         )
         if (gradle.startParameter.isOffline)
             systemProperty("ai.djl.offline", "true")

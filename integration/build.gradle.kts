@@ -1,5 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
-
 plugins {
     ai.djl.javaProject
     application
@@ -39,14 +37,22 @@ tasks {
     }
 
     run.configure {
+        for (prop in systemProperties.iterator()) {
+            if (prop.key.startsWith("ai.djl.") || prop.key == "nightly") {
+                systemProperty(prop.key, prop.value)
+            }
+        }
         environment("TF_CPP_MIN_LOG_LEVEL" to "1") // turn off TensorFlow print out
-        systemProperty("file.encoding", "UTF-8")
         jvmArgs("-Xverify:none")
     }
 
     register<JavaExec>("debugEnv") {
+        for (prop in systemProperties.iterator()) {
+            if (prop.key.startsWith("ai.djl.") || prop.key == "nightly") {
+                systemProperty(prop.key, prop.value)
+            }
+        }
         classpath = sourceSets.main.get().runtimeClasspath
-        systemProperties["ai.djl.logging.level"] = "debug"
         mainClass = "ai.djl.integration.util.DebugEnvironment"
     }
 

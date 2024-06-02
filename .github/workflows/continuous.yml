@@ -85,10 +85,9 @@ jobs:
         run: ./gradlew :engines:pytorch:pytorch-native:compileJNI
       - name: Test ONNX Runtime
         run: |
-          ./gradlew -Dai.djl.default_engine=OnnxRuntime :integration:test --stacktrace
-          ./gradlew :integration:clean
+          ./gradlew -Dai.djl.default_engine=OnnxRuntime :integration:clean :integration:test --stacktrace
       - name: Build with Gradle
-        run: ./gradlew build :jacoco:testCodeCoverageReport --stacktrace
+        run: ./gradlew clean build :jacoco:testCodeCoverageReport --stacktrace
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()

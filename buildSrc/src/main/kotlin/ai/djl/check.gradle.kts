@@ -15,6 +15,7 @@ spotbugs {
     excludeFilter = file("${rootProject.projectDir}/tools/conf/findbugs-exclude.xml")
     ignoreFailures = false
 }
+
 tasks {
     named<SpotBugsTask>("spotbugsMain") {
         reports.create("html") {
@@ -37,6 +38,7 @@ pmd {
     ruleSets = emptyList() // workaround pmd gradle plugin bug
     ruleSetFiles = files("${rootProject.projectDir}/tools/conf/pmd.xml")
 }
+
 tasks.withType<Pmd> {
     reports {
         xml.required = true
@@ -53,8 +55,8 @@ checkstyle {
         "checkstyle.licenseHeader.file" to file("${rootProject.projectDir}/tools/conf/licenseHeader.java")
     )
     configFile = file("${rootProject.projectDir}/tools/conf/checkstyle.xml")
-    
 }
+
 tasks {
     named<Checkstyle>("checkstyleMain") {
         classpath += configurations["compileClasspath"]

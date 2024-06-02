@@ -1,5 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
-
 plugins {
     ai.djl.javaProject
     application
@@ -32,14 +30,28 @@ tasks {
 
     run.configure {
         environment("TF_CPP_MIN_LOG_LEVEL" to "1") // turn off TensorFlow print out
-        systemProperty("file.encoding", "UTF-8")
+        for (prop in System.getProperties().iterator()) {
+            val key = prop.key.toString()
+            if (key.startsWith("ai.djl.")) {
+                systemProperty(key, prop.value)
+            }
+        }
     }
 
     register<JavaExec>("listmodels") {
-        systemProperty("file.encoding", "UTF-8")
+        for (prop in System.getProperties().iterator()) {
+            val key = prop.key.toString()
+            if (key.startsWith("ai.djl.")) {
+                systemProperty(key, prop.value)
+            }
+        }
+        if (!systemProperties.containsKey("ai.djl.logging.level")) {
+            systemProperty("ai.djl.logging.level", "debug")
+        }
         classpath = sourceSets.main.get().runtimeClasspath
         mainClass = "ai.djl.examples.inference.ListModels"
     }
+
     distTar { enabled = false }
     distZip { enabled = false }
 }
