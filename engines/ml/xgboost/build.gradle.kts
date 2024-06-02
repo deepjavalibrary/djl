@@ -11,6 +11,7 @@ val xgbFlavor = if (isGpu) "-gpu" else ""
 
 val exclusion by configurations.registering
 
+@Suppress("UnstableApiUsage")
 dependencies {
     api(project(":api"))
     api(libs.commons.logging)

@@ -46,10 +46,10 @@ tasks {
                 from(jnilibDir)
                 into("$baseResourcePath/native/lib")
             }
+        }
 
-            filesMatching("**/tensorrt.properties") {
-                expand(mapOf("trtVersion" to libs.versions.tensorrt.get(), "version" to version))
-            }
+        filesMatching("**/tensorrt.properties") {
+            expand(mapOf("trtVersion" to libs.versions.tensorrt.get(), "version" to version))
         }
     }
 

@@ -14,9 +14,9 @@ dependencies {
 }
 
 tasks.processResources {
-    inputs.properties(mapOf("djlVersion" to libs.versions.djl, "tensorflowVersion" to libs.versions.tensorflow))
-    filesMatching("**/mxnet-engine.properties") {
-        expand(mapOf("djl_version" to libs.versions.djl, "tensorflow_version" to libs.versions.tensorflow))
+    inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(), "tensorflowVersion" to libs.versions.tensorflow.get()))
+    filesMatching("**/tensorflow-engine.properties") {
+        expand(mapOf("djlVersion" to libs.versions.djl.get(), "tensorflowVersion" to libs.versions.tensorflow.get()))
     }
 }
 

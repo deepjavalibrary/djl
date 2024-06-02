@@ -16,6 +16,7 @@ import ai.djl.sentencepiece.jni.LibUtils;
 import ai.djl.sentencepiece.jni.SentencePieceLibrary;
 import ai.djl.util.Ec2Utils;
 import ai.djl.util.NativeResource;
+import ai.djl.util.Platform;
 
 /** The processor holder for SentencePiece. */
 public final class SpProcessor extends NativeResource<Long> {
@@ -40,6 +41,16 @@ public final class SpProcessor extends NativeResource<Long> {
         }
         Ec2Utils.callHome("SentencePiece");
         return new SpProcessor();
+    }
+
+    /**
+     * Returns the version of the sentencepiece.
+     *
+     * @return the version number of the sentencepiece
+     */
+    public String getVersion() {
+        Platform platform = Platform.detectPlatform("sentencepiece");
+        return platform.getVersion();
     }
 
     void loadModel(String path) {

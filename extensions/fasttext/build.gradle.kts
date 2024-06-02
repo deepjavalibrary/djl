@@ -47,11 +47,10 @@ tasks {
                 from(jnilibDir)
                 into("$baseResourcePath/native/lib")
             }
+        }
 
-            // write properties
-            filesMatching("**/fasttext.properties") {
-                expand(mapOf("fasttextVersion" to libs.versions.fasttext.get(), "version" to version))
-            }
+        filesMatching("**/fasttext.properties") {
+            expand(mapOf("fasttextVersion" to libs.versions.fasttext.get(), "version" to version))
         }
     }
 

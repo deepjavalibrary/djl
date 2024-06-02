@@ -17,7 +17,7 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        var path = "${project.projectDir}/build/resources/main"
+        val path = "${project.projectDir}/build/resources/main"
         inputs.properties(mapOf("djl_version" to libs.versions.djl.get(), "llamacpp_version" to libs.versions.llamacpp.get()))
         outputs.dir("$path/native/lib")
         doLast {

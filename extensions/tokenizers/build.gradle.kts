@@ -56,9 +56,6 @@ tasks {
                 into("$baseResourcePath/native/lib")
             }
 
-            filesMatching("**/tokenizers.properties") {
-                expand(mapOf("tokenizersVersion" to tokenizers, "version" to version))
-            }
             url = "https://mlrepo.djl.ai/model/nlp"
             val tasks = listOf(
                 "fill_mask",
@@ -92,6 +89,10 @@ tasks {
                     downloadPath gzipInto file
                 }
             }
+        }
+
+        filesMatching("**/tokenizers.properties") {
+            expand(mapOf("tokenizersVersion" to libs.versions.tokenizers.get(), "version" to version))
         }
     }
 

@@ -46,10 +46,10 @@ tasks {
                 from(jnilibDir)
                 into("$baseResourcePath/native/lib")
             }
+        }
 
-            filesMatching("**/sentencepiece.properties") {
-                expand(mapOf("sentencepieceVersion" to libs.versions.sentencepiece.get(), "version" to version))
-            }
+        filesMatching("**/sentencepiece.properties") {
+            expand(mapOf("sentencepieceVersion" to libs.versions.sentencepiece.get(), "version" to version))
         }
     }
 

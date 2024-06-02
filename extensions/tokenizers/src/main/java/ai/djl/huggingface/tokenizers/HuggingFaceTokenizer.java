@@ -21,6 +21,7 @@ import ai.djl.translate.ArgumentsUtil;
 import ai.djl.util.Ec2Utils;
 import ai.djl.util.NativeResource;
 import ai.djl.util.PairList;
+import ai.djl.util.Platform;
 import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
@@ -186,6 +187,16 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
 
         long handle = TokenizersLibrary.LIB.createTokenizerFromString(json);
         return new HuggingFaceTokenizer(handle, options);
+    }
+
+    /**
+     * Returns the version of the Huggingface tokenizer.
+     *
+     * @return the version number of the Huggingface tokenizer
+     */
+    public String getVersion() {
+        Platform platform = Platform.detectPlatform("tokenizers");
+        return platform.getVersion();
     }
 
     /** {@inheritDoc} */
