@@ -23,4 +23,22 @@ public class PretrainedConfig {
     String problemType;
 
     Map<String, String> id2label;
+
+    /**
+     * Sets the problem type.
+     *
+     * @param problemType the problem type
+     */
+    public void setProblemType(String problemType) {
+        this.problemType = problemType;
+    }
+
+    /**
+     * Sets the id to label map.
+     *
+     * @param id2label the id to label map
+     */
+    public void setId2label(Map<String, String> id2label) {
+        this.id2label = id2label;
+    }
 }

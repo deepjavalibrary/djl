@@ -267,5 +267,23 @@ public class AmesRandomAccess extends CsvDataset {
 
         List<String> featureArray;
         Set<String> categorical;
+
+        /**
+         * Sets the feature array.
+         *
+         * @param featureArray the feature array
+         */
+        public void setFeatureArray(List<String> featureArray) {
+            this.featureArray = featureArray;
+        }
+
+        /**
+         * Sets the categorical value.
+         *
+         * @param categorical the categorical value
+         */
+        public void setCategorical(Set<String> categorical) {
+            this.categorical = categorical;
+        }
     }
 }

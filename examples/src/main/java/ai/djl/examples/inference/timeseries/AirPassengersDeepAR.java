@@ -124,5 +124,23 @@ public final class AirPassengersDeepAR {
 
         Date start;
         float[] target;
+
+        /**
+         * Sets the start date.
+         *
+         * @param start the start date
+         */
+        public void setStart(Date start) {
+            this.start = start;
+        }
+
+        /**
+         * Sets the target value.
+         *
+         * @param target the target value
+         */
+        public void setTarget(float[] target) {
+            this.target = target;
+        }
     }
 }
