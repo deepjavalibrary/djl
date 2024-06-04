@@ -277,5 +277,32 @@ public class M5Forecast extends CsvTimeSeriesDataset {
         Set<String> categorical;
         // categorical = String in featureArray its value indicate a String in featureToMap
         Map<String, Map<String, Integer>> featureToMap;
+
+        /**
+         * Sets the feature array.
+         *
+         * @param featureArray the feature array
+         */
+        public void setFeatureArray(List<String> featureArray) {
+            this.featureArray = featureArray;
+        }
+
+        /**
+         * Sets the categorical value.
+         *
+         * @param categorical the categorical value
+         */
+        public void setCategorical(Set<String> categorical) {
+            this.categorical = categorical;
+        }
+
+        /**
+         * Sets the feature map.
+         *
+         * @param featureToMap the feature map
+         */
+        public void setFeatureToMap(Map<String, Map<String, Integer>> featureToMap) {
+            this.featureToMap = featureToMap;
+        }
     }
 }
