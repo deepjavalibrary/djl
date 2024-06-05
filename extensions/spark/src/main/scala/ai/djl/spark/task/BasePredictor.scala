@@ -106,7 +106,7 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
     validateInputType(dataset.schema)
     outputSchema = transformSchema(dataset.schema)
     val outputDf = dataset.toDF()
-      .mapPartitions(transformRows)(RowEncoder.apply(outputSchema))
+      .mapPartitions(transformRows)(RowEncoder.encoderFor(outputSchema))
     outputDf
   }
 
