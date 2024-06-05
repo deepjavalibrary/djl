@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     if: github.repository == 'deepjavalibrary/djl'
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         api-level: [ 26 ]

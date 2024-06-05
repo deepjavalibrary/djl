@@ -10,7 +10,6 @@ jobs:
       matrix:
         format: ["armeabi-v7a", "arm64-v8a", "x86" ,"x86_64"]
     env:
-      PYTORCH_VERSION: "2.1.2"
       NDK_VERSION: "21.1.6352462"
     steps:
       - uses: actions/checkout@v4
@@ -25,6 +24,7 @@ jobs:
           python-version: '3.x'
       - name: clone pytorch
         run: |
+          PYTORCH_VERSION=$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
           git clone https://github.com/pytorch/pytorch android_pytorch_tmp -b "v${PYTORCH_VERSION}" --recursive
       - name: install Python Dependencies
         run: pip install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions
@@ -46,5 +46,6 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
+          PYTORCH_VERSION=$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
           aws s3 cp android_pytorch_tmp/build_android/${{ matrix.format }}_native.zip s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/android_native/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/android_native*"
