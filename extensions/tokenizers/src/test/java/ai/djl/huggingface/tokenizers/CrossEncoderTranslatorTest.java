@@ -14,7 +14,7 @@ package ai.djl.huggingface.tokenizers;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
-import ai.djl.huggingface.translator.CrossEncoderTranslatorFactory;
+import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
@@ -65,8 +65,9 @@ public class CrossEncoderTranslatorTest {
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-cased")
                         .optArgument("tokenizerPath", modelDir)
+                        .optArgument("reranking", true)
                         .optOption("hasParameter", "false")
-                        .optTranslatorFactory(new CrossEncoderTranslatorFactory())
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .build();
 
         try (ZooModel<StringPair, float[]> model = criteria.loadModel();
@@ -83,8 +84,9 @@ public class CrossEncoderTranslatorTest {
                         .optBlock(block)
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-cased")
+                        .optArgument("reranking", true)
                         .optOption("hasParameter", "false")
-                        .optTranslatorFactory(new CrossEncoderTranslatorFactory())
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .build();
 
         try (ZooModel<Input, Output> model = criteria2.loadModel();
@@ -131,7 +133,7 @@ public class CrossEncoderTranslatorTest {
             options.put("hasParameter", "false");
             model.load(modelDir, "test", options);
 
-            CrossEncoderTranslatorFactory factory = new CrossEncoderTranslatorFactory();
+            TextEmbeddingTranslatorFactory factory = new TextEmbeddingTranslatorFactory();
             Map<String, String> arguments = new HashMap<>();
 
             Assert.assertThrows(
@@ -139,6 +141,7 @@ public class CrossEncoderTranslatorTest {
                     () -> factory.newInstance(String.class, Integer.class, model, arguments));
 
             arguments.put("tokenizer", "bert-base-cased");
+            arguments.put("reranking", "true");
 
             Assert.assertThrows(
                     IllegalArgumentException.class,
