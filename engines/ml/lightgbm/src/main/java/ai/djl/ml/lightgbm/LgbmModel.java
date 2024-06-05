@@ -95,4 +95,25 @@ public class LgbmModel extends BaseModel {
         }
         super.close();
     }
+
+    /**
+     * Sets the inference type of the model based on the given string. Supported inference types
+     * include NORMAL, RAW_SCORE, LEAF_INDEX, CONTRIB.
+     *
+     * @param inferenceType The string representing the inference type.
+     * @throws IllegalArgumentException if the given inference type is not supported.
+     */
+    public void setInferenceType(String inferenceType) {
+        ((LgbmSymbolBlock) block).setInferenceType(inferenceType);
+    }
+
+    /**
+     * Gets the string representation of the current model inference type.
+     *
+     * @return The string representation of the current inference type.
+     * @throws IllegalStateException if the current inference type is unknown.
+     */
+    public String getInferenceType() {
+        return ((LgbmSymbolBlock) block).getInferenceType();
+    }
 }

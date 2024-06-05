@@ -24,6 +24,7 @@ import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 
 import com.microsoft.ml.lightgbm.SWIGTYPE_p_p_void;
+import com.microsoft.ml.lightgbm.lightgbmlibConstants;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,6 +36,7 @@ public class LgbmSymbolBlock extends AbstractSymbolBlock implements AutoCloseabl
     private int iterations;
     private String uid;
     private LgbmNDManager manager;
+    private int inferenceType;
 
     /**
      * Constructs a {@code LgbmSymbolBlock}.
@@ -53,6 +55,7 @@ public class LgbmSymbolBlock extends AbstractSymbolBlock implements AutoCloseabl
         this.manager = manager;
         uid = String.valueOf(handle);
         manager.attachInternal(uid, this);
+        this.inferenceType = lightgbmlibConstants.C_API_PREDICT_NORMAL;
     }
 
     /** {@inheritDoc} */
@@ -66,7 +69,7 @@ public class LgbmSymbolBlock extends AbstractSymbolBlock implements AutoCloseabl
         try (LgbmNDManager sub = (LgbmNDManager) manager.newSubManager()) {
             LgbmNDArray lgbmNDArray = sub.from(array);
             Pair<Integer, ByteBuffer> result =
-                    JniUtils.inference(handle.get(), iterations, lgbmNDArray);
+                    JniUtils.inference(handle.get(), iterations, lgbmNDArray, inferenceType);
 
             NDArray ret =
                     manager.create(
@@ -106,5 +109,45 @@ public class LgbmSymbolBlock extends AbstractSymbolBlock implements AutoCloseabl
     @Override
     public ParameterList getDirectParameters() {
         throw new UnsupportedOperationException("Not yet supported");
+    }
+
+    void setInferenceType(String inferenceType) {
+        switch (inferenceType) {
+            case "NORMAL":
+                this.inferenceType = lightgbmlibConstants.C_API_PREDICT_NORMAL;
+                break;
+            case "RAW_SCORE":
+                this.inferenceType = lightgbmlibConstants.C_API_PREDICT_RAW_SCORE;
+                break;
+            case "LEAF_INDEX":
+                this.inferenceType = lightgbmlibConstants.C_API_PREDICT_LEAF_INDEX;
+                break;
+            case "CONTRIB":
+                this.inferenceType = lightgbmlibConstants.C_API_PREDICT_CONTRIB;
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        "Unsupported inference type: "
+                                + inferenceType
+                                + ". Supported types include: NORMAL, RAW_SCORE, LEAF_INDEX,"
+                                + " CONTRIB.");
+        }
+    }
+
+    String getInferenceType() {
+        if (this.inferenceType == lightgbmlibConstants.C_API_PREDICT_NORMAL) {
+            return "NORMAL";
+        } else if (this.inferenceType == lightgbmlibConstants.C_API_PREDICT_RAW_SCORE) {
+            return "RAW_SCORE";
+        } else if (this.inferenceType == lightgbmlibConstants.C_API_PREDICT_LEAF_INDEX) {
+            return "LEAF_INDEX";
+        } else if (this.inferenceType == lightgbmlibConstants.C_API_PREDICT_CONTRIB) {
+            return "CONTRIB";
+        } else {
+            throw new IllegalStateException(
+                    "Unknown inference type: "
+                            + this.inferenceType
+                            + ". Please ensure a correct inference type is set.");
+        }
     }
 }

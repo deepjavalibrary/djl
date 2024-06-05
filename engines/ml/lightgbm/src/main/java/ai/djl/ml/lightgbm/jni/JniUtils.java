@@ -26,7 +26,7 @@ import com.microsoft.ml.lightgbm.SWIGTYPE_p_int;
 import com.microsoft.ml.lightgbm.SWIGTYPE_p_long_long;
 import com.microsoft.ml.lightgbm.SWIGTYPE_p_p_void;
 import com.microsoft.ml.lightgbm.lightgbmlib;
-import com.microsoft.ml.lightgbm.lightgbmlibJNI;
+import com.microsoft.ml.lightgbm.lightgbmlibConstants;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -60,7 +60,7 @@ public final class JniUtils {
     }
 
     public static Pair<Integer, ByteBuffer> inference(
-            SWIGTYPE_p_p_void model, int iterations, NDArray a) {
+            SWIGTYPE_p_p_void model, int iterations, NDArray a, int inferenceType) {
         if (a instanceof LgbmDataset) {
             LgbmDataset dataset = (LgbmDataset) a;
             switch (dataset.getSrcType()) {
@@ -68,30 +68,25 @@ public final class JniUtils {
                     throw new IllegalArgumentException(
                             "LightGBM can only do inference with an Array LightGBMDataset");
                 case ARRAY:
-                    return inferenceMat(model, iterations, dataset.getSrcArrayConverted());
+                    return inferenceMat(
+                            model, iterations, dataset.getSrcArrayConverted(), inferenceType);
                 default:
                     throw new IllegalArgumentException("Unexpected LgbmDataset SrcType");
             }
         }
         if (a instanceof LgbmNDArray) {
-            return inferenceMat(model, iterations, (LgbmNDArray) a);
+            return inferenceMat(model, iterations, (LgbmNDArray) a, inferenceType);
         }
         throw new IllegalArgumentException("LightGBM inference must be called with a LgbmNDArray");
     }
 
     public static Pair<Integer, ByteBuffer> inferenceMat(
-            SWIGTYPE_p_p_void model, int iterations, LgbmNDArray a) {
+            SWIGTYPE_p_p_void model, int iterations, LgbmNDArray a, int inferenceType) {
         SWIGTYPE_p_long_long outLength = lightgbmlib.new_int64_tp();
         SWIGTYPE_p_double outBuffer = null;
-        SWIGTYPE_p_int numClasses = lightgbmlib.new_intp();
         try {
-            int outFlag =
-                    lightgbmlib.LGBM_BoosterGetNumClasses(
-                            lightgbmlib.voidpp_value(model), numClasses);
-            checkCall(outFlag);
-            int classes = lightgbmlib.intp_value(numClasses);
-
-            outBuffer = lightgbmlib.new_doubleArray((long) classes * a.getRows());
+            int bufferLength = calculateBufferLength(model, inferenceType, a.getRows(), iterations);
+            outBuffer = lightgbmlib.new_doubleArray(bufferLength);
             int result =
                     lightgbmlib.LGBM_BoosterPredictForMat(
                             lightgbmlib.voidpp_value(model),
@@ -100,7 +95,7 @@ public final class JniUtils {
                             a.getRows(),
                             a.getCols(),
                             1,
-                            lightgbmlibJNI.C_API_PREDICT_NORMAL_get(),
+                            inferenceType,
                             0,
                             iterations,
                             "",
@@ -137,7 +132,38 @@ public final class JniUtils {
             if (outBuffer != null) {
                 lightgbmlib.delete_doubleArray(outBuffer);
             }
+        }
+    }
+
+    private static int calculateBufferLength(
+            SWIGTYPE_p_p_void model, int inferenceType, int rows, int iterations) {
+        SWIGTYPE_p_int numClasses = lightgbmlib.new_intp();
+        SWIGTYPE_p_int numFeatures = lightgbmlib.new_intp();
+        try {
+            int outFlag =
+                    lightgbmlib.LGBM_BoosterGetNumClasses(
+                            lightgbmlib.voidpp_value(model), numClasses);
+            checkCall(outFlag);
+            int classes = lightgbmlib.intp_value(numClasses);
+
+            if (inferenceType == lightgbmlibConstants.C_API_PREDICT_NORMAL
+                    || inferenceType == lightgbmlibConstants.C_API_PREDICT_RAW_SCORE) {
+                return classes * rows;
+            } else if (inferenceType == lightgbmlibConstants.C_API_PREDICT_LEAF_INDEX) {
+                return classes * rows * iterations;
+            } else if (inferenceType == lightgbmlibConstants.C_API_PREDICT_CONTRIB) {
+                int outFlag2 =
+                        lightgbmlib.LGBM_BoosterGetNumFeature(
+                                lightgbmlib.voidpp_value(model), numFeatures);
+                checkCall(outFlag2);
+                int features = lightgbmlib.intp_value(numFeatures);
+                return classes * rows * (features + 1);
+            } else {
+                throw new IllegalArgumentException("Unsupported inference type: " + inferenceType);
+            }
+        } finally {
             lightgbmlib.delete_intp(numClasses);
+            lightgbmlib.delete_intp(numFeatures);
         }
     }
 
