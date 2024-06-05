@@ -9,18 +9,18 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS"
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
-FROM 314815235551.dkr.ecr.us-east-2.amazonaws.com/sagemaker-spark-processing:3.3-cpu
+FROM 314815235551.dkr.ecr.us-east-2.amazonaws.com/sagemaker-spark-processing:3.5-cpu
 LABEL maintainer="djl-dev@amazon.com"
 
 # Install dependencies
-ARG DJL_VERSION=0.24.0
-ARG JNA_VERSION=5.13.0
+ARG DJL_VERSION=0.28.0
+ARG JNA_VERSION=5.14.0
 ARG JAVACV_VERSION=1.5.9
 ARG JAVACPP_VERSION=1.5.9
 ARG FFMPEG_VERSION=6.0-1.5.9
-ARG TENSORFLOW_CORE_VERSION=0.4.2
-ARG PROTOBUF_VERSION=3.22.2
-ARG PYTORCH_VERSION=1.13.1
+ARG TENSORFLOW_CORE_VERSION=0.5.0
+ARG PROTOBUF_VERSION=3.25.3
+ARG PYTORCH_VERSION=2.2.2
 
 RUN pip3 install --no-cache-dir torch==${PYTORCH_VERSION} --index-url https://download.pytorch.org/whl/cpu
 RUN pip3 install --no-cache-dir pillow pandas numpy pyarrow librosa 'transformers[torch]'
@@ -47,7 +47,6 @@ ADD --chmod=644 https://repo1.maven.org/maven2/net/java/dev/jna/jna/${JNA_VERSIO
 ADD --chmod=644 https://repo1.maven.org/maven2/ai/djl/tensorflow/tensorflow-engine/${DJL_VERSION}/tensorflow-engine-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-tensorflow-engine-${DJL_VERSION}.jar
 ADD --chmod=644 https://repo1.maven.org/maven2/ai/djl/tensorflow/tensorflow-model-zoo/${DJL_VERSION}/tensorflow-model-zoo-${DJL_VERSION}.jar /usr/lib/spark/jars/djl-tensorflow-model-zoo-${DJL_VERSION}.jar
 ADD --chmod=644 https://repo1.maven.org/maven2/org/tensorflow/tensorflow-core-api/${TENSORFLOW_CORE_VERSION}/tensorflow-core-api-${TENSORFLOW_CORE_VERSION}.jar /usr/lib/spark/jars/
-RUN rm /usr/lib/spark/jars/protobuf-java-*.jar
 ADD --chmod=644 https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/${PROTOBUF_VERSION}/protobuf-java-${PROTOBUF_VERSION}.jar /usr/lib/spark/jars/
 
 # Set environment
