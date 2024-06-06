@@ -17,6 +17,7 @@ import ai.djl.Model;
 import ai.djl.ml.lightgbm.jni.JniUtils;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.translate.ArgumentsUtil;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,6 +57,12 @@ public class LgbmModel extends BaseModel {
             }
         }
         block = JniUtils.loadModel((LgbmNDManager) manager, modelFile.toAbsolutePath().toString());
+        if (options != null) {
+            String inferenceType = ArgumentsUtil.stringValue(options, "inference_type");
+            if (inferenceType != null) {
+                setInferenceType(inferenceType);
+            }
+        }
     }
 
     private Path findModelFile(String prefix) {
@@ -97,21 +104,22 @@ public class LgbmModel extends BaseModel {
     }
 
     /**
-     * Sets the inference type of the model based on the given string. Supported inference types
-     * include NORMAL, RAW_SCORE, LEAF_INDEX, CONTRIB.
+     * Sets the inference type of the model based on the given string.
      *
-     * @param inferenceType The string representing the inference type.
-     * @throws IllegalArgumentException if the given inference type is not supported.
+     * <p>Supported inference types include NORMAL, RAW_SCORE, LEAF_INDEX, CONTRIB.
+     *
+     * @param inferenceType the string representing the inference type
+     * @throws IllegalArgumentException if the given inference type is not supported
      */
     public void setInferenceType(String inferenceType) {
         ((LgbmSymbolBlock) block).setInferenceType(inferenceType);
     }
 
     /**
-     * Gets the string representation of the current model inference type.
+     * Returns the string representation of the current model inference type.
      *
-     * @return The string representation of the current inference type.
-     * @throws IllegalStateException if the current inference type is unknown.
+     * @return the string representation of the current inference type
+     * @throws IllegalStateException if the current inference type is unknown
      */
     public String getInferenceType() {
         return ((LgbmSymbolBlock) block).getInferenceType();

@@ -69,7 +69,7 @@ public class LgbmSymbolBlock extends AbstractSymbolBlock implements AutoCloseabl
         try (LgbmNDManager sub = (LgbmNDManager) manager.newSubManager()) {
             LgbmNDArray lgbmNDArray = sub.from(array);
             Pair<Integer, ByteBuffer> result =
-                    JniUtils.inference(handle.get(), iterations, lgbmNDArray, inferenceType);
+                    JniUtils.inference(getHandle(), iterations, lgbmNDArray, inferenceType);
 
             NDArray ret =
                     manager.create(
@@ -135,19 +135,16 @@ public class LgbmSymbolBlock extends AbstractSymbolBlock implements AutoCloseabl
     }
 
     String getInferenceType() {
-        if (this.inferenceType == lightgbmlibConstants.C_API_PREDICT_NORMAL) {
+        if (inferenceType == lightgbmlibConstants.C_API_PREDICT_NORMAL) {
             return "NORMAL";
-        } else if (this.inferenceType == lightgbmlibConstants.C_API_PREDICT_RAW_SCORE) {
+        } else if (inferenceType == lightgbmlibConstants.C_API_PREDICT_RAW_SCORE) {
             return "RAW_SCORE";
-        } else if (this.inferenceType == lightgbmlibConstants.C_API_PREDICT_LEAF_INDEX) {
+        } else if (inferenceType == lightgbmlibConstants.C_API_PREDICT_LEAF_INDEX) {
             return "LEAF_INDEX";
-        } else if (this.inferenceType == lightgbmlibConstants.C_API_PREDICT_CONTRIB) {
+        } else if (inferenceType == lightgbmlibConstants.C_API_PREDICT_CONTRIB) {
             return "CONTRIB";
         } else {
-            throw new IllegalStateException(
-                    "Unknown inference type: "
-                            + this.inferenceType
-                            + ". Please ensure a correct inference type is set.");
+            throw new AssertionError("Unexpected inference type: " + inferenceType);
         }
     }
 }

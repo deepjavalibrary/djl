@@ -48,16 +48,30 @@ public class LgbmModelTest {
                         .setTypes(NDList.class, NDList.class)
                         .optModelPath(modelDir)
                         .optModelName("quadratic")
+                        .optOption("inference_type", "NORMAL")
                         .build();
 
         try (ZooModel<NDList, NDList> model = criteria.loadModel();
                 Predictor<NDList, NDList> predictor = model.newPredictor()) {
+            LgbmModel lgbm = (LgbmModel) model.getWrappedModel();
+            Assert.assertEquals(lgbm.getInferenceType(), "NORMAL");
             try (NDManager manager = NDManager.newBaseManager()) {
                 NDArray array = manager.ones(new Shape(10, 4));
                 NDList output = predictor.predict(new NDList(array));
                 Assert.assertEquals(output.singletonOrThrow().getDataType(), DataType.FLOAT32);
                 Assert.assertEquals(output.singletonOrThrow().getShape().size(), 10);
             }
+
+            lgbm.setInferenceType("RAW_SCORE");
+            Assert.assertEquals(lgbm.getInferenceType(), "RAW_SCORE");
+
+            lgbm.setInferenceType("LEAF_INDEX");
+            Assert.assertEquals(lgbm.getInferenceType(), "LEAF_INDEX");
+
+            lgbm.setInferenceType("CONTRIB");
+            Assert.assertEquals(lgbm.getInferenceType(), "CONTRIB");
+
+            Assert.assertThrows(() -> lgbm.setInferenceType("invalid"));
         }
     }
 }
