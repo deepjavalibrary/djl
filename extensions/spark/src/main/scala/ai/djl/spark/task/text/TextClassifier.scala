@@ -20,14 +20,14 @@ import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.sql.types.{ArrayType, DoubleType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
-import scala.jdk.CollectionConverters.collectionAsScalaIterableConverter
+import scala.jdk.CollectionConverters.{collectionAsScalaIterableConverter, seqAsJavaListConverter}
 
 /**
  * TextClassifier performs text classification on text.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class TextClassifier(override val uid: String) extends BaseTextPredictor[Array[String], Array[Classifications]]
+class TextClassifier(override val uid: String) extends BaseTextPredictor[String, Classifications]
   with HasInputCol with HasOutputCol {
 
   def this() = this(Identifiable.randomUID("TextClassifier"))
@@ -57,8 +57,8 @@ class TextClassifier(override val uid: String) extends BaseTextPredictor[Array[S
    */
   def setTopK(value: Int): this.type = set(topK, value)
 
-  setDefault(inputClass, classOf[Array[String]])
-  setDefault(outputClass, classOf[Array[Classifications]])
+  setDefault(inputClass, classOf[String])
+  setDefault(outputClass, classOf[Classifications])
   setDefault(translatorFactory, new TextClassificationTranslatorFactory())
 
   /**
@@ -84,8 +84,8 @@ class TextClassifier(override val uid: String) extends BaseTextPredictor[Array[S
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val predictor = model.newPredictor()
     iter.grouped($(batchSize)).flatMap { batch =>
-      val inputs = batch.map(_.getString(inputColIndex)).toArray
-      val output = predictor.predict(inputs)
+      val inputs = batch.map(_.getString(inputColIndex)).asJava
+      val output = predictor.batchPredict(inputs).asScala
       batch.zip(output).map { case (row, out) =>
         Row.fromSeq(row.toSeq :+ Row(out.getClassNames.toArray(), out.getProbabilities.toArray(),
           out.topK[Classifications.Classification]().asScala.map(_.toString)))
