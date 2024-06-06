@@ -19,12 +19,14 @@ import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
+import scala.jdk.CollectionConverters.{collectionAsScalaIterableConverter, seqAsJavaListConverter}
+
 /**
  * QuestionAnswerer performs question answering on text.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class QuestionAnswerer(override val uid: String) extends BaseTextPredictor[Array[QAInput], Array[String]]
+class QuestionAnswerer(override val uid: String) extends BaseTextPredictor[QAInput, String]
   with HasInputCols with HasOutputCol {
 
   def this() = this(Identifiable.randomUID("QuestionAnswerer"))
@@ -46,8 +48,8 @@ class QuestionAnswerer(override val uid: String) extends BaseTextPredictor[Array
    */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  setDefault(inputClass, classOf[Array[QAInput]])
-  setDefault(outputClass, classOf[Array[String]])
+  setDefault(inputClass, classOf[QAInput])
+  setDefault(outputClass, classOf[String])
   setDefault(translatorFactory, new QuestionAnsweringTranslatorFactory())
 
   /**
@@ -72,8 +74,8 @@ class QuestionAnswerer(override val uid: String) extends BaseTextPredictor[Array
     val predictor = model.newPredictor()
     iter.grouped($(batchSize)).flatMap { batch =>
       val inputs = batch.map(row => new QAInput(row.getString(inputColIndices(0)),
-        row.getString(inputColIndices(1)))).toArray
-      val output = predictor.predict(inputs)
+        row.getString(inputColIndices(1)))).asJava
+      val output = predictor.batchPredict(inputs).asScala
       batch.zip(output).map { case (row, out) =>
         Row.fromSeq(row.toSeq :+ out)
       }

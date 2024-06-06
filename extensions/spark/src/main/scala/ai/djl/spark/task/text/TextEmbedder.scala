@@ -18,12 +18,14 @@ import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.sql.types.{ArrayType, FloatType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
+import scala.jdk.CollectionConverters.{collectionAsScalaIterableConverter, seqAsJavaListConverter}
+
 /**
  * TextEmbedder performs text embedding on text.
  *
  * @param uid An immutable unique ID for the object and its derivatives.
  */
-class TextEmbedder(override val uid: String) extends BaseTextPredictor[Array[String], Array[Array[Float]]]
+class TextEmbedder(override val uid: String) extends BaseTextPredictor[String, Array[Float]]
   with HasInputCol with HasOutputCol {
 
   def this() = this(Identifiable.randomUID("TextEmbedder"))
@@ -44,8 +46,8 @@ class TextEmbedder(override val uid: String) extends BaseTextPredictor[Array[Str
    */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  setDefault(inputClass, classOf[Array[String]])
-  setDefault(outputClass, classOf[Array[Array[Float]]])
+  setDefault(inputClass, classOf[String])
+  setDefault(outputClass, classOf[Array[Float]])
   setDefault(translatorFactory, new TextEmbeddingTranslatorFactory())
 
   /**
@@ -68,8 +70,8 @@ class TextEmbedder(override val uid: String) extends BaseTextPredictor[Array[Str
   override protected def transformRows(iter: Iterator[Row]): Iterator[Row] = {
     val predictor = model.newPredictor()
     iter.grouped($(batchSize)).flatMap { batch =>
-      val inputs = batch.map(_.getString(inputColIndex)).toArray
-      val output = predictor.predict(inputs)
+      val inputs = batch.map(_.getString(inputColIndex)).asJava
+      val output = predictor.batchPredict(inputs).asScala
       batch.zip(output).map { case (row, out) =>
         Row.fromSeq(row.toSeq :+ out)
       }
