@@ -17,9 +17,8 @@ import ai.djl.translate.TranslatorFactory
 import org.apache.spark.ml.Transformer
 import org.apache.spark.ml.param.{IntParam, Param, ParamMap}
 import org.apache.spark.ml.util.Identifiable
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.types.{DataType, StructField, StructType}
-import org.apache.spark.sql.{DataFrame, Dataset, Row}
+import org.apache.spark.sql.{DataFrame, Dataset, Encoders, Row}
 
 /**
  * BasePredictor is the base class of predictors.
@@ -106,7 +105,7 @@ abstract class BasePredictor[A, B](override val uid: String) extends Transformer
     validateInputType(dataset.schema)
     outputSchema = transformSchema(dataset.schema)
     val outputDf = dataset.toDF()
-      .mapPartitions(transformRows)(RowEncoder.encoderFor(outputSchema))
+      .mapPartitions(transformRows)(Encoders.row(outputSchema))
     outputDf
   }
 
