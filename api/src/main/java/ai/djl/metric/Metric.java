@@ -30,7 +30,7 @@ public class Metric {
             Pattern.compile(
                     "\\s*([\\w\\s]+)\\.([\\w\\s]+):([0-9\\-,.e]+)(?>\\|#([^|]*))?(?>\\|(\\d+))?(?>\\|([cgh]))?");
 
-    private static final Dimension HOST = new Dimension("Host", getLocalHostName());
+    private static final Dimension[] HOST = {new Dimension("Host", getLocalHostName())};
 
     @SerializedName("MetricName")
     private String metricName;
@@ -58,18 +58,6 @@ public class Metric {
      */
     public Metric(String metricName, Number value) {
         this(metricName, value, Unit.COUNT);
-    }
-
-    /**
-     * Constructs a {@code Metric} instance with the specified {@code metricName}, <code>value
-     * </code>, and {@code unit}.
-     *
-     * @param metricName the metric name
-     * @param value the metric value
-     * @param unit the metric unit
-     */
-    public Metric(String metricName, Number value, Unit unit) {
-        this(metricName, null, value.toString(), unit.getValue(), null, HOST);
     }
 
     /**
@@ -126,7 +114,7 @@ public class Metric {
         this.unit = unit;
         this.value = value;
         this.timestamp = timestamp;
-        this.dimensions = dimensions;
+        this.dimensions = dimensions.length == 0 ? HOST : dimensions;
     }
 
     /**
@@ -214,7 +202,7 @@ public class Metric {
         String type = matcher.group(6);
         MetricType metricType = type == null ? null : MetricType.of(type);
 
-        Dimension[] dimensions = null;
+        Dimension[] dimensions;
         if (dimension != null) {
             String[] dims = dimension.split(",");
             dimensions = new Dimension[dims.length];
@@ -225,6 +213,8 @@ public class Metric {
                     dimensions[index++] = new Dimension(pair[0], pair[1]);
                 }
             }
+        } else {
+            dimensions = HOST;
         }
 
         return new Metric(metricName, metricType, value, unit, timestamp, dimensions);
