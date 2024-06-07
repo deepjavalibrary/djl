@@ -68,7 +68,7 @@ public class MetricsTest {
 
     @Test
     public void testParseMetrics() {
-        String line = "Disk.Gigabytes:311|#Host:localhost,Model:resnet|1650953744320";
+        String line = "Disk.Gigabytes:311|#Host:localhost,Model:resnet|1650953744320|g";
         Metric metric = Metric.parse(line);
         Assert.assertNotNull(metric);
         Assert.assertEquals(metric.getValue().intValue(), 311);
@@ -77,6 +77,7 @@ public class MetricsTest {
         Assert.assertEquals(metric.getDimensions()[0].getName(), "Host");
         Assert.assertEquals(metric.getDimensions()[0].getValue(), "localhost");
         Assert.assertEquals(line, metric.toString());
+        Assert.assertEquals(metric.getMetricType(), MetricType.GAUGE);
 
         Assert.assertNull(Metric.parse("DiskAvailable.Gigabytes:311#"));
         Metric invalid = Metric.parse("Disk.InvalidUnits:311");
@@ -104,5 +105,13 @@ public class MetricsTest {
     public void testPercentileException() {
         Metrics metrics = new Metrics();
         metrics.percentile("not_found", 1);
+    }
+
+    @Test
+    public void testMetricType() {
+        Assert.assertEquals(MetricType.of("c"), MetricType.COUNTER);
+        Assert.assertEquals(MetricType.of("g"), MetricType.GAUGE);
+        Assert.assertEquals(MetricType.of("h"), MetricType.HISTOGRAM);
+        Assert.assertThrows(() -> MetricType.of("a"));
     }
 }
