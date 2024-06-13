@@ -63,7 +63,7 @@ public class RsSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
                 inputHandles[i] = sub.from(inputs.get(i)).getHandle();
             }
             long outputHandle = RustLibrary.runInference(handle.get(), inputHandles);
-            RsNDArray output = new RsNDArray(manager, outputHandle, inputs.head().getDataType());
+            RsNDArray output = new RsNDArray(manager, outputHandle);
             output.attach(inputs.head().getManager());
             return new NDList(output);
         }
