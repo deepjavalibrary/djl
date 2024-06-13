@@ -6,10 +6,10 @@ edition = "2021"
 
 [dependencies]
 jni = "0.21.1"
-candle-core = "0.4.1"
-candle-nn = "0.4.1"
-candle-transformers = "0.4.1"
-candle-flash-attn = { version = "0.4.1", optional = true }
+candle-core = "0.5.1"
+candle-nn = "0.5.1"
+candle-transformers = "0.5.1"
+candle-flash-attn = { version = "0.5.1", optional = true }
 tokenizers = { path = "../tokenizers/tokenizers", version = "*", features = ["http"] }
 half = "2.4.0"
 tracing = "0.1.40"
