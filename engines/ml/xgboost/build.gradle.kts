@@ -43,7 +43,7 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        val jnilibDir = buildDirectory / "resources/java/main/lib/linux/aarch64/"
+        val jnilibDir = buildDirectory / "resources/main/lib/linux/aarch64/"
         inputs.properties(mapOf("xgboostVersion" to libs.versions.xgboost.get()))
         outputs.dir(jnilibDir)
         doLast {
