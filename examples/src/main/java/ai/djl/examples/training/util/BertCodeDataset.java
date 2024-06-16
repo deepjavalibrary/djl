@@ -62,10 +62,10 @@ public class BertCodeDataset implements Dataset {
     private long epochLimit;
     private NDManager manager;
 
-    public BertCodeDataset(int batchSize, long epochLimit) {
+    public BertCodeDataset(int batchSize, long epochLimit, String engine) {
         this.batchSize = batchSize;
         this.epochLimit = epochLimit;
-        this.manager = NDManager.newBaseManager();
+        this.manager = NDManager.newBaseManager(engine);
     }
 
     /** {@inheritDoc} */

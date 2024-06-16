@@ -29,7 +29,7 @@ public class TrainSentimentAnalysisTest {
         TestRequirements.nightly();
         TestRequirements.gpu("MXNet");
 
-        String[] args = new String[] {"-e", "1", "-g", "1", "--engine", "MXNet"};
+        String[] args = {"-e", "1", "-g", "1", "--engine", "MXNet"};
         TrainSentimentAnalysis.runExample(args);
     }
 }

@@ -28,7 +28,7 @@ public class TrainTimeSeriesTest {
     public void testTrainTimeSeries() throws TranslateException, IOException {
         TestRequirements.linux();
 
-        // TODO: PyTorch -- cuDNN error: CUDNN_STATUS_VERSION_MISMATCH
+        // TODO: PyTorch -- PtNDArray.gammaln not implemented
         String[] args = new String[] {"-g", "1", "-e", "5", "-b", "32", "--engine", "MXNet"};
         TrainingResult result = TrainTimeSeries.runExample(args);
         Assert.assertNotNull(result);

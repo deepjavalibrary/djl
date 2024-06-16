@@ -28,7 +28,7 @@ public class TrainSeq2SeqTest {
     public void testTrainSeq2Seq() throws IOException, TranslateException {
         TestRequirements.linux();
 
-        // TODO: PyTorch -- cuDNN error: CUDNN_STATUS_VERSION_MISMATCH
+        // TODO: PyTorch -- PtNDArray.sequenceMask not implemented
         String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2", "--engine", "MXNet"};
         TrainingResult result = TrainSeq2Seq.runExample(args);
         Assert.assertNotNull(result);

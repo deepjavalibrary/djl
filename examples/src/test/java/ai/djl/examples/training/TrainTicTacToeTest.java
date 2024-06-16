@@ -13,7 +13,6 @@
 package ai.djl.examples.training;
 
 import ai.djl.engine.Engine;
-import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 
 import org.testng.Assert;
@@ -25,8 +24,6 @@ public class TrainTicTacToeTest {
 
     @Test
     public void testTrainTicTacToe() throws IOException {
-        TestRequirements.linux();
-
         Engine engine = Engine.getEngine("PyTorch");
         if (Boolean.getBoolean("nightly") && engine.getGpuCount() > 0) {
             String[] args = new String[] {"-g", "1", "-e", "6"};
