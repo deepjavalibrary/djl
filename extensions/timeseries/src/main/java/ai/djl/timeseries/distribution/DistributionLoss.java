@@ -57,7 +57,7 @@ public class DistributionLoss extends Loss {
             NDArray lossWeights = predictions.get("loss_weights");
             NDArray weightedValue =
                     NDArrays.where(lossWeights.neq(0), loss.mul(lossWeights), loss.zerosLike());
-            NDArray sumWeights = lossWeights.sum().maximum(1.);
+            NDArray sumWeights = lossWeights.sum().maximum(1f);
             loss = weightedValue.sum().div(sumWeights);
         }
         return loss;

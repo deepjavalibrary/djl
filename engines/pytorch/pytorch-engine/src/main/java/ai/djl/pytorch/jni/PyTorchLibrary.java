@@ -324,6 +324,8 @@ final class PyTorchLibrary {
 
     native long torchExp(long handle);
 
+    native long torchLgamma(long handle);
+
     native long torchLog(long handle);
 
     native long torchLog10(long handle);
