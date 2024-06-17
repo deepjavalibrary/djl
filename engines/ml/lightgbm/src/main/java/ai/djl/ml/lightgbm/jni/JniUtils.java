@@ -29,6 +29,7 @@ import com.microsoft.ml.lightgbm.lightgbmlib;
 import com.microsoft.ml.lightgbm.lightgbmlibConstants;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 
@@ -104,7 +105,8 @@ public final class JniUtils {
             checkCall(result);
             int length = Math.toIntExact(lightgbmlib.int64_tp_value(outLength));
             if (a.getDataType() == DataType.FLOAT32) {
-                ByteBuffer bb = ByteBuffer.allocateDirect(length * 4);
+                ByteBuffer bb =
+                        ByteBuffer.allocateDirect(length * 4).order(ByteOrder.nativeOrder());
                 FloatBuffer wrapped = bb.asFloatBuffer();
                 for (int i = 0; i < length; i++) {
                     wrapped.put((float) lightgbmlib.doubleArray_getitem(outBuffer, i));
@@ -112,7 +114,8 @@ public final class JniUtils {
                 bb.rewind();
                 return new Pair<>(length, bb);
             } else if (a.getDataType() == DataType.FLOAT64) {
-                ByteBuffer bb = ByteBuffer.allocateDirect(length * 8);
+                ByteBuffer bb =
+                        ByteBuffer.allocateDirect(length * 8).order(ByteOrder.nativeOrder());
                 DoubleBuffer wrapped = bb.asDoubleBuffer();
                 for (int i = 0; i < length; i++) {
                     wrapped.put(lightgbmlib.doubleArray_getitem(outBuffer, i));
