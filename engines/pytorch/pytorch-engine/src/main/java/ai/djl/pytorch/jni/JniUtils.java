@@ -1112,6 +1112,11 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.torchExp(ndArray.getHandle()));
     }
 
+    public static PtNDArray gammaln(PtNDArray ndArray) {
+        return new PtNDArray(
+                ndArray.getManager(), PyTorchLibrary.LIB.torchLgamma(ndArray.getHandle()));
+    }
+
     public static PtNDArray log(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchLog(ndArray.getHandle()));
