@@ -54,7 +54,8 @@ public final class TrainBertOnCode {
         BertArguments arguments = (BertArguments) new BertArguments().parseArgs(args);
 
         BertCodeDataset dataset =
-                new BertCodeDataset(arguments.getBatchSize(), arguments.getLimit());
+                new BertCodeDataset(
+                        arguments.getBatchSize(), arguments.getLimit(), arguments.getEngine());
         dataset.prepare();
 
         // Create model & trainer

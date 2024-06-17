@@ -27,6 +27,12 @@ public class MxEngineProvider implements EngineProvider {
     /** {@inheritDoc} */
     @Override
     public int getEngineRank() {
+        String osName = System.getProperty("os.name");
+        String osArch = System.getProperty("os.arch");
+        if (osName.startsWith("Mac") && "aarch64".equals(osArch)) {
+            // MXNet doesn't support macOS M1
+            return 99;
+        }
         return MxEngine.RANK;
     }
 
