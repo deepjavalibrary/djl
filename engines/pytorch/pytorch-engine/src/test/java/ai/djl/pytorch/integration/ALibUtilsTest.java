@@ -27,7 +27,7 @@ public class ALibUtilsTest {
         TestRequirements.notMacX86();
 
         System.setProperty("ai.djl.pytorch.native_helper", ALibUtilsTest.class.getName());
-        System.setProperty("STDCXX_LIBRARY_PATH", "/usr/lib/non-exists");
+        System.setProperty("LIBSTDCXX_LIBRARY_PATH", "/usr/lib/non-exists");
     }
 
     @AfterClass

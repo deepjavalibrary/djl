@@ -254,8 +254,8 @@ tasks {
                 )
                 for (item in uploadDirs)
                     fileTree(item).files.map { it.name }.forEach {
-                        val out = item.relativeTo(File("${BINARY_ROOT}/")).absolutePath
-                        appendLine(out + URLEncoder.encode(it, "UTF-8"))
+                        val out = item.toRelativeString(File("${BINARY_ROOT}/"))
+                        appendLine(out + "/" + URLEncoder.encode(it, "UTF-8"))
                     }
             }
             exec {
@@ -263,7 +263,6 @@ tasks {
             }
         }
     }
-
 }
 
 java {
