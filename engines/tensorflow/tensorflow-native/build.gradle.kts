@@ -72,8 +72,8 @@ tasks {
                 )
                 for (item in uploadDirs)
                     fileTree(item).files.map { it.name }.forEach {
-                        val out = item.relativeTo(buildDirectory / "native/").absolutePath
-                        appendLine(out + it)
+                        val out = item.toRelativeString(buildDirectory / "native/")
+                        appendLine("$out/$it")
                     }
             }
             delete(
