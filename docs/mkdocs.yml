@@ -182,6 +182,8 @@ nav:
           - 'docs/serving/serving/docs/lmi/conceptual_guide/lmi_engine.md'
       - SageMaker LMI containers resources:
           - 'docs/demos/aws/sagemaker/large-model-inference/README.md'
+      - Releases:
+          - 'docs/serving/serving/docs/lmi/user_guides/release_notes.md'
   - Demos:
       - Demos: 'docs/demos/README.md'
       - AWS:
