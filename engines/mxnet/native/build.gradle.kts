@@ -6,9 +6,9 @@ plugins {
 
 group = "ai.djl.mxnet"
 
-val VERSION = libs.versions.mxnet.get()
+val mxnetVersion = libs.versions.mxnet.get()
 val isRelease = project.hasProperty("release") || project.hasProperty("staging")
-version = VERSION + if (isRelease) "" else "-SNAPSHOT"
+version = mxnetVersion + if (isRelease) "" else "-SNAPSHOT"
 
 tasks {
     // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
@@ -29,34 +29,32 @@ tasks {
         from(placeholder)
     }
 
-    withType<GenerateModuleMetadata> { enabled = false }
-
-    signing {
-        isRequired = project.hasProperty("staging") || project.hasProperty("snapshot")
-        val signingKey = findProperty("signingKey").toString()
-        val signingPassword = findProperty("signingPassword").toString()
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(publishing.publications)
+    java {
+        withJavadocJar()
+        withSourcesJar()
     }
 
-    val BINARY_ROOT = buildDirectory / "download"
-    val flavorNames = file(BINARY_ROOT).list() ?: emptyArray()
+    withType<GenerateModuleMetadata> { enabled = false }
+
+    val binaryRoot = buildDirectory / "download"
+    val requireSigning = project.hasProperty("staging") || project.hasProperty("snapshot")
+    val flavorNames = file(binaryRoot).list() ?: emptyArray()
     for (flavor in flavorNames) {
 
-        val platformNames = (BINARY_ROOT / flavor).list() ?: emptyArray()
+        val platformNames = (binaryRoot / flavor).list() ?: emptyArray()
 
         val artifactsNames = ArrayList<Task>()
 
         for (osName in platformNames) {
             register<Jar>("$flavor-${osName}Jar") {
                 doFirst {
-                    val propFile = BINARY_ROOT / flavor / osName / "native/lib/mxnet.properties"
+                    val propFile = binaryRoot / flavor / osName / "native/lib/mxnet.properties"
                     propFile.delete()
-                    val dsStore = BINARY_ROOT / flavor / osName / "native/lib/.DS_Store"
+                    val dsStore = binaryRoot / flavor / osName / "native/lib/.DS_Store"
                     dsStore.delete()
 
                     val versionName = "${project.version}-$nowFormatted"
-                    val dir = BINARY_ROOT / flavor / osName / "native/lib"
+                    val dir = binaryRoot / flavor / osName / "native/lib"
                     propFile.text = buildString {
                         append("version=$versionName\nclassifier=$flavor-$osName-x86_64\nlibraries=")
                         var first = true
@@ -68,7 +66,7 @@ tasks {
                             append(name)
                         }
                     }
-                    val metaInf = BINARY_ROOT / flavor / osName / "META-INF"
+                    val metaInf = binaryRoot / flavor / osName / "META-INF"
                     metaInf.mkdirs()
                     val licenseFile = metaInf / "LICENSE"
                     licenseFile.text =
@@ -80,7 +78,7 @@ tasks {
 
                     from("src/main/resources")
                 }
-                from(BINARY_ROOT / flavor / osName)
+                from(binaryRoot / flavor / osName)
                 archiveClassifier = "$osName-x86_64"
                 archiveBaseName = "mxnet-native-$flavor"
 
@@ -135,19 +133,31 @@ tasks {
         }
     }
 
+    signing {
+        isRequired = requireSigning
+        if (requireSigning) {
+            val signingKey = findProperty("signingKey").toString()
+            val signingPassword = findProperty("signingPassword").toString()
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            sign(publishing.publications)
+        }
+    }
+
     // Gradle 8.0 requires explicitly dependency
     withType<PublishToMavenRepository> {
         for (flavor in flavorNames) {
-            dependsOn("sign${flavor.substring(0, 1).uppercase() + flavor.substring(1)}Publication")
+            if (requireSigning) {
+                dependsOn("sign${flavor.substring(0, 1).uppercase() + flavor.substring(1)}Publication")
+            }
 
-            val platformNames = (BINARY_ROOT / flavor).list() ?: emptyArray()
+            val platformNames = (binaryRoot / flavor).list() ?: emptyArray()
             for (osName in platformNames)
                 dependsOn("$flavor-${osName}Jar")
         }
     }
     withType<Sign> {
         for (flavor in flavorNames) {
-            val platformNames = (BINARY_ROOT / flavor).list() ?: emptyArray()
+            val platformNames = (binaryRoot / flavor).list() ?: emptyArray()
             for (osName in platformNames)
                 dependsOn("$flavor-${osName}Jar")
         }
@@ -178,7 +188,7 @@ tasks {
 
     register("downloadMxnetNativeLib") {
         doLast {
-            val url = "https://publish.djl.ai/mxnet-$VERSION"
+            val url = "https://publish.djl.ai/mxnet-$mxnetVersion"
             // @formatter:off
             val files = mapOf("linux/common/libgfortran.so.3.gz" to "mkl/linux/native/lib/libgfortran.so.3",
                               "linux/common/libgomp.so.1.gz"     to "mkl/linux/native/lib/libgomp.so.1",
@@ -196,28 +206,23 @@ tasks {
             // @formatter:on
             for ((key, value) in files) {
                 project.logger.lifecycle("Downloading $url/$key")
-                val file = BINARY_ROOT / value
+                val file = binaryRoot / value
                 file.parentFile.mkdirs()
                 "$url/$key".url gzipInto file
             }
 
             copy {
-                from(BINARY_ROOT / "mkl/linux/native/lib") {
+                from(binaryRoot / "mkl/linux/native/lib") {
                     exclude("**/libmxnet.so")
                 }
-                into(BINARY_ROOT / "cu102mkl/linux/native/lib")
+                into(binaryRoot / "cu102mkl/linux/native/lib")
             }
             copy {
-                from(BINARY_ROOT / "mkl/linux/native/lib") {
+                from(binaryRoot / "mkl/linux/native/lib") {
                     exclude("**/libmxnet.so")
                 }
-                into(BINARY_ROOT / "cu112mkl/linux/native/lib")
+                into(binaryRoot / "cu112mkl/linux/native/lib")
             }
         }
     }
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
 }

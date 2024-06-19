@@ -1,6 +1,6 @@
 plugins {
     ai.djl.javaProject
-    ai.djl.publish
+    `maven-publish`
     signing
 }
 
@@ -111,157 +111,159 @@ tasks {
         }
     }
 
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
     withType<GenerateModuleMetadata> { enabled = false }
-}
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
+    val binaryRoot = buildDirectory / "download"
+    val requireSigning = project.hasProperty("staging") || project.hasProperty("snapshot")
+    val flavorNames: Array<String> = binaryRoot.list() ?: emptyArray()
+    for (flavor in flavorNames) {
 
-signing {
-    isRequired = project.hasProperty("staging") || project.hasProperty("snapshot")
-    val signingKey = findProperty("signingKey").toString()
-    val signingPassword = findProperty("signingPassword").toString()
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications["maven"])
-}
+        val platformNames = (binaryRoot / flavor).list() ?: emptyArray()
 
-val BINARY_ROOT = buildDirectory / "download"
-val flavorNames: Array<String> = BINARY_ROOT.list() ?: emptyArray()
-for (flavor in flavorNames) {
+        val artifactsNames = ArrayList<Task>()
 
-    val platformNames = (BINARY_ROOT / flavor).list() ?: emptyArray()
+        for (osName in platformNames) {
+            register<Jar>("$flavor-${osName}Jar") {
+                doFirst {
+                    val propFile = binaryRoot / flavor / osName / "native/lib/tensorflow.properties"
+                    propFile.delete()
+                    val dsStore = binaryRoot / flavor / osName / "native/lib/.DS_Store"
+                    dsStore.delete()
 
-    val artifactsNames = ArrayList<Task>()
-
-    for (osName in platformNames) {
-        tasks.create<Jar>("$flavor-${osName}Jar") {
-            doFirst {
-                val propFile = BINARY_ROOT / flavor / osName / "native/lib/tensorflow.properties"
-                propFile.delete()
-                val dsStore = BINARY_ROOT / flavor / osName / "native/lib/.DS_Store"
-                dsStore.delete()
-
-                val versionName = "${project.version}-$nowFormatted"
-                val dir = BINARY_ROOT / flavor / osName / "native/lib"
-                propFile.text = buildString {
-                    append("version=$versionName\nclassifier=$flavor-$osName-x86_64\nlibraries=")
-                    var first = true
-                    for (name in dir.list()!!.sorted()) {
-                        if (first)
-                            first = false
-                        else
-                            append(',')
-                        append(name)
+                    val versionName = "${project.version}-$nowFormatted"
+                    val dir = binaryRoot / flavor / osName / "native/lib"
+                    propFile.text = buildString {
+                        append("version=$versionName\nclassifier=$flavor-$osName-x86_64\nlibraries=")
+                        var first = true
+                        for (name in dir.list()!!.sorted()) {
+                            if (first)
+                                first = false
+                            else
+                                append(',')
+                            append(name)
+                        }
                     }
+
+                    from("src/main/resources")
                 }
+                from(binaryRoot / flavor / osName)
+                archiveClassifier = "$osName-x86_64"
+                archiveBaseName = "tensorflow-native-$flavor"
 
-                from("src/main/resources")
+                manifest {
+                    attributes("Automatic-Module-Name" to "ai.djl.tensorflow_native_${flavor}_$osName")
+                }
             }
-            from(BINARY_ROOT / flavor / osName)
-            archiveClassifier = "$osName-x86_64"
-            archiveBaseName = "tensorflow-native-$flavor"
-
-            manifest {
-                attributes("Automatic-Module-Name" to "ai.djl.tensorflow_native_${flavor}_$osName")
-            }
+            artifactsNames += named("${flavor}-${osName}Jar").get()
         }
-        artifactsNames.add(tasks["$flavor-${osName}Jar"])
-    }
 
-    // Only publish if the project directory equals the current directory
-    // This means that publishing from the main project does not publish the native jars
-    // and the native jars have to be published separately
-    if (project.projectDir.toString() == System.getProperty("user.dir")) {
-        publishing.publications.create<MavenPublication>(flavor) {
-            artifactId = "tensorflow-native-$flavor"
-            from(components["java"])
-            setArtifacts(artifactsNames)
-            artifact(tasks.jar)
-            artifact(tasks.javadocJar)
-            artifact(tasks.sourcesJar)
-            pom {
-                name = "DJL release for TensorFlow native binaries"
-                description = "Deep Java Library (DJL) provided TensorFlow native library binary distribution"
-                url = "http://www.djl.ai/engines/tensorflow/${project.name}"
-                packaging = "jar"
+        // Only publish if the project directory equals the current directory
+        // This means that publishing from the main project does not publish the native jars
+        // and the native jars have to be published separately
+        if (project.projectDir.toString() == System.getProperty("user.dir")) {
+            publishing.publications.create<MavenPublication>(flavor) {
+                artifactId = "tensorflow-native-$flavor"
+                from(project.components["java"])
+                setArtifacts(artifactsNames)
+                artifact(jar)
+                artifact(named("javadocJar"))
+                artifact(named("sourcesJar"))
+                pom {
+                    name = "DJL release for TensorFlow native binaries"
+                    description = "Deep Java Library (DJL) provided TensorFlow native library binary distribution"
+                    url = "http://www.djl.ai/engines/tensorflow/${project.name}"
+                    packaging = "jar"
 
-                licenses {
-                    license {
-                        name = "The Apache License, Version 2.0"
-                        url = "https://www.apache.org/licenses/LICENSE-2.0"
+                    licenses {
+                        license {
+                            name = "The Apache License, Version 2.0"
+                            url = "https://www.apache.org/licenses/LICENSE-2.0"
+                        }
                     }
-                }
 
-                scm {
-                    connection = "scm:git:git@github.com:deepjavalibrary/djl.git"
-                    developerConnection = "scm:git:git@github.com:deepjavalibrary/djl.git"
-                    url = "https://github.com/deepjavalibrary/djl"
-                    tag = "HEAD"
-                }
+                    scm {
+                        connection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                        developerConnection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                        url = "https://github.com/deepjavalibrary/djl"
+                        tag = "HEAD"
+                    }
 
-                developers {
-                    developer {
-                        name = "DJL.AI Team"
-                        email = "djl-dev@amazon.com"
-                        organization = "Amazon AI"
-                        organizationUrl = "https://amazon.com"
+                    developers {
+                        developer {
+                            name = "DJL.AI Team"
+                            email = "djl-dev@amazon.com"
+                            organization = "Amazon AI"
+                            organizationUrl = "https://amazon.com"
+                        }
                     }
                 }
             }
         }
     }
-}
 
-tasks {
+    signing {
+        isRequired = requireSigning
+        if (requireSigning) {
+            val signingKey = findProperty("signingKey").toString()
+            val signingPassword = findProperty("signingPassword").toString()
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            sign(publishing.publications)
+        }
+    }
+
     // Gradle 8.0 requires explicitly dependency
     withType<PublishToMavenRepository> {
         for (flavor in flavorNames) {
-            dependsOn("sign${flavor.substring(0, 1).uppercase() + flavor.substring(1)}Publication")
+            if (requireSigning) {
+                dependsOn("sign${flavor.substring(0, 1).uppercase() + flavor.substring(1)}Publication")
+            }
 
-            val platformNames = (BINARY_ROOT / flavor).list() ?: emptyArray()
+            val platformNames = (binaryRoot / flavor).list() ?: emptyArray()
             for (osName in platformNames)
                 dependsOn("$flavor-${osName}Jar")
         }
     }
     withType<Sign> {
         for (flavor in flavorNames) {
-            val platformNames = (BINARY_ROOT / flavor).list() ?: emptyArray()
+            val platformNames = (binaryRoot / flavor).list() ?: emptyArray()
             for (osName in platformNames)
                 dependsOn("$flavor-${osName}Jar")
         }
     }
-}
 
-publishing.repositories {
-    maven {
-        if (project.hasProperty("snapshot")) {
-            name = "snapshot"
-            url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-            credentials {
-                username = findProperty("ossrhUsername").toString()
-                password = findProperty("ossrhPassword").toString()
+    publishing.repositories {
+        maven {
+            if (project.hasProperty("snapshot")) {
+                name = "snapshot"
+                url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+                credentials {
+                    username = findProperty("ossrhUsername").toString()
+                    password = findProperty("ossrhPassword").toString()
+                }
+            } else if (project.hasProperty("staging")) {
+                name = "staging"
+                url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = findProperty("ossrhUsername").toString()
+                    password = findProperty("ossrhPassword").toString()
+                }
+            } else {
+                name = "local"
+                url = uri("build/repo")
             }
-        } else if (project.hasProperty("staging")) {
-            name = "staging"
-            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = findProperty("ossrhUsername").toString()
-                password = findProperty("ossrhPassword").toString()
-            }
-        } else {
-            name = "local"
-            url = uri("build/repo")
         }
     }
-}
 
-tasks.register("downloadTensorflowNativeLib") {
-    doLast {
-        val url = "https://publish.djl.ai/tensorflow-${libs.versions.tensorflow.get()}"
-        // @formatter:off
-        val files = mapOf(
+    register("downloadTensorflowNativeLib") {
+        doLast {
+            val url = "https://publish.djl.ai/tensorflow-${libs.versions.tensorflow.get()}"
+            // @formatter:off
+            val files = mapOf(
                 "linux/cpu/libjnitensorflow.so.gz"                           to "cpu/linux/native/lib/libjnitensorflow.so",
                 "linux/cpu/libtensorflow_cc.so.2.gz"                         to "cpu/linux/native/lib/libtensorflow_cc.so.2",
                 "linux/cpu/libtensorflow_framework.so.2.gz"                  to "cpu/linux/native/lib/libtensorflow_framework.so.2",
@@ -373,12 +375,13 @@ tasks.register("downloadTensorflowNativeLib") {
                 "win/cu113/vcomp140.dll.gz"                                  to "cu113/win/native/lib/vcomp140.dll",
                 "win/cu113/vcruntime140_1.dll.gz"                            to "cu113/win/native/lib/vcruntime140_1.dll",
                 "win/cu113/vcruntime140.dll.gz"                              to "cu113/win/native/lib/vcruntime140.dll")
-        // @formatter:on
-        for ((key, value) in files) {
-            project.logger.lifecycle("Downloading $url/$key")
-            val file = BINARY_ROOT / value
-            file.parentFile.mkdirs()
-            "$url/$key".url gzipInto file
+            // @formatter:on
+            for ((key, value) in files) {
+                project.logger.lifecycle("Downloading $url/$key")
+                val file = binaryRoot / value
+                file.parentFile.mkdirs()
+                "$url/$key".url gzipInto file
+            }
         }
     }
 }
