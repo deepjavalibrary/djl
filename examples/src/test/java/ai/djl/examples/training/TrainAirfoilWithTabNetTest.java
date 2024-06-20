@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.training;
 
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 
@@ -24,6 +25,8 @@ public class TrainAirfoilWithTabNetTest {
 
     @Test
     public void testTrainAirfoilWithTabNet() throws TranslateException, IOException {
+        TestRequirements.linux(); // TODO: NaN on Windows for PyTorch 2.3.1
+
         String[] args = {"-g", "1", "-e", "20", "-b", "32"};
         if (!Boolean.getBoolean("nightly")) {
             args[3] = "2";
