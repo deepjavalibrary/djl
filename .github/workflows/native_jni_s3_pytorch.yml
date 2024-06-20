@@ -37,8 +37,10 @@ jobs:
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
           export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
-          ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
-          ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
+          if [[ $PYTORCH_VERSION =~ ^(?\.[1-2]?\..*)$ ]]; then \
+            ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION; \
+            ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"; \
+          fi;
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -50,8 +52,10 @@ jobs:
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
           PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
-          aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
+          if [[ $PYTORCH_VERSION =~ ^(?\.[1-2]?\..*)$ ]]; then \
+            aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib; \
+            aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"; \
+          fi;
 
   build-pytorch-jni-linux:
     if: github.repository == 'deepjavalibrary/djl'
