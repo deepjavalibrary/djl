@@ -138,6 +138,7 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
                     "cu*.dll",
                     "fbgemm.dll",
                     "nv*.dll",
+                    "mkl_*.dll",
                     "torch_cpu.dll",
                     "torch_cuda*.dll",
                     "torch.dll",
