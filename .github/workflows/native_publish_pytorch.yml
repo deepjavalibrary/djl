@@ -7,6 +7,10 @@ on:
           description: 'staging/snapshot, default is snapshot'
           required: true
           default: 'snapshot'
+        package_type:
+          description: 'cpu/gpu, default is gpu'
+          required: true
+          default: 'cpu'
 
 jobs:
   build:
@@ -27,7 +31,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Download native binaries
-        run: ./gradlew :engines:pytorch:pytorch-native:dPTNL
+        run: ./gradlew :engines:pytorch:pytorch-native:dPTNL -Ppackage_type=${{ github.event.inputs.package_type }}
       - name: Publish to snapshot/staging repository
         working-directory: engines/pytorch/pytorch-native
         run: ./gradlew publish -P${{ github.event.inputs.mode }}
