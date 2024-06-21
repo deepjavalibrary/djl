@@ -138,7 +138,6 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
                     "cu*.dll",
                     "fbgemm.dll",
                     "nv*.dll",
-                    "mkl_*.dll",
                     "torch_cpu.dll",
                     "torch_cuda*.dll",
                     "torch.dll",
@@ -160,6 +159,18 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
             val libomp = outputDir / "native/lib/libomp.dylib"
             val ompUrl = "https://publish.djl.ai/extra/macos-arm64/libomp.dylib"
             ompUrl.url into libomp
+        }
+        if (value == "cpu/win-x86_64") {
+            copy {
+                from("$outputDir/libtorch/lib/") {
+                    include("mkl_*.dll")
+                }
+                into("$outputDir/native/lib")
+            }
+            val mklUrl = "https://publish.djl.ai/extra/win-x86_64/mkl_def.1.dll"
+            mklUrl.url into outputDir / "native/lib/mkl_def.1.dll"
+            val vmlUrl = "https://publish.djl.ai/extra/win-x86_64/mkl_vml_def.1.dll"
+            vmlUrl.url into outputDir / "native/lib/mkl_vml_def.1.dll"
         }
         delete(file)
         delete(outputDir / "libtorch")
