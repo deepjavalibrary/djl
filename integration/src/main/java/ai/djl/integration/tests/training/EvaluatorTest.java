@@ -32,13 +32,13 @@ public class EvaluatorTest {
     public void testAccuracy() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
 
-            NDArray predictions =
+            NDArray predictionsArray =
                     manager.create(new float[] {0.3f, 0.7f, 0, 1, 0.4f, 0.6f}, new Shape(3, 2));
             NDArray labels = manager.create(new int[] {0, 1, 1}, new Shape(3));
 
             AbstractAccuracy acc = new Accuracy();
             acc.addAccumulator("");
-            acc.updateAccumulator("", new NDList(labels), new NDList(predictions));
+            acc.updateAccumulator("", new NDList(labels), new NDList(predictionsArray));
             float accuracy = acc.getAccumulator("");
             float expectedAccuracy = 2.f / 3;
             Assert.assertEquals(
@@ -50,7 +50,7 @@ public class EvaluatorTest {
 
             acc = new Accuracy();
             acc.addAccumulator("");
-            acc.updateAccumulator("", new NDList(labels), new NDList(predictions));
+            acc.updateAccumulator("", new NDList(labels), new NDList(predictionsArray));
             accuracy = acc.getAccumulator("");
             expectedAccuracy = 2.f / 3;
             Assert.assertEquals(
@@ -64,12 +64,12 @@ public class EvaluatorTest {
     public void testCoverage() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
 
-            NDArray predictions = manager.create(new float[] {0.3f, 0.7f, 0.0f}, new Shape(3));
+            NDArray predictionsArray = manager.create(new float[] {0.3f, 0.7f, 0.0f}, new Shape(3));
             NDArray labels = manager.create(new float[] {0.5f, 0.5f, 0.5f}, new Shape(3));
 
             Coverage coverage = new Coverage();
             coverage.addAccumulator("");
-            coverage.updateAccumulator("", new NDList(labels), new NDList(predictions));
+            coverage.updateAccumulator("", new NDList(labels), new NDList(predictionsArray));
             float accuracy = coverage.getAccumulator("");
             float expectedAccuracy = 1.f / 3;
             Assert.assertEquals(
@@ -82,7 +82,7 @@ public class EvaluatorTest {
     @Test
     public void testTopKAccuracy() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
-            NDArray predictions =
+            NDArray predictionsArray =
                     manager.create(
                             new float[] {
                                 0.1f, 0.2f, 0.3f, 0.4f, 0, 1, 0, 0, 0.3f, 0.5f, 0.1f, 0.1f
@@ -91,7 +91,7 @@ public class EvaluatorTest {
             NDArray labels = manager.create(new int[] {0, 1, 2}, new Shape(3));
             TopKAccuracy topKAccuracy = new TopKAccuracy(2);
             topKAccuracy.addAccumulator("");
-            topKAccuracy.updateAccumulator("", new NDList(labels), new NDList(predictions));
+            topKAccuracy.updateAccumulator("", new NDList(labels), new NDList(predictionsArray));
             float expectedAccuracy = 1.f / 3;
             float accuracy = topKAccuracy.getAccumulator("");
             Assert.assertEquals(
@@ -102,7 +102,7 @@ public class EvaluatorTest {
             labels = manager.create(new long[] {0, 1, 2}, new Shape(3));
             topKAccuracy = new TopKAccuracy(2);
             topKAccuracy.addAccumulator("");
-            topKAccuracy.updateAccumulator("", new NDList(labels), new NDList(predictions));
+            topKAccuracy.updateAccumulator("", new NDList(labels), new NDList(predictionsArray));
             expectedAccuracy = 1.f / 3;
             accuracy = topKAccuracy.getAccumulator("");
             Assert.assertEquals(

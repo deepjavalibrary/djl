@@ -22,27 +22,27 @@ public class TimeOffset {
     private static String oPattern = "(?<multiple>\\d*)(?<granularity>\\w+)";
 
     private String name;
-    private int n;
+    private int offsetValue;
 
     /**
      * Constructs a new {@code TimeOffset} instance.
      *
      * @param name offset granularity including "D", "M" etc
-     * @param n offset multiple
+     * @param offsetValue offset multiple
      */
-    public TimeOffset(String name, int n) {
+    public TimeOffset(String name, int offsetValue) {
         this.name = name;
-        this.n = n;
+        this.offsetValue = offsetValue;
     }
 
     /**
      * Return {@code TimeOffset} object from frequency string.
      *
-     * @param freqStr Frequency string of the form [multiple][granularity] such as "12H", "1D" etc.
+     * @param frequencyString Frequency string of the form [multiple][granularity] such as "12H", "1D" etc.
      * @return a TimeOffset containing multiple and granularity
      */
-    public static TimeOffset toOffset(String freqStr) {
-        Matcher matcher = Pattern.compile(oPattern).matcher(freqStr);
+    public static TimeOffset toOffset(String frequencyString) {
+        Matcher matcher = Pattern.compile(oPattern).matcher(frequencyString);
         matcher.find();
         String name = matcher.group("granularity");
         if ("".equals(name)) {
@@ -73,7 +73,7 @@ public class TimeOffset {
      * @return the multiple of {@code TimeOffset}
      */
     public double getMultipleOfTimeOffset() {
-        return n;
+        return offsetValue;
     }
 
     /**
@@ -82,6 +82,6 @@ public class TimeOffset {
      * @return the formatted frequency string
      */
     public String toFreqStr() {
-        return n + name;
+        return offsetValue + name;
     }
 }
