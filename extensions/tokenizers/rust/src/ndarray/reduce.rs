@@ -1,4 +1,4 @@
-use candle_core::{DType, Tensor};
+use candle::{DType, Tensor};
 use jni::objects::{JIntArray, JObject, ReleaseMode};
 use jni::sys::{jboolean, jdouble, jint, jlong, JNI_TRUE};
 use jni::JNIEnv;
