@@ -49,7 +49,7 @@ Note that you need to click the download model button to find the actual Google 
 
 Please refer to these two examples:
 
-1. [Object Detection with TensorFlow](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/ObjectDetection.java) for loading from TensorFlow Hub url.
+1. [Object Detection with TensorFlow](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/cv/ObjectDetection.java) for loading from TensorFlow Hub url.
 2. [BERT Classification](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/BertClassification.java) for loading from local downloaded model.
 
 ## How to import TensorFlow models that use [TensorFlow Extensions](https://www.tensorflow.org/resources/libraries-extensions)
