@@ -1,6 +1,6 @@
 use crate::cast_handle;
 use crate::ndarray::{as_data_type, as_device, as_shape, return_handle};
-use candle_core::{DType, Error, Tensor};
+use candle::{DType, Error, Tensor};
 use half::{bf16, f16};
 use jni::objects::{JByteBuffer, JLongArray, JObject, JString};
 use jni::sys::{jfloat, jint, jlong};

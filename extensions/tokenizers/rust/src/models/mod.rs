@@ -4,8 +4,7 @@ mod distilbert;
 use crate::ndarray::as_data_type;
 use crate::{cast_handle, drop_handle, to_handle, to_string_array};
 use bert::{BertConfig, BertModel};
-use candle_core::DType;
-use candle_core::{Device, Result, Tensor};
+use candle::{Device, DType, Result, Tensor};
 use candle_nn::VarBuilder;
 use distilbert::{DistilBertConfig, DistilBertModel};
 use jni::objects::{JLongArray, JObject, JString, ReleaseMode};
@@ -26,7 +25,7 @@ pub(crate) trait Model {
         _attention_mask: &Tensor,
         _token_type_ids: Option<&Tensor>,
     ) -> Result<Tensor> {
-        candle_core::bail!("`forward` is not implemented for this model");
+        candle::bail!("`forward` is not implemented for this model");
     }
 }
 
@@ -47,9 +46,9 @@ fn load_model<'local>(
     let config: Config = serde_json::from_str(&config).unwrap();
 
     // Get candle device
-    let device = if candle_core::utils::cuda_is_available() {
+    let device = if candle::utils::cuda_is_available() {
         Device::new_cuda(0)
-    } else if candle_core::utils::metal_is_available() {
+    } else if candle::utils::metal_is_available() {
         Device::new_metal(0)
     } else {
         Ok(Device::Cpu)

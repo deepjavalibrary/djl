@@ -1,4 +1,4 @@
-use candle_core::{DType, Device, Error, Result, Shape, Tensor, WithDType};
+use candle::{DType, Device, Error, Result, Shape, Tensor, WithDType};
 use half::{bf16, f16};
 use jni::objects::{JByteBuffer, JIntArray, JLongArray, JObject, JString, ReleaseMode};
 use jni::sys::{jint, jlong};

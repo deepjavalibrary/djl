@@ -17,6 +17,7 @@ mod ndarray;
 #[cfg(feature = "cuda")]
 mod compute_cap;
 mod models;
+mod layers;
 
 extern crate tokenizers as tk;
 

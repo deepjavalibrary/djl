@@ -1,4 +1,4 @@
-use candle_core::{DType, Device, Result, Tensor};
+use candle::{DType, Device, Result, Tensor};
 use candle_nn::{Embedding, Module, VarBuilder};
 use candle_transformers::models::with_tracing::{layer_norm, linear, LayerNorm, Linear};
 use serde::Deserialize;
@@ -210,7 +210,7 @@ impl MultiHeadSelfAttention {
             let mask = attention_mask.broadcast_as(scores.shape())?;
 
             let scores = masked_fill(&scores.to_dtype(DType::F32)?, &mask, f32::NEG_INFINITY)?;
-            let weights = candle_nn::ops::softmax(&scores, candle_core::D::Minus1)?;
+            let weights = candle_nn::ops::softmax(&scores, candle::D::Minus1)?;
 
             let context = weights.matmul(&v.contiguous()?)?;
             context

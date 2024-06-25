@@ -1,4 +1,4 @@
-use candle_core::Tensor;
+use candle::Tensor;
 use jni::objects::JObject;
 use jni::sys::jlong;
 use jni::JNIEnv;

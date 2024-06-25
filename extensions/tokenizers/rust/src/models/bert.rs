@@ -1,7 +1,8 @@
 use crate::models::Model;
-use candle_core::{Device, Result, Tensor};
+use crate::layers::Linear;
+use candle::{Device, Result, Tensor};
 use candle_nn::{embedding, Embedding, Module, VarBuilder};
-use candle_transformers::models::with_tracing::{layer_norm, linear, LayerNorm, Linear};
+use candle_transformers::models::with_tracing::{layer_norm, LayerNorm};
 use serde::Deserialize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
@@ -208,11 +209,11 @@ impl BertSelfAttention {
     fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
         let attention_head_size = config.hidden_size / config.num_attention_heads;
         let all_head_size = config.num_attention_heads * attention_head_size;
-        let dropout = Dropout::new(config.hidden_dropout_prob);
         let hidden_size = config.hidden_size;
-        let query = linear(hidden_size, all_head_size, vb.pp("query"))?;
-        let value = linear(hidden_size, all_head_size, vb.pp("value"))?;
-        let key = linear(hidden_size, all_head_size, vb.pp("key"))?;
+        let dropout = Dropout::new(config.hidden_dropout_prob);
+        let query = Linear::load(vb.pp("query"), hidden_size, all_head_size, None)?;
+        let value = Linear::load(vb.pp("value"), hidden_size, all_head_size, None)?;
+        let key = Linear::load(vb.pp("key"), hidden_size, all_head_size, None)?;
         Ok(Self {
             query,
             key,
@@ -275,7 +276,7 @@ impl Module for BertSelfAttention {
             let attention_scores = (attention_scores / (self.attention_head_size as f64).sqrt())?;
             let attention_probs = {
                 let _enter_sm = self.span_softmax.enter();
-                candle_nn::ops::softmax(&attention_scores, candle_core::D::Minus1)?
+                candle_nn::ops::softmax(&attention_scores, candle::D::Minus1)?
             };
             let attention_probs = self.dropout.forward(&attention_probs)?;
 
@@ -284,7 +285,7 @@ impl Module for BertSelfAttention {
         };
 
         let context_layer = context_layer.transpose(1, 2)?.contiguous()?;
-        let context_layer = context_layer.flatten_from(candle_core::D::Minus2)?;
+        let context_layer = context_layer.flatten_from(candle::D::Minus2)?;
         Ok(context_layer)
     }
 }
@@ -298,7 +299,7 @@ struct BertSelfOutput {
 
 impl BertSelfOutput {
     fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
-        let dense = linear(config.hidden_size, config.hidden_size, vb.pp("dense"))?;
+        let dense = Linear::load(vb.pp("dense"), config.hidden_size, config.hidden_size, None)?;
         let layer_norm = layer_norm(
             config.hidden_size,
             config.layer_norm_eps,
@@ -358,7 +359,7 @@ struct BertIntermediate {
 
 impl BertIntermediate {
     fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
-        let dense = linear(config.hidden_size, config.intermediate_size, vb.pp("dense"))?;
+        let dense = Linear::load(vb.pp("dense"), config.hidden_size, config.intermediate_size, None)?;
         Ok(Self {
             dense,
             intermediate_act: HiddenActLayer::new(config.hidden_act),
@@ -386,7 +387,7 @@ struct BertOutput {
 
 impl BertOutput {
     fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
-        let dense = linear(config.intermediate_size, config.hidden_size, vb.pp("dense"))?;
+        let dense = Linear::load(vb.pp("dense"), config.intermediate_size, config.hidden_size, None)?;
         let layer_norm = layer_norm(
             config.hidden_size,
             config.layer_norm_eps,

@@ -6,10 +6,11 @@ edition = "2021"
 
 [dependencies]
 jni = "0.21.1"
-candle-core = "0.5.1"
+candle = { version = "0.5.1", package = "candle-core" }
 candle-nn = "0.5.1"
 candle-transformers = "0.5.1"
 candle-flash-attn = { version = "0.5.1", optional = true }
+cudarc = { version = "0.11.6", default-features = false, features = [ "cublaslt", "f16" ], optional = true }
 tokenizers = { path = "../tokenizers/tokenizers", version = "*", features = ["http"] }
 half = "2.4.0"
 tracing = "0.1.40"
@@ -25,5 +26,5 @@ openssl = { version = "0.10", features = ["vendored"] }
 crate_type = ["cdylib"]
 
 [features]
-cuda = ["candle-core/cuda", "candle-nn/cuda", "candle-transformers/cuda"]
+cuda = ["candle/cuda", "candle-nn/cuda", "candle-transformers/cuda"]
 flash-attn = ["cuda", "candle-transformers/flash-attn", "dep:candle-flash-attn"]
