@@ -1,5 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package ai.djl
 
 import org.gradle.kotlin.dsl.attributes
