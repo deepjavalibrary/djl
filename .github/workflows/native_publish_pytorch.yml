@@ -31,7 +31,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Download native binaries
-        run: ./gradlew :engines:pytorch:pytorch-native:dPTNL -Ppackage_type=${{ github.event.inputs.package_type }}
+        run: ./gradlew :engines:pytorch:pytorch-native:dPTNL -Ppackage_type=${{ inputs.package_type }}
       - name: Publish to snapshot/staging repository
         working-directory: engines/pytorch/pytorch-native
         run: ./gradlew publish -P${{ github.event.inputs.mode }}
