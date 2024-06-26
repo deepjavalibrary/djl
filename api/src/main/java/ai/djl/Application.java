@@ -82,25 +82,15 @@ public class Application {
             case "nlp/fill_mask":
             case "fill_mask":
                 return NLP.FILL_MASK;
-            case "nlp/machine_translation":
-            case "machine_translation":
-                return NLP.MACHINE_TRANSLATION;
-            case "nlp/multiple_choice":
-            case "multiple_choice":
-                return NLP.MULTIPLE_CHOICE;
             case "nlp/question_answer":
             case "question_answering":
                 return NLP.QUESTION_ANSWER;
-            case "nlp/sentiment_analysis":
-            case "sentiment_analysis":
-                return NLP.SENTIMENT_ANALYSIS;
             case "nlp/text_classification":
             case "text_classification":
                 return NLP.TEXT_CLASSIFICATION;
-            case "nlp/text_embedding":
-            case "text_embedding":
-            case "sentence_similarity":
-                return NLP.TEXT_EMBEDDING;
+            case "nlp/sentiment_analysis":
+            case "sentiment_analysis":
+                return NLP.SENTIMENT_ANALYSIS;
             case "nlp/token_classification":
             case "token_classification":
                 return NLP.TOKEN_CLASSIFICATION;
@@ -110,10 +100,26 @@ public class Application {
             case "nlp/text_generation":
             case "text_generation":
                 return NLP.TEXT_GENERATION;
+            case "nlp/machine_translation":
+            case "machine_translation":
+                return NLP.MACHINE_TRANSLATION;
+            case "nlp/multiple_choice":
+            case "multiple_choice":
+                return NLP.MULTIPLE_CHOICE;
+            case "nlp/text_embedding":
+            case "text_embedding":
+            case "sentence_similarity":
+                return NLP.TEXT_EMBEDDING;
             case "tabular":
                 return Tabular.ANY;
             case "tabular/linear_regression":
                 return Tabular.LINEAR_REGRESSION;
+            case "tabular/softmax_regression":
+                return Tabular.SOFTMAX_REGRESSION;
+            case "audio":
+                return Audio.ANY;
+            case "timeseries/forecasting":
+                return TimeSeries.FORECASTING;
             case "undefined":
             default:
                 return UNDEFINED;
