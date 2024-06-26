@@ -133,7 +133,7 @@ jobs:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: [ self-hosted, gpu ]
     container:
-      image: nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu20.04
+      image: nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
       options: --gpus all --runtime=nvidia
     timeout-minutes: 30
     needs: create-runners
@@ -141,7 +141,7 @@ jobs:
       - name: Setup Environment
         run: |
           apt-get update
-          apt-get install -y software-properties-common wget locales libfontconfig1
+          DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common wget locales libfontconfig1
           locale-gen en_US.UTF-8
       - uses: actions/checkout@v4
       - name: Set up JDK 17

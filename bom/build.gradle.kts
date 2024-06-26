@@ -123,7 +123,6 @@ publishing {
                         +"ai.djl.mxnet:mxnet-native-mkl:$mxnet:win-x86_64"
                         +"ai.djl.mxnet:mxnet-native-cu112mkl:$mxnet:linux-x86_64"
                         var pytorch = libs.versions.pytorch.get()
-                        +"ai.djl.pytorch:pytorch-native-cpu:$pytorch:osx-x86_64"
                         +"ai.djl.pytorch:pytorch-native-cpu:$pytorch:osx-aarch64"
                         +"ai.djl.pytorch:pytorch-native-cpu:$pytorch:linux-x86_64"
                         +"ai.djl.pytorch:pytorch-native-cpu:$pytorch:win-x86_64"
@@ -136,12 +135,13 @@ publishing {
                         +"ai.djl.pytorch:pytorch-native-cu117:$pytorch:linux-x86_64"
                         +"ai.djl.pytorch:pytorch-native-cu117:$pytorch:win-x86_64"
                         +"ai.djl.pytorch:pytorch-native-cu117-precxx11:$pytorch:linux-x86_64"
-                        val tensorflow = libs.versions.tensorflow.get()
+                        val tensorflow = "${libs.versions.tensorflow.get()}-SNAPSHOT"
                         +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:osx-x86_64"
+                        +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:osx-aarch64"
                         +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:linux-x86_64"
+                        +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:linux-aarch64"
                         +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:win-x86_64"
-                        +"ai.djl.tensorflow:tensorflow-native-cu113:$tensorflow:linux-x86_64"
-                        +"ai.djl.tensorflow:tensorflow-native-cu113:$tensorflow:win-x86_64"
+                        +"ai.djl.tensorflow:tensorflow-native-cu121:$tensorflow:linux-x86_64"
                     }
                 }
             }
