@@ -38,7 +38,8 @@ public class TimeOffset {
     /**
      * Return {@code TimeOffset} object from frequency string.
      *
-     * @param frequencyString Frequency string of the form [multiple][granularity] such as "12H", "1D" etc.
+     * @param frequencyString Frequency string of the form [multiple][granularity] such as "12H",
+     *     "1D" etc.
      * @return a TimeOffset containing multiple and granularity
      */
     public static TimeOffset toOffset(String frequencyString) {
