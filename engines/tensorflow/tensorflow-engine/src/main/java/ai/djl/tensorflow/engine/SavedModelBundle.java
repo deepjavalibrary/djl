@@ -17,9 +17,9 @@ import org.tensorflow.internal.c_api.TF_Graph;
 import org.tensorflow.internal.c_api.TF_Operation;
 import org.tensorflow.internal.c_api.TF_Session;
 import org.tensorflow.internal.c_api.global.tensorflow;
-import org.tensorflow.proto.framework.CollectionDef;
-import org.tensorflow.proto.framework.MetaGraphDef;
-import org.tensorflow.proto.framework.SignatureDef;
+import org.tensorflow.proto.CollectionDef;
+import org.tensorflow.proto.MetaGraphDef;
+import org.tensorflow.proto.SignatureDef;
 
 import java.util.ArrayList;
 import java.util.List;

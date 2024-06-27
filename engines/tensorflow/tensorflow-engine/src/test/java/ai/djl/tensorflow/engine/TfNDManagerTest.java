@@ -16,7 +16,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.testing.TestRequirements;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -28,8 +27,6 @@ public class TfNDManagerTest {
 
     @Test
     public void testNDArray() {
-        TestRequirements.notArm();
-
         try (NDManager manager = NDManager.newBaseManager()) {
             NDArray array = manager.create("string");
             Assert.assertEquals(array.toStringArray()[0], "string");

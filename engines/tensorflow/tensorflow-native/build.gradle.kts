@@ -1,3 +1,7 @@
+import java.net.URL
+import java.util.zip.GZIPOutputStream
+import java.util.zip.ZipInputStream
+
 plugins {
     ai.djl.javaProject
     `maven-publish`
@@ -8,88 +12,56 @@ group = "ai.djl.tensorflow"
 
 val isRelease = project.hasProperty("release") || project.hasProperty("staging")
 version = libs.versions.tensorflow.get() + if (isRelease) "" else "-SNAPSHOT"
+val tfJava = libs.versions.tensorflowCore.get()
 
-val download by configurations.registering
-
-@Suppress("UnstableApiUsage")
-dependencies {
-    download("org.tensorflow:tensorflow-core-api:0.5.0:linux-x86_64-gpu")
-    download("org.tensorflow:tensorflow-core-api:0.5.0:linux-x86_64")
-    download("org.tensorflow:tensorflow-core-api:0.5.0:macosx-x86_64")
-    download("org.tensorflow:tensorflow-core-api:0.5.0:windows-x86_64")
-    download("org.tensorflow:tensorflow-core-api:0.5.0:windows-x86_64-gpu")
+infix fun URL.unzipInto(dir: File) {
+    dir.mkdirs()
+    ZipInputStream(openStream()).use { zis ->
+        generateSequence { zis.nextEntry }.forEach {
+            if (!it.isDirectory && it.name.startsWith("org/tensorflow/internal/c_api")) {
+                val fileName = it.name.split("/").last()
+                if (it.name.matches(Regex(".+(\\.so(\\.\\d+)?|\\.dylib|\\.dll|LICENSE.*)"))) {
+                    project.logger.lifecycle("gzip $fileName ...")
+                    GZIPOutputStream((dir / "${fileName}.gz").outputStream()).use { out ->
+                        zis.copyTo(out)
+                    }
+                }
+            }
+        }
+    }
 }
 
 tasks {
     register("uploadTensorflowNativeLibs") {
         doLast {
-            delete(buildDirectory / "download")
-            delete(buildDirectory / "native")
+            val dir = buildDirectory / "download"
+            delete(dir)
 
-            copy {
-                from(download)
-                into(buildDirectory / "download")
-            }
+            val url =
+                "https://repo1.maven.org/maven2/org/tensorflow/tensorflow-core-native/${tfJava}/tensorflow-core-native-$tfJava"
+            val aarch64Url = "https://publish.djl.ai/tensorflow/${libs.versions.tensorflow.get()}/linux-arm64.jar"
 
-            fileTree(buildDirectory / "download").forEach { f ->
-                copy {
-                    from(zipTree(f)) {
-                        exclude(
-                            "**/pom.xml",
-                            "**/*.properties",
-                            "**/*.h",
-                            "**/*.hpp",
-                            "**/*.cmake",
-                            "META-INF/**"
-                        )
-                    }
-                    into(buildDirectory / "native")
-                    includeEmptyDirs = false
+            "${url}-macosx-arm64.jar".url unzipInto dir / "cpu/osx-aarch64/native/lib"
+            "${url}-macosx-x86_64.jar".url unzipInto dir / "cpu/osx-x86_64/native/lib"
+            "${url}-windows-x86_64.jar".url unzipInto dir / "cpu/win-x86_64/native/lib"
+            "${url}-linux-x86_64.jar".url unzipInto dir / "cpu/linux-x86_64/native/lib"
+            "${url}-linux-x86_64-gpu.jar".url unzipInto dir / "cu121/linux-x86_64/native/lib"
+            aarch64Url.url unzipInto dir / "cpu/linux-aarch64/native/lib"
+            (dir / "cpu/linux-aarch64/native/lib/libomp.so.gz").renameTo(dir / "cpu/linux-aarch64/native/lib/libomp-e9212f90.so.5.gz")
+
+            (dir / "files.txt").text = buildString {
+                fileTree(dir).files.forEach {
+                    appendLine(it.toRelativeString(dir))
                 }
             }
-
-            exec {
-                commandLine("sh", "-c", "find $buildDirectory/native -type f | xargs gzip")
-            }
-
-            val tfUnzipDir = buildDirectory / "native/org/tensorflow/internal/c_api"
-
-            ant.withGroovyBuilder {
-                "move"("file" to "$tfUnzipDir/linux-x86_64/", "toFile" to "$buildDirectory/native/linux/cpu/")
-                "move"("file" to "$tfUnzipDir/linux-x86_64-gpu/", "toFile" to "$buildDirectory/native/linux/cu113/")
-                "move"("file" to "$tfUnzipDir/macosx-x86_64/", "toFile" to "$buildDirectory/native/osx/cpu/")
-                "move"("file" to "$tfUnzipDir/windows-x86_64/", "toFile" to "$buildDirectory/native/win/cpu/")
-                "move"("file" to "$tfUnzipDir/windows-x86_64-gpu/", "toFile" to "$buildDirectory/native/win/cu113/")
-            }
-
-            (buildDirectory / "native/files.txt").text = buildString {
-                val uploadDirs = listOf(
-                    buildDirectory / "native/linux/cpu/",
-                    buildDirectory / "native/linux/cu113/",
-                    buildDirectory / "native/osx/cpu/",
-                    buildDirectory / "native/win/cpu/",
-                    buildDirectory / "native/win/cu113/"
-                )
-                for (item in uploadDirs)
-                    fileTree(item).files.map { it.name }.forEach {
-                        val out = item.toRelativeString(buildDirectory / "native/")
-                        appendLine("$out/$it")
-                    }
-            }
-            delete(
-                buildDirectory / "native/org/",
-                buildDirectory / "native/com/",
-                buildDirectory / "native/google/",
-                buildDirectory / "native/module-info.class.gz"
-            )
 
             exec {
                 commandLine(
                     "aws",
                     "s3",
                     "sync",
-                    "$buildDirectory/native/",
-                    "s3://djl-ai/publish/tensorflow-${libs.versions.tensorflow.get()}/"
+                    "$buildDirectory/download/",
+                    "s3://djl-ai/publish/tensorflow/${libs.versions.tensorflow.get()}/"
                 )
             }
         }
@@ -119,10 +91,10 @@ tasks {
     withType<GenerateModuleMetadata> { enabled = false }
 
     val binaryRoot = buildDirectory / "download"
+    (binaryRoot / "files.txt").delete()
     val requireSigning = project.hasProperty("staging") || project.hasProperty("snapshot")
     val flavorNames: Array<String> = binaryRoot.list() ?: emptyArray()
     for (flavor in flavorNames) {
-
         val platformNames = (binaryRoot / flavor).list() ?: emptyArray()
 
         val artifactsNames = ArrayList<Task>()
@@ -138,7 +110,7 @@ tasks {
                     val versionName = "${project.version}-$nowFormatted"
                     val dir = binaryRoot / flavor / osName / "native/lib"
                     propFile.text = buildString {
-                        append("version=$versionName\nclassifier=$flavor-$osName-x86_64\nlibraries=")
+                        append("version=$versionName\nclassifier=$flavor-$osName\nlibraries=")
                         var first = true
                         for (name in dir.list()!!.sorted()) {
                             if (first)
@@ -152,7 +124,7 @@ tasks {
                     from("src/main/resources")
                 }
                 from(binaryRoot / flavor / osName)
-                archiveClassifier = "$osName-x86_64"
+                archiveClassifier = osName
                 archiveBaseName = "tensorflow-native-$flavor"
 
                 manifest {
@@ -261,126 +233,18 @@ tasks {
 
     register("downloadTensorflowNativeLib") {
         doLast {
-            val url = "https://publish.djl.ai/tensorflow-${libs.versions.tensorflow.get()}"
-            // @formatter:off
-            val files = mapOf(
-                "linux/cpu/libjnitensorflow.so.gz"                           to "cpu/linux/native/lib/libjnitensorflow.so",
-                "linux/cpu/libtensorflow_cc.so.2.gz"                         to "cpu/linux/native/lib/libtensorflow_cc.so.2",
-                "linux/cpu/libtensorflow_framework.so.2.gz"                  to "cpu/linux/native/lib/libtensorflow_framework.so.2",
-                "linux/cpu/LICENSE.gz"                                       to "cpu/linux/META-INF/LICENSE",
-                "linux/cpu/THIRD_PARTY_TF_JNI_LICENSES.gz"                   to "cpu/linux/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
-                "linux/cu113/libjnitensorflow.so.gz"                         to "cu113/linux/native/lib/libjnitensorflow.so",
-                "linux/cu113/libtensorflow_cc.so.2.gz"                       to "cu113/linux/native/lib/libtensorflow_cc.so.2",
-                "linux/cu113/libtensorflow_framework.so.2.gz"                to "cu113/linux/native/lib/libtensorflow_framework.so.2",
-                "linux/cu113/LICENSE.gz"                                     to "cu113/linux/META-INF/LICENSE",
-                "linux/cu113/THIRD_PARTY_TF_JNI_LICENSES.gz"                 to "cu113/linux/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
-                "osx/cpu/libjnitensorflow.dylib.gz"                          to "cpu/osx/native/lib/libjnitensorflow.dylib",
-                "osx/cpu/libtensorflow_cc.2.dylib.gz"                        to "cpu/osx/native/lib/libtensorflow_cc.2.dylib",
-                "osx/cpu/libtensorflow_framework.2.dylib.gz"                 to "cpu/osx/native/lib/libtensorflow_framework.2.dylib",
-                "osx/cpu/LICENSE.gz"                                         to "cpu/osx/META-INF/LICENSE",
-                "osx/cpu/THIRD_PARTY_TF_JNI_LICENSES.gz"                     to "cpu/osx/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
-                "win/cpu/api-ms-win-core-console-l1-1-0.dll.gz"              to "cpu/win/native/lib/api-ms-win-core-console-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-datetime-l1-1-0.dll.gz"             to "cpu/win/native/lib/api-ms-win-core-datetime-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-debug-l1-1-0.dll.gz"                to "cpu/win/native/lib/api-ms-win-core-debug-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-errorhandling-l1-1-0.dll.gz"        to "cpu/win/native/lib/api-ms-win-core-errorhandling-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-file-l1-1-0.dll.gz"                 to "cpu/win/native/lib/api-ms-win-core-file-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-file-l1-2-0.dll.gz"                 to "cpu/win/native/lib/api-ms-win-core-file-l1-2-0.dll",
-                "win/cpu/api-ms-win-core-file-l2-1-0.dll.gz"                 to "cpu/win/native/lib/api-ms-win-core-file-l2-1-0.dll",
-                "win/cpu/api-ms-win-core-handle-l1-1-0.dll.gz"               to "cpu/win/native/lib/api-ms-win-core-handle-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-heap-l1-1-0.dll.gz"                 to "cpu/win/native/lib/api-ms-win-core-heap-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-interlocked-l1-1-0.dll.gz"          to "cpu/win/native/lib/api-ms-win-core-interlocked-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-libraryloader-l1-1-0.dll.gz"        to "cpu/win/native/lib/api-ms-win-core-libraryloader-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-localization-l1-2-0.dll.gz"         to "cpu/win/native/lib/api-ms-win-core-localization-l1-2-0.dll",
-                "win/cpu/api-ms-win-core-memory-l1-1-0.dll.gz"               to "cpu/win/native/lib/api-ms-win-core-memory-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-namedpipe-l1-1-0.dll.gz"            to "cpu/win/native/lib/api-ms-win-core-namedpipe-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-processenvironment-l1-1-0.dll.gz"   to "cpu/win/native/lib/api-ms-win-core-processenvironment-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-processthreads-l1-1-0.dll.gz"       to "cpu/win/native/lib/api-ms-win-core-processthreads-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-processthreads-l1-1-1.dll.gz"       to "cpu/win/native/lib/api-ms-win-core-processthreads-l1-1-1.dll",
-                "win/cpu/api-ms-win-core-profile-l1-1-0.dll.gz"              to "cpu/win/native/lib/api-ms-win-core-profile-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-rtlsupport-l1-1-0.dll.gz"           to "cpu/win/native/lib/api-ms-win-core-rtlsupport-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-string-l1-1-0.dll.gz"               to "cpu/win/native/lib/api-ms-win-core-string-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-synch-l1-1-0.dll.gz"                to "cpu/win/native/lib/api-ms-win-core-synch-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-synch-l1-2-0.dll.gz"                to "cpu/win/native/lib/api-ms-win-core-synch-l1-2-0.dll",
-                "win/cpu/api-ms-win-core-sysinfo-l1-1-0.dll.gz"              to "cpu/win/native/lib/api-ms-win-core-sysinfo-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-timezone-l1-1-0.dll.gz"             to "cpu/win/native/lib/api-ms-win-core-timezone-l1-1-0.dll",
-                "win/cpu/api-ms-win-core-util-l1-1-0.dll.gz"                 to "cpu/win/native/lib/api-ms-win-core-util-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-convert-l1-1-0.dll.gz"               to "cpu/win/native/lib/api-ms-win-crt-convert-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-environment-l1-1-0.dll.gz"           to "cpu/win/native/lib/api-ms-win-crt-environment-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-filesystem-l1-1-0.dll.gz"            to "cpu/win/native/lib/api-ms-win-crt-filesystem-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-heap-l1-1-0.dll.gz"                  to "cpu/win/native/lib/api-ms-win-crt-heap-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-locale-l1-1-0.dll.gz"                to "cpu/win/native/lib/api-ms-win-crt-locale-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-math-l1-1-0.dll.gz"                  to "cpu/win/native/lib/api-ms-win-crt-math-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-multibyte-l1-1-0.dll.gz"             to "cpu/win/native/lib/api-ms-win-crt-multibyte-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-runtime-l1-1-0.dll.gz"               to "cpu/win/native/lib/api-ms-win-crt-runtime-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-stdio-l1-1-0.dll.gz"                 to "cpu/win/native/lib/api-ms-win-crt-stdio-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-string-l1-1-0.dll.gz"                to "cpu/win/native/lib/api-ms-win-crt-string-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-time-l1-1-0.dll.gz"                  to "cpu/win/native/lib/api-ms-win-crt-time-l1-1-0.dll",
-                "win/cpu/api-ms-win-crt-utility-l1-1-0.dll.gz"               to "cpu/win/native/lib/api-ms-win-crt-utility-l1-1-0.dll",
-                "win/cpu/concrt140.dll.gz"                                   to "cpu/win/native/lib/concrt140.dll",
-                "win/cpu/jnitensorflow.dll.gz"                               to "cpu/win/native/lib/jnitensorflow.dll",
-                "win/cpu/libiomp5md.dll.gz"                                  to "cpu/win/native/lib/libiomp5md.dll",
-                "win/cpu/LICENSE.gz"                                         to "cpu/win/META-INF/LICENSE",
-                "win/cpu/msvcp140.dll.gz"                                    to "cpu/win/native/lib/msvcp140.dll",
-                "win/cpu/tensorflow_cc.dll.gz"                               to "cpu/win/native/lib/tensorflow_cc.dll",
-                "win/cpu/THIRD_PARTY_TF_JNI_LICENSES.gz"                     to "cpu/win/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
-                "win/cpu/ucrtbase.dll.gz"                                    to "cpu/win/native/lib/ucrtbase.dll",
-                "win/cpu/vcomp140.dll.gz"                                    to "cpu/win/native/lib/vcomp140.dll",
-                "win/cpu/vcruntime140_1.dll.gz"                              to "cpu/win/native/lib/vcruntime140_1.dll",
-                "win/cpu/vcruntime140.dll.gz"                                to "cpu/win/native/lib/vcruntime140.dll",
-                "win/cu113/api-ms-win-core-console-l1-1-0.dll.gz"            to "cu113/win/native/lib/api-ms-win-core-console-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-datetime-l1-1-0.dll.gz"           to "cu113/win/native/lib/api-ms-win-core-datetime-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-debug-l1-1-0.dll.gz"              to "cu113/win/native/lib/api-ms-win-core-debug-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-errorhandling-l1-1-0.dll.gz"      to "cu113/win/native/lib/api-ms-win-core-errorhandling-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-file-l1-1-0.dll.gz"               to "cu113/win/native/lib/api-ms-win-core-file-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-file-l1-2-0.dll.gz"               to "cu113/win/native/lib/api-ms-win-core-file-l1-2-0.dll",
-                "win/cu113/api-ms-win-core-file-l2-1-0.dll.gz"               to "cu113/win/native/lib/api-ms-win-core-file-l2-1-0.dll",
-                "win/cu113/api-ms-win-core-handle-l1-1-0.dll.gz"             to "cu113/win/native/lib/api-ms-win-core-handle-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-heap-l1-1-0.dll.gz"               to "cu113/win/native/lib/api-ms-win-core-heap-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-interlocked-l1-1-0.dll.gz"        to "cu113/win/native/lib/api-ms-win-core-interlocked-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-libraryloader-l1-1-0.dll.gz"      to "cu113/win/native/lib/api-ms-win-core-libraryloader-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-localization-l1-2-0.dll.gz"       to "cu113/win/native/lib/api-ms-win-core-localization-l1-2-0.dll",
-                "win/cu113/api-ms-win-core-memory-l1-1-0.dll.gz"             to "cu113/win/native/lib/api-ms-win-core-memory-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-namedpipe-l1-1-0.dll.gz"          to "cu113/win/native/lib/api-ms-win-core-namedpipe-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-processenvironment-l1-1-0.dll.gz" to "cu113/win/native/lib/api-ms-win-core-processenvironment-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-processthreads-l1-1-0.dll.gz"     to "cu113/win/native/lib/api-ms-win-core-processthreads-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-processthreads-l1-1-1.dll.gz"     to "cu113/win/native/lib/api-ms-win-core-processthreads-l1-1-1.dll",
-                "win/cu113/api-ms-win-core-profile-l1-1-0.dll.gz"            to "cu113/win/native/lib/api-ms-win-core-profile-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-rtlsupport-l1-1-0.dll.gz"         to "cu113/win/native/lib/api-ms-win-core-rtlsupport-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-string-l1-1-0.dll.gz"             to "cu113/win/native/lib/api-ms-win-core-string-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-synch-l1-1-0.dll.gz"              to "cu113/win/native/lib/api-ms-win-core-synch-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-synch-l1-2-0.dll.gz"              to "cu113/win/native/lib/api-ms-win-core-synch-l1-2-0.dll",
-                "win/cu113/api-ms-win-core-sysinfo-l1-1-0.dll.gz"            to "cu113/win/native/lib/api-ms-win-core-sysinfo-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-timezone-l1-1-0.dll.gz"           to "cu113/win/native/lib/api-ms-win-core-timezone-l1-1-0.dll",
-                "win/cu113/api-ms-win-core-util-l1-1-0.dll.gz"               to "cu113/win/native/lib/api-ms-win-core-util-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-convert-l1-1-0.dll.gz"             to "cu113/win/native/lib/api-ms-win-crt-convert-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-environment-l1-1-0.dll.gz"         to "cu113/win/native/lib/api-ms-win-crt-environment-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-filesystem-l1-1-0.dll.gz"          to "cu113/win/native/lib/api-ms-win-crt-filesystem-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-heap-l1-1-0.dll.gz"                to "cu113/win/native/lib/api-ms-win-crt-heap-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-locale-l1-1-0.dll.gz"              to "cu113/win/native/lib/api-ms-win-crt-locale-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-math-l1-1-0.dll.gz"                to "cu113/win/native/lib/api-ms-win-crt-math-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-multibyte-l1-1-0.dll.gz"           to "cu113/win/native/lib/api-ms-win-crt-multibyte-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-runtime-l1-1-0.dll.gz"             to "cu113/win/native/lib/api-ms-win-crt-runtime-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-stdio-l1-1-0.dll.gz"               to "cu113/win/native/lib/api-ms-win-crt-stdio-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-string-l1-1-0.dll.gz"              to "cu113/win/native/lib/api-ms-win-crt-string-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-time-l1-1-0.dll.gz"                to "cu113/win/native/lib/api-ms-win-crt-time-l1-1-0.dll",
-                "win/cu113/api-ms-win-crt-utility-l1-1-0.dll.gz"             to "cu113/win/native/lib/api-ms-win-crt-utility-l1-1-0.dll",
-                "win/cu113/concrt140.dll.gz"                                 to "cu113/win/native/lib/concrt140.dll",
-                "win/cu113/jnitensorflow.dll.gz"                             to "cu113/win/native/lib/jnitensorflow.dll",
-                "win/cu113/libiomp5md.dll.gz"                                to "cu113/win/native/lib/libiomp5md.dll",
-                "win/cu113/LICENSE.gz"                                       to "cu113/win/META-INF/LICENSE",
-                "win/cu113/msvcp140.dll.gz"                                  to "cu113/win/native/lib/msvcp140.dll",
-                "win/cu113/tensorflow_cc.dll.gz"                             to "cu113/win/native/lib/tensorflow_cc.dll",
-                "win/cu113/THIRD_PARTY_TF_JNI_LICENSES.gz"                   to "cu113/win/META-INF/THIRD_PARTY_TF_JNI_LICENSES",
-                "win/cu113/ucrtbase.dll.gz"                                  to "cu113/win/native/lib/ucrtbase.dll",
-                "win/cu113/vcomp140.dll.gz"                                  to "cu113/win/native/lib/vcomp140.dll",
-                "win/cu113/vcruntime140_1.dll.gz"                            to "cu113/win/native/lib/vcruntime140_1.dll",
-                "win/cu113/vcruntime140.dll.gz"                              to "cu113/win/native/lib/vcruntime140.dll")
-            // @formatter:on
-            for ((key, value) in files) {
-                project.logger.lifecycle("Downloading $url/$key")
-                val file = binaryRoot / value
+            delete(binaryRoot)
+
+            val url = "https://publish.djl.ai/tensorflow/${libs.versions.tensorflow.get()}"
+            val list = "${url}/files.txt".url.text.split(Regex("\n"))
+            for (f in list) {
+                if (f.isBlank()) {
+                    continue
+                }
+                project.logger.lifecycle("Downloading $f")
+                val file = binaryRoot / f.substring(0, f.length - 3)
                 file.parentFile.mkdirs()
-                "$url/$key".url gzipInto file
+                "$url/$f".url gzipInto file
             }
         }
     }

@@ -33,10 +33,10 @@ import org.tensorflow.internal.c_api.TF_Graph;
 import org.tensorflow.internal.c_api.TF_Operation;
 import org.tensorflow.internal.c_api.TF_Session;
 import org.tensorflow.internal.c_api.TF_Tensor;
-import org.tensorflow.proto.framework.MetaGraphDef;
-import org.tensorflow.proto.framework.SignatureDef;
-import org.tensorflow.proto.framework.TensorInfo;
-import org.tensorflow.proto.framework.TensorShapeProto;
+import org.tensorflow.proto.MetaGraphDef;
+import org.tensorflow.proto.SignatureDef;
+import org.tensorflow.proto.TensorInfo;
+import org.tensorflow.proto.TensorShapeProto;
 
 import java.util.ArrayList;
 import java.util.Arrays;

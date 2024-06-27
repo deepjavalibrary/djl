@@ -152,7 +152,6 @@ public final class LibUtils {
 
     private static String downloadTensorFlow(Platform platform) {
         String version = platform.getVersion();
-        String os = platform.getOsPrefix();
         String classifier = platform.getClassifier();
         String cudaArch = platform.getCudaArch();
         String flavor = platform.getFlavor();
@@ -172,13 +171,13 @@ public final class LibUtils {
         }
 
         Path tmp = null;
-        String link = "https://publish.djl.ai/tensorflow-" + matcher.group(1);
+        String link = "https://publish.djl.ai/tensorflow/" + matcher.group(1);
         try (InputStream is = Utils.openUrl(link + "/files.txt")) {
             Files.createDirectories(cacheDir);
             tmp = Files.createTempDirectory(cacheDir, "tmp");
 
             List<String> lines = Utils.readLines(is);
-            boolean found = downloadFiles(lines, link, os, flavor, tmp);
+            boolean found = downloadFiles(lines, link, classifier, flavor, tmp);
             if (!found && cudaArch != null) {
                 // fallback to cpu
                 String cpuFlavor = "cpu";
@@ -187,13 +186,13 @@ public final class LibUtils {
                 if (Files.exists(path)) {
                     logger.warn(
                             "No matching CUDA flavor for {} found: {}/sm_{}, fallback to CPU.",
-                            os,
+                            classifier,
                             flavor,
                             cudaArch);
                     return path.toAbsolutePath().toString();
                 }
                 flavor = cpuFlavor;
-                found = downloadFiles(lines, link, os, flavor, tmp);
+                found = downloadFiles(lines, link, classifier, flavor, tmp);
             }
 
             if (!found) {
@@ -213,11 +212,17 @@ public final class LibUtils {
     }
 
     private static boolean downloadFiles(
-            List<String> lines, String link, String os, String flavor, Path tmp)
+            List<String> lines, String link, String classifier, String flavor, Path tmp)
             throws IOException {
         boolean found = false;
+        String prefix;
+        if (flavor.startsWith("cu12") && "linux-x86_64".equals(classifier)) {
+            prefix = "cu121/linux-x86_64";
+        } else {
+            prefix = flavor + '/' + classifier + '/';
+        }
         for (String line : lines) {
-            if (line.startsWith(os + '/' + flavor + '/')) {
+            if (line.startsWith(prefix)) {
                 found = true;
                 URL url = new URL(link + '/' + line.replace("+", "%2B"));
                 String fileName = line.substring(line.lastIndexOf('/') + 1, line.length() - 3);

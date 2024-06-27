@@ -47,10 +47,10 @@ import org.tensorflow.internal.c_api.TF_Status;
 import org.tensorflow.internal.c_api.TF_TString;
 import org.tensorflow.internal.c_api.TF_Tensor;
 import org.tensorflow.internal.c_api.global.tensorflow;
-import org.tensorflow.proto.framework.ConfigProto;
-import org.tensorflow.proto.framework.GPUOptions;
-import org.tensorflow.proto.framework.MetaGraphDef;
-import org.tensorflow.proto.framework.RunOptions;
+import org.tensorflow.proto.ConfigProto;
+import org.tensorflow.proto.GPUOptions;
+import org.tensorflow.proto.MetaGraphDef;
+import org.tensorflow.proto.RunOptions;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

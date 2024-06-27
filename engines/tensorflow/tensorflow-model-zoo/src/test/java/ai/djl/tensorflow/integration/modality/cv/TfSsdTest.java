@@ -26,14 +26,12 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Pair;
 
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -44,11 +42,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TfSsdTest {
-
-    @BeforeClass
-    public void setUp() {
-        TestRequirements.notArm();
-    }
 
     @Test
     public void testTfSSD() throws IOException, ModelException, TranslateException {

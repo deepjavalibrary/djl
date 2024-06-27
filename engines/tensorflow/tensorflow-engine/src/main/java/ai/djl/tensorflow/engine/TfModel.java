@@ -22,8 +22,8 @@ import ai.djl.util.Utils;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import org.tensorflow.proto.framework.ConfigProto;
-import org.tensorflow.proto.framework.RunOptions;
+import org.tensorflow.proto.ConfigProto;
+import org.tensorflow.proto.RunOptions;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
