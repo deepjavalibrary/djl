@@ -37,15 +37,15 @@ public class DistributionTest {
             NDArray logits = manager.create(new float[] {0.1f, 2f});
             totalCount.setName("total_count");
             logits.setName("logits");
-            Distribution negativeBinomial =
+            Distribution negativeBinomialDistribution =
                     NegativeBinomial.builder().setDistrArgs(new NDList(totalCount, logits)).build();
 
-            NDArray expected = manager.create(new float[] {-2.3027f, -2.2539f});
-            NDArray real = negativeBinomial.logProb(manager.create(new float[] {2f, 1f}));
-            Assertions.assertAlmostEquals(real, expected);
+            NDArray expectedValues = manager.create(new float[] {-2.3027f, -2.2539f});
+            NDArray actualValues = negativeBinomialDistribution.logProb(manager.create(new float[] {2f, 1f}));
+            Assertions.assertAlmostEquals(actualValues, expectedValues);
 
-            NDArray samplesMean = negativeBinomial.sample(100000).mean(new int[] {0});
-            Assertions.assertAlmostEquals(samplesMean, negativeBinomial.mean(), 2e-2f, 2e-2f);
+            NDArray samplesMean = negativeBinomialDistribution.sample(100000).mean(new int[] {0});
+            Assertions.assertAlmostEquals(samplesMean, negativeBinomialDistribution.mean(), 2e-2f, 2e-2f);
         }
     }
 
@@ -58,15 +58,15 @@ public class DistributionTest {
             mu.setName("mu");
             sigma.setName("sigma");
             nu.setName("nu");
-            Distribution studentT =
+            Distribution studentTDistribution =
                     StudentT.builder().setDistrArgs(new NDList(mu, sigma, nu)).build();
 
-            NDArray expected = manager.create(new float[] {-0.9779f, -1.6940f});
-            NDArray real = studentT.logProb(manager.create(new float[] {1000f, -1000f}));
-            Assertions.assertAlmostEquals(real, expected);
+            NDArray expectedValues = manager.create(new float[] {-0.9779f, -1.6940f});
+            NDArray actualValues = studentTDistribution.logProb(manager.create(new float[] {1000f, -1000f}));
+            Assertions.assertAlmostEquals(actualValues, expectedValues);
 
-            NDArray samplesMean = studentT.sample(100000).mean(new int[] {0});
-            Assertions.assertAlmostEquals(samplesMean, studentT.mean(), 2e-2f, 2e-2f);
+            NDArray samplesMean = studentTDistribution.sample(100000).mean(new int[] {0});
+            Assertions.assertAlmostEquals(samplesMean, studentTDistribution.mean(), 2e-2f, 2e-2f);
         }
     }
 }
