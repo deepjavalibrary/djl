@@ -36,30 +36,33 @@ final class OrtUtils {
         if (shape.size() == 0) {
             throw new UnsupportedOperationException("OnnxRuntime doesn't support 0 length tensor.");
         }
-        if (data instanceof ByteBuffer) {
-            data = dataType.asDataType((ByteBuffer) data);
-        }
         long[] sh = shape.getShape();
         try {
             switch (dataType) {
                 case FLOAT32:
-                    return OnnxTensor.createTensor(env, (FloatBuffer) data, sh);
+                    return OnnxTensor.createTensor(env, asFloatBuffer(data), sh);
                 case FLOAT64:
-                    return OnnxTensor.createTensor(env, (DoubleBuffer) data, sh);
+                    return OnnxTensor.createTensor(env, asDoubleBuffer(data), sh);
+                case FLOAT16:
+                    return OnnxTensor.createTensor(
+                            env, (ByteBuffer) data, sh, OnnxJavaType.FLOAT16);
+                case BFLOAT16:
+                    return OnnxTensor.createTensor(
+                            env, (ByteBuffer) data, sh, OnnxJavaType.BFLOAT16);
                 case INT32:
-                    return OnnxTensor.createTensor(env, (IntBuffer) data, sh);
+                    return OnnxTensor.createTensor(env, asIntBuffer(data), sh);
                 case INT64:
-                    return OnnxTensor.createTensor(env, (LongBuffer) data, sh);
+                    return OnnxTensor.createTensor(env, asLongBuffer(data), sh);
                 case INT8:
                     return OnnxTensor.createTensor(env, (ByteBuffer) data, sh, OnnxJavaType.INT8);
                 case UINT8:
                     return OnnxTensor.createTensor(env, (ByteBuffer) data, sh, OnnxJavaType.UINT8);
+                case BOOLEAN:
+                    return OnnxTensor.createTensor(env, (ByteBuffer) data, sh, OnnxJavaType.BOOL);
                 case STRING:
                     throw new UnsupportedOperationException(
                             "Use toTensor(OrtEnvironment env, String[] inputs, Shape shape)"
                                     + " instead.");
-                case BOOLEAN:
-                case FLOAT16:
                 default:
                     throw new UnsupportedOperationException("Data type not supported: " + dataType);
             }
@@ -81,6 +84,10 @@ final class OrtUtils {
         switch (javaType) {
             case FLOAT:
                 return DataType.FLOAT32;
+            case FLOAT16:
+                return DataType.FLOAT16;
+            case BFLOAT16:
+                return DataType.BFLOAT16;
             case DOUBLE:
                 return DataType.FLOAT64;
             case INT8:
@@ -100,5 +107,33 @@ final class OrtUtils {
             default:
                 throw new UnsupportedOperationException("type is not supported: " + javaType);
         }
+    }
+
+    private static FloatBuffer asFloatBuffer(Buffer data) {
+        if (data instanceof ByteBuffer) {
+            return ((ByteBuffer) data).asFloatBuffer();
+        }
+        return (FloatBuffer) data;
+    }
+
+    private static DoubleBuffer asDoubleBuffer(Buffer data) {
+        if (data instanceof ByteBuffer) {
+            return ((ByteBuffer) data).asDoubleBuffer();
+        }
+        return (DoubleBuffer) data;
+    }
+
+    private static IntBuffer asIntBuffer(Buffer data) {
+        if (data instanceof ByteBuffer) {
+            return ((ByteBuffer) data).asIntBuffer();
+        }
+        return (IntBuffer) data;
+    }
+
+    private static LongBuffer asLongBuffer(Buffer data) {
+        if (data instanceof ByteBuffer) {
+            return ((ByteBuffer) data).asLongBuffer();
+        }
+        return (LongBuffer) data;
     }
 }
