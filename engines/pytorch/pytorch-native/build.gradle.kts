@@ -62,42 +62,53 @@ fun downloadBuildAndroid(ver: String) {
     }
 }
 
-fun prepareNativeLib(binaryRoot: String, ver: String) {
+fun prepareNativeLib(binaryRoot: String, ver: String, packageType: String?) {
     if ("mac" !in os)
         throw GradleException("This command must be run from osx")
 
     val officialPytorchUrl = "https://download.pytorch.org/libtorch"
     val aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
     val cuda = "cu121"
-    // @formatter:off
-    val files = mapOf("cpu/libtorch-cxx11-abi-shared-with-deps-$ver%2Bcpu.zip"     to "cpu/linux-x86_64",
-                      "cpu/libtorch-macos-arm64-$ver.zip"                          to "cpu/osx-aarch64",
-                      "cpu/libtorch-win-shared-with-deps-$ver%2Bcpu.zip"           to "cpu/win-x86_64",
-                      "$cuda/libtorch-cxx11-abi-shared-with-deps-$ver%2B$cuda.zip" to "$cuda/linux-x86_64",
-                      "$cuda/libtorch-win-shared-with-deps-$ver%2B$cuda.zip"       to "$cuda/win-x86_64",
-                      "cpu/libtorch-shared-with-deps-$ver%2Bcpu.zip"               to "cpu-precxx11/linux-x86_64",
-                      "$cuda/libtorch-shared-with-deps-$ver%2B$cuda.zip"           to "$cuda-precxx11/linux-x86_64")
-
-    val aarch64Files = mapOf("$ver/libtorch-shared-with-deps-$ver-aarch64.zip" to "cpu-precxx11/linux-aarch64")
-    // @formatter:on
-    copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
-    copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
-
-    exec {
-        commandLine(
-            "install_name_tool",
-            "-add_rpath",
-            "@loader_path",
-            "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib"
+    if (packageType == "gpu") {
+        // @formatter:off
+        val files = mapOf(
+            "$cuda/libtorch-cxx11-abi-shared-with-deps-$ver%2B$cuda.zip" to "$cuda/linux-x86_64",
+            "$cuda/libtorch-win-shared-with-deps-$ver%2B$cuda.zip"       to "$cuda/win-x86_64",
+            "$cuda/libtorch-shared-with-deps-$ver%2B$cuda.zip"           to "$cuda-precxx11/linux-x86_64",
         )
-    }
-    exec {
-        commandLine(
-            "install_name_tool",
-            "-add_rpath",
-            "@loader_path",
-            "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch.dylib"
+        // @formatter:on
+
+        copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
+    } else {
+        // @formatter:off
+        val files = mapOf(
+            "cpu/libtorch-cxx11-abi-shared-with-deps-$ver%2Bcpu.zip"     to "cpu/linux-x86_64",
+            "cpu/libtorch-macos-arm64-$ver.zip"                          to "cpu/osx-aarch64",
+            "cpu/libtorch-win-shared-with-deps-$ver%2Bcpu.zip"           to "cpu/win-x86_64",
+            "cpu/libtorch-shared-with-deps-$ver%2Bcpu.zip"               to "cpu-precxx11/linux-x86_64",
         )
+        // @formatter:on
+
+        val aarch64Files = mapOf("$ver/libtorch-shared-with-deps-$ver-aarch64.zip" to "cpu-precxx11/linux-aarch64")
+        copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
+        copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
+
+        exec {
+            commandLine(
+                "install_name_tool",
+                "-add_rpath",
+                "@loader_path",
+                "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib"
+            )
+        }
+        exec {
+            commandLine(
+                "install_name_tool",
+                "-add_rpath",
+                "@loader_path",
+                "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch.dylib"
+            )
+        }
     }
 }
 
@@ -212,14 +223,16 @@ tasks {
     val binaryRoot = buildDirectory / "download"
     register("downloadPyTorchNativeLib") {
         doLast {
-            prepareNativeLib("$binaryRoot", ptVersion)
+            val packageType = project.findProperty("package_type")?.toString()
+            prepareNativeLib("$binaryRoot", ptVersion, packageType)
         }
     }
 
     register("uploadS3") {
         doLast {
             delete("$binaryRoot")
-            prepareNativeLib("$binaryRoot", ptVersion)
+            prepareNativeLib("$binaryRoot", ptVersion, "cpu")
+            prepareNativeLib("$binaryRoot", ptVersion, "gpu")
 
             exec {
                 commandLine("sh", "-c", "find $binaryRoot -type f | xargs gzip")
