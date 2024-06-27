@@ -20,6 +20,7 @@ import ai.djl.modality.Classifications;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.onnxruntime.zoo.tabular.softmax_regression.IrisFlower;
 import ai.djl.repository.zoo.Criteria;
@@ -143,6 +144,42 @@ public class OrtTest {
 
             float[][] value = (float[][]) ((OrtNDArray) ones).getTensor().getValue();
             Assert.assertEquals(value[0], new float[] {1, 1});
+
+            array = manager.create(new Shape(1), DataType.BOOLEAN);
+            Assert.assertEquals(array.getDataType(), DataType.BOOLEAN);
+
+            array = manager.create(new Shape(1), DataType.FLOAT16);
+            Assert.assertEquals(array.getDataType(), DataType.FLOAT16);
+
+            array = manager.create(new Shape(1), DataType.BFLOAT16);
+            Assert.assertEquals(array.getDataType(), DataType.BFLOAT16);
+
+            array = manager.create(new double[] {0});
+            Assert.assertEquals(array.getDataType(), DataType.FLOAT64);
+
+            array = manager.create(new Shape(1), DataType.FLOAT64);
+            Assert.assertEquals(array.getDataType(), DataType.FLOAT64);
+
+            array = manager.create(new Shape(1), DataType.INT8);
+            Assert.assertEquals(array.getDataType(), DataType.INT8);
+
+            array = manager.create(new Shape(1), DataType.UINT8);
+            Assert.assertEquals(array.getDataType(), DataType.UINT8);
+
+            array = manager.create(new int[] {0});
+            Assert.assertEquals(array.getDataType(), DataType.INT32);
+
+            array = manager.create(new Shape(1), DataType.INT32);
+            Assert.assertEquals(array.getDataType(), DataType.INT32);
+
+            array = manager.create(new long[] {0L});
+            Assert.assertEquals(array.getDataType(), DataType.INT64);
+
+            array = manager.create(new Shape(1), DataType.INT64);
+            Assert.assertEquals(array.getDataType(), DataType.INT64);
+
+            Assert.assertThrows(() -> manager.create(new Shape(0), DataType.FLOAT32));
+            Assert.assertThrows(() -> manager.create(new Shape(1), DataType.UINT32));
         }
     }
 
