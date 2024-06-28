@@ -115,7 +115,7 @@ public class StanfordQuestionAnsweringDataset extends TextDataset implements Raw
         Map<String, Object> data;
         try (BufferedReader reader = Files.newBufferedReader(usagePath)) {
             data =
-                    JsonUtils.GSON_PRETTY.fromJson(
+                    JsonUtils.GSON.fromJson(
                             reader, new TypeToken<Map<String, Object>>() {}.getType());
         }
         List<Map<String, Object>> articles = (List<Map<String, Object>>) data.get("data");
@@ -227,7 +227,7 @@ public class StanfordQuestionAnsweringDataset extends TextDataset implements Raw
         Path usagePath = prepareUsagePath(null);
         Object data;
         try (BufferedReader reader = Files.newBufferedReader(usagePath)) {
-            data = JsonUtils.GSON_PRETTY.fromJson(reader, new TypeToken<Object>() {}.getType());
+            data = JsonUtils.GSON.fromJson(reader, new TypeToken<Object>() {}.getType());
         }
         return data;
     }

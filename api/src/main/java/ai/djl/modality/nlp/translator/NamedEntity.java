@@ -100,6 +100,6 @@ public class NamedEntity {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return JsonUtils.GSON_PRETTY.toJson(this);
+        return JsonUtils.toJson(this);
     }
 }
