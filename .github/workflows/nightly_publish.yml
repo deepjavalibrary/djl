@@ -189,6 +189,7 @@ jobs:
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -Psnapshot
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.1.2 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.2.2 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.3.1 -Psnapshot
           ./gradlew clean engines:ml:xgboost:publish -Pgpu -Psnapshot
@@ -204,6 +205,7 @@ jobs:
         if: ${{ github.event.inputs.mode == 'staging' }}
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -P${{ github.event.inputs.mode }}
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.1.2 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.2.2 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.3.1 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:ml:xgboost:publish -Pgpu -P${{ github.event.inputs.mode }}
