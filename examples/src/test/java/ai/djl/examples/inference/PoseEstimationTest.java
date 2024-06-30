@@ -15,22 +15,19 @@ package ai.djl.examples.inference;
 import ai.djl.ModelException;
 import ai.djl.examples.inference.cv.PoseEstimation;
 import ai.djl.modality.cv.output.Joints;
-import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.List;
 
 public class PoseEstimationTest {
 
     @Test
     public void testPoseEstimation() throws ModelException, TranslateException, IOException {
-        TestRequirements.linux();
-
-        List<Joints> result = PoseEstimation.predict();
-        Assert.assertTrue(result.get(0).getJoints().get(0).getConfidence() > 0.6d);
+        Joints[] result = PoseEstimation.predict();
+        Assert.assertEquals(result.length, 3);
+        Assert.assertEquals(result[0].getJoints().size(), 17);
     }
 }

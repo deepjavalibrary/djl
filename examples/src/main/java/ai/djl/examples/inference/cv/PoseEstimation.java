@@ -12,18 +12,14 @@
  */
 package ai.djl.examples.inference.cv;
 
-import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
-import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.modality.cv.translator.YoloPoseTranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 
 import org.slf4j.Logger;
@@ -33,9 +29,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * An example of inference using a pose estimation model.
@@ -51,98 +45,39 @@ public final class PoseEstimation {
     private PoseEstimation() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        List<Joints> joints = predict();
-        logger.info("{}", joints);
+        Joints[] joints = predict();
+        logger.info("{}", Arrays.toString(joints));
     }
 
-    public static List<Joints> predict() throws IOException, ModelException, TranslateException {
+    public static Joints[] predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/pose_soccer.png");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
 
-        List<Image> people = predictPeopleInImage(img);
-
-        if (people.isEmpty()) {
-            logger.warn("No people found in image.");
-            return Collections.emptyList();
-        }
-
-        return predictJointsForPeople(people);
-    }
-
-    private static List<Image> predictPeopleInImage(Image img)
-            throws MalformedModelException,
-                    ModelNotFoundException,
-                    IOException,
-                    TranslateException {
-
-        Criteria<Image, DetectedObjects> criteria =
+        // Use DJL PyTorch model zoo model
+        Criteria<Image, Joints[]> criteria =
                 Criteria.builder()
-                        .setTypes(Image.class, DetectedObjects.class)
-                        .optModelUrls("djl://ai.djl.mxnet/ssd/0.0.1/ssd_512_resnet50_v1_voc")
-                        .optEngine("MXNet")
-                        .optProgress(new ProgressBar())
+                        .setTypes(Image.class, Joints[].class)
+                        .optModelUrls("djl://ai.djl.pytorch/yolov8n-pose")
+                        .optTranslatorFactory(new YoloPoseTranslatorFactory())
                         .build();
 
-        DetectedObjects detectedObjects;
-        try (ZooModel<Image, DetectedObjects> ssd = criteria.loadModel();
-                Predictor<Image, DetectedObjects> predictor = ssd.newPredictor()) {
-            detectedObjects = predictor.predict(img);
+        try (ZooModel<Image, Joints[]> pose = criteria.loadModel();
+                Predictor<Image, Joints[]> predictor = pose.newPredictor()) {
+            Joints[] allJoints = predictor.predict(img);
+            saveJointsImage(img, allJoints);
+            return allJoints;
         }
-
-        List<DetectedObjects.DetectedObject> items = detectedObjects.items();
-        List<Image> people = new ArrayList<>();
-        for (DetectedObjects.DetectedObject item : items) {
-            if ("person".equals(item.getClassName())) {
-                Rectangle rect = item.getBoundingBox().getBounds();
-                int width = img.getWidth();
-                int height = img.getHeight();
-                people.add(
-                        img.getSubImage(
-                                (int) (rect.getX() * width),
-                                (int) (rect.getY() * height),
-                                (int) (rect.getWidth() * width),
-                                (int) (rect.getHeight() * height)));
-            }
-        }
-        return people;
     }
 
-    private static List<Joints> predictJointsForPeople(List<Image> people)
-            throws MalformedModelException,
-                    ModelNotFoundException,
-                    IOException,
-                    TranslateException {
-
-        // Use DJL MXNet model zoo model, model can be found:
-        // https://mlrepo.djl.ai/model/cv/pose_estimation/ai/djl/mxnet/simple_pose/0.0.1/simple_pose_resnet18_v1b-0000.params.gz
-        // https://mlrepo.djl.ai/model/cv/pose_estimation/ai/djl/mxnet/simple_pose/0.0.1/simple_pose_resnet18_v1b-symbol.json
-        Criteria<Image, Joints> criteria =
-                Criteria.builder()
-                        .setTypes(Image.class, Joints.class)
-                        .optModelUrls(
-                                "djl://ai.djl.mxnet/simple_pose/0.0.1/simple_pose_resnet18_v1b")
-                        .build();
-
-        List<Joints> allJoints = new ArrayList<>();
-        try (ZooModel<Image, Joints> pose = criteria.loadModel();
-                Predictor<Image, Joints> predictor = pose.newPredictor()) {
-            int count = 0;
-            for (Image person : people) {
-                Joints joints = predictor.predict(person);
-                saveJointsImage(person, joints, count++);
-                allJoints.add(joints);
-            }
-        }
-        return allJoints;
-    }
-
-    private static void saveJointsImage(Image img, Joints joints, int count) throws IOException {
+    private static void saveJointsImage(Image img, Joints[] allJoints) throws IOException {
         Path outputDir = Paths.get("build/output");
         Files.createDirectories(outputDir);
 
-        img.drawJoints(joints);
+        for (Joints joints : allJoints) {
+            img.drawJoints(joints);
+        }
 
-        Path imagePath = outputDir.resolve("joints-" + count + ".png");
+        Path imagePath = outputDir.resolve("joints.png");
         // Must use png format because you can't save as jpg with an alpha channel
         img.save(Files.newOutputStream(imagePath), "png");
         logger.info("Pose image has been saved in: {}", imagePath);
