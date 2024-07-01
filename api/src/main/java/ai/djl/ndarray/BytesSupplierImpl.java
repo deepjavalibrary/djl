@@ -40,7 +40,7 @@ class BytesSupplierImpl implements BytesSupplier {
     public byte[] getAsBytes() {
         if (buf == null) {
             if (value == null) {
-                value = JsonUtils.GSON.toJson(obj) + '\n';
+                value = JsonUtils.toJson(obj) + '\n';
             }
             buf = value.getBytes(StandardCharsets.UTF_8);
         }
@@ -52,7 +52,7 @@ class BytesSupplierImpl implements BytesSupplier {
     public String getAsString() {
         if (value == null) {
             if (obj != null) {
-                value = JsonUtils.GSON.toJson(obj) + '\n';
+                value = JsonUtils.toJson(obj) + '\n';
             } else {
                 value = new String(buf, StandardCharsets.UTF_8);
             }
