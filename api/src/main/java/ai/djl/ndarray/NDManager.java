@@ -399,7 +399,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(float[][] data) {
-        FloatBuffer buffer = FloatBuffer.allocate(data.length * data[0].length);
+        FloatBuffer buffer = allocateDirect(data.length * data[0].length * 4).asFloatBuffer();
         for (float[] d : data) {
             buffer.put(d);
         }
@@ -414,7 +414,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(int[][] data) {
-        IntBuffer buffer = IntBuffer.allocate(data.length * data[0].length);
+        IntBuffer buffer = allocateDirect(data.length * data[0].length * 4).asIntBuffer();
         for (int[] d : data) {
             buffer.put(d);
         }
@@ -429,7 +429,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(double[][] data) {
-        DoubleBuffer buffer = DoubleBuffer.allocate(data.length * data[0].length);
+        DoubleBuffer buffer = allocateDirect(data.length * data[0].length * 8).asDoubleBuffer();
         for (double[] d : data) {
             buffer.put(d);
         }
@@ -444,7 +444,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(long[][] data) {
-        LongBuffer buffer = LongBuffer.allocate(data.length * data[0].length);
+        LongBuffer buffer = allocateDirect(data.length * data[0].length * 8).asLongBuffer();
         for (long[] d : data) {
             buffer.put(d);
         }
@@ -459,7 +459,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(byte[][] data) {
-        ByteBuffer buffer = ByteBuffer.allocate(data.length * data[0].length);
+        ByteBuffer buffer = allocateDirect(data.length * data[0].length);
         for (byte[] d : data) {
             buffer.put(d);
         }
@@ -474,7 +474,7 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(boolean[][] data) {
-        ByteBuffer buffer = ByteBuffer.allocate(data.length * data[0].length);
+        ByteBuffer buffer = allocateDirect(data.length * data[0].length);
         for (boolean[] d : data) {
             for (boolean b : d) {
                 buffer.put((byte) (b ? 1 : 0));
