@@ -84,7 +84,7 @@ public class ModelZooTest {
             Files.createDirectories(dir);
             Path file = dir.resolve("models.json");
             try (Writer writer = Files.newBufferedWriter(file)) {
-                writer.write(JsonUtils.GSON_PRETTY.toJson(map));
+                writer.write(JsonUtils.toJson(map));
             }
 
             // static variables cannot not be initialized properly if directly use new HfModelZoo()

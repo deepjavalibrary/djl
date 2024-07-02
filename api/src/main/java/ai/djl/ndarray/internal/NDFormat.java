@@ -13,6 +13,7 @@
 package ai.djl.ndarray.internal;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.NDScope;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.Utils;
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
 public abstract class NDFormat {
 
     private static final int PRECISION = 8;
-    private static final String LF = System.getProperty("line.separator");
+    private static final String LF = System.lineSeparator();
     private static final Pattern PATTERN = Pattern.compile("\\s*\\d\\.(\\d*?)0*e[+-](\\d+)");
     private static final boolean DEBUGGER =
             !Boolean.getBoolean("jshell")
@@ -90,9 +91,7 @@ public abstract class NDFormat {
         NDFormat format;
         DataType dataType = array.getDataType();
 
-        if (dataType == DataType.UINT8) {
-            format = new HexFormat();
-        } else if (dataType == DataType.BOOLEAN) {
+        if (dataType == DataType.BOOLEAN) {
             format = new BooleanFormat();
         } else if (dataType == DataType.STRING) {
             format = new StringFormat();
@@ -126,9 +125,13 @@ public abstract class NDFormat {
             init(array);
             sb.append(format(array.toArray()[0])).append(LF);
         } else if (size > maxSize) {
-            sb.append("[ Exceed max print size ]");
+            sb.append("Exceed max print size:").append(LF);
+            int limit = Math.min(maxSize, maxRows * maxColumns);
+            dumpFlat(sb, array, limit);
         } else if (dimension > maxDepth) {
-            sb.append("[ Exceed max print dimension ]");
+            sb.append("Exceed max print dimension:").append(LF);
+            int limit = Math.min(maxSize, maxRows * maxColumns);
+            dumpFlat(sb, array, limit);
         } else {
             init(array);
             dump(sb, array, 0, true, maxRows, maxColumns);
@@ -170,6 +173,17 @@ public abstract class NDFormat {
             sb.append(']').append(LF);
         } else {
             sb.append("],").append(LF);
+        }
+    }
+
+    @SuppressWarnings("try")
+    private void dumpFlat(StringBuilder sb, NDArray array, int limit) {
+        try (NDScope ignore = new NDScope()) {
+            NDArray tmp = array.flatten().get(":" + limit);
+            init(tmp);
+            sb.append('{');
+            append(sb, array.toArray(), limit);
+            sb.append('}').append(LF);
         }
     }
 
@@ -318,15 +332,6 @@ public abstract class NDFormat {
                 }
             }
             return new String(chars);
-        }
-    }
-
-    private static final class HexFormat extends NDFormat {
-
-        /** {@inheritDoc} */
-        @Override
-        public CharSequence format(Number value) {
-            return String.format(Locale.ENGLISH, "0x%02X", value.byteValue());
         }
     }
 

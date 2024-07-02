@@ -26,8 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * An example of inference using an action recognition model.
@@ -48,16 +46,16 @@ public final class ActionRecognition {
     }
 
     public static Classifications predict() throws IOException, ModelException, TranslateException {
-        Path imageFile = Paths.get("src/test/resources/action_discus_throw.png");
-        Image img = ImageFactory.getInstance().fromFile(imageFile);
+        String url = "https://resources.djl.ai/images/action_dance.jpg";
+        Image img = ImageFactory.getInstance().fromUrl(url);
 
-        // Use DJL MXNet model zoo model
+        // Use DJL PyTorch model zoo model
         Criteria<Image, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
                         .optModelUrls(
-                                "djl://ai.djl.mxnet/action_recognition/0.0.1/inceptionv3_ucf101")
-                        .optEngine("MXNet")
+                                "djl://ai.djl.pytorch/Human-Action-Recognition-VIT-Base-patch16-224")
+                        .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
                         .build();
 
