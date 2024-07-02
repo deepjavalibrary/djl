@@ -70,6 +70,7 @@ public class GloveWordEmbeddingTranslatorFactory implements TranslatorFactory {
         /** {@inheritDoc} */
         @Override
         public NDList processOutput(TranslatorContext ctx, NDList list) {
+            list.detach();
             return list;
         }
 

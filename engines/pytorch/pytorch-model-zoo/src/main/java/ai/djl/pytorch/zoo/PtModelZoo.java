@@ -33,6 +33,12 @@ public class PtModelZoo extends ModelZoo {
     public static final String GROUP_ID = "ai.djl.pytorch";
 
     PtModelZoo() {
+        addModel(
+                REPOSITORY.model(
+                        CV.ACTION_RECOGNITION,
+                        GROUP_ID,
+                        "Human-Action-Recognition-VIT-Base-patch16-224",
+                        "0.0.1"));
         addModel(REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet", "0.0.1"));
         addModel(
                 REPOSITORY.model(CV.IMAGE_CLASSIFICATION, GROUP_ID, "resnet18_embedding", "0.0.1"));

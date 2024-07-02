@@ -1,0 +1,45 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/action_recognition",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "Human-Action-Recognition-VIT-Base-patch16-224",
+  "name": "Human-Action-Recognition-VIT-Base-patch16-224",
+  "description": "Action Recognition models",
+  "website": "http://www.djl.ai/engines/pytorch/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "Human-Action-Recognition-VIT-Base-patch16-224",
+      "properties": {
+      },
+      "arguments": {
+        "width": 224,
+        "height": 224,
+        "resize": true,
+        "scaleFactor": 0.00392156862745098,
+        "normalize": "0.5,0.5,0.5,0.5,0.5,0.5",
+        "applySoftmax": true,
+        "translatorFactory": "ai.djl.modality.cv.translator.ImageClassificationTranslatorFactory"
+      },
+      "options": {
+        "mapLocation": "true"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/Human-Action-Recognition-VIT-Base-patch16-224.zip",
+          "sha1Hash": "943cf0f9cfab07445489aeb67b9c74c9c85680f4",
+          "name": "",
+          "size": 318499747
+        }
+      }
+    }
+  ]
+}

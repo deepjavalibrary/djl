@@ -24,8 +24,9 @@ import java.util.List;
 /** An interface containing Gson constants. */
 public interface JsonUtils {
 
-    Gson GSON = new GsonBuilder().create();
-    Gson GSON_PRETTY = builder().create();
+    boolean PRETTY_PRINT = Boolean.parseBoolean(Utils.getEnvOrSystemProperty("DJL_PRETTY_PRINT"));
+    Gson GSON = builder().create();
+    Gson GSON_PRETTY = builder().setPrettyPrinting().create();
     Type LIST_TYPE = new TypeToken<List<String>>() {}.getType();
 
     /**
@@ -34,19 +35,33 @@ public interface JsonUtils {
      * @return a custom {@code GsonBuilder} instance.
      */
     static GsonBuilder builder() {
-        return new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                .setPrettyPrinting()
-                .serializeSpecialFloatingPointValues()
-                .registerTypeAdapter(
-                        Double.class,
-                        (JsonSerializer<Double>)
-                                (src, t, ctx) -> {
-                                    long v = src.longValue();
-                                    if (src.equals(Double.valueOf(String.valueOf(v)))) {
-                                        return new JsonPrimitive(v);
-                                    }
-                                    return new JsonPrimitive(src);
-                                });
+        GsonBuilder builder =
+                new GsonBuilder()
+                        .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                        .serializeSpecialFloatingPointValues()
+                        .registerTypeAdapter(
+                                Double.class,
+                                (JsonSerializer<Double>)
+                                        (src, t, ctx) -> {
+                                            long v = src.longValue();
+                                            if (src.equals(Double.valueOf(String.valueOf(v)))) {
+                                                return new JsonPrimitive(v);
+                                            }
+                                            return new JsonPrimitive(src);
+                                        });
+        if (PRETTY_PRINT) {
+            builder.setPrettyPrinting();
+        }
+        return builder;
+    }
+
+    /**
+     * Serializes the specified object into its equivalent JSON representation.
+     *
+     * @param src the source object
+     * @return the json string
+     */
+    static String toJson(Object src) {
+        return GSON.toJson(src);
     }
 }
