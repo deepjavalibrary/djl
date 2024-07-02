@@ -79,7 +79,10 @@ public class YoloV8Translator extends YoloV5Translator {
                     "Expected classes: " + (nClasses - 4) + ", got " + classes.size());
         }
 
-        ArrayList<IntermediateResult> intermediateResults = new ArrayList<>();
+        ArrayList<Rectangle> boxes = new ArrayList<>();
+        ArrayList<Float> scores = new ArrayList<>();
+        ArrayList<Integer> classIds = new ArrayList<>();
+
         // reverse order search in heap; searches through #maxBoxes for optimization when set
         for (int i = numberRows - 1; i > numberRows - maxBoxes; --i) {
             int index = i * nClasses;
@@ -101,12 +104,13 @@ public class YoloV8Translator extends YoloV5Translator {
                 float h = buf[index + 3];
                 Rectangle rect =
                         new Rectangle(Math.max(0, xPos - w / 2), Math.max(0, yPos - h / 2), w, h);
-                intermediateResults.add(
-                        new IntermediateResult(
-                                classes.get(maxIndex), maxClassProb, maxIndex, rect));
+                boxes.add(rect);
+                scores.add(maxClassProb);
+                classIds.add(maxIndex);
             }
         }
-        return nms(intermediateResults);
+
+        return nms(boxes, classIds, scores);
     }
 
     /** The builder for {@link YoloV8Translator}. */
