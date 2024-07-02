@@ -14,6 +14,7 @@ package ai.djl.modality.cv.output;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  * A {@code Rectangle} specifies an area in a coordinate space that is enclosed by the {@code
@@ -151,5 +152,82 @@ public class Rectangle implements BoundingBox {
         double y = getY();
         return String.format(
                 "{\"x\"=%.3f, \"y\"=%.3f, \"width\"=%.3f, \"height\"=%.3f}", x, y, width, height);
+    }
+
+    /**
+     * Applies nms (non-maximum suppression) to the list of rectangles.
+     *
+     * @param boxes an list of {@code Rectangle}
+     * @param scores a list of scores
+     * @param nmsThreshold the nms threshold
+     * @return the filtered list with the index of the original list
+     */
+    public static List<Integer> nms(
+            List<Rectangle> boxes, List<Double> scores, float nmsThreshold) {
+        List<Integer> ret = new ArrayList<>();
+        PriorityQueue<Integer> pq =
+                new PriorityQueue<>(
+                        50,
+                        (lhs, rhs) -> {
+                            // Intentionally reversed to put high confidence at the head of the
+                            // queue.
+                            return Double.compare(scores.get(rhs), scores.get(lhs));
+                        });
+        for (int i = 0; i < boxes.size(); ++i) {
+            pq.add(i);
+        }
+
+        // do non maximum suppression
+        while (!pq.isEmpty()) {
+            // insert detection with max confidence
+            int[] detections = pq.stream().mapToInt(Integer::intValue).toArray();
+            ret.add(detections[0]);
+            Rectangle box = boxes.get(detections[0]);
+            pq.clear();
+            for (int i = 1; i < detections.length; i++) {
+                int detection = detections[i];
+                Rectangle location = boxes.get(detection);
+                if (box.boxIou(location) < nmsThreshold) {
+                    pq.add(detection);
+                }
+            }
+        }
+        return ret;
+    }
+
+    private double boxIou(Rectangle other) {
+        double intersection = intersection(other);
+        double union =
+                getWidth() * getHeight() + other.getWidth() * other.getHeight() - intersection;
+        return intersection / union;
+    }
+
+    private double intersection(Rectangle b) {
+        double w =
+                overlap(
+                        (getX() * 2 + getWidth()) / 2,
+                        getWidth(),
+                        (b.getX() * 2 + b.getWidth()) / 2,
+                        b.getWidth());
+        double h =
+                overlap(
+                        (getY() * 2 + getHeight()) / 2,
+                        getHeight(),
+                        (b.getY() * 2 + b.getHeight()) / 2,
+                        b.getHeight());
+        if (w < 0 || h < 0) {
+            return 0;
+        }
+        return w * h;
+    }
+
+    private double overlap(double x1, double w1, double x2, double w2) {
+        double l1 = x1 - w1 / 2;
+        double l2 = x2 - w2 / 2;
+        double left = Math.max(l1, l2);
+        double r1 = x1 + w1 / 2;
+        double r2 = x2 + w2 / 2;
+        double right = Math.min(r1, r2);
+        return right - left;
     }
 }
