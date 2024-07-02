@@ -212,7 +212,7 @@ nav:
       - Android:
           - Doodledraw (PyTorch): 'docs/demos/android/pytorch_android/quickdraw_recognition/README.md'
           - Style Transfer (PyTorch): 'docs/demos/android/pytorch_android/style_transfer_cyclegan/README.md'
-          - Face Detection (PyTorch): 'docs/demos/android/face_detection/README.md'
+          - Face Detection (PyTorch): 'docs/demos/android/pytorch_android/face_detection/README.md'
           - MXNet Android Template: 'docs/demos/android/mxnet-android/README.md'
       - EcoSystem:
           - Java Integrations:
