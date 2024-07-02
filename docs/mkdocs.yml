@@ -15,8 +15,18 @@ theme:
   features:
     - navigation.tabs
   palette:
-    primary: light-blue
-    accent: light-blue
+      - scheme: default
+        primary: light-blue
+        accent: light-blue
+        toggle:
+            icon: material/weather-sunny
+            name: Switch to dark mode
+      - scheme: slate
+        primary: black
+        accent: deep-orange
+        toggle:
+            icon: material/weather-night
+            name: Switch to light mode
   edit_uri: ''
 
 extra:
