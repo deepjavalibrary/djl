@@ -33,7 +33,6 @@ public class Arguments {
     protected int epoch;
     protected int batchSize;
     protected int maxGpus;
-    protected boolean isSymbolic;
     protected boolean preTrained;
     protected String outputDir;
     protected long limit;
@@ -60,7 +59,6 @@ public class Arguments {
         } else {
             batchSize = maxGpus > 0 ? 32 * maxGpus : 32;
         }
-        isSymbolic = cmd.hasOption("symbolic-model");
         preTrained = cmd.hasOption("pre-trained");
 
         if (cmd.hasOption("output-dir")) {
@@ -127,12 +125,6 @@ public class Arguments {
                         .desc("Max number of GPUs to use for training")
                         .build());
         options.addOption(
-                Option.builder("s")
-                        .longOpt("symbolic-model")
-                        .argName("SYMBOLIC")
-                        .desc("Use symbolic model, use imperative model if false")
-                        .build());
-        options.addOption(
                 Option.builder("p")
                         .longOpt("pre-trained")
                         .argName("PRE-TRAINED")
@@ -188,10 +180,6 @@ public class Arguments {
 
     public Device[] getMaxGpus() {
         return Engine.getEngine(engine).getDevices(maxGpus);
-    }
-
-    public boolean isSymbolic() {
-        return isSymbolic;
     }
 
     public boolean isPreTrained() {

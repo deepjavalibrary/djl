@@ -12,11 +12,9 @@
  */
 package ai.djl.examples.training.transferlearning;
 
-import ai.djl.Application;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.cv.classification.Cifar10;
-import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.inference.Predictor;
@@ -30,10 +28,7 @@ import ai.djl.modality.cv.translator.ImageClassificationTranslator;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
-import ai.djl.nn.Blocks;
-import ai.djl.nn.SequentialBlock;
-import ai.djl.nn.SymbolBlock;
-import ai.djl.nn.core.Linear;
+import ai.djl.nn.BlockFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.DefaultTrainingConfig;
@@ -55,7 +50,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 
 /**
  * An example of training an image classification (ResNet for Cifar10) model.
@@ -112,8 +106,7 @@ public final class TrainResnetWithCifar10 {
                 Path modelPath = Paths.get("build/model");
                 model.save(modelPath, "resnetv1");
 
-                Classifications classifications =
-                        testSaveParameters(model.getBlock(), modelPath, arguments);
+                Classifications classifications = testSaveParameters(modelPath, arguments);
                 logger.info("Predict result: {}", classifications.topK(3));
                 return result;
             }
@@ -121,50 +114,15 @@ public final class TrainResnetWithCifar10 {
     }
 
     private static Model getModel(Arguments arguments) throws IOException, ModelException {
-        boolean isSymbolic = arguments.isSymbolic();
         boolean preTrained = arguments.isPreTrained();
-        Map<String, String> options = arguments.getCriteria();
         Criteria.Builder<Image, Classifications> builder =
                 Criteria.builder()
-                        .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                         .setTypes(Image.class, Classifications.class)
                         .optEngine(arguments.getEngine())
-                        .optProgress(new ProgressBar())
-                        .optArtifactId("resnet");
-        if (isSymbolic) {
-            // load the model
-            builder.optGroupId("ai.djl.mxnet");
-            if (options == null) {
-                builder.optFilter("layers", "50");
-                builder.optFilter("flavor", "v1");
-            } else {
-                builder.optFilters(options);
-            }
-            Model model = builder.build().loadModel();
-            SequentialBlock newBlock = new SequentialBlock();
-            SymbolBlock block = (SymbolBlock) model.getBlock();
-            block.removeLastBlock();
-            newBlock.add(block);
-            // the original model don't include the flatten
-            // so apply the flatten here
-            newBlock.add(Blocks.batchFlattenBlock());
-            newBlock.add(Linear.builder().setUnits(10).build());
-            model.setBlock(newBlock);
-            if (!preTrained) {
-                model.getBlock().clear();
-            }
-            return model;
-        }
+                        .optProgress(new ProgressBar());
         // imperative resnet50
         if (preTrained) {
-            builder.optGroupId(BasicModelZoo.GROUP_ID);
-            if (options == null) {
-                builder.optFilter("layers", "50");
-                builder.optFilter("flavor", "v1");
-                builder.optFilter("dataset", "cifar10");
-            } else {
-                builder.optFilters(options);
-            }
+            builder.optModelUrls("djl://ai.djl.zoo/resnet/0.0.2/resnetv1");
             // load pre-trained imperative ResNet50 from DJL model zoo
             return builder.build().loadModel();
         } else {
@@ -181,7 +139,7 @@ public final class TrainResnetWithCifar10 {
         }
     }
 
-    private static Classifications testSaveParameters(Block block, Path path, Arguments arguments)
+    static Classifications testSaveParameters(Path path, Arguments arguments)
             throws IOException, ModelException, TranslateException {
         String synsetUrl =
                 "https://mlrepo.djl.ai/model/cv/image_classification/ai/djl/mxnet/synset_cifar10.txt";
@@ -192,6 +150,13 @@ public final class TrainResnetWithCifar10 {
                         .optSynsetUrl(synsetUrl)
                         .optApplySoftmax(true)
                         .build();
+        BlockFactory resnetFactory =
+                (model, modelPath, arguments1) ->
+                        ResNetV1.builder()
+                                .setImageShape(new Shape(3, 32, 32))
+                                .setNumLayers(50)
+                                .setOutSize(10)
+                                .build();
 
         Image img = ImageFactory.getInstance().fromUrl("src/test/resources/airplane1.png");
 
@@ -201,7 +166,7 @@ public final class TrainResnetWithCifar10 {
                         .optModelPath(path)
                         .optEngine(arguments.getEngine())
                         .optTranslator(translator)
-                        .optBlock(block)
+                        .optArgument("blockFactory", resnetFactory)
                         .optModelName("resnetv1")
                         .build();
 
