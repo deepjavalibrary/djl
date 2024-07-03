@@ -205,12 +205,25 @@ class OpenCVImage implements Image {
         int imageWidth = image.width();
         int imageHeight = image.height();
 
-        Scalar color =
-                new Scalar(
-                        RandomUtils.nextInt(178),
-                        RandomUtils.nextInt(178),
-                        RandomUtils.nextInt(178));
-        for (Joints.Joint joint : joints.getJoints()) {
+        List<Joints.Joint> list = joints.getJoints();
+        if (list.size() == 17) {
+            Scalar color = new Scalar(37, 255, 224);
+            drawLine(list.get(5), list.get(7), imageWidth, imageHeight, color);
+            drawLine(list.get(7), list.get(9), imageWidth, imageHeight, color);
+            drawLine(list.get(6), list.get(8), imageWidth, imageHeight, color);
+            drawLine(list.get(8), list.get(10), imageWidth, imageHeight, color);
+            drawLine(list.get(11), list.get(13), imageWidth, imageHeight, color);
+            drawLine(list.get(12), list.get(14), imageWidth, imageHeight, color);
+            drawLine(list.get(13), list.get(15), imageWidth, imageHeight, color);
+            drawLine(list.get(14), list.get(16), imageWidth, imageHeight, color);
+            drawLine(list.get(5), list.get(6), imageWidth, imageHeight, color);
+            drawLine(list.get(11), list.get(12), imageWidth, imageHeight, color);
+            drawLine(list.get(5), list.get(11), imageWidth, imageHeight, color);
+            drawLine(list.get(6), list.get(12), imageWidth, imageHeight, color);
+        }
+
+        Scalar color = new Scalar(190, 150, 37);
+        for (Joints.Joint joint : list) {
             int x = (int) (joint.getX() * imageWidth);
             int y = (int) (joint.getY() * imageHeight);
             Point point = new Point(x, y);
@@ -338,6 +351,14 @@ class OpenCVImage implements Image {
         Core.subtract(image, new Scalar(mean[0], mean[1], mean[2]), result);
         Core.divide(result, new Scalar(std[0], std[1], std[2]), result);
         return new OpenCVImage(result);
+    }
+
+    private void drawLine(Joints.Joint from, Joints.Joint to, int width, int height, Scalar color) {
+        int x0 = (int) (from.getX() * width);
+        int y0 = (int) (from.getY() * height);
+        int x1 = (int) (to.getX() * width);
+        int y1 = (int) (to.getY() * height);
+        Imgproc.line(image, new Point(x0, y0), new Point(x1, y1), color, 2, Imgproc.LINE_AA);
     }
 
     private void drawLandmarks(BoundingBox box) {
