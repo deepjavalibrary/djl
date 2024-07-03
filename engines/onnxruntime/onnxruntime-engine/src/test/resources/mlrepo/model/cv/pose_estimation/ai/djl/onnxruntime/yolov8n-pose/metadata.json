@@ -1,0 +1,40 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/pose_estimation",
+  "groupId": "ai.djl.onnxruntime",
+  "artifactId": "yolov8n-pose",
+  "name": "Yolov8n pose",
+  "description": "Yolov8n Pose Estimation",
+  "website": "http://www.djl.ai/engines/onnxruntime/onnxruntime-engine",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "yolov8n-pose",
+      "properties": {
+      },
+      "arguments": {
+        "width": 640,
+        "height": 640,
+        "resize": true,
+        "threshold": 0.25,
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloPoseTranslatorFactory"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/yolov8n-pose.zip",
+          "sha1Hash": "8b968172ad2dd80a40fd16a276274ee8e2a2ff44",
+          "name": "",
+          "size": 11535121
+        }
+      }
+    }
+  ]
+}
