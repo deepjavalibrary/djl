@@ -15,7 +15,6 @@ package ai.djl.examples.training;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.cv.classification.Cifar10;
-import ai.djl.basicmodelzoo.BasicModelZoo;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
@@ -25,10 +24,6 @@ import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
-import ai.djl.nn.Blocks;
-import ai.djl.nn.SequentialBlock;
-import ai.djl.nn.SymbolBlock;
-import ai.djl.nn.core.Linear;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
@@ -53,7 +48,6 @@ import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Map;
 
 /** This example features sample usage of a variety of optimizers to train Cifar10. */
 public final class TrainWithOptimizers {
@@ -97,50 +91,15 @@ public final class TrainWithOptimizers {
     }
 
     private static Model getModel(Arguments arguments) throws IOException, ModelException {
-        boolean isSymbolic = arguments.isSymbolic();
         boolean preTrained = arguments.isPreTrained();
-        Map<String, String> options = arguments.getCriteria();
         Criteria.Builder<Image, Classifications> builder =
                 Criteria.builder()
                         .setTypes(Image.class, Classifications.class)
                         .optEngine(arguments.getEngine())
-                        .optProgress(new ProgressBar())
-                        .optArtifactId("resnet");
-        if (isSymbolic) {
-            // currently only MxEngine support removeLastBlock
-            builder.optGroupId("ai.djl.mxnet");
-            if (options == null) {
-                builder.optFilter("layers", "50");
-                builder.optFilter("flavor", "v1");
-            } else {
-                builder.optFilters(options);
-            }
-
-            Model model = builder.build().loadModel();
-            SequentialBlock newBlock = new SequentialBlock();
-            SymbolBlock block = (SymbolBlock) model.getBlock();
-            block.removeLastBlock();
-            newBlock.add(block);
-            // the original model don't include the flatten
-            // so apply the flatten here
-            newBlock.add(Blocks.batchFlattenBlock());
-            newBlock.add(Linear.builder().setUnits(10).build());
-            model.setBlock(newBlock);
-            if (!preTrained) {
-                model.getBlock().clear();
-            }
-            return model;
-        }
+                        .optProgress(new ProgressBar());
         // imperative resnet50
         if (preTrained) {
-            builder.optGroupId(BasicModelZoo.GROUP_ID);
-            if (options == null) {
-                builder.optFilter("layers", "50");
-                builder.optFilter("flavor", "v1");
-                builder.optFilter("dataset", "cifar10");
-            } else {
-                builder.optFilters(options);
-            }
+            builder.optModelUrls("djl://ai.djl.zoo/resnet/0.0.2/resnetv1");
             // load pre-trained imperative ResNet50 from DJL model zoo
             return builder.build().loadModel();
         } else {

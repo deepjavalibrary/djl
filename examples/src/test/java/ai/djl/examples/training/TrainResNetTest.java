@@ -26,40 +26,20 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 
 public class TrainResNetTest {
+
     private static final int SEED = 1234;
 
     @Test
     public void testTrainResNet() throws ModelException, IOException, TranslateException {
-        TestRequirements.linux();
-
-        // Limit max 4 gpu for cifar10 training to make it converge faster.
-        // and only train 10 batch for unit test.
-        // only MXNet support symbolic model
-        String[] args = {"-e", "2", "-g", "4", "-m", "10", "-s", "-p", "--engine", "MXNet"};
-
-        TrainingResult result = TrainResnetWithCifar10.runExample(args);
-        Assert.assertNotNull(result);
-    }
-
-    @Test
-    public void testTrainResNetSymbolicNightly()
-            throws ModelException, IOException, TranslateException {
-        TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.gpu("MXNet");
 
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
         // only MXNet support symbolic model
-        String[] args = {"-e", "10", "-g", "4", "-s", "-p", "--engine", "MXNet"};
-
-        Engine.getEngine("MXNet").setRandomSeed(SEED);
+        String[] args = {"-e", "2", "-g", "4", "-m", "10", "-p"};
         TrainingResult result = TrainResnetWithCifar10.runExample(args);
-        Assert.assertNotNull(result);
 
-        Assert.assertTrue(result.getTrainEvaluation("Accuracy") >= 0.8f);
-        Assert.assertTrue(result.getValidateEvaluation("Accuracy") >= 0.68f);
-        Assert.assertTrue(result.getValidateLoss() < 1.1);
+        Assert.assertNotNull(result);
     }
 
     @Test
@@ -67,13 +47,13 @@ public class TrainResNetTest {
             throws ModelException, IOException, TranslateException {
         TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.gpu("MXNet");
+        TestRequirements.gpu("PyTorch");
 
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
-        String[] args = {"-e", "10", "-g", "4", "--engine", "MXNet"};
+        String[] args = {"-e", "10", "-g", "4"};
 
-        Engine.getEngine("MXNet").setRandomSeed(SEED);
+        Engine.getEngine("PyTorch").setRandomSeed(SEED);
         TrainingResult result = TrainResnetWithCifar10.runExample(args);
         Assert.assertNotNull(result);
 

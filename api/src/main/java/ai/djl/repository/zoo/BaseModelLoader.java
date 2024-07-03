@@ -195,11 +195,19 @@ public class BaseModelLoader implements ModelLoader {
             throws IOException {
         Model model = Model.newInstance(name, device, engine);
         if (block == null) {
-            String className = (String) arguments.get("blockFactory");
-            BlockFactory factory =
-                    ClassLoaderUtils.findImplementation(modelPath, BlockFactory.class, className);
-            if (factory != null) {
-                block = factory.newBlock(model, modelPath, arguments);
+            Object bf = arguments.get("blockFactory");
+            if (bf instanceof BlockFactory) {
+                block = ((BlockFactory) bf).newBlock(model, modelPath, arguments);
+            } else {
+                String className = (String) bf;
+                BlockFactory factory =
+                        ClassLoaderUtils.findImplementation(
+                                modelPath, BlockFactory.class, className);
+                if (factory != null) {
+                    block = factory.newBlock(model, modelPath, arguments);
+                } else if (className != null) {
+                    throw new IllegalArgumentException("Failed to load BlockFactory: " + className);
+                }
             }
         }
         if (block != null) {
