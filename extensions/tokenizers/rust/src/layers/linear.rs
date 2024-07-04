@@ -20,7 +20,12 @@ pub struct Linear {
 }
 
 impl Linear {
-    pub fn load(vb: VarBuilder, in_dim: usize, out_dim: usize, act: Option<HiddenAct>) -> Result<Self> {
+    pub fn load(
+        vb: VarBuilder,
+        in_dim: usize,
+        out_dim: usize,
+        act: Option<HiddenAct>,
+    ) -> Result<Self> {
         Ok(Self {
             weight: vb.get((out_dim, in_dim), "weight")?,
             bias: Some(vb.get(out_dim, "bias")?),

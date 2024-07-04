@@ -4,7 +4,7 @@ mod distilbert;
 use crate::ndarray::as_data_type;
 use crate::{cast_handle, drop_handle, to_handle, to_string_array};
 use bert::{BertConfig, BertModel};
-use candle::{Device, DType, Result, Tensor};
+use candle::{DType, Device, Result, Tensor};
 use candle_nn::VarBuilder;
 use distilbert::{DistilBertConfig, DistilBertModel};
 use jni::objects::{JLongArray, JObject, JString, ReleaseMode};

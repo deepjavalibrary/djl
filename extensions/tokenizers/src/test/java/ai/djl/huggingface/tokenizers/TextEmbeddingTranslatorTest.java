@@ -12,6 +12,7 @@
  */
 package ai.djl.huggingface.tokenizers;
 
+import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory;
@@ -104,6 +105,7 @@ public class TextEmbeddingTranslatorTest {
                         .optArgument("block_shapes", "(1,7,384)")
                         .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
+                        .optDevice(Device.cpu())
                         .optArgument("tokenizer", "bert-base-uncased")
                         .optArgument("pooling", "max")
                         .optOption("hasParameter", "false")

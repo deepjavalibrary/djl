@@ -2,8 +2,8 @@
 pub use cudarc::cublaslt::Activation;
 
 use crate::layers::HiddenAct;
-use candle::{CpuStorage, Device, Layout, Result, Shape, Storage, Tensor};
 use candle::backend::BackendStorage;
+use candle::{CpuStorage, Device, Layout, Result, Shape, Storage, Tensor};
 
 #[cfg(feature = "cuda")]
 use candle::cuda_backend::WrapErr;

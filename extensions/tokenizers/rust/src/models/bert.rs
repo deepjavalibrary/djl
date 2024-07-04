@@ -1,5 +1,5 @@
-use crate::models::Model;
 use crate::layers::Linear;
+use crate::models::Model;
 use candle::{Device, Result, Tensor};
 use candle_nn::{embedding, Embedding, Module, VarBuilder};
 use candle_transformers::models::with_tracing::{layer_norm, LayerNorm};
@@ -359,7 +359,12 @@ struct BertIntermediate {
 
 impl BertIntermediate {
     fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
-        let dense = Linear::load(vb.pp("dense"), config.hidden_size, config.intermediate_size, None)?;
+        let dense = Linear::load(
+            vb.pp("dense"),
+            config.hidden_size,
+            config.intermediate_size,
+            None,
+        )?;
         Ok(Self {
             dense,
             intermediate_act: HiddenActLayer::new(config.hidden_act),
@@ -387,7 +392,12 @@ struct BertOutput {
 
 impl BertOutput {
     fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
-        let dense = Linear::load(vb.pp("dense"), config.intermediate_size, config.hidden_size, None)?;
+        let dense = Linear::load(
+            vb.pp("dense"),
+            config.intermediate_size,
+            config.hidden_size,
+            None,
+        )?;
         let layer_norm = layer_norm(
             config.hidden_size,
             config.layer_norm_eps,
