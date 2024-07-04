@@ -12,16 +12,23 @@
  */
 package ai.djl.util;
 
+import ai.djl.util.cuda.CudaUtils;
+
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 
 public class PlatformTest {
 
@@ -94,6 +101,43 @@ public class PlatformTest {
         Assert.assertFalse(platform.matches(system));
     }
 
+    @Test
+    public void testDetectPlatform() throws IOException, ReflectiveOperationException {
+        Path dir = Paths.get("build/tmp/");
+        Files.createDirectories(dir);
+        Platform system = Platform.fromSystem();
+        String classifier = system.getClassifier();
+        createZipFile(0, "1.0", "cpu", classifier, true);
+        createZipFile(1, "1.0", "cpu", classifier, false);
+        createZipFile(2, "1.0", "cpu-precxx11", classifier, false);
+        createZipFile(3, "1.0", "cu117", classifier, false);
+        createZipFile(4, "1.0", "cu117-precxx11", classifier, false);
+        createZipFile(5, "1.0", "cu999", classifier, false);
+        createZipFile(6, "1.0", "cu999-precxx11", classifier, false);
+        createZipFile(7, "99.99", "cu999-precxx11", classifier, false);
+        System.setProperty("ai.djl.util.cuda.fork", "true");
+        try {
+            String[] gpuInfo = new String[] {"1", "99990", "90"};
+            Field field = CudaUtils.class.getDeclaredField("gpuInfo");
+            field.setAccessible(true);
+            field.set(null, gpuInfo);
+            URL[] urls = new URL[8];
+            for (int i = 0; i < 8; ++i) {
+                urls[i] = dir.resolve(i + ".jar").toUri().toURL();
+            }
+            URLClassLoader cl = new URLClassLoader(urls);
+            Thread.currentThread().setContextClassLoader(cl);
+
+            Platform detected = Platform.detectPlatform("pytorch");
+            Assert.assertEquals(detected.getFlavor(), "cu999-precxx11");
+
+            field.set(null, null);
+        } finally {
+            System.clearProperty("ai.djl.util.cuda.fork");
+            Thread.currentThread().setContextClassLoader(null);
+        }
+    }
+
     private URL createPropertyFile(String content) throws IOException {
         Path dir = Paths.get("build/tmp/testFile/");
         Files.createDirectories(dir);
@@ -103,5 +147,25 @@ public class PlatformTest {
             writer.newLine();
         }
         return file.toUri().toURL();
+    }
+
+    private void createZipFile(
+            int index, String version, String flavor, String classifier, boolean placeHolder)
+            throws IOException {
+        Path file = Paths.get("build/tmp/" + index + ".jar");
+        try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(file))) {
+            JarEntry entry = new JarEntry("native/lib/pytorch.properties");
+            jos.putNextEntry(entry);
+            if (placeHolder) {
+                jos.write("placeholder=true\nversion=2.3.1".getBytes(StandardCharsets.UTF_8));
+            } else {
+                jos.write("version=".getBytes(StandardCharsets.UTF_8));
+                jos.write(version.getBytes(StandardCharsets.UTF_8));
+                jos.write("\nflavor=".getBytes(StandardCharsets.UTF_8));
+                jos.write(flavor.getBytes(StandardCharsets.UTF_8));
+                jos.write("\nclassifier=".getBytes(StandardCharsets.UTF_8));
+                jos.write(classifier.getBytes(StandardCharsets.UTF_8));
+            }
+        }
     }
 }
