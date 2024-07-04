@@ -28,7 +28,7 @@ public class Yolov8DetectionTest {
 
     @Test
     public void testYolov8Detection() throws ModelException, TranslateException, IOException {
-        TestRequirements.linux();
+        TestRequirements.notGpu();
 
         DetectedObjects result = Yolov8Detection.predict();
 

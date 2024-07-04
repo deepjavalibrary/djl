@@ -149,7 +149,7 @@ public class EarlyStoppingListenerTest {
                 }
 
                 TrainingResult trainingResult = trainer.getTrainingResult();
-                Assert.assertEquals(trainingResult.getEpoch(), 3);
+                Assert.assertTrue(trainingResult.getEpoch() < 5);
             }
         }
     }

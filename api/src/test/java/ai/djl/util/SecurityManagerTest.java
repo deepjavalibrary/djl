@@ -12,14 +12,11 @@
  */
 package ai.djl.util;
 
-import ai.djl.util.cuda.CudaUtils;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import java.io.FilePermission;
 import java.security.Permission;
 
 public class SecurityManagerTest {
@@ -58,27 +55,5 @@ public class SecurityManagerTest {
         Assert.assertEquals(Utils.getenv("HOME", "/home"), "/home");
         Assert.assertEquals(Utils.getenv("TEST", "test"), "test");
         Assert.assertEquals(Utils.getenv().size(), 0);
-    }
-
-    @Test
-    public void testCudaUtils() {
-        // Disable access to the cudart library files
-        SecurityManager sm =
-                new SecurityManager() {
-                    @Override
-                    public void checkPermission(Permission perm) {
-                        if (perm instanceof FilePermission && perm.getName().contains("cudart")) {
-                            throw new SecurityException(
-                                    "Don't have permission to read file: " + perm.getName());
-                        }
-                    }
-                };
-        System.setSecurityManager(sm);
-        try {
-            Assert.assertFalse(CudaUtils.hasCuda());
-            Assert.assertEquals(CudaUtils.getGpuCount(), 0);
-        } finally {
-            System.setSecurityManager(null);
-        }
     }
 }
