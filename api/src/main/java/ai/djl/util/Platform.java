@@ -20,7 +20,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -71,32 +73,50 @@ public final class Platform {
         }
 
         Platform systemPlatform = Platform.fromSystem(engine);
-        Platform placeholder = null;
+        List<Platform> availablePlatforms = new ArrayList<>();
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
             Platform platform = Platform.fromUrl(url);
             platform.apiVersion = systemPlatform.apiVersion;
             if (platform.isPlaceholder()) {
-                placeholder = platform;
+                availablePlatforms.add(platform);
             } else if (platform.matches(systemPlatform)) {
                 logger.info("Found matching platform from: {}", url);
-                return platform;
+                availablePlatforms.add(platform);
             } else {
                 logger.info("Ignore mismatching platform from: {}", url);
             }
         }
-        if (placeholder != null) {
-            logger.info("Found placeholder platform from: {}", placeholder);
-            return placeholder;
+        if (availablePlatforms.isEmpty()) {
+            if (systemPlatform.version == null) {
+                throw new AssertionError("No " + engine + " version found in property file.");
+            }
+            if (systemPlatform.apiVersion == null) {
+                throw new AssertionError("No " + engine + " djl_version found in property file.");
+            }
+            return systemPlatform;
+        } else if (availablePlatforms.size() == 1) {
+            Platform ret = availablePlatforms.get(0);
+            if (ret.isPlaceholder()) {
+                logger.info("Found placeholder platform from: {}", ret);
+            }
+            return ret;
         }
-
-        if (systemPlatform.version == null) {
-            throw new AssertionError("No " + engine + " version found in property file.");
-        }
-        if (systemPlatform.apiVersion == null) {
-            throw new AssertionError("No " + engine + " djl_version found in property file.");
-        }
-        return systemPlatform;
+        availablePlatforms.sort(
+                (o1, o2) -> {
+                    if (o1.isPlaceholder()) {
+                        return 1;
+                    } else if (o2.isPlaceholder()) {
+                        return -1;
+                    }
+                    // cu121-precx11 > cu121 > cu118-precss11 > cpu-precxx11 > cpu
+                    int ret = o2.getFlavor().compareTo(o1.getFlavor());
+                    if (ret == 0) {
+                        return o2.getVersion().compareTo(o1.getVersion());
+                    }
+                    return ret;
+                });
+        return availablePlatforms.get(0);
     }
 
     /**

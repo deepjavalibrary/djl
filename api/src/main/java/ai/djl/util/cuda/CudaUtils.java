@@ -139,11 +139,13 @@ public final class CudaUtils {
      */
     public static String getComputeCapability(int device) {
         if (Boolean.getBoolean("ai.djl.util.cuda.fork")) {
-            String[] ret = execute(device);
-            if (ret.length != 3) {
-                throw new IllegalArgumentException(ret[0]);
+            if (gpuInfo == null) { // NOPMD
+                gpuInfo = execute(-1);
             }
-            return ret[0];
+            if (device >= gpuInfo.length - 2) {
+                throw new IllegalArgumentException("Invalid device: " + device);
+            }
+            return gpuInfo[device + 2];
         }
 
         if (LIB == null) {
@@ -214,7 +216,12 @@ public final class CudaUtils {
                 return;
             }
             int cudaVersion = getCudaVersion();
-            System.out.println(gpuCount + "," + cudaVersion);
+            StringBuilder sb = new StringBuilder();
+            sb.append(gpuCount).append(',').append(cudaVersion);
+            for (int i = 0; i < gpuCount; ++i) {
+                sb.append(',').append(getComputeCapability(i));
+            }
+            System.out.println(sb);
             return;
         }
         try {

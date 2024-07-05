@@ -55,6 +55,8 @@ public class CudaUtilsTest {
         System.setProperty("ai.djl.util.cuda.fork", "true");
         try {
             testCudaUtils();
+            CudaUtils.main(new String[0]);
+            CudaUtils.main(new String[] {"-1"});
         } finally {
             System.clearProperty("ai.djl.util.cuda.fork");
         }
