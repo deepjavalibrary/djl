@@ -403,28 +403,38 @@ public class BufferedImageFactory extends ImageFactory {
             float b = RandomUtils.nextFloat();
             int imageWidth = image.getWidth();
             int imageHeight = image.getHeight();
-            int x = (int) (mask.getX() * imageWidth);
-            int y = (int) (mask.getY() * imageHeight);
+            int x = 0;
+            int y = 0;
+            int w = imageWidth;
+            int h = imageHeight;
+            if (!mask.isFullImageMask()) {
+                x = (int) (mask.getX() * imageWidth);
+                y = (int) (mask.getY() * imageHeight);
+                w = (int) (mask.getWidth() * imageWidth);
+                h = (int) (mask.getHeight() * imageHeight);
+                // Correct some coordinates of box when going out of image
+                if (x < 0) {
+                    x = 0;
+                }
+                if (y < 0) {
+                    y = 0;
+                }
+            }
             float[][] probDist = mask.getProbDist();
-            // Correct some coordinates of box when going out of image
-            if (x < 0) {
-                x = 0;
-            }
-            if (y < 0) {
-                y = 0;
-            }
 
             BufferedImage maskImage =
                     new BufferedImage(
-                            probDist.length, probDist[0].length, BufferedImage.TYPE_INT_ARGB);
-            for (int xCor = 0; xCor < probDist.length; xCor++) {
-                for (int yCor = 0; yCor < probDist[xCor].length; yCor++) {
-                    float opacity = probDist[xCor][yCor] * 0.8f;
+                            probDist[0].length, probDist.length, BufferedImage.TYPE_INT_ARGB);
+            for (int yCor = 0; yCor < probDist.length; yCor++) {
+                for (int xCor = 0; xCor < probDist[0].length; xCor++) {
+                    float opacity = probDist[yCor][xCor] * 0.8f;
                     maskImage.setRGB(xCor, yCor, new Color(r, g, b, opacity).darker().getRGB());
                 }
             }
+            java.awt.Image scaled = maskImage.getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH);
+
             Graphics2D gR = (Graphics2D) image.getGraphics();
-            gR.drawImage(maskImage, x, y, null);
+            gR.drawImage(scaled, x, y, null);
             gR.dispose();
         }
 
