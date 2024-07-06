@@ -119,14 +119,14 @@ public final class Feature {
         if (!freq.matches("\\d+.*")) {
             sb.insert(0, 1);
         }
-        sb.insert(0, "P");
-        String formattedFreq = sb.toString();
 
         TemporalAmount timeFreq;
         if (freq.endsWith("H") || freq.endsWith("T") || freq.endsWith("S")) {
-            timeFreq = Duration.parse(formattedFreq);
+            sb.insert(0, "PT");
+            timeFreq = Duration.parse(sb.toString());
         } else {
-            timeFreq = Period.parse(formattedFreq);
+            sb.insert(0, "P");
+            timeFreq = Period.parse(sb.toString());
         }
 
         List<LocalDateTime> index = new ArrayList<>();
