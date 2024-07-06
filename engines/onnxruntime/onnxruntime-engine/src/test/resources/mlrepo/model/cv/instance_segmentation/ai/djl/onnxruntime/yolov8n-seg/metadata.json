@@ -1,0 +1,40 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/instance_segmentation",
+  "groupId": "ai.djl.onnxruntime",
+  "artifactId": "yolov8n-seg",
+  "name": "Yolov8n seg",
+  "description": "Yolov8n Instance Segmentation",
+  "website": "http://www.djl.ai/engines/onnxruntime/onnxruntime-engine",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "yolov8n-seg",
+      "properties": {
+      },
+      "arguments": {
+        "width": 640,
+        "height": 640,
+        "resize": true,
+        "threshold": 0.25,
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloSegmentationTranslatorFactory"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/yolov8n-seg.zip",
+          "sha1Hash": "dd7411362de950dcce003ecca847fd591757a364",
+          "name": "",
+          "size": 11913575
+        }
+      }
+    }
+  ]
+}
