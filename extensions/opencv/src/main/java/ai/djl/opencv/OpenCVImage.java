@@ -374,12 +374,19 @@ class OpenCVImage implements Image {
             }
         }
         float[][] probDist = mask.getProbDist();
+        float max = 0;
+        for (float[] row : probDist) {
+            for (float f : row) {
+                max = Math.max(max, f);
+            }
+        }
+        float ratio = 0.5f / max;
 
         BufferedImage maskImage =
                 new BufferedImage(probDist[0].length, probDist.length, BufferedImage.TYPE_INT_ARGB);
         for (int yCor = 0; yCor < probDist.length; yCor++) {
             for (int xCor = 0; xCor < probDist[0].length; xCor++) {
-                float opacity = probDist[yCor][xCor] * 0.8f;
+                float opacity = probDist[yCor][xCor] * ratio;
                 maskImage.setRGB(xCor, yCor, new Color(r, g, b, opacity).darker().getRGB());
             }
         }

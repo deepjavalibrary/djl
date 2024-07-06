@@ -16,7 +16,6 @@ import ai.djl.ModelException;
 import ai.djl.examples.inference.cv.InstanceSegmentation;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
@@ -28,11 +27,9 @@ public class InstanceSegmentationTest {
 
     @Test
     public void testInstanceSegmentation() throws ModelException, TranslateException, IOException {
-        TestRequirements.linux();
-
         DetectedObjects result = InstanceSegmentation.predict();
         Classifications.Classification best = result.best();
         Assert.assertEquals(best.getClassName(), "bicycle");
-        Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
+        Assert.assertTrue(Double.compare(best.getProbability(), 0.7) > 0);
     }
 }

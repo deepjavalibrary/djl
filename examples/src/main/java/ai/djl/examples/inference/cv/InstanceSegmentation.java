@@ -17,6 +17,7 @@ import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.translator.YoloSegmentationTranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
@@ -55,9 +56,8 @@ public final class InstanceSegmentation {
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optModelUrls(
-                                "djl://ai.djl.mxnet/mask_rcnn/0.0.1/mask_rcnn_resnet18_v1b_coco")
-                        .optEngine("MXNet")
+                        .optModelUrls("djl://ai.djl.pytorch/yolov8n-seg")
+                        .optTranslatorFactory(new YoloSegmentationTranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
 
