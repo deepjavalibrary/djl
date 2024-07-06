@@ -12,7 +12,6 @@
  */
 package ai.djl.modality.cv.translator;
 
-import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Mask;
@@ -70,14 +69,6 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
 
     /** {@inheritDoc} */
     @Override
-    public NDList processInput(TranslatorContext ctx, Image image) {
-        ctx.setAttachment("originalHeight", image.getHeight());
-        ctx.setAttachment("originalWidth", image.getWidth());
-        return super.processInput(ctx, image);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         float[] ids = list.get(0).toFloatArray();
         float[] scores = list.get(1).toFloatArray();
@@ -102,18 +93,15 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
                 double w = box[2] / rescaledWidth - x;
                 double h = box[3] / rescaledHeight - y;
 
-                int maskW = (int) (w * (int) ctx.getAttachment("originalWidth"));
-                int maskH = (int) (h * (int) ctx.getAttachment("originalHeight"));
-
                 // Reshape mask to actual image bounding box shape.
                 NDArray array = masks.get(i);
                 Shape maskShape = array.getShape();
-                array = array.reshape(maskShape.addAll(new Shape(1)));
-                NDArray maskArray = NDImageUtils.resize(array, maskW, maskH).transpose();
-                float[] flattened = maskArray.toFloatArray();
-                float[][] maskFloat = new float[maskW][maskH];
-                for (int j = 0; j < maskW; j++) {
-                    System.arraycopy(flattened, j * maskH, maskFloat[j], 0, maskH);
+                int maskH = (int) maskShape.get(0);
+                int maskW = (int) maskShape.get(1);
+                float[] flattened = array.toFloatArray();
+                float[][] maskFloat = new float[maskH][maskW];
+                for (int j = 0; j < maskH; j++) {
+                    System.arraycopy(flattened, j * maskW, maskFloat[j], 0, maskW);
                 }
                 Mask mask = new Mask(x, y, w, h, maskFloat);
 

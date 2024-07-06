@@ -21,6 +21,7 @@ public class Mask extends Rectangle {
 
     private static final long serialVersionUID = 1L;
     private float[][] probDist;
+    private boolean fullImageMask;
 
     /**
      * Constructs a Mask with the given data.
@@ -32,8 +33,29 @@ public class Mask extends Rectangle {
      * @param dist the probability distribution for each pixel in the rectangle
      */
     public Mask(double x, double y, double width, double height, float[][] dist) {
+        this(x, y, width, height, dist, false);
+    }
+
+    /**
+     * Constructs a Mask with the given data.
+     *
+     * @param x the left coordinate of the bounding rectangle
+     * @param y the top coordinate of the bounding rectangle
+     * @param width the width of the bounding rectangle
+     * @param height the height of the bounding rectangle
+     * @param dist the probability distribution for each pixel in the rectangle
+     * @param fullImageMask if the mask if for full image
+     */
+    public Mask(
+            double x,
+            double y,
+            double width,
+            double height,
+            float[][] dist,
+            boolean fullImageMask) {
         super(x, y, width, height);
         this.probDist = dist;
+        this.fullImageMask = fullImageMask;
     }
 
     /**
@@ -43,5 +65,14 @@ public class Mask extends Rectangle {
      */
     public float[][] getProbDist() {
         return probDist;
+    }
+
+    /**
+     * Returns if the mask is for full image.
+     *
+     * @return if the mask is for full image
+     */
+    public boolean isFullImageMask() {
+        return fullImageMask;
     }
 }
