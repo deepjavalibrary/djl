@@ -16,8 +16,8 @@ mod ndarray;
 
 #[cfg(feature = "cuda")]
 mod compute_cap;
-mod models;
 mod layers;
+mod models;
 
 extern crate tokenizers as tk;
 
@@ -30,7 +30,6 @@ use jni::errors::Error;
 use jni::objects::{
     JClass, JLongArray, JMethodID, JObject, JObjectArray, JString, JValue, ReleaseMode,
 };
-#[cfg(feature = "cuda")]
 use jni::sys::JNI_FALSE;
 
 use jni::sys::{jboolean, jint, jlong, jobjectArray, jsize, jvalue, JNI_TRUE};
@@ -811,7 +810,7 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_isCudaAvailable<'loca
     }
     #[cfg(not(feature = "cuda"))]
     {
-        JNI_TRUE
+        JNI_FALSE
     }
 }
 
