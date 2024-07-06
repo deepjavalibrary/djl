@@ -39,8 +39,7 @@ public abstract class BaseTimeSeriesTranslator implements Translator<TimeSeriesD
         this.batchifier = builder.batchifier;
         this.freq = builder.freq;
         this.predictionLength = builder.predictionLength;
-        // TODO: for inferring
-        this.contextLength = builder.predictionLength;
+        this.contextLength = builder.contextLength;
     }
 
     /** {@inheritDoc} */
@@ -57,6 +56,7 @@ public abstract class BaseTimeSeriesTranslator implements Translator<TimeSeriesD
     public abstract static class BaseBuilder<T extends BaseBuilder<T>> {
         protected Batchifier batchifier = Batchifier.STACK;
         protected int predictionLength;
+        protected int contextLength;
 
         protected String freq;
 
@@ -82,6 +82,8 @@ public abstract class BaseTimeSeriesTranslator implements Translator<TimeSeriesD
                 throw new IllegalArgumentException(
                         "The value of `prediction_length` should be > 0");
             }
+            this.contextLength =
+                    ArgumentsUtil.intValue(arguments, "context_length", predictionLength);
             if (arguments.containsKey("batchifier")) {
                 batchifier = Batchifier.fromString((String) arguments.get("batchifier"));
             }
