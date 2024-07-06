@@ -14,6 +14,7 @@ package ai.djl.testing;
 
 import ai.djl.engine.Engine;
 import ai.djl.engine.EngineException;
+import ai.djl.util.cuda.CudaUtils;
 
 import org.testng.SkipException;
 
@@ -76,9 +77,16 @@ public final class TestRequirements {
     }
 
     /** Requires a test have at least one gpu. */
-    public static void gpu(String engine) {
-        if (Engine.getEngine(engine).getGpuCount() == 0) {
-            throw new SkipException("This test requires a GPU to run");
+    public static void gpu(String engine, int numGpu) {
+        if (Engine.getEngine(engine).getGpuCount() < numGpu) {
+            throw new SkipException("This test requires " + numGpu + " GPUs to run");
+        }
+    }
+
+    /** Avoid OOM on GPUs with multiple engines. */
+    public static void notGpu() {
+        if (CudaUtils.getGpuCount() > 0) {
+            throw new SkipException("This test requires CPU only machine to run");
         }
     }
 }

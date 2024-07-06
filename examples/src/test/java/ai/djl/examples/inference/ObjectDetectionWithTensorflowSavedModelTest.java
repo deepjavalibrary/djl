@@ -35,6 +35,7 @@ public class ObjectDetectionWithTensorflowSavedModelTest {
         // throttling and will fail the test.
         TestRequirements.linux();
         TestRequirements.nightly();
+        TestRequirements.notGpu();
 
         DetectedObjects result = ObjectDetectionWithTensorflowSavedModel.predict();
 

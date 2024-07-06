@@ -35,6 +35,7 @@ public class MaskDetectionTest {
     @Test
     public void testMaskDetection() throws ModelException, TranslateException, IOException {
         TestRequirements.linux();
+        TestRequirements.notGpu();
 
         DetectedObjects result = MaskDetection.predict();
         logger.info("{}", result);

@@ -32,6 +32,7 @@ public class TrainResNetTest {
     @Test
     public void testTrainResNet() throws ModelException, IOException, TranslateException {
         TestRequirements.nightly();
+        TestRequirements.gpu("PyTorch", 1);
 
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
@@ -47,7 +48,7 @@ public class TrainResNetTest {
             throws ModelException, IOException, TranslateException {
         TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.gpu("PyTorch");
+        TestRequirements.gpu("PyTorch", 4);
 
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.

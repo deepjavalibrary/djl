@@ -27,7 +27,7 @@ public class TrainSentimentAnalysisTest {
             throws ModelException, TranslateException, IOException {
         TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.gpu("MXNet");
+        TestRequirements.gpu("MXNet", 1);
 
         String[] args = {"-e", "1", "-g", "1", "--engine", "MXNet"};
         TrainSentimentAnalysis.runExample(args);

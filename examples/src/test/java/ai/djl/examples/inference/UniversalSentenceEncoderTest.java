@@ -29,6 +29,7 @@ public class UniversalSentenceEncoderTest {
     public void testSentimentAnalysis() throws ModelException, TranslateException, IOException {
         TestRequirements.linux();
         TestRequirements.nightly();
+        TestRequirements.notGpu();
 
         List<String> inputs = new ArrayList<>();
         inputs.add("The quick brown fox jumps over the lazy dog.");
