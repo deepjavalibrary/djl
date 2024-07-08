@@ -120,10 +120,10 @@ public final class TrainTimeSeries {
                 inputShapes[6] =
                         new Shape(
                                 1,
-                                predictionLength,
+                                contextLength,
                                 TimeFeature.timeFeaturesFromFreqStr(freq).size() + 1);
-                inputShapes[7] = new Shape(1, predictionLength);
-                inputShapes[8] = new Shape(1, predictionLength);
+                inputShapes[7] = new Shape(1, contextLength);
+                inputShapes[8] = new Shape(1, contextLength);
                 trainer.initialize(inputShapes);
 
                 EasyTrain.fit(trainer, arguments.getEpoch(), trainSet, null);
@@ -147,6 +147,7 @@ public final class TrainTimeSeries {
 
             Map<String, Object> arguments = new ConcurrentHashMap<>();
             arguments.put("prediction_length", predictionLength);
+            arguments.put("context_length", predictionNetwork.getContextLength());
             arguments.put("freq", freq);
             arguments.put("use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(), false);
             arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), true);
@@ -239,6 +240,7 @@ public final class TrainTimeSeries {
                         .setFreq(freq)
                         .setPredictionLength(predictionLength)
                         .optDistrOutput(distributionOutput)
+                        .optContextLength(8)
                         .optUseFeatStaticCat(true);
         return training ? builder.buildTrainingNetwork() : builder.buildPredictionNetwork();
     }
