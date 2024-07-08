@@ -1,0 +1,43 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/pose_estimation",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "yolov8n-pose",
+  "name": "Yolov8n pose",
+  "description": "Yolov8n Pose Estimation",
+  "website": "http://www.djl.ai/engines/pytorch/pytorch-model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "yolov8n-pose",
+      "properties": {
+      },
+      "arguments": {
+        "width": 640,
+        "height": 640,
+        "resize": true,
+        "threshold": 0.25,
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloPoseTranslatorFactory"
+      },
+      "options": {
+        "mapLocation": "true"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/yolov8n-pose.zip",
+          "sha1Hash": "b2358198586ea35189f30aa5f49285dc1842ec1b",
+          "name": "",
+          "size": 11684792
+        }
+      }
+    }
+  ]
+}
