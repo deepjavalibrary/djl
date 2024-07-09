@@ -347,18 +347,37 @@ public class BufferedImageFactory extends ImageFactory {
             convertIdNeeded();
 
             Graphics2D g = (Graphics2D) image.getGraphics();
-            int stroke = 2;
-            g.setStroke(new BasicStroke(stroke));
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             int imageWidth = image.getWidth();
             int imageHeight = image.getHeight();
 
-            for (Joints.Joint joint : joints.getJoints()) {
-                g.setPaint(randomColor().darker());
+            List<Joints.Joint> list = joints.getJoints();
+            if (list.size() == 17) {
+                g.setColor(new Color(224, 255, 37));
+                g.setStroke(new BasicStroke(3));
+                drawLine(g, list.get(5), list.get(7), imageWidth, imageHeight);
+                drawLine(g, list.get(7), list.get(9), imageWidth, imageHeight);
+                drawLine(g, list.get(6), list.get(8), imageWidth, imageHeight);
+                drawLine(g, list.get(8), list.get(10), imageWidth, imageHeight);
+                drawLine(g, list.get(11), list.get(13), imageWidth, imageHeight);
+                drawLine(g, list.get(12), list.get(14), imageWidth, imageHeight);
+                drawLine(g, list.get(13), list.get(15), imageWidth, imageHeight);
+                drawLine(g, list.get(14), list.get(16), imageWidth, imageHeight);
+                drawLine(g, list.get(5), list.get(6), imageWidth, imageHeight);
+                drawLine(g, list.get(11), list.get(12), imageWidth, imageHeight);
+                drawLine(g, list.get(5), list.get(11), imageWidth, imageHeight);
+                drawLine(g, list.get(6), list.get(12), imageWidth, imageHeight);
+            }
+
+            g.setColor(new Color(37, 150, 190));
+            g.setStroke(new BasicStroke(2));
+            for (Joints.Joint joint : list) {
                 int x = (int) (joint.getX() * imageWidth);
                 int y = (int) (joint.getY() * imageHeight);
-                g.fillOval(x, y, 10, 10);
+                g.fillOval(x - 6, y - 6, 12, 12);
             }
+
             g.dispose();
         }
 
@@ -380,8 +399,13 @@ public class BufferedImageFactory extends ImageFactory {
             image = target;
         }
 
-        private Color randomColor() {
-            return new Color(RandomUtils.nextInt(255));
+        private void drawLine(
+                Graphics2D g, Joints.Joint from, Joints.Joint to, int width, int height) {
+            int x0 = (int) (from.getX() * width);
+            int y0 = (int) (from.getY() * height);
+            int x1 = (int) (to.getX() * width);
+            int y1 = (int) (to.getY() * height);
+            g.drawLine(x0, y0, x1, y1);
         }
 
         private void drawText(Graphics2D g, String text, int x, int y, int stroke, int padding) {
