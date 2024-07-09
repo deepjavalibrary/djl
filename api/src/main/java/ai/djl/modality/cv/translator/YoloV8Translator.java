@@ -46,8 +46,8 @@ public class YoloV8Translator extends YoloV5Translator {
      *
      * @return a new builder
      */
-    public static YoloV8Translator.Builder builder() {
-        return new YoloV8Translator.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
@@ -56,8 +56,8 @@ public class YoloV8Translator extends YoloV5Translator {
      * @param arguments arguments to specify builder options
      * @return a new builder
      */
-    public static YoloV8Translator.Builder builder(Map<String, ?> arguments) {
-        YoloV8Translator.Builder builder = new YoloV8Translator.Builder();
+    public static Builder builder(Map<String, ?> arguments) {
+        Builder builder = new Builder();
         builder.configPreProcess(arguments);
         builder.configPostProcess(arguments);
 

@@ -1,0 +1,43 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/instance_segmentation",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "yolov8n-seg",
+  "name": "Yolov8n seg",
+  "description": "Yolov8n Instance Segmentation",
+  "website": "http://www.djl.ai/engines/pytorch/pytorch-model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "yolov8n-seg",
+      "properties": {
+      },
+      "arguments": {
+        "width": 640,
+        "height": 640,
+        "resize": true,
+        "threshold": 0.25,
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloSegmentationTranslatorFactory"
+      },
+      "options": {
+        "mapLocation": "true"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/yolov8n-seg.zip",
+          "sha1Hash": "bbb0d99b20b3235d70547617110d58b94e28c124",
+          "name": "",
+          "size": 12069002
+        }
+      }
+    }
+  ]
+}
