@@ -99,28 +99,18 @@ jobs:
   test-aarch64:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: [ self-hosted, aarch64 ]
-    container: amazonlinux:2
+    container:
+      image: amazonlinux:2
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto.aarch64
     timeout-minutes: 30
     needs: create-runners
     steps:
       - name: Setup Environment
         run: |
-          yum -y update
           yum install -y tar gzip
-      # checkout@v4 requires GLIBC 2.27
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: corretto
-          architecture: aarch64
-      - uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          yum -y install java-17-amazon-corretto-devel
+      - uses: taiki-e/checkout-action@v1
       - name: Test with Gradle
         run: |
           ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
