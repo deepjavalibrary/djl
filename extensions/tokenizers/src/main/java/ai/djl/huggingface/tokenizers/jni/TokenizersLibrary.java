@@ -60,6 +60,8 @@ public final class TokenizersLibrary {
 
     public native long[] getOverflowing(long encoding);
 
+    public native int getOverflowCount(long encoding);
+
     public native String decode(long tokenizer, long[] ids, boolean addSpecialTokens);
 
     public native String getTruncationStrategy(long tokenizer);
