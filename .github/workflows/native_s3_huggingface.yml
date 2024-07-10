@@ -9,76 +9,36 @@ on:
       - extensions/tokenizers/rust/**
 
 jobs:
-  build-tokenizers-jni-osx:
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'corretto'
-          java-version: 17
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Release JNI prep
-        run: |
-          ./gradlew :extensions:tokenizers:compileJNI
-          ./gradlew -Pjni :extensions:tokenizers:test
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
-      - name: Copy files to S3 with the AWS CLI
-        run: |
-          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
-          aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
-
   build-tokenizers-jni-linux:
     runs-on: ubuntu-latest
     container:
       image: amazonlinux:2
       env:
         JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Install Environment
         run: |
-          yum -y update
           yum -y groupinstall "Development Tools"
           yum -y install patch perl-IPC-Cmd cmake3
           yum -y install java-17-amazon-corretto-devel
           ln -s /usr/bin/cmake3 /usr/bin/cmake
-          pip3 install awscli --upgrade
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          pip3 install awscli wheel setuptools --upgrade
       - uses: taiki-e/checkout-action@v1
       - name: Release JNI prep
         run: |
           source "$HOME/.cargo/env"
-          export PATH=$PATH:/opt/rh/devtoolset-7/root/usr/bin
           ./gradlew :extensions:tokenizers:compileJNI
           PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
       - name: Build djl-converter wheel
         working-directory: extensions/tokenizers/src/main/python/
         run: ./setup.py bdist_wheel
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
+          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
+          rm -f extensions/tokenizers/jnilib/$DJL_VERSION/win-x86_64/*.dll
           TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
@@ -120,6 +80,8 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         shell: bash
         run: |
+          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
+          rm -f extensions/tokenizers/jnilib/$DJL_VERSION/win-x86_64/*.dll
           TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
@@ -157,6 +119,8 @@ jobs:
       - name: Copy files to S3 with the AWS CLI
         shell: bash
         run: |
+          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
+          rm -f extensions/tokenizers/jnilib/$DJL_VERSION/win-x86_64/*.dll
           TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
@@ -196,31 +160,27 @@ jobs:
       image: amazonlinux:2
       env:
         JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto.aarch64
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Install Environment
         run: |
-          yum -y update
           yum -y groupinstall "Development Tools"
           yum -y install patch perl-IPC-Cmd cmake3
           yum -y install java-17-amazon-corretto-devel
           ln -s /usr/bin/cmake3 /usr/bin/cmake
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           pip3 install awscli --upgrade
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
       - uses: taiki-e/checkout-action@v1
       - name: Release JNI prep
         run: |
+          source "$HOME/.cargo/env"
           ./gradlew :extensions:tokenizers:compileJNI
           PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
+          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
+          rm -f extensions/tokenizers/jnilib/$DJL_VERSION/win-x86_64/*.dll
           TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
@@ -231,15 +191,13 @@ jobs:
     timeout-minutes: 30
     needs: create-runners
     container:
-      image: nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+      image: nvidia/cuda:12.4.1-cudnn-devel-ubuntu20.04
       options: --gpus all --runtime=nvidia
     steps:
       - name: Install Environment
         run: |
           apt-get -y update
           apt-get -y install curl git
-          curl https://sh.rustup.rs -sSf | sh -s -- -y
-          . "$HOME/.cargo/env"
       - name: Set up Python3
         uses: actions/setup-python@v5
         with:
@@ -251,9 +209,9 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: 17
@@ -266,6 +224,7 @@ jobs:
       - name: Release JNI prep
         run: |
           CUDA_VERSION=cu124
+          . "$HOME/.cargo/env"
           ./gradlew :extensions:tokenizers:compileJNI -Pcuda=$CUDA_VERSION
           ./gradlew -Pjni :extensions:tokenizers:test
       - name: Configure AWS Credentials
@@ -276,6 +235,8 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
+          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
+          rm -f extensions/tokenizers/jnilib/$DJL_VERSION/win-x86_64/*.dll
           TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
