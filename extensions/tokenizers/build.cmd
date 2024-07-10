@@ -18,5 +18,5 @@ set RUST_MANIFEST=rust/Cargo.toml
 cargo build --manifest-path %RUST_MANIFEST% --release
 
 @rem for nightly ci
-md build\jnilib\win-x86_64
-copy rust\target\release\djl.dll build\jnilib\win-x86_64\tokenizers.dll
+md build\jnilib\win-x86_64\cpu
+copy rust\target\release\djl.dll build\jnilib\win-x86_64\cpu\tokenizers.dll

@@ -12,6 +12,7 @@ PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 
 VERSION=v$1
 ARCH=$2
+FLAVOR=$3
 
 pushd $WORK_DIR
 if [ ! -d "tokenizers" ]; then
@@ -29,16 +30,16 @@ javac -sourcepath src/main/java/ src/main/java/ai/djl/engine/rust/RustLibrary.ja
 
 RUST_MANIFEST=rust/Cargo.toml
 if [ -x "$(command -v nvcc)" ]; then
-  cargo build --manifest-path $RUST_MANIFEST --release --features cuda,flash-attn
+  cargo build --manifest-path $RUST_MANIFEST --release --features cuda,flash-attn,cublaslt
 else
   cargo build --manifest-path $RUST_MANIFEST --release
 fi
 
 # for nightly ci
 if [[ $PLATFORM == 'darwin' ]]; then
-  mkdir -p build/jnilib/osx-$ARCH
-  cp -f rust/target/release/libdjl.dylib build/jnilib/osx-$ARCH/libtokenizers.dylib
+  mkdir -p build/jnilib/osx-$ARCH/$FLAVOR
+  cp -f rust/target/release/libdjl.dylib build/jnilib/osx-$ARCH/$FLAVOR/libtokenizers.dylib
 elif [[ $PLATFORM == 'linux' ]]; then
-  mkdir -p build/jnilib/linux-$ARCH
-  cp -f rust/target/release/libdjl.so build/jnilib/linux-$ARCH/libtokenizers.so
+  mkdir -p build/jnilib/linux-$ARCH/$FLAVOR
+  cp -f rust/target/release/libdjl.so build/jnilib/linux-$ARCH/$FLAVOR/libtokenizers.so
 fi
