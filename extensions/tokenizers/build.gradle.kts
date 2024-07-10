@@ -38,11 +38,10 @@ tasks {
                 "win-x86_64/libwinpthread-1.dll" to "extra",
                 "win-x86_64/libgcc_s_seh-1.dll" to "extra",
                 "win-x86_64/libstdc%2B%2B-6.dll" to "extra",
-                "win-x86_64/tokenizers.dll" to "$tokenizers/jnilib/$djl",
-                "linux-x86_64/libtokenizers.so" to "$tokenizers/jnilib/$djl",
-                "linux-aarch64/libtokenizers.so" to "$tokenizers/jnilib/$djl",
-                "osx-x86_64/libtokenizers.dylib" to "$tokenizers/jnilib/$djl",
-                "osx-aarch64/libtokenizers.dylib" to "$tokenizers/jnilib/$djl"
+                "win-x86_64/cpu/tokenizers.dll" to "$tokenizers/jnilib/$djl",
+                "linux-x86_64/cpu/libtokenizers.so" to "$tokenizers/jnilib/$djl",
+                "linux-aarch64/cpu/libtokenizers.so" to "$tokenizers/jnilib/$djl",
+                "osx-aarch64/cpu/libtokenizers.dylib" to "$tokenizers/jnilib/$djl"
             )
             val jnilibDir = project.projectDir / "jnilib/$djl"
             for ((key, value) in files) {
