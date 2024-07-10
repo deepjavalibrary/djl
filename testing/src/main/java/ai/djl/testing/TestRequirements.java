@@ -58,6 +58,13 @@ public final class TestRequirements {
         }
     }
 
+    /** Requires the test runs on non-GPU. */
+    public static void notGpu() {
+        if (Engine.getInstance().getGpuCount() > 0) {
+            throw new SkipException("This test requires non-GPU to run");
+        }
+    }
+
     /** Requires that the test runs on macOS M1. */
     public static void macosM1() {
         if (!System.getProperty("os.name").toLowerCase().startsWith("mac")
