@@ -1,5 +1,6 @@
 package ai.djl
 
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.kotlin.dsl.attributes
 import org.gradle.kotlin.dsl.`java-library`
 import org.gradle.kotlin.dsl.systemProperties
@@ -44,6 +45,7 @@ tasks {
         testLogging {
             showStandardStreams = true
             events("passed", "skipped", "failed", "standardOut", "standardError")
+            exceptionFormat = TestExceptionFormat.FULL
         }
 
         jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
