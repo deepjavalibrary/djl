@@ -7,7 +7,6 @@ plugins {
 include(":api")
 include(":basicdataset")
 include(":djl-zero")
-include(":engines:llama")
 include(":engines:ml:lightgbm")
 include(":engines:ml:xgboost")
 include(":engines:mxnet:jnarator")
