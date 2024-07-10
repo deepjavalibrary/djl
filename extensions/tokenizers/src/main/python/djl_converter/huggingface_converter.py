@@ -111,11 +111,7 @@ class HuggingfaceConverter:
 
         config = AutoConfig.from_pretrained(model_id)
         if hasattr(config, "model_type"):
-            if config.model_type == "bert":
-                include_types = True
-            elif config.model_type == "distilbert":
-                include_types = False
-            else:
+            if config.model_type != "bert" and config.model_type != "distilbert":
                 return False, f"Unsupported model_type: {config.model_type}", -1
         else:
             return False, f"Unknown model_type: {model_id}", -1
@@ -126,6 +122,7 @@ class HuggingfaceConverter:
             os.makedirs(temp_dir)
 
         tokenizer = AutoTokenizer.from_pretrained(model_id)
+        include_types = "token_type_ids" in tokenizer.model_input_names
         hf_pipeline = PipelineHolder(tokenizer, ModelHolder(config))
         try:
             # Save tokenizer.json to temp dir
@@ -196,7 +193,7 @@ class HuggingfaceConverter:
         shutil.copyfile(config, os.path.join(temp_dir, "config.json"))
 
         # Save jit traced .pt file to temp dir
-        include_types = False
+        include_types = "token_type_ids" in hf_pipeline.tokenizer.model_input_names
         model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
                                           include_types)
         if not model_file:
@@ -205,17 +202,7 @@ class HuggingfaceConverter:
         result, reason = self.verify_jit_model(hf_pipeline, model_file,
                                                include_types, args.cpu_only)
         if not result:
-            include_types = True
-            model_file = self.jit_trace_model(hf_pipeline, model_id, temp_dir,
-                                              include_types)
-            if not model_file:
-                return False, reason, -1
-
-            result, reason = self.verify_jit_model(hf_pipeline, model_file,
-                                                   include_types,
-                                                   args.cpu_only)
-            if not result:
-                return False, reason, -1
+            return False, reason, -1
 
         arguments = self.save_serving_properties(model_info, "PyTorch",
                                                  temp_dir, hf_pipeline,
