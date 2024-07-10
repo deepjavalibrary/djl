@@ -498,6 +498,17 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 }
 
 #[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getOverflowCount(
+    _: JNIEnv,
+    _: JObject,
+    handle: jlong,
+) -> jint {
+    let encoding = cast_handle::<Encoding>(handle);
+    let count = encoding.get_overflowing().len();
+    count as jint
+}
+
+#[no_mangle]
 pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getOverflowing<
     'local,
 >(
