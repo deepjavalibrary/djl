@@ -135,7 +135,7 @@ publishing {
                         +"ai.djl.pytorch:pytorch-native-cu117:$pytorch:linux-x86_64"
                         +"ai.djl.pytorch:pytorch-native-cu117:$pytorch:win-x86_64"
                         +"ai.djl.pytorch:pytorch-native-cu117-precxx11:$pytorch:linux-x86_64"
-                        val tensorflow = "${libs.versions.tensorflow.get()}-SNAPSHOT"
+                        val tensorflow = "${libs.versions.tensorflow.get()}"
                         +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:osx-x86_64"
                         +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:osx-aarch64"
                         +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:linux-x86_64"
