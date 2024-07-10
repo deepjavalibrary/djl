@@ -608,7 +608,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         long[] specialTokenMask = TokenizersLibrary.LIB.getSpecialTokenMask(encoding);
         CharSpan[] charSpans = TokenizersLibrary.LIB.getTokenCharSpans(encoding);
 
-        int overFlowCount = TokenizersLibrary.LIB.getOverflowCount();
+        int overFlowCount = TokenizersLibrary.LIB.getOverflowCount(encoding);
         boolean exceedMaxLength = overFlowCount > 0;
         Encoding[] overflowing;
         if (withOverflowingTokens) {
