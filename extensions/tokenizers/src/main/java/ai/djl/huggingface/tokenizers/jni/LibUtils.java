@@ -82,8 +82,9 @@ public final class LibUtils {
         Path cacheDir = Utils.getEngineCacheDir("tokenizers");
         Platform platform = Platform.detectPlatform("tokenizers");
         String classifier = platform.getClassifier();
+        String flavor = platform.getFlavor();
         String version = platform.getVersion();
-        Path dir = cacheDir.resolve(version + '-' + classifier);
+        Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(LIB_NAME);
         logger.debug("Using cache dir: {}", dir);
         if (Files.exists(path)) {
@@ -96,7 +97,7 @@ public final class LibUtils {
             tmp = Files.createTempDirectory(cacheDir, "tmp");
 
             for (String libName : libs) {
-                String libPath = "native/lib/" + classifier + "/" + libName;
+                String libPath = "native/lib/" + classifier + "/" + flavor + "/" + libName;
                 logger.info("Extracting {} to cache ...", libPath);
                 try (InputStream is = ClassLoaderUtils.getResourceAsStream(libPath)) {
                     Path target = tmp.resolve(libName);
