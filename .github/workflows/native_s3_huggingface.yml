@@ -115,7 +115,6 @@ jobs:
         shell: bash
         run: |
           DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
-          rm -f extensions/tokenizers/jnilib/$DJL_VERSION/win-x86_64/*.dll
           TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
           aws s3 sync extensions/tokenizers/jnilib/$DJL_VERSION/win-x86_64 s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/$DJL_VERSION/win-x86_64/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
