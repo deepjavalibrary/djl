@@ -15,7 +15,7 @@ fasttext = "0.9.2"
 sentencepiece = "0.2.0"
 tokenizers = "0.19.1"
 
-slf4j = "1.7.36"
+slf4j = "2.0.13"
 log4j_slf4j = "2.23.1"
 gson = "2.10.1"
 jna = "5.14.0"
@@ -54,7 +54,7 @@ apache-commons-compress = { module = "org.apache.commons:commons-compress", vers
 apache-commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commonsCsv" }
 apache-hadoop-client = { module = "org.apache.hadoop:hadoop-client", version.ref = "hadoop" }
 apache-hadoop-minicluster = { module = "org.apache.hadoop:hadoop-minicluster", version.ref = "hadoop" }
-apache-log4j-slf4j = { module = "org.apache.logging.log4j:log4j-slf4j-impl", version.ref = "log4j_slf4j" }
+apache-log4j-slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j_slf4j" }
 onnxruntime = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref = "onnxruntime" }
 onnxruntimeAndroid = { module = "com.microsoft.onnxruntime:onnxruntime-android", version.ref = "onnxruntime" }
 bytedeco-javacpp = { module = "org.bytedeco:javacpp", version.ref = "javacpp" }
