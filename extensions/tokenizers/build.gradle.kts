@@ -41,6 +41,7 @@ tasks {
                 "win-x86_64/cpu/tokenizers.dll" to "$tokenizers/jnilib/$djl",
                 "linux-x86_64/cpu/libtokenizers.so" to "$tokenizers/jnilib/$djl",
                 "linux-aarch64/cpu/libtokenizers.so" to "$tokenizers/jnilib/$djl",
+                "osx-x86_64/cpu/libtokenizers.dylib" to "$tokenizers/jnilib/$djl",
                 "osx-aarch64/cpu/libtokenizers.dylib" to "$tokenizers/jnilib/$djl"
             )
             val jnilibDir = project.projectDir / "jnilib/$djl"
