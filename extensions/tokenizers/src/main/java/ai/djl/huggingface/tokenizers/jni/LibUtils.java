@@ -36,7 +36,8 @@ public final class LibUtils {
 
     private static final String LIB_NAME = System.mapLibraryName("tokenizers");
     private static final Pattern VERSION_PATTERN =
-            Pattern.compile("(\\d+\\.\\d+\\.\\d+)-(\\d+\\.\\d+\\.\\d+)(-SNAPSHOT)?(-\\d+)?");
+            Pattern.compile(
+                    "(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)-(\\d+\\.\\d+\\.\\d+)(-SNAPSHOT)?(-\\d+)?");
 
     private static EngineException exception;
 
@@ -85,6 +86,7 @@ public final class LibUtils {
     private static Path copyJniLibrary(String[] libs) {
         Path cacheDir = Utils.getEngineCacheDir("tokenizers");
         Platform platform = Platform.detectPlatform("tokenizers");
+        String os = platform.getOsPrefix();
         String classifier = platform.getClassifier();
         String flavor = platform.getFlavor();
         String version = platform.getVersion();
@@ -95,22 +97,20 @@ public final class LibUtils {
             return dir.toAbsolutePath();
         }
 
-        boolean isCuda = flavor.contains("cu");
-
-        // For cuda, download jni lib files
-        if (isCuda) {
+        // For Linux cuda 12.x, download JNI library
+        if (flavor.startsWith("cu12") && !"win".equals(os)) {
             Matcher matcher = VERSION_PATTERN.matcher(version);
             if (!matcher.matches()) {
                 throw new EngineException("Unexpected version: " + version);
             }
             String jniVersion = matcher.group(1);
-            String djlVersion = matcher.group(2);
+            String djlVersion = matcher.group(3);
 
             downloadJniLib(dir, path, djlVersion, jniVersion, classifier, flavor);
-            return dir;
+            return dir.toAbsolutePath();
         }
 
-        // For cpu, extract jni lib files from classpath
+        // Extract JNI library from classpath
         Path tmp = null;
         try {
             Files.createDirectories(cacheDir);
