@@ -270,6 +270,12 @@ final class PyTorchLibrary {
 
     native long torchFft(long handle, long length, long axis);
 
+    native long torchIfft(long handle, long length, long axis);
+
+    native long torchRfft(long handle, long length, long axis);
+
+    native long torchIrfft(long handle, long length, long axis);
+
     native long torchStft(
             long handle,
             long nFft,
@@ -286,6 +292,8 @@ final class PyTorchLibrary {
     native long torchViewAsReal(long handle);
 
     native long torchViewAsComplex(long handle);
+
+    native long conj(long handle);
 
     native long[] torchSplit(long handle, long size, long dim);
 

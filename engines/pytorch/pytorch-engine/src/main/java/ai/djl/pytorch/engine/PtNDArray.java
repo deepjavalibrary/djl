@@ -1103,6 +1103,24 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray rfft(long length, long axis) {
+        return JniUtils.rfft(this, length, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray ifft(long length, long axis) {
+        return JniUtils.ifft(this, length, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray irfft(long length, long axis) {
+        return JniUtils.irfft(this, length, axis);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray stft(
             long nFft,
             long hopLength,
@@ -1626,6 +1644,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     @Override
     public NDArray real() {
         return JniUtils.real(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray conj() {
+        return JniUtils.conj(this);
     }
 
     /** {@inheritDoc} */

@@ -34,6 +34,33 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFft(
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIfft(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong jn, jlong jaxis) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const auto* result_ptr = new torch::Tensor(torch::fft_ifft(*tensor_ptr, jn, jaxis));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRfft(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong jn, jlong jaxis) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const auto* result_ptr = new torch::Tensor(torch::fft_rfft(*tensor_ptr, jn, jaxis));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchIrfft(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong jn, jlong jaxis) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const auto* result_ptr = new torch::Tensor(torch::fft_irfft(*tensor_ptr, jn, jaxis));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFft2(
     JNIEnv* env, jobject jthis, jlong jhandle, jlongArray js, jlongArray jaxes) {
   API_BEGIN()
@@ -88,6 +115,15 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchViewAsReal(
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 #endif
+}
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_conj(
+    JNIEnv* env, jobject jthis, jlong jhandle) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const auto* result_ptr = new torch::Tensor(torch::conj(*tensor_ptr));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
 }
 
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchViewAsComplex(

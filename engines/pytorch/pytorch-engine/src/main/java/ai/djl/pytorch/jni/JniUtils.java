@@ -1017,6 +1017,24 @@ public final class JniUtils {
                 PyTorchLibrary.LIB.torchFft(ndArray.getHandle(), length, axis));
     }
 
+    public static PtNDArray ifft(PtNDArray ndArray, long length, long axis) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchIfft(ndArray.getHandle(), length, axis));
+    }
+
+    public static PtNDArray rfft(PtNDArray ndArray, long length, long axis) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchRfft(ndArray.getHandle(), length, axis));
+    }
+
+    public static PtNDArray irfft(PtNDArray ndArray, long length, long axis) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchIrfft(ndArray.getHandle(), length, axis));
+    }
+
     public static PtNDArray stft(
             PtNDArray ndArray,
             long nFft,
@@ -1066,6 +1084,10 @@ public final class JniUtils {
             throw new UnsupportedOperationException("complex() is not supported.");
         }
         return new PtNDArray(ndArray.getManager(), handle);
+    }
+
+    public static PtNDArray conj(PtNDArray ndArray) {
+        return new PtNDArray(ndArray.getManager(), PyTorchLibrary.LIB.conj(ndArray.getHandle()));
     }
 
     public static PtNDArray abs(PtNDArray ndArray) {
