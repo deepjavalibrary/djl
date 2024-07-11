@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** Utilities for finding the Huggingface tokenizer native binary on the System. */
 @SuppressWarnings("MissingJavadocMethod")
@@ -33,6 +35,9 @@ public final class LibUtils {
     private static final Logger logger = LoggerFactory.getLogger(LibUtils.class);
 
     private static final String LIB_NAME = System.mapLibraryName("tokenizers");
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile(
+                    "(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)-(\\d+\\.\\d+\\.\\d+)(-SNAPSHOT)?(-\\d+)?");
 
     private static EngineException exception;
 
@@ -63,7 +68,7 @@ public final class LibUtils {
             libs = new String[] {LIB_NAME};
         }
 
-        Path dir = copyJniLibraryFromClasspath(libs);
+        Path dir = copyJniLibrary(libs);
         logger.debug("Loading huggingface library from: {}", dir);
 
         for (String libName : libs) {
@@ -78,9 +83,10 @@ public final class LibUtils {
         }
     }
 
-    private static Path copyJniLibraryFromClasspath(String[] libs) {
+    private static Path copyJniLibrary(String[] libs) {
         Path cacheDir = Utils.getEngineCacheDir("tokenizers");
         Platform platform = Platform.detectPlatform("tokenizers");
+        String os = platform.getOsPrefix();
         String classifier = platform.getClassifier();
         String flavor = platform.getFlavor();
         String version = platform.getVersion();
@@ -91,6 +97,20 @@ public final class LibUtils {
             return dir.toAbsolutePath();
         }
 
+        // For Linux cuda 12.x, download JNI library
+        if (flavor.startsWith("cu12") && !"win".equals(os)) {
+            Matcher matcher = VERSION_PATTERN.matcher(version);
+            if (!matcher.matches()) {
+                throw new EngineException("Unexpected version: " + version);
+            }
+            String jniVersion = matcher.group(1);
+            String djlVersion = matcher.group(3);
+
+            downloadJniLib(dir, path, djlVersion, jniVersion, classifier, flavor);
+            return dir.toAbsolutePath();
+        }
+
+        // Extract JNI library from classpath
         Path tmp = null;
         try {
             Files.createDirectories(cacheDir);
@@ -108,6 +128,40 @@ public final class LibUtils {
             return dir.toAbsolutePath();
         } catch (IOException e) {
             throw new IllegalStateException("Cannot copy jni files", e);
+        } finally {
+            if (tmp != null) {
+                Utils.deleteQuietly(tmp);
+            }
+        }
+    }
+
+    private static void downloadJniLib(
+            Path cacheDir,
+            Path path,
+            String djlVersion,
+            String version,
+            String classifier,
+            String flavor) {
+        String url =
+                "https://publish.djl.ai/tokenizers/"
+                        + version
+                        + "/jnilib/"
+                        + djlVersion
+                        + '/'
+                        + classifier
+                        + '/'
+                        + flavor
+                        + '/'
+                        + LIB_NAME;
+        logger.info("Downloading jni {} to cache ...", url);
+        Path tmp = null;
+        try (InputStream is = Utils.openUrl(url)) {
+            Files.createDirectories(cacheDir);
+            tmp = Files.createTempFile(cacheDir, "jni", "tmp");
+            Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
+            Utils.moveQuietly(tmp, path);
+        } catch (IOException e) {
+            throw new EngineException("Cannot download jni files: " + url, e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
