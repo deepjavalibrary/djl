@@ -185,7 +185,7 @@ jobs:
           aws s3 sync extensions/tokenizers/jnilib s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
-  build-tokenizers-cu124:
+  build-tokenizers-jni-cu124:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: [ self-hosted, g5 ]
     timeout-minutes: 30
@@ -244,7 +244,7 @@ jobs:
   stop-runners:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: [ self-hosted, scheduler ]
-    needs: [ create-runners, build-tokenizer-jni-aarch64, build-tokenizers-cu124 ]
+    needs: [ create-runners, build-tokenizer-jni-aarch64, build-tokenizers-jni-cu124 ]
     steps:
       - name: Stop all instances
         run: |
