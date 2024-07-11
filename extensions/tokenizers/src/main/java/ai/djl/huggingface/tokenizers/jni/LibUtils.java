@@ -38,6 +38,7 @@ public final class LibUtils {
     private static final Pattern VERSION_PATTERN =
             Pattern.compile(
                     "(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)-(\\d+\\.\\d+\\.\\d+)(-SNAPSHOT)?(-\\d+)?");
+    private static final String FLAVOR_CU124 = "cu124";
 
     private static EngineException exception;
 
@@ -106,7 +107,7 @@ public final class LibUtils {
             String jniVersion = matcher.group(1);
             String djlVersion = matcher.group(3);
 
-            downloadJniLib(dir, path, djlVersion, jniVersion, classifier, flavor);
+            downloadJniLib(dir, path, djlVersion, jniVersion, classifier, FLAVOR_CU124);
             return dir.toAbsolutePath();
         }
 
