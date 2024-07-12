@@ -18,6 +18,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Utils;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
@@ -26,9 +27,13 @@ import ai.onnxruntime.OrtSession.SessionOptions;
 import ai.onnxruntime.OrtSession.SessionOptions.ExecutionMode;
 import ai.onnxruntime.OrtSession.SessionOptions.OptLevel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -40,6 +45,8 @@ import java.util.Map;
  * provides ONNX Runtime Specific functionality
  */
 public class OrtModel extends BaseModel {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrtModel.class);
 
     private OrtEnvironment env;
     private SessionOptions sessionOptions;
@@ -190,6 +197,9 @@ public class OrtModel extends BaseModel {
         }
 
         String customOpLibrary = (String) options.get("customOpLibrary");
+        if (customOpLibrary == null) {
+            customOpLibrary = getOrtxLibraryPath();
+        }
         if (customOpLibrary != null) {
             ortSession.registerCustomOpLibrary(customOpLibrary);
         }
@@ -222,5 +232,17 @@ public class OrtModel extends BaseModel {
             ortSession.addCUDA(device.getDeviceId());
         }
         return ortSession;
+    }
+
+    private String getOrtxLibraryPath() {
+        ClassLoader cl = ClassLoaderUtils.getContextClassLoader();
+        try {
+            Class<?> clazz = Class.forName("ai.onnxruntime.extensions.OrtxPackage", true, cl);
+            Method method = clazz.getDeclaredMethod("getLibraryPath");
+            return (String) method.invoke(null);
+        } catch (Throwable e) {
+            logger.debug("Failed to load onnx extension", e);
+        }
+        return null;
     }
 }

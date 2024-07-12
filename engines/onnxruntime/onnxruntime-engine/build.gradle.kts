@@ -1,5 +1,3 @@
-import java.net.URL
-
 plugins {
     ai.djl.javaProject
     ai.djl.publish
@@ -14,13 +12,14 @@ dependencies {
     testImplementation(project(":testing"))
     testImplementation(project(":engines:pytorch:pytorch-engine"))
     testImplementation(project(":extensions:tokenizers"))
+    testImplementation("com.microsoft.onnxruntime:onnxruntime-extensions:${libs.versions.onnxruntimeExtensions.get()}")
 
     testRuntimeOnly(libs.slf4j.simple)
 }
 
 tasks {
     processResources {
-        var basePath = "${project.projectDir}/build/resources/main/nlp"
+        val basePath = "${project.projectDir}/build/resources/main/nlp"
         outputs.dir(basePath)
         doLast {
             val url = "https://mlrepo.djl.ai/model/nlp"
@@ -34,7 +33,7 @@ tasks {
             for (task in tasks) {
                 val file = File("$basePath/$task/ai.djl.huggingface.onnxruntime.json")
                 if (file.exists())
-                    project.logger.lifecycle("model zoo metadata alrady exists: $task")
+                    project.logger.lifecycle("model zoo metadata already exists: $task")
                 else {
                     project.logger.lifecycle("Downloading model zoo metadata: $task")
                     file.parentFile.mkdirs()
