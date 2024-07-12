@@ -129,7 +129,7 @@ public final class LibUtils {
         }
 
         // Copy JNI library from classpath
-        if (copyJniLibraryFromClasspath(libs, dir, classifier, flavor)) {
+        if (copyJniLibraryFromClasspath(libs, cacheDir, dir, classifier, flavor)) {
             return dir.toAbsolutePath();
         }
 
@@ -149,7 +149,7 @@ public final class LibUtils {
     }
 
     private static boolean copyJniLibraryFromClasspath(
-            String[] libs, Path cacheDir, String classifier, String flavor) {
+            String[] libs, Path cacheDir, Path dir, String classifier, String flavor) {
         Path tmp = null;
         try {
             Files.createDirectories(cacheDir);
@@ -163,7 +163,7 @@ public final class LibUtils {
                     Files.copy(is, target, StandardCopyOption.REPLACE_EXISTING);
                 }
             }
-            Utils.moveQuietly(tmp, cacheDir);
+            Utils.moveQuietly(tmp, dir);
             return true;
         } catch (IOException e) {
             logger.error("Cannot copy jni files", e);
