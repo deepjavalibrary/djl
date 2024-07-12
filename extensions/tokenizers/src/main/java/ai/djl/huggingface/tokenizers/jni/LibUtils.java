@@ -38,7 +38,6 @@ public final class LibUtils {
     private static final Pattern VERSION_PATTERN =
             Pattern.compile(
                     "(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)-(\\d+\\.\\d+\\.\\d+)(-SNAPSHOT)?(-\\d+)?");
-    private static final String FLAVOR_CU124 = "cu124";
 
     private static EngineException exception;
 
@@ -98,8 +97,19 @@ public final class LibUtils {
             return dir.toAbsolutePath();
         }
 
-        // For Linux cuda 12.x, download JNI library
-        if (flavor.startsWith("cu12") && !"win".equals(os)) {
+        String resolvedFlavor = flavor;
+        if ("win".equals(os)) {
+            resolvedFlavor = "cpu";
+        } else if (flavor.startsWith("cu")) {
+            if ("cu122".compareTo(flavor) <= 0) { // cu122 onwards will resolve to cu122
+                resolvedFlavor = "cu122";
+            } else { // Else resolve to cpu
+                resolvedFlavor = "cpu";
+            }
+        }
+
+        // Download JNI library
+        if (resolvedFlavor.startsWith("cu")) {
             Matcher matcher = VERSION_PATTERN.matcher(version);
             if (!matcher.matches()) {
                 throw new EngineException("Unexpected version: " + version);
@@ -107,7 +117,7 @@ public final class LibUtils {
             String jniVersion = matcher.group(1);
             String djlVersion = matcher.group(3);
 
-            downloadJniLib(dir, path, djlVersion, jniVersion, classifier, FLAVOR_CU124);
+            downloadJniLib(dir, path, djlVersion, jniVersion, classifier, resolvedFlavor);
             return dir.toAbsolutePath();
         }
 
@@ -118,7 +128,7 @@ public final class LibUtils {
             tmp = Files.createTempDirectory(cacheDir, "tmp");
 
             for (String libName : libs) {
-                String libPath = "native/lib/" + classifier + "/" + flavor + "/" + libName;
+                String libPath = "native/lib/" + classifier + "/" + resolvedFlavor + "/" + libName;
                 logger.info("Extracting {} to cache ...", libPath);
                 try (InputStream is = ClassLoaderUtils.getResourceAsStream(libPath)) {
                     Path target = tmp.resolve(libName);

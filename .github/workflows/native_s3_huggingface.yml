@@ -216,14 +216,16 @@ jobs:
           aws s3 sync extensions/tokenizers/jnilib/$DJL_VERSION/linux-aarch64 s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/$DJL_VERSION/linux-aarch64/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
-  build-tokenizers-jni-cu124:
+  build-tokenizers-jni-cu122:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: [ self-hosted, g5 ]
     timeout-minutes: 30
     needs: create-runners
     container:
-      image: nvidia/cuda:12.4.1-cudnn-devel-ubuntu20.04
+      image: nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04
       options: --gpus all --runtime=nvidia
+    env:
+      CUDA_VERSION: cu122
     steps:
       - name: Install Environment
         run: |
@@ -254,9 +256,8 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
-          CUDA_VERSION=cu124
           . "$HOME/.cargo/env"
-          ./gradlew :extensions:tokenizers:compileJNI -Pcuda=$CUDA_VERSION
+          ./gradlew :extensions:tokenizers:compileJNI -Pcuda=${{ env.CUDA_VERSION }}
           ./gradlew -Pjni :extensions:tokenizers:test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -268,13 +269,13 @@ jobs:
         run: |
           DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
           TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
-          aws s3 sync extensions/tokenizers/jnilib/$DJL_VERSION/linux-x86_64/cu124 s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/$DJL_VERSION/linux-x86_64/cu124/
+          aws s3 sync extensions/tokenizers/jnilib/$DJL_VERSION/linux-x86_64/${{ env.CUDA_VERSION }} s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/${DJL_VERSION}/linux-x86_64/${{ env.CUDA_VERSION }}/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
   stop-runners:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: [ self-hosted, scheduler ]
-    needs: [ create-runners, build-tokenizer-jni-aarch64, build-tokenizers-jni-cu124 ]
+    needs: [ create-runners, build-tokenizer-jni-aarch64, build-tokenizers-jni-cu122 ]
     steps:
       - name: Stop all instances
         run: |

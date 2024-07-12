@@ -29,8 +29,10 @@ javac -sourcepath src/main/java/ src/main/java/ai/djl/huggingface/tokenizers/jni
 javac -sourcepath src/main/java/ src/main/java/ai/djl/engine/rust/RustLibrary.java -h build/include -d build/classes
 
 RUST_MANIFEST=rust/Cargo.toml
-if [ -x "$(command -v nvcc)" ]; then
-  cargo build --manifest-path $RUST_MANIFEST --release --features cuda,flash-attn,cublaslt
+if [[ "$FLAVOR" = "cpu"* ]]; then
+  cargo build --manifest-path $RUST_MANIFEST --release
+elif [[ "$FLAVOR" = "cu"* && "$FLAVOR" > "cu121" ]]; then
+  cargo build --manifest-path $RUST_MANIFEST --release --features cuda,cublaslt,flash-attn
 else
   cargo build --manifest-path $RUST_MANIFEST --release
 fi
