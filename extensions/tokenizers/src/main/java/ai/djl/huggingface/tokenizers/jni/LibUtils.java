@@ -158,6 +158,10 @@ public final class LibUtils {
 
             for (String libName : libs) {
                 String libPath = "native/lib/" + classifier + "/" + flavor + "/" + libName;
+                if (ClassLoaderUtils.getResource(libPath) == null) {
+                    logger.info("library not found in classpath: {}", libPath);
+                    return false;
+                }
                 logger.info("Extracting {} to cache ...", libPath);
                 try (InputStream is = ClassLoaderUtils.getResourceAsStream(libPath)) {
                     Path target = tmp.resolve(libName);
