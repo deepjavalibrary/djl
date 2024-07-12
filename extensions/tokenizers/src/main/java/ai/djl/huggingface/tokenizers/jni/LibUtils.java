@@ -95,9 +95,10 @@ public final class LibUtils {
         if (override) {
             logger.info("Uses override TOKENIZERS_FLAVOR: {}", flavor);
         } else {
-            flavor = platform.getFlavor();
             if (Utils.isOfflineMode() || "win".equals(os)) {
                 flavor = "cpu";
+            } else {
+                flavor = platform.getFlavor();
             }
         }
 
