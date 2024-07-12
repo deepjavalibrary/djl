@@ -222,7 +222,7 @@ jobs:
     timeout-minutes: 30
     needs: create-runners
     container:
-      image: nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04
+      image: nvidia/cuda:12.2.2-cudnn8-devel-ubuntu20.04
       options: --gpus all --runtime=nvidia
     env:
       CUDA_VERSION: cu122
