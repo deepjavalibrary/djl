@@ -17,14 +17,14 @@ tokenizers = "0.19.1"
 
 slf4j = "2.0.13"
 log4j_slf4j = "2.23.1"
-gson = "2.10.1"
+gson = "2.11.0"
 jna = "5.14.0"
-commonCli = "1.7.0"
-commonsCompress = "1.26.1"
+commonCli = "1.8.0"
+commonsCompress = "1.26.2"
 commonsCsv = "1.11.0"
-commonsLogging = "1.3.1"
+commonsLogging = "1.3.3"
 
-awssdk = "2.25.45"
+awssdk = "2.26.19"
 ffmpeg = "6.1.1-1.5.10"
 hadoop = "3.4.0"
 javacpp = "1.5.10"
@@ -34,14 +34,13 @@ spark = "3.5.1"
 tablesaw = "0.43.1"
 rapis = "22.12.0"
 protobuf = "3.25.3"
-jackson = "2.12.7.1"
-twelvemonkeys = "3.5"
+jackson = "2.17.2"
 jtransforms = "3.1"
 
 antlr = "4.11.1"
 testng = "7.10.2"
 junit = "4.13.2"
-mockito = "5.11.0"
+mockito = "5.12.0"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -75,7 +74,6 @@ tablesaw-jsplot = { module = "tech.tablesaw:tablesaw-jsplot", version.ref = "tab
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 ai-rapids-cudf = { module = "ai.rapids:cudf", version.ref = "rapis" }
 google-protobuf = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
-twelvemonkeys-imageio-jpeg = { module = "com.twelvemonkeys.imageio:imageio-jpeg", version.ref = "twelvemonkeys" }
 tensorflow-core = { module = "org.tensorflow:tensorflow-core-api", version.ref = "tensorflowCore" }
 wendykierp-jTransforms = { module = "com.github.wendykierp:JTransforms", version.ref = "jtransforms" }
 

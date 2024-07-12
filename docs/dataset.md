@@ -47,7 +47,7 @@ This module contains the following datasets:
 
 - [Captcha](https://javadoc.io/doc/ai.djl/basicdataset/latest/ai/djl/basicdataset/cv/classification/CaptchaDataset.html) - A dataset for a grayscale 6-digit CAPTCHA task
 - [Coco](https://javadoc.io/doc/ai.djl/basicdataset/latest/ai/djl/basicdataset/cv/CocoDetection.html) - A large-scale object detection, segmentation, and captioning dataset that contains 1.5 million object instances
-  - You have to manually add `com.twelvemonkeys.imageio:imageio-jpeg:3.5` dependency to your project
+  - You have to manually add `com.twelvemonkeys.imageio:imageio-jpeg:3.11.0` dependency to your project
 
 ### NLP
 
