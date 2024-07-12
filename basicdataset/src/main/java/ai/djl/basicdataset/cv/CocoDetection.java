@@ -40,7 +40,7 @@ import java.util.Optional;
  * of the standard benchmark object detection datasets.
  *
  * <p>To use this dataset, you have to manually add {@code
- * com.twelvemonkeys.imageio:imageio-jpeg:3.5} as a dependency in your project.
+ * com.twelvemonkeys.imageio:imageio-jpeg:3.11.0} as a dependency in your project.
  *
  * <p>Each image might have different {@link ai.djl.ndarray.types.Shape}s.
  */

@@ -41,12 +41,12 @@ images that not supported by default JDK, you can consider add the following dep
     <dependency>
         <groupId>com.twelvemonkeys.imageio</groupId>
         <artifactId>imageio-jpeg</artifactId>
-        <version>3.8.3</version>
+        <version>3.11.0</version>
     </dependency>
     <dependency>
         <groupId>com.twelvemonkeys.imageio</groupId>
         <artifactId>imageio-bmp</artifactId>
-        <version>3.8.3</version>
+        <version>3.11.0</version>
     </dependency>
     ...
 ```
