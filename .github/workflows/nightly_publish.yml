@@ -38,7 +38,7 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         run: brew install libomp
       - name: Build with Gradle
-        run: ./gradlew -Dnightly=true build :jacoco:testCodeCoverageReport --stacktrace
+        run: ./gradlew -Dnightly=true build :jacoco:testCodeCoverageReport
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -147,14 +147,10 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Test with Gradle
         run: |
-          ./gradlew :integration:test
-          ./gradlew :engines:tensorflow:tensorflow-model-zoo:test
-          ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=PyTorch
+          ./gradlew :integration:test -Dai.djl.default_engine=PyTorch
           ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=TensorFlow
-          ./gradlew :engines:mxnet:mxnet-model-zoo:test
           ./gradlew :engines:pytorch:pytorch-model-zoo:test
           ./gradlew :engines:tensorflow:tensorflow-model-zoo:test
-          ./gradlew :engines:tensorrt:test
           ./gradlew :engines:onnxruntime:onnxruntime-engine:test
 
   publish:

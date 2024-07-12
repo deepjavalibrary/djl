@@ -104,7 +104,7 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
-          gradlew :extensions:tokenizer:compileJNI
+          gradlew :extensions:tokenizers:compileJNI
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
