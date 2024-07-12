@@ -38,7 +38,7 @@ public final class LibUtils {
     private static final Pattern VERSION_PATTERN =
             Pattern.compile(
                     "(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)-(\\d+\\.\\d+\\.\\d+)(-SNAPSHOT)?(-\\d+)?");
-    private static final String FLAVOR_CU124 = "cu124";
+    private static final int[] SUPPORTED_CUDA_VERSIONS = {122};
 
     private static EngineException exception;
 
@@ -89,8 +89,39 @@ public final class LibUtils {
         Platform platform = Platform.detectPlatform("tokenizers");
         String os = platform.getOsPrefix();
         String classifier = platform.getClassifier();
-        String flavor = platform.getFlavor();
         String version = platform.getVersion();
+        String flavor = Utils.getEnvOrSystemProperty("TOKENIZERS_FLAVOR");
+        boolean override = flavor != null && !flavor.isEmpty();
+        if (override) {
+            logger.info("Uses override TOKENIZERS_FLAVOR: {}", flavor);
+        } else {
+            if (Utils.isOfflineMode() || "win".equals(os)) {
+                flavor = "cpu";
+            } else {
+                flavor = platform.getFlavor();
+            }
+        }
+
+        // Find the highest matching CUDA version
+        if (flavor.startsWith("cu")) {
+            int cudaVersion = Integer.parseInt(flavor.substring(2, 5));
+            boolean match = false;
+            for (int v : SUPPORTED_CUDA_VERSIONS) {
+                if (override && cudaVersion == v) {
+                    match = true;
+                    break;
+                } else if (cudaVersion >= v) {
+                    flavor = "cu" + v;
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) {
+                logger.warn("No matching cuda flavor for {} found: {}.", classifier, flavor);
+                flavor = "cpu"; // Fallback to CPU
+            }
+        }
+
         Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(LIB_NAME);
         logger.debug("Using cache dir: {}", dir);
@@ -98,8 +129,13 @@ public final class LibUtils {
             return dir.toAbsolutePath();
         }
 
-        // For Linux cuda 12.x, download JNI library
-        if (flavor.startsWith("cu12") && !"win".equals(os)) {
+        // Copy JNI library from classpath
+        if (copyJniLibraryFromClasspath(libs, cacheDir, dir, classifier, flavor)) {
+            return dir.toAbsolutePath();
+        }
+
+        // Download JNI library
+        if (flavor.startsWith("cu")) {
             Matcher matcher = VERSION_PATTERN.matcher(version);
             if (!matcher.matches()) {
                 throw new EngineException("Unexpected version: " + version);
@@ -107,11 +143,14 @@ public final class LibUtils {
             String jniVersion = matcher.group(1);
             String djlVersion = matcher.group(3);
 
-            downloadJniLib(dir, path, djlVersion, jniVersion, classifier, FLAVOR_CU124);
+            downloadJniLib(dir, path, djlVersion, jniVersion, classifier, flavor);
             return dir.toAbsolutePath();
         }
+        return null;
+    }
 
-        // Extract JNI library from classpath
+    private static boolean copyJniLibraryFromClasspath(
+            String[] libs, Path cacheDir, Path dir, String classifier, String flavor) {
         Path tmp = null;
         try {
             Files.createDirectories(cacheDir);
@@ -126,14 +165,15 @@ public final class LibUtils {
                 }
             }
             Utils.moveQuietly(tmp, dir);
-            return dir.toAbsolutePath();
+            return true;
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot copy jni files", e);
+            logger.error("Cannot copy jni files", e);
         } finally {
             if (tmp != null) {
                 Utils.deleteQuietly(tmp);
             }
         }
+        return false;
     }
 
     private static void downloadJniLib(
