@@ -38,7 +38,7 @@ public final class LibUtils {
     private static final Pattern VERSION_PATTERN =
             Pattern.compile(
                     "(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)-(\\d+\\.\\d+\\.\\d+)(-SNAPSHOT)?(-\\d+)?");
-    private static int[] SUPPORTED_CUDA_VERSIONS = {122};
+    private static final int[] SUPPORTED_CUDA_VERSIONS = {122};
 
     private static EngineException exception;
 
@@ -89,6 +89,7 @@ public final class LibUtils {
         Platform platform = Platform.detectPlatform("tokenizers");
         String os = platform.getOsPrefix();
         String classifier = platform.getClassifier();
+        String version = platform.getVersion();
         String flavor = Utils.getEnvOrSystemProperty("TOKENIZERS_FLAVOR");
         boolean override = flavor != null && !flavor.isEmpty();
         if (override) {
@@ -120,7 +121,6 @@ public final class LibUtils {
             }
         }
 
-        String version = platform.getVersion();
         Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
         Path path = dir.resolve(LIB_NAME);
         logger.debug("Using cache dir: {}", dir);
