@@ -87,7 +87,7 @@ jobs:
         run: |
           ./gradlew -Dai.djl.default_engine=OnnxRuntime :integration:clean :integration:test
       - name: Build with Gradle
-        run: ./gradlew clean build :jacoco:testCodeCoverageReport
+        run: ./gradlew build :jacoco:testCodeCoverageReport
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
