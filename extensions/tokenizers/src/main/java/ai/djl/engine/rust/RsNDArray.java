@@ -1607,6 +1607,7 @@ public class RsNDArray extends NativeResource<Long> implements NDArray {
         return toArray(RustLibrary.real(getHandle()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public NDArray conj() {
         throw new UnsupportedOperationException("Not implemented");
