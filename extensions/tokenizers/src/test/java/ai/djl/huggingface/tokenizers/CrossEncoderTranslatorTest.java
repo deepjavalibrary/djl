@@ -14,6 +14,7 @@ package ai.djl.huggingface.tokenizers;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
+import ai.djl.huggingface.translator.TextClassificationTranslatorFactory;
 import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Input;
@@ -68,6 +69,26 @@ public class CrossEncoderTranslatorTest {
                         .optArgument("reranking", true)
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<StringPair, float[]> model = criteria.loadModel();
+                Predictor<StringPair, float[]> predictor = model.newPredictor()) {
+            StringPair input = new StringPair(text1, text2);
+            float[] res = predictor.predict(input);
+            Assert.assertEquals(res[0], 0.32456556f, 0.0001);
+        }
+
+        criteria =
+                Criteria.builder()
+                        .setTypes(StringPair.class, float[].class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-cased")
+                        .optArgument("tokenizerPath", modelDir)
+                        .optArgument("reranking", true)
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextClassificationTranslatorFactory())
                         .build();
 
         try (ZooModel<StringPair, float[]> model = criteria.loadModel();
