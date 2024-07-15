@@ -17,11 +17,14 @@ import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.modality.nlp.translator.CrossEncoderServingTranslator;
 import ai.djl.modality.nlp.translator.TextClassificationServingTranslator;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
 import ai.djl.util.Pair;
+import ai.djl.util.StringPair;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -40,6 +43,7 @@ public class TextClassificationTranslatorFactory implements TranslatorFactory, S
 
     static {
         SUPPORTED_TYPES.add(new Pair<>(String.class, Classifications.class));
+        SUPPORTED_TYPES.add(new Pair<>(StringPair.class, float[].class));
         SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
 
@@ -62,6 +66,17 @@ public class TextClassificationTranslatorFactory implements TranslatorFactory, S
                             .optTokenizerPath(modelPath)
                             .optManager(model.getNDManager())
                             .build();
+            if (ArgumentsUtil.booleanValue(arguments, "reranking")) {
+                CrossEncoderTranslator translator =
+                        CrossEncoderTranslator.builder(tokenizer, arguments).build();
+                if (input == StringPair.class && output == float[].class) {
+                    return (Translator<I, O>) translator;
+                } else if (input == Input.class && output == Output.class) {
+                    return (Translator<I, O>) new CrossEncoderServingTranslator(translator);
+                }
+                throw new IllegalArgumentException("Unsupported input/output types.");
+            }
+
             TextClassificationTranslator translator =
                     TextClassificationTranslator.builder(tokenizer, arguments).build();
             if (input == String.class && output == Classifications.class) {
