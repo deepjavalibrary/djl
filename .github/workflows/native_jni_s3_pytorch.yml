@@ -272,7 +272,12 @@ jobs:
   build-pytorch-jni-aarch64:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: [ self-hosted, aarch64 ]
-    container: amazonlinux:2
+    container:
+      image: amazonlinux:2
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto.aarch64
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     timeout-minutes: 30
     needs: create-aarch64-runner
     steps:
@@ -288,22 +293,15 @@ jobs:
           ln -sf /usr/bin/gcc10-ar /usr/bin/ar
           ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
-      - uses: actions/checkout@v3
+      - uses: taiki-e/checkout-action@v1
       - name: Release JNI prep
         run: |
-          export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto.aarch64
           export PATH=$PATH:$JAVA_HOME/bin
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
           export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
