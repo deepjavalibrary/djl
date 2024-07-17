@@ -13,6 +13,14 @@ use jni::JNIEnv;
 use serde::Deserialize;
 use std::path::PathBuf;
 
+#[derive(Debug, PartialEq, Clone)]
+pub enum Pool {
+    Cls,
+    Mean,
+    Splade,
+    LastToken,
+}
+
 pub(crate) trait Model {
     #[allow(dead_code)]
     fn is_padded(&self) -> bool;

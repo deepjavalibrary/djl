@@ -1,8 +1,7 @@
-use crate::layers::Linear;
+use crate::layers::{LayerNorm, Linear};
 use crate::models::Model;
 use candle::{Device, Result, Tensor};
 use candle_nn::{embedding, Embedding, Module, VarBuilder};
-use candle_transformers::models::with_tracing::{layer_norm, LayerNorm};
 use serde::Deserialize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
@@ -40,6 +39,8 @@ impl HiddenActLayer {
 pub enum PositionEmbeddingType {
     #[default]
     Absolute,
+    Alibi,
+    Rope,
 }
 
 // https://github.com/huggingface/transformers/blob/6eedfa6dd15dc1e22a55ae036f681914e5a0d9a1/src/transformers/models/bert/configuration_bert.py#L1
@@ -160,10 +161,10 @@ impl BertEmbeddings {
             config.hidden_size,
             vb.pp("token_type_embeddings"),
         )?;
-        let layer_norm = layer_norm(
-            config.hidden_size,
-            config.layer_norm_eps,
+        let layer_norm = LayerNorm::load(
             vb.pp("LayerNorm"),
+            config.hidden_size,
+            config.layer_norm_eps as f32,
         )?;
         Ok(Self {
             word_embeddings,
@@ -187,7 +188,7 @@ impl BertEmbeddings {
             let position_ids = Tensor::new(&position_ids[..], input_ids.device())?;
             embeddings = embeddings.broadcast_add(&position_embeddings.forward(&position_ids)?)?
         }
-        let embeddings = self.layer_norm.forward(&embeddings)?;
+        let embeddings = self.layer_norm.forward(&embeddings, None)?;
         let embeddings = self.dropout.forward(&embeddings)?;
         Ok(embeddings)
     }
@@ -300,10 +301,10 @@ struct BertSelfOutput {
 impl BertSelfOutput {
     fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
         let dense = Linear::load(vb.pp("dense"), config.hidden_size, config.hidden_size, None)?;
-        let layer_norm = layer_norm(
-            config.hidden_size,
-            config.layer_norm_eps,
+        let layer_norm = LayerNorm::load(
             vb.pp("LayerNorm"),
+            config.hidden_size,
+            config.layer_norm_eps as f32,
         )?;
         let dropout = Dropout::new(config.hidden_dropout_prob);
         Ok(Self {
@@ -318,7 +319,7 @@ impl BertSelfOutput {
         let _enter = self.span.enter();
         let hidden_states = self.dense.forward(hidden_states)?;
         let hidden_states = self.dropout.forward(&hidden_states)?;
-        self.layer_norm.forward(&(hidden_states + input_tensor)?)
+        self.layer_norm.forward(&hidden_states, Some(&input_tensor))
     }
 }
 
@@ -398,10 +399,10 @@ impl BertOutput {
             config.hidden_size,
             None,
         )?;
-        let layer_norm = layer_norm(
-            config.hidden_size,
-            config.layer_norm_eps,
+        let layer_norm = LayerNorm::load(
             vb.pp("LayerNorm"),
+            config.hidden_size,
+            config.layer_norm_eps as f32,
         )?;
         let dropout = Dropout::new(config.hidden_dropout_prob);
         Ok(Self {
@@ -416,7 +417,7 @@ impl BertOutput {
         let _enter = self.span.enter();
         let hidden_states = self.dense.forward(hidden_states)?;
         let hidden_states = self.dropout.forward(&hidden_states)?;
-        self.layer_norm.forward(&(hidden_states + input_tensor)?)
+        self.layer_norm.forward(&hidden_states, Some(&input_tensor))
     }
 }
 
