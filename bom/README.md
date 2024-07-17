@@ -22,7 +22,7 @@ will need to mention the type as pom and the scope as import) as the following:
         <dependency>
             <groupId>ai.djl</groupId>
             <artifactId>bom</artifactId>
-            <version>0.28.0</version>
+            <version>0.29.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -38,7 +38,7 @@ will need to mention the type as pom and the scope as import) as the following:
         <dependency>
             <groupId>ai.djl</groupId>
             <artifactId>bom</artifactId>
-            <version>0.28.0</version>
+            <version>0.29.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
