@@ -25,6 +25,6 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl.tablesaw</groupId>
     <artifactId>tablesaw</artifactId>
-    <version>0.28.0</version>
+    <version>0.29.0</version>
 </dependency>
 ```
