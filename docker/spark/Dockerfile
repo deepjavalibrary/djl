@@ -13,14 +13,14 @@ FROM 314815235551.dkr.ecr.us-east-2.amazonaws.com/sagemaker-spark-processing:3.5
 LABEL maintainer="djl-dev@amazon.com"
 
 # Install dependencies
-ARG DJL_VERSION=0.28.0
+ARG DJL_VERSION=0.29.0
 ARG JNA_VERSION=5.14.0
 ARG JAVACV_VERSION=1.5.9
 ARG JAVACPP_VERSION=1.5.9
 ARG FFMPEG_VERSION=6.0-1.5.9
 ARG TENSORFLOW_CORE_VERSION=0.5.0
 ARG PROTOBUF_VERSION=3.25.3
-ARG PYTORCH_VERSION=2.2.2
+ARG PYTORCH_VERSION=2.3.1
 
 RUN pip3 install --no-cache-dir torch==${PYTORCH_VERSION} --index-url https://download.pytorch.org/whl/cpu
 RUN pip3 install --no-cache-dir pillow pandas numpy pyarrow librosa 'transformers[torch]'

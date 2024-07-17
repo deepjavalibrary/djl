@@ -43,7 +43,7 @@ You can pull the ONNX Runtime engine from the central Maven repository by includ
 <dependency>
     <groupId>ai.djl.onnxruntime</groupId>
     <artifactId>onnxruntime-engine</artifactId>
-    <version>0.28.0</version>
+    <version>0.29.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -61,7 +61,7 @@ Maven:
 <dependency>
     <groupId>ai.djl.onnxruntime</groupId>
     <artifactId>onnxruntime-engine</artifactId>
-    <version>0.28.0</version>
+    <version>0.29.0</version>
     <scope>runtime</scope>
     <exclusions>
         <exclusion>
