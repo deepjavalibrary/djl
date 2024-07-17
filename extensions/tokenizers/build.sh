@@ -32,7 +32,7 @@ RUST_MANIFEST=rust/Cargo.toml
 if [[ "$FLAVOR" = "cpu"* ]]; then
   cargo build --manifest-path $RUST_MANIFEST --release
 elif [[ "$FLAVOR" = "cu"* && "$FLAVOR" > "cu121" ]]; then
-  cargo build --manifest-path $RUST_MANIFEST --release --features cuda,cublaslt,flash-attn
+  cargo build --manifest-path $RUST_MANIFEST --release --features cuda,flash-attn
 else
   cargo build --manifest-path $RUST_MANIFEST --release
 fi
