@@ -46,7 +46,7 @@ pub enum PositionEmbeddingType {
 
 // https://github.com/huggingface/transformers/blob/6eedfa6dd15dc1e22a55ae036f681914e5a0d9a1/src/transformers/models/bert/configuration_bert.py#L1
 #[derive(Debug, Clone, PartialEq, Deserialize)]
-pub struct BertConfig {
+pub struct XLMRobertaConfig {
     pub architectures: Vec<String>,
     model_type: Option<String>,
     vocab_size: usize,
@@ -70,11 +70,11 @@ pub struct BertConfig {
     pub use_flash_attn: Option<bool>,
 }
 
-impl Default for BertConfig {
+impl Default for XLMRobertaConfig {
     fn default() -> Self {
         Self {
             architectures: Vec::new(),
-            model_type: Some("bert".to_string()),
+            model_type: Some("xlm-roberta".to_string()),
             vocab_size: 30522,
             hidden_size: 768,
             num_hidden_layers: 12,
@@ -125,7 +125,7 @@ struct BertEmbeddings {
 }
 
 impl BertEmbeddings {
-    fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
+    fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
         let word_embeddings = embedding(
             config.vocab_size,
             config.hidden_size,
@@ -187,7 +187,7 @@ struct BertSelfAttention {
 }
 
 impl BertSelfAttention {
-    fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
+    fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
         let attention_head_size = config.hidden_size / config.num_attention_heads;
         let all_head_size = config.num_attention_heads * attention_head_size;
         let hidden_size = config.hidden_size;
@@ -279,7 +279,7 @@ struct BertSelfOutput {
 }
 
 impl BertSelfOutput {
-    fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
+    fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
         let dense = Linear::load(vb.pp("dense"), config.hidden_size, config.hidden_size, None)?;
         let layer_norm = LayerNorm::load(
             vb.pp("LayerNorm"),
@@ -311,7 +311,7 @@ struct BertAttention {
 }
 
 impl BertAttention {
-    fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
+    fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
         let self_attention = BertSelfAttention::load(vb.pp("self"), config)?;
         let self_output = BertSelfOutput::load(vb.pp("output"), config)?;
         Ok(Self {
@@ -339,7 +339,7 @@ struct BertIntermediate {
 }
 
 impl BertIntermediate {
-    fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
+    fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
         let dense = Linear::load(
             vb.pp("dense"),
             config.hidden_size,
@@ -372,7 +372,7 @@ struct BertOutput {
 }
 
 impl BertOutput {
-    fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
+    fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
         let dense = Linear::load(
             vb.pp("dense"),
             config.intermediate_size,
@@ -410,7 +410,7 @@ struct BertLayer {
 }
 
 impl BertLayer {
-    fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
+    fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
         let attention = BertAttention::load(vb.pp("attention"), config)?;
         let intermediate = BertIntermediate::load(vb.pp("intermediate"), config)?;
         let output = BertOutput::load(vb.pp("output"), config)?;
@@ -445,7 +445,7 @@ struct BertEncoder {
 }
 
 impl BertEncoder {
-    fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
+    fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
         let layers = (0..config.num_hidden_layers)
             .map(|index| BertLayer::load(vb.pp(&format!("layer.{index}")), config))
             .collect::<Result<Vec<_>>>()?;
@@ -470,48 +470,35 @@ pub trait ClassificationHead {
     fn forward(&self, hidden_states: &Tensor) -> Result<Tensor>;
 }
 
-pub struct BertClassificationHead {
-    pooler: Option<Linear>,
+pub struct XLMRobertaClassificationHead {
+    intermediate: Linear,
     output: Linear,
     span: tracing::Span,
 }
 
-impl BertClassificationHead {
-    pub(crate) fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
+impl XLMRobertaClassificationHead {
+    pub(crate) fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
         let n_classes = match &config.id2label {
             None => candle::bail!("`id2label` must be set for classifier models"),
             Some(id2label) => id2label.len(),
         };
-
-        let pooler: Option<Linear> = match Linear::load(
-            vb.pp("bert.pooler.dense"),
-            config.hidden_size,
-            config.hidden_size,
-            None)
-        {
-            Ok(layer) => Some(layer),
-            Err(_) => None,
-        };
-        let output = Linear::load(vb.pp("classifier"), config.hidden_size, n_classes, None)?;
-
+        let intermediate = Linear::load(vb.pp("dense"), config.hidden_size, config.hidden_size, None)?;
+        let output = Linear::load(vb.pp("out_proj"), config.hidden_size, n_classes, None)?;
         Ok(Self {
-            pooler,
+            intermediate,
             output,
             span: tracing::span!(tracing::Level::TRACE, "classifier"),
         })
     }
 }
 
-impl ClassificationHead for BertClassificationHead {
+impl ClassificationHead for XLMRobertaClassificationHead {
     fn forward(&self, hidden_states: &Tensor) -> Result<Tensor> {
         let _enter = self.span.enter();
 
-        let mut hidden_states = hidden_states.unsqueeze(1)?;
-        if let Some(pooler) = self.pooler.as_ref() {
-            hidden_states = pooler.forward(&hidden_states)?;
-            hidden_states = hidden_states.tanh()?;
-        }
-
+        let hidden_states = hidden_states.unsqueeze(1)?;
+        let hidden_states = self.intermediate.forward(&hidden_states)?;
+        let hidden_states = hidden_states.tanh()?;
         let hidden_states = self.output.forward(&hidden_states)?;
         let hidden_states = hidden_states.squeeze(1)?;
         Ok(hidden_states)
@@ -519,7 +506,7 @@ impl ClassificationHead for BertClassificationHead {
 }
 
 // https://github.com/huggingface/transformers/blob/6eedfa6dd15dc1e22a55ae036f681914e5a0d9a1/src/transformers/models/bert/modeling_bert.py#L874
-pub struct BertModel {
+pub struct XLMRobertaModel {
     embeddings: BertEmbeddings,
     encoder: BertEncoder,
     #[allow(unused)]
@@ -527,23 +514,29 @@ pub struct BertModel {
     span: tracing::Span,
 }
 
-impl BertModel {
-    pub fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
+impl XLMRobertaModel {
+    pub fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
         let (embeddings, encoder) = match (
             BertEmbeddings::load(vb.pp("embeddings"), config),
             BertEncoder::load(vb.pp("encoder"), config),
         ) {
             (Ok(embeddings), Ok(encoder)) => (embeddings, encoder),
             (Err(err), _) | (_, Err(err)) => {
-                if let Some(model_type) = &config.model_type {
-                    if let (Ok(embeddings), Ok(encoder)) = (
-                        BertEmbeddings::load(vb.pp(&format!("{model_type}.embeddings")), config),
-                        BertEncoder::load(vb.pp(&format!("{model_type}.encoder")), config),
-                    ) {
-                        (embeddings, encoder)
-                    } else {
-                        return Err(err);
-                    }
+                if let (Ok(embeddings), Ok(encoder)) = (
+                    BertEmbeddings::load(vb.pp("roberta.embeddings".to_string()), config),
+                    BertEncoder::load(vb.pp("roberta.encoder".to_string()), config),
+                ) {
+                    (embeddings, encoder)
+                } else if let (Ok(embeddings), Ok(encoder)) = (
+                    BertEmbeddings::load(vb.pp("xlm-roberta.embeddings".to_string()), config),
+                    BertEncoder::load(vb.pp("xlm-roberta.encoder".to_string()), config),
+                ) {
+                    (embeddings, encoder)
+                } else if let (Ok(embeddings), Ok(encoder)) = (
+                    BertEmbeddings::load(vb.pp("camembert.embeddings".to_string()), config),
+                    BertEncoder::load(vb.pp("camembert.encoder".to_string()), config),
+                ) {
+                    (embeddings, encoder)
                 } else {
                     return Err(err);
                 }
@@ -558,7 +551,7 @@ impl BertModel {
     }
 }
 
-impl Model for BertModel {
+impl Model for XLMRobertaModel {
 
     fn get_input_names(&self) -> Vec<String> {
         return vec![
@@ -583,22 +576,22 @@ impl Model for BertModel {
     }
 }
 
-pub struct BertForSequenceClassification {
-    bert: Box<BertModel>,
+pub struct XLMRobertaForSequenceClassification {
+    roberta: Box<XLMRobertaModel>,
     classifier: Box<dyn ClassificationHead + Send>,
     #[allow(unused)]
     pub device: Device,
     span: tracing::Span,
 }
 
-impl BertForSequenceClassification {
-    pub fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
-        let bert = Box::new(BertModel::load(vb.clone(), &config)?);
+impl XLMRobertaForSequenceClassification {
+    pub fn load(vb: VarBuilder, config: &XLMRobertaConfig) -> Result<Self> {
+        let roberta = Box::new(XLMRobertaModel::load(vb.clone(), &config)?);
         let classifier: Box<dyn ClassificationHead + Send> = Box::new(
-            BertClassificationHead::load(vb.pp("classifier"), config)?,
+            XLMRobertaClassificationHead::load(vb.pp("classifier"), config)?,
         );
         Ok(Self {
-            bert,
+            roberta,
             classifier,
             device: vb.device().clone(),
             span: tracing::span!(tracing::Level::TRACE, "model"),
@@ -606,7 +599,7 @@ impl BertForSequenceClassification {
     }
 }
 
-impl Model for BertForSequenceClassification {
+impl Model for XLMRobertaForSequenceClassification {
 
     fn get_input_names(&self) -> Vec<String> {
         return vec![
@@ -624,7 +617,7 @@ impl Model for BertForSequenceClassification {
     ) -> Result<Tensor> {
         let _enter = self.span.enter();
         let embeddings = self
-            .bert
+            .roberta
             .forward(input_ids, attention_mask, token_type_ids)?;
         let sequence_output = embeddings.i(0)?;
         let logits = self.classifier.forward(&sequence_output)?;

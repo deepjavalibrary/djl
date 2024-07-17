@@ -52,6 +52,8 @@ jobs:
           export CUDA_VERSION=${CUDA_VERSION:-cu124}
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcuda=$CUDA_VERSION -Ppt_version=$PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
+          ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Pcuda=$CUDA_VERSION -Ppt_version=$PYTORCH_VERSION
+          ./gradlew :engines:pytorch:pytorch-native:cleanJNI
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:

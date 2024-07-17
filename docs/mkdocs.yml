@@ -15,21 +15,23 @@ theme:
   features:
     - navigation.tabs
   palette:
-      - scheme: default
-        primary: light-blue
-        accent: light-blue
-        toggle:
-            icon: material/weather-sunny
-            name: Switch to dark mode
-      - scheme: slate
-        primary: black
-        accent: deep-orange
-        toggle:
-            icon: material/weather-night
-            name: Switch to light mode
+    - scheme: default
+      primary: light-blue
+      accent: light-blue
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      accent: deep-orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
   edit_uri: ''
 
 extra:
+  version:
+    provider: mike
   social:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/deepjavalibrary/djl
@@ -43,12 +45,14 @@ extra:
     provider: google
     property: G-JE0V807433
 docs_dir: '../'
+site_dir: '../../site'
 plugins:
   - search
   - mknotebooks
+  - mike
   - exclude:
       regex:
-        - '.*\.(symbol|params|pt|jar|gz|zip|txt|json|sh|bat|cmd|puml|g4|java|py|cc|h|pro|properties|xml|gradlew|gradle|Dockerfile|RepositoryFactory|EngineProvider|ZooProvider)$|(docker|integration|testing|tools|docs/demos/apache-spark/notebook)/.*$'
+        - '.*\.(symbol|params|pt|jar|gz|zip|txt|json|sh|bat|cmd|puml|g4|java|py|cc|h|pro|properties|xml|html|scala|sbt|kt|npy|npz|onnx|rs|rst|safetensors|tar|toml|trt|vue|scss|yml|yaml|Dockerfile|cmake|RepositoryFactory|EngineProvider|ZooProvider)$|LICENSE|NOTICE|.*gradle.*|.*/mvnw|.*/Dockerfile.*|.*(hdpi|\.git|\.mvn|docker|buildSrc|gradle|integration|testing|jacoco|tools|javadoc|META-INF|/webapp|apache-spark/notebook|visualization-vue|malicious-url-detector/docs|frontend|interactive-console)/.*'
 
 
 nav:
@@ -175,6 +179,7 @@ nav:
           - 'docs/serving/serving/docs/lmi/user_guides/lmi_input_output_schema.md'
           - 'docs/serving/serving/docs/lmi/user_guides/chat_input_output_schema.md'
           - 'docs/serving/serving/docs/lmi/user_guides/output_formatter_schema.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/input_formatter_schema.md'
       - Deployment Guides:
           - 'docs/serving/serving/docs/lmi/deployment_guide/README.md'
           - 'docs/serving/serving/docs/lmi/deployment_guide/model-artifacts.md'

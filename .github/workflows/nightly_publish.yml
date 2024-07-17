@@ -119,11 +119,11 @@ jobs:
           # ./gradlew :integration:test "-Dai.djl.default_engine=OnnxRuntime"
           # ./gradlew :integration:clean
 
-  test-cuda-121:
+  test-cuda-124:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: [ self-hosted, gpu ]
     container:
-      image: nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+      image: nvidia/cuda:12.4.1-devel-ubuntu22.04
       options: --gpus all --runtime=nvidia
     timeout-minutes: 30
     needs: create-runners
@@ -151,12 +151,14 @@ jobs:
           ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=TensorFlow
           ./gradlew :engines:pytorch:pytorch-model-zoo:test
           ./gradlew :engines:tensorflow:tensorflow-model-zoo:test
+          # manually install cudnn9, PyTorch doesn't work with cudnn9, but OnnxRuntime requires cudnn9
+          apt-get update && apt-get install -y --no-install-recommends libcudnn9-cuda-12
           ./gradlew :engines:onnxruntime:onnxruntime-engine:test
 
   publish:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    needs: [ build, test-pytorch, test-tensorflow, test-aarch64, test-cuda-121 ]
+    needs: [ build, test-pytorch, test-tensorflow, test-aarch64, test-cuda-124 ]
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -176,8 +178,8 @@ jobs:
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.1.2 -Psnapshot
-          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.2.2 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.3.1 -Psnapshot
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.4.0 -Psnapshot
           ./gradlew clean engines:ml:xgboost:publish -Pgpu -Psnapshot
           ./gradlew clean publish -Psnapshot
           cd bom
@@ -192,8 +194,8 @@ jobs:
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.1.2 -P${{ github.event.inputs.mode }}
-          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.2.2 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.3.1 -P${{ github.event.inputs.mode }}
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.4.0 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:ml:xgboost:publish -Pgpu -P${{ github.event.inputs.mode }}
           ./gradlew clean publish -P${{ github.event.inputs.mode }}
           cd bom
@@ -239,7 +241,7 @@ jobs:
   stop-runners:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: [ self-hosted, scheduler ]
-    needs: [ create-runners, test-aarch64, test-cuda-121 ]
+    needs: [ create-runners, test-aarch64, test-cuda-124 ]
     steps:
       - name: Stop all instances
         run: |
