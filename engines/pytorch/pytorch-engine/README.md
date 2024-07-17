@@ -24,7 +24,7 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 ## Installation
 You can pull the PyTorch engine from the central Maven repository by including the following dependency:
 
-- ai.djl.pytorch:pytorch-engine:0.28.0
+- ai.djl.pytorch:pytorch-engine:0.29.0
 
 ```xml
 <dependency>
@@ -117,7 +117,7 @@ export PYTORCH_FLAVOR=cpu
 For macOS, you can use the following library:
 
 - ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
-- ai.djl.pytorch:pytorch-native-cpu:2.1.1:osx-x86_64
+- ai.djl.pytorch:pytorch-native-cpu:2.3.1:osx-x86_64
 
 ```xml
 <dependency>
