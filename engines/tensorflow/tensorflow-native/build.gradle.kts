@@ -42,7 +42,6 @@ tasks {
             val aarch64Url = "https://publish.djl.ai/tensorflow/${libs.versions.tensorflow.get()}/linux-arm64.jar"
 
             "${url}-macosx-arm64.jar".url unzipInto dir / "cpu/osx-aarch64/native/lib"
-            "${url}-macosx-x86_64.jar".url unzipInto dir / "cpu/osx-x86_64/native/lib"
             "${url}-windows-x86_64.jar".url unzipInto dir / "cpu/win-x86_64/native/lib"
             "${url}-linux-x86_64.jar".url unzipInto dir / "cpu/linux-x86_64/native/lib"
             "${url}-linux-x86_64-gpu.jar".url unzipInto dir / "cu121/linux-x86_64/native/lib"

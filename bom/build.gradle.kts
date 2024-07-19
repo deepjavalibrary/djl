@@ -117,7 +117,6 @@ publishing {
                         }
 
                         val mxnet = libs.versions.mxnet.get()
-                        +"ai.djl.mxnet:mxnet-native-mkl:$mxnet:osx-x86_64"
                         +"ai.djl.mxnet:mxnet-native-mkl:$mxnet:linux-x86_64"
                         +"ai.djl.mxnet:mxnet-native-mkl:$mxnet:win-x86_64"
                         +"ai.djl.mxnet:mxnet-native-cu112mkl:$mxnet:linux-x86_64"
@@ -129,13 +128,10 @@ publishing {
                         +"ai.djl.pytorch:pytorch-native-cpu-precxx11:$pytorch:linux-aarch64"
                         +"ai.djl.pytorch:pytorch-native-cu121:$pytorch:linux-x86_64"
                         +"ai.djl.pytorch:pytorch-native-cu121:$pytorch:win-x86_64"
-                        +"ai.djl.pytorch:pytorch-native-cu121-precxx11:$pytorch:linux-x86_64"
                         pytorch = "1.13.1"
                         +"ai.djl.pytorch:pytorch-native-cu117:$pytorch:linux-x86_64"
                         +"ai.djl.pytorch:pytorch-native-cu117:$pytorch:win-x86_64"
-                        +"ai.djl.pytorch:pytorch-native-cu117-precxx11:$pytorch:linux-x86_64"
                         val tensorflow = "${libs.versions.tensorflow.get()}"
-                        +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:osx-x86_64"
                         +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:osx-aarch64"
                         +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:linux-x86_64"
                         +"ai.djl.tensorflow:tensorflow-native-cpu:$tensorflow:linux-aarch64"

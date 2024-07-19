@@ -26,7 +26,6 @@ dependencies {
     }
     api(libs.wendykierp.jTransforms)
 
-    runtimeOnly(libs.bytedeco.ffmpeg) { artifact { classifier = "macosx-x86_64" } }
     runtimeOnly(libs.bytedeco.ffmpeg) { artifact { classifier = "linux-x86_64" } }
     runtimeOnly(libs.bytedeco.ffmpeg) { artifact { classifier = "windows-x86_64" } }
     runtimeOnly(libs.bytedeco.ffmpeg) { artifact { classifier = "macosx-arm64" } }

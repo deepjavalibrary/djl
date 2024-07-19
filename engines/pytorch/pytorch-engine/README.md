@@ -1,6 +1,7 @@
 # DJL - PyTorch engine implementation
 
 ## Overview
+
 This module contains the Deep Java Library (DJL) EngineProvider for PyTorch.
 
 We don't recommend that developers use classes in this module directly.
@@ -19,14 +20,17 @@ You can also build the latest javadocs locally using the following command:
 # for Windows:
 ..\..\gradlew javadoc
 ```
+
 The javadocs output is built in the `build/doc/javadoc` folder.
 
 ## Installation
+
 You can pull the PyTorch engine from the central Maven repository by including the following dependency:
 
 - ai.djl.pytorch:pytorch-engine:0.29.0
 
 ```xml
+
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-engine</artifactId>
@@ -42,6 +46,7 @@ ways to specify PyTorch version:
 2. Sets environment variable: `PYTORCH_VERSION` to override the default package version.
 
 ### Supported PyTorch versions
+
 The following table illustrates which pytorch version that DJL supports:
 
 | PyTorch engine version | PyTorch native library version            |
@@ -74,17 +79,20 @@ The following table illustrates which pytorch version that DJL supports:
 | pytorch-engine:0.4.0   | pytorch-native-auto:1.4.0                 |
 
 ### BOM support
+
 We strongly recommend you to use [Bill of Materials (BOM)](../../../bom/README.md) to manage your dependencies.
 
-By default, DJL will download the PyTorch native libraries into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
+By default, DJL will download the PyTorch native libraries
+into [cache folder](../../../docs/development/cache_management.md) the first time you run DJL.
 It will automatically determine the appropriate jars for your system based on the platform and GPU support.
 
-### CentOS 7 or Amazon Linux 2 support 
-If you are running on an older operating system (like CentOS 7), you have to use
+### Amazon Linux 2 support
+
+If you are running on an older operating system (like Amazonlinux 2), you have to use
 [precxx11 build](#for-pre-cxx11-build) or set system property to auto select for precxx11 binary:
 
 ```java
-System.setProperty("PYTORCH_PRECXX11", "true");
+System.setProperty("PYTORCH_PRECXX11","true");
 ```
 
 or use System env
@@ -114,36 +122,21 @@ export PYTORCH_FLAVOR=cpu
 ```
 
 ### macOS
-For macOS, you can use the following library:
 
-- ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
-- ai.djl.pytorch:pytorch-native-cpu:2.3.1:osx-x86_64
+**Note:**
 
-```xml
-<dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-cpu</artifactId>
-    <classifier>osx-x86_64</classifier>
-    <version>2.3.1</version>
-    <scope>runtime</scope>
-</dependency>
-<dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-jni</artifactId>
-    <version>2.3.1-0.29.0</version>
-    <scope>runtime</scope>
-</dependency>
-```
-
-**Note:** PyTorch 1.13+ doesn't support mac 11 any more, you must use DJL 0.19.0 ane lower version.
+- x86_64 macOS is no longer supported since 0.30.0
+- PyTorch 1.13+ doesn't support mac 11 any more, you must use DJL 0.19.0 ane lower version.
 
 ### macOS M1
+
 For macOS M1, you can use the following library:
 
 - ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
 - ai.djl.pytorch:pytorch-native-cpu:2.3.1:osx-aarch64
 
 ```xml
+
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cpu</artifactId>
@@ -152,14 +145,15 @@ For macOS M1, you can use the following library:
     <scope>runtime</scope>
 </dependency>
 <dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-jni</artifactId>
-    <version>2.3.1-0.29.0</version>
-    <scope>runtime</scope>
+<groupId>ai.djl.pytorch</groupId>
+<artifactId>pytorch-jni</artifactId>
+<version>2.3.1-0.29.0</version>
+<scope>runtime</scope>
 </dependency>
 ```
 
 ### Linux
+
 For the Linux platform, you can choose between CPU, GPU. If you have NVIDIA [CUDA](https://en.wikipedia.org/wiki/CUDA)
 installed on your GPU machine, you can use one of the following library:
 
@@ -169,6 +163,7 @@ installed on your GPU machine, you can use one of the following library:
 - ai.djl.pytorch:pytorch-native-cu121:2.3.1:linux-x86_64 - CUDA 12.1
 
 ```xml
+
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cu121</artifactId>
@@ -177,10 +172,10 @@ installed on your GPU machine, you can use one of the following library:
     <scope>runtime</scope>
 </dependency>
 <dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-jni</artifactId>
-    <version>2.3.1-0.29.0</version>
-    <scope>runtime</scope>
+<groupId>ai.djl.pytorch</groupId>
+<artifactId>pytorch-jni</artifactId>
+<version>2.3.1-0.29.0</version>
+<scope>runtime</scope>
 </dependency>
 ```
 
@@ -190,6 +185,7 @@ installed on your GPU machine, you can use one of the following library:
 - ai.djl.pytorch:pytorch-native-cpu:2.3.1:linux-x86_64
 
 ```xml
+
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cpu</artifactId>
@@ -198,10 +194,10 @@ installed on your GPU machine, you can use one of the following library:
     <version>2.3.1</version>
 </dependency>
 <dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-jni</artifactId>
-    <version>2.3.1-0.29.0</version>
-    <scope>runtime</scope>
+<groupId>ai.djl.pytorch</groupId>
+<artifactId>pytorch-jni</artifactId>
+<version>2.3.1-0.29.0</version>
+<scope>runtime</scope>
 </dependency>
 ```
 
@@ -211,6 +207,7 @@ installed on your GPU machine, you can use one of the following library:
 - ai.djl.pytorch:pytorch-native-cpu-precxx11:2.3.1:linux-aarch64
 
 ```xml
+
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cpu-precxx11</artifactId>
@@ -219,30 +216,26 @@ installed on your GPU machine, you can use one of the following library:
     <version>2.3.1</version>
 </dependency>
 <dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-jni</artifactId>
-    <version>2.3.1-0.29.0</version>
-    <scope>runtime</scope>
+<groupId>ai.djl.pytorch</groupId>
+<artifactId>pytorch-jni</artifactId>
+<version>2.3.1-0.29.0</version>
+<scope>runtime</scope>
 </dependency>
 ```
 
 ### For Pre-CXX11 build
 
-We also provide packages for the system like CentOS 7/Ubuntu 14.04 with GLIBC >= 2.17.
-All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` in the package that contains `CXXABI_1.3.9` to use the package successfully.
+**Note:** precxx11 GPU build is no longer support since 0.30.0,
+
+We also provide packages for the system like Amazonliunx 2 with GLIBC >= 2.17.
+All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` in the package that
+contains `CXXABI_1.3.9` to use the package successfully.
 
 - ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
-- ai.djl.pytorch:pytorch-native-cu121-precxx11:2.3.1:linux-x86_64 - CUDA 12.1
-- ai.djl.pytorch:pytorch-native-cpu-precxx11:2.3.1:linux-x86_64   - CPU
+- ai.djl.pytorch:pytorch-native-cpu-precxx11:2.3.1:linux-x86_64 - CPU
 
 ```xml
-<dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-cu121-precxx11</artifactId>
-    <classifier>linux-x86_64</classifier>
-    <version>2.3.1</version>
-    <scope>runtime</scope>
-</dependency>
+
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-jni</artifactId>
@@ -252,6 +245,7 @@ All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` i
 ```
 
 ```xml
+
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cpu-precxx11</artifactId>
@@ -260,10 +254,10 @@ All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` i
     <scope>runtime</scope>
 </dependency>
 <dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-jni</artifactId>
-    <version>2.3.1-0.29.0</version>
-    <scope>runtime</scope>
+<groupId>ai.djl.pytorch</groupId>
+<artifactId>pytorch-jni</artifactId>
+<version>2.3.1-0.29.0</version>
+<scope>runtime</scope>
 </dependency>
 ```
 
@@ -271,7 +265,8 @@ All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` i
 
 PyTorch requires Visual C++ Redistributable Packages. If you encounter an UnsatisfiedLinkError while using
 DJL on Windows, please download and install
-[Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot.
+[Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads)
+and reboot.
 
 For the Windows platform, you can choose between CPU and GPU.
 
@@ -281,6 +276,7 @@ For the Windows platform, you can choose between CPU and GPU.
 - ai.djl.pytorch:pytorch-native-cu121:2.3.1:win-x86_64 - CUDA 12.1
 
 ```xml
+
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cu121</artifactId>
@@ -289,10 +285,10 @@ For the Windows platform, you can choose between CPU and GPU.
     <scope>runtime</scope>
 </dependency>
 <dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-jni</artifactId>
-    <version>2.3.1-0.29.0</version>
-    <scope>runtime</scope>
+<groupId>ai.djl.pytorch</groupId>
+<artifactId>pytorch-jni</artifactId>
+<version>2.3.1-0.29.0</version>
+<scope>runtime</scope>
 </dependency>
 ```
 
@@ -302,6 +298,7 @@ For the Windows platform, you can choose between CPU and GPU.
 - ai.djl.pytorch:pytorch-native-cpu:2.3.1:win-x86_64
 
 ```xml
+
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cpu</artifactId>
@@ -310,9 +307,9 @@ For the Windows platform, you can choose between CPU and GPU.
     <version>2.3.1</version>
 </dependency>
 <dependency>
-    <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-jni</artifactId>
-    <version>2.3.1-0.29.0</version>
-    <scope>runtime</scope>
+<groupId>ai.djl.pytorch</groupId>
+<artifactId>pytorch-jni</artifactId>
+<version>2.3.1-0.29.0</version>
+<scope>runtime</scope>
 </dependency>
 ```

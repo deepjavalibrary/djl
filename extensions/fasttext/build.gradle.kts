@@ -28,7 +28,6 @@ tasks {
                 "https://publish.djl.ai/fasttext-${libs.versions.fasttext.get()}/jnilib/${libs.versions.djl.get()}"
             val files = mapOf(
                 "linux-x86_64" to "libjni_fasttext.so",
-                "osx-x86_64" to "libjni_fasttext.dylib",
                 "osx-aarch64" to "libjni_fasttext.dylib"
             )
             val jnilibDir = project.projectDir / "jnilib/${libs.versions.djl.get()}"
