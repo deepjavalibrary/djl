@@ -37,7 +37,7 @@ for the official ONNX Runtime project.
 ## Installation
 You can pull the ONNX Runtime engine from the central Maven repository by including the following dependency:
 
-- ai.djl.onnxruntime:onnxruntime-engine:0.28.0
+- ai.djl.onnxruntime:onnxruntime-engine:0.29.0
 
 ```xml
 <dependency>
@@ -73,7 +73,7 @@ Maven:
 <dependency>
     <groupId>com.microsoft.onnxruntime</groupId>
     <artifactId>onnxruntime_gpu</artifactId>
-    <version>1.17.1</version>
+    <version>1.18.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -81,10 +81,10 @@ Maven:
 Gradle:
 
 ```groovy
-implementation("ai.djl.onnxruntime:onnxruntime-engine:0.28.0") {
+implementation("ai.djl.onnxruntime:onnxruntime-engine:0.29.0") {
     exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
 }
-implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.17.1"
+implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.18.0"
 ```
 
 #### Enable TensorRT execution
