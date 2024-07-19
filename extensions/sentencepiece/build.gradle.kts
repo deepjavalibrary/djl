@@ -27,7 +27,6 @@ tasks {
                 "win-x86_64" to "sentencepiece_native.dll",
                 "linux-x86_64" to "libsentencepiece_native.so",
                 "linux-aarch64" to "libsentencepiece_native.so",
-                "osx-x86_64" to "libsentencepiece_native.dylib",
                 "osx-aarch64" to "libsentencepiece_native.dylib"
             )
             val jnilibDir = project.projectDir / "jnilib/${libs.versions.djl.get()}"

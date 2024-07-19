@@ -14,49 +14,6 @@ on:
     - cron: '0 5 * * *'
 
 jobs:
-  build-pytorch-jni-macos:
-    if: github.repository == 'deepjavalibrary/djl'
-    runs-on: macos-13
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'corretto'
-          java-version: 17
-      - uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Release JNI prep
-        shell: bash
-        run: |
-          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
-          echo $PYTORCH_VERSION
-          if [[ $PYTORCH_VERSION =~ ^(?\.[1-2]?\..*)$ ]]; then \
-            ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION; \
-            ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"; \
-          fi;
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
-      - name: Copy files to S3 with the AWS CLI
-        shell: bash
-        run: |
-          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
-          PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
-          if [[ $PYTORCH_VERSION =~ ^(?\.[1-2]?\..*)$ ]]; then \
-            aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib; \
-            aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"; \
-          fi;
-
   build-pytorch-jni-linux:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
@@ -111,48 +68,37 @@ jobs:
   build-pytorch-jni-precxx11:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    container: nvidia/cuda:12.1.1-cudnn8-devel-centos7
+    container:
+      image: amazonlinux:2
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    timeout-minutes: 30
+    needs: create-aarch64-runner
     steps:
-      - name: Install Environment
+      - name: Install compiler environment
         run: |
           yum -y update
-          yum -y install centos-release-scl-rh epel-release
-          yum -y install devtoolset-9 rh-git218 patch cmake3
-          ln -s /usr/bin/cmake3 /usr/bin/cmake
+          yum -y install patch git cmake3 python3-devel java-17-amazon-corretto-devel
+          yum -y install gcc10 gcc10-c++
+          ln -sf /usr/bin/gcc10-gcc /usr/bin/gcc
+          ln -sf /usr/bin/gcc10-cc /usr/bin/cc
+          ln -sf /usr/bin/gcc10-g++ /usr/bin/g++
+          ln -sf /usr/bin/gcc10-c++ /usr/bin/c++
+          ln -sf /usr/bin/gcc10-ar /usr/bin/ar
+          ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: 17
-      - uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - uses: taiki-e/checkout-action@v1
       - name: Release JNI prep
         run: |
-          source scl_source enable devtoolset-9 rh-git218 || true
+          export PATH=$PATH:$JAVA_HOME/bin
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
           export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
-          export PYTORCH_PRECXX11=true
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
+          export PYTORCH_PRECXX11=true
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
-          ./gradlew :engines:pytorch:pytorch-native:cleanJNI
-          rm -rf ~/.djl.ai
-          export TORCH_CUDA_ARCH_LIST="8.0 8.6 8.9 9.0"
-          CUDA_VERSION=${{ github.event.inputs.cuda }}
-          export CUDA_VERSION=${CUDA_VERSION:-cu121}
-          ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcuda=$CUDA_VERSION -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}

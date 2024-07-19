@@ -9,41 +9,6 @@ on:
       - extensions/tokenizers/rust/**
 
 jobs:
-  build-tokenizers-jni-osx:
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'corretto'
-          java-version: 17
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Release JNI prep
-        run: |
-          ./gradlew :extensions:tokenizers:compileJNI
-          PYTORCH_VERSION=2.2.2 ./gradlew -Pjni :extensions:tokenizers:test
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
-      - name: Copy files to S3 with the AWS CLI
-        run: |
-          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
-          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
-          aws s3 sync extensions/tokenizers/jnilib/$DJL_VERSION/osx-x86_64 s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/$DJL_VERSION/osx-x86_64/
-          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
-
   build-tokenizers-jni-linux:
     runs-on: ubuntu-latest
     container:
