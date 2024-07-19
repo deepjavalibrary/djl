@@ -37,7 +37,7 @@ XGBoost can only run on top of the Linux/Mac machine. User can build from source
 ## Installation
 You can pull the XGBoost engine from the central Maven repository by including the following dependency:
 
-- ai.djl.ml.xgboost:xgboost:0.28.0
+- ai.djl.ml.xgboost:xgboost:0.29.0
 
 ```xml
 <dependency>
