@@ -51,10 +51,11 @@ tasks {
             for (file in collection) {
                 file.text = file.text.replace("/${previousVersion}/", "/${djlVersion}/")
                     .replace(">${previousVersion}<", ">${djlVersion}<")
+                    .replace(">${previousVersion}-SNAPSHOT<", ">${djlVersion}-SNAPSHOT<")
                     .replace("\"${previousVersion}\"", "\"${djlVersion}\"")
-                    .replace("-${previousVersion}", "-${djlVersion}")
+                    .replace(" ${previousVersion}`", " ${djlVersion}`")
                     .replace("_${previousVersion}", "_${djlVersion}")
-                    .replace(":${previousVersion}([\"\\\\\\n])", ":${djlVersion}\$1")
+                    .replace(Regex(":${previousVersion}([\"\\\\\\n])"), ":${djlVersion}\$1")
             }
         }
     }
