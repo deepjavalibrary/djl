@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.testing.Assertions;
@@ -1051,6 +1052,58 @@ public class NDArrayOtherOpTest {
     }
 
     @Test
+    public void testIfft() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray ele =
+                    manager.create(
+                                    new float[][] {
+                                        {15.0f, 0.0f},
+                                        {-2.5f, 3.440955f},
+                                        {-2.4999998f, 0.8122992f},
+                                        {-2.4999998f, -0.8122992f},
+                                        {-2.5f, -3.440955f}
+                                    })
+                            .complex();
+
+            NDArray result = ele.ifft(5);
+            result = result.real().get(new NDIndex(":, 0"));
+            NDArray expected = manager.create(new float[] {1, 2, 3, 4, 5});
+            Assertions.assertAlmostEquals(result, expected);
+        }
+    }
+
+    @Test
+    public void testRfft() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray ele = manager.create(new float[] {1, 2, 3, 4, 5});
+            NDArray result = ele.rfft(5);
+            result = result.real().flatten();
+            NDArray expected =
+                    manager.create(
+                            new float[] {15.0f, 0.0f, -2.5f, 3.4409549f, -2.4999998f, 0.8122992f});
+            Assertions.assertAlmostEquals(result, expected);
+        }
+    }
+
+    @Test
+    public void testIrfft() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray ele =
+                    manager.create(
+                                    new float[][] {
+                                        {15.0f, 0.0f},
+                                        {-2.5f, 3.4409549f},
+                                        {-2.4999998f, 0.8122992f}
+                                    })
+                            .complex();
+
+            NDArray result = ele.irfft(5);
+            NDArray expected = manager.create(new float[] {1, 2, 3, 4, 5});
+            Assertions.assertAlmostEquals(result, expected);
+        }
+    }
+
+    @Test
     public void testStft() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray audio = manager.ones(new Shape(20));
@@ -1139,6 +1192,22 @@ public class NDArrayOtherOpTest {
             NDArray actual = fft2.ifft2(sizes, axes).real();
             NDArray expected = array.toType(DataType.COMPLEX64, true).real();
             Assertions.assertAlmostEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void testConj() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array = manager.create(new float[][] {{1, 2}, {-3, -4}}).complex();
+            NDArray result = array.conj().real();
+            NDArray expected = manager.create(new float[][] {{1, -2}, {-3, 4}});
+            Assertions.assertAlmostEquals(result, expected);
+
+            // non-complex array
+            array = manager.create(new float[][] {{1, 2}, {-3, -4}});
+            result = array.conj();
+            expected = manager.create(new float[][] {{1, 2}, {-3, -4}});
+            Assertions.assertAlmostEquals(result, expected);
         }
     }
 }

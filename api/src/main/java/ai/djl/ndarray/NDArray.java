@@ -3376,6 +3376,69 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray fft(long length, long axis);
 
     /**
+     * Computes the one dimensional inverse discrete Fourier transform.
+     *
+     * @param length Length of the transformed axis of the output.
+     * @param axis Axis over which to compute the IFFT.
+     * @return The truncated or zero-padded input, transformed along the axis indicated by axis, or
+     *     the last one if axis is not specified.
+     */
+    NDArray ifft(long length, long axis);
+
+    /**
+     * Computes the one dimensional inverse discrete Fourier transform.
+     *
+     * @param length Length of the transformed axis of the output.
+     * @return The truncated or zero-padded input, transformed along the axis indicated by axis, or
+     *     the last one if axis is not specified.
+     */
+    default NDArray ifft(long length) {
+        return ifft(length, -1);
+    }
+
+    /**
+     * Computes the one dimensional Fourier transform of real-valued input.
+     *
+     * @param length Length of the transformed axis of the output.
+     * @return The truncated or zero-padded input, transformed along the axis indicated by axis, or
+     *     the last one if axis is not specified.
+     */
+    default NDArray rfft(long length) {
+        return rfft(length, -1);
+    }
+
+    /**
+     * Computes the one dimensional Fourier transform of real-valued input.
+     *
+     * @param length Length of the transformed axis of the output.
+     * @param axis Axis over which to compute the FFT.
+     * @return The truncated or transformed along the axis indicated by axis, or the last one if
+     *     axis is not specified.
+     */
+    NDArray rfft(long length, long axis);
+
+    /**
+     * Computes the one dimensional inverse Fourier transform of real-valued input.
+     *
+     * @param length Length of the transformed axis of the output.
+     * @param axis Axis over which to compute the IRFFT.
+     * @return The truncated or transformed along the axis indicated by axis, or the last one if
+     *     axis is not specified.
+     */
+    NDArray irfft(long length, long axis);
+
+    /**
+     * Computes the one dimensional inverse Fourier transform of real-valued input.
+     *
+     * @param length Length of the transformed axis of the output.
+     * @return The truncated or transformed along the axis indicated by axis, or the last one if
+     *     axis is not specified.
+     */
+    default NDArray irfft(long length) {
+        return irfft(length, -1);
+    }
+
+    /**
      * Computes the Short Time Fourier Transform (STFT).
      *
      * @param nFft size of Fourier transform
@@ -5404,4 +5467,12 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return tje real NDArray
      */
     NDArray real();
+
+    /**
+     * Conjugate complex array.
+     *
+     * @return Returns a view of input with a flipped conjugate bit. If input has a non-complex
+     *     type, this function just returns input.
+     */
+    NDArray conj();
 }
