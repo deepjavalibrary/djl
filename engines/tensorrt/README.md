@@ -28,7 +28,7 @@ The javadocs output is generated in the `build/doc/javadoc` folder.
 ## Installation
 You can pull the TensorRT engine from the central Maven repository by including the following dependency:
 
-- ai.djl.tensorrt:tensorrt:0.28.0
+- ai.djl.tensorrt:tensorrt:0.29.0
 
 ```xml
 <dependency>

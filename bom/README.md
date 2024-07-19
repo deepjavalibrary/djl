@@ -65,7 +65,7 @@ will need to mention the type as pom and the scope as import) as the following:
 - First you need add BOM into your build.gradle file as the following:
 
 ```
-    implementation platform("ai.djl:bom:0.28.0")
+    implementation platform("ai.djl:bom:0.29.0")
 ```
 
 - Then you import the desired DJL modules into to you pom.xml file (no version is needed):
