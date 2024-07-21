@@ -171,7 +171,7 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
             val ompUrl = "https://publish.djl.ai/extra/macos-arm64/libomp.dylib"
             ompUrl.url into libomp
         }
-        if (value == "cpu/win-x86_64") {
+        if ("win-x86_64" in value) {
             copy {
                 from("$outputDir/libtorch/lib/") {
                     include("mkl_*.dll")
