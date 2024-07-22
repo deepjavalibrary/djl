@@ -257,7 +257,7 @@ public abstract class RandomAccessDataset implements Dataset {
      *
      * @param indicesOfRecordKeys Map for keys of the records in this dataset to their index
      *     position within this dataset. While this map typically maps all records, technically it
-     *     just needs to map the ones occuring in <code>subRecordKeys</code>.
+     *     just needs to map the ones occurring in <code>subRecordKeys</code>.
      * @param subRecordKeys Keys to define the view on the dataset. All keys in <code>subRecordKeys
      *     </code> must be contained in <code>indicesOfRecordKeys</code> but may occur more than
      *     once.
