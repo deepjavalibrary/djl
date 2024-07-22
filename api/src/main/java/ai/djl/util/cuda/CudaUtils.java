@@ -38,6 +38,7 @@ public final class CudaUtils {
     private static final CudaLibrary LIB = loadLibrary();
 
     private static String[] gpuInfo;
+    private static boolean logging = true;
 
     private CudaUtils() {}
 
@@ -64,6 +65,7 @@ public final class CudaUtils {
             try {
                 return Integer.parseInt(gpuInfo[0]);
             } catch (NumberFormatException e) {
+                logger.warn("Unexpected output: {}", gpuInfo[0], e);
                 return 0;
             }
         }
@@ -77,17 +79,21 @@ public final class CudaUtils {
             case 0:
                 return count[0];
             case CudaLibrary.ERROR_NO_DEVICE:
-                logger.debug(
-                        "No GPU device found: {} ({})", LIB.cudaGetErrorString(result), result);
+                if (logging) {
+                    logger.debug(
+                            "No GPU device found: {} ({})", LIB.cudaGetErrorString(result), result);
+                }
                 return 0;
             case CudaLibrary.INITIALIZATION_ERROR:
             case CudaLibrary.INSUFFICIENT_DRIVER:
             case CudaLibrary.ERROR_NOT_PERMITTED:
             default:
-                logger.warn(
-                        "Failed to detect GPU count: {} ({})",
-                        LIB.cudaGetErrorString(result),
-                        result);
+                if (logging) {
+                    logger.warn(
+                            "Failed to detect GPU count: {} ({})",
+                            LIB.cudaGetErrorString(result),
+                            result);
+                }
                 return 0;
         }
     }
@@ -209,6 +215,7 @@ public final class CudaUtils {
      */
     @SuppressWarnings("PMD.SystemPrintln")
     public static void main(String[] args) {
+        logging = false;
         int gpuCount = getGpuCount();
         if (args.length == 0) {
             if (gpuCount <= 0) {
@@ -262,23 +269,33 @@ public final class CudaUtils {
                     if (files != null && files.length > 0) {
                         String fileName = files[0].getName();
                         String cudaRt = fileName.substring(0, fileName.length() - 4);
-                        logger.debug("Found cudart: {}", files[0].getAbsolutePath());
+                        if (logging) {
+                            logger.debug("Found cudart: {}", files[0].getAbsolutePath());
+                        }
                         return Native.load(cudaRt, CudaLibrary.class);
                     }
                 }
-                logger.debug("No cudart library found in path.");
+                if (logging) {
+                    logger.debug("No cudart library found in path.");
+                }
                 return null;
             }
             return Native.load("cudart", CudaLibrary.class);
         } catch (UnsatisfiedLinkError e) {
-            logger.debug("cudart library not found.");
-            logger.trace("", e);
+            if (logging) {
+                logger.debug("cudart library not found.");
+                logger.trace("", e);
+            }
         } catch (LinkageError e) {
-            logger.warn("You have a conflict version of JNA in the classpath.");
-            logger.debug("", e);
+            if (logging) {
+                logger.warn("You have a conflict version of JNA in the classpath.");
+                logger.debug("", e);
+            }
         } catch (SecurityException e) {
-            logger.warn("Access denied during loading cudart library.");
-            logger.trace("", e);
+            if (logging) {
+                logger.warn("Access denied during loading cudart library.");
+                logger.trace("", e);
+            }
         }
         return null;
     }
