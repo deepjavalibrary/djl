@@ -32,7 +32,6 @@ import org.bytedeco.javacpp.PointerScope;
 import org.tensorflow.exceptions.TensorFlowException;
 import org.tensorflow.internal.c_api.AbstractTFE_Context;
 import org.tensorflow.internal.c_api.AbstractTFE_TensorHandle;
-import org.tensorflow.internal.c_api.AbstractTF_Graph;
 import org.tensorflow.internal.c_api.AbstractTF_Tensor;
 import org.tensorflow.internal.c_api.TFE_Context;
 import org.tensorflow.internal.c_api.TFE_ContextOptions;
@@ -82,29 +81,27 @@ public final class JavacppUtils {
             TF_Buffer runOpts = TF_Buffer.newBufferFromString(runOptions);
 
             // load the session
-            TF_Graph graphHandle = AbstractTF_Graph.newGraph().retainReference();
+            TF_Graph graphHandle = TF_Graph.newGraph();
             TF_Buffer metaGraphDef = TF_Buffer.newBuffer();
             TF_Session sessionHandle =
-                    tensorflow.TF_LoadSessionFromSavedModel(
-                            opts,
-                            runOpts,
-                            new BytePointer(exportDir),
-                            new PointerPointer<>(tags),
-                            tags.length,
-                            graphHandle,
-                            metaGraphDef,
-                            status);
+                    TF_Session.loadSessionFromSavedModel(
+                            opts, runOpts, exportDir, tags, graphHandle, metaGraphDef, status);
             status.throwExceptionIfNotOK();
 
             // handle the result
+            SavedModelBundle bundle;
             try {
-                return new SavedModelBundle(
-                        graphHandle,
-                        sessionHandle,
-                        MetaGraphDef.parseFrom(metaGraphDef.dataAsByteBuffer()));
+                bundle =
+                        new SavedModelBundle(
+                                graphHandle,
+                                sessionHandle,
+                                MetaGraphDef.parseFrom(metaGraphDef.dataAsByteBuffer()));
             } catch (InvalidProtocolBufferException e) {
                 throw new TensorFlowException("Cannot parse MetaGraphDef protocol buffer", e);
             }
+            graphHandle.retainReference();
+            sessionHandle.retainReference();
+            return bundle;
         }
     }
 
