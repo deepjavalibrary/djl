@@ -46,6 +46,14 @@ def main():
     from djl_converter.huggingface_models import HuggingfaceModels, SUPPORTED_TASKS
 
     task, arch = HuggingfaceModels.to_supported_task(model_info.config)
+    if not task:
+        if "sentence-similarity" in model_info.tags:
+            task = "sentence-similarity"
+    if not task:
+        logging.error(
+            f"Unsupported model architecture: {arch} for {model_id}.")
+        return
+
     converter = SUPPORTED_TASKS[task]
 
     try:
