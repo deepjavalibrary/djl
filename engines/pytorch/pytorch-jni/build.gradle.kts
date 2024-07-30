@@ -32,12 +32,12 @@ tasks {
                 "osx-aarch64/cpu/libdjl_torch.dylib",
                 "win-x86_64/cpu/djl_torch.dll"
             ) + when {
-                ptVersion.startsWith("2.3.") -> listOf(
-                    "linux-x86_64/cu121/libdjl_torch.so",
-                    "win-x86_64/cu121/djl_torch.dll"
+                ptVersion.startsWith("2.4.") -> listOf(
+                    "linux-x86_64/cu124/libdjl_torch.so",
+                    "win-x86_64/cu124/djl_torch.dll"
                 )
 
-                ptVersion.startsWith("2.1.") || ptVersion.startsWith("2.2.") -> listOf(
+                ptVersion.matches(Regex("2.[1-3].\\d")) -> listOf(
                     "linux-x86_64/cu121/libdjl_torch.so",
                     "win-x86_64/cu121/djl_torch.dll",
                 )
