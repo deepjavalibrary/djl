@@ -175,6 +175,7 @@ nav:
           - 'docs/serving/serving/docs/lmi/user_guides/lmi_input_output_schema.md'
           - 'docs/serving/serving/docs/lmi/user_guides/chat_input_output_schema.md'
           - 'docs/serving/serving/docs/lmi/user_guides/output_formatter_schema.md'
+          - 'docs/serving/serving/docs/lmi/user_guides/input_formatter_schema.md'
       - Deployment Guides:
           - 'docs/serving/serving/docs/lmi/deployment_guide/README.md'
           - 'docs/serving/serving/docs/lmi/deployment_guide/model-artifacts.md'
