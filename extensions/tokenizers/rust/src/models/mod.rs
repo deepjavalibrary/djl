@@ -1,10 +1,12 @@
 mod bert;
 mod distilbert;
+mod xlm_roberta;
 
 use crate::ndarray::as_data_type;
 use crate::{cast_handle, drop_handle, to_handle, to_string_array};
-use bert::{BertConfig, BertModel};
-use candle::{DType, Device, Result, Tensor};
+use bert::{BertConfig, BertModel, BertForSequenceClassification};
+use xlm_roberta::{XLMRobertaConfig, XLMRobertaModel, XLMRobertaForSequenceClassification};
+use candle::{DType, Device, Result, Tensor, Error};
 use candle_nn::VarBuilder;
 use distilbert::{DistilBertConfig, DistilBertModel};
 use jni::objects::{JLongArray, JObject, JString, ReleaseMode};
@@ -14,6 +16,7 @@ use serde::Deserialize;
 use std::path::PathBuf;
 
 #[derive(Debug, PartialEq, Clone)]
+#[allow(dead_code, unused)]
 pub enum Pool {
     Cls,
     Mean,
@@ -21,9 +24,16 @@ pub enum Pool {
     LastToken,
 }
 
+#[derive(Deserialize)]
+#[serde(tag = "model_type", rename_all = "kebab-case")]
+enum Config {
+    Bert(BertConfig),
+    XlmRoberta(XLMRobertaConfig),
+    #[serde(rename(deserialize = "distilbert"))]
+    DistilBert(DistilBertConfig),
+}
+
 pub(crate) trait Model {
-    #[allow(dead_code)]
-    fn is_padded(&self) -> bool;
 
     fn get_input_names(&self) -> Vec<String>;
 
@@ -51,7 +61,7 @@ fn load_model<'local>(
 
     // Load config
     let config: String = std::fs::read_to_string(model_path.join("config.json"))?;
-    let config: Config = serde_json::from_str(&config).unwrap();
+    let config: Config = serde_json::from_str(&config).map_err(Error::msg)?;
 
     // Get candle device
     let device = if candle::utils::cuda_is_available() {
@@ -91,24 +101,35 @@ fn load_model<'local>(
         (Config::Bert(mut config), _) => {
             tracing::info!("Starting Bert model on {:?}", device);
             config.use_flash_attn = Some(use_flash_attn);
-            Ok(Box::new(BertModel::load(vb, &config)?))
+            match config.architectures.first() {
+                Some(arch) => match arch.as_str() {
+                    "BertForSequenceClassification" => Ok(Box::new(BertForSequenceClassification::load(vb, &config)?)),
+                    "BertModel" => Ok(Box::new(BertModel::load(vb, &config)?)),
+                    _ => Ok(Box::new(BertModel::load(vb, &config)?)),
+                },
+                None => Ok(Box::new(BertModel::load(vb, &config)?)),
+            }
+        }
+        (Config::XlmRoberta(mut config), _) => {
+            tracing::info!("Starting XlmRoberta model on {:?}", device);
+            config.use_flash_attn = Some(use_flash_attn);
+            match config.architectures.first() {
+                Some(arch) => match arch.as_str() {
+                    "XLMRobertaForSequenceClassification" => Ok(Box::new(XLMRobertaForSequenceClassification::load(vb, &config)?)),
+                    "XLMRobertaModel" => Ok(Box::new(XLMRobertaModel::load(vb, &config)?)),
+                    _ => Ok(Box::new(XLMRobertaModel::load(vb, &config)?)),
+                },
+                None => Ok(Box::new(XLMRobertaModel::load(vb, &config)?)),
+            }
         }
         (Config::DistilBert(mut config), _) => {
-            tracing::info!("Starting DistilBertModel model on {:?}", device);
+            tracing::info!("Starting DistilBert model on {:?}", device);
             config.use_flash_attn = Some(use_flash_attn);
             Ok(Box::new(DistilBertModel::load(vb, &config)?))
         }
     };
 
     model
-}
-
-#[derive(Deserialize)]
-#[serde(tag = "model_type", rename_all = "kebab-case")]
-enum Config {
-    Bert(BertConfig),
-    #[serde(rename(deserialize = "distilbert"))]
-    DistilBert(DistilBertConfig),
 }
 
 #[no_mangle]

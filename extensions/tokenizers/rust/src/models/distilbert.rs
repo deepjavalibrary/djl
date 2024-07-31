@@ -329,6 +329,7 @@ impl Transformer {
 pub struct DistilBertModel {
     embeddings: Embeddings,
     transformer: Transformer,
+    #[allow(unused)]
     pub device: Device,
     span: tracing::Span,
 }
@@ -365,9 +366,6 @@ impl DistilBertModel {
 }
 
 impl Model for DistilBertModel {
-    fn is_padded(&self) -> bool {
-        true
-    }
 
     fn get_input_names(&self) -> Vec<String> {
         return vec!["input_ids".to_string(), "attention_mask".to_string()];
