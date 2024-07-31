@@ -68,7 +68,7 @@ fun prepareNativeLib(binaryRoot: String, ver: String, packageType: String?) {
 
     val officialPytorchUrl = "https://download.pytorch.org/libtorch"
     val aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
-    val cuda = "cu121"
+    val cuda = "cu124"
     if (packageType == "gpu") {
         // @formatter:off
         val files = mapOf(
@@ -171,18 +171,18 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
             val ompUrl = "https://publish.djl.ai/extra/macos-arm64/libomp.dylib"
             ompUrl.url into libomp
         }
-        if ("win-x86_64" in value) {
-            copy {
-                from("$outputDir/libtorch/lib/") {
-                    include("mkl_*.dll")
-                }
-                into("$outputDir/native/lib")
-            }
-            val mklUrl = "https://publish.djl.ai/extra/win-x86_64/mkl_def.1.dll"
-            mklUrl.url into outputDir / "native/lib/mkl_def.1.dll"
-            val vmlUrl = "https://publish.djl.ai/extra/win-x86_64/mkl_vml_def.1.dll"
-            vmlUrl.url into outputDir / "native/lib/mkl_vml_def.1.dll"
-        }
+//        if ("win-x86_64" in value) {
+//            copy {
+//                from("$outputDir/libtorch/lib/") {
+//                    include("mkl_*.dll")
+//                }
+//                into("$outputDir/native/lib")
+//            }
+//            val mklUrl = "https://publish.djl.ai/extra/win-x86_64/mkl_def.1.dll"
+//            mklUrl.url into outputDir / "native/lib/mkl_def.1.dll"
+//            val vmlUrl = "https://publish.djl.ai/extra/win-x86_64/mkl_vml_def.1.dll"
+//            vmlUrl.url into outputDir / "native/lib/mkl_vml_def.1.dll"
+//        }
         delete(file)
         delete(outputDir / "libtorch")
     }
@@ -245,9 +245,9 @@ tasks {
                     binaryRoot / "cpu/win-x86_64/native/lib/",
                     binaryRoot / "cpu-precxx11/linux-aarch64/native/lib/",
                     binaryRoot / "cpu-precxx11/linux-x86_64/native/lib/",
-                    binaryRoot / "cu121/linux-x86_64/native/lib/",
-                    binaryRoot / "cu121/win-x86_64/native/lib/",
-                    binaryRoot / "cu121-precxx11/linux-x86_64/native/lib/"
+                    binaryRoot / "cu124/linux-x86_64/native/lib/",
+                    binaryRoot / "cu124/win-x86_64/native/lib/",
+                    binaryRoot / "cu124-precxx11/linux-x86_64/native/lib/"
                 )
                 for (item in uploadDirs)
                     fileTree(item).files.map { it.name }.forEach {

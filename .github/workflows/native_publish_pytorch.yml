@@ -8,7 +8,7 @@ on:
           required: true
           default: 'snapshot'
         package_type:
-          description: 'cpu/gpu, default is gpu'
+          description: 'cpu/gpu, default is cpu'
           required: true
           default: 'cpu'
 

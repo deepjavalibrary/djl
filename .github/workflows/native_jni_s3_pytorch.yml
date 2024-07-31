@@ -9,7 +9,7 @@ on:
       cuda:
         description: 'CUDA version'
         required: true
-        default: 'cu121'
+        default: 'cu124'
   schedule:
     - cron: '0 5 * * *'
 
@@ -49,7 +49,7 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
           export TORCH_CUDA_ARCH_LIST="8.0 8.6 8.9 9.0"
           CUDA_VERSION=${{ github.event.inputs.cuda }}
-          export CUDA_VERSION=${CUDA_VERSION:-cu121}
+          export CUDA_VERSION=${CUDA_VERSION:-cu124}
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcuda=$CUDA_VERSION -Ppt_version=$PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
       - name: Configure AWS Credentials
@@ -144,7 +144,7 @@ jobs:
           set "CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.7"
           set "PATH=%CUDA_PATH%\bin;%CUDA_PATH%\libnvvp;%PATH%"
           set CUDA_VERSION=${{ github.event.inputs.cuda }}
-          if "%CUDA_VERSION%" == "" set CUDA_VERSION=cu121
+          if "%CUDA_VERSION%" == "" set CUDA_VERSION=cu124
           gradlew :engines:pytorch:pytorch-native:cleanJNI :engines:pytorch:pytorch-native:compileJNI -Pcuda=%CUDA_VERSION% -Ppt_version=${{ github.event.inputs.pt_version }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
