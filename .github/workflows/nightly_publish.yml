@@ -123,7 +123,7 @@ jobs:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: [ self-hosted, gpu ]
     container:
-      image: nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+      image: nvidia/cuda:12.4.1-devel-ubuntu22.04
       options: --gpus all --runtime=nvidia
     timeout-minutes: 30
     needs: create-runners
@@ -151,6 +151,8 @@ jobs:
           ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=TensorFlow
           ./gradlew :engines:pytorch:pytorch-model-zoo:test
           ./gradlew :engines:tensorflow:tensorflow-model-zoo:test
+          # manually install cudnn9, PyTorch doesn't work with cudnn9, but OnnxRuntime requires cudnn9
+          apt-get update && apt-get install -y --no-install-recommends libcudnn9-cuda-12
           ./gradlew :engines:onnxruntime:onnxruntime-engine:test
 
   publish:
