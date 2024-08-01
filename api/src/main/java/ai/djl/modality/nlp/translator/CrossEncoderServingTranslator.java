@@ -35,7 +35,7 @@ import java.util.List;
 /** A {@link Translator} that can handle generic cross encoder {@link Input} and {@link Output}. */
 public class CrossEncoderServingTranslator implements NoBatchifyTranslator<Input, Output> {
 
-    private static final Type LIST_TYPE = new TypeToken<List<String>>() {}.getType();
+    private static final Type LIST_TYPE = new TypeToken<List<StringPair>>() {}.getType();
 
     private Translator<StringPair, float[]> translator;
 
