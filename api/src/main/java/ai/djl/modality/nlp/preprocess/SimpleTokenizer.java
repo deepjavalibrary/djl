@@ -32,13 +32,13 @@ public class SimpleTokenizer implements Tokenizer {
         this.delimiter = delimiter;
     }
 
-    /** Creates an instance of {@code SimpleTokenizer} with the default delimiter. */
+    /** Creates an instance of {@code SimpleTokenizer} with the default delimiter (" "). */
     public SimpleTokenizer() {}
 
     /** {@inheritDoc} */
     @Override
     public List<String> tokenize(String sentence) {
-        return Arrays.asList(sentence.split(" "));
+        return Arrays.asList(sentence.split(delimiter));
     }
 
     /** {@inheritDoc} */
