@@ -280,7 +280,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
 
         private HuggingFaceTokenizer tokenizer;
         private Batchifier batchifier = Batchifier.STACK;
-        private boolean normalize = true;
+        private boolean normalize;
         private String pooling = "mean";
         private boolean includeTokenTypes;
         private String dense;
@@ -385,7 +385,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         public void configure(Map<String, ?> arguments) {
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
             optBatchifier(Batchifier.fromString(batchifierStr));
-            optNormalize(ArgumentsUtil.booleanValue(arguments, "normalize", true));
+            optNormalize(ArgumentsUtil.booleanValue(arguments, "normalize", false));
             optPoolingMode(ArgumentsUtil.stringValue(arguments, "pooling", "mean"));
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
             optDense(ArgumentsUtil.stringValue(arguments, "dense"));
