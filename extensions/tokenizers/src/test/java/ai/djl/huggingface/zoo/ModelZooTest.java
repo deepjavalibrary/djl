@@ -55,8 +55,8 @@ public class ModelZooTest {
         try (ZooModel<QAInput, String> model = criteria.loadModel();
                 Predictor<QAInput, String> predictor = model.newPredictor()) {
             QAInput input = new QAInput(question, paragraph);
-            String res = predictor.predict(input);
-            Assert.assertEquals(res, "december 2004");
+            String result = predictor.predict(input);
+            Assert.assertEquals(result, "december 2004");
         }
     }
 
@@ -101,7 +101,7 @@ public class ModelZooTest {
     }
 
     @Test
-    public void testOffLine() {
+    public void testOffline() {
         System.setProperty("DJL_CACHE_DIR", "build/cache");
         System.setProperty("ai.djl.offline", "true");
         try {
