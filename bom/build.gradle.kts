@@ -120,7 +120,7 @@ publishing {
                         +"ai.djl.mxnet:mxnet-native-mkl:$mxnet:linux-x86_64"
                         +"ai.djl.mxnet:mxnet-native-mkl:$mxnet:win-x86_64"
                         +"ai.djl.mxnet:mxnet-native-cu112mkl:$mxnet:linux-x86_64"
-                        var pytorch = "${libs.versions.pytorch.get()}-SNAPSHOT"
+                        var pytorch = "${libs.versions.pytorch.get()}"
                         +"ai.djl.pytorch:pytorch-native-cpu:$pytorch:osx-aarch64"
                         +"ai.djl.pytorch:pytorch-native-cpu:$pytorch:linux-x86_64"
                         +"ai.djl.pytorch:pytorch-native-cpu:$pytorch:win-x86_64"
