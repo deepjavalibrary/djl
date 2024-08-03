@@ -21,12 +21,12 @@ mike deploy "$VERSION_NUMBER" -F docs/mkdocs.yml -b gh-pages
 
 git checkout gh-pages
 
-echo "Attempting to update versions.json"
-curl -O https://docs.djl.ai/versions.json || echo "Unable to retrieve versions.json"
-DUPLICATE=$(jq --arg v "$VERSION_NUMBER" 'any(.version == $v)' versions.json) 
-if [ "$DUPLICATE" = "true" ]; then
-  echo "Version $VERSION_NUMBER already exists. Skipping update."
-else
-  jq --arg v "$VERSION_NUMBER" '([{"version": $v, "title": $v, "aliases": []}] + .)' versions.json > temp.json && mv temp.json versions.json
-  echo "Versions.json updated with $VERSION_NUMBER"
-fi
+echo "generating versions.json"
+current_version=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' "$BASE_DIR/../../gradle/libs.versions.toml" | awk -F '.' '{print $2}')
+versions='[{"version":"master","title":"master","aliases":[]}'
+for i in {1..4}; do
+  version="0.$((current_version - i)).0"
+  versions="$versions, {\"version\":\"$version\",\"title\":\"$version\",\"aliases\":[]}"
+done
+versions="$versions]"
+echo "$versions" | jq "." > "$BASE_DIR/../../versions.json"
