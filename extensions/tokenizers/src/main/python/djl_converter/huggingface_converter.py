@@ -111,7 +111,9 @@ class HuggingfaceConverter:
 
         config = AutoConfig.from_pretrained(model_id)
         if hasattr(config, "model_type"):
-            if config.model_type not in ["bert", "distilbert", "xlm-roberta"]:
+            if config.model_type not in [
+                    "bert", "camembert", "distilbert", "xlm-roberta", "roberta"
+            ]:
                 return False, f"Unsupported model_type: {config.model_type}", -1
         else:
             return False, f"Unknown model_type: {model_id}", -1

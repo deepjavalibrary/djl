@@ -116,6 +116,7 @@ impl Module for Dropout {
 
 // https://github.com/huggingface/transformers/blob/6eedfa6dd15dc1e22a55ae036f681914e5a0d9a1/src/transformers/models/bert/modeling_bert.py#L180
 struct BertEmbeddings {
+    config: XLMRobertaConfig,
     word_embeddings: Embedding,
     position_embeddings: Option<Embedding>,
     token_type_embeddings: Embedding,
@@ -147,6 +148,7 @@ impl BertEmbeddings {
             config.layer_norm_eps as f32,
         )?;
         Ok(Self {
+            config: config.clone(),
             word_embeddings,
             position_embeddings: Some(position_embeddings),
             token_type_embeddings,
@@ -163,8 +165,8 @@ impl BertEmbeddings {
         let token_type_embeddings = self.token_type_embeddings.forward(token_type_ids)?;
         let mut embeddings = (&input_embeddings + token_type_embeddings)?;
         if let Some(position_embeddings) = &self.position_embeddings {
-            // TODO: Proper absolute positions?
-            let position_ids = (0..seq_len as u32).collect::<Vec<_>>();
+            let position_offset = self.config.pad_token_id as u32 + 1;
+            let position_ids = (position_offset..(seq_len as u32 + position_offset)).collect::<Vec<_>>();
             let position_ids = Tensor::new(&position_ids[..], input_ids.device())?;
             embeddings = embeddings.broadcast_add(&position_embeddings.forward(&position_ids)?)?
         }
@@ -523,18 +525,13 @@ impl XLMRobertaModel {
             (Ok(embeddings), Ok(encoder)) => (embeddings, encoder),
             (Err(err), _) | (_, Err(err)) => {
                 if let (Ok(embeddings), Ok(encoder)) = (
-                    BertEmbeddings::load(vb.pp("roberta.embeddings".to_string()), config),
-                    BertEncoder::load(vb.pp("roberta.encoder".to_string()), config),
-                ) {
-                    (embeddings, encoder)
-                } else if let (Ok(embeddings), Ok(encoder)) = (
                     BertEmbeddings::load(vb.pp("xlm-roberta.embeddings".to_string()), config),
                     BertEncoder::load(vb.pp("xlm-roberta.encoder".to_string()), config),
                 ) {
                     (embeddings, encoder)
                 } else if let (Ok(embeddings), Ok(encoder)) = (
-                    BertEmbeddings::load(vb.pp("camembert.embeddings".to_string()), config),
-                    BertEncoder::load(vb.pp("camembert.encoder".to_string()), config),
+                    BertEmbeddings::load(vb.pp("roberta.embeddings".to_string()), config),
+                    BertEncoder::load(vb.pp("roberta.encoder".to_string()), config),
                 ) {
                     (embeddings, encoder)
                 } else {
@@ -619,7 +616,7 @@ impl Model for XLMRobertaForSequenceClassification {
         let embeddings = self
             .roberta
             .forward(input_ids, attention_mask, token_type_ids)?;
-        let sequence_output = embeddings.i(0)?;
+        let sequence_output = embeddings.i((.., 0))?;
         let logits = self.classifier.forward(&sequence_output)?;
         Ok(logits)
     }
