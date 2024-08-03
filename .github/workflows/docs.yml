@@ -65,7 +65,15 @@ jobs:
           ref: ${{ github.event.inputs.version-number }}
           path: docs/demos
 
-      - name: run Notebooks
+      - name: Cache Jupyter Notebooks
+        id: jupyter-notebooks-cache
+        uses: actions/cache@v4
+        with:
+          path: docs/demos/jupyter
+          key: ${{ runner.os }}-jupyter-${{ hashFiles('docs/demos/jupyter/*') }}
+          
+      - name: Run Notebooks
+        if: steps.jupyter-notebooks-cache.outputs.cache-hit != 'true'
         working-directory: docs/demos/jupyter
         env:
           DJL_DISABLE_PROGRESS_BAR: true
