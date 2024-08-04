@@ -6,7 +6,7 @@ This module contains the DJL ONNX Runtime engine for Android.
 ## Installation
 You can pull the ONNX Runtime for Android from the central Maven repository by including the following dependency:
 
-- ai.djl.android:onnxruntime:0.28.0
+- ai.djl.android:onnxruntime:0.29.0
 
 ```xml
 <dependency>
