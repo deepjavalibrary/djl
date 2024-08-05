@@ -43,7 +43,7 @@ def main():
 
         try:
             result, reason, size = converter.save_model(
-                model_info, args, temp_dir, True)
+                model_info, task, args, temp_dir, True)
             if not result:
                 logging.error(f"{model_info.modelId}: {reason}")
         except Exception as e:
