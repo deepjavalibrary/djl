@@ -52,18 +52,19 @@ class HuggingfaceConverter:
         self.outputs = None
         self.api = HfApi()
 
-    def save_model(self, model_info, args: Namespace, temp_dir: str,
+    def save_model(self, model_info, task: str, args: Namespace, temp_dir: str,
                    model_zoo: bool):
         if args.output_format == "OnnxRuntime":
-            return self.save_onnx_model(model_info, args, temp_dir, model_zoo)
+            return self.save_onnx_model(model_info, task, args, temp_dir,
+                                        model_zoo)
         elif args.output_format == "Rust":
             return self.save_rust_model(model_info, args, temp_dir, model_zoo)
         else:
             return self.save_pytorch_model(model_info, args, temp_dir,
                                            model_zoo)
 
-    def save_onnx_model(self, model_info, args: Namespace, temp_dir: str,
-                        model_zoo: bool):
+    def save_onnx_model(self, model_info, task: str, args: Namespace,
+                        temp_dir: str, model_zoo: bool):
         model_id = model_info.modelId
 
         if not os.path.exists(temp_dir):
@@ -82,6 +83,8 @@ class HuggingfaceConverter:
             sys.argv.extend(["--dtype", args.dtype])
         if args.trust_remote_code:
             sys.argv.append("--trust-remote-code")
+        if os.path.exists(model_id):
+            sys.argv.extend(["--task", task])
         sys.argv.append(temp_dir)
 
         main()
@@ -135,29 +138,46 @@ class HuggingfaceConverter:
             return False, "Failed to save tokenizer", -1
 
         # Save config.json
-        config_file = hf_hub_download(repo_id=model_id, filename="config.json")
+        if os.path.exists(model_id):
+            config_file = os.path.join(model_id, "config.json")
+        else:
+            config_file = hf_hub_download(repo_id=model_id,
+                                          filename="config.json")
+
         shutil.copyfile(config_file, os.path.join(temp_dir, "config.json"))
 
         target = os.path.join(temp_dir, "model.safetensors")
-        model = self.api.model_info(model_id, files_metadata=True)
-        has_sf_file = False
-        has_pt_file = False
-        for sibling in model.siblings:
-            if sibling.rfilename == "model.safetensors":
-                has_sf_file = True
-            elif sibling.rfilename == "pytorch_model.bin":
-                has_pt_file = True
 
-        if has_sf_file:
-            file = hf_hub_download(repo_id=model_id,
-                                   filename="model.safetensors")
-            shutil.copyfile(file, target)
-        elif has_pt_file:
-            file = hf_hub_download(repo_id=model_id,
-                                   filename="pytorch_model.bin")
-            convert_file(file, target)
+        if os.path.exists(model_id):
+            file = os.path.join(model_id, "model.safetensors")
+            if os.path.exists(file):
+                shutil.copyfile(file, target)
+            else:
+                file = os.path.join(model_id, "pytorch_model.bin")
+                if os.path.exists(file):
+                    convert_file(file, target)
+                else:
+                    return False, f"No model file found for: {model_id}", -1
         else:
-            return False, f"No model file found for: {model_id}", -1
+            model = self.api.model_info(model_id, files_metadata=True)
+            has_sf_file = False
+            has_pt_file = False
+            for sibling in model.siblings:
+                if sibling.rfilename == "model.safetensors":
+                    has_sf_file = True
+                elif sibling.rfilename == "pytorch_model.bin":
+                    has_pt_file = True
+
+            if has_sf_file:
+                file = hf_hub_download(repo_id=model_id,
+                                       filename="model.safetensors")
+                shutil.copyfile(file, target)
+            elif has_pt_file:
+                file = hf_hub_download(repo_id=model_id,
+                                       filename="pytorch_model.bin")
+                convert_file(file, target)
+            else:
+                return False, f"No model file found for: {model_id}", -1
 
         arguments = self.save_serving_properties(model_info, "Rust", temp_dir,
                                                  hf_pipeline, include_types)
@@ -191,8 +211,13 @@ class HuggingfaceConverter:
             return False, "Failed to save tokenizer", -1
 
         # Save config.json just for reference
-        config = hf_hub_download(repo_id=model_id, filename="config.json")
-        shutil.copyfile(config, os.path.join(temp_dir, "config.json"))
+        if os.path.exists(model_id):
+            config_file = os.path.join(model_id, "config.json")
+        else:
+            config_file = hf_hub_download(repo_id=model_id,
+                                          filename="config.json")
+
+        shutil.copyfile(config_file, os.path.join(temp_dir, "config.json"))
 
         # Save jit traced .pt file to temp dir
         include_types = "token_type_ids" in hf_pipeline.tokenizer.model_input_names

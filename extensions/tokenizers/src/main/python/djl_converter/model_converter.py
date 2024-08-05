@@ -10,15 +10,22 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS"
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
+import json
 import logging
 import os
 import sys
 
-from huggingface_hub import HfApi
-
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 from djl_converter.arg_parser import converter_args
+
+
+class ModelInfoHolder(object):
+
+    def __init__(self, model_id: str):
+        self.modelId = model_id
+        with open(os.path.join(model_id, "config.json")) as f:
+            self.config = json.load(f)
 
 
 def main():
@@ -38,10 +45,17 @@ def main():
         logging.error(f"output directory: {output_dir} is not empty.")
         return
 
-    api = HfApi()
-    model_info = api.model_info(args.model_id,
-                                revision=args.revision,
-                                token=args.token)
+    if os.path.exists(args.model_id):
+        logging.info(f"converting local model: {args.model_id}")
+        model_info = ModelInfoHolder(args.model_id)
+    else:
+        logging.info(f"converting HuggingFace hub model: {args.model_id}")
+        from huggingface_hub import HfApi
+
+        api = HfApi()
+        model_info = api.model_info(args.model_id,
+                                    revision=args.revision,
+                                    token=args.token)
 
     from djl_converter.huggingface_models import HuggingfaceModels, SUPPORTED_TASKS
 
@@ -51,14 +65,14 @@ def main():
             task = "sentence-similarity"
     if not task:
         logging.error(
-            f"Unsupported model architecture: {arch} for {model_id}.")
+            f"Unsupported model architecture: {arch} for {args.model_id}.")
         return
 
     converter = SUPPORTED_TASKS[task]
 
     try:
-        result, reason, _ = converter.save_model(model_info, args, output_dir,
-                                                 False)
+        result, reason, _ = converter.save_model(model_info, task, args,
+                                                 output_dir, False)
         if result:
             logging.info(f"Convert model {model_info.modelId} finished.")
         else:
