@@ -1,13 +1,14 @@
 name: Docs
-
 on:
-  pull_request:
-    paths:
-      - "docs/mkdocs.yml"
-  # Publish docs weekly
   schedule:
-    - cron:  '0 9 * * 1'
+    - cron: '0 9 * * 1'
   workflow_dispatch:
+    inputs:
+      version-number:
+        type: string
+        description: What is the new version number (ex. v0.28.0) for the website? If updating dev, leave this blank.
+        default: master
+        required: false
 
 jobs:
   documentation:
@@ -19,50 +20,81 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 17
+
       - name: Set up Python3
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+
       - name: Install CN fonts
         run: sudo apt-get update && sudo apt-get install fonts-arphic-uming
-      - name: install Python Dependencies
-        run: pip3 install nbconvert mkdocs==1.4.3 mkdocs-exclude mknotebooks mkdocs-material jupyter Pygments Markdown
+
+      - name: Install Python Dependencies
+        run: pip3 install nbconvert mkdocs==1.4.3 mkdocs-exclude mknotebooks mkdocs-material jupyter Pygments Markdown mike
+
+      - name: Cache IJava Kernel
+        id: ijava-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/jupyter/kernels/java
+          key: ${{ runner.os }}-ijava-kernel
+
       - name: Install IJava kernel
+        if: steps.ijava-cache.outputs.cache-hit != 'true'
         run: |
           git clone https://github.com/frankfliu/IJava.git
           cd IJava/
           ./gradlew installKernel
-      - name: checkout repo
+
+      - name: Checkout DJL Repo
         uses: actions/checkout@v4
-      - name: add mybinder link
-        run: |
-          python3 tools/scripts/add_online_runner.py
-      - name: clone demos
-        run: |
-          cd docs
-          git clone https://github.com/deepjavalibrary/djl-demo.git demos
-      - name: clone serving
-        run: |
-          cd docs
-          git clone https://github.com/deepjavalibrary/djl-serving.git serving
-      - name: run Notebooks
-        run: |
-          cd docs/demos/jupyter
-          bash test_notebook.sh
-      - name: build docs
-        run: |
-          cd docs
-          export DJL_DISABLE_PROGRESS_BAR=true
-          mkdocs build --site-dir ../../site
-      - name: Configure AWS Credentials
-        if: github.event_name != 'pull_request'
+        with:
+          ref: ${{ github.event.version-number }}
+
+      - name: Checkout DJL-Serving
+        uses: actions/checkout@v4
+        with:
+          repository: 'deepjavalibrary/djl-serving'
+          ref: ${{ github.event.inputs.version-number }}
+          path: docs/serving
+
+      - name: Checkout DJL-Demo
+        uses: actions/checkout@v4
+        with:
+          repository: 'deepjavalibrary/djl-demo'
+          ref: ${{ github.event.inputs.version-number }}
+          path: docs/demos
+
+      - name: Cache Jupyter Notebooks
+        id: jupyter-notebooks-cache
+        uses: actions/cache@v4
+        with:
+          path: docs/demos/jupyter
+          key: ${{ runner.os }}-jupyter-${{ hashFiles('docs/demos/jupyter/*') }}
+          
+      - name: Run Notebooks
+        if: steps.jupyter-notebooks-cache.outputs.cache-hit != 'true'
+        working-directory: docs/demos/jupyter
+        env:
+          DJL_DISABLE_PROGRESS_BAR: true
+        run: bash test_notebook.sh
+
+      - name: Build docs website
+        run: tools/scripts/build-website.sh "${{ github.event.inputs.version-number || 'master' }}"
+
+      - name: Configure Deployment AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
+
       - name: Copy files to S3 with the AWS CLI
-        if: github.event_name != 'pull_request'
+        env: 
+           DJL_VERSION: ${{ github.event.inputs.pt_version || 'master' }}
         run: |
-          aws s3 sync ../site s3://djl-ai/documentation/nightly --delete
+          aws s3 sync $DJL_VERSION s3://djl-ai/documentation/nightly/$DJL_VERSION --delete
+          aws s3 cp versions.json s3://djl-ai/documentation/nightly/versions.json
           aws cloudfront create-invalidation --distribution-id E733IIDCG0G5U --paths "/*"
+
+
