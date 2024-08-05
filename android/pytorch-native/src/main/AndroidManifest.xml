@@ -1,2 +1,1 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ai.djl.android.pytorch_native" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"/>
