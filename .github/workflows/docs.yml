@@ -91,10 +91,11 @@ jobs:
 
       - name: Copy files to S3 with the AWS CLI
         env: 
-           DJL_VERSION: ${{ github.event.inputs.pt_version || 'master' }}
+           DJL_VERSION: ${{ github.event.inputs.version-number || 'master' }}
         run: |
-          aws s3 sync $DJL_VERSION s3://djl-ai/documentation/nightly/$DJL_VERSION --delete
           aws s3 cp versions.json s3://djl-ai/documentation/nightly/versions.json
+          git checkout -f gh-pages
+          aws s3 sync $DJL_VERSION s3://djl-ai/documentation/nightly/$DJL_VERSION --delete
           aws cloudfront create-invalidation --distribution-id E733IIDCG0G5U --paths "/*"
 
 
