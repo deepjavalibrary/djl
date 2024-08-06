@@ -95,7 +95,7 @@ jobs:
 
       - name: Copy files to S3 with the AWS CLI
         env: 
-           DJL_VERSION: ${{ github.event.inputs.pt_version || 'master' }}
+           DJL_VERSION: ${{ github.event.inputs.version-number || 'master' }}
         run: |
           pwd
           ls
