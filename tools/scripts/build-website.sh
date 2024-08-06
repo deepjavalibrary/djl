@@ -3,6 +3,7 @@
 set -ex
 
 echo "generating versions.json"
+echo "$BASE_DIR" 
 current_version=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' "/home/runner/work/djl/djl/gradle/libs.versions.toml" | awk -F '.' '{print $2}')
 versions='[{"version":"master","title":"master","aliases":[]}'
 for i in {1..4}; do
