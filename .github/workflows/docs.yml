@@ -10,9 +10,12 @@ on:
         default: master
         required: false
 
+permissions:
+  id-token: write 
+  contents: read 
+
 jobs:
   documentation:
-    if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK 17
@@ -82,12 +85,13 @@ jobs:
       - name: Build docs website
         run: tools/scripts/build-website.sh "${{ github.event.inputs.version-number || 'master' }}"
 
-      - name: Configure Deployment AWS Credentials
+      - name: Configure AWS Test Credentials
         uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+        with: 
+          audience: sts.amazonaws.com
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::185921645874:role/UpdateWebsite
+          role-session-name: UpdateWebsite
 
       - name: Copy files to S3 with the AWS CLI
         env: 
