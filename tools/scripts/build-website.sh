@@ -22,13 +22,11 @@ mike deploy "$VERSION_NUMBER" -F docs/mkdocs.yml -b gh-pages
 git checkout gh-pages
 
 echo "generating versions.json"
-current_version=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' "$BASE_DIR/../../gradle/libs.versions.toml" | awk -F '.' '{print $2}')
+current_version=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' "$BASE_DIR/gradle/libs.versions.toml" | awk -F '.' '{print $2}')
 versions='[{"version":"master","title":"master","aliases":[]}'
 for i in {1..4}; do
   version="0.$((current_version - i)).0"
   versions="$versions, {\"version\":\"$version\",\"title\":\"$version\",\"aliases\":[]}"
 done
 versions="$versions]"
-echo "$BASE_DIR" 
-pwd
 echo "$versions" | jq "." > "./versions.json"
