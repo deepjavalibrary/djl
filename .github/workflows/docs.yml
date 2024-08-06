@@ -97,9 +97,9 @@ jobs:
         env: 
            DJL_VERSION: ${{ github.event.inputs.version-number || 'master' }}
         run: |
-          pwd
-          ls
-          aws s3 sync ./$DJL_VERSION s3://updated-documentation-website/website/$DJL_VERSION --delete
           aws s3 cp ./versions.json s3://updated-documentation-website/website/versions.json
+          git checkout -f gh-pages
+          aws s3 sync ./$DJL_VERSION s3://updated-documentation-website/website/$DJL_VERSION --delete
+          
 
 
