@@ -22,6 +22,7 @@ import ai.djl.modality.nlp.translator.QATranslator;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.TranslatorContext;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ public class PtBertQATranslator extends QATranslator {
 
     PtBertQATranslator(Builder builder) {
         super(builder);
+        batchifier = null; // PtBertQATranslator doesn't support batch
     }
 
     /** {@inheritDoc} */
@@ -74,11 +76,11 @@ public class PtBertQATranslator extends QATranslator {
         long[] indices = tokens.stream().mapToLong(vocabulary::getIndex).toArray();
         long[] attentionMask = token.getAttentionMask().stream().mapToLong(i -> i).toArray();
         NDList ndList = new NDList(3);
-        ndList.add(manager.create(indices));
-        ndList.add(manager.create(attentionMask));
+        ndList.add(manager.create(indices, new Shape(1, indices.length)));
+        ndList.add(manager.create(attentionMask, new Shape(1, attentionMask.length)));
         if (includeTokenTypes) {
             long[] tokenTypes = token.getTokenTypes().stream().mapToLong(i -> i).toArray();
-            ndList.add(manager.create(tokenTypes));
+            ndList.add(manager.create(tokenTypes, new Shape(1, tokenTypes.length)));
         }
         return ndList;
     }
