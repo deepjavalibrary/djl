@@ -29,4 +29,6 @@ for i in {1..4}; do
   versions="$versions, {\"version\":\"$version\",\"title\":\"$version\",\"aliases\":[]}"
 done
 versions="$versions]"
-echo "$versions" | jq "." > "$BASE_DIR/../../versions.json"
+echo "$BASE_DIR" 
+pwd
+echo "$versions" | jq "." > "./versions.json"
