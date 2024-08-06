@@ -71,7 +71,7 @@ jobs:
         with:
           path: docs/demos/jupyter
           key: ${{ runner.os }}-jupyter-${{ hashFiles('docs/demos/jupyter/*') }}
-          
+
       - name: Run Notebooks
         if: steps.jupyter-notebooks-cache.outputs.cache-hit != 'true'
         working-directory: docs/demos/jupyter
@@ -90,12 +90,11 @@ jobs:
           aws-region: us-east-2
 
       - name: Copy files to S3 with the AWS CLI
-        env: 
-           DJL_VERSION: ${{ github.event.inputs.version-number || 'master' }}
+        env:
+          DJL_VERSION: ${{ github.event.inputs.version-number || 'master' }}
         run: |
-          aws s3 cp versions.json s3://djl-ai/documentation/nightly/versions.json
-          git checkout -f gh-pages
           aws s3 sync $DJL_VERSION s3://djl-ai/documentation/nightly/$DJL_VERSION --delete
+          aws s3 cp versions.json s3://djl-ai/documentation/nightly/versions.json
           aws cloudfront create-invalidation --distribution-id E733IIDCG0G5U --paths "/*"
 
 
