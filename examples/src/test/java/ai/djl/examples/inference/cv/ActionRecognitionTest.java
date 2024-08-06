@@ -10,12 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.cv.InstanceSegmentation;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
@@ -23,13 +21,13 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-public class InstanceSegmentationTest {
+public class ActionRecognitionTest {
 
     @Test
-    public void testInstanceSegmentation() throws ModelException, TranslateException, IOException {
-        DetectedObjects result = InstanceSegmentation.predict();
+    public void testActionRecognition() throws ModelException, TranslateException, IOException {
+        Classifications result = ActionRecognition.predict();
         Classifications.Classification best = result.best();
-        Assert.assertEquals(best.getClassName(), "bicycle");
-        Assert.assertTrue(Double.compare(best.getProbability(), 0.7) > 0);
+        Assert.assertEquals(best.getClassName(), "Dancing");
+        Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
     }
 }

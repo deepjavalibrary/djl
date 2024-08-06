@@ -10,16 +10,16 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.cv.ObjectDetectionWithTensorflowSavedModel;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -27,23 +27,22 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class ObjectDetectionWithTensorflowSavedModelTest {
+public class ObjectDetectionTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(ObjectDetectionTest.class);
 
     @Test
     public void testObjectDetection() throws ModelException, TranslateException, IOException {
-        // Only run nightly, this example download the synset file from github, this can cause
-        // throttling and will fail the test.
         TestRequirements.linux();
-        TestRequirements.nightly();
-        TestRequirements.notGpu();
 
-        DetectedObjects result = ObjectDetectionWithTensorflowSavedModel.predict();
+        DetectedObjects result = ObjectDetection.predict();
+        logger.info("{}", result);
 
-        Assert.assertEquals(result.getNumberOfObjects(), 3);
+        Assert.assertTrue(result.getNumberOfObjects() >= 3);
+        Classifications.Classification obj = result.best();
+        String className = obj.getClassName();
         List<String> objects = Arrays.asList("dog", "bicycle", "car");
-        for (Classifications.Classification obj : result.items()) {
-            Assert.assertTrue(objects.contains(obj.getClassName()));
-            Assert.assertTrue(Double.compare(obj.getProbability(), 0.7) > 0);
-        }
+        Assert.assertTrue(objects.contains(className));
+        Assert.assertTrue(obj.getProbability() > 0.6);
     }
 }

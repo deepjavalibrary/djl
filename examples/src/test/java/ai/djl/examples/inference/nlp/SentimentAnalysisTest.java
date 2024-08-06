@@ -10,9 +10,10 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.nlp;
 
 import ai.djl.ModelException;
+import ai.djl.modality.Classifications;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
@@ -20,24 +21,15 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-public class UniversalSentenceEncoderTest {
+public class SentimentAnalysisTest {
 
     @Test
     public void testSentimentAnalysis() throws ModelException, TranslateException, IOException {
         TestRequirements.linux();
         TestRequirements.nightly();
-        TestRequirements.notGpu();
 
-        List<String> inputs = new ArrayList<>();
-        inputs.add("The quick brown fox jumps over the lazy dog.");
-        inputs.add("I am a sentence for which I would like to get its embedding");
-
-        float[][] result = UniversalSentenceEncoder.predict(inputs);
-        Assert.assertNotNull(result);
-
-        Assert.assertEquals(result[0][0], -0.031330183, 0.0001);
+        Classifications result = SentimentAnalysis.predict();
+        Assert.assertEquals(result.best().getClassName(), "Positive");
     }
 }

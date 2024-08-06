@@ -11,11 +11,9 @@
  * and limitations under the License.
  */
 
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.timeseries;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.timeseries.AirPassengersDeepAR;
-import ai.djl.examples.inference.timeseries.M5ForecastingDeepAR;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 

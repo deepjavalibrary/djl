@@ -10,10 +10,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.sr.SuperResolution;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.testing.TestRequirements;
@@ -24,27 +23,18 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
-public class SuperResolutionTest {
+public class StyleTransferTest {
 
     @Test
-    public void testSuperResolution() throws ModelException, TranslateException, IOException {
+    public void testStyleTransfer() throws IOException, ModelException, TranslateException {
         TestRequirements.linux();
-        TestRequirements.notGpu();
 
-        String imagePath = "src/test/resources/";
-        Image fox = ImageFactory.getInstance().fromFile(Paths.get(imagePath + "fox.png"));
-        List<Image> inputImages = Arrays.asList(fox, fox);
+        String imagePath = "src/test/resources/mountains.png";
+        Image input = ImageFactory.getInstance().fromFile(Paths.get(imagePath));
+        Image generatedImage = StyleTransfer.transfer(input, StyleTransfer.Artist.MONET);
 
-        List<Image> enhancedImages = SuperResolution.enhance(inputImages);
-
-        Assert.assertEquals(enhancedImages.size(), 2);
-        int size = 4 * fox.getWidth();
-        for (Image img : enhancedImages) {
-            Assert.assertEquals(img.getWidth(), size);
-            Assert.assertEquals(img.getHeight(), size);
-        }
+        Assert.assertEquals(generatedImage.getWidth(), input.getWidth());
+        Assert.assertEquals(generatedImage.getHeight(), input.getHeight());
     }
 }

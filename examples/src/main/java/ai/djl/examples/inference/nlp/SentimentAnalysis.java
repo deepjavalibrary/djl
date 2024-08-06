@@ -11,9 +11,8 @@
  * and limitations under the License.
  */
 
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.nlp;
 
-import ai.djl.Application;
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.ModelException;
@@ -58,8 +57,8 @@ public final class SentimentAnalysis {
 
         Criteria<String, Classifications> criteria =
                 Criteria.builder()
-                        .optApplication(Application.NLP.SENTIMENT_ANALYSIS)
                         .setTypes(String.class, Classifications.class)
+                        .optModelUrls("djl://ai.djl.pytorch/distilbert")
                         .optEngine("PyTorch")
                         // This model was traced on CPU and can only run on CPU
                         .optDevice(Device.cpu())

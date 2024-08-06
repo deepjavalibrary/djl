@@ -10,11 +10,11 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.sr;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.cv.BigGAN;
 import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
@@ -22,19 +22,28 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
-public class BigGANTest {
+public class SuperResolutionTest {
 
     @Test
-    public void testBigGAN() throws ModelException, TranslateException, IOException {
+    public void testSuperResolution() throws ModelException, TranslateException, IOException {
         TestRequirements.linux();
+        TestRequirements.notGpu();
 
-        Image[] generatedImages = BigGAN.generate();
+        String imagePath = "src/test/resources/";
+        Image fox = ImageFactory.getInstance().fromFile(Paths.get(imagePath + "fox.png"));
+        List<Image> inputImages = Arrays.asList(fox, fox);
 
-        Assert.assertEquals(generatedImages.length, 5);
-        for (Image img : generatedImages) {
-            Assert.assertEquals(img.getWidth(), 256);
-            Assert.assertEquals(img.getHeight(), 256);
+        List<Image> enhancedImages = SuperResolution.enhance(inputImages);
+
+        Assert.assertEquals(enhancedImages.size(), 2);
+        int size = 4 * fox.getWidth();
+        for (Image img : enhancedImages) {
+            Assert.assertEquals(img.getWidth(), size);
+            Assert.assertEquals(img.getHeight(), size);
         }
     }
 }
