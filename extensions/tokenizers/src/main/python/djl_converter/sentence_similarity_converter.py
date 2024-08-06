@@ -20,7 +20,6 @@ import torch
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 
 from djl_converter.huggingface_converter import HuggingfaceConverter, PipelineHolder
-from huggingface_hub import hf_hub_download
 
 
 class SentenceSimilarityConverter(HuggingfaceConverter):
@@ -63,7 +62,7 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
                 'sentence_xlnet_config.json'
         ]:
             try:
-                file = hf_hub_download(repo_id=model_id, filename=config_name)
+                file = self.get_file(model_id, config_name)
                 with open(file) as f:
                     config = json.load(f)
                     if config.get("max_seq_length"):
@@ -75,7 +74,7 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
             except requests.exceptions.HTTPError:
                 pass
 
-        if not "maxLength" in args:
+        if "maxLength" not in args:
             if hasattr(hf_pipeline.model, "config"):
                 config = hf_pipeline.model.config
             else:
@@ -92,7 +91,7 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
         layer_norm_path = None
         normalize = False
         try:
-            file = hf_hub_download(repo_id=model_id, filename="modules.json")
+            file = self.get_file(model_id, "modules.json")
             with open(file, "r") as f:
                 modules = json.load(f)
 
@@ -113,8 +112,7 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
 
         if pooling_path:
             try:
-                file = hf_hub_download(repo_id=model_id,
-                                       filename=f"{pooling_path}/config.json")
+                file = self.get_file(model_id, f"{pooling_path}/config.json")
                 if os.path.exists(file):
                     with open(file, "r") as f:
                         pooling = json.load(f)
@@ -134,8 +132,7 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
 
         if dense_path:
             try:
-                file = hf_hub_download(repo_id=model_id,
-                                       filename=f"{dense_path}/config.json")
+                file = self.get_file(model_id, f"{dense_path}/config.json")
                 with open(file, "r") as f:
                     dense = json.load(f)
                     activation = dense.get("activation_function")
@@ -166,6 +163,5 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
     @staticmethod
     def save_module_weight(model_id: str, temp_dir: str, layer: str,
                            name: str):
-        file = hf_hub_download(repo_id=model_id,
-                               filename=f"{layer}/model.safetensors")
+        file = self.get_file(model_id, f"{layer}/model.safetensors")
         shutil.copyfile(file, os.path.join(temp_dir, f"{name}.safetensors"))

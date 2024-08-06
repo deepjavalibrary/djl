@@ -138,12 +138,7 @@ class HuggingfaceConverter:
             return False, "Failed to save tokenizer", -1
 
         # Save config.json
-        if os.path.exists(model_id):
-            config_file = os.path.join(model_id, "config.json")
-        else:
-            config_file = hf_hub_download(repo_id=model_id,
-                                          filename="config.json")
-
+        config_file = self.get_file(model_id, "config.json")
         shutil.copyfile(config_file, os.path.join(temp_dir, "config.json"))
 
         target = os.path.join(temp_dir, "model.safetensors")
@@ -169,12 +164,10 @@ class HuggingfaceConverter:
                     has_pt_file = True
 
             if has_sf_file:
-                file = hf_hub_download(repo_id=model_id,
-                                       filename="model.safetensors")
+                file = self.get_file(model_id, "model.safetensors")
                 shutil.copyfile(file, target)
             elif has_pt_file:
-                file = hf_hub_download(repo_id=model_id,
-                                       filename="pytorch_model.bin")
+                file = self.get_file(model_id, "pytorch_model.bin")
                 convert_file(file, target)
             else:
                 return False, f"No model file found for: {model_id}", -1
@@ -211,12 +204,7 @@ class HuggingfaceConverter:
             return False, "Failed to save tokenizer", -1
 
         # Save config.json just for reference
-        if os.path.exists(model_id):
-            config_file = os.path.join(model_id, "config.json")
-        else:
-            config_file = hf_hub_download(repo_id=model_id,
-                                          filename="config.json")
-
+        config_file = self.get_file(model_id, "config.json")
         shutil.copyfile(config_file, os.path.join(temp_dir, "config.json"))
 
         # Save jit traced .pt file to temp dir
@@ -371,6 +359,13 @@ class HuggingfaceConverter:
             return False, "Failed to run inference on jit model"
 
         return self.verify_jit_output(hf_pipeline, encoding, out)
+
+    @staticmethod
+    def get_file(model_id: str, file_name: str) -> str:
+        if os.path.exists(model_id):
+            return os.path.join(model_id, file_name)
+        else:
+            return hf_hub_download(repo_id=model_id, filename=file_name)
 
     def get_extra_arguments(self, hf_pipeline, model_id: str,
                             temp_dir: str) -> dict:

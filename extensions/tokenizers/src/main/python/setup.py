@@ -35,8 +35,8 @@ if __name__ == '__main__':
     version = detect_version()
 
     requirements = [
-        'huggingface_hub', 'transformers', 'sentence_transformers', 'torch',
-        'optimum[exporters,onnxruntime]', 'safetensors'
+        'huggingface-hub', 'transformers', 'sentence-transformers', 'torch',
+        'optimum[exporters,onnxruntime]', 'safetensors', 'requests'
     ]
 
     setup(name='djl_converter',
