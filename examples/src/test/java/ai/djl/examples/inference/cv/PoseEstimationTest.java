@@ -10,31 +10,23 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.cv;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.face.FeatureExtraction;
-import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.ImageFactory;
-import ai.djl.testing.TestRequirements;
+import ai.djl.modality.cv.output.Joints;
 import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-public class FeatureExtractionTest {
+public class PoseEstimationTest {
 
     @Test
-    public void testFeatureComparison() throws ModelException, TranslateException, IOException {
-        TestRequirements.linux();
-
-        Path imageFile = Paths.get("src/test/resources/kana1.jpg");
-        Image img = ImageFactory.getInstance().fromFile(imageFile);
-        float[] feature = FeatureExtraction.predict(img);
-        Assert.assertEquals(feature.length, 512);
+    public void testPoseEstimation() throws ModelException, TranslateException, IOException {
+        Joints[] result = PoseEstimation.predict();
+        Assert.assertEquals(result.length, 3);
+        Assert.assertEquals(result[0].getJoints().size(), 17);
     }
 }

@@ -10,25 +10,33 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.face;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.cv.ActionRecognition;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
-public class ActionRecognitionTest {
+public class LightFaceDetectionTest {
 
     @Test
-    public void testActionRecognition() throws ModelException, TranslateException, IOException {
-        Classifications result = ActionRecognition.predict();
-        Classifications.Classification best = result.best();
-        Assert.assertEquals(best.getClassName(), "Dancing");
-        Assert.assertTrue(Double.compare(best.getProbability(), 0.9) > 0);
+    public void testLightFaceDetection() throws ModelException, TranslateException, IOException {
+        TestRequirements.linux();
+
+        DetectedObjects result = LightFaceDetection.predict();
+
+        List<String> objects = Collections.singletonList("Face");
+        for (Classifications.Classification obj : result.items()) {
+            Assert.assertTrue(objects.contains(obj.getClassName()));
+            Assert.assertTrue(Double.compare(obj.getProbability(), 0.6) > 0);
+        }
     }
 }

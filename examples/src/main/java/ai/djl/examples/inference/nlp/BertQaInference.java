@@ -11,11 +11,10 @@
  * and limitations under the License.
  */
 
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.nlp;
 
-import ai.djl.Application;
-import ai.djl.Device;
 import ai.djl.ModelException;
+import ai.djl.huggingface.translator.QuestionAnsweringTranslatorFactory;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.nlp.qa.QAInput;
 import ai.djl.repository.zoo.Criteria;
@@ -65,11 +64,11 @@ public final class BertQaInference {
 
         Criteria<QAInput, String> criteria =
                 Criteria.builder()
-                        .optApplication(Application.NLP.QUESTION_ANSWER)
                         .setTypes(QAInput.class, String.class)
-                        .optFilter("backbone", "bert")
+                        .optModelUrls(
+                                "djl://ai.djl.huggingface.pytorch/deepset/minilm-uncased-squad2")
                         .optEngine("PyTorch")
-                        .optDevice(Device.cpu())
+                        .optTranslatorFactory(new QuestionAnsweringTranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
 

@@ -50,7 +50,7 @@ Note that you need to click the download model button to find the actual Google 
 Please refer to these two examples:
 
 1. [Object Detection with TensorFlow](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/cv/ObjectDetection.java) for loading from TensorFlow Hub url.
-2. [BERT Classification](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/BertClassification.java) for loading from local downloaded model.
+2. [BERT Classification](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/nlp/BertClassification.java) for loading from local downloaded model.
 
 ## How to import TensorFlow models that use [TensorFlow Extensions](https://www.tensorflow.org/resources/libraries-extensions)
 
@@ -68,7 +68,7 @@ This is a text encoder from tensorflow hub that uses ops from the TensorFlow Tex
 - You need to download the library files for the extension so that we can load them for use. [Here](https://github.com/tensorflow/text#install-using-pip) are instructions for downloading TensorFlow text. We'll use version `2.7.0` in this example.
 - After the library files are downloaded, you are ready to load them for use in DJL. You do this by using
 TensorFlow Java `TensorFlow.loadLibrary(...)` API before loading the model in DJL. 
-- We can update the existing [UniversalSentenceEncoder](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/UniversalSentenceEncoder.java) example to use the Multilingual model:
+- We can update the existing [UniversalSentenceEncoder](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/nlp/UniversalSentenceEncoder.java) example to use the Multilingual model:
 
 ```java
 // Build Criteria for Multilingual Universal Sentence Encoder from TensorFlow Hub

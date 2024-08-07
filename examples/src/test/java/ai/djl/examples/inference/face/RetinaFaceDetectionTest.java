@@ -10,40 +10,33 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.face;
 
 import ai.djl.ModelException;
-import ai.djl.examples.inference.cv.ObjectDetection;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class ObjectDetectionTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(ObjectDetectionTest.class);
+public class RetinaFaceDetectionTest {
 
     @Test
-    public void testObjectDetection() throws ModelException, TranslateException, IOException {
+    public void testRetinaFaceDetection() throws ModelException, TranslateException, IOException {
         TestRequirements.linux();
+        TestRequirements.nightly();
+        DetectedObjects result = RetinaFaceDetection.predict();
 
-        DetectedObjects result = ObjectDetection.predict();
-        logger.info("{}", result);
-
-        Assert.assertTrue(result.getNumberOfObjects() >= 3);
-        Classifications.Classification obj = result.best();
-        String className = obj.getClassName();
-        List<String> objects = Arrays.asList("dog", "bicycle", "car");
-        Assert.assertTrue(objects.contains(className));
-        Assert.assertTrue(obj.getProbability() > 0.6);
+        List<String> objects = Collections.singletonList("Face");
+        for (Classifications.Classification obj : result.items()) {
+            Assert.assertTrue(objects.contains(obj.getClassName()));
+            Assert.assertTrue(Double.compare(obj.getProbability(), 0.6) > 0);
+        }
     }
 }

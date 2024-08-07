@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -10,10 +10,11 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package ai.djl.examples.inference;
+package ai.djl.examples.inference.face;
 
 import ai.djl.ModelException;
-import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
@@ -21,15 +22,18 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-public class SentimentAnalysisTest {
+public class FeatureExtractionTest {
 
     @Test
-    public void testSentimentAnalysis() throws ModelException, TranslateException, IOException {
+    public void testFeatureComparison() throws ModelException, TranslateException, IOException {
         TestRequirements.linux();
-        TestRequirements.nightly();
 
-        Classifications result = SentimentAnalysis.predict();
-        Assert.assertEquals(result.best().getClassName(), "Positive");
+        Path imageFile = Paths.get("src/test/resources/kana1.jpg");
+        Image img = ImageFactory.getInstance().fromFile(imageFile);
+        float[] feature = FeatureExtraction.predict(img);
+        Assert.assertEquals(feature.length, 512);
     }
 }
