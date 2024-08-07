@@ -1,7 +1,8 @@
-huggingface_hub
+huggingface-hub
 transformers
-sentence_transformers
+sentence-transformers
 torch
 protobuf==3.20.2
 optimum[exporters,onnxruntime]
 safetensors
+requests
