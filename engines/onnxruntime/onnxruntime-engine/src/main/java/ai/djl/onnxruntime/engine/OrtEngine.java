@@ -115,7 +115,7 @@ public final class OrtEngine extends Engine {
                 sessionOptions.addCUDA();
                 return true;
             } catch (OrtException e) {
-                logger.warn("CUDA is not supported OnnxRuntime engine: " + e.getMessage());
+                logger.warn("CUDA is not supported OnnxRuntime engine: {}", e.getMessage());
                 return false;
             }
         }
