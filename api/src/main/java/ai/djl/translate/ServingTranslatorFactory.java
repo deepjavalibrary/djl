@@ -97,7 +97,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             Constructor<? extends TranslatorFactory> constructor = subclass.getConstructor();
             return constructor.newInstance();
         } catch (Throwable e) {
-            logger.trace("Not able to load TranslatorFactory: " + className, e);
+            logger.trace("Not able to load TranslatorFactory: {}", className, e);
         }
         return null;
     }

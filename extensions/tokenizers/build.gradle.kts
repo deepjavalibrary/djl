@@ -81,7 +81,7 @@ tasks {
             for (task in tasks) {
                 var file = prefix / task / "ai.djl.huggingface.pytorch.json"
                 if (file.exists())
-                    project.logger.lifecycle("PyTorch model zoo metadata alrady exists: $task")
+                    project.logger.lifecycle("PyTorch model zoo metadata already exists: $task")
                 else {
                     project.logger.lifecycle("Downloading PyTorch model zoo metadata: $task")
                     file.parentFile.mkdirs()
