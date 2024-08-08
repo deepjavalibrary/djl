@@ -12,7 +12,6 @@
  */
 package ai.djl.examples.training;
 
-import ai.djl.engine.Engine;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 
@@ -25,14 +24,7 @@ public class TrainMnistWithLSTMTest {
 
     @Test
     public void testTrainMnistWithLSTM() throws IOException, TranslateException {
-        String[] args;
-        Engine engine = Engine.getEngine("PyTorch");
-        if (engine.getGpuCount() > 0) {
-            // TODO: PyTorch -- cuDNN error: CUDNN_STATUS_VERSION_MISMATCH
-            args = new String[] {"-g", "1", "-e", "1", "-m", "2", "--engine", "MXNet"};
-        } else {
-            args = new String[] {"-g", "1", "-e", "1", "-m", "2"};
-        }
+        String[] args = {"-g", "1", "-e", "1", "-m", "2"};
         TrainingResult result = TrainMnistWithLSTM.runExample(args);
         Assert.assertNotNull(result);
     }

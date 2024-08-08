@@ -29,6 +29,7 @@ public class TrainSentimentAnalysisTest {
         TestRequirements.nightly();
         TestRequirements.gpu("MXNet", 1);
 
+        // TODO: Add a PyTorch Glove model to model zoo
         String[] args = {"-e", "1", "-g", "1", "--engine", "MXNet"};
         TrainSentimentAnalysis.runExample(args);
     }
