@@ -43,7 +43,7 @@ def main():
 
     if os.listdir(output_dir):
         logging.error(f"output directory: {output_dir} is not empty.")
-        return
+        return False
 
     if os.path.exists(args.model_id):
         logging.info(f"converting local model: {args.model_id}")
@@ -66,7 +66,7 @@ def main():
     if not task:
         logging.error(
             f"Unsupported model architecture: {arch} for {args.model_id}.")
-        return
+        return False
 
     converter = SUPPORTED_TASKS[task]
 
@@ -75,12 +75,16 @@ def main():
                                                  output_dir, False)
         if result:
             logging.info(f"Convert model {model_info.modelId} finished.")
+            return True
         else:
             logging.error(f"{model_info.modelId}: {reason}")
     except Exception as e:
         logging.warning(f"Failed to convert model: {model_info.modelId}.")
         logging.warning(e, exc_info=True)
 
+    return False
+
 
 if __name__ == "__main__":
-    main()
+    if not main():
+        sys.exit(1)
