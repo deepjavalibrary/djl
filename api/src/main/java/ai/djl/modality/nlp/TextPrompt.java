@@ -71,6 +71,12 @@ public final class TextPrompt {
      */
     public static TextPrompt parseInput(Input input) throws TranslateException {
         String contentType = input.getProperty("Content-Type", null);
+        if (contentType != null) {
+            int pos = contentType.indexOf(';');
+            if (pos > 0) {
+                contentType = contentType.substring(0, pos);
+            }
+        }
         String text = input.getData().getAsString();
         if (!"application/json".equals(contentType)) {
             return new TextPrompt(text);

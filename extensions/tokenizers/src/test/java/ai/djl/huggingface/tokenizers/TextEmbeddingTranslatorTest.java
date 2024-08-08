@@ -213,7 +213,7 @@ public class TextEmbeddingTranslatorTest {
             Map<String, String> map = new HashMap<>();
             map.put("inputs", text);
             input.add(JsonUtils.GSON.toJson(map));
-            input.addProperty("Content-Type", "application/json");
+            input.addProperty("Content-Type", "application/json; charset=utf-8");
             out = predictor.predict(input);
             res = (float[]) out.getData().getAsObject();
             Assert.assertEquals(res.length, 384);

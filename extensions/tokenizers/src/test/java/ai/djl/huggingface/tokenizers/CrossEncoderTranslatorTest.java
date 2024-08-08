@@ -38,11 +38,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CrossEncoderTranslatorTest {
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCrossEncoderTranslator()
             throws ModelException, IOException, TranslateException {
         String text1 = "Sentence 1";
@@ -117,6 +119,48 @@ public class CrossEncoderTranslatorTest {
             input.add("value", text2);
             Output res = predictor.predict(input);
             float[] buf = (float[]) res.getData().getAsObject();
+            Assert.assertEquals(buf[0], 0.32455865, 0.0001);
+
+            input = new Input();
+            input.add("text", text1);
+            input.add("text_pair", text2);
+            res = predictor.predict(input);
+            buf = (float[]) res.getData().getAsObject();
+            Assert.assertEquals(buf[0], 0.32455865, 0.0001);
+
+            input = new Input();
+            input.addProperty("Content-Type", "application/json; charset=utf-8");
+            input.add("data", "{\"text\": \"" + text1 + "\", \"text_pair\": \"" + text2 + "\"}");
+            res = predictor.predict(input);
+            buf = (float[]) res.getData().getAsObject();
+            Assert.assertEquals(buf[0], 0.32455865, 0.0001);
+
+            input = new Input();
+            input.addProperty("Content-Type", "application/json; charset=utf-8");
+            input.add("data", "{\"key\": \"" + text1 + "\", \"value\": \"" + text2 + "\"}");
+            res = predictor.predict(input);
+            buf = (float[]) res.getData().getAsObject();
+            Assert.assertEquals(buf[0], 0.32455865, 0.0001);
+
+            input = new Input();
+            input.addProperty("Content-Type", "application/json");
+            input.add("data", "{\"query\": \"" + text1 + "\", \"texts\": [\"" + text2 + "\"]}");
+            res = predictor.predict(input);
+            buf = ((List<float[]>) res.getData().getAsObject()).get(0);
+            Assert.assertEquals(buf[0], 0.32455865, 0.0001);
+
+            input = new Input();
+            input.addProperty("Content-Type", "application/json");
+            input.add("data", "{\"query\": \"" + text1 + "\", \"texts\": [\"" + text2 + "\"]}");
+            res = predictor.predict(input);
+            buf = ((List<float[]>) res.getData().getAsObject()).get(0);
+            Assert.assertEquals(buf[0], 0.32455865, 0.0001);
+
+            input = new Input();
+            input.addProperty("Content-Type", "application/json");
+            input.add("data", "[{\"text\": \"" + text1 + "\", \"text_pair\": \"" + text2 + "\"}]");
+            res = predictor.predict(input);
+            buf = ((List<float[]>) res.getData().getAsObject()).get(0);
             Assert.assertEquals(buf[0], 0.32455865, 0.0001);
 
             Assert.assertThrows(TranslateException.class, () -> predictor.predict(new Input()));
