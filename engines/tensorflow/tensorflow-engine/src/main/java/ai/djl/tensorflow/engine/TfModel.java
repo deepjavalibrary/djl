@@ -91,8 +91,8 @@ public class TfModel extends BaseModel {
                 configProto = (ConfigProto) config;
             } else if (config instanceof String) {
                 try {
-                    byte[] buf = Base64.getDecoder().decode((String) config);
-                    configProto = ConfigProto.parseFrom(buf);
+                    byte[] buffer = Base64.getDecoder().decode((String) config);
+                    configProto = ConfigProto.parseFrom(buffer);
                 } catch (InvalidProtocolBufferException e) {
                     throw new MalformedModelException("Invalid ConfigProto: " + config, e);
                 }
@@ -102,8 +102,8 @@ public class TfModel extends BaseModel {
                 runOptions = (RunOptions) run;
             } else if (run instanceof String) {
                 try {
-                    byte[] buf = Base64.getDecoder().decode((String) run);
-                    runOptions = RunOptions.parseFrom(buf);
+                    byte[] buffer = Base64.getDecoder().decode((String) run);
+                    runOptions = RunOptions.parseFrom(buffer);
                 } catch (InvalidProtocolBufferException e) {
                     throw new MalformedModelException("Invalid RunOptions: " + run, e);
                 }
