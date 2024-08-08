@@ -123,7 +123,7 @@ public class QuestionAnsweringTranslatorTest {
                     TranslateException.class,
                     () -> {
                         Input req = new Input();
-                        req.addProperty("Content-Type", "application/json");
+                        req.addProperty("Content-Type", "application/json; charset=utf-8");
                         req.add("Invalid json");
                         predictor.predict(req);
                     });

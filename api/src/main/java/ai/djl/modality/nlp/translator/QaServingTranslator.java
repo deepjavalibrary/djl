@@ -65,6 +65,12 @@ public class QaServingTranslator implements NoBatchifyTranslator<Input, Output> 
         }
 
         String contentType = input.getProperty("Content-Type", null);
+        if (contentType != null) {
+            int pos = contentType.indexOf(';');
+            if (pos > 0) {
+                contentType = contentType.substring(0, pos);
+            }
+        }
         QAInput qa;
         if ("application/json".equals(contentType)) {
             String json = input.getData().getAsString();
