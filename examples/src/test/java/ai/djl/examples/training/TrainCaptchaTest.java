@@ -27,7 +27,22 @@ public class TrainCaptchaTest {
     public void testTrainCaptcha() throws IOException, TranslateException {
         TestRequirements.linux();
 
-        // TODO: PyTorch -- cuDNN error: CUDNN_STATUS_VERSION_MISMATCH
+        // TODO: PyTorch
+        /*
+        ai.djl.engine.EngineException: index 11 is out of bounds for dimension 1 with size 11
+            at app//ai.djl.pytorch.jni.PyTorchLibrary.torchGather(Native Method)
+            at app//ai.djl.pytorch.jni.JniUtils.pick(JniUtils.java:581)
+            at app//ai.djl.pytorch.jni.JniUtils.indexAdv(JniUtils.java:417)
+            at app//ai.djl.pytorch.engine.PtNDArrayIndexer.get(PtNDArrayIndexer.java:74)
+            at app//ai.djl.ndarray.NDArray.get(NDArray.java:614)
+            at app//ai.djl.ndarray.NDArray.get(NDArray.java:603)
+            at app//ai.djl.training.loss.SoftmaxCrossEntropyLoss.evaluate(SoftmaxCrossEntropyLoss.java:86)
+            at app//ai.djl.training.loss.IndexLoss.evaluate(IndexLoss.java:55)
+            at app//ai.djl.training.loss.AbstractCompositeLoss.evaluate(AbstractCompositeLoss.java:68)
+            at app//ai.djl.training.EasyTrain.trainSplit(EasyTrain.java:124)
+            at app//ai.djl.training.EasyTrain.trainBatch(EasyTrain.java:110)
+            at app//ai.djl.training.EasyTrain.fit(EasyTrain.java:58)
+         */
         String[] args = new String[] {"-g", "1", "-e", "1", "-m", "2", "--engine", "MXNet"};
         TrainingResult result = TrainCaptcha.runExample(args);
         Assert.assertNotNull(result);

@@ -36,7 +36,6 @@ public class TrainResNetTest {
 
         // Limit max 4 gpu for cifar10 training to make it converge faster.
         // and only train 10 batch for unit test.
-        // only MXNet support symbolic model
         String[] args = {"-e", "2", "-g", "4", "-m", "10", "-p"};
         TrainingResult result = TrainResnetWithCifar10.runExample(args);
 
