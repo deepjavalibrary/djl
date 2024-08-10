@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
@@ -243,6 +244,17 @@ public final class MRL {
      */
     public List<Artifact> listArtifacts() throws IOException {
         return getMetadata().getArtifacts();
+    }
+
+    /**
+     * Returns {@code true} if the artifact is ready for use.
+     *
+     * @param artifact the artifact to prepare
+     * @return {@code true} if the artifact is ready for use
+     * @throws IOException if it failed to prepare
+     */
+    public boolean isPrepared(Artifact artifact) throws IOException {
+        return Files.exists(repository.getResourceDirectory(artifact));
     }
 
     /**
