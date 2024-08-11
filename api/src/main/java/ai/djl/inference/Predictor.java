@@ -61,25 +61,26 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <ul>
  *   <li><a
- *       href="http://docs.djl.ai/docs/demos/jupyter/tutorial/03_image_classification_with_your_model.html">Inference
+ *       href="https://docs.djl.ai/master/docs/demos/jupyter/tutorial/03_image_classification_with_your_model.html">Inference
  *       with a custom trained model</a>
  *   <li><a
- *       href="http://docs.djl.ai/docs/demos/jupyter/object_detection_with_model_zoo.html">Inference
+ *       href="https://docs.djl.ai/master/docs/demos/jupyter/object_detection_with_model_zoo.html">Inference
  *       with a model zoo model</a>
- *   <li><a href="http://docs.djl.ai/docs/demos/jupyter/load_mxnet_model.html">Inference with an
- *       MXNet model</a>
+ *   <li><a href="https://docs.djl.ai/master/docs/demos/jupyter/load_mxnet_model.html">Inference
+ *       with an MXNet model</a>
  * </ul>
  *
  * @param <I> the input type
  * @param <O> the output type
  * @see Model
  * @see Translator
- * @see <a href="http://docs.djl.ai/docs/development/memory_management.html">The guide on memory
- *     management</a>
+ * @see <a href="https://docs.djl.ai/master/docs/development/memory_management.html">The guide on
+ *     memory management</a>
  * @see <a
  *     href="https://github.com/deepjavalibrary/djl/blob/master/examples/docs/multithread_inference.md">The
  *     guide on running multi-threaded inference</a>
- * @see <a href="http://docs.djl.ai/docs/development/inference_performance_optimization.html">The
+ * @see <a
+ *     href="https://docs.djl.ai/master/docs/development/inference_performance_optimization.html">The
  *     guide on inference performance optimization</a>
  */
 public class Predictor<I, O> implements AutoCloseable {

@@ -20,14 +20,14 @@ Note: when searching in JavaDoc, if your access is denied, please try removing t
 - [Troubleshooting](development/troubleshooting.md)
 - [Inference Optimization](development/inference_performance_optimization.md)
 
-## [Jupyter notebook tutorials](http://docs.djl.ai/docs/demos/jupyter/index.html)
+## [Jupyter notebook tutorials](https://docs.djl.ai/master/docs/demos/jupyter/index.html)
 
-- **[Beginner Jupyter Tutorial](http://docs.djl.ai/docs/demos/jupyter/tutorial/index.html)**
-- [Run object detection with model zoo](http://docs.djl.ai/docs/demos/jupyter/object_detection_with_model_zoo.html)
-- [Load pre-trained PyTorch model](http://docs.djl.ai/docs/demos/jupyter/load_pytorch_model.html)
-- [Load pre-trained Apache MXNet model](http://docs.djl.ai/docs/demos/jupyter/load_mxnet_model.html)
-- [Transfer learning example](http://docs.djl.ai/docs/demos/jupyter/transfer_learning_on_cifar10.html)
-- [Question answering example](http://docs.djl.ai/docs/demos/jupyter/BERTQA.html)
+- **[Beginner Jupyter Tutorial](https://docs.djl.ai/master/docs/demos/jupyter/tutorial/index.html)**
+- [Run object detection with model zoo](https://docs.djl.ai/master/docs/demos/jupyter/object_detection_with_model_zoo.html)
+- [Load pre-trained PyTorch model](https://docs.djl.ai/master/docs/demos/jupyter/load_pytorch_model.html)
+- [Load pre-trained Apache MXNet model](https://docs.djl.ai/master/docs/demos/jupyter/load_mxnet_model.html)
+- [Transfer learning example](https://docs.djl.ai/master/docs/demos/jupyter/transfer_learning_on_cifar10.html)
+- [Question answering example](https://docs.djl.ai/master/docs/demos/jupyter/BERTQA.html)
 
 ## [API Examples](../examples/README.md)
 

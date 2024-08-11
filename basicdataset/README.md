@@ -4,7 +4,7 @@
 
 This module contains a number of basic and standard datasets in the Deep Java Library's (DJL). These datasets are used to train deep learning models.
 
-You can find the datasets provided by this module on our [docs](http://docs.djl.ai/docs/dataset.html).
+You can find the datasets provided by this module on our [docs](https://docs.djl.ai/master/docs/dataset.html).
 
 ## Documentation
 

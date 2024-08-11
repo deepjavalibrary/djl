@@ -27,7 +27,7 @@ let app = new Vue({
             },
             {
                 name: 'Tutorial',
-                url: 'https://docs.djl.ai/docs/demos/jupyter/tutorial/index.html'
+                url: 'https://docs.djl.ai/master/docs/demos/jupyter/tutorial/index.html'
             },
             {
                 name: 'Examples',
@@ -49,7 +49,7 @@ let app = new Vue({
         page1: {
             title: 'Deep Java Library',
             abstract: 'Open source library to build and deploy deep learning in Java',
-            getStartUtl: 'https://docs.djl.ai/docs/quick_start.html',
+            getStartUtl: 'https://docs.djl.ai/master/docs/quick_start.html',
             gitHubUrl: 'https://github.com/deepjavalibrary/djl',
         },
         page2: {
@@ -92,7 +92,7 @@ let app = new Vue({
         page5: {
             title: 'About Us',
             abstract: 'Built with ❤️ for the Java community by',
-            contactUrl: 'https://docs.djl.ai/leaders.html',
+            contactUrl: 'https://docs.djl.ai/master/leaders.html',
             leadrs: [
                 {
                     name: 'anthony',

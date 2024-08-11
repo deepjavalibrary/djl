@@ -23,8 +23,8 @@ import java.util.concurrent.ExecutorService;
 /**
  * An interface to represent a set of sample data/label pairs to train a model.
  *
- * @see <a href="http://docs.djl.ai/docs/dataset.html">The guide to datasets</a>
- * @see <a href="http://docs.djl.ai/docs/development/how_to_use_dataset.html">The guide to
+ * @see <a href="https://docs.djl.ai/master/docs/dataset.html">The guide to datasets</a>
+ * @see <a href="https://docs.djl.ai/master/docs/development/how_to_use_dataset.html">The guide to
  *     implementing a custom dataset</a>
  */
 public interface Dataset {

@@ -151,7 +151,7 @@ Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/5
 
 * [DJL Website](https://djl.ai/)
 * [Documentation](https://docs.djl.ai/)
-* [DJL Demos](https://docs.djl.ai/docs/demos/index.html)
+* [DJL Demos](https://docs.djl.ai/master/docs/demos/index.html)
 * [Dive into Deep Learning Book Java version](https://d2l.djl.ai/)
 
 ## License

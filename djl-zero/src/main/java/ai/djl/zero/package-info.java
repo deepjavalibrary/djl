@@ -14,6 +14,6 @@
 /**
  * Contains a zero deep learning knowledge required wrapper over DJL.
  *
- * <p><a href="https://docs.djl.ai/zero/index.html">See more details</a>.
+ * <p><a href="https://docs.djl.ai/master/zero/index.html">See more details</a>.
  */
 package ai.djl.zero;
