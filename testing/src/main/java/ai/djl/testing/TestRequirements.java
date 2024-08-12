@@ -51,16 +51,24 @@ public final class TestRequirements {
         }
     }
 
-    /** Requires a test have at least one gpu. */
-    public static void gpu() {
-        if (Engine.getInstance().getGpuCount() == 0) {
+    /**
+     * Requires a test have at least one gpu.
+     *
+     * @param engineName the engine name
+     */
+    public static void gpu(String engineName) {
+        if (Engine.getEngine(engineName).getGpuCount() == 0) {
             throw new SkipException("This test requires a GPU to run");
         }
     }
 
-    /** Requires the test runs on non-GPU. */
-    public static void notGpu() {
-        if (Engine.getInstance().getGpuCount() > 0) {
+    /**
+     * Requires the test runs on non-GPU.
+     *
+     * @param engineName the engine name
+     */
+    public static void notGpu(String engineName) {
+        if (Engine.getEngine(engineName).getGpuCount() > 0) {
             throw new SkipException("This test requires non-GPU to run");
         }
     }
