@@ -116,7 +116,7 @@ The following pseudocode demonstrates how to create a `DeepARTranslator` with `a
 If you want to customize your own time series model translator, you can easily use the transform
 package for your data preprocess.
 
-See [examples](src/test/java/ai/djl/timeseries/translator/DeepARTranslatorTest.java) for more details.
+See [examples](https://github.com/deepjavalibrary/djl/blob/master/extensions/timeseries/src/test/java/ai/djl/timeseries/translator/DeepARTranslatorTest.java) for more details.
 
 ## Simple Example
 
@@ -223,7 +223,7 @@ Since djl doesn't support drawing yet, you can find our script for visualization
 [here](https://gist.github.com/Carkham/a5162c9298bc51fec648a458a3437008).
 
 The **full source code** for this example is available
-[here](../../examples/src/main/java/ai/djl/examples/inference/timeseries/AirPassengersDeepAR.java)
+[here](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/inference/timeseries/AirPassengersDeepAR.java)
 
 ## Documentation
 

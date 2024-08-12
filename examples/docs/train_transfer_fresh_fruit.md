@@ -26,7 +26,7 @@ The example is structured as follows:
 3. The demonstration of transfer learning in Java
 4. Experiment on the reduction of the training data size
 
-The full source code is available [here](../src/main/java/ai/djl/examples/training/transferlearning/TransferFreshFruit.java).
+The full source code is available [here](https://github.com/deepjavalibrary/djl/blob/master/examples/src/main/java/ai/djl/examples/training/transferlearning/TransferFreshFruit.java).
 
 ## The data set and the problem formulation
 In this example, we demonstrate with the [fruit fresh and rotten dataset](https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification),
