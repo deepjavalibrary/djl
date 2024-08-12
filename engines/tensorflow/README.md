@@ -5,7 +5,7 @@ This directory contains the Deep Java Library (DJL) EngineProvider for TensorFlo
 It is based off the [TensorFlow Deep Learning Framework](https://www.tensorflow.org/).
 
 The DJL TensorFlow Engine allows you to run prediction with TensorFlow or Keras models using Java.
-Refer to [How to import TensorFlow models](https://docs.djl.ai/docs/tensorflow/how_to_import_tensorflow_models_in_DJL.html) for loading TF models in DJL.
+Refer to [How to import TensorFlow models](https://docs.djl.ai/master/docs/tensorflow/how_to_import_tensorflow_models_in_DJL.html) for loading TF models in DJL.
 
 ## Modules
 

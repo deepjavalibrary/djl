@@ -48,10 +48,10 @@ import java.util.regex.Pattern;
  * contain methods to detect information about the usable machine hardware and to create a new
  * {@link NDManager} and {@link Model}.
  *
- * @see <a href="http://docs.djl.ai/docs/engine.html">Engine Guide</a>
+ * @see <a href="https://docs.djl.ai/master/docs/engine.html">Engine Guide</a>
  * @see EngineProvider
- * @see <a href="http://docs.djl.ai/docs/development/cache_management.html">The guide on resource
- *     and engine caching</a>
+ * @see <a href="https://docs.djl.ai/master/docs/development/cache_management.html">The guide on
+ *     resource and engine caching</a>
  */
 public abstract class Engine {
 

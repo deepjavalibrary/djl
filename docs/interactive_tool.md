@@ -63,7 +63,7 @@ After that, click `run` and you should see the following result:
 
 Finally, you can get the running project setup by clicking `Get Template`. This will bring you a gradle project that can be used in your local machine.
 
-## [Java Jupyter Notebook](http://docs.djl.ai/docs/demos/jupyter/index.html)
+## [Java Jupyter Notebook](https://docs.djl.ai/master/docs/demos/jupyter/index.html)
 
 Wait a second, are we talking about hosting Jupyter Notebook in python? 
 No, it’s Java 11, only.
@@ -71,6 +71,6 @@ No, it’s Java 11, only.
 ![jupyter](https://djl-ai.s3.amazonaws.com/web-data/images/jupyter.gif)
 
 Inspired by Spencer Park’s [IJava project](https://github.com/SpencerPark/IJava), we integrated DJL with Jupyter Notebooks. 
-For more information on the simple setup, follow the instructions in [DJL Jupyter notebooks](http://docs.djl.ai/docs/demos/jupyter/index.html#setup).
+For more information on the simple setup, follow the instructions in [DJL Jupyter notebooks](https://docs.djl.ai/master/docs/demos/jupyter/index.html#setup).
 After that, use the Jupyter Notebook freely in your hosted server. You can do all kinds of work, like block building and plotting a graph.
-There are [tutorials and instructions](http://docs.djl.ai/docs/demos/jupyter/index.html#djl---jupyter-notebooks) to guide you how you can run training and/or inference with Java.
+There are [tutorials and instructions](https://docs.djl.ai/master/docs/demos/jupyter/index.html#djl---jupyter-notebooks) to guide you how you can run training and/or inference with Java.

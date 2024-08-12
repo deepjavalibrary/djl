@@ -67,7 +67,7 @@ public final class PtEngine extends Engine {
                 logger.info(
                         "PyTorch graph executor optimizer is enabled, this may impact your"
                             + " inference latency and throughput. See:"
-                            + " https://docs.djl.ai/docs/development/inference_performance_optimization.html#graph-executor-optimization");
+                            + " https://docs.djl.ai/master/docs/development/inference_performance_optimization.html#graph-executor-optimization");
             }
             logger.info("Number of inter-op threads is {}", JniUtils.getNumInteropThreads());
             logger.info("Number of intra-op threads is {}", JniUtils.getNumThreads());

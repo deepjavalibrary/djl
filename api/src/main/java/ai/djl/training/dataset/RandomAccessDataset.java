@@ -42,7 +42,7 @@ import java.util.stream.IntStream;
  *
  * <p>Almost all datasets in DJL extend, either directly or indirectly, {@link RandomAccessDataset}.
  *
- * @see <a href="http://docs.djl.ai/docs/development/how_to_use_dataset.html">The guide to
+ * @see <a href="https://docs.djl.ai/master/docs/development/how_to_use_dataset.html">The guide to
  *     implementing a custom dataset</a>
  */
 public abstract class RandomAccessDataset implements Dataset {

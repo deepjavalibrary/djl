@@ -116,7 +116,7 @@ For more information on saving, loading and exporting checkpoints, please refer 
 
 ## How to load DJL TensorFlow model zoo models
 
-The steps are the same as loading any other DJL model zoo models, you can use the `Criteria` API as documented [here](https://docs.djl.ai/docs/load_model.html#criteria-class).
+The steps are the same as loading any other DJL model zoo models, you can use the `Criteria` API as documented [here](https://docs.djl.ai/master/docs/load_model.html#criteria-class).
 
 Note for TensorFlow image classification models, you need to manually specify the translator instead of using the built-in one because
 TensorFlow requires channels last ("NHWC") image formats while DJL use channels first ("NCHW") image formats. By default, DJL will add

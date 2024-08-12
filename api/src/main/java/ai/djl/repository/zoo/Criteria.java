@@ -53,8 +53,8 @@ import java.util.Set;
  *         .build();
  * </pre>
  *
- * <p>See <a href="http://docs.djl.ai/docs/load_model.html#criteria-class">Model loading</a> for
- * more detail.
+ * <p>See <a href="https://docs.djl.ai/master/docs/load_model.html#criteria-class">Model loading</a>
+ * for more detail.
  *
  * @param <I> the model input type
  * @param <O> the model output type

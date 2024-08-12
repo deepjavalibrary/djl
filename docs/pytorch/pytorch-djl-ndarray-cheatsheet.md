@@ -3,7 +3,7 @@
 In the following examples, we assume
 
 - `manager` is an instance of `ai.djl.ndarray.NDManager`
-    - it is recommended to look through https://docs.djl.ai/docs/development/memory_management.html
+    - it is recommended to look through https://docs.djl.ai/master/docs/development/memory_management.html
       in advance so that you can get better insight of `NDManager`
 - `$tensor` is a placeholder for an instance of `torch.tensor`
 - `$ndarray` is a placeholder for an instance of `ai.djl.ndarray.NDArray`

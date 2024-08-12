@@ -204,7 +204,7 @@ ensorflow.so: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `CXXABI_1.3.11' 
 nsorflow/cache/2.3.1-cu101-linux-x86_64/libtensorflow.so.2)
 ```
 
-Please upgrade gcc version according to the steps on [TensorFlow install page](https://docs.djl.ai/engines/tensorflow/index.html#note)
+Please upgrade gcc version according to the steps on [TensorFlow install page](https://docs.djl.ai/master/engines/tensorflow/index.html#note)
 
 ## 9. X11 error when running object detection notebooks on EC2 instances.
 

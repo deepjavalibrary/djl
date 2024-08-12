@@ -52,16 +52,17 @@ import java.util.function.Consumer;
  *
  * <ul>
  *   <li><a
- *       href="http://docs.djl.ai/docs/demos/jupyter/tutorial/02_train_your_first_model.html">Training
+ *       href="https://docs.djl.ai/master/docs/demos/jupyter/tutorial/02_train_your_first_model.html">Training
  *       your first model</a>
- *   <li><a href="http://docs.djl.ai/docs/demos/jupyter/transfer_learning_on_cifar10.html">Training
+ *   <li><a
+ *       href="https://docs.djl.ai/master/docs/demos/jupyter/transfer_learning_on_cifar10.html">Training
  *       using transfer learning</a>
- *   <li><a href="http://docs.djl.ai/docs/demos/jupyter/load_mxnet_model.html">Inference with an
- *       MXNet model</a>
+ *   <li><a href="https://docs.djl.ai/master/docs/demos/jupyter/load_mxnet_model.html">Inference
+ *       with an MXNet model</a>
  * </ul>
  *
- * @see <a href="http://docs.djl.ai/docs/development/memory_management.html">The guide on memory
- *     management</a>
+ * @see <a href="https://docs.djl.ai/master/docs/development/memory_management.html">The guide on
+ *     memory management</a>
  */
 public class Trainer implements AutoCloseable {
 

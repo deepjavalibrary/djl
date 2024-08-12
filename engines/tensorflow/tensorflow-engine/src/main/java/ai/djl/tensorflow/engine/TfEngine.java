@@ -68,7 +68,7 @@ public final class TfEngine extends Engine implements AutoCloseable {
                                 + " native library.\n"
                                 + "It can be installed or upgraded through gcc by following the"
                                 + " instructions on the TensorFlow install page:"
-                                + " https://docs.djl.ai/engines/tensorflow/index.html#note";
+                                + " https://docs.djl.ai/master/engines/tensorflow/index.html#note";
                 throw new EngineException(msg, t);
             }
 

@@ -105,6 +105,6 @@ img.save(out2, "png");
 ```
 
 ## Useful Information
-If you want to learn more about loading models, click [here](http://docs.djl.ai/docs/load_model.html).
+If you want to learn more about loading models, click [here](https://docs.djl.ai/master/docs/load_model.html).
 
-If you want to learn more about the model zoo, click [here](http://docs.djl.ai/docs/model-zoo.html).
+If you want to learn more about the model zoo, click [here](https://docs.djl.ai/master/docs/model-zoo.html).

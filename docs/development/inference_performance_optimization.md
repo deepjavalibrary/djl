@@ -15,13 +15,13 @@ For engines that are thread-safe, we do nothing and for ones that are not, we wi
 
 Therefore, we recommend creating a new [Predictor](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/inference/Predictor.html) for each thread.
 That Predictor should be reused if the thread does multiple predictions.
-Alternatively, you can also use a pool of Predictors or you can leverage the [DJL Serving WorkLoadManager](http://docs.djl.ai/docs/serving/wlm/index.html).
+Alternatively, you can also use a pool of Predictors or you can leverage the [DJL Serving WorkLoadManager](https://docs.djl.ai/master/docs/serving/wlm/index.html).
 
 For a reference implementation, see [Multi-threaded Benchmark](https://github.com/deepjavalibrary/djl-serving/blob/master/benchmark/src/main/java/ai/djl/benchmark/MultithreadedBenchmark.java).
 
 In addition, you may need to set engine-specific configurations as well.
 Engine-specific details are given below.
-You can also reference the [list of all DJL system configurations](http://docs.djl.ai/docs/serving/serving/docs/configurations.html).
+You can also reference the [list of all DJL system configurations](https://docs.djl.ai/master/docs/serving/serving/docs/configurations.html).
 
 ### Apache MXNet
 
