@@ -9,6 +9,7 @@ use crate::{cast_handle, drop_handle, to_handle};
 mod binary;
 mod cmp;
 mod creation;
+mod nn;
 mod other;
 mod reduce;
 mod unary;

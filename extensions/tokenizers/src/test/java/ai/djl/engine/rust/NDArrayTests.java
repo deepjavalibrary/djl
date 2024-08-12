@@ -18,6 +18,7 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Activation;
 import ai.djl.testing.Assertions;
 import ai.djl.testing.TestRequirements;
 
@@ -212,6 +213,70 @@ public class NDArrayTests {
 
             result = array.split(new long[] {0});
             Assert.assertEquals(result.singletonOrThrow(), array);
+        }
+    }
+
+    @Test
+    public void testSoftmax() {
+        try (NDManager manager = NDManager.newBaseManager("Rust")) {
+            NDArray array = manager.ones(new Shape(10));
+            NDArray expected = manager.zeros(new Shape(10)).add(0.1f);
+            Assertions.assertAlmostEquals(array.softmax(0), expected);
+            // test multi-dim
+            array = manager.ones(new Shape(2, 3, 1, 3));
+            expected = manager.zeros(new Shape(2, 3, 1, 3)).add(0.5f);
+            Assertions.assertAlmostEquals(array.softmax(0), expected);
+            expected = manager.zeros(new Shape(2, 3, 1, 3)).add(0.33333334f);
+            Assertions.assertAlmostEquals(array.softmax(1), expected);
+            expected = manager.ones(new Shape(2, 3, 1, 3));
+            Assertions.assertAlmostEquals(array.softmax(2), expected);
+            expected = manager.zeros(new Shape(2, 3, 1, 3)).add(0.33333334f);
+            Assertions.assertAlmostEquals(array.softmax(3), expected);
+            // test scalar
+            array = manager.create(1f);
+            Assertions.assertAlmostEquals(array.softmax(0), array);
+            // test zero
+            array = manager.create(new Shape(2, 0, 1));
+            Assertions.assertAlmostEquals(array.softmax(0), array);
+        }
+    }
+
+    @Test
+    public void testLogSoftmax() {
+        try (NDManager manager = NDManager.newBaseManager("Rust")) {
+            NDArray array = manager.ones(new Shape(10));
+            NDArray expected = manager.zeros(new Shape(10)).add(-2.3025851f);
+            Assertions.assertAlmostEquals(array.logSoftmax(0), expected);
+            // test multi-dim
+            array = manager.ones(new Shape(2, 3, 1, 3));
+            expected = manager.zeros(new Shape(2, 3, 1, 3)).add(-0.6931472f);
+            Assertions.assertAlmostEquals(array.logSoftmax(0), expected);
+            expected = manager.zeros(new Shape(2, 3, 1, 3)).add(-1.0986123f);
+            Assertions.assertAlmostEquals(array.logSoftmax(1), expected);
+            // test scalar
+            array = manager.create(1f);
+            Assertions.assertAlmostEquals(array.softmax(0), array);
+            // test zero
+            array = manager.create(new Shape(2, 0, 1));
+            Assertions.assertAlmostEquals(array.softmax(0), array);
+        }
+    }
+
+    @Test
+    public void testSigmoid() {
+        try (NDManager manager = NDManager.newBaseManager("Rust")) {
+            NDArray data = manager.create(new float[] {0});
+            NDArray expected = manager.create(new float[] {0.5f});
+            Assertions.assertAlmostEquals(Activation.sigmoid(data), expected);
+        }
+    }
+
+    @Test
+    public void testLeakyRelu() {
+        try (NDManager manager = NDManager.newBaseManager("Rust")) {
+            NDArray data = manager.create(new float[] {-1, 0, 2});
+            NDArray expected = manager.create(new float[] {-1, 0, 2});
+            Assert.assertEquals(Activation.leakyRelu(data, 1.0f), expected);
         }
     }
 

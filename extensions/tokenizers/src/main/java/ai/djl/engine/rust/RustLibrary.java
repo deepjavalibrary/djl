@@ -322,13 +322,9 @@ public final class RustLibrary {
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    public static long softmax(long handle, int axis) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
+    public static native long softmax(long handle, int axis);
 
-    public static long logSoftmax(long handle, int axis) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
+    public static native long logSoftmax(long handle, int axis);
 
     public static native long cumSum(long handle, int axis);
 
@@ -400,9 +396,7 @@ public final class RustLibrary {
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    public static long sigmoid(long handle) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
+    public static native long sigmoid(long handle);
 
     public static long softPlus(long handle) {
         throw new UnsupportedOperationException("Not implemented");
@@ -412,9 +406,7 @@ public final class RustLibrary {
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    public static long leakyRelu(long handle, float alpha) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
+    public static native long leakyRelu(long handle, float alpha);
 
     public static long elu(long handle, float alpha) {
         throw new UnsupportedOperationException("Not implemented");

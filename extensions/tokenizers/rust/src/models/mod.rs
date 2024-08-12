@@ -6,18 +6,18 @@ mod xlm_roberta;
 
 use crate::ndarray::as_data_type;
 use crate::{cast_handle, drop_handle, to_handle, to_string_array};
-use candle::{DType, Device, Result, Tensor, Error};
-use candle_nn::VarBuilder;
-use bert::{BertConfig, BertModel, BertForSequenceClassification};
+use bert::{BertConfig, BertForSequenceClassification, BertModel};
 use camembert::{CamembertConfig, CamembertModel};
+use candle::{DType, Device, Error, Result, Tensor};
+use candle_nn::VarBuilder;
 use distilbert::{DistilBertConfig, DistilBertModel};
-use roberta::{RobertaConfig, RobertaModel, RobertaForSequenceClassification};
-use xlm_roberta::{XLMRobertaConfig, XLMRobertaModel, XLMRobertaForSequenceClassification};
 use jni::objects::{JLongArray, JObject, JString, ReleaseMode};
 use jni::sys::{jint, jlong, jobjectArray};
 use jni::JNIEnv;
+use roberta::{RobertaConfig, RobertaForSequenceClassification, RobertaModel};
 use serde::Deserialize;
 use std::path::PathBuf;
+use xlm_roberta::{XLMRobertaConfig, XLMRobertaForSequenceClassification, XLMRobertaModel};
 
 #[derive(Debug, PartialEq, Clone)]
 #[allow(dead_code, unused)]
@@ -40,7 +40,6 @@ enum Config {
 }
 
 pub(crate) trait Model {
-
     fn get_input_names(&self) -> Vec<String>;
 
     fn forward(
@@ -109,7 +108,9 @@ fn load_model<'local>(
             config.use_flash_attn = Some(use_flash_attn);
             match config.architectures.first() {
                 Some(arch) => match arch.as_str() {
-                    "BertForSequenceClassification" => Ok(Box::new(BertForSequenceClassification::load(vb, &config)?)),
+                    "BertForSequenceClassification" => {
+                        Ok(Box::new(BertForSequenceClassification::load(vb, &config)?))
+                    }
                     _ => Ok(Box::new(BertModel::load(vb, &config)?)),
                 },
                 None => Ok(Box::new(BertModel::load(vb, &config)?)),
@@ -125,7 +126,9 @@ fn load_model<'local>(
             config.use_flash_attn = Some(use_flash_attn);
             match config.architectures.first() {
                 Some(arch) => match arch.as_str() {
-                    "RobertaForSequenceClassification" => Ok(Box::new(RobertaForSequenceClassification::load(vb, &config)?)),
+                    "RobertaForSequenceClassification" => Ok(Box::new(
+                        RobertaForSequenceClassification::load(vb, &config)?,
+                    )),
                     _ => Ok(Box::new(RobertaModel::load(vb, &config)?)),
                 },
                 None => Ok(Box::new(RobertaModel::load(vb, &config)?)),
@@ -136,7 +139,9 @@ fn load_model<'local>(
             config.use_flash_attn = Some(use_flash_attn);
             match config.architectures.first() {
                 Some(arch) => match arch.as_str() {
-                    "XLMRobertaForSequenceClassification" => Ok(Box::new(XLMRobertaForSequenceClassification::load(vb, &config)?)),
+                    "XLMRobertaForSequenceClassification" => Ok(Box::new(
+                        XLMRobertaForSequenceClassification::load(vb, &config)?,
+                    )),
                     _ => Ok(Box::new(XLMRobertaModel::load(vb, &config)?)),
                 },
                 None => Ok(Box::new(XLMRobertaModel::load(vb, &config)?)),

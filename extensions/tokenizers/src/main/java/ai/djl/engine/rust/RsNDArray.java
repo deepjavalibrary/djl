@@ -1229,6 +1229,9 @@ public class RsNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public RsNDArray softmax(int axis) {
+        if (getShape().isScalar() || shape.size() == 0) {
+            return (RsNDArray) duplicate();
+        }
         return toArray(RustLibrary.softmax(getHandle(), axis));
     }
 

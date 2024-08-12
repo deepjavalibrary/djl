@@ -487,8 +487,8 @@ impl BertClassificationHead {
             vb.pp("bert.pooler.dense"),
             config.hidden_size,
             config.hidden_size,
-            None)
-        {
+            None,
+        ) {
             Ok(layer) => Some(layer),
             Err(_) => None,
         };
@@ -555,7 +555,6 @@ impl BertModel {
 }
 
 impl Model for BertModel {
-
     fn get_input_names(&self) -> Vec<String> {
         return vec![
             "input_ids".to_string(),
@@ -590,9 +589,8 @@ pub struct BertForSequenceClassification {
 impl BertForSequenceClassification {
     pub fn load(vb: VarBuilder, config: &BertConfig) -> Result<Self> {
         let bert = Box::new(BertModel::load(vb.clone(), &config)?);
-        let classifier: Box<dyn ClassificationHead + Send> = Box::new(
-            BertClassificationHead::load(vb.pp("classifier"), config)?,
-        );
+        let classifier: Box<dyn ClassificationHead + Send> =
+            Box::new(BertClassificationHead::load(vb.pp("classifier"), config)?);
         Ok(Self {
             bert,
             classifier,
@@ -603,7 +601,6 @@ impl BertForSequenceClassification {
 }
 
 impl Model for BertForSequenceClassification {
-
     fn get_input_names(&self) -> Vec<String> {
         return vec![
             "input_ids".to_string(),
