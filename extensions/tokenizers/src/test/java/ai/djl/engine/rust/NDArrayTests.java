@@ -119,7 +119,7 @@ public class NDArrayTests {
 
     @Test
     public void testI64toF16() {
-        TestRequirements.notGpu();
+        TestRequirements.notGpu("Rust");
         try (NDManager manager = NDManager.newBaseManager("Rust")) {
             NDArray array = manager.create(2);
             Assert.assertEquals(array.getDataType(), DataType.INT32);

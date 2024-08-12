@@ -46,7 +46,7 @@ public class VGGTest {
     public void testTrainWithDefaultChannels() {
         // Vgg is too large to be fit into the github action cpu main memory
         // only run the test when we have GPU
-        TestRequirements.gpu();
+        TestRequirements.gpu(TestUtils.getEngine());
 
         TrainingConfig config =
                 new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())

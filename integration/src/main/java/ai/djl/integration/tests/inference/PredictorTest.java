@@ -36,7 +36,7 @@ public class PredictorTest {
 
     @Test
     public void testPredictorWithDeviceGpu() throws TranslateException {
-        TestRequirements.gpu();
+        TestRequirements.gpu(TestUtils.getEngine());
 
         // CPU model, GPU predictor
         predictWithDeviceHelper(Device.cpu(), Device.gpu());
@@ -44,7 +44,7 @@ public class PredictorTest {
 
     @Test
     public void testPredictorWithDeviceCpu() throws TranslateException {
-        TestRequirements.gpu();
+        TestRequirements.gpu(TestUtils.getEngine());
 
         // GPU model, CPU predictor
         predictWithDeviceHelper(Device.gpu(), Device.cpu());
