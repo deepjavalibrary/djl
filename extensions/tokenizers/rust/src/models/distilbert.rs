@@ -366,7 +366,6 @@ impl DistilBertModel {
 }
 
 impl Model for DistilBertModel {
-
     fn get_input_names(&self) -> Vec<String> {
         return vec!["input_ids".to_string(), "attention_mask".to_string()];
     }

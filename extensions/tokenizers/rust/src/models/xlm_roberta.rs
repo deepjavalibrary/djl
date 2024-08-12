@@ -166,7 +166,8 @@ impl BertEmbeddings {
         let mut embeddings = (&input_embeddings + token_type_embeddings)?;
         if let Some(position_embeddings) = &self.position_embeddings {
             let position_offset = self.config.pad_token_id as u32 + 1;
-            let position_ids = (position_offset..(seq_len as u32 + position_offset)).collect::<Vec<_>>();
+            let position_ids =
+                (position_offset..(seq_len as u32 + position_offset)).collect::<Vec<_>>();
             let position_ids = Tensor::new(&position_ids[..], input_ids.device())?;
             embeddings = embeddings.broadcast_add(&position_embeddings.forward(&position_ids)?)?
         }
@@ -484,7 +485,8 @@ impl XLMRobertaClassificationHead {
             None => candle::bail!("`id2label` must be set for classifier models"),
             Some(id2label) => id2label.len(),
         };
-        let intermediate = Linear::load(vb.pp("dense"), config.hidden_size, config.hidden_size, None)?;
+        let intermediate =
+            Linear::load(vb.pp("dense"), config.hidden_size, config.hidden_size, None)?;
         let output = Linear::load(vb.pp("out_proj"), config.hidden_size, n_classes, None)?;
         Ok(Self {
             intermediate,
@@ -549,7 +551,6 @@ impl XLMRobertaModel {
 }
 
 impl Model for XLMRobertaModel {
-
     fn get_input_names(&self) -> Vec<String> {
         return vec![
             "input_ids".to_string(),
@@ -597,7 +598,6 @@ impl XLMRobertaForSequenceClassification {
 }
 
 impl Model for XLMRobertaForSequenceClassification {
-
     fn get_input_names(&self) -> Vec<String> {
         return vec![
             "input_ids".to_string(),
