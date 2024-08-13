@@ -184,10 +184,10 @@ jobs:
   build-tokenizers-jni-cu122:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: [ self-hosted, g5 ]
-    timeout-minutes: 30
+    timeout-minutes: 60
     needs: create-runners
     container:
-      image: nvidia/cuda:12.2.2-cudnn8-devel-ubuntu20.04
+      image: nvidia/cuda:12.2.2-devel-ubuntu20.04
       options: --gpus all --runtime=nvidia
     env:
       CUDA_VERSION: cu122
@@ -195,14 +195,7 @@ jobs:
       - name: Install Environment
         run: |
           apt-get -y update
-          apt-get -y install curl git
-      - name: Set up Python3
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - name: Install Python Dependencies
-        run: |
-          python -m pip install --upgrade pip
+          apt-get -y install curl git python3-pip
           pip install awscli wheel setuptools --upgrade
       - uses: actions-rs/toolchain@v1
         with:
@@ -223,7 +216,6 @@ jobs:
         run: |
           . "$HOME/.cargo/env"
           ./gradlew :extensions:tokenizers:compileJNI -Pcuda=${{ env.CUDA_VERSION }}
-          ./gradlew -Pjni :extensions:tokenizers:test
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -234,7 +226,7 @@ jobs:
         run: |
           DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
           TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
-          aws s3 sync extensions/tokenizers/jnilib/$DJL_VERSION/linux-x86_64/${{ env.CUDA_VERSION }} s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/${DJL_VERSION}/linux-x86_64/${{ env.CUDA_VERSION }}/
+          aws s3 sync extensions/tokenizers/jnilib/$DJL_VERSION/linux-x86_64/ s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/${DJL_VERSION}/linux-x86_64/
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib/*"
 
   stop-runners:

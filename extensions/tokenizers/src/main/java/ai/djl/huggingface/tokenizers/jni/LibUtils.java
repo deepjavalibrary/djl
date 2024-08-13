@@ -25,6 +25,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +42,8 @@ public final class LibUtils {
             Pattern.compile(
                     "(\\d+\\.\\d+\\.\\d+(-[a-z]+)?)-(\\d+\\.\\d+\\.\\d+)(-SNAPSHOT)?(-\\d+)?");
     private static final int[] SUPPORTED_CUDA_VERSIONS = {122};
+    private static final Set<String> SUPPORTED_CUDA_ARCH =
+            new HashSet<>(Arrays.asList("80", "86", "89", "90"));
 
     private static EngineException exception;
 
@@ -90,6 +95,10 @@ public final class LibUtils {
         String os = platform.getOsPrefix();
         String classifier = platform.getClassifier();
         String version = platform.getVersion();
+        String cudaArch = platform.getCudaArch();
+        if (cudaArch == null) {
+            cudaArch = "";
+        }
         String flavor = Utils.getEnvOrSystemProperty("TOKENIZERS_FLAVOR");
         boolean override = flavor != null && !flavor.isEmpty();
         if (override) {
@@ -104,20 +113,26 @@ public final class LibUtils {
 
         // Find the highest matching CUDA version
         if (flavor.startsWith("cu")) {
-            int cudaVersion = Integer.parseInt(flavor.substring(2, 5));
             boolean match = false;
-            for (int v : SUPPORTED_CUDA_VERSIONS) {
-                if (override && cudaVersion == v) {
-                    match = true;
-                    break;
-                } else if (cudaVersion >= v) {
-                    flavor = "cu" + v;
-                    match = true;
-                    break;
+            if (SUPPORTED_CUDA_ARCH.contains(cudaArch)) {
+                int cudaVersion = Integer.parseInt(flavor.substring(2, 5));
+                for (int v : SUPPORTED_CUDA_VERSIONS) {
+                    if (override && cudaVersion == v) {
+                        match = true;
+                        break;
+                    } else if (cudaVersion >= v) {
+                        flavor = "cu" + v + "-" + cudaArch;
+                        match = true;
+                        break;
+                    }
                 }
             }
             if (!match) {
-                logger.warn("No matching cuda flavor for {} found: {}.", classifier, flavor);
+                logger.warn(
+                        "No matching cuda flavor for {} found: {}/sm_{}.",
+                        classifier,
+                        flavor,
+                        cudaArch);
                 flavor = "cpu"; // Fallback to CPU
             }
         }
