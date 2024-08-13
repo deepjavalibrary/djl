@@ -76,6 +76,7 @@ public class Criteria<I, O> {
     private Block block;
     private String modelName;
     private Progress progress;
+    private List<ModelLoader> resolvedLoaders;
 
     Criteria(Builder<I, O> builder) {
         this.application = builder.application;
@@ -96,7 +97,41 @@ public class Criteria<I, O> {
     }
 
     /**
-     * Load the {@link ZooModel} that matches this criteria.
+     * Returns {@code true} of the model artifacts has been downloaded.
+     *
+     * @return {@code true} of the model artifacts has been downloaded
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     */
+    public boolean isDownloaded() throws IOException, ModelNotFoundException {
+        if (resolvedLoaders == null) {
+            resolvedLoaders = resolveModelLoaders();
+        }
+
+        for (ModelLoader loader : resolvedLoaders) {
+            if (!loader.isDownloaded(this)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Downloads the model artifacts that matches this criteria.
+     *
+     * @throws IOException for various exceptions loading data from the repository
+     * @throws ModelNotFoundException if no model with the specified criteria is found
+     */
+    public void downloadModel() throws ModelNotFoundException, IOException {
+        if (!isDownloaded()) {
+            for (ModelLoader loader : resolvedLoaders) {
+                loader.downloadModel(this, progress);
+            }
+        }
+    }
+
+    /**
+     * Loads the {@link ZooModel} that matches this criteria.
      *
      * @return the model that matches the criteria
      * @throws IOException for various exceptions loading data from the repository
@@ -105,82 +140,23 @@ public class Criteria<I, O> {
      */
     public ZooModel<I, O> loadModel()
             throws IOException, ModelNotFoundException, MalformedModelException {
-        if (inputClass == null || outputClass == null) {
-            throw new IllegalArgumentException("inputClass and outputClass are required.");
+        if (resolvedLoaders == null) {
+            resolvedLoaders = resolveModelLoaders();
         }
 
         Logger logger = LoggerFactory.getLogger(ModelZoo.class);
-        logger.debug("Loading model with {}", this);
-
-        List<ModelZoo> list = new ArrayList<>();
-        if (modelZoo != null) {
-            logger.debug("Searching model in specified model zoo: {}", modelZoo.getGroupId());
-            if (groupId != null && !modelZoo.getGroupId().equals(groupId)) {
-                throw new ModelNotFoundException(
-                        "groupId conflict with ModelZoo criteria."
-                                + modelZoo.getGroupId()
-                                + " v.s. "
-                                + groupId);
-            }
-            Set<String> supportedEngine = modelZoo.getSupportedEngines();
-            if (engine != null && !supportedEngine.contains(engine)) {
-                throw new ModelNotFoundException(
-                        "ModelZoo doesn't support specified engine: " + engine);
-            }
-            list.add(modelZoo);
-        } else {
-            for (ModelZoo zoo : ModelZoo.listModelZoo()) {
-                if (groupId != null && !zoo.getGroupId().equals(groupId)) {
-                    // filter out ModelZoo by groupId
-                    logger.debug("Ignore ModelZoo {} by groupId: {}", zoo.getGroupId(), groupId);
-                    continue;
-                }
-                Set<String> supportedEngine = zoo.getSupportedEngines();
-                if (engine != null && !supportedEngine.contains(engine)) {
-                    logger.debug("Ignore ModelZoo {} by engine: {}", zoo.getGroupId(), engine);
-                    continue;
-                }
-                list.add(zoo);
-            }
-        }
-
         Exception lastException = null;
-        for (ModelZoo zoo : list) {
-            String loaderGroupId = zoo.getGroupId();
-            for (ModelLoader loader : zoo.getModelLoaders()) {
-                Application app = loader.getApplication();
-                String loaderArtifactId = loader.getArtifactId();
-                logger.debug("Checking ModelLoader: {}", loader);
-                if (artifactId != null && !artifactId.equals(loaderArtifactId)) {
-                    // filter out by model loader artifactId
-                    logger.debug(
-                            "artifactId mismatch for ModelLoader: {}:{}",
-                            loaderGroupId,
-                            loaderArtifactId);
-                    continue;
-                }
-                if (application != Application.UNDEFINED
-                        && app != Application.UNDEFINED
-                        && !app.matches(application)) {
-                    // filter out ModelLoader by application
-                    logger.debug(
-                            "application mismatch for ModelLoader: {}:{}",
-                            loaderGroupId,
-                            loaderArtifactId);
-                    continue;
-                }
-
-                try {
-                    return loader.loadModel(this);
-                } catch (ModelNotFoundException e) {
-                    lastException = e;
-                    logger.trace("", e);
-                    logger.debug(
-                            "{} for ModelLoader: {}:{}",
-                            e.getMessage(),
-                            loaderGroupId,
-                            loaderArtifactId);
-                }
+        for (ModelLoader loader : resolvedLoaders) {
+            try {
+                return loader.loadModel(this);
+            } catch (ModelNotFoundException e) {
+                lastException = e;
+                logger.trace("", e);
+                logger.debug(
+                        "{} for ModelLoader: {}:{}",
+                        e.getMessage(),
+                        loader.getGroupId(),
+                        loader.getArtifactId());
             }
         }
         throw new ModelNotFoundException(
@@ -394,6 +370,82 @@ public class Criteria<I, O> {
      */
     public static Builder<?, ?> builder() {
         return new Builder<>();
+    }
+
+    private List<ModelLoader> resolveModelLoaders() throws ModelNotFoundException {
+        if (inputClass == null || outputClass == null) {
+            throw new IllegalArgumentException("inputClass and outputClass are required.");
+        }
+
+        Logger logger = LoggerFactory.getLogger(ModelZoo.class);
+        logger.debug("Loading model with {}", this);
+
+        List<ModelZoo> list = new ArrayList<>();
+        if (modelZoo != null) {
+            logger.debug("Searching model in specified model zoo: {}", modelZoo.getGroupId());
+            if (groupId != null && !modelZoo.getGroupId().equals(groupId)) {
+                throw new ModelNotFoundException(
+                        "groupId conflict with ModelZoo criteria."
+                                + modelZoo.getGroupId()
+                                + " v.s. "
+                                + groupId);
+            }
+            Set<String> supportedEngine = modelZoo.getSupportedEngines();
+            if (engine != null && !supportedEngine.contains(engine)) {
+                throw new ModelNotFoundException(
+                        "ModelZoo doesn't support specified engine: " + engine);
+            }
+            list.add(modelZoo);
+        } else {
+            for (ModelZoo zoo : ModelZoo.listModelZoo()) {
+                if (groupId != null && !zoo.getGroupId().equals(groupId)) {
+                    // filter out ModelZoo by groupId
+                    logger.debug("Ignore ModelZoo {} by groupId: {}", zoo.getGroupId(), groupId);
+                    continue;
+                }
+                Set<String> supportedEngine = zoo.getSupportedEngines();
+                if (engine != null && !supportedEngine.contains(engine)) {
+                    logger.debug("Ignore ModelZoo {} by engine: {}", zoo.getGroupId(), engine);
+                    continue;
+                }
+                list.add(zoo);
+            }
+        }
+
+        List<ModelLoader> loaders = new ArrayList<>();
+        for (ModelZoo zoo : list) {
+            String loaderGroupId = zoo.getGroupId();
+            for (ModelLoader loader : zoo.getModelLoaders()) {
+                Application app = loader.getApplication();
+                String loaderArtifactId = loader.getArtifactId();
+                logger.debug("Checking ModelLoader: {}", loader);
+                if (artifactId != null && !artifactId.equals(loaderArtifactId)) {
+                    // filter out by model loader artifactId
+                    logger.debug(
+                            "artifactId mismatch for ModelLoader: {}:{}",
+                            loaderGroupId,
+                            loaderArtifactId);
+                    continue;
+                }
+                if (application != Application.UNDEFINED
+                        && app != Application.UNDEFINED
+                        && !app.matches(application)) {
+                    // filter out ModelLoader by application
+                    logger.debug(
+                            "application mismatch for ModelLoader: {}:{}",
+                            loaderGroupId,
+                            loaderArtifactId);
+                    continue;
+                }
+
+                loaders.add(loader);
+            }
+        }
+
+        if (loaders.isEmpty()) {
+            throw new ModelNotFoundException("No model matching the criteria is found.");
+        }
+        return loaders;
     }
 
     /** A Builder to construct a {@code Criteria}. */

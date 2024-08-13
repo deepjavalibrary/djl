@@ -63,6 +63,12 @@ public class BaseModelLoader implements ModelLoader {
 
     /** {@inheritDoc} */
     @Override
+    public String getGroupId() {
+        return mrl.getGroupId();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String getArtifactId() {
         return mrl.getArtifactId();
     }
@@ -173,6 +179,28 @@ public class BaseModelLoader implements ModelLoader {
                 progress.end();
             }
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, O> boolean isDownloaded(Criteria<I, O> criteria)
+            throws IOException, ModelNotFoundException {
+        Artifact artifact = mrl.match(criteria.getFilters());
+        if (artifact == null) {
+            throw new ModelNotFoundException("No matching filter found");
+        }
+        return mrl.isPrepared(artifact);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <I, O> void downloadModel(Criteria<I, O> criteria, Progress progress)
+            throws IOException, ModelNotFoundException {
+        Artifact artifact = mrl.match(criteria.getFilters());
+        if (artifact == null) {
+            throw new ModelNotFoundException("No matching filter found");
+        }
+        mrl.prepare(artifact, progress);
     }
 
     /** {@inheritDoc} */

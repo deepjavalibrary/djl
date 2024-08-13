@@ -15,6 +15,9 @@ package ai.djl.repository;
 import ai.djl.MalformedModelException;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.ndarray.NDList;
+import ai.djl.nn.Block;
+import ai.djl.nn.Blocks;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
@@ -23,8 +26,37 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class ZooTest {
+
+    @Test
+    public void testCriteria() throws ModelNotFoundException, IOException {
+        Block block = Blocks.identityBlock();
+        Path modelDir = Paths.get("build/model");
+        Files.createDirectories(modelDir);
+
+        Criteria<NDList, NDList> criteria =
+                Criteria.builder()
+                        .setTypes(NDList.class, NDList.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optOption("hasParameter", "false")
+                        .optEngine("PyTorch")
+                        .build();
+
+        criteria.downloadModel();
+        Assert.assertTrue(criteria.isDownloaded());
+
+        criteria =
+                Criteria.builder()
+                        .setTypes(NDList.class, NDList.class)
+                        .optEngine("Nonexist")
+                        .build();
+        Assert.assertThrows(criteria::isDownloaded);
+    }
 
     @Test
     public void testCriteriaToBuilder() {
