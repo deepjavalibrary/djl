@@ -18,6 +18,7 @@ mod ndarray;
 mod compute_cap;
 mod layers;
 mod models;
+mod utils;
 
 extern crate tokenizers as tk;
 

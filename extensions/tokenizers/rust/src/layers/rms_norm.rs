@@ -2,13 +2,13 @@ use candle::{DType, Device, Result, Tensor, D};
 use candle_nn::VarBuilder;
 
 #[derive(Debug)]
-pub struct RMSNorm {
+pub struct RmsNorm {
     weight: Tensor,
     epsilon: f32,
     span: tracing::Span,
 }
 
-impl RMSNorm {
+impl RmsNorm {
     pub fn load(vb: VarBuilder, hidden_size: usize, epsilon: f32) -> Result<Self> {
         Ok(Self {
             weight: vb

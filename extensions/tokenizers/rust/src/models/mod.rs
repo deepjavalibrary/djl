@@ -1,6 +1,7 @@
 mod bert;
 mod camembert;
 mod distilbert;
+mod mistral;
 mod roberta;
 mod xlm_roberta;
 
@@ -14,6 +15,7 @@ use distilbert::{DistilBertConfig, DistilBertModel};
 use jni::objects::{JLongArray, JObject, JString, ReleaseMode};
 use jni::sys::{jint, jlong, jobjectArray};
 use jni::JNIEnv;
+use mistral::{MistralConfig, MistralModel};
 use roberta::{RobertaConfig, RobertaForSequenceClassification, RobertaModel};
 use serde::Deserialize;
 use std::path::PathBuf;
@@ -35,8 +37,8 @@ enum Config {
     Camembert(CamembertConfig),
     Roberta(RobertaConfig),
     XlmRoberta(XLMRobertaConfig),
-    #[serde(rename(deserialize = "distilbert"))]
-    DistilBert(DistilBertConfig),
+    Distilbert(DistilBertConfig),
+    Mistral(MistralConfig),
 }
 
 pub(crate) trait Model {
@@ -80,18 +82,19 @@ fn load_model<'local>(
     // Get candle dtype
     let dtype = as_data_type(dtype).unwrap();
 
-    let safetensors_path = model_path.join("model.safetensors");
-    let vb = if safetensors_path.exists() {
-        unsafe {
-            VarBuilder::from_mmaped_safetensors(
-                &[model_path.join("model.safetensors")],
-                dtype,
-                &device,
-            )?
-        }
-    } else {
-        VarBuilder::from_pth(model_path.join("pytorch_model.bin"), dtype, &device)?
-    };
+    // Load safetensors
+    let safetensors_paths: Vec<PathBuf> = std::fs::read_dir(model_path)?
+        .filter_map(|entry| {
+            let path = entry.ok()?.path();
+            if path.extension()?.to_str()? == "safetensors" {
+                Some(path)
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    let vb = unsafe { VarBuilder::from_mmaped_safetensors(&safetensors_paths, dtype, &device)? };
 
     let use_flash_attn = cfg!(feature = "cuda")
         && cfg!(feature = "flash-attn")
@@ -147,10 +150,15 @@ fn load_model<'local>(
                 None => Ok(Box::new(XLMRobertaModel::load(vb, &config)?)),
             }
         }
-        (Config::DistilBert(mut config), _) => {
+        (Config::Distilbert(mut config), _) => {
             tracing::info!("Starting DistilBert model on {:?}", device);
             config.use_flash_attn = Some(use_flash_attn);
             Ok(Box::new(DistilBertModel::load(vb, &config)?))
+        }
+        (Config::Mistral(mut config), _) => {
+            tracing::info!("Starting Mistral model on {:?}", device);
+            config.use_flash_attn = Some(use_flash_attn);
+            Ok(Box::new(MistralModel::load(vb, &config)?))
         }
     };
 

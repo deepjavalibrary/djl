@@ -27,9 +27,13 @@ impl Linear {
         out_dim: usize,
         act: Option<HiddenAct>,
     ) -> Result<Self> {
+        let bias = match vb.get(out_dim, "bias") {
+            Ok(w) => Some(w),
+            Err(_) => None,
+        };
         Ok(Self {
             weight: vb.get((out_dim, in_dim), "weight")?,
-            bias: Some(vb.get(out_dim, "bias")?),
+            bias,
             act,
             span: tracing::span!(tracing::Level::TRACE, "linear"),
         })
