@@ -340,17 +340,13 @@ impl DistilBertModel {
             Embeddings::load(vb.pp("embeddings"), config),
             Transformer::load(vb.pp("transformer"), config),
         ) {
-            (Ok(embeddings), Ok(encoder)) => (embeddings, encoder),
+            (Ok(embeddings), Ok(transformer)) => (embeddings, transformer),
             (Err(err), _) | (_, Err(err)) => {
-                if let Some(model_type) = &config.model_type {
-                    if let (Ok(embeddings), Ok(encoder)) = (
-                        Embeddings::load(vb.pp(&format!("{model_type}.embeddings")), config),
-                        Transformer::load(vb.pp(&format!("{model_type}.transformer")), config),
-                    ) {
-                        (embeddings, encoder)
-                    } else {
-                        return Err(err);
-                    }
+                if let (Ok(embeddings), Ok(transformer)) = (
+                    Embeddings::load(vb.pp("distilbert.embeddings".to_string()), config),
+                    Transformer::load(vb.pp("distilbert.transformer".to_string()), config),
+                ) {
+                    (embeddings, transformer)
                 } else {
                     return Err(err);
                 }
