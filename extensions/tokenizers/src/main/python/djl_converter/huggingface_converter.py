@@ -94,8 +94,10 @@ class HuggingfaceConverter:
         inputs = repr(model.graph.input)
         include_types = "token_type_id" in inputs
 
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
-        config = AutoConfig.from_pretrained(model_id)
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_id, trust_remote_code=args.trust_remote_code)
+        config = AutoConfig.from_pretrained(
+            model_id, trust_remote_code=args.trust_remote_code)
         hf_pipeline = PipelineHolder(tokenizer, ModelHolder(config))
         arguments = self.save_serving_properties(model_info, "OnnxRuntime",
                                                  temp_dir, hf_pipeline,
@@ -112,10 +114,12 @@ class HuggingfaceConverter:
                         model_zoo: bool):
         model_id = model_info.modelId
 
-        config = AutoConfig.from_pretrained(model_id)
+        config = AutoConfig.from_pretrained(
+            model_id, trust_remote_code=args.trust_remote_code)
         if hasattr(config, "model_type"):
             if config.model_type not in [
-                    "bert", "camembert", "distilbert", "xlm-roberta", "roberta"
+                    "bert", "camembert", "distilbert", "xlm-roberta",
+                    "roberta", "nomic_bert", "mistral"
             ]:
                 return False, f"Unsupported model_type: {config.model_type}", -1
         else:
@@ -142,7 +146,6 @@ class HuggingfaceConverter:
         shutil.copyfile(config_file, os.path.join(temp_dir, "config.json"))
 
         target = os.path.join(temp_dir, "model.safetensors")
-
         if os.path.exists(model_id):
             file = os.path.join(model_id, "model.safetensors")
             if os.path.exists(file):
@@ -155,20 +158,22 @@ class HuggingfaceConverter:
                     return False, f"No model file found for: {model_id}", -1
         else:
             model = self.api.model_info(model_id, files_metadata=True)
-            has_sf_file = False
-            has_pt_file = False
+            sf_files = []
+            pt_files = []
             for sibling in model.siblings:
-                if sibling.rfilename == "model.safetensors":
-                    has_sf_file = True
-                elif sibling.rfilename == "pytorch_model.bin":
-                    has_pt_file = True
+                if sibling.rfilename.endswith(".safetensors"):
+                    sf_files.append(sibling.rfilename)
+                elif sibling.rfilename.endswith(".bin"):
+                    pt_files.append(sibling.rfilename)
 
-            if has_sf_file:
-                file = self.get_file(model_id, "model.safetensors")
-                shutil.copyfile(file, target)
-            elif has_pt_file:
-                file = self.get_file(model_id, "pytorch_model.bin")
-                convert_file(file, target)
+            if sf_files:
+                for f in sf_files:
+                    file = hf_hub_download(repo_id=model_id, filename=f)
+                    shutil.copyfile(file, os.path.join(temp_dir, f))
+            elif pt_files:
+                for f in pt_files:
+                    file = hf_hub_download(repo_id=model_id, filename=f)
+                    convert_file(file, os.path.join(temp_dir, f))
             else:
                 return False, f"No model file found for: {model_id}", -1
 
