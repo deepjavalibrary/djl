@@ -239,12 +239,12 @@ impl DecoderLayer {
         let input_layernorm = RmsNorm::load(
             vb.pp("input_layernorm"),
             config.hidden_size,
-            config.rms_norm_eps as f32,
+            config.rms_norm_eps,
         )?;
         let post_attention_layernorm = RmsNorm::load(
             vb.pp("post_attention_layernorm"),
             config.hidden_size,
-            config.rms_norm_eps as f32,
+            config.rms_norm_eps,
         )?;
         Ok(Self {
             self_attn,
@@ -256,12 +256,9 @@ impl DecoderLayer {
 
     fn forward(&self, xs: &Tensor, attention_mask: Option<&Tensor>) -> Result<Tensor> {
         let residual = xs;
-        let (xs, residual) = self.input_layernorm.forward(xs, Some(&residual))?;
+        let xs = self.input_layernorm.forward(xs)?;
         let xs = self.self_attn.forward(&xs, attention_mask)?;
-        let (xs, residual) = self
-            .post_attention_layernorm
-            .forward(&xs, Some(&residual))?;
-        let xs = self.mlp.forward(&xs);
+        let xs = xs.apply(&self.post_attention_layernorm)?.apply(&self.mlp)?;
         residual + xs
     }
 }
@@ -283,11 +280,7 @@ impl MistralModel {
         let layers = (0..config.num_hidden_layers)
             .map(|index| DecoderLayer::load(vb.pp(&format!("layers.{index}")), config))
             .collect::<Result<Vec<_>>>()?;
-        let norm = RmsNorm::load(
-            vb.pp("norm"),
-            config.hidden_size,
-            config.rms_norm_eps as f32,
-        )?;
+        let norm = RmsNorm::load(vb.pp("norm"), config.hidden_size, config.rms_norm_eps)?;
         Ok(Self {
             embed_tokens,
             layers,
@@ -339,7 +332,7 @@ impl Model for MistralModel {
             xs = layer.forward(&xs, attention_mask.as_ref())?
         }
         let xs = xs.narrow(1, seq_len - 1, 1)?;
-        let (xs, _residual) = self.norm.forward(&xs, None)?;
+        let xs = self.norm.forward(&xs)?;
         Ok(xs)
     }
 }
