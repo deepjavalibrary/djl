@@ -172,8 +172,11 @@ class HuggingfaceConverter:
                     shutil.copyfile(file, os.path.join(temp_dir, f))
             elif pt_files:
                 for f in pt_files:
+                    # Change file name from pytorch_model*.bin to model*.safetensors
+                    target = f.replace("pytorch_model", "model").replace(
+                        ".bin", ".safetensors")
                     file = hf_hub_download(repo_id=model_id, filename=f)
-                    convert_file(file, os.path.join(temp_dir, f))
+                    convert_file(file, os.path.join(temp_dir, target))
             else:
                 return False, f"No model file found for: {model_id}", -1
 
