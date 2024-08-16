@@ -58,9 +58,14 @@ fn load_model<'local>(
     env: &mut JNIEnv,
     model_path: JString,
     dtype: jint,
+    device: JString,
 ) -> Result<Box<dyn Model>> {
     let model_path: String = env
         .get_string(&model_path)
+        .expect("Couldn't get java string!")
+        .into();
+    let device: String = env
+        .get_string(&device)
         .expect("Couldn't get java string!")
         .into();
 
@@ -71,13 +76,7 @@ fn load_model<'local>(
     let config: Config = serde_json::from_str(&config).map_err(Error::msg)?;
 
     // Get candle device
-    let device = if candle::utils::cuda_is_available() {
-        Device::new_cuda(0)
-    } else if candle::utils::metal_is_available() {
-        Device::new_metal(0)
-    } else {
-        Ok(Device::Cpu)
-    }?;
+    let device = as_device(&device).expect("Couldn't get device!");
 
     // Get candle dtype
     let dtype = as_data_type(dtype).unwrap();
@@ -171,8 +170,9 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_loadModel<'local>(
     _: JObject,
     model_path: JString,
     dtype: jint,
+    device: JString,
 ) -> jlong {
-    let model = load_model(&mut env, model_path, dtype);
+    let model = load_model(&mut env, model_path, dtype, device);
 
     match model {
         Ok(output) => to_handle(output),
@@ -233,4 +233,22 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_runInference<'local>(
             0
         }
     }
+}
+
+pub fn as_device(device: &String) -> Result<Device> {
+    if device.starts_with("gpu") {
+        if let Some(id_str) = device
+            .strip_prefix("gpu(")
+            .and_then(|s| s.strip_suffix(")"))
+        {
+            if let Ok(id) = id_str.parse::<usize>() {
+                return Device::new_cuda(id);
+            }
+        }
+        panic!("Invalid GPU format!");
+    } else if device == "cpu()" {
+        return Ok(Device::Cpu);
+    } else {
+        panic!("Unsupported device string!");
+    };
 }
