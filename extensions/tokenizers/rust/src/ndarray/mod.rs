@@ -14,9 +14,6 @@ mod other;
 mod reduce;
 mod unary;
 
-static CUDA_DEVICE: std::sync::Mutex<Option<Device>> = std::sync::Mutex::new(None);
-static METAL_DEVICE: std::sync::Mutex<Option<Device>> = std::sync::Mutex::new(None);
-
 #[no_mangle]
 pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_getDataType(
     _: JNIEnv,
@@ -287,7 +284,11 @@ fn to_data_type(data_type: DType) -> i32 {
     }
 }
 
-fn as_device<'local>(env: &mut JNIEnv<'local>, device_type: JString, _: usize) -> Result<Device> {
+pub fn as_device<'local>(
+    env: &mut JNIEnv<'local>,
+    device_type: JString,
+    device_id: usize,
+) -> Result<Device> {
     let device_type: String = env
         .get_string(&device_type)
         .expect("Couldn't get java string!")
@@ -295,24 +296,8 @@ fn as_device<'local>(env: &mut JNIEnv<'local>, device_type: JString, _: usize) -
 
     match device_type.as_str() {
         "cpu" => Ok(Device::Cpu),
-        "gpu" => {
-            let mut device = CUDA_DEVICE.lock().unwrap();
-            if let Some(device) = device.as_ref() {
-                return Ok(device.clone());
-            };
-            let d = Device::new_cuda(0).unwrap();
-            *device = Some(d.clone());
-            Ok(d)
-        }
-        "mps" => {
-            let mut device = METAL_DEVICE.lock().unwrap();
-            if let Some(device) = device.as_ref() {
-                return Ok(device.clone());
-            };
-            let d = Device::new_metal(0).unwrap();
-            *device = Some(d.clone());
-            Ok(d)
-        }
+        "gpu" => Device::new_cuda(device_id),
+        "mps" => Device::new_metal(device_id),
         _ => Err(Error::Msg(format!("Invalid device type: {}", device_type))),
     }
 }
