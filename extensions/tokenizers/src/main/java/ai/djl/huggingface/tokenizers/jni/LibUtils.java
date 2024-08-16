@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,7 +76,11 @@ public final class LibUtils {
             libs = new String[] {LIB_NAME};
         }
 
-        Path dir = copyJniLibrary(libs);
+        Platform platform = Platform.detectPlatform("tokenizers");
+        Path dir = findOverrideLibrary(platform);
+        if (dir == null) {
+            dir = copyJniLibrary(libs, platform);
+        }
         logger.debug("Loading huggingface library from: {}", dir);
 
         for (String libName : libs) {
@@ -89,9 +95,31 @@ public final class LibUtils {
         }
     }
 
-    private static Path copyJniLibrary(String[] libs) {
+    private static Path findOverrideLibrary(Platform platform) {
+        String libPath = Utils.getEnvOrSystemProperty("RUST_LIBRARY_PATH");
+        if (libPath != null) {
+            logger.info("Override Rust library path: {}", libPath);
+            Path path = Paths.get(libPath);
+            String fileName = Objects.requireNonNull(path.getFileName()).toString();
+            if (Files.isRegularFile(path) && LIB_NAME.equals(fileName)) {
+                return path.getParent();
+            } else if (Files.isDirectory(path)) {
+                String cudaArch = platform.getCudaArch();
+                if (!cudaArch.isEmpty()) {
+                    path = path.resolve(cudaArch);
+                }
+                Path file = path.resolve(LIB_NAME);
+                if (Files.exists(file)) {
+                    return path;
+                }
+            }
+            throw new EngineException("No native rust library found in: " + libPath);
+        }
+        return null;
+    }
+
+    private static Path copyJniLibrary(String[] libs, Platform platform) {
         Path cacheDir = Utils.getEngineCacheDir("tokenizers");
-        Platform platform = Platform.detectPlatform("tokenizers");
         String os = platform.getOsPrefix();
         String classifier = platform.getClassifier();
         String version = platform.getVersion();
@@ -99,10 +127,10 @@ public final class LibUtils {
         if (cudaArch == null) {
             cudaArch = "";
         }
-        String flavor = Utils.getEnvOrSystemProperty("TOKENIZERS_FLAVOR");
+        String flavor = Utils.getEnvOrSystemProperty("RUST_FLAVOR");
         boolean override = flavor != null && !flavor.isEmpty();
         if (override) {
-            logger.info("Uses override TOKENIZERS_FLAVOR: {}", flavor);
+            logger.info("Uses override RUST_FLAVOR: {}", flavor);
         } else {
             if (Utils.isOfflineMode() || "win".equals(os)) {
                 flavor = "cpu";
@@ -121,7 +149,7 @@ public final class LibUtils {
                         match = true;
                         break;
                     } else if (cudaVersion >= v) {
-                        flavor = "cu" + v + "-" + cudaArch;
+                        flavor = "cu" + v;
                         match = true;
                         break;
                     }
@@ -138,14 +166,17 @@ public final class LibUtils {
         }
 
         Path dir = cacheDir.resolve(version + '-' + flavor + '-' + classifier);
-        Path path = dir.resolve(LIB_NAME);
+        if (!cudaArch.isEmpty()) {
+            dir = dir.resolve(cudaArch);
+        }
         logger.debug("Using cache dir: {}", dir);
+        Path path = dir.resolve(LIB_NAME);
         if (Files.exists(path)) {
             return dir.toAbsolutePath();
         }
 
         // Copy JNI library from classpath
-        if (copyJniLibraryFromClasspath(libs, cacheDir, dir, classifier, flavor)) {
+        if (copyJniLibraryFromClasspath(libs, dir, classifier, flavor)) {
             return dir.toAbsolutePath();
         }
 
@@ -158,18 +189,19 @@ public final class LibUtils {
             String jniVersion = matcher.group(1);
             String djlVersion = matcher.group(3);
 
-            downloadJniLib(dir, path, djlVersion, jniVersion, classifier, flavor);
+            downloadJniLib(path, djlVersion, jniVersion, classifier, flavor + '-' + cudaArch);
             return dir.toAbsolutePath();
         }
-        return null;
+        throw new EngineException("Unexpected flavor: " + flavor);
     }
 
     private static boolean copyJniLibraryFromClasspath(
-            String[] libs, Path cacheDir, Path dir, String classifier, String flavor) {
+            String[] libs, Path dir, String classifier, String flavor) {
         Path tmp = null;
         try {
-            Files.createDirectories(cacheDir);
-            tmp = Files.createTempDirectory(cacheDir, "tmp");
+            Path parent = Objects.requireNonNull(dir.getParent());
+            Files.createDirectories(parent);
+            tmp = Files.createTempDirectory(parent, "tmp");
 
             for (String libName : libs) {
                 String libPath = "native/lib/" + classifier + "/" + flavor + "/" + libName;
@@ -196,12 +228,7 @@ public final class LibUtils {
     }
 
     private static void downloadJniLib(
-            Path cacheDir,
-            Path path,
-            String djlVersion,
-            String version,
-            String classifier,
-            String flavor) {
+            Path path, String djlVersion, String version, String classifier, String flavor) {
         String url =
                 "https://publish.djl.ai/tokenizers/"
                         + version
@@ -214,10 +241,11 @@ public final class LibUtils {
                         + '/'
                         + LIB_NAME;
         logger.info("Downloading jni {} to cache ...", url);
+        Path parent = Objects.requireNonNull(path.getParent());
         Path tmp = null;
         try (InputStream is = Utils.openUrl(url)) {
-            Files.createDirectories(cacheDir);
-            tmp = Files.createTempFile(cacheDir, "jni", "tmp");
+            Files.createDirectories(parent);
+            tmp = Files.createTempFile(parent, "jni", "tmp");
             Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
             Utils.moveQuietly(tmp, path);
         } catch (IOException e) {
