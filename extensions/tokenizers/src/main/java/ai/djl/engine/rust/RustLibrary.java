@@ -22,7 +22,8 @@ public final class RustLibrary {
 
     public static native boolean isCudaAvailable();
 
-    public static native long loadModel(String modelPath, int dtype, String device);
+    public static native long loadModel(
+            String modelPath, int dtype, String deviceType, int deviceId);
 
     public static native long deleteModel(long handle);
 

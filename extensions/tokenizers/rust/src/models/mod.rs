@@ -5,7 +5,7 @@ mod mistral;
 mod roberta;
 mod xlm_roberta;
 
-use crate::ndarray::as_data_type;
+use crate::ndarray::{as_data_type, as_device};
 use crate::{cast_handle, drop_handle, to_handle, to_string_array};
 use bert::{BertConfig, BertForSequenceClassification, BertModel};
 use camembert::{CamembertConfig, CamembertModel};
@@ -54,32 +54,12 @@ pub(crate) trait Model {
     }
 }
 
-fn load_model<'local>(
-    env: &mut JNIEnv,
-    model_path: JString,
-    dtype: jint,
-    device: JString,
-) -> Result<Box<dyn Model>> {
-    let model_path: String = env
-        .get_string(&model_path)
-        .expect("Couldn't get java string!")
-        .into();
-    let device: String = env
-        .get_string(&device)
-        .expect("Couldn't get java string!")
-        .into();
-
+fn load_model(model_path: String, dtype: DType, device: Device) -> Result<Box<dyn Model>> {
     let model_path = PathBuf::from(model_path);
 
     // Load config
     let config: String = std::fs::read_to_string(model_path.join("config.json"))?;
     let config: Config = serde_json::from_str(&config).map_err(Error::msg)?;
-
-    // Get candle device
-    let device = as_device(&device).expect("Couldn't get device!");
-
-    // Get candle dtype
-    let dtype = as_data_type(dtype).unwrap();
 
     // Load safetensors
     let safetensors_paths: Vec<PathBuf> = std::fs::read_dir(model_path)?
@@ -166,15 +146,25 @@ fn load_model<'local>(
 
 #[no_mangle]
 pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_loadModel<'local>(
-    mut env: JNIEnv,
+    mut env: JNIEnv<'local>,
     _: JObject,
     model_path: JString,
     dtype: jint,
-    device: JString,
+    device_type: JString,
+    device_id: jint,
 ) -> jlong {
-    let model = load_model(&mut env, model_path, dtype, device);
+    let model = || {
+        let model_path: String = env
+            .get_string(&model_path)
+            .expect("Couldn't get java string!")
+            .into();
+        let dtype = as_data_type(dtype).unwrap();
+        let device = as_device(&mut env, device_type, device_id as usize)?;
+        load_model(model_path, dtype, device)
+    };
+    let ret = model();
 
-    match model {
+    match ret {
         Ok(output) => to_handle(output),
         Err(err) => {
             env.throw(err.to_string()).unwrap();
@@ -233,22 +223,4 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_runInference<'local>(
             0
         }
     }
-}
-
-pub fn as_device(device: &String) -> Result<Device> {
-    if device.starts_with("gpu") {
-        if let Some(id_str) = device
-            .strip_prefix("gpu(")
-            .and_then(|s| s.strip_suffix(")"))
-        {
-            if let Ok(id) = id_str.parse::<usize>() {
-                return Device::new_cuda(id);
-            }
-        }
-        panic!("Invalid GPU format!");
-    } else if device == "cpu()" {
-        return Ok(Device::Cpu);
-    } else {
-        panic!("Unsupported device string!");
-    };
 }

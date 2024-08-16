@@ -58,7 +58,10 @@ public class RsModel extends BaseModel {
         if (block == null) {
             handle.set(
                     RustLibrary.loadModel(
-                            modelDir.toString(), dataType.ordinal(), device.toString()));
+                            modelDir.toAbsolutePath().toString(),
+                            dataType.ordinal(),
+                            device.getDeviceType(),
+                            device.getDeviceId()));
             block = new RsSymbolBlock((RsNDManager) manager, handle.get());
         } else {
             loadBlock(prefix, options);
