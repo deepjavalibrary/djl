@@ -158,7 +158,7 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_loadModel<'local>(
             .get_string(&model_path)
             .expect("Couldn't get java string!")
             .into();
-        let dtype = as_data_type(dtype).unwrap();
+        let dtype = as_data_type(dtype)?;
         let device = as_device(&mut env, device_type, device_id as usize)?;
         load_model(model_path, dtype, device)
     };
