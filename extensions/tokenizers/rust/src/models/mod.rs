@@ -2,6 +2,7 @@ mod bert;
 mod camembert;
 mod distilbert;
 mod mistral;
+mod qwen2;
 mod roberta;
 mod xlm_roberta;
 
@@ -16,6 +17,7 @@ use jni::objects::{JLongArray, JObject, JString, ReleaseMode};
 use jni::sys::{jint, jlong, jobjectArray};
 use jni::JNIEnv;
 use mistral::{MistralConfig, MistralModel};
+use qwen2::{Qwen2Config, Qwen2Model};
 use roberta::{RobertaConfig, RobertaForSequenceClassification, RobertaModel};
 use serde::Deserialize;
 use std::path::PathBuf;
@@ -39,6 +41,7 @@ enum Config {
     XlmRoberta(XLMRobertaConfig),
     Distilbert(DistilBertConfig),
     Mistral(MistralConfig),
+    Qwen2(Qwen2Config),
 }
 
 pub(crate) trait Model {
@@ -138,6 +141,11 @@ fn load_model(model_path: String, dtype: DType, device: Device) -> Result<Box<dy
             tracing::info!("Starting Mistral model on {:?}", device);
             config.use_flash_attn = Some(use_flash_attn);
             Ok(Box::new(MistralModel::load(vb, &config)?))
+        }
+        (Config::Qwen2(mut config), _) => {
+            tracing::info!("Starting Qwen2 model on {:?}", device);
+            config.use_flash_attn = Some(use_flash_attn);
+            Ok(Box::new(Qwen2Model::load(vb, &config)?))
         }
     };
 

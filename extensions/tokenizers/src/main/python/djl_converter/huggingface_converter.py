@@ -119,7 +119,7 @@ class HuggingfaceConverter:
         if hasattr(config, "model_type"):
             if config.model_type not in [
                     "bert", "camembert", "distilbert", "xlm-roberta",
-                    "roberta", "nomic_bert", "mistral"
+                    "roberta", "nomic_bert", "mistral", "qwen2"
             ]:
                 return False, f"Unsupported model_type: {config.model_type}", -1
         else:
