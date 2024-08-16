@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicReference;
 /** {@code RsModel} is the Rust implementation of {@link Model}. */
 public class RsModel extends BaseModel {
 
-    private Device device;
     private final AtomicReference<Long> handle;
 
     /**
@@ -39,7 +38,6 @@ public class RsModel extends BaseModel {
      */
     RsModel(String name, Device device) {
         super(name);
-        this.device = device;
         manager = RsNDManager.getSystemManager().newSubManager(device);
         manager.setName("RsModel");
         dataType = DataType.FLOAT16;
@@ -56,6 +54,7 @@ public class RsModel extends BaseModel {
         }
         setModelDir(modelPath);
         if (block == null) {
+            Device device = manager.getDevice();
             handle.set(
                     RustLibrary.loadModel(
                             modelDir.toAbsolutePath().toString(),
