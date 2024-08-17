@@ -87,6 +87,22 @@ public class NDArrayShapesManipulationOpTest {
     }
 
     @Test
+    public void testPad() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array = manager.zeros(new Shape(3, 3, 4, 2));
+            NDArray result = array.pad(new Shape(1, 1), 1d);
+            Assert.assertEquals(result.getShape(), new Shape(3, 3, 4, 4));
+            Assert.assertEquals(result.getFloat(0, 0, 0, 0), 1f);
+
+            result = array.pad(new Shape(1, 1, 2, 2), 1d);
+            Assert.assertEquals(result.getShape(), new Shape(3, 3, 8, 4));
+
+            result = array.pad(new Shape(0, 1, 2, 1, 3, 3), 1d);
+            Assert.assertEquals(result.getShape(), new Shape(3, 9, 7, 3));
+        }
+    }
+
+    @Test
     public void testReshape() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array = manager.create(new float[] {1f, 2f, 3f, 4f, 5f, 6f});

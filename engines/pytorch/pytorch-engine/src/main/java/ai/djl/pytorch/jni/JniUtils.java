@@ -616,6 +616,12 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.tensorClone(ndArray.getHandle()));
     }
 
+    public static PtNDArray pad(PtNDArray ndArray, long[] shape, double value) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchPad(ndArray.getHandle(), shape, value));
+    }
+
     public static PtNDArray reshape(PtNDArray ndArray, long[] shape) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchReshape(ndArray.getHandle(), shape));

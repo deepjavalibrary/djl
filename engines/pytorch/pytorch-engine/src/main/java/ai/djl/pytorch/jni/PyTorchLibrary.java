@@ -165,6 +165,8 @@ final class PyTorchLibrary {
 
     native long torchLogicalNot(long handle);
 
+    native long torchPad(long handle, long[] shape, double value);
+
     native long torchReshape(long handle, long[] shape);
 
     native long torchSoftmax(long handle, long dim, int dType);

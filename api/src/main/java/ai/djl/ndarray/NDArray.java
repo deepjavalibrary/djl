@@ -3519,6 +3519,24 @@ public interface NDArray extends NDResource, BytesSupplier {
     }
 
     /**
+     * Pads this {@code NDArray} with the given {@link Shape}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * NDArray array = manager.zeros(3, 3, 4, 2);
+     * array.pad(new Shape(1, 1), 0); # pad last dim by 1 on each side
+     * array.getShape() => (3, 3, 4, 4)
+     * </pre>
+     *
+     * @param padding the padding shape, must be even
+     * @return a padded {@code NDArray}
+     * @throws IllegalArgumentException thrown if the given {@code padding} does not match the size
+     *     of the current shape
+     */
+    NDArray pad(Shape padding, double value);
+
+    /**
      * Reshapes this {@code NDArray} to the given {@link Shape}.
      *
      * <p>Examples
