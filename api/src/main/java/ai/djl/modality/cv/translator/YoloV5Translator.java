@@ -27,7 +27,7 @@ import java.util.Map;
 
 /**
  * A translator for YoloV5 models. This was tested with ONNX exported Yolo models. For details check
- * here: https://github.com/ultralytics/yolov5
+ * <a href="https://github.com/ultralytics/yolov5">here</a>
  */
 public class YoloV5Translator extends ObjectDetectionTranslator {
 
@@ -68,7 +68,11 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
     }
 
     protected DetectedObjects nms(
-            List<Rectangle> boxes, List<Integer> classIds, List<Float> scores) {
+            int imageWidth,
+            int imageHeight,
+            List<Rectangle> boxes,
+            List<Integer> classIds,
+            List<Float> scores) {
         List<String> retClasses = new ArrayList<>();
         List<Double> retProbs = new ArrayList<>();
         List<BoundingBox> retBB = new ArrayList<>();
@@ -94,22 +98,30 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
                 retClasses.add(classes.get(id));
                 retProbs.add(scores.get(pos).doubleValue());
                 Rectangle rect = boxes.get(pos);
-                if (applyRatio) {
-                    retBB.add(
+                if (removePadding) {
+                    int padW = (width - imageWidth) / 2;
+                    int padH = (height - imageHeight) / 2;
+                    rect =
                             new Rectangle(
-                                    rect.getX() / imageWidth,
-                                    rect.getY() / imageHeight,
+                                    (rect.getX() - padW) / imageWidth,
+                                    (rect.getY() - padH) / imageHeight,
                                     rect.getWidth() / imageWidth,
-                                    rect.getHeight() / imageHeight));
-                } else {
-                    retBB.add(rect);
+                                    rect.getHeight() / imageHeight);
+                } else if (applyRatio) {
+                    rect =
+                            new Rectangle(
+                                    rect.getX() / width,
+                                    rect.getY() / height,
+                                    rect.getWidth() / width,
+                                    rect.getHeight() / height);
                 }
+                retBB.add(rect);
             }
         }
         return new DetectedObjects(retClasses, retProbs, retBB);
     }
 
-    protected DetectedObjects processFromBoxOutput(NDList list) {
+    protected DetectedObjects processFromBoxOutput(int imageWidth, int imageHeight, NDList list) {
         float[] flattened = list.get(0).toFloatArray();
         int sizeClasses = classes.size();
         int stride = 5 + sizeClasses;
@@ -142,7 +154,7 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
                 classIds.add(maxIndex);
             }
         }
-        return nms(boxes, classIds, scores);
+        return nms(imageWidth, imageHeight, boxes, classIds, scores);
     }
 
     private DetectedObjects processFromDetectOutput() {
@@ -153,6 +165,8 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
     /** {@inheritDoc} */
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
+        int imageWidth = (Integer) ctx.getAttachment("width");
+        int imageHeight = (Integer) ctx.getAttachment("height");
         switch (yoloOutputLayerType) {
             case DETECT:
                 return processFromDetectOutput();
@@ -160,11 +174,11 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
                 if (list.get(0).getShape().dimension() > 2) {
                     return processFromDetectOutput();
                 } else {
-                    return processFromBoxOutput(list);
+                    return processFromBoxOutput(imageWidth, imageHeight, list);
                 }
             case BOX:
             default:
-                return processFromBoxOutput(list);
+                return processFromBoxOutput(imageWidth, imageHeight, list);
         }
     }
 

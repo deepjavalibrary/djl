@@ -33,8 +33,6 @@ public class YoloSegmentationTranslator extends YoloV5Translator {
 
     private float threshold;
     private float nmsThreshold;
-    private int width;
-    private int height;
 
     /**
      * Creates the instance segmentation translator from the given builder.
@@ -45,8 +43,6 @@ public class YoloSegmentationTranslator extends YoloV5Translator {
         super(builder);
         this.threshold = builder.threshold;
         this.nmsThreshold = builder.nmsThreshold;
-        this.width = builder.width;
-        this.height = builder.height;
     }
 
     /** {@inheritDoc} */
