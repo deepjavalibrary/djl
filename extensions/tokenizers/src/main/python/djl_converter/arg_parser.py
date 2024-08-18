@@ -45,9 +45,10 @@ def converter_args():
     parser.add_argument(
         "--trust-remote-code",
         action="store_true",
-        help=
-        "Allows to use custom code for the modeling hosted in the model repository. This option should only be set for repositories you trust and in which you have read the code, as it will execute on your local machine arbitrary code present in the model repository."
-    )
+        help="Allows to use custom code for the modeling hosted in the model"
+        " repository. This option should only be set for repositories you trust and in which"
+        " you have read the code, as it will execute on your local machine arbitrary code"
+        " present in the model repository.")
 
     args = parser.parse_args()
     if args.output_dir is None:
@@ -84,6 +85,13 @@ def importer_args():
         help="Model category to convert",
     )
     group.add_argument("-m", "--model-name", help="Model name to convert")
+    parser.add_argument(
+        "--trust-remote-code",
+        action="store_true",
+        help="Allows to use custom code for the modeling hosted in the model"
+        " repository. This option should only be set for repositories you trust and in which"
+        " you have read the code, as it will execute on your local machine arbitrary code"
+        " present in the model repository.")
 
     args = parser.parse_args()
     if args.output_dir is None:
