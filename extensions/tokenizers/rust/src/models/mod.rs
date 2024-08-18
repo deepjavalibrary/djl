@@ -1,6 +1,8 @@
 mod bert;
 mod camembert;
 mod distilbert;
+mod gemma2;
+mod gte;
 mod mistral;
 mod qwen2;
 mod roberta;
@@ -13,6 +15,8 @@ use camembert::{CamembertConfig, CamembertModel};
 use candle::{DType, Device, Error, Result, Tensor};
 use candle_nn::VarBuilder;
 use distilbert::{DistilBertConfig, DistilBertModel};
+use gemma2::{Gemma2Config, Gemma2Model};
+use gte::{GTEConfig, GTEModel};
 use jni::objects::{JLongArray, JObject, JString, ReleaseMode};
 use jni::sys::{jint, jlong, jobjectArray};
 use jni::JNIEnv;
@@ -42,6 +46,9 @@ enum Config {
     Distilbert(DistilBertConfig),
     Mistral(MistralConfig),
     Qwen2(Qwen2Config),
+    #[serde(rename = "new")]
+    GTE(GTEConfig),
+    Gemma2(Gemma2Config),
 }
 
 pub(crate) trait Model {
@@ -146,6 +153,16 @@ fn load_model(model_path: String, dtype: DType, device: Device) -> Result<Box<dy
             tracing::info!("Starting Qwen2 model on {:?}", device);
             config.use_flash_attn = Some(use_flash_attn);
             Ok(Box::new(Qwen2Model::load(vb, &config)?))
+        }
+        (Config::GTE(mut config), _) => {
+            tracing::info!("Starting GTE model on {:?}", device);
+            config.use_flash_attn = Some(use_flash_attn);
+            Ok(Box::new(GTEModel::load(vb, &config)?))
+        }
+        (Config::Gemma2(mut config), _) => {
+            tracing::info!("Starting Gemma2 model on {:?}", device);
+            config.use_flash_attn = Some(use_flash_attn);
+            Ok(Box::new(Gemma2Model::load(vb, &config)?))
         }
     };
 
