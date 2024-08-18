@@ -29,8 +29,6 @@ public class YoloPoseTranslator extends BaseImageTranslator<Joints[]> {
 
     private static final int MAX_DETECTION = 300;
 
-    private int width;
-    private int height;
     private float threshold;
     private float nmsThreshold;
 
@@ -41,8 +39,6 @@ public class YoloPoseTranslator extends BaseImageTranslator<Joints[]> {
      */
     public YoloPoseTranslator(Builder builder) {
         super(builder);
-        this.width = builder.width;
-        this.height = builder.height;
         this.threshold = builder.threshold;
         this.nmsThreshold = builder.nmsThreshold;
     }

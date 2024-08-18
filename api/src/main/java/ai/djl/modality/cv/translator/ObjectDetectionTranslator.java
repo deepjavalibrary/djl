@@ -29,9 +29,8 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
     protected float threshold;
     private SynsetLoader synsetLoader;
     protected List<String> classes;
-    protected double imageWidth;
-    protected double imageHeight;
     protected boolean applyRatio;
+    protected boolean removePadding;
 
     /**
      * Creates the {@link ObjectDetectionTranslator} from the given builder.
@@ -42,9 +41,8 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
         super(builder);
         this.threshold = builder.threshold;
         this.synsetLoader = builder.synsetLoader;
-        this.imageWidth = builder.imageWidth;
-        this.imageHeight = builder.imageHeight;
         this.applyRatio = builder.applyRatio;
+        this.removePadding = builder.removePadding;
     }
 
     /** {@inheritDoc} */
@@ -61,9 +59,8 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
             extends ClassificationBuilder<T> {
 
         protected float threshold = 0.2f;
-        protected double imageWidth;
-        protected double imageHeight;
         protected boolean applyRatio;
+        protected boolean removePadding;
 
         /**
          * Sets the threshold for prediction accuracy.
@@ -75,19 +72,6 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
          */
         public T optThreshold(float threshold) {
             this.threshold = threshold;
-            return self();
-        }
-
-        /**
-         * Sets the optional rescale size.
-         *
-         * @param imageWidth the width to rescale images to
-         * @param imageHeight the height to rescale images to
-         * @return this builder
-         */
-        public T optRescaleSize(double imageWidth, double imageHeight) {
-            this.imageWidth = imageWidth;
-            this.imageHeight = imageHeight;
             return self();
         }
 
@@ -108,37 +92,17 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
             return self();
         }
 
-        /**
-         * Get resized image width.
-         *
-         * @return image width
-         */
-        public double getImageWidth() {
-            return imageWidth;
-        }
-
-        /**
-         * Get resized image height.
-         *
-         * @return image height
-         */
-        public double getImageHeight() {
-            return imageHeight;
-        }
-
         /** {@inheritDoc} */
         @Override
         protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
-            if (ArgumentsUtil.booleanValue(arguments, "rescale")) {
-                optRescaleSize(width, height);
-            }
             if (ArgumentsUtil.booleanValue(arguments, "optApplyRatio")
                     || ArgumentsUtil.booleanValue(arguments, "applyRatio")) {
                 optApplyRatio(true);
-                optRescaleSize(width, height);
             }
             threshold = ArgumentsUtil.floatValue(arguments, "threshold", 0.2f);
+            String centerFit = ArgumentsUtil.stringValue(arguments, "centerFit", "false");
+            removePadding = "true".equals(centerFit);
         }
     }
 }

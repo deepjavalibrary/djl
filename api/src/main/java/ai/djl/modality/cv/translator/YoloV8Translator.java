@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * A translator for YoloV8 models. This was tested with ONNX exported Yolo models. For details check
- * here: https://github.com/ultralytics/ultralytics
+ * <a href="https://github.com/ultralytics/ultralytics">here</a>
  */
 public class YoloV8Translator extends YoloV5Translator {
 
@@ -66,7 +66,7 @@ public class YoloV8Translator extends YoloV5Translator {
 
     /** {@inheritDoc} */
     @Override
-    protected DetectedObjects processFromBoxOutput(NDList list) {
+    protected DetectedObjects processFromBoxOutput(int imageWidth, int imageHeight, NDList list) {
         NDArray rawResult = list.get(0);
         NDArray reshapedResult = rawResult.transpose();
         Shape shape = reshapedResult.getShape();
@@ -110,7 +110,7 @@ public class YoloV8Translator extends YoloV5Translator {
             }
         }
 
-        return nms(boxes, classIds, scores);
+        return nms(imageWidth, imageHeight, boxes, classIds, scores);
     }
 
     /** The builder for {@link YoloV8Translator}. */

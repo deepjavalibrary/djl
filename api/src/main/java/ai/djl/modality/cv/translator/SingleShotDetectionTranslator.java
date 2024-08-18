@@ -59,19 +59,14 @@ public class SingleShotDetectionTranslator extends ObjectDetectionTranslator {
                 }
                 String className = classes.get(classId);
                 float[] box = boundingBoxes.get(i).toFloatArray();
-                // rescale box coordinates by imageWidth and imageHeight
-                double x = imageWidth > 0 ? box[0] / imageWidth : box[0];
-                double y = imageHeight > 0 ? box[1] / imageHeight : box[1];
-                double w = imageWidth > 0 ? box[2] / imageWidth - x : box[2] - x;
-                double h = imageHeight > 0 ? box[3] / imageHeight - y : box[3] - y;
+                // rescale box coordinates by width and height
+                double x = width > 0 ? box[0] / width : box[0];
+                double y = height > 0 ? box[1] / height : box[1];
+                double w = width > 0 ? box[2] / width - x : box[2] - x;
+                double h = height > 0 ? box[3] / height - y : box[3] - y;
                 Rectangle rect;
                 if (applyRatio) {
-                    rect =
-                            new Rectangle(
-                                    x / imageWidth,
-                                    y / imageHeight,
-                                    w / imageWidth,
-                                    h / imageHeight);
+                    rect = new Rectangle(x / width, y / height, w / width, h / height);
                 } else {
                     rect = new Rectangle(x, y, w, h);
                 }

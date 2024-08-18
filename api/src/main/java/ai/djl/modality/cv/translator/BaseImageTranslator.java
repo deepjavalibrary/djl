@@ -15,6 +15,7 @@ package ai.djl.modality.cv.translator;
 import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.CenterCrop;
+import ai.djl.modality.cv.transform.CenterFit;
 import ai.djl.modality.cv.transform.Normalize;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -50,6 +51,8 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
 
     private Image.Flag flag;
     private Batchifier batchifier;
+    protected int width;
+    protected int height;
 
     /**
      * Constructs an ImageTranslator with the provided builder.
@@ -60,6 +63,8 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
         flag = builder.flag;
         pipeline = builder.pipeline;
         batchifier = builder.batchifier;
+        width = builder.width;
+        height = builder.height;
     }
 
     /** {@inheritDoc} */
@@ -72,6 +77,8 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
     @Override
     public NDList processInput(TranslatorContext ctx, Image input) {
         NDArray array = input.toNDArray(ctx.getNDManager(), flag);
+        ctx.setAttachment("width", input.getWidth());
+        ctx.setAttachment("height", input.getHeight());
         return pipeline.transform(new NDList(array));
     }
 
@@ -170,6 +177,10 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             }
             if (ArgumentsUtil.booleanValue(arguments, "centerCrop", false)) {
                 addTransform(new CenterCrop(width, height));
+            }
+            String centerFit = ArgumentsUtil.stringValue(arguments, "centerFit", "false");
+            if ("true".equals(centerFit)) {
+                addTransform(new CenterFit(width, height));
             }
             if (ArgumentsUtil.booleanValue(arguments, "toTensor", true)) {
                 addTransform(new ToTensor());
