@@ -20,7 +20,6 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
 import ai.djl.testing.Assertions;
-import ai.djl.testing.TestRequirements;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -119,14 +118,17 @@ public class NDArrayTests {
 
     @Test
     public void testI64toF16() {
-        TestRequirements.notGpu("Rust");
         try (NDManager manager = NDManager.newBaseManager("Rust")) {
             NDArray array = manager.create(2);
             Assert.assertEquals(array.getDataType(), DataType.INT32);
             NDArray int64 = array.toType(DataType.INT64, false);
-            NDArray f16 = int64.toType(DataType.FLOAT16, false);
-            NDArray bool = f16.toType(DataType.BOOLEAN, false);
-            Assert.assertTrue(bool.getBoolean());
+            try {
+                NDArray f16 = int64.toType(DataType.FLOAT16, false);
+                NDArray bool = f16.toType(DataType.BOOLEAN, false);
+                Assert.assertTrue(bool.getBoolean());
+            } catch (UnsupportedOperationException e) {
+                // ignore on GPU
+            }
         }
     }
 

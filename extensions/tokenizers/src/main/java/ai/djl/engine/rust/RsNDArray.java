@@ -171,6 +171,12 @@ public class RsNDArray extends NativeResource<Long> implements NDArray {
             long newHandle = RustLibrary.toBoolean(getHandle());
             return toArray(newHandle, dataType, false, true);
         }
+        if (this.dataType == DataType.INT64
+                && dataType == DataType.FLOAT16
+                && getDevice().isGpu()) {
+            // TODO:
+            throw new UnsupportedOperationException("FP16 to I64 is not supported on GPU.");
+        }
         int dType = manager.toRustDataType(dataType);
         long newHandle = RustLibrary.toDataType(getHandle(), dType);
         return toArray(newHandle, dataType, false, true);
