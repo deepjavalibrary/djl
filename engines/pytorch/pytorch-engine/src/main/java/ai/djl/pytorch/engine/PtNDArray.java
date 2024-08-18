@@ -1146,6 +1146,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray pad(Shape padding, double value) {
+        return JniUtils.pad(this, padding.getShape(), value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray reshape(Shape shape) {
         return JniUtils.reshape(this, shape.getShape());
     }

@@ -19,6 +19,16 @@
 
 // The file is the implementation for PyTorch neural network functional ops
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchPad(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jshape, jdouble jvalue) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
+  const auto* result_ptr = new torch::Tensor(pad(*tensor_ptr, c10::ArrayRef(shape_vec), "constant", jvalue));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSoftmax(
     JNIEnv* env, jobject jthis, jlong jhandle, jlong jdim, jint jdtype) {
   API_BEGIN()
