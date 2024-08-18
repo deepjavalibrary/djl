@@ -54,7 +54,8 @@ def main():
             size = -1
 
         huggingface_models.update_progress(model_info, converter.application,
-                                           result, reason, size, args.cpu_only)
+                                           result, reason, size, args.cpu_only,
+                                           args.min_version)
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
 
