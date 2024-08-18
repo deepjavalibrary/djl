@@ -117,6 +117,7 @@ class HuggingfaceConverter:
         config = AutoConfig.from_pretrained(
             model_id, trust_remote_code=args.trust_remote_code)
         if hasattr(config, "model_type"):
+            # TODO: Monitor if "new" model_type will change or if there is conflict
             if config.model_type not in [
                     "bert", "camembert", "distilbert", "xlm-roberta",
                     "roberta", "nomic_bert", "mistral", "qwen2", "new",
