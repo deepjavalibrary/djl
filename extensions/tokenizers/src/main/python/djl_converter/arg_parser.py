@@ -92,6 +92,9 @@ def importer_args():
         " repository. This option should only be set for repositories you trust and in which"
         " you have read the code, as it will execute on your local machine arbitrary code"
         " present in the model repository.")
+    parser.add_argument(
+        "--min-version",
+        help="Requires a specific version of DJL to load the model.")
 
     args = parser.parse_args()
     if args.output_dir is None:

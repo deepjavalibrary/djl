@@ -14,7 +14,7 @@ import json
 import logging
 import os
 from argparse import Namespace
-from typing import List
+from typing import List, Optional
 
 from huggingface_hub import HfApi
 from huggingface_hub import hf_hub_download
@@ -150,7 +150,8 @@ class HuggingfaceModels:
         return ret
 
     def update_progress(self, model_info: ModelInfo, application: str,
-                        result: bool, reason: str, size: int, cpu_only: bool):
+                        result: bool, reason: str, size: int, cpu_only: bool,
+                        min_version: Optional[str]):
         status = {
             "result": "success" if result else "failed",
             "application": application,
@@ -162,6 +163,8 @@ class HuggingfaceModels:
             status["reason"] = reason
         if cpu_only:
             status["cpu_only"] = True
+        if result and min_version:
+            status["requires"] = min_version
 
         self.processed_models[model_info.modelId] = status
 
