@@ -163,5 +163,6 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
     @staticmethod
     def save_module_weight(model_id: str, temp_dir: str, layer: str,
                            name: str):
-        file = self.get_file(model_id, f"{layer}/model.safetensors")
+        file = SentenceSimilarityConverter.get_file(
+            model_id, f"{layer}/model.safetensors")
         shutil.copyfile(file, os.path.join(temp_dir, f"{name}.safetensors"))

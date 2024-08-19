@@ -50,6 +50,7 @@ class HuggingfaceConverter:
         self.translator = None
         self.inputs = None
         self.outputs = None
+        self.max_model_size = int(os.getenv("MAX_MODEL_SIZE", "2_000_000_000"))
         self.api = HfApi()
 
     def save_model(self, model_info, task: str, args: Namespace, temp_dir: str,
@@ -103,6 +104,9 @@ class HuggingfaceConverter:
                                                  temp_dir, hf_pipeline,
                                                  include_types)
         if model_zoo:
+            model_size = self.get_dir_size(temp_dir)
+            if model_size > self.max_model_size:
+                return False, f"Model size too large: {model_size}", -1
             size = self.save_to_model_zoo(model_info, args.output_dir,
                                           "OnnxRuntime", temp_dir, arguments)
         else:
@@ -183,6 +187,9 @@ class HuggingfaceConverter:
         arguments = self.save_serving_properties(model_info, "Rust", temp_dir,
                                                  hf_pipeline, include_types)
         if model_zoo:
+            model_size = self.get_dir_size(temp_dir)
+            if model_size > self.max_model_size:
+                return False, f"Model size too large: {model_size}", -1
             size = self.save_to_model_zoo(model_info, args.output_dir, "Rust",
                                           temp_dir, arguments)
         else:
@@ -231,6 +238,9 @@ class HuggingfaceConverter:
                                                  temp_dir, hf_pipeline,
                                                  include_types)
         if model_zoo:
+            model_size = self.get_dir_size(temp_dir)
+            if model_size > self.max_model_size:
+                return False, f"Model size too large: {model_size}", -1
             size = self.save_to_model_zoo(model_info, args.output_dir,
                                           "PyTorch", temp_dir, arguments)
         else:
@@ -331,6 +341,17 @@ class HuggingfaceConverter:
         metadata.save_metadata(metadata_file)
 
         return file_size
+
+    @staticmethod
+    def get_dir_size(path: str) -> int:
+        total = 0
+        with os.scandir(path) as it:
+            for entry in it:
+                if entry.is_file():
+                    total += entry.stat().st_size
+                elif entry.is_dir():
+                    total += HuggingfaceConverter.get_dir_size(entry.path)
+        return total
 
     def verify_jit_model(self, hf_pipeline, model_file: str,
                          include_types: bool, cpu_only: bool):
