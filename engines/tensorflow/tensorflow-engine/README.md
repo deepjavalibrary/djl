@@ -46,14 +46,14 @@ You can choose a native library based on your platform if you don't have network
 ### macOS
 For macOS, you can use the following library:
 
-- ai.djl.tensorflow:tensorflow-native-cpu:2.7.0:osx-x86_64
+- ai.djl.tensorflow:tensorflow-native-cpu:2.16.1:osx-aarch64
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-native-cpu</artifactId>
-    <classifier>osx-x86_64</classifier>
-    <version>2.7.0</version>
+    <classifier>osx-aarch64</classifier>
+    <version>2.16.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -64,21 +64,21 @@ installed on your GPU machine, you can use one of the following library:
 
 #### Linux GPU
 
-- ai.djl.tensorflow:tensorflow-native-cu110:2.7.0:linux-x86_64 - CUDA 11.3
+- ai.djl.tensorflow:tensorflow-native-cu121:2.16.1:linux-x86_64 - CUDA 12.1-cudnn8
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-native-cu121</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>2.7.0</version>
+    <version>2.16.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
 
 ### Linux CPU
 
-- ai.djl.tensorflow:tensorflow-native-cpu:2.7.0:linux-x86_64
+- ai.djl.tensorflow:tensorflow-native-cpu:2.16.1:linux-x86_64
 
 ```xml
 <dependency>
@@ -86,7 +86,7 @@ installed on your GPU machine, you can use one of the following library:
     <artifactId>tensorflow-native-cpu</artifactId>
     <classifier>linux-x86_64</classifier>
     <scope>runtime</scope>
-    <version>2.7.0</version>
+    <version>2.16.1</version>
 </dependency>
 ```
 
@@ -96,7 +96,7 @@ For the Windows platform, you can choose between CPU and GPU.
 
 #### Windows GPU
 
-- ai.djl.tensorflow:tensorflow-native-cu121:2.16.1:win-x86_64
+- ai.djl.tensorflow:tensorflow-native-cu121:2.16.1:win-x86_64 - CUDA 12.1-cudnn8
 
 ```xml
 <dependency>
