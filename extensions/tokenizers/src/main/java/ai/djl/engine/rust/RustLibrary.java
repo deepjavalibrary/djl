@@ -87,7 +87,7 @@ public final class RustLibrary {
 
     public static native long toDataType(long handle, int dataType);
 
-    public static native ByteBuffer getByteBuffer(long handle);
+    public static native byte[] toByteArray(long handle);
 
     public static native long fullSlice(long handle, long[] min, long[] max, long[] step);
 
