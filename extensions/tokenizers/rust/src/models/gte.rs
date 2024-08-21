@@ -134,8 +134,8 @@ impl RotaryEmbedding {
         let (_b_sz, _h, seq_len, _n_embd) = q.dims4()?;
         let cos = self.cos.narrow(0, 0, seq_len)?;
         let sin = self.sin.narrow(0, 0, seq_len)?;
-        let q_embed = rotary_emb::rope(q, &cos, &sin)?;
-        let k_embed = rotary_emb::rope(k, &cos, &sin)?;
+        let q_embed = rotary_emb::rope(&q.contiguous()?, &cos, &sin)?;
+        let k_embed = rotary_emb::rope(&k.contiguous()?, &cos, &sin)?;
         Ok((q_embed, k_embed))
     }
 }
