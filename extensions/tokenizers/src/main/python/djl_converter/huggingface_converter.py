@@ -137,7 +137,9 @@ class HuggingfaceConverter:
             os.makedirs(temp_dir)
 
         tokenizer = AutoTokenizer.from_pretrained(model_id)
-        include_types = config.model_type != "distilbert"
+        include_types = config.model_type not in [
+            "distilbert", "mistral", "qwen2", "gemma2"
+        ]
         hf_pipeline = PipelineHolder(tokenizer, ModelHolder(config))
         try:
             # Save tokenizer.json to temp dir
