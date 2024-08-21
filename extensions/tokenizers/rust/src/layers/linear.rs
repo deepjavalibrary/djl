@@ -1,4 +1,4 @@
-use crate::layers::cublaslt::get_cublas_lt_wrapper;
+use crate::layers::cublaslt::{get_cublas_lt_wrapper, CublasLtWrapper};
 use candle::{Device, Result, Tensor};
 use candle_nn::VarBuilder;
 use serde::Deserialize;
@@ -17,6 +17,7 @@ pub struct Linear {
     weight: Tensor,
     bias: Option<Tensor>,
     act: Option<HiddenAct>,
+    cublaslt: Option<CublasLtWrapper>,
     span: tracing::Span,
 }
 
@@ -31,10 +32,12 @@ impl Linear {
             Ok(w) => Some(w),
             Err(_) => None,
         };
+        let cublaslt = get_cublas_lt_wrapper(&vb.device());
         Ok(Self {
             weight: vb.get((out_dim, in_dim), "weight")?,
             bias,
             act,
+            cublaslt,
             span: tracing::span!(tracing::Level::TRACE, "linear"),
         })
     }
@@ -43,7 +46,7 @@ impl Linear {
         let _enter = self.span.enter();
 
         #[allow(unused)]
-        if let (Device::Cuda(_), Some(cublaslt)) = (x.device(), get_cublas_lt_wrapper()) {
+        if let (Device::Cuda(_), Some(cublaslt)) = (x.device(), self.cublaslt.clone()) {
             match x.dims() {
                 &[bsize, _, _] => cublaslt.batch_matmul(
                     &self.weight.broadcast_left(bsize)?,

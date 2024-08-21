@@ -5,29 +5,23 @@ use std::sync::Once;
 #[cfg(feature = "cuda")]
 use candle_cublaslt::{fused_batch_matmul, fused_matmul, Activation, CublasLt};
 
-static INIT: Once = Once::new();
-static mut CUBLASLT: Option<CublasLtWrapper> = None;
-
-pub fn get_cublas_lt_wrapper() -> Option<&'static CublasLtWrapper> {
+pub fn get_cublas_lt_wrapper(device: &Device) -> Option<CublasLtWrapper> {
     unsafe {
-        INIT.call_once(|| {
-            CUBLASLT = match Device::cuda_if_available(0) {
-                Ok(device) => {
-                    #[cfg(feature = "cuda")]
-                    {
-                        Some(CublasLtWrapper {
-                            cublaslt: CublasLt::new(&device).unwrap(),
-                        })
-                    }
-                    #[cfg(not(feature = "cuda"))]
-                    {
-                        None
-                    }
-                }
-                Err(_) => None,
-            };
-        });
-        CUBLASLT.as_ref()
+        let cublaslt = if device.is_cuda() {
+            #[cfg(feature = "cuda")]
+            {
+                Some(CublasLtWrapper {
+                    cublaslt: CublasLt::new(&device).unwrap(),
+                })
+            }
+            #[cfg(not(feature = "cuda"))]
+            {
+                None
+            }
+        } else {
+            None
+        };
+        cublaslt.clone()
     }
 }
 
