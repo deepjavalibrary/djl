@@ -171,7 +171,7 @@ class HuggingfaceConverter:
             for sibling in model.siblings:
                 if sibling.rfilename.endswith(".safetensors"):
                     sf_files.append(sibling.rfilename)
-                elif sibling.rfilename.endswith(".bin"):
+                elif sibling.rfilename == "pytorch_model.bin":
                     pt_files.append(sibling.rfilename)
 
             if sf_files:
