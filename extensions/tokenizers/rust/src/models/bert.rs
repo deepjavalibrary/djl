@@ -492,7 +492,16 @@ impl BertClassificationHead {
             Ok(layer) => Some(layer),
             Err(_) => None,
         };
-        let output = Linear::load(vb.pp("classifier"), config.hidden_size, n_classes, None)?;
+        let output = match Linear::load(vb.pp("classifier"), config.hidden_size, n_classes, None) {
+            Ok(output) => output,
+            Err(err) => {
+                if let Ok(output) = Linear::load(vb, config.hidden_size, n_classes, None) {
+                    output
+                } else {
+                    return Err(err);
+                }
+            }
+        };
 
         Ok(Self {
             pooler,
