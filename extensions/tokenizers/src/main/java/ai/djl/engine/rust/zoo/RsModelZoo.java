@@ -68,6 +68,7 @@ public class RsModelZoo extends ModelZoo {
                 if (!initialized) {
                     Version version = new Version(Engine.getDjlVersion());
                     addModels(Application.NLP.TEXT_EMBEDDING, version);
+                    addModels(Application.NLP.TEXT_CLASSIFICATION, version);
                     initialized = true;
                 }
             }
