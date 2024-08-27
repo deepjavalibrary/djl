@@ -238,6 +238,8 @@ pub extern "system" fn Java_ai_djl_engine_rust_RustLibrary_normalize<'local>(
     let normalize = || {
         let tensor = cast_handle::<Tensor>(handle);
         let device = tensor.device();
+        let rank = tensor.shape().rank() as i32;
+        let dim: i32 = if dim < 0 { rank + dim } else { dim };
         let pow = Tensor::new(vec![p as f64], device)?.to_dtype(tensor.dtype())?;
         let root = Tensor::new(vec![1f64 / p as f64], device)?.to_dtype(tensor.dtype())?;
         let eps = Tensor::new(vec![eps as f64], device)?.to_dtype(tensor.dtype())?;
