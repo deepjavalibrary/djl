@@ -48,6 +48,7 @@ dependencies {
         api("ai.djl.timeseries:timeseries:${version}")
         api("com.microsoft.onnxruntime:onnxruntime:${libs.versions.onnxruntime.get()}")
         api("com.microsoft.onnxruntime:onnxruntime_gpu:${libs.versions.onnxruntime.get()}")
+        api("com.microsoft.onnxruntime:onnxruntime-extensions:${libs.versions.onnxruntimeExtensions.get()}")
     }
 }
 
