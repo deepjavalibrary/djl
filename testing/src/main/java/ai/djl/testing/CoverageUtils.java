@@ -72,8 +72,8 @@ public final class CoverageUtils {
                 continue;
             }
 
-            Method[] declaredMethods = clazz.getDeclaredMethods();
-            for (Method method : declaredMethods) {
+            Method[] methods = clazz.getDeclaredMethods();
+            for (Method method : methods) {
                 String methodName = method.getName();
                 int parameterCount = method.getParameterCount();
                 try {

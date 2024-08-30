@@ -197,7 +197,7 @@ public class PtModel extends BaseModel {
             // Unfreeze parameters if training directly
             block.freezeParameters(
                     false,
-                    param -> param.getType() != Type.RUNNING_MEAN && param.getType() != Type.RUNNING_VAR);
+                    p -> p.getType() != Type.RUNNING_MEAN && p.getType() != Type.RUNNING_VAR);
         }
         for (Pair<Initializer, Predicate<Parameter>> pair : initializer) {
             if (pair.getKey() != null && pair.getValue() != null) {
