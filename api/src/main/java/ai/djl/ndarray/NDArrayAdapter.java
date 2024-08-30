@@ -317,13 +317,15 @@ public abstract class NDArrayAdapter implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray booleanMask(NDArray index, int axis) {
-        return correctedArray(getAlternativeArray().booleanMask(alternativeManager.from(index), axis));
+        return correctedArray(
+                getAlternativeArray().booleanMask(alternativeManager.from(index), axis));
     }
 
     /** {@inheritDoc} */
     @Override
     public NDArray sequenceMask(NDArray sequenceLength, float value) {
-        return correctedArray(getAlternativeArray().sequenceMask(alternativeManager.from(sequenceLength), value));
+        return correctedArray(
+                getAlternativeArray().sequenceMask(alternativeManager.from(sequenceLength), value));
     }
 
     /** {@inheritDoc} */
@@ -875,8 +877,7 @@ public abstract class NDArrayAdapter implements NDArray {
     public NDList split(long sections, int axis) {
         NDList list = getAlternativeArray().split(sections, axis);
         NDArray[] corrected = new NDArray[list.size()];
-        for (int i = 0; i < list.size(); i++)
-        {
+        for (int i = 0; i < list.size(); i++) {
             corrected[i] = correctedArray(list.get(i));
         }
         return new NDList(corrected);
@@ -887,8 +888,7 @@ public abstract class NDArrayAdapter implements NDArray {
     public NDList split(long[] indices, int axis) {
         NDList list = getAlternativeArray().split(indices, axis);
         NDArray[] corrected = new NDArray[list.size()];
-        for (int i = 0; i < list.size(); i++)
-        {
+        for (int i = 0; i < list.size(); i++) {
             corrected[i] = correctedArray(list.get(i));
         }
         return new NDList(corrected);
@@ -1368,19 +1368,19 @@ public abstract class NDArrayAdapter implements NDArray {
      * @param array the NDArray to return.
      * @return the NDArray to return.
      */
-    private NDArray correctedArray(NDArray array)
-    {
+    private NDArray correctedArray(NDArray array) {
         if (array.getManager() != manager) {
-            // Handle hybrid engine arrays, copy the data to a new array owned by the expected manager.
-            NDArray corrected = manager.create(array.getShape(), array.getDataType(), array.getDevice());
+            // Handle hybrid engine arrays, copy the data to a new array owned by the expected
+            // manager.
+            NDArray corrected =
+                    manager.create(array.getShape(), array.getDataType(), array.getDevice());
             array.copyTo(corrected);
             corrected.setName(array.getName());
 
             // No need to keep the old array anymore.
             array.close();
             return corrected;
-        }
-        else {
+        } else {
             return array;
         }
     }

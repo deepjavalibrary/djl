@@ -1822,7 +1822,8 @@ public final class NDArrays {
     public static NDArray stack(NDList arrays, int axis) {
         Preconditions.checkArgument(arrays.size() > 0, "need at least one array to stack");
         NDArray array = arrays.head();
-        return correctedArray(array.getNDArrayInternal().stack(arrays.subNDList(1), axis), array.getManager());
+        return correctedArray(
+                array.getNDArrayInternal().stack(arrays.subNDList(1), axis), array.getManager());
     }
 
     /**
@@ -1879,7 +1880,8 @@ public final class NDArrays {
             return arrays.singletonOrThrow().duplicate();
         }
         NDArray array = arrays.head();
-        return correctedArray(array.getNDArrayInternal().concat(arrays.subNDList(1), axis), array.getManager());
+        return correctedArray(
+                array.getNDArrayInternal().concat(arrays.subNDList(1), axis), array.getManager());
     }
 
     /**
@@ -2017,26 +2019,27 @@ public final class NDArrays {
     }
 
     /**
-     * Returns a corrected array ensuring it is owned by the expected NDManager.  This is required
+     * Returns a corrected array ensuring it is owned by the expected NDManager. This is required
      * for hybrid engine support.
      *
      * @param array the NDArray to return.
      * @param expectedManager the expected manager.
      * @return the NDArray to return.
      */
-    private static NDArray correctedArray(NDArray array, NDManager expectedManager)
-    {
+    private static NDArray correctedArray(NDArray array, NDManager expectedManager) {
         if (array.getManager() != expectedManager) {
-            // Handle hybrid engine arrays, copy the data to a new array owned by the expected manager.
-            NDArray corrected = expectedManager.create(array.getShape(), array.getDataType(), array.getDevice());
+            // Handle hybrid engine arrays, copy the data to a new array owned by the expected
+            // manager.
+            NDArray corrected =
+                    expectedManager.create(
+                            array.getShape(), array.getDataType(), array.getDevice());
             array.copyTo(corrected);
             corrected.setName(array.getName());
 
             // No need to keep the old array anymore.
             array.close();
             return corrected;
-        }
-        else {
+        } else {
             return array;
         }
     }
