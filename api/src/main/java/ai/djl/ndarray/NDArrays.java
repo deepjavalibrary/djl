@@ -2028,12 +2028,13 @@ public final class NDArrays {
     {
         if (array.getManager() != expectedManager) {
             // Handle hybrid engine arrays, copy the data to a new array owned by the expected manager.
-            NDArray correctedArray = expectedManager.create(array.getShape(), array.getDataType(), array.getDevice());
-            array.copyTo(correctedArray);
+            NDArray corrected = expectedManager.create(array.getShape(), array.getDataType(), array.getDevice());
+            array.copyTo(corrected);
+            corrected.setName(array.getName());
 
             // No need to keep the old array anymore.
             array.close();
-            return correctedArray;
+            return corrected;
         }
         else {
             return array;

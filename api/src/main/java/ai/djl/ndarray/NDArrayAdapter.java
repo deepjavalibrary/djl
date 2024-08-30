@@ -1374,6 +1374,7 @@ public abstract class NDArrayAdapter implements NDArray {
             // Handle hybrid engine arrays, copy the data to a new array owned by the expected manager.
             NDArray corrected = manager.create(array.getShape(), array.getDataType(), array.getDevice());
             array.copyTo(corrected);
+            corrected.setName(array.getName());
 
             // No need to keep the old array anymore.
             array.close();
