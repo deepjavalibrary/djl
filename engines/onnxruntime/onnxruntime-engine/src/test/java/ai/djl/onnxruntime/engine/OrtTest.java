@@ -73,6 +73,7 @@ public class OrtTest {
             Criteria<IrisFlower, Classifications> criteria =
                     Criteria.builder()
                             .setTypes(IrisFlower.class, Classifications.class)
+                            .optModelUrls("djl://ai.djl.onnxruntime/iris_flowers")
                             .optEngine("OnnxRuntime") // use OnnxRuntime engine
                             .optOption("interOpNumThreads", "1")
                             .optOption("intraOpNumThreads", "1")
