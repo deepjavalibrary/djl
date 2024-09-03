@@ -95,14 +95,7 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
 
                 // Reshape mask to actual image bounding box shape.
                 NDArray array = masks.get(i);
-                Shape maskShape = array.getShape();
-                int maskH = (int) maskShape.get(0);
-                int maskW = (int) maskShape.get(1);
-                float[] flattened = array.toFloatArray();
-                float[][] maskFloat = new float[maskH][maskW];
-                for (int j = 0; j < maskH; j++) {
-                    System.arraycopy(flattened, j * maskW, maskFloat[j], 0, maskW);
-                }
+                float[][] maskFloat = Mask.toMask(array);
                 Mask mask = new Mask(x, y, w, h, maskFloat);
 
                 retNames.add(className);

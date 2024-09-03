@@ -567,6 +567,13 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray interpolation(long[] size, int mode, boolean alignCorners) {
+        return JniUtils.interpolate(
+                array.getManager().from(array), size, getInterpolationMode(mode), false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArray resize(int width, int height, int interpolation) {
         // create subManager to help close intermediate NDArray
         PtNDManager manager = array.getManager();

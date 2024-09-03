@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -155,7 +156,7 @@ class OpenCVImage implements Image {
 
     /** {@inheritDoc} */
     @Override
-    public void drawBoundingBoxes(DetectedObjects detections) {
+    public void drawBoundingBoxes(DetectedObjects detections, float opacity) {
         int imageWidth = image.width();
         int imageHeight = image.height();
 
@@ -191,11 +192,28 @@ class OpenCVImage implements Image {
             if (box instanceof Mask) {
                 Mask mask = (Mask) box;
                 BufferedImage img = mat2Image(image);
-                drawMask(img, mask);
+                drawMask(img, mask, 0.5f);
                 image = image2Mat(img);
             } else if (box instanceof Landmark) {
                 drawLandmarks(box);
             }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void drawMarks(List<ai.djl.modality.cv.output.Point> points, int radius) {
+        Scalar color = new Scalar(190, 150, 37);
+        for (ai.djl.modality.cv.output.Point point : points) {
+            int[][] star = createStar(point, radius);
+            Point[] mat = new Point[10];
+            for (int i = 0; i < 10; ++i) {
+                mat[i] = new Point(star[0][i], star[1][i]);
+            }
+            MatOfPoint mop = new MatOfPoint();
+            mop.fromArray(mat);
+            List<MatOfPoint> ppt = Collections.singletonList(mop);
+            Imgproc.fillPoly(image, ppt, color, Imgproc.LINE_AA);
         }
     }
 
@@ -370,7 +388,7 @@ class OpenCVImage implements Image {
         }
     }
 
-    private void drawMask(BufferedImage img, Mask mask) {
+    private void drawMask(BufferedImage img, Mask mask, float ratio) {
         // TODO: use OpenCV native way to draw mask
         float r = RandomUtils.nextFloat();
         float g = RandomUtils.nextFloat();
@@ -395,13 +413,15 @@ class OpenCVImage implements Image {
             }
         }
         float[][] probDist = mask.getProbDist();
-        float max = 0;
-        for (float[] row : probDist) {
-            for (float f : row) {
-                max = Math.max(max, f);
+        if (ratio < 0 || ratio > 1) {
+            float max = 0;
+            for (float[] row : probDist) {
+                for (float f : row) {
+                    max = Math.max(max, f);
+                }
             }
+            ratio = 0.5f / max;
         }
-        float ratio = 0.5f / max;
 
         BufferedImage maskImage =
                 new BufferedImage(probDist[0].length, probDist.length, BufferedImage.TYPE_INT_ARGB);

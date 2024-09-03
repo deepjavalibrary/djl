@@ -20,6 +20,7 @@ import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Landmark;
 import ai.djl.modality.cv.output.Mask;
+import ai.djl.modality.cv.output.Point;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -116,6 +117,8 @@ public class OpenCVImageFactoryTest {
                     Collections.singletonList(new Joints.Joint(0.2, 0.2, 0.8));
             Joints joints = new Joints(jointList);
             imgCopy.drawJoints(joints);
+
+            imgCopy.drawMarks(Collections.singletonList(new Point(20, 20)));
 
             try (OutputStream os = Files.newOutputStream(Paths.get("build/newImage.png"))) {
                 imgCopy.save(os, "png");

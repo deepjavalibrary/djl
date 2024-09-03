@@ -506,6 +506,12 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray interpolation(long[] size, int mode, boolean alignCorners) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray resize(int width, int height, int interpolation) {
         if (array.isEmpty()) {
             throw new IllegalArgumentException("Can't resize image with 0 dims.");

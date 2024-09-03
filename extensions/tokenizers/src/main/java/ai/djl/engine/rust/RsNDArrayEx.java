@@ -466,6 +466,12 @@ public class RsNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray interpolation(long[] size, int mode, boolean alignCorners) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public RsNDArray resize(int width, int height, int interpolation) {
         long[] shape = array.getShape().getShape();
         if (shape[0] == height && shape[1] == width) {
