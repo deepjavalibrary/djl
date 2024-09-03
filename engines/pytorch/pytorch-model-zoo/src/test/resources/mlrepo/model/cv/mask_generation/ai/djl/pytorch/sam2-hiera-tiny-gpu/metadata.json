@@ -1,0 +1,37 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/mask_generation",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "sam2-hiera-tiny-gpu",
+  "name": "Mask generation",
+  "description": "Segment Anything in Images",
+  "website": "http://www.djl.ai/engines/pytorch/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "sam2-hiera-tiny-gpu",
+      "arguments": {
+        "translatorFactory": "ai.djl.modality.cv.translator.Sam2TranslatorFactory"
+      },
+      "options": {
+        "mapLocation": "true"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/sam2-hiera-tiny-gpu.zip",
+          "name": "",
+          "sha1Hash": "41440632b2f2d481282b8cd7004d37cc3c6f9a16",
+          "size": 145037570
+        }
+      }
+    }
+  ]
+}
