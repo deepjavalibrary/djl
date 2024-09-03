@@ -15,6 +15,7 @@ The following examples are included for training:
 The following examples are included for inference:
 
 - [Image classification example](docs/image_classification.md)
+- [Segment anything 2 example](docs/segment_anything_2.md)
 - [Single-shot object detection example](docs/object_detection.md)
 - [Face detection example](docs/face_detection.md)
 - [Face recognition example](docs/face_recognition.md)
