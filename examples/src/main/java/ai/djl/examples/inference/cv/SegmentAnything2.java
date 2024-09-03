@@ -53,7 +53,7 @@ public final class SegmentAnything2 {
                         .setTypes(Sam2Input.class, DetectedObjects.class)
                         .optModelUrls("djl://ai.djl.pytorch/sam2-hiera-tiny")
                         .optEngine("PyTorch")
-                        .optDevice(Device.cpu()) // this model only works on CPU
+                        .optDevice(Device.cpu()) // use sam2-hiera-tiny-gpu for GPU
                         .optTranslator(new Sam2Translator())
                         .optProgress(new ProgressBar())
                         .build();

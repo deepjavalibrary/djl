@@ -62,6 +62,9 @@ public class Application {
             case "cv/instance_segmentation":
             case "instance_segmentation":
                 return CV.INSTANCE_SEGMENTATION;
+            case "cv/mask_generation":
+            case "mask_generation":
+                return CV.MASK_GENERATION;
             case "cv/pose_estimation":
             case "pose_estimation":
                 return CV.POSE_ESTIMATION;
@@ -195,6 +198,12 @@ public class Application {
          * classification), and their location as a pixel map.
          */
         Application INSTANCE_SEGMENTATION = new Application("cv/instance_segmentation");
+
+        /**
+         * An application that generates masks that identify a specific object or region of interest
+         * in a given image.
+         */
+        Application MASK_GENERATION = new Application("cv/mask_generation");
 
         /**
          * An application that accepts an image of a single person and returns the {@link
