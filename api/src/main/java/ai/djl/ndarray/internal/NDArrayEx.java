@@ -453,6 +453,8 @@ public interface NDArrayEx {
         }
     }
 
+    NDArray interpolation(long[] size, int mode, boolean alignCorners);
+
     NDArray resize(int width, int height, int interpolation);
 
     default NDArray crop(int x, int y, int width, int height) {

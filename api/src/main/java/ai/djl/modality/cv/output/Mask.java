@@ -12,6 +12,9 @@
  */
 package ai.djl.modality.cv.output;
 
+import ai.djl.ndarray.NDArray;
+import ai.djl.ndarray.types.Shape;
+
 /**
  * A mask with a probability for each pixel within a bounding rectangle.
  *
@@ -74,5 +77,23 @@ public class Mask extends Rectangle {
      */
     public boolean isFullImageMask() {
         return fullImageMask;
+    }
+
+    /**
+     * Converts the mask tensor to a mask array.
+     *
+     * @param array the mask NDArray
+     * @return the mask array
+     */
+    public static float[][] toMask(NDArray array) {
+        Shape maskShape = array.getShape();
+        int height = (int) maskShape.get(0);
+        int width = (int) maskShape.get(1);
+        float[] flattened = array.toFloatArray();
+        float[][] mask = new float[height][width];
+        for (int i = 0; i < height; i++) {
+            System.arraycopy(flattened, i * width, mask[i], 0, width);
+        }
+        return mask;
     }
 }

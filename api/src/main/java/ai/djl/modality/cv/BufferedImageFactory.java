@@ -295,7 +295,7 @@ public class BufferedImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
-        public void drawBoundingBoxes(DetectedObjects detections) {
+        public void drawBoundingBoxes(DetectedObjects detections, float opacity) {
             // Make image copy with alpha channel because original image was jpg
             convertIdNeeded();
 
@@ -321,21 +321,36 @@ public class BufferedImageFactory extends ImageFactory {
                     k = (k + 100) % 255;
                 }
 
-                Rectangle rectangle = box.getBounds();
-                int x = (int) (rectangle.getX() * imageWidth);
-                int y = (int) (rectangle.getY() * imageHeight);
-                g.drawRect(
-                        x,
-                        y,
-                        (int) (rectangle.getWidth() * imageWidth),
-                        (int) (rectangle.getHeight() * imageHeight));
-                drawText(g, className, x, y, stroke, 4);
+                if (!className.isEmpty()) {
+                    Rectangle rectangle = box.getBounds();
+                    int x = (int) (rectangle.getX() * imageWidth);
+                    int y = (int) (rectangle.getY() * imageHeight);
+                    g.drawRect(
+                            x,
+                            y,
+                            (int) (rectangle.getWidth() * imageWidth),
+                            (int) (rectangle.getHeight() * imageHeight));
+                    drawText(g, className, x, y, stroke, 4);
+                }
                 // If we have a mask instead of a plain rectangle, draw tha mask
                 if (box instanceof Mask) {
-                    drawMask((Mask) box);
+                    drawMask((Mask) box, opacity);
                 } else if (box instanceof Landmark) {
                     drawLandmarks(box);
                 }
+            }
+            g.dispose();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void drawMarks(List<Point> points, int radius) {
+            Graphics2D g = (Graphics2D) image.getGraphics();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setColor(new Color(246, 96, 0));
+            for (Point point : points) {
+                int[][] star = createStar(point, radius);
+                g.fillPolygon(star[0], star[1], 10);
             }
             g.dispose();
         }
@@ -421,7 +436,7 @@ public class BufferedImageFactory extends ImageFactory {
             g.drawString(text, x + padding, y + ascent);
         }
 
-        private void drawMask(Mask mask) {
+        private void drawMask(Mask mask, float ratio) {
             float r = RandomUtils.nextFloat();
             float g = RandomUtils.nextFloat();
             float b = RandomUtils.nextFloat();
@@ -445,13 +460,15 @@ public class BufferedImageFactory extends ImageFactory {
                 }
             }
             float[][] probDist = mask.getProbDist();
-            float max = 0;
-            for (float[] row : probDist) {
-                for (float f : row) {
-                    max = Math.max(max, f);
+            if (ratio < 0 || ratio > 1) {
+                float max = 0;
+                for (float[] row : probDist) {
+                    for (float f : row) {
+                        max = Math.max(max, f);
+                    }
                 }
+                ratio = 0.5f / max;
             }
-            float ratio = 0.5f / max;
 
             BufferedImage maskImage =
                     new BufferedImage(

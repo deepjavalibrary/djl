@@ -926,6 +926,12 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray interpolation(long[] size, int mode, boolean alignCorners) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray resize(int width, int height, int interpolation) {
         if (array.isEmpty()) {
             throw new IllegalArgumentException("attempt to resize of an empty NDArray");
