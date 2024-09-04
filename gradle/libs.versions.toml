@@ -14,7 +14,7 @@ lightgbm = "3.2.110"
 tensorrt = "8.4.1"
 fasttext = "0.9.2"
 sentencepiece = "0.2.0"
-tokenizers = "0.19.1"
+tokenizers = "0.20.0"
 
 slf4j = "2.0.13"
 log4j_slf4j = "2.23.1"

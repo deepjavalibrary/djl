@@ -38,7 +38,7 @@ public class HuggingFaceTokenizerTest {
     public void testVersion() {
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
             String djlVersion = Engine.getDjlVersion();
-            Assert.assertEquals(tokenizer.getVersion(), "0.19.1-" + djlVersion);
+            Assert.assertEquals(tokenizer.getVersion(), "0.20.0-" + djlVersion);
         }
     }
 

@@ -27,6 +27,8 @@ candle = { git = "https://github.com/huggingface/candle", rev = "f76bb7794aa8659
 candle-nn = { git = "https://github.com/huggingface/candle", rev = "f76bb7794aa8659c5023797979a3392cdfc01f32", package = "candle-nn" }
 candle-transformers = { git = "https://github.com/huggingface/candle", rev = "f76bb7794aa8659c5023797979a3392cdfc01f32", package = "candle-transformers" }
 candle-flash-attn = { git = "https://github.com/huggingface/candle", rev = "f76bb7794aa8659c5023797979a3392cdfc01f32", package = "candle-flash-attn" }
+# openssl-src 300.3.2 is broken for AL2
+openssl-src = { git = "https://github.com/alexcrichton/openssl-src-rs", rev = "c591de676017446c9f1d719e77eb162159ce8886", package = "openssl-src" }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = { version = "0.10", features = ["vendored"] }
