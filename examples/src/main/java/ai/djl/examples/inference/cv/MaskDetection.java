@@ -56,9 +56,9 @@ public final class MaskDetection {
 
         // modelUrl can be replaced to local onnx model file
         String modelUrl = "https://resources.djl.ai/demo/onnxruntime/face_mask_detection.zip";
-        Criteria<Image, DetectedObjects> criteria =
+        Criteria<String, DetectedObjects> criteria =
                 Criteria.builder()
-                        .setTypes(Image.class, DetectedObjects.class)
+                        .setTypes(String.class, DetectedObjects.class)
                         .optModelUrls(modelUrl)
                         .optEngine("OnnxRuntime")
                         .optTranslatorFactory(new YoloV5TranslatorFactory())
@@ -67,9 +67,9 @@ public final class MaskDetection {
                         .optArgument("rescale", true) // post process
                         .build();
 
-        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel()) {
-            try (Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
-                DetectedObjects detection = predictor.predict(img);
+        try (ZooModel<String, DetectedObjects> model = criteria.loadModel()) {
+            try (Predictor<String, DetectedObjects> predictor = model.newPredictor()) {
+                DetectedObjects detection = predictor.predict(imageUrl);
                 String outputDir = "build/output";
                 saveBoundingBoxImage(img, detection, outputDir);
                 return detection;

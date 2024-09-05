@@ -50,9 +50,9 @@ public final class Yolov8Detection {
 
         // Use DJL OnnxRuntime model zoo model, model can be found:
         // https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/onnxruntime/yolov8n/0.0.1/yolov8n.zip
-        Criteria<Image, DetectedObjects> criteria =
+        Criteria<Path, DetectedObjects> criteria =
                 Criteria.builder()
-                        .setTypes(Image.class, DetectedObjects.class)
+                        .setTypes(Path.class, DetectedObjects.class)
                         .optModelUrls("djl://ai.djl.onnxruntime/yolov8n")
                         .optEngine("OnnxRuntime")
                         .optArgument("width", 640)
@@ -68,12 +68,12 @@ public final class Yolov8Detection {
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<Image, DetectedObjects> model = criteria.loadModel();
-                Predictor<Image, DetectedObjects> predictor = model.newPredictor()) {
+        try (ZooModel<Path, DetectedObjects> model = criteria.loadModel();
+                Predictor<Path, DetectedObjects> predictor = model.newPredictor()) {
             Path outputPath = Paths.get("build/output");
             Files.createDirectories(outputPath);
 
-            DetectedObjects detection = predictor.predict(img);
+            DetectedObjects detection = predictor.predict(imgPath);
             if (detection.getNumberOfObjects() > 0) {
                 img.drawBoundingBoxes(detection);
                 Path output = outputPath.resolve("yolov8_detected.png");

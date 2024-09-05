@@ -41,7 +41,7 @@ public class YoloV8TranslatorFactoryTest {
 
     @Test
     public void testGetSupportedTypes() {
-        Assert.assertEquals(factory.getSupportedTypes().size(), 5);
+        Assert.assertEquals(factory.getSupportedTypes().size(), 6);
     }
 
     @Test

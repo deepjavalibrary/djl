@@ -15,8 +15,9 @@ package ai.djl.modality.cv.translator;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.translator.wrapper.FileImagePreProcesor;
+import ai.djl.modality.cv.translator.wrapper.FileImagePreProcessor;
 import ai.djl.modality.cv.translator.wrapper.InputStreamImagePreProcessor;
+import ai.djl.modality.cv.translator.wrapper.StringImagePreProcessor;
 import ai.djl.modality.cv.translator.wrapper.UrlImagePreProcessor;
 import ai.djl.translate.ExpansionTranslatorFactory;
 import ai.djl.translate.PreProcessor;
@@ -44,8 +45,9 @@ public abstract class BaseImageTranslatorFactory<O> extends ExpansionTranslatorF
             getPreprocessorExpansions() {
         Map<Type, Function<PreProcessor<Image>, PreProcessor<?>>> expansions =
                 new ConcurrentHashMap<>();
-        expansions.put(Path.class, FileImagePreProcesor::new);
+        expansions.put(Path.class, FileImagePreProcessor::new);
         expansions.put(URL.class, UrlImagePreProcessor::new);
+        expansions.put(String.class, StringImagePreProcessor::new);
         expansions.put(InputStream.class, InputStreamImagePreProcessor::new);
         return expansions;
     }

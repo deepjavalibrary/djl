@@ -41,7 +41,7 @@ public class ImageClassificationTranslatorFactoryTest {
 
     @Test
     public void testGetSupportedTypes() {
-        Assert.assertEquals(factory.getSupportedTypes().size(), 5);
+        Assert.assertEquals(factory.getSupportedTypes().size(), 6);
     }
 
     @Test
@@ -67,6 +67,10 @@ public class ImageClassificationTranslatorFactoryTest {
             Translator<Input, Output> translator5 =
                     factory.newInstance(Input.class, Output.class, model, arguments);
             Assert.assertTrue(translator5 instanceof ImageServingTranslator);
+
+            Translator<String, Classifications> translator6 =
+                    factory.newInstance(String.class, Classifications.class, model, arguments);
+            Assert.assertTrue(translator6 instanceof BasicTranslator);
 
             Assert.assertThrows(
                     IllegalArgumentException.class,

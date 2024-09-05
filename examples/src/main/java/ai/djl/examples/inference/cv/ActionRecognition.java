@@ -15,8 +15,6 @@ package ai.djl.examples.inference.cv;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
@@ -26,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * An example of inference using an action recognition model.
@@ -46,22 +45,20 @@ public final class ActionRecognition {
     }
 
     public static Classifications predict() throws IOException, ModelException, TranslateException {
-        String url = "https://resources.djl.ai/images/action_dance.jpg";
-        Image img = ImageFactory.getInstance().fromUrl(url);
-
+        URL url = new URL("https://resources.djl.ai/images/action_dance.jpg");
         // Use DJL PyTorch model zoo model
-        Criteria<Image, Classifications> criteria =
+        Criteria<URL, Classifications> criteria =
                 Criteria.builder()
-                        .setTypes(Image.class, Classifications.class)
+                        .setTypes(URL.class, Classifications.class)
                         .optModelUrls(
                                 "djl://ai.djl.pytorch/Human-Action-Recognition-VIT-Base-patch16-224")
                         .optEngine("PyTorch")
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<Image, Classifications> inception = criteria.loadModel();
-                Predictor<Image, Classifications> action = inception.newPredictor()) {
-            return action.predict(img);
+        try (ZooModel<URL, Classifications> inception = criteria.loadModel();
+                Predictor<URL, Classifications> action = inception.newPredictor()) {
+            return action.predict(url);
         }
     }
 }
