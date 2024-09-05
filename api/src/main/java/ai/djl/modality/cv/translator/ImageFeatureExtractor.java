@@ -13,6 +13,7 @@
 package ai.djl.modality.cv.translator;
 
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.TranslatorContext;
 
 import java.util.Map;
@@ -20,7 +21,7 @@ import java.util.Map;
 /**
  * A generic {@link ai.djl.translate.Translator} for Image Classification feature extraction tasks.
  */
-public class ImageFeatureExtractor extends BaseImageTranslator<byte[]> {
+public class ImageFeatureExtractor extends BaseImageTranslator<float[]> {
 
     /**
      * Constructs an Image Classification using {@link Builder}.
@@ -33,8 +34,8 @@ public class ImageFeatureExtractor extends BaseImageTranslator<byte[]> {
 
     /** {@inheritDoc} */
     @Override
-    public byte[] processOutput(TranslatorContext ctx, NDList list) {
-        return list.get(0).toByteArray();
+    public float[] processOutput(TranslatorContext ctx, NDList list) {
+        return list.get(0).toType(DataType.FLOAT32, false).toFloatArray();
     }
 
     /**

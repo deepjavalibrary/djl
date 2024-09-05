@@ -16,17 +16,11 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.modality.cv.transform.Normalize;
-import ai.djl.modality.cv.transform.ToTensor;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
+import ai.djl.modality.cv.translator.ImageFeatureExtractorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.Pipeline;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
-import ai.djl.translate.TranslatorContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +29,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class FeatureExtraction {
 
@@ -55,13 +51,25 @@ public final class FeatureExtraction {
     public static float[] predict(Image img)
             throws IOException, ModelException, TranslateException {
         img.getWrappedImage();
+
+        List<Float> mean =
+                Arrays.asList(
+                        127.5f / 255.0f,
+                        127.5f / 255.0f,
+                        127.5f / 255.0f,
+                        128.0f / 255.0f,
+                        128.0f / 255.0f,
+                        128.0f / 255.0f);
+        String normalize = mean.stream().map(Object::toString).collect(Collectors.joining(","));
+
         Criteria<Image, float[]> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, float[].class)
                         .optModelUrls(
                                 "https://resources.djl.ai/test-models/pytorch/face_feature.zip")
                         .optModelName("face_feature") // specify model file prefix
-                        .optTranslator(new FaceFeatureTranslator())
+                        .optArgument("normalize", normalize)
+                        .optTranslatorFactory(new ImageFeatureExtractorFactory())
                         .optProgress(new ProgressBar())
                         .optEngine("PyTorch") // Use PyTorch engine
                         .build();
@@ -69,46 +77,6 @@ public final class FeatureExtraction {
         try (ZooModel<Image, float[]> model = criteria.loadModel()) {
             Predictor<Image, float[]> predictor = model.newPredictor();
             return predictor.predict(img);
-        }
-    }
-
-    private static final class FaceFeatureTranslator implements Translator<Image, float[]> {
-
-        FaceFeatureTranslator() {}
-
-        /** {@inheritDoc} */
-        @Override
-        public NDList processInput(TranslatorContext ctx, Image input) {
-            NDArray array = input.toNDArray(ctx.getNDManager(), Image.Flag.COLOR);
-            Pipeline pipeline = new Pipeline();
-            pipeline
-                    // .add(new Resize(160))
-                    .add(new ToTensor())
-                    .add(
-                            new Normalize(
-                                    new float[] {127.5f / 255.0f, 127.5f / 255.0f, 127.5f / 255.0f},
-                                    new float[] {
-                                        128.0f / 255.0f, 128.0f / 255.0f, 128.0f / 255.0f
-                                    }));
-
-            return pipeline.transform(new NDList(array));
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public float[] processOutput(TranslatorContext ctx, NDList list) {
-            NDList result = new NDList();
-            long numOutputs = list.singletonOrThrow().getShape().get(0);
-            for (int i = 0; i < numOutputs; i++) {
-                result.add(list.singletonOrThrow().get(i));
-            }
-            float[][] embeddings =
-                    result.stream().map(NDArray::toFloatArray).toArray(float[][]::new);
-            float[] feature = new float[embeddings.length];
-            for (int i = 0; i < embeddings.length; i++) {
-                feature[i] = embeddings[i][0];
-            }
-            return feature;
         }
     }
 }
