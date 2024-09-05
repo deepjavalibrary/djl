@@ -147,10 +147,13 @@ public class XgbNDManager extends BaseNDManager {
             throw new UnsupportedOperationException("XgbNDArray only supports float32.");
         }
 
-        if (data.isDirect() && data instanceof ByteBuffer) {
-            // TODO: allow user to set missing value
-            long handle = JniUtils.createDMatrix(data, shape, missingValue);
-            return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.DENSE);
+        if (data instanceof ByteBuffer) {
+            if (data.isDirect()) {
+                // TODO: allow user to set missing value
+                long handle = JniUtils.createDMatrix(data, shape, missingValue);
+                return new XgbNDArray(this, alternativeManager, handle, shape, SparseFormat.DENSE);
+            }
+            data = ((ByteBuffer) data).asFloatBuffer();
         }
 
         DataType inputType = DataType.fromBuffer(data);
