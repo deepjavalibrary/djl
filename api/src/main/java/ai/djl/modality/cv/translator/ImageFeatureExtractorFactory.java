@@ -21,20 +21,21 @@ import java.io.Serializable;
 import java.util.Map;
 
 /** A {@link TranslatorFactory} that creates an {@link ImageClassificationTranslator}. */
-public class ImageFeatureExtractorFactory extends BaseImageTranslatorFactory<byte[]>
+public class ImageFeatureExtractorFactory extends BaseImageTranslatorFactory<float[]>
         implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /** {@inheritDoc} */
     @Override
-    protected Translator<Image, byte[]> buildBaseTranslator(Model model, Map<String, ?> arguments) {
+    protected Translator<Image, float[]> buildBaseTranslator(
+            Model model, Map<String, ?> arguments) {
         return ImageFeatureExtractor.builder(arguments).build();
     }
 
     /** {@inheritDoc} */
     @Override
-    public Class<byte[]> getBaseOutputType() {
-        return byte[].class;
+    public Class<float[]> getBaseOutputType() {
+        return float[].class;
     }
 }

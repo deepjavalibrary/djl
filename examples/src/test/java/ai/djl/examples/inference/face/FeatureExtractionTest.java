@@ -15,7 +15,6 @@ package ai.djl.examples.inference.face;
 import ai.djl.ModelException;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
-import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
 import org.testng.Assert;
@@ -29,11 +28,24 @@ public class FeatureExtractionTest {
 
     @Test
     public void testFeatureComparison() throws ModelException, TranslateException, IOException {
-        TestRequirements.linux();
-
         Path imageFile = Paths.get("src/test/resources/kana1.jpg");
         Image img = ImageFactory.getInstance().fromFile(imageFile);
         float[] feature = FeatureExtraction.predict(img);
         Assert.assertEquals(feature.length, 512);
+        float[] expected = {
+            -0.040261813f,
+            -0.019486334f,
+            -0.09802657f,
+            0.017009983f,
+            0.037828982f,
+            0.030801114f,
+            -0.02714689f,
+            0.042024296f,
+            -0.009838469f,
+            -0.005961003f
+        };
+        float[] sub = new float[10];
+        System.arraycopy(feature, 0, sub, 0, 10);
+        Assert.assertEquals(sub, expected, 0.0001f);
     }
 }
