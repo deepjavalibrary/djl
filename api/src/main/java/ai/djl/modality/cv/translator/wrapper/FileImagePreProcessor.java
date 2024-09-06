@@ -21,16 +21,16 @@ import ai.djl.translate.TranslatorContext;
 import java.nio.file.Path;
 
 /** Built-in {@code PreProcessor} that provides image pre-processing from file path. */
-public class FileImagePreProcesor implements PreProcessor<Path> {
+public class FileImagePreProcessor implements PreProcessor<Path> {
 
     private PreProcessor<Image> preProcessor;
 
     /**
-     * Creates a {@code FileImagePreProcesor} instance.
+     * Creates a {@code FileImagePreProcessor} instance.
      *
-     * @param preProcessor a {@code {@link PreProcessor}} that can process image
+     * @param preProcessor a {@code PreProcessor} that can process image
      */
-    public FileImagePreProcesor(PreProcessor<Image> preProcessor) {
+    public FileImagePreProcessor(PreProcessor<Image> preProcessor) {
         this.preProcessor = preProcessor;
     }
 

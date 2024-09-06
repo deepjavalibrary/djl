@@ -17,12 +17,16 @@ import ai.djl.ndarray.NDArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * {@code ImageFactory} contains image creation mechanism on top of different platforms like PC and
@@ -37,6 +41,8 @@ public abstract class ImageFactory {
         "ai.djl.modality.cv.BufferedImageFactory",
         "ai.djl.android.core.BitmapImageFactory"
     };
+
+    private static final Pattern URL_PATTERN = Pattern.compile("^data:image/\\w+;base64,(.+)");
 
     private static ImageFactory factory = newInstance();
 
@@ -98,13 +104,22 @@ public abstract class ImageFactory {
     }
 
     /**
-     * Gets {@link Image} from URL.
+     * Gets {@link Image} from string representation.
      *
-     * @param url the String represent URL to load from
+     * @param url the String represent URL or base64 encoded image to load from
      * @return {@link Image}
      * @throws IOException URL is not valid.
      */
     public Image fromUrl(String url) throws IOException {
+        Matcher m = URL_PATTERN.matcher(url);
+        if (m.matches()) {
+            // url="data:image/png;base64,..."
+            byte[] buf = Base64.getDecoder().decode(m.group(1));
+            try (InputStream is = new ByteArrayInputStream(buf)) {
+                return fromInputStream(is);
+            }
+        }
+
         URI uri = URI.create(url);
         if (uri.isAbsolute()) {
             return fromUrl(uri.toURL());

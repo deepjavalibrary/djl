@@ -24,7 +24,9 @@ import ai.djl.testing.Assertions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 
 public class BufferedImageFactoryTest {
 
@@ -32,11 +34,16 @@ public class BufferedImageFactoryTest {
     public void testLoadImage() throws IOException {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             ImageFactory factory = ImageFactory.getInstance();
-            Image img =
-                    factory.fromUrl(
-                            "https://github.com/deepjavalibrary/djl/raw/master/examples/src/test/resources/dog_bike_car.jpg");
+            Image img = factory.fromUrl("https://resources.djl.ai/images/dog_bike_car.jpg");
             NDArray array = img.toNDArray(manager);
             Assert.assertEquals(new Shape(img.getHeight(), img.getWidth(), 3), array.getShape());
+
+            try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                img.save(bos, "png");
+                String data = Base64.getEncoder().encodeToString(bos.toByteArray());
+                Image img2 = factory.fromUrl("data:image/png;base64," + data);
+                Assert.assertEquals(img2.getWidth(), 768);
+            }
         }
     }
 

@@ -23,6 +23,12 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonSerializable;
+import ai.djl.util.JsonUtils;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -80,7 +86,34 @@ public class ImageServingTranslator implements Translator<Input, Output> {
             if (data == null) {
                 throw new TranslateException("Input data is empty.");
             }
-            Image image = factory.fromInputStream(new ByteArrayInputStream(data.getAsBytes()));
+            String contentType = input.getProperty("Content-Type", null);
+            if (contentType != null) {
+                int pos = contentType.indexOf(';');
+                if (pos > 0) {
+                    contentType = contentType.substring(0, pos);
+                }
+            }
+            Image image;
+            if ("application/json".equalsIgnoreCase(contentType)) {
+                try {
+                    JsonElement element =
+                            JsonUtils.GSON.fromJson(data.getAsString(), JsonElement.class);
+                    if (element == null || !element.isJsonObject()) {
+                        throw new TranslateException("Invalid JsonObject input.");
+                    }
+                    JsonObject obj = element.getAsJsonObject();
+                    JsonPrimitive url = obj.getAsJsonPrimitive("image_url");
+                    if (url == null) {
+                        throw new TranslateException("Missing \"image_url\" in json.");
+                    }
+
+                    image = factory.fromUrl(url.getAsString());
+                } catch (JsonParseException e) {
+                    throw new TranslateException("Input is not a valid json.", e);
+                }
+            } else {
+                image = factory.fromInputStream(new ByteArrayInputStream(data.getAsBytes()));
+            }
             return translator.processInput(ctx, image);
         } catch (IOException e) {
             throw new TranslateException("Input is not an Image data type", e);
