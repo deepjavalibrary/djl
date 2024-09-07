@@ -23,5 +23,5 @@ def add_to_zip(path: str, handle: zipfile.ZipFile):
 
 
 def zip_dir(src_dir: str, output_file: str):
-    with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as f:
+    with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_STORED) as f:
         add_to_zip(src_dir, f)
