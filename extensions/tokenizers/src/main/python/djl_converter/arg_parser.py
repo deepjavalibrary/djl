@@ -78,6 +78,16 @@ def importer_args():
                         "--cpu-only",
                         action='store_true',
                         help="Only validate jit traced model on CPU")
+    parser.add_argument("--optimize",
+                        choices=["O1", "O2", "O3", "O4"],
+                        help="Optimization option for ONNX models")
+    parser.add_argument(
+        "--device",
+        help='The device to use to do the export. Defaults to "cpu".')
+    parser.add_argument(
+        "--dtype",
+        choices=["fp32", "fp16", "bf16"],
+        help="The floating point precision to use for the export.")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "-c",
