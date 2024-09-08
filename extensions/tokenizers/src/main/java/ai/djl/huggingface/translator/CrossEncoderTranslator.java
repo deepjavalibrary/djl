@@ -26,6 +26,7 @@ import ai.djl.util.StringPair;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -88,14 +89,29 @@ public class CrossEncoderTranslator implements Translator<StringPair, float[]> {
     /** {@inheritDoc} */
     @Override
     public List<float[]> batchProcessOutput(TranslatorContext ctx, NDList list) {
-        NDList[] batches = batchifier.unbatchify(list);
-        List<float[]> ret = new ArrayList<>(batches.length);
-        for (NDList batch : batches) {
-            NDArray result = batch.get(0);
-            if (sigmoid) {
+        if (sigmoid) {
+            NDList[] batches = batchifier.unbatchify(list);
+            List<float[]> ret = new ArrayList<>(batches.length);
+            for (NDList batch : batches) {
+                NDArray result = batch.get(0);
                 result = result.getNDArrayInternal().sigmoid();
+                ret.add(result.toFloatArray());
             }
-            ret.add(result.toFloatArray());
+            return ret;
+        }
+        NDArray array = list.get(0);
+        int batchSize = Math.toIntExact(array.size(0));
+        float[] buf = list.get(0).toFloatArray();
+        if (batchSize == 1) {
+            return Collections.singletonList(buf);
+        }
+
+        int length = buf.length / batchSize;
+        List<float[]> ret = new ArrayList<>(batchSize);
+        for (int i = 0; i < batchSize; ++i) {
+            float[] f = new float[length];
+            System.arraycopy(buf, i * length, f, 0, length);
+            ret.add(f);
         }
         return ret;
     }

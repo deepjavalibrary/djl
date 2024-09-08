@@ -107,7 +107,7 @@ public class TextEmbeddingServingTranslator implements Translator<Input, Output>
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "unchecked"})
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public List<Output> batchProcessOutput(TranslatorContext ctx, NDList list) throws Exception {
         List<float[]> outputs = translator.batchProcessOutput(ctx, list);
         int[] mapping = (int[]) ctx.getAttachment("mapping");

@@ -89,7 +89,7 @@ tasks {
                     downloadPath gzipInto file
                 }
 
-                if ("text_embedding" != task)
+                if (task !in arrayOf("text_embedding", "text_classification"))
                     continue
 
                 file = prefix / task / "ai.djl.huggingface.rust.json"
