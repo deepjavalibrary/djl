@@ -284,6 +284,29 @@ public class BitmapImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
+        public void drawMarks(List<Point> points, int radius) {
+            Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            Canvas canvas = new Canvas(mutableBitmap);
+
+            // set the paint configure
+            Paint paint = new Paint();
+            paint.setStrokeWidth(2);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setAntiAlias(true);
+
+            paint.setColor(darker(randomColor()));
+            for (Point point : points) {
+                int[][] star = createStar(point, radius);
+                drawPolygon(canvas, paint, star);
+            }
+
+            Bitmap oldBitmap = bitmap;
+            bitmap = mutableBitmap;
+            oldBitmap.recycle();
+        }
+
+        /** {@inheritDoc} */
+        @Override
         public void drawJoints(Joints joints) {
             Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
             Canvas canvas = new Canvas(mutableBitmap);
@@ -394,6 +417,16 @@ public class BitmapImageFactory extends ImageFactory {
             }
             Canvas canvas = new Canvas(image);
             canvas.drawBitmap(maskedImage, x, y, null);
+        }
+
+        private void drawPolygon(Canvas canvas, Paint paint, int[][] polygon) {
+            android.graphics.Path polygonPath = new android.graphics.Path();
+            polygonPath.moveTo(polygon[0][0], polygonPath[1][0]);
+            for (int i = 1; i < polygon[0].length; i++) {
+                polygonPath.lineTo(polygon[0][i], polygon[1][i]);
+            }
+            polygonPath.close();
+            canvas.drawPath(polygonPath, paint);
         }
     }
 }
