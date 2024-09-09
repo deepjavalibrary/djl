@@ -25,6 +25,7 @@ import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Mask;
+import ai.djl.modality.cv.output.Point;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
@@ -241,7 +242,7 @@ public class BitmapImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
-        public void drawBoundingBoxes(DetectedObjects detections) {
+        public void drawBoundingBoxes(DetectedObjects detections, float opacity) {
             Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
             Canvas canvas = new Canvas(mutableBitmap);
             // set the paint configure
@@ -421,7 +422,7 @@ public class BitmapImageFactory extends ImageFactory {
 
         private void drawPolygon(Canvas canvas, Paint paint, int[][] polygon) {
             android.graphics.Path polygonPath = new android.graphics.Path();
-            polygonPath.moveTo(polygon[0][0], polygonPath[1][0]);
+            polygonPath.moveTo(polygon[0][0], polygon[1][0]);
             for (int i = 1; i < polygon[0].length; i++) {
                 polygonPath.lineTo(polygon[0][i], polygon[1][i]);
             }
