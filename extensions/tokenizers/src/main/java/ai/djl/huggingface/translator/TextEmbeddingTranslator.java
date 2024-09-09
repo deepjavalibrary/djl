@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -155,14 +156,20 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     /** {@inheritDoc} */
     @Override
     public List<float[]> batchProcessOutput(TranslatorContext ctx, NDList list) {
-        int batchSize = Math.toIntExact(list.head().size(0));
         NDArray attentionMask = (NDArray) ctx.getAttachment("attentionMask");
         NDArray output = processEmbedding(list, attentionMask);
+        int batchSize = Math.toIntExact(output.size(0));
+        float[] buf = output.toFloatArray();
+        if (batchSize == 1) {
+            return Collections.singletonList(buf);
+        }
+
+        int length = buf.length / batchSize;
         List<float[]> ret = new ArrayList<>(batchSize);
-        NDList splitList = output.split(batchSize);
-        for (int i = 0; i < batchSize; i++) {
-            NDArray array = splitList.get(i);
-            ret.add(array.toFloatArray());
+        for (int i = 0; i < batchSize; ++i) {
+            float[] f = new float[length];
+            System.arraycopy(buf, i * length, f, 0, length);
+            ret.add(f);
         }
         return ret;
     }

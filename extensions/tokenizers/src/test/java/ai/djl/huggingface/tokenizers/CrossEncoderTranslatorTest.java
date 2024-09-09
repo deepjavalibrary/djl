@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,6 @@ import java.util.Map;
 public class CrossEncoderTranslatorTest {
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testCrossEncoderTranslator()
             throws ModelException, IOException, TranslateException {
         String text1 = "Sentence 1";
@@ -146,21 +146,21 @@ public class CrossEncoderTranslatorTest {
             input.addProperty("Content-Type", "application/json");
             input.add("data", "{\"query\": \"" + text1 + "\", \"texts\": [\"" + text2 + "\"]}");
             res = predictor.predict(input);
-            buf = ((List<float[]>) res.getData().getAsObject()).get(0);
+            buf = ((float[][]) res.getData().getAsObject())[0];
             Assert.assertEquals(buf[0], 0.32455865, 0.0001);
 
             input = new Input();
             input.addProperty("Content-Type", "application/json");
             input.add("data", "{\"query\": \"" + text1 + "\", \"texts\": [\"" + text2 + "\"]}");
             res = predictor.predict(input);
-            buf = ((List<float[]>) res.getData().getAsObject()).get(0);
+            buf = ((float[][]) res.getData().getAsObject())[0];
             Assert.assertEquals(buf[0], 0.32455865, 0.0001);
 
             input = new Input();
             input.addProperty("Content-Type", "application/json");
             input.add("data", "[{\"text\": \"" + text1 + "\", \"text_pair\": \"" + text2 + "\"}]");
             res = predictor.predict(input);
-            buf = ((List<float[]>) res.getData().getAsObject()).get(0);
+            buf = ((float[][]) res.getData().getAsObject())[0];
             Assert.assertEquals(buf[0], 0.32455865, 0.0001);
 
             Assert.assertThrows(TranslateException.class, () -> predictor.predict(new Input()));
@@ -211,6 +211,58 @@ public class CrossEncoderTranslatorTest {
             Assert.assertThrows(
                     IllegalArgumentException.class,
                     () -> factory.newInstance(String.class, Integer.class, model, arguments));
+        }
+    }
+
+    @Test
+    public void testCrossEncoderTranslatorServingBatch()
+            throws ModelException, IOException, TranslateException {
+        String text1 = "Sentence 1";
+        String text2 = "Sentence 2";
+        Block block =
+                new LambdaBlock(
+                        a -> {
+                            NDManager manager = a.getManager();
+                            NDArray array =
+                                    manager.create(
+                                            new float[][] {{-0.7329f}, {-0.7329f}, {-0.7329f}});
+                            return new NDList(array);
+                        },
+                        "model");
+        Path modelDir = Paths.get("build/model");
+        Files.createDirectories(modelDir);
+
+        Criteria<Input, Output> criteria =
+                Criteria.builder()
+                        .setTypes(Input.class, Output.class)
+                        .optModelPath(modelDir)
+                        .optBlock(block)
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-cased")
+                        .optArgument("reranking", true)
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<Input, Output> model = criteria.loadModel();
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            Input input1 = new Input();
+            input1.add("text", text1);
+            input1.add("text_pair", text2);
+
+            Input input2 = new Input();
+            input2.addProperty("Content-Type", "application/json; charset=utf-8");
+            input2.add(
+                    "data",
+                    "{\"query\": \"query\", \"texts\": [\"" + text1 + "\", \"" + text2 + "\"]}");
+            List<Input> batchInput = Arrays.asList(input1, input2);
+
+            List<Output> batchOutput = predictor.batchPredict(batchInput);
+            Assert.assertEquals(batchOutput.size(), 2);
+            float[] ret1 = (float[]) batchOutput.get(0).getData().getAsObject();
+            float[][] ret2 = (float[][]) batchOutput.get(1).getData().getAsObject();
+            Assert.assertEquals(ret1[0], 0.32455865, 0.0001);
+            Assert.assertEquals(ret2[1][0], 0.32455865, 0.0001);
         }
     }
 }
