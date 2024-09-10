@@ -241,7 +241,8 @@ public class OrtModel extends BaseModel {
             Method method = clazz.getDeclaredMethod("getLibraryPath");
             return (String) method.invoke(null);
         } catch (Throwable e) {
-            logger.debug("Failed to load onnx extension", e);
+            logger.info("Onnx extension not found in classpath.");
+            logger.trace("Failed to load onnx extension", e);
         }
         return null;
     }
