@@ -13,6 +13,10 @@ on:
   schedule:
     - cron: '0 5 * * *'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-pytorch-jni-linux:
     if: github.repository == 'deepjavalibrary/djl'
@@ -55,10 +59,9 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Pcuda=$CUDA_VERSION -Ppt_version=$PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
@@ -74,8 +77,6 @@ jobs:
       image: amazonlinux:2
       env:
         JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     timeout-minutes: 30
     needs: create-aarch64-runner
     steps:
@@ -101,6 +102,11 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
           export PYTORCH_PRECXX11=true
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
+      - name: Configure Deployment AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
+          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
@@ -148,11 +154,10 @@ jobs:
           set CUDA_VERSION=${{ github.event.inputs.cuda }}
           if "%CUDA_VERSION%" == "" set CUDA_VERSION=cu124
           gradlew :engines:pytorch:pytorch-native:cleanJNI :engines:pytorch:pytorch-native:compileJNI -Pcuda=%CUDA_VERSION% -Ppt_version=${{ github.event.inputs.pt_version }}
-      - name: Configure AWS Credentials
+      - name: Configure Deployment AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         shell: bash
@@ -187,11 +192,10 @@ jobs:
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
-      - name: Configure AWS Credentials
+      - name: Configure Deployment AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         shell: bash
@@ -224,8 +228,6 @@ jobs:
       image: amazonlinux:2
       env:
         JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto.aarch64
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     timeout-minutes: 30
     needs: create-aarch64-runner
     steps:
@@ -250,6 +252,11 @@ jobs:
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
+      - name: Configure Deployment AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
+          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}

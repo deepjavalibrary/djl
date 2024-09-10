@@ -8,6 +8,10 @@ on:
     paths:
       - extensions/tokenizers/rust/**
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-tokenizers-jni-linux:
     runs-on: ubuntu-latest
@@ -15,8 +19,6 @@ jobs:
       image: amazonlinux:2
       env:
         JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Install Environment
         run: |
@@ -35,6 +37,11 @@ jobs:
       - name: Build djl-converter wheel
         working-directory: extensions/tokenizers/src/main/python/
         run: ./setup.py bdist_wheel
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
+          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
@@ -73,8 +80,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         shell: bash
@@ -111,8 +117,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         shell: bash
@@ -157,8 +162,6 @@ jobs:
       image: amazonlinux:2
       env:
         JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto.aarch64
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Install Environment
         run: |
@@ -174,6 +177,11 @@ jobs:
           source "$HOME/.cargo/env"
           ./gradlew :extensions:tokenizers:compileJNI
           PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
+          aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
           DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
@@ -217,10 +225,9 @@ jobs:
           . "$HOME/.cargo/env"
           ./gradlew :extensions:tokenizers:compileJNI -Pcuda=${{ env.CUDA_VERSION }}
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |

@@ -3,6 +3,10 @@ name: Native S3 Tensorflow
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   upload:
     runs-on: ubuntu-latest
@@ -23,8 +27,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
       - name: Upload tensorflow native binaries to s3
         run: ./gradlew :engines:tensorflow:tensorflow-native:uTNL

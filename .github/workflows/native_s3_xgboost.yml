@@ -7,6 +7,10 @@ on:
         description: 'xgboost version'
         required: false
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   create-aarch64-runner:
     if: github.repository == 'deepjavalibrary/djl'
@@ -56,10 +60,9 @@ jobs:
           python3 create_jni.py
           cd ../..
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         run: |
