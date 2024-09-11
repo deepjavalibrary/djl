@@ -17,7 +17,7 @@ sentencepiece = "0.2.0"
 tokenizers = "0.20.0"
 
 slf4j = "2.0.16"
-log4j_slf4j = "2.23.1"
+log4j_slf4j = "2.24.0"
 gson = "2.11.0"
 jna = "5.14.0"
 commonCli = "1.9.0"
@@ -25,7 +25,7 @@ commonsCompress = "1.27.1"
 commonsCsv = "1.11.0"
 commonsLogging = "1.3.4"
 
-awssdk = "2.27.18"
+awssdk = "2.27.23"
 ffmpeg = "6.1.1-1.5.10"
 hadoop = "3.4.0"
 javacpp = "1.5.10"
@@ -33,7 +33,7 @@ javacv = "1.5.10"
 openpnpOpencv = "4.9.0-0"
 spark = "3.5.2"
 tablesaw = "0.43.1"
-rapis = "22.12.0"
+rapis = "24.08.0"
 protobuf = "3.25.4"
 jackson = "2.17.2"
 jtransforms = "3.1"
@@ -83,3 +83,4 @@ antlrRuntime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
 testng = { module = "org.testng:testng", version.ref = "testng" }
 junit = { module = "junit:junit", version.ref = "junit" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+
