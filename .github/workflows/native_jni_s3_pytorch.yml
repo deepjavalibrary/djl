@@ -83,7 +83,7 @@ jobs:
       - name: Install compiler environment
         run: |
           yum -y update
-          yum -y install patch git cmake3 python3-devel java-17-amazon-corretto-devel
+          yum -y install patch git cmake3 python3-devel java-17-amazon-corretto-devel jq
           yum -y install gcc10 gcc10-c++
           ln -sf /usr/bin/gcc10-gcc /usr/bin/gcc
           ln -sf /usr/bin/gcc10-cc /usr/bin/cc
@@ -102,11 +102,28 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
           export PYTORCH_PRECXX11=true
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
-      - name: Configure Deployment AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
-          aws-region: us-east-2
+      - name: Configure AWS Credentials
+        run: |
+          oidc_token=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r ".value")
+          echo "::add-mask::$oidc_token"
+          
+          read -r AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN <<<"$(aws sts assume-role-with-web-identity \
+            --region "us-east-2" \
+            --role-arn "arn:aws:iam::425969335547:role/djl-ci-publish-role" \
+            --role-session-name "native-jni-s3-pytorch-jni-precxx11" \
+            --web-identity-token "$oidc_token" \
+            --query "[Credentials.AccessKeyId, Credentials.SecretAccessKey, Credentials.SessionToken]" \
+            --output text)"
+          
+          echo "::add-mask::$AWS_ACCESS_KEY_ID"
+          echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+          echo "::add-mask::$AWS_SESSION_TOKEN"
+          
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> "$GITHUB_ENV"
+          
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
@@ -234,7 +251,7 @@ jobs:
       - name: Install compiler environment
         run: |
           yum -y update
-          yum -y install patch git cmake3 python3-devel java-17-amazon-corretto-devel
+          yum -y install patch git cmake3 python3-devel java-17-amazon-corretto-devel jq
           yum -y install gcc10 gcc10-c++
           ln -sf /usr/bin/gcc10-gcc /usr/bin/gcc
           ln -sf /usr/bin/gcc10-cc /usr/bin/cc
@@ -252,11 +269,28 @@ jobs:
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
-      - name: Configure Deployment AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
-          aws-region: us-east-2
+      - name: Configure AWS Credentials
+        run: |
+          oidc_token=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r ".value")
+          echo "::add-mask::$oidc_token"
+          
+          read -r AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN <<<"$(aws sts assume-role-with-web-identity \
+            --region "us-east-2" \
+            --role-arn "arn:aws:iam::425969335547:role/djl-ci-publish-role" \
+            --role-session-name "native-jni-s3-pytorch-jni-aarch64" \
+            --web-identity-token "$oidc_token" \
+            --query "[Credentials.AccessKeyId, Credentials.SecretAccessKey, Credentials.SessionToken]" \
+            --output text)"
+          
+          echo "::add-mask::$AWS_ACCESS_KEY_ID"
+          echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+          echo "::add-mask::$AWS_SESSION_TOKEN"
+          
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> "$GITHUB_ENV"
+          
       - name: Copy files to S3 with the AWS CLI
         run: |
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
