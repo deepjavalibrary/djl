@@ -133,8 +133,8 @@ export PYTORCH_FLAVOR=cpu
 
 For macOS M1, you can use the following library:
 
-- ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
-- ai.djl.pytorch:pytorch-native-cpu:2.3.1:osx-aarch64
+- ai.djl.pytorch:pytorch-jni:2.4.0-0.30.0
+- ai.djl.pytorch:pytorch-native-cpu:2.4.0:osx-aarch64
 
 ```xml
 
@@ -142,13 +142,13 @@ For macOS M1, you can use the following library:
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cpu</artifactId>
     <classifier>osx-aarch64</classifier>
-    <version>2.3.1</version>
+    <version>2.4.0</version>
     <scope>runtime</scope>
 </dependency>
 <dependency>
 <groupId>ai.djl.pytorch</groupId>
 <artifactId>pytorch-jni</artifactId>
-<version>2.3.1-0.29.0</version>
+<version>2.4.0-0.30.0</version>
 <scope>runtime</scope>
 </dependency>
 ```
@@ -160,30 +160,30 @@ installed on your GPU machine, you can use one of the following library:
 
 #### Linux GPU
 
-- ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
-- ai.djl.pytorch:pytorch-native-cu121:2.3.1:linux-x86_64 - CUDA 12.1
+- ai.djl.pytorch:pytorch-jni:2.4.0-0.30.0
+- ai.djl.pytorch:pytorch-native-cu124:2.4.0:linux-x86_64 - CUDA 12.4
 
 ```xml
 
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-cu121</artifactId>
+    <artifactId>pytorch-native-cu124</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>2.3.1</version>
+    <version>2.4.0</version>
     <scope>runtime</scope>
 </dependency>
 <dependency>
 <groupId>ai.djl.pytorch</groupId>
 <artifactId>pytorch-jni</artifactId>
-<version>2.3.1-0.29.0</version>
+<version>2.4.0-0.30.0</version>
 <scope>runtime</scope>
 </dependency>
 ```
 
 ### Linux CPU
 
-- ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
-- ai.djl.pytorch:pytorch-native-cpu:2.3.1:linux-x86_64
+- ai.djl.pytorch:pytorch-jni:2.4.0-0.30.0
+- ai.djl.pytorch:pytorch-native-cpu:2.4.0:linux-x86_64
 
 ```xml
 
@@ -192,20 +192,20 @@ installed on your GPU machine, you can use one of the following library:
     <artifactId>pytorch-native-cpu</artifactId>
     <classifier>linux-x86_64</classifier>
     <scope>runtime</scope>
-    <version>2.3.1</version>
+    <version>2.4.0</version>
 </dependency>
 <dependency>
 <groupId>ai.djl.pytorch</groupId>
 <artifactId>pytorch-jni</artifactId>
-<version>2.3.1-0.29.0</version>
+<version>2.4.0-0.30.0</version>
 <scope>runtime</scope>
 </dependency>
 ```
 
 ### For aarch64 build
 
-- ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
-- ai.djl.pytorch:pytorch-native-cpu-precxx11:2.3.1:linux-aarch64
+- ai.djl.pytorch:pytorch-jni:2.4.0-0.30.0
+- ai.djl.pytorch:pytorch-native-cpu-precxx11:2.4.0:linux-aarch64
 
 ```xml
 
@@ -214,12 +214,12 @@ installed on your GPU machine, you can use one of the following library:
     <artifactId>pytorch-native-cpu-precxx11</artifactId>
     <classifier>linux-aarch64</classifier>
     <scope>runtime</scope>
-    <version>2.3.1</version>
+    <version>2.4.0</version>
 </dependency>
 <dependency>
 <groupId>ai.djl.pytorch</groupId>
 <artifactId>pytorch-jni</artifactId>
-<version>2.3.1-0.29.0</version>
+<version>2.4.0-0.30.0</version>
 <scope>runtime</scope>
 </dependency>
 ```
@@ -232,15 +232,15 @@ We also provide packages for the system like Amazonliunx 2 with GLIBC >= 2.17.
 All the package were built with GCC 7, we provided a newer `libstdc++.so.6.24` in the package that
 contains `CXXABI_1.3.9` to use the package successfully.
 
-- ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
-- ai.djl.pytorch:pytorch-native-cpu-precxx11:2.3.1:linux-x86_64 - CPU
+- ai.djl.pytorch:pytorch-jni:2.4.0-0.30.0
+- ai.djl.pytorch:pytorch-native-cpu-precxx11:2.4.0:linux-x86_64 - CPU
 
 ```xml
 
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-jni</artifactId>
-    <version>2.3.1-0.29.0</version>
+    <version>2.4.0-0.30.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -251,13 +251,13 @@ contains `CXXABI_1.3.9` to use the package successfully.
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-native-cpu-precxx11</artifactId>
     <classifier>linux-x86_64</classifier>
-    <version>2.3.1</version>
+    <version>2.4.0</version>
     <scope>runtime</scope>
 </dependency>
 <dependency>
 <groupId>ai.djl.pytorch</groupId>
 <artifactId>pytorch-jni</artifactId>
-<version>2.3.1-0.29.0</version>
+<version>2.4.0-0.30.0</version>
 <scope>runtime</scope>
 </dependency>
 ```
@@ -273,30 +273,30 @@ For the Windows platform, you can choose between CPU and GPU.
 
 #### Windows GPU
 
-- ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
-- ai.djl.pytorch:pytorch-native-cu121:2.3.1:win-x86_64 - CUDA 12.1
+- ai.djl.pytorch:pytorch-jni:2.4.0-0.30.0
+- ai.djl.pytorch:pytorch-native-cu124:2.4.0:win-x86_64 - CUDA 12.4
 
 ```xml
 
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
-    <artifactId>pytorch-native-cu121</artifactId>
+    <artifactId>pytorch-native-cu124</artifactId>
     <classifier>win-x86_64</classifier>
-    <version>2.3.1</version>
+    <version>2.4.0</version>
     <scope>runtime</scope>
 </dependency>
 <dependency>
 <groupId>ai.djl.pytorch</groupId>
 <artifactId>pytorch-jni</artifactId>
-<version>2.3.1-0.29.0</version>
+<version>2.4.0-0.30.0</version>
 <scope>runtime</scope>
 </dependency>
 ```
 
 ### Windows CPU
 
-- ai.djl.pytorch:pytorch-jni:2.3.1-0.29.0
-- ai.djl.pytorch:pytorch-native-cpu:2.3.1:win-x86_64
+- ai.djl.pytorch:pytorch-jni:2.4.0-0.30.0
+- ai.djl.pytorch:pytorch-native-cpu:2.4.0:win-x86_64
 
 ```xml
 
@@ -305,12 +305,12 @@ For the Windows platform, you can choose between CPU and GPU.
     <artifactId>pytorch-native-cpu</artifactId>
     <classifier>win-x86_64</classifier>
     <scope>runtime</scope>
-    <version>2.3.1</version>
+    <version>2.4.0</version>
 </dependency>
 <dependency>
 <groupId>ai.djl.pytorch</groupId>
 <artifactId>pytorch-jni</artifactId>
-<version>2.3.1-0.29.0</version>
+<version>2.4.0-0.30.0</version>
 <scope>runtime</scope>
 </dependency>
 ```
