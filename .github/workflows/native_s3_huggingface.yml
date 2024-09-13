@@ -23,7 +23,7 @@ jobs:
       - name: Install Environment
         run: |
           yum -y groupinstall "Development Tools"
-          yum -y install patch perl-IPC-Cmd cmake3
+          yum -y install patch perl-IPC-Cmd cmake3 curl jq
           yum -y install java-17-amazon-corretto-devel
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -38,10 +38,26 @@ jobs:
         working-directory: extensions/tokenizers/src/main/python/
         run: ./setup.py bdist_wheel
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
-          aws-region: us-east-2
+        run: |
+          oidc_token=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r ".value")
+          echo "::add-mask::$oidc_token"
+
+          read -r AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN <<<"$(aws sts assume-role-with-web-identity \
+            --region "us-east-2" \
+            --role-arn "arn:aws:iam::425969335547:role/djl-ci-publish-role" \
+            --role-session-name "build-tokenizers-jni-linux" \
+            --web-identity-token "$oidc_token" \
+            --query "[Credentials.AccessKeyId, Credentials.SecretAccessKey, Credentials.SessionToken]" \
+            --output text)"
+
+          echo "::add-mask::$AWS_ACCESS_KEY_ID"
+          echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+          echo "::add-mask::$AWS_SESSION_TOKEN"
+
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> "$GITHUB_ENV"
       - name: Copy files to S3 with the AWS CLI
         run: |
           DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
@@ -166,7 +182,7 @@ jobs:
       - name: Install Environment
         run: |
           yum -y groupinstall "Development Tools"
-          yum -y install patch perl-IPC-Cmd cmake3
+          yum -y install patch perl-IPC-Cmd cmake3 curl jq
           yum -y install java-17-amazon-corretto-devel
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -178,10 +194,26 @@ jobs:
           ./gradlew :extensions:tokenizers:compileJNI
           PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
-          aws-region: us-east-2
+        run: |
+          oidc_token=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r ".value")
+          echo "::add-mask::$oidc_token"
+
+          read -r AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN <<<"$(aws sts assume-role-with-web-identity \
+            --region "us-east-2" \
+            --role-arn "arn:aws:iam::425969335547:role/djl-ci-publish-role" \
+            --role-session-name "build-tokenizer-jni-aarch64" \
+            --web-identity-token "$oidc_token" \
+            --query "[Credentials.AccessKeyId, Credentials.SecretAccessKey, Credentials.SessionToken]" \
+            --output text)"
+
+          echo "::add-mask::$AWS_ACCESS_KEY_ID"
+          echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+          echo "::add-mask::$AWS_SESSION_TOKEN"
+
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> "$GITHUB_ENV"
       - name: Copy files to S3 with the AWS CLI
         run: |
           DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)

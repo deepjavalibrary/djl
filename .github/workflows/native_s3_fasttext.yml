@@ -16,7 +16,7 @@ jobs:
         run: |
           yum -y update
           yum -y groupinstall "Development Tools"
-          yum -y install patch cmake3
+          yum -y install patch cmake3 curl jq
           ln -sf /usr/bin/cmake3 /usr/bin/cmake
           pip3 install awscli --upgrade
       - uses: actions/checkout@v3
@@ -37,10 +37,26 @@ jobs:
           ./gradlew :extensions:fasttext:compileJNI
           ./gradlew -Pjni :extensions:fasttext:test
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
-          aws-region: us-east-2
+        run: |
+          oidc_token=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r ".value")
+          echo "::add-mask::$oidc_token"
+
+          read -r AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN <<<"$(aws sts assume-role-with-web-identity \
+            --region "us-east-2" \
+            --role-arn "arn:aws:iam::425969335547:role/djl-ci-publish-role" \
+            --role-session-name "build-fasttext-jni-linux" \
+            --web-identity-token "$oidc_token" \
+            --query "[Credentials.AccessKeyId, Credentials.SecretAccessKey, Credentials.SessionToken]" \
+            --output text)"
+
+          echo "::add-mask::$AWS_ACCESS_KEY_ID"
+          echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+          echo "::add-mask::$AWS_SESSION_TOKEN"
+
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> "$GITHUB_ENV"
       - name: Copy files to S3 with the AWS CLI
         run: |
           FASTTEXT_VERSION="$(awk -F '=' '/fasttext/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
