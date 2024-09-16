@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
 
 set -e
-WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 
-VERSION=v$1
-ARCH=$2
-FLAVOR=$3
-
-pushd "$WORK_DIR"
-if [ ! -d "tokenizers" ]; then
-  git clone https://github.com/huggingface/tokenizers -b "$VERSION"
-fi
+ARCH=$1
+FLAVOR=$2
 
 if [ ! -d "build" ]; then
   mkdir build
