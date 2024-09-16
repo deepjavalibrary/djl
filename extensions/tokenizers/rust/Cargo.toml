@@ -13,7 +13,7 @@ candle-flash-attn = { version = "*", optional = true }
 candle-cublaslt = { git = "https://github.com/huggingface/candle-cublaslt", rev = "cf789b7dd6d4abb19b03b9556442f94f0588b4a0", optional = true }
 candle-layer-norm = { git = "https://github.com/xyang16/candle-layer-norm", rev = "e574de6a7f88bafbede8edf9ee43170c6a8ce51a", optional = true }
 candle-rotary = { git = "https://github.com/huggingface/candle-rotary", rev = "0a718a0856569a92f3112e64f10d07e4447822e8", optional = true }
-tokenizers = { path = "../tokenizers/tokenizers", version = "*", features = ["http"] }
+tokenizers = { version = "0.20.0", features = ["http"] }
 half = "2.4.0"
 tracing = "0.1.40"
 safetensors = "0.4.3"

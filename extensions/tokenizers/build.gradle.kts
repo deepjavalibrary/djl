@@ -114,11 +114,11 @@ tasks {
             if ("mac" in os || "linux" in os) {
                 val arch = if (arch == "amd64") "x86_64" else arch
                 exec {
-                    commandLine("bash", "build.sh", libs.versions.tokenizers.get(), arch, flavor)
+                    commandLine("bash", "build.sh", arch, flavor)
                 }
             } else
                 exec {
-                    commandLine("${project.projectDir}/build.cmd", libs.versions.tokenizers.get())
+                    commandLine("${project.projectDir}/build.cmd")
                 }
 
             // for ci to upload to S3
