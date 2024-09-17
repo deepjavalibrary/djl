@@ -10,7 +10,7 @@ permissions:
 jobs:
   build-tensorrt-jni-linux:
     runs-on: ubuntu-latest
-    container: deepjavalibrary/ubuntu18.04:tensorrt-cuda116
+    container: nvcr.io/nvidia/tensorrt:22.07-py3
     steps:
       - name: Install Environment
         run: pip3 install awscli --upgrade
