@@ -21,7 +21,7 @@ pub fn get_cublas_lt_wrapper(device: &Device) -> Option<CublasLtWrapper> {
         } else {
             None
         };
-        cublaslt.clone()
+        cublaslt
     }
 }
 
