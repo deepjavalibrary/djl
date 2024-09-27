@@ -13,6 +13,7 @@
 package ai.djl.util;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -25,6 +26,9 @@ public class SecurityManagerTest {
 
     @BeforeTest
     public void setUp() {
+        if (Runtime.version().version().get(0) > 17) {
+            throw new SkipException("Skip SecurityManagerTest for JDK 19+");
+        }
         originalSM = System.getSecurityManager();
     }
 
