@@ -19,6 +19,14 @@ tasks {
     checkstyleMain { exclude("ai/djl/mxnet/jnarator/parser/*") }
     pmdMain { exclude("ai/djl/mxnet/jnarator/parser/*") }
 
+    compileJava {
+        options.apply {
+            release = 8
+            encoding = "UTF-8"
+            compilerArgs = listOf("-proc:none", "-Xlint:all,-options,-static")
+        }
+    }
+
     jar {
         dependsOn(generateGrammarSource)
         manifest {
@@ -39,5 +47,4 @@ tasks {
     generateTestGrammarSource {
         dependsOn(verifyJava)
     }
-
 }
