@@ -17,8 +17,8 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.translator.Sam2Translator;
 import ai.djl.modality.cv.translator.Sam2Translator.Sam2Input;
+import ai.djl.modality.cv.translator.Sam2TranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
@@ -54,7 +54,7 @@ public final class SegmentAnything2 {
                         .optModelUrls("djl://ai.djl.pytorch/sam2-hiera-tiny")
                         .optEngine("PyTorch")
                         .optDevice(Device.cpu()) // use sam2-hiera-tiny-gpu for GPU
-                        .optTranslator(new Sam2Translator())
+                        .optTranslatorFactory(new Sam2TranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
 

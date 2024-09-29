@@ -13,8 +13,6 @@
 package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
-import ai.djl.modality.cv.Image;
-import ai.djl.modality.cv.output.CategoryMask;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.translator.Sam2Translator.Sam2Input;
 import ai.djl.translate.Translator;
@@ -43,8 +41,8 @@ public class Sam2TranslatorFactory implements TranslatorFactory, Serializable {
     @SuppressWarnings("unchecked")
     public <I, O> Translator<I, O> newInstance(
             Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
-        if (input == Image.class && output == CategoryMask.class) {
-            return (Translator<I, O>) new Sam2Translator();
+        if (input == Sam2Input.class && output == DetectedObjects.class) {
+            return (Translator<I, O>) Sam2Translator.builder(arguments).build();
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

@@ -25,7 +25,7 @@ import java.io.IOException;
 public class SegmentAnything2Test {
 
     @Test
-    public void testInstanceSegmentation() throws ModelException, TranslateException, IOException {
+    public void testSam2() throws ModelException, TranslateException, IOException {
         DetectedObjects result = SegmentAnything2.predict();
         Classifications.Classification best = result.best();
         Assert.assertTrue(Double.compare(best.getProbability(), 0.3) > 0);
