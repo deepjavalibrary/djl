@@ -13,6 +13,8 @@
 package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
+import ai.djl.modality.Input;
+import ai.djl.modality.Output;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.translator.Sam2Translator.Sam2Input;
 import ai.djl.translate.Translator;
@@ -34,6 +36,7 @@ public class Sam2TranslatorFactory implements TranslatorFactory, Serializable {
 
     static {
         SUPPORTED_TYPES.add(new Pair<>(Sam2Input.class, DetectedObjects.class));
+        SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
 
     /** {@inheritDoc} */
@@ -43,6 +46,9 @@ public class Sam2TranslatorFactory implements TranslatorFactory, Serializable {
             Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
         if (input == Sam2Input.class && output == DetectedObjects.class) {
             return (Translator<I, O>) Sam2Translator.builder(arguments).build();
+        } else if (input == Input.class && output == Output.class) {
+            Sam2Translator translator = Sam2Translator.builder(arguments).build();
+            return (Translator<I, O>) new Sam2ServingTranslator(translator);
         }
         throw new IllegalArgumentException("Unsupported input/output types.");
     }

@@ -344,6 +344,18 @@ public class BufferedImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
+        public void drawRectangle(Rectangle rect, int rgb, int thickness) {
+            Graphics2D g = (Graphics2D) image.getGraphics();
+            g.setStroke(new BasicStroke(thickness));
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setPaint(new Color(rgb));
+            int x = (int) rect.getX();
+            int y = (int) rect.getY();
+            g.drawRect(x, y, (int) rect.getWidth(), (int) rect.getHeight());
+        }
+
+        /** {@inheritDoc} */
+        @Override
         public void drawMarks(List<Point> points, int radius) {
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

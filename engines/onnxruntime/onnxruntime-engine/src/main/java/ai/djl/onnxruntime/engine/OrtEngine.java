@@ -77,7 +77,13 @@ public final class OrtEngine extends Engine {
     @Override
     public Engine getAlternativeEngine() {
         if (!initialized && !Boolean.getBoolean("ai.djl.onnx.disable_alternative")) {
-            Engine engine = Engine.getInstance();
+            Engine engine;
+            if (Engine.hasEngine("PyTorch")) {
+                // workaround MXNet engine issue on CI
+                engine = Engine.getEngine("PyTorch");
+            } else {
+                engine = Engine.getInstance();
+            }
             if (engine.getRank() < getRank()) {
                 // alternativeEngine should not have the same rank as OnnxRuntime
                 alternativeEngine = engine;
