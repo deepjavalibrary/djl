@@ -12,6 +12,9 @@
  */
 package ai.djl.modality.cv.translator;
 
+import ai.djl.Model;
+import ai.djl.ModelException;
+import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.BoundingBox;
@@ -27,15 +30,21 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.NoBatchifyTranslator;
+import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /** A {@link Translator} that handles mask generation task. */
 public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedObjects> {
@@ -44,13 +53,38 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
     private static final float[] STD = {0.229f, 0.224f, 0.225f};
 
     private Pipeline pipeline;
+    private Predictor<NDList, NDList> predictor;
+    private String encoderPath;
 
     /** Constructs a {@code Sam2Translator} instance. */
-    public Sam2Translator() {
+    public Sam2Translator(Builder builder) {
         pipeline = new Pipeline();
         pipeline.add(new Resize(1024, 1024));
         pipeline.add(new ToTensor());
         pipeline.add(new Normalize(MEAN, STD));
+        this.encoderPath = builder.encoderPath;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void prepare(TranslatorContext ctx) throws IOException, ModelException {
+        if (encoderPath == null) {
+            return;
+        }
+        Model model = ctx.getModel();
+        Path path = Paths.get(encoderPath);
+        if (!path.isAbsolute() && Files.notExists(path)) {
+            path = model.getModelPath().resolve(encoderPath);
+        }
+        if (!Files.exists(path)) {
+            throw new IOException("encoder model not found: " + encoderPath);
+        }
+        NDManager manager = ctx.getNDManager();
+        Model encoder = manager.getEngine().newModel("encoder", manager.getDevice());
+        encoder.load(path);
+        predictor = encoder.newPredictor(new NoopTranslator(null));
+        model.getNDManager().attachInternal(UUID.randomUUID().toString(), predictor);
+        model.getNDManager().attachInternal(UUID.randomUUID().toString(), encoder);
     }
 
     /** {@inheritDoc} */
@@ -72,7 +106,21 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         NDArray locations = manager.create(buf, new Shape(1, numPoints, 2));
         NDArray labels = manager.create(input.getLabels());
 
-        return new NDList(array, locations, labels);
+        if (predictor == null) {
+            return new NDList(array, locations, labels);
+        }
+
+        NDList embeddings = predictor.predict(new NDList(array));
+        NDArray mask = manager.zeros(new Shape(1, 1, 256, 256));
+        NDArray hasMask = manager.zeros(new Shape(1));
+        return new NDList(
+                embeddings.get(2),
+                embeddings.get(0),
+                embeddings.get(1),
+                locations,
+                labels,
+                mask,
+                hasMask);
     }
 
     /** {@inheritDoc} */
@@ -99,6 +147,55 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         List<BoundingBox> boxes = Collections.singletonList(mask);
 
         return new DetectedObjects(classes, probabilities, boxes);
+    }
+
+    /**
+     * Creates a builder to build a {@code Sam2Translator}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return builder(Collections.emptyMap());
+    }
+
+    /**
+     * Creates a builder to build a {@code Sam2Translator} with specified arguments.
+     *
+     * @param arguments arguments to specify builder options
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, ?> arguments) {
+        return new Builder(arguments);
+    }
+
+    /** The builder for Sam2Translator. */
+    public static class Builder {
+
+        String encoderPath;
+
+        Builder(Map<String, ?> arguments) {
+            encoderPath = ArgumentsUtil.stringValue(arguments, "encoder");
+        }
+
+        /**
+         * Sets the encoder model path.
+         *
+         * @param encoderPath the encoder model path
+         * @return the builder
+         */
+        public Builder optEncoderPath(String encoderPath) {
+            this.encoderPath = encoderPath;
+            return this;
+        }
+
+        /**
+         * Builds the translator.
+         *
+         * @return the new translator
+         */
+        public Sam2Translator build() {
+            return new Sam2Translator(this);
+        }
     }
 
     /** A class represents the segment anything input. */
@@ -149,8 +246,12 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
             return ret;
         }
 
-        int[][] getLabels() {
-            return new int[][] {labels.stream().mapToInt(Integer::intValue).toArray()};
+        float[][] getLabels() {
+            float[][] buf = new float[1][labels.size()];
+            for (int i = 0; i < labels.size(); ++i) {
+                buf[0][i] = labels.get(i);
+            }
+            return buf;
         }
 
         /**
