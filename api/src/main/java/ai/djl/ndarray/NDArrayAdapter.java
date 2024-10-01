@@ -1346,6 +1346,7 @@ public abstract class NDArrayAdapter implements NDArray {
         } else {
             alternativeArray.set(getDataType().asDataType(toByteBuffer()));
         }
+        NDScope.unregister(alternativeArray);
         return alternativeArray;
     }
 }
