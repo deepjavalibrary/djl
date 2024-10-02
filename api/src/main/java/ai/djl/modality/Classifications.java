@@ -18,14 +18,8 @@ import ai.djl.translate.Ensembleable;
 import ai.djl.util.JsonSerializable;
 import ai.djl.util.JsonUtils;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
-import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,11 +35,6 @@ import java.util.stream.Collectors;
 public class Classifications implements JsonSerializable, Ensembleable<Classifications> {
 
     private static final long serialVersionUID = 1L;
-
-    private static final Gson GSON =
-            JsonUtils.builder()
-                    .registerTypeAdapter(Classifications.class, new ClassificationsSerializer())
-                    .create();
 
     @SuppressWarnings("serial")
     protected List<String> classNames;
@@ -210,31 +199,25 @@ public class Classifications implements JsonSerializable, Ensembleable<Classific
 
     /** {@inheritDoc} */
     @Override
-    public String toJson() {
-        return GSON.toJson(this) + '\n';
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getAsString() {
-        return toJson();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ByteBuffer toByteBuffer() {
-        return ByteBuffer.wrap(toJson().getBytes(StandardCharsets.UTF_8));
+    public JsonElement serialize() {
+        return JsonUtils.GSON.toJsonTree(topK());
     }
 
     /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append('[').append(System.lineSeparator());
-        for (Classification item : topK(topK)) {
-            sb.append('\t').append(item).append(System.lineSeparator());
+        sb.append("[\n");
+        List<Classification> list = topK();
+        int index = 0;
+        for (Classification item : list) {
+            sb.append('\t').append(item);
+            if (++index < list.size()) {
+                sb.append(',');
+            }
+            sb.append('\n');
         }
-        sb.append(']');
+        sb.append("]\n");
         return sb.toString();
     }
 
@@ -306,7 +289,7 @@ public class Classifications implements JsonSerializable, Ensembleable<Classific
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(100);
-            sb.append("{\"class\": \"").append(className).append("\", \"probability\": ");
+            sb.append("{\"className\": \"").append(className).append("\", \"probability\": ");
             if (probability < 0.00001) {
                 sb.append(String.format("%.1e", probability));
             } else {
@@ -315,17 +298,6 @@ public class Classifications implements JsonSerializable, Ensembleable<Classific
             }
             sb.append('}');
             return sb.toString();
-        }
-    }
-
-    /** A customized Gson serializer to serialize the {@code Classifications} object. */
-    public static final class ClassificationsSerializer implements JsonSerializer<Classifications> {
-
-        /** {@inheritDoc} */
-        @Override
-        public JsonElement serialize(Classifications src, Type type, JsonSerializationContext ctx) {
-            List<?> list = src.topK();
-            return ctx.serialize(list);
         }
     }
 }

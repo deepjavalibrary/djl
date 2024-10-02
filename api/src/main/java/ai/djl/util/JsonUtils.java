@@ -26,7 +26,8 @@ public interface JsonUtils {
 
     boolean PRETTY_PRINT = Boolean.parseBoolean(Utils.getEnvOrSystemProperty("DJL_PRETTY_PRINT"));
     Gson GSON = builder().create();
-    Gson GSON_PRETTY = builder().setPrettyPrinting().create();
+    Gson GSON_COMPACT = builder(false).create();
+    Gson GSON_PRETTY = builder(true).create();
     Type LIST_TYPE = new TypeToken<List<String>>() {}.getType();
 
     /**
@@ -35,10 +36,22 @@ public interface JsonUtils {
      * @return a custom {@code GsonBuilder} instance.
      */
     static GsonBuilder builder() {
+        return builder(PRETTY_PRINT);
+    }
+
+    /**
+     * Returns a custom {@code GsonBuilder} instance.
+     *
+     * @param prettyPrint true for pretty print
+     * @return a custom {@code GsonBuilder} instance.
+     */
+    static GsonBuilder builder(boolean prettyPrint) {
         GsonBuilder builder =
                 new GsonBuilder()
                         .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                         .serializeSpecialFloatingPointValues()
+                        .registerTypeHierarchyAdapter(
+                                JsonSerializable.class, new JsonSerializable.Serializer())
                         .registerTypeAdapter(
                                 Double.class,
                                 (JsonSerializer<Double>)
@@ -49,7 +62,7 @@ public interface JsonUtils {
                                             }
                                             return new JsonPrimitive(src);
                                         });
-        if (PRETTY_PRINT) {
+        if (prettyPrint) {
             builder.setPrettyPrinting();
         }
         return builder;

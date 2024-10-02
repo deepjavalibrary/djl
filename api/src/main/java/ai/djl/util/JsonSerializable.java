@@ -14,7 +14,14 @@ package ai.djl.util;
 
 import ai.djl.ndarray.BytesSupplier;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
 import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A class implements {@code JsonSerializable} indicates it can be serialized into a json string.
@@ -26,5 +33,37 @@ public interface JsonSerializable extends Serializable, BytesSupplier {
      *
      * @return a json string
      */
-    String toJson();
+    default String toJson() {
+        return JsonUtils.GSON_COMPACT.toJson(serialize());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    default String getAsString() {
+        return toJson();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    default ByteBuffer toByteBuffer() {
+        return ByteBuffer.wrap(toJson().getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Serializes the object to the {@code JsonElement}.
+     *
+     * @return the {@code JsonElement}
+     */
+    JsonElement serialize();
+
+    /** A customized Gson serializer to serialize the {@code Segmentation} object. */
+    final class Serializer implements JsonSerializer<JsonSerializable> {
+
+        /** {@inheritDoc} */
+        @Override
+        public JsonElement serialize(
+                JsonSerializable src, Type type, JsonSerializationContext ctx) {
+            return src.serialize();
+        }
+    }
 }
