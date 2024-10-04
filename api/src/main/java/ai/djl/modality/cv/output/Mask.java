@@ -14,6 +14,10 @@ package ai.djl.modality.cv.output;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.util.JsonUtils;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * A mask with a probability for each pixel within a bounding rectangle.
@@ -77,6 +81,17 @@ public class Mask extends Rectangle {
      */
     public boolean isFullImageMask() {
         return fullImageMask;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public JsonObject serialize() {
+        JsonObject ret = super.serialize();
+        if (fullImageMask) {
+            ret.add("fullImageMask", new JsonPrimitive(true));
+        }
+        ret.add("mask", JsonUtils.GSON.toJsonTree(probDist));
+        return ret;
     }
 
     /**

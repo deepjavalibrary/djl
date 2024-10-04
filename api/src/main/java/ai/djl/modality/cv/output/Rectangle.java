@@ -12,6 +12,11 @@
  */
 package ai.djl.modality.cv.output;
 
+import ai.djl.util.JsonSerializable;
+import ai.djl.util.JsonUtils;
+
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -25,7 +30,7 @@ import java.util.PriorityQueue;
  * if you have an image width of 400 pixels and the rectangle starts at 100 pixels, you would use
  * .25.
  */
-public class Rectangle implements BoundingBox {
+public class Rectangle implements BoundingBox, JsonSerializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -145,13 +150,29 @@ public class Rectangle implements BoundingBox {
         return height;
     }
 
+    /**
+     * Returns the upper left and bottom right coordinates.
+     *
+     * @return the upper left and bottom right coordinates
+     */
+    public double[] getCoordinates() {
+        Point upLeft = corners.get(0);
+        Point bottomRight = corners.get(2);
+        return new double[] {upLeft.getX(), upLeft.getY(), bottomRight.getX(), bottomRight.getY()};
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public JsonObject serialize() {
+        JsonObject ret = new JsonObject();
+        ret.add("rect", JsonUtils.GSON.toJsonTree(getCoordinates()));
+        return ret;
+    }
+
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        double x = getX();
-        double y = getY();
-        return String.format(
-                "{\"x\"=%.3f, \"y\"=%.3f, \"width\"=%.3f, \"height\"=%.3f}", x, y, width, height);
+        return toJson();
     }
 
     /**

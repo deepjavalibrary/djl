@@ -12,6 +12,8 @@
  */
 package ai.djl.modality.cv.output;
 
+import ai.djl.util.JsonUtils;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -48,19 +50,7 @@ public class Joints implements Serializable {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(4000);
-        sb.append("\n[\n\t");
-        boolean first = true;
-        for (Joint joint : joints) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",\n\t");
-            }
-            sb.append(joint);
-        }
-        sb.append("\n]");
-        return sb.toString();
+        return JsonUtils.GSON_PRETTY.toJson(this) + "\n";
     }
 
     /**
@@ -69,7 +59,9 @@ public class Joints implements Serializable {
      * @see Joints
      */
     public static class Joint extends Point {
+
         private static final long serialVersionUID = 1L;
+
         private double confidence;
 
         /**
@@ -91,14 +83,6 @@ public class Joints implements Serializable {
          */
         public double getConfidence() {
             return confidence;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public String toString() {
-            return String.format(
-                    "{\"Joint\": {\"x\"=%.3f, \"y\"=%.3f}, \"confidence\": %.4f}",
-                    getX(), getY(), getConfidence());
         }
     }
 }
