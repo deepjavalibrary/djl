@@ -33,15 +33,17 @@ public class Sam2InputTest {
                 "{\"image\": \""
                         + file.toUri().toURL()
                         + "\",\n"
+                        + "\"visualize\": true,\n"
                         + "\"prompt\": [\n"
                         + "    {\"type\": \"point\", \"data\": [575, 750], \"label\": 0},\n"
                         + "    {\"type\": \"rectangle\", \"data\": [425, 600, 700, 875]}\n"
                         + "]}";
         Sam2Input input = Sam2Input.fromJson(json);
+        Assert.assertTrue(input.isVisualize());
         Assert.assertEquals(input.getPoints().size(), 1);
         Assert.assertEquals(input.getBoxes().size(), 1);
 
-        input = Sam2Input.builder(img).addPoint(0, 1).addBox(0, 0, 1, 1).build();
+        input = Sam2Input.builder(img).visualize().addPoint(0, 1).addBox(0, 0, 1, 1).build();
         Assert.assertEquals(input.getPoints().size(), 1);
         Assert.assertEquals(input.getBoxes().size(), 1);
     }

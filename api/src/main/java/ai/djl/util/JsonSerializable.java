@@ -49,11 +49,7 @@ public interface JsonSerializable extends Serializable, BytesSupplier {
         return ByteBuffer.wrap(toJson().getBytes(StandardCharsets.UTF_8));
     }
 
-    /**
-     * Serializes the object to the {@code JsonElement}.
-     *
-     * @return the {@code JsonElement}
-     */
+    /** {@inheritDoc} */
     JsonElement serialize();
 
     /** A customized Gson serializer to serialize the {@code Segmentation} object. */

@@ -205,6 +205,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         private Image image;
         private Point[] points;
         private int[] labels;
+        private boolean visualize;
 
         /**
          * Constructs a {@code Sam2Input} instance.
@@ -214,9 +215,22 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
          * @param labels the labels for the locations (0: background, 1: foreground)
          */
         public Sam2Input(Image image, Point[] points, int[] labels) {
+            this(image, points, labels, false);
+        }
+
+        /**
+         * Constructs a {@code Sam2Input} instance.
+         *
+         * @param image the image
+         * @param points the locations on the image
+         * @param labels the labels for the locations (0: background, 1: foreground)
+         * @param visualize true if output visualized image
+         */
+        public Sam2Input(Image image, Point[] points, int[] labels, boolean visualize) {
             this.image = image;
             this.points = points;
             this.labels = labels;
+            this.visualize = visualize;
         }
 
         /**
@@ -226,6 +240,15 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
          */
         public Image getImage() {
             return image;
+        }
+
+        /**
+         * Returns {@code true} if output visualized image.
+         *
+         * @return {@code true} if output visualized image
+         */
+        public boolean isVisualize() {
+            return visualize;
         }
 
         /**
@@ -288,13 +311,16 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         public static Sam2Input fromJson(String input) throws IOException {
             Prompt prompt = JsonUtils.GSON.fromJson(input, Prompt.class);
             if (prompt.image == null) {
-                throw new IllegalArgumentException("Missing url value");
+                throw new IllegalArgumentException("Missing image value");
             }
             if (prompt.prompt == null || prompt.prompt.length == 0) {
                 throw new IllegalArgumentException("Missing prompt value");
             }
             Image image = ImageFactory.getInstance().fromUrl(prompt.image);
             Builder builder = builder(image);
+            if (prompt.visualize) {
+                builder.visualize();
+            }
             for (Location location : prompt.prompt) {
                 int[] data = location.data;
                 if ("point".equals(location.type)) {
@@ -322,6 +348,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
             private Image image;
             private List<Point> points;
             private List<Integer> labels;
+            private boolean visualize;
 
             Builder(Image image) {
                 this.image = image;
@@ -381,6 +408,16 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
             }
 
             /**
+             * Sets the visualize for the {@code Sam2Input}.
+             *
+             * @return the builder
+             */
+            public Builder visualize() {
+                visualize = true;
+                return this;
+            }
+
+            /**
              * Builds the {@code Sam2Input}.
              *
              * @return the new {@code Sam2Input}
@@ -388,7 +425,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
             public Sam2Input build() {
                 Point[] location = points.toArray(new Point[0]);
                 int[] array = labels.stream().mapToInt(Integer::intValue).toArray();
-                return new Sam2Input(image, location, array);
+                return new Sam2Input(image, location, array, visualize);
             }
         }
 
@@ -413,6 +450,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         private static final class Prompt {
             String image;
             Location[] prompt;
+            boolean visualize;
 
             public void setImage(String image) {
                 this.image = image;
@@ -420,6 +458,10 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
 
             public void setPrompt(Location[] prompt) {
                 this.prompt = prompt;
+            }
+
+            public void setVisualize(boolean visualize) {
+                this.visualize = visualize;
             }
         }
     }
