@@ -20,15 +20,21 @@ from sam2.sam2_image_predictor import SAM2ImagePredictor
 from torch import nn
 
 
-class SAM2ImageEncoder(nn.Module):
+class Sam2Wrapper(nn.Module):
 
-    def __init__(self, sam_model: SAM2Base) -> None:
+    def __init__(self, sam_model: SAM2Base, multimask_output: bool) -> None:
         super().__init__()
         self.model = sam_model
         self.image_encoder = sam_model.image_encoder
         self.no_mem_embed = sam_model.no_mem_embed
+        self.mask_decoder = sam_model.sam_mask_decoder
+        self.prompt_encoder = sam_model.sam_prompt_encoder
+        self.img_size = sam_model.image_size
+        self.multimask_output = multimask_output
+        self.sparse_embedding = None
 
-    def forward(self, x: torch.Tensor) -> tuple[Any, Any, Any]:
+    @torch.no_grad()
+    def encode(self, x: torch.Tensor) -> tuple[Any, Any, Any]:
         backbone_out = self.image_encoder(x)
         backbone_out["backbone_fpn"][0] = self.model.sam_mask_decoder.conv_s0(
             backbone_out["backbone_fpn"][0])
@@ -52,18 +58,6 @@ class SAM2ImageEncoder(nn.Module):
         ][::-1]
 
         return feats[0], feats[1], feats[2]
-
-
-class SAM2ImageDecoder(nn.Module):
-
-    def __init__(self, sam_model: SAM2Base, multimask_output: bool) -> None:
-        super().__init__()
-        self.mask_decoder = sam_model.sam_mask_decoder
-        self.prompt_encoder = sam_model.sam_prompt_encoder
-        self.model = sam_model
-        self.img_size = sam_model.image_size
-        self.multimask_output = multimask_output
-        self.sparse_embedding = None
 
     @torch.no_grad()
     def forward(
@@ -152,17 +146,13 @@ def trace_model(model_id: str):
         device = torch.device("cpu")
 
     model_name = f"{model_id[9:]}"
-    os.makedirs(model_name)
+    os.makedirs(model_name, exist_ok=True)
 
     predictor = SAM2ImagePredictor.from_pretrained(model_id, device=device)
-    encoder = SAM2ImageEncoder(predictor.model)
-    decoder = SAM2ImageDecoder(predictor.model, True)
+    model = Sam2Wrapper(predictor.model, True)
 
     input_image = torch.ones(1, 3, 1024, 1024).to(device)
-    high_res_feats_0, high_res_feats_1, image_embed = encoder(input_image)
-
-    converted = torch.jit.trace(encoder, input_image)
-    torch.jit.save(converted, f"model_name/encoder.pt")
+    high_res_feats_0, high_res_feats_1, image_embed = model.encode(input_image)
 
     # trace decoder model
     embed_size = (
@@ -179,10 +169,14 @@ def trace_model(model_id: str):
     mask_input = torch.randn(1, 1, *mask_input_size, dtype=torch.float)
     has_mask_input = torch.tensor([1], dtype=torch.float)
 
-    converted = torch.jit.trace(
-        decoder, (image_embed, high_res_feats_0, high_res_feats_1,
-                  point_coords, point_labels, mask_input, has_mask_input))
-    torch.jit.save(converted, f"model_name/model_name.pt")
+    converted = torch.jit.trace_module(
+        model, {
+            "encode":
+            input_image,
+            "forward": (image_embed, high_res_feats_0, high_res_feats_1,
+                        point_coords, point_labels, mask_input, has_mask_input)
+        })
+    torch.jit.save(converted, f"{model_name}/{model_name}.pt")
 
     # save serving.properties
     serving_file = os.path.join(model_name, "serving.properties")
@@ -191,7 +185,7 @@ def trace_model(model_id: str):
             f"engine=PyTorch\n"
             f"option.modelName={model_name}\n"
             f"translatorFactory=ai.djl.modality.cv.translator.Sam2TranslatorFactory\n"
-            f"encoder=encoder.pt")
+            f"encode_method=encode\n")
 
 
 if __name__ == '__main__':
