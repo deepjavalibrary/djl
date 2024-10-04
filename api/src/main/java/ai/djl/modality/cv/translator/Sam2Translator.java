@@ -58,6 +58,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
     private Pipeline pipeline;
     private Predictor<NDList, NDList> predictor;
     private String encoderPath;
+    private String encodeMethod;
 
     /** Constructs a {@code Sam2Translator} instance. */
     public Sam2Translator(Builder builder) {
@@ -66,12 +67,19 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         pipeline.add(new ToTensor());
         pipeline.add(new Normalize(MEAN, STD));
         this.encoderPath = builder.encoderPath;
+        this.encodeMethod = builder.encodeMethod;
     }
 
     /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws IOException, ModelException {
         if (encoderPath == null) {
+            // PyTorch model
+            if (encodeMethod != null) {
+                Model model = ctx.getModel();
+                predictor = model.newPredictor(new NoopTranslator(null));
+                model.getNDManager().attachInternal(UUID.randomUUID().toString(), predictor);
+            }
             return;
         }
         Model model = ctx.getModel();
@@ -111,7 +119,15 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
             return new NDList(array, locations, labels);
         }
 
-        NDList embeddings = predictor.predict(new NDList(array));
+        NDList embeddings;
+        if (encodeMethod == null) {
+            embeddings = predictor.predict(new NDList(array));
+        } else {
+            NDArray placeholder = manager.create("");
+            placeholder.setName("module_method:" + encodeMethod);
+            embeddings = predictor.predict(new NDList(placeholder, array));
+        }
+
         NDArray mask = manager.zeros(new Shape(1, 1, 256, 256));
         NDArray hasMask = manager.zeros(new Shape(1));
         return new NDList(
@@ -173,9 +189,11 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
     public static class Builder {
 
         String encoderPath;
+        String encodeMethod;
 
         Builder(Map<String, ?> arguments) {
             encoderPath = ArgumentsUtil.stringValue(arguments, "encoder");
+            encodeMethod = ArgumentsUtil.stringValue(arguments, "encode_method");
         }
 
         /**
@@ -186,6 +204,17 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
          */
         public Builder optEncoderPath(String encoderPath) {
             this.encoderPath = encoderPath;
+            return this;
+        }
+
+        /**
+         * Sets the module name for encode method.
+         *
+         * @param encodeMethod the module name for encode method
+         * @return the builder
+         */
+        public Builder optEncodeMethod(String encodeMethod) {
+            this.encodeMethod = encodeMethod;
             return this;
         }
 
