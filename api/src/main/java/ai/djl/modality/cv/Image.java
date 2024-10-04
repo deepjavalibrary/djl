@@ -16,6 +16,7 @@ import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Joints;
 import ai.djl.modality.cv.output.Point;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 
@@ -136,6 +137,15 @@ public interface Image {
      * @param detections the object detection results
      */
     void drawBoundingBoxes(DetectedObjects detections, float opacity);
+
+    /**
+     * Draws a rectangle on the image.
+     *
+     * @param rect the rectangle to draw
+     * @param rgb the color
+     * @param thickness the thickness
+     */
+    void drawRectangle(Rectangle rect, int rgb, int thickness);
 
     /**
      * Draws a mark on the image.
