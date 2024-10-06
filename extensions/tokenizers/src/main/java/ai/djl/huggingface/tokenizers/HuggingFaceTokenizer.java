@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -232,6 +233,9 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the {@code Encoding} of the input sentence
      */
     public Encoding encode(String text, boolean addSpecialTokens, boolean withOverflowingTokens) {
+        if (text == null) {
+            throw new NullPointerException("text cannot be null");
+        }
         if (doLowerCase != null) {
             text = text.toLowerCase(doLowerCase);
         }
@@ -261,6 +265,10 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      */
     public Encoding encode(
             String text, String textPair, boolean addSpecialTokens, boolean withOverflowingTokens) {
+        if (text == null || textPair == null) {
+            throw new NullPointerException("text/text_pair cannot be null");
+        }
+
         if (doLowerCase != null) {
             text = text.toLowerCase(doLowerCase);
             textPair = textPair.toLowerCase(doLowerCase);
@@ -322,6 +330,8 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
             for (int i = 0; i < inputs.length; ++i) {
                 inputs[i] = inputs[i].toLowerCase(doLowerCase);
             }
+        } else if (Arrays.stream(inputs).anyMatch(Objects::isNull)) {
+            throw new NullPointerException("input text cannot be null");
         }
         long encoding = TokenizersLibrary.LIB.encodeList(getHandle(), inputs, addSpecialTokens);
         return toEncoding(encoding, withOverflowingTokens);
@@ -377,6 +387,8 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
             for (int i = 0; i < inputs.length; ++i) {
                 inputs[i] = inputs[i].toLowerCase(doLowerCase);
             }
+        } else if (Arrays.stream(inputs).anyMatch(Objects::isNull)) {
+            throw new NullPointerException("input text cannot be null");
         }
         long[] encodings = TokenizersLibrary.LIB.batchEncode(getHandle(), inputs, addSpecialTokens);
         Encoding[] ret = new Encoding[encodings.length];
@@ -417,6 +429,13 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
             }
             for (int i = 0; i < textPair.length; ++i) {
                 textPair[i] = textPair[i].toLowerCase(doLowerCase);
+            }
+        } else {
+            if (inputs.keys().stream().anyMatch(Objects::isNull)) {
+                throw new NullPointerException("text pair key cannot be null");
+            }
+            if (inputs.values().stream().anyMatch(Objects::isNull)) {
+                throw new NullPointerException("text pair value cannot be null");
             }
         }
         long[] encodings =

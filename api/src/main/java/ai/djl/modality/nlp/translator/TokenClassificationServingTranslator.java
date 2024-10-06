@@ -56,6 +56,7 @@ public class TokenClassificationServingTranslator implements NoBatchifyTranslato
         TextPrompt prompt = TextPrompt.parseInput(input);
         if (prompt.isBatch()) {
             ctx.setAttachment("batch", Boolean.TRUE);
+            return translator.batchProcessInput(ctx, prompt.getBatch());
         }
 
         NDList ret = translator.processInput(ctx, prompt.getText());
