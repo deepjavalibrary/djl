@@ -14,7 +14,6 @@ package ai.djl.modality.cv.translator;
 
 import ai.djl.Model;
 import ai.djl.modality.Input;
-import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.CategoryMask;
 import ai.djl.translate.Translator;
@@ -37,7 +36,7 @@ public class SemanticSegmentationTranslatorFactoryTest {
 
     @Test
     public void testGetSupportedTypes() {
-        Assert.assertEquals(factory.getSupportedTypes().size(), 1);
+        Assert.assertEquals(factory.getSupportedTypes().size(), 6);
     }
 
     @Test
@@ -49,7 +48,7 @@ public class SemanticSegmentationTranslatorFactoryTest {
             Assert.assertTrue(translator instanceof SemanticSegmentationTranslator);
             Assert.assertThrows(
                     IllegalArgumentException.class,
-                    () -> factory.newInstance(Input.class, Output.class, model, arguments));
+                    () -> factory.newInstance(Input.class, Image.class, model, arguments));
         }
     }
 }

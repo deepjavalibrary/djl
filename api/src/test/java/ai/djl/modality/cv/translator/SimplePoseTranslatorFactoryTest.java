@@ -37,7 +37,7 @@ public class SimplePoseTranslatorFactoryTest {
 
     @Test
     public void testGetSupportedTypes() {
-        Assert.assertEquals(factory.getSupportedTypes().size(), 2);
+        Assert.assertEquals(factory.getSupportedTypes().size(), 6);
     }
 
     @Test
