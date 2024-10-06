@@ -34,7 +34,9 @@ public class CategoryMask implements JsonSerializable {
 
     private static final int COLOR_BLACK = 0xFF000000;
 
+    @SuppressWarnings("serial")
     private List<String> classes;
+
     private int[][] mask;
 
     /**
