@@ -30,14 +30,17 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link Translator} that can handle generic question answering {@link Input} and {@link Output}.
  */
 public class QaServingTranslator implements NoBatchifyTranslator<Input, Output> {
 
-    private static final Type LIST_TYPE = new TypeToken<List<String>>() {}.getType();
+    private static final Type LIST_TYPE = new TypeToken<List<QAInput>>() {}.getType();
 
     private Translator<QAInput, String> translator;
 
@@ -116,13 +119,20 @@ public class QaServingTranslator implements NoBatchifyTranslator<Input, Output> 
         Output output = new Output();
         output.addProperty("Content-Type", "application/json");
         if (ctx.getAttachment("batch") != null) {
-            output.add(BytesSupplier.wrapAsJson(translator.batchProcessOutput(ctx, list)));
+            List<String> answers = translator.batchProcessOutput(ctx, list);
+            List<Map<String, String>> ret = new ArrayList<>();
+            for (String answer : answers) {
+                ret.add(Collections.singletonMap("answer", answer));
+            }
+            output.add(BytesSupplier.wrapAsJson(ret));
         } else {
             Batchifier batchifier = translator.getBatchifier();
             if (batchifier != null) {
                 list = batchifier.unbatchify(list)[0];
             }
-            output.add(translator.processOutput(ctx, list));
+            String answer = translator.processOutput(ctx, list);
+            Map<String, String> ret = Collections.singletonMap("answer", answer);
+            output.add(BytesSupplier.wrapAsJson(ret));
         }
         return output;
     }
