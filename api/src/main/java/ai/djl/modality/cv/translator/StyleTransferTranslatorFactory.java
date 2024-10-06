@@ -16,33 +16,25 @@ import ai.djl.Model;
 import ai.djl.modality.cv.Image;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
-import ai.djl.util.Pair;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 /** A {@link TranslatorFactory} that creates a {@link StyleTransferTranslator} instance. */
-public class StyleTransferTranslatorFactory implements TranslatorFactory, Serializable {
+public class StyleTransferTranslatorFactory extends BaseImageTranslatorFactory<Image>
+        implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /** {@inheritDoc} */
     @Override
-    public Set<Pair<Type, Type>> getSupportedTypes() {
-        return Collections.singleton(new Pair<>(Image.class, Image.class));
+    protected Translator<Image, Image> buildBaseTranslator(Model model, Map<String, ?> arguments) {
+        return new StyleTransferTranslator();
     }
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
-    public <I, O> Translator<I, O> newInstance(
-            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
-        if (!isSupported(input, output)) {
-            throw new IllegalArgumentException("Unsupported input/output types.");
-        }
-        return (Translator<I, O>) new StyleTransferTranslator();
+    public Class<Image> getBaseOutputType() {
+        return Image.class;
     }
 }
