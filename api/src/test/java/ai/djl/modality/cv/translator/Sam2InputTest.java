@@ -30,7 +30,7 @@ public class Sam2InputTest {
         Path file = Paths.get("../examples/src/test/resources/kitten.jpg");
         Image img = ImageFactory.getInstance().fromFile(file);
         String json =
-                "{\"image\": \""
+                "{\"image_url\": \""
                         + file.toUri().toURL()
                         + "\",\n"
                         + "\"visualize\": true,\n"

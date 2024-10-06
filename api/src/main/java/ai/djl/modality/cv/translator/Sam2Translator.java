@@ -39,6 +39,8 @@ import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -340,7 +342,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         public static Sam2Input fromJson(String input) throws IOException {
             Prompt prompt = JsonUtils.GSON.fromJson(input, Prompt.class);
             if (prompt.image == null) {
-                throw new IllegalArgumentException("Missing image value");
+                throw new IllegalArgumentException("Missing image_url value");
             }
             if (prompt.prompt == null || prompt.prompt.length == 0) {
                 throw new IllegalArgumentException("Missing prompt value");
@@ -477,7 +479,10 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         }
 
         private static final class Prompt {
+
+            @SerializedName("image_url")
             String image;
+
             Location[] prompt;
             boolean visualize;
 
