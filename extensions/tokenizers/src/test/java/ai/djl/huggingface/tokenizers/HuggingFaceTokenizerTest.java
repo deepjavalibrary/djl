@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -102,6 +103,17 @@ public class HuggingFaceTokenizerTest {
                 Assert.assertEquals(charSpansExpected[i].getStart(), charSpansResult[i].getStart());
                 Assert.assertEquals(charSpansExpected[i].getEnd(), charSpansResult[i].getEnd());
             }
+
+            Assert.assertThrows(() -> tokenizer.encode((String) null));
+            Assert.assertThrows(() -> tokenizer.encode(new String[] {null}));
+            Assert.assertThrows(() -> tokenizer.encode(null, null));
+            Assert.assertThrows(() -> tokenizer.encode("null", null));
+            Assert.assertThrows(() -> tokenizer.batchEncode(new String[] {null}));
+            List<String> empty = Collections.singletonList(null);
+            List<String> some = Collections.singletonList("null");
+
+            Assert.assertThrows(() -> tokenizer.batchEncode(new PairList<>(empty, some)));
+            Assert.assertThrows(() -> tokenizer.batchEncode(new PairList<>(some, empty)));
         }
 
         Map<String, String> options = new ConcurrentHashMap<>();

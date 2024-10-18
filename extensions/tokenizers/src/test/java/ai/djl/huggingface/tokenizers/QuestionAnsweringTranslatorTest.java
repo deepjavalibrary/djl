@@ -102,7 +102,7 @@ public class QuestionAnsweringTranslatorTest {
             input.add("question", question);
             input.add("paragraph", paragraph);
             Output res = predictor.predict(input);
-            Assert.assertEquals(res.getAsString(0), "December 2004");
+            Assert.assertEquals(res.getAsString(0), "{\"answer\":\"December 2004\"}");
 
             Assert.assertThrows(
                     "Input data is empty.",
