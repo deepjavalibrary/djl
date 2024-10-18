@@ -34,7 +34,7 @@ openpnpOpencv = "4.9.0-0"
 spark = "3.5.2"
 tablesaw = "0.43.1"
 rapis = "24.08.0"
-protobuf = "3.25.4"
+protobuf = "3.25.5"
 jackson = "2.17.2"
 jtransforms = "3.1"
 
