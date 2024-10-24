@@ -84,7 +84,7 @@ class HuggingfaceConverter:
             sys.argv.extend(["--dtype", args.dtype])
         if args.trust_remote_code:
             sys.argv.append("--trust-remote-code")
-        if os.path.exists(model_id):
+        if task:
             sys.argv.extend(["--task", task])
         sys.argv.append(temp_dir)
 
