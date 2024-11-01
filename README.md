@@ -2,14 +2,14 @@
 ![DeepJavaLibrary](website/img/deepjavalibrary.png?raw=true "Deep Java Library")
 
 ![Continuous](https://github.com/deepjavalibrary/djl/workflows/Continuous/badge.svg)
-![Docs](https://github.com/deepjavalibrary/djl/workflows/Docs/badge.svg)
+[![Docs](https://github.com/deepjavalibrary/djl/workflows/Docs/badge.svg)](https://docs.djl.ai/master/index.html)
 ![Nightly Publish](https://github.com/deepjavalibrary/djl/workflows/Nightly%20Publish/badge.svg)
 
 # Deep Java Library (DJL)
 
 ## Overview
 
-Deep Java Library (DJL) is an open-source, high-level, engine-agnostic Java framework for deep learning. DJL is designed to be easy to get started with and simple to
+[Deep Java Library (DJL)](https://docs.djl.ai/master/index.html) is an open-source, high-level, engine-agnostic Java framework for deep learning. DJL is designed to be easy to get started with and simple to
 use for Java developers. DJL provides a native Java development experience and functions like any other regular Java library.
 
 You don't have to be machine learning/deep learning expert to get started. You can use your existing Java expertise as an on-ramp to learn and use machine learning and deep learning. You can
@@ -142,7 +142,7 @@ You can read our guide to [community forums, following DJL, issues, discussions,
 
 Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/social_media_social_media_logo_slack-512.png' width='20px' /> slack channel](http://tiny.cc/djl_slack) to get in touch with the development team, for questions and discussions.
 
-Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/512/1_Twitter_colored_svg-512.png' width='20px' /> twitter](https://twitter.com/deepjavalibrary) to see updates about new content, features, and releases.
+Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/512/1_Twitter_colored_svg-512.png' width='20px' /> twitter](https://x.com/deepjavalibrary) to see updates about new content, features, and releases.
 
 关注我们 [<img src='https://www.iconfinder.com/icons/5060515/download/svg/512' width='20px' /> 知乎专栏](https://zhuanlan.zhihu.com/c_1255493231133417472) 获取DJL最新的内容！
 
