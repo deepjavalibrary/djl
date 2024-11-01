@@ -142,7 +142,7 @@ You can read our guide to [community forums, following DJL, issues, discussions,
 
 Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/social_media_social_media_logo_slack-512.png' width='20px' /> slack channel](http://tiny.cc/djl_slack) to get in touch with the development team, for questions and discussions.
 
-Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/512/1_Twitter_colored_svg-512.png' width='20px' /> twitter](https://x.com/deepjavalibrary) to see updates about new content, features, and releases.
+Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/512/1_Twitter_colored_svg-512.png' width='20px' /> X (formerly Twitter)](https://x.com/deepjavalibrary) to see updates about new content, features, and releases.
 
 关注我们 [<img src='https://www.iconfinder.com/icons/5060515/download/svg/512' width='20px' /> 知乎专栏](https://zhuanlan.zhihu.com/c_1255493231133417472) 获取DJL最新的内容！
 
