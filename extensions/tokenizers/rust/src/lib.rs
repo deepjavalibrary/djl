@@ -59,7 +59,7 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     let mut parameters = FromPretrainedParameters::default();
     if !hf_token.is_null() {
         let hf_token: String = env.get_string(&hf_token).unwrap().into();
-        parameters.auth_token = Some(hf_token);
+        parameters.token = Some(hf_token);
     }
     let tokenizer = Tokenizer::from_pretrained(identifier, Some(parameters));
 
