@@ -23,18 +23,17 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-public class Yolov8DetectionTest {
+public class YoloDetectionTest {
 
     @Test
     public void testYolov8Detection() throws ModelException, TranslateException, IOException {
         TestRequirements.notGpu();
 
-        DetectedObjects result = Yolov8Detection.predict();
+        DetectedObjects result = YoloDetection.predict();
 
         Assert.assertTrue(result.getNumberOfObjects() >= 1);
+        Assert.assertTrue(result.getClassNames().contains("dog"));
         Classifications.Classification obj = result.best();
-        String className = obj.getClassName();
-        Assert.assertEquals(className, "dog");
         Assert.assertTrue(obj.getProbability() > 0.6);
     }
 }

@@ -56,7 +56,7 @@ public final class InstanceSegmentation {
         Criteria<Image, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, DetectedObjects.class)
-                        .optModelUrls("djl://ai.djl.pytorch/yolov8n-seg")
+                        .optModelUrls("djl://ai.djl.pytorch/yolo11n-seg")
                         .optTranslatorFactory(new YoloSegmentationTranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
