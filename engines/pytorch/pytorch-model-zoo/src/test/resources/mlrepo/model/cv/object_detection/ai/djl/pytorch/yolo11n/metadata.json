@@ -1,0 +1,43 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/object_detection",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "yolo11n",
+  "name": "yolo11n",
+  "description": "Yolo11n Object Detection",
+  "website": "http://www.djl.ai/engines/onnxruntime/model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "yolo11n",
+      "arguments": {
+        "width": 640,
+        "height": 640,
+        "resize": true,
+        "rescale": true,
+        "optApplyRatio": true,
+        "threshold": 0.6,
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloV8TranslatorFactory"
+      },
+      "options": {
+        "mapLocation": "true"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/yolo11n.zip",
+          "name": "",
+          "sha1Hash": "5af1900a48422b91d585bf096b1a03da310e6ed3",
+          "size": 9499137
+        }
+      }
+    }
+  ]
+}

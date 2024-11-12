@@ -33,11 +33,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /** An example of inference using an yolov8 model. */
-public final class Yolov8Detection {
+public final class YoloDetection {
 
-    private static final Logger logger = LoggerFactory.getLogger(Yolov8Detection.class);
+    private static final Logger logger = LoggerFactory.getLogger(YoloDetection.class);
 
-    private Yolov8Detection() {}
+    private YoloDetection() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
         DetectedObjects detection = predict();
@@ -49,11 +49,11 @@ public final class Yolov8Detection {
         Image img = ImageFactory.getInstance().fromFile(imgPath);
 
         // Use DJL OnnxRuntime model zoo model, model can be found:
-        // https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/onnxruntime/yolov8n/0.0.1/yolov8n.zip
+        // https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/onnxruntime/yolo11n/0.0.1/yolo11n.zip
         Criteria<Path, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Path.class, DetectedObjects.class)
-                        .optModelUrls("djl://ai.djl.onnxruntime/yolov8n")
+                        .optModelUrls("djl://ai.djl.onnxruntime/yolo11n")
                         .optEngine("OnnxRuntime")
                         .optArgument("width", 640)
                         .optArgument("height", 640)
@@ -76,7 +76,7 @@ public final class Yolov8Detection {
             DetectedObjects detection = predictor.predict(imgPath);
             if (detection.getNumberOfObjects() > 0) {
                 img.drawBoundingBoxes(detection);
-                Path output = outputPath.resolve("yolov8_detected.png");
+                Path output = outputPath.resolve("yolo_detected.png");
                 try (OutputStream os = Files.newOutputStream(output)) {
                     img.save(os, "png");
                 }
