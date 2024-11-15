@@ -85,6 +85,7 @@ The following pseudocode demonstrates running training:
 
 ## Release Notes
 
+* [0.31.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.31.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.31.0))
 * [0.30.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.30.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.30.0))
 * [0.29.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.29.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.29.0))
 * [0.28.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.28.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.28.0))
@@ -92,7 +93,7 @@ The following pseudocode demonstrates running training:
 * [0.26.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.26.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.26.0))
 * [+25 releases](https://github.com/deepjavalibrary/djl/releases)
 
-The release of DJL 0.30.0 is planned for November 2024.
+The release of DJL 0.32.0 is planned for January 2025.
 
 ## Building From Source
 
