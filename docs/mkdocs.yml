@@ -199,6 +199,8 @@ nav:
           - 'docs/demos/aws/sagemaker/large-model-inference/README.md'
       - Releases:
           - 'docs/serving/serving/docs/lmi/user_guides/release_notes.md'
+      - Announcements:
+          - 'docs/serving/serving/docs/lmi/announcements/breaking_changes.md'
   - Demos:
       - Demos: 'docs/demos/README.md'
       - AWS:
