@@ -21,10 +21,10 @@ function copy_files() {
   flavor="$2"
   if [[ $PLATFORM == 'darwin' ]]; then
     mkdir -p "build/jnilib/osx-$arch/$flavor"
-    cp -f rust/target/release/libdjl.dylib "build/jnilib/osx-$arch/$flavor/libtokenizers.dylib"
+    cp -f rust/target/release/libdjl_tokenizer.dylib "build/jnilib/osx-$arch/$flavor/libtokenizers.dylib"
   elif [[ $PLATFORM == 'linux' ]]; then
     mkdir -p "build/jnilib/linux-$arch/$flavor"
-    cp -f rust/target/release/libdjl.so "build/jnilib/linux-$arch/$flavor/libtokenizers.so"
+    cp -f rust/target/release/libdjl_tokenizer.so "build/jnilib/linux-$arch/$flavor/libtokenizers.so"
   fi
 }
 

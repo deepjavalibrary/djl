@@ -40,8 +40,12 @@ use tk::tokenizer::{EncodeInput, Encoding};
 use tk::utils::padding::{PaddingParams, PaddingStrategy};
 use tk::utils::truncation::{TruncationParams, TruncationStrategy};
 use tk::Tokenizer;
-use tk::{FromPretrainedParameters, Offsets};
+use tk::Offsets;
 
+#[cfg(not(target_os = "android"))]
+use tk::FromPretrainedParameters;
+
+#[cfg(not(target_os = "android"))]
 #[no_mangle]
 pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_createTokenizer<
     'local,
@@ -70,6 +74,20 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
             0
         }
     }
+}
+
+#[cfg(target_os = "android")]
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_createTokenizer<
+    'local,
+>(
+    mut env: JNIEnv<'local>,
+    _: JObject,
+    _: JString,
+    _: JString,
+) -> jlong {
+    env.throw("Not supported on Android").unwrap();
+    0
 }
 
 #[no_mangle]
