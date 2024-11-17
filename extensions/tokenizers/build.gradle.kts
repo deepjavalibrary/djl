@@ -131,6 +131,22 @@ tasks {
         }
     }
 
+    register("compileAndroidJNI"){
+        doFirst {
+            for (abi in listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")) {
+                exec {
+                    commandLine("bash", "build_android.sh", abi)
+                }
+                val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/android/$abi"
+                copy {
+                    from(buildDirectory / "jnilib" / "$abi")
+                    into(ciDir)
+                }
+                delete("$buildDirectory/jnilib")
+            }
+        }
+    }
+
     register("formatPython") {
         doFirst {
             exec {
