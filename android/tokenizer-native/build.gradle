@@ -108,7 +108,7 @@ afterEvaluate {
 
 tasks.register('processResources') {
     doLast {
-        def url = "https://publish.djl.ai/tokenizer/jnilib/android"
+        def url = "https://publish.djl.ai/tokenizer/${tokenizers_version}/jnilib/${djl_version}/android"
         def abis = ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"]
         abis.each { abi ->
             def downloadPath = new URL("${url}/${abi}/libdjl_tokenizer.so")
