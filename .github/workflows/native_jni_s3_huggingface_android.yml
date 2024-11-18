@@ -31,6 +31,15 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Install NDK
         run: echo "y" | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --install "ndk;${NDK_VERSION}"
+      - name: Install Rust
+        run: |
+          source "$HOME/.cargo/env"
+          cargo install cargo-ndk
+          rustup target add \
+            aarch64-linux-android \
+            armv7-linux-androideabi \
+            x86_64-linux-android \
+            i686-linux-android
       - name: build android
         run: |
           export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}
