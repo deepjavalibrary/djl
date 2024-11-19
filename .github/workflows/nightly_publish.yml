@@ -175,11 +175,12 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Publish to snapshot repository
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
+        # PT 1.13.1 is for PT 1.x support, and CUDA 11.x support
+        # PT 2.3.1 is for CUDA 12.1 support
+        # PT 2.5.1 is for CUDA 12.4 support
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -Psnapshot
-          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.1.2 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.3.1 -Psnapshot
-          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.4.0 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.5.1 -Psnapshot
           ./gradlew clean engines:ml:xgboost:publish -Pgpu -Psnapshot
           ./gradlew clean publish -Psnapshot
