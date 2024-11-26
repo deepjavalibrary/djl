@@ -15,8 +15,9 @@ jobs:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: [ macos-latest, ubuntu-latest ]
+        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
 
     steps:
       - uses: actions/checkout@v4
@@ -52,6 +53,7 @@ jobs:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
+      fail-fast: false
       matrix:
         operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
 
@@ -76,8 +78,9 @@ jobs:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: [ ubuntu-latest, windows-latest ]
+        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
 
     steps:
       - uses: actions/checkout@v4
@@ -95,6 +98,30 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=TensorFlow"
+
+  test-onnx:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 17
+      - uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Test with Gradle
+        run: ./gradlew :integration:test "-Dai.djl.default_engine=OnnxRuntime"
 
   test-aarch64:
     if: github.repository == 'deepjavalibrary/djl'
