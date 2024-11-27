@@ -38,7 +38,7 @@ public class IntegrationTests {
             // TODO: windows CPU build is having OOM issue if 3 engines are loaded and running tests
             // together
             if (System.getProperty("os.name").startsWith("Win")) {
-                engines.add("MXNet");
+                engines.add("PyTorch");
             } else if ("aarch64".equals(System.getProperty("os.arch"))) {
                 engines.add("PyTorch");
             } else {

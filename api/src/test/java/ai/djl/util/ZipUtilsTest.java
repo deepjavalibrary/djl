@@ -47,15 +47,40 @@ public class ZipUtilsTest {
 
     @Test
     public void testOffendingTar() throws IOException {
-        Path path = Paths.get("src/test/resources/offending.tar");
+        String[] offendingTars =
+                new String[] {
+                    "src/test/resources/linux-created-offender-traversal-elements.tar",
+                    "src/test/resources/windows-created-offender-traversal-elements.tar",
+                    "src/test/resources/linux-created-offender-root.tar",
+                    "src/test/resources/windows-created-offender-root.tar",
+                };
         Path output = Paths.get("build/output");
-        Path file = output.resolve("tmp/empty.txt");
-        Utils.deleteQuietly(file);
         Files.createDirectories(output);
-        try (InputStream is = Files.newInputStream(path)) {
-            TarUtils.untar(is, output, false);
+        for (String offendingTar : offendingTars) {
+            Path tarPath = Paths.get(offendingTar);
+            try (InputStream is = Files.newInputStream(tarPath)) {
+                Assert.assertThrows(() -> TarUtils.untar(is, output, false));
+            }
         }
-        Assert.assertTrue(Files.exists(file));
+    }
+
+    @Test
+    public void testOffendingZip() throws IOException {
+        String[] offendingTars =
+                new String[] {
+                    "src/test/resources/linux-created-offender-traversal-elements.zip",
+                    "src/test/resources/windows-created-offender-traversal-elements.zip",
+                    "src/test/resources/linux-created-offender-root.zip",
+                    "src/test/resources/windows-created-offender-root.zip",
+                };
+        Path output = Paths.get("build/output");
+        Files.createDirectories(output);
+        for (String offendingTar : offendingTars) {
+            Path tarPath = Paths.get(offendingTar);
+            try (InputStream is = Files.newInputStream(tarPath)) {
+                Assert.assertThrows(() -> ZipUtils.unzip(is, output));
+            }
+        }
     }
 
     @Test
