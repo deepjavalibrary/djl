@@ -52,12 +52,10 @@ public final class ZipUtils {
         ZipEntry entry;
         Set<String> set = new HashSet<>();
         while ((entry = zis.getNextEntry()) != null) {
-            String name = removeLeadingFileSeparator(entry.getName());
-            if (name.contains("..")) {
-                throw new IOException("Malicious zip entry: " + name);
-            }
-            set.add(name);
-            Path file = dest.resolve(name).toAbsolutePath();
+            String entryName = entry.getName();
+            validateArchiveEntry(entry.getName(), dest);
+            set.add(entryName);
+            Path file = dest.resolve(entryName).toAbsolutePath();
             if (entry.isDirectory()) {
                 Files.createDirectories(file);
             } else {
@@ -121,14 +119,18 @@ public final class ZipUtils {
         }
     }
 
-    static String removeLeadingFileSeparator(String name) {
-        int index = 0;
-        for (; index < name.length(); index++) {
-            if (name.charAt(index) != File.separatorChar) {
-                break;
-            }
+    static void validateArchiveEntry(String name, Path destination) throws IOException {
+        if (name.contains("..")) {
+            throw new IOException("Invalid archive entry, contains traversal elements: " + name);
         }
-        return name.substring(index);
+        Path expectedOutputPath = destination.resolve(name).toAbsolutePath().normalize();
+        if (!expectedOutputPath.startsWith(destination.normalize())) {
+            throw new IOException(
+                    "Bad archive entry "
+                            + name
+                            + ". Attempted write outside destination "
+                            + destination);
+        }
     }
 
     private static final class ValidationInputStream extends FilterInputStream {
