@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     requirements = [
         'huggingface-hub', 'transformers', 'sentence-transformers', 'torch',
-        'optimum[exporters,onnxruntime]', 'safetensors', 'requests'
+        'optimum[exporters]', 'safetensors', 'requests'
     ]
 
     setup(name='djl_converter',
