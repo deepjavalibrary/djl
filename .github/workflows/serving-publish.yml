@@ -1,0 +1,110 @@
+name: Serving publish
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'staging/snapshot, default is snapshot'
+        required: true
+        default: 'snapshot'
+      serving-branch:
+        description: 'djl-serving branch, default is master'
+        required: true
+        default: 'master'
+      repo-id:
+        description: 'staging repository id for djl api packages'
+        required: false
+        default: ''
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: deepjavalibrary/djl-serving
+          ref: ${{ github.event.inputs.serving-branch }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 17
+      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
+      - uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
+          aws-region: us-east-2
+      - name: Copy serving snapshot artifacts to S3
+        if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
+        run: |
+          ./gradlew :serving:createDeb -Psnapshot
+          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
+          aws s3 cp serving/build/distributions/*.deb s3://djl-ai/publish/djl-serving/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/djl-serving_${DJL_VERSION}*"
+      - name: Copy serving release artifacts to S3
+        if: ${{ github.event.inputs.mode == 'staging' }}
+        run: |
+          ./gradlew :serving:dZ :serving:createDeb -Pstaging
+          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
+          aws s3 cp serving/build/distributions/*.deb s3://djl-ai/publish/djl-serving/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/djl-serving_${DJL_VERSION}*"
+          if [[ $(aws s3 ls s3://djl-ai/publish/djl-serving/serving-$DJL_VERSION.tar | wc -l) -eq 0 ]]; \
+            then aws s3 cp serving/build/distributions/*.tar s3://djl-ai/publish/djl-serving/; \
+            else echo serving tarball published already!; fi
+          aws s3 cp serving/build/distributions/*.zip s3://djl-ai/publish/djl-serving/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-serving/serving-${DJL_VERSION}*"
+      - name: Copy benchmark release artifacts to S3
+        if: ${{ github.event.inputs.mode == 'staging' }}
+        run: |
+          ./gradlew :benchmark:dZ :benchmark:createDeb -Pstaging
+          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
+          aws s3 cp benchmark/build/distributions/*.tar s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
+          aws s3 cp benchmark/build/distributions/*.deb s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
+          aws s3 cp benchmark/build/distributions/*.zip s3://djl-ai/publish/djl-bench/${DJL_VERSION}/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/djl-bench/${DJL_VERSION}/*"
+      - name: Copy awscurl snapshot artifacts to S3
+        if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
+        run: |
+          ./gradlew :awscurl:jar
+          aws s3 cp awscurl/build/awscurl s3://djl-ai/publish/awscurl/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/awscurl/awscurl"
+      - name: Copy awscurl staging artifacts to S3
+        if: ${{ github.event.inputs.mode == 'staging' }}
+        run: |
+          ./gradlew :awscurl:jar -Pstaging
+          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
+          aws s3 cp awscurl/build/awscurl s3://djl-ai/publish/awscurl/${DJL_VERSION}/
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/awscurl/${DJL_VERSION}/*"
+      - name: Publish to snapshot repository
+        if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
+        run: ./gradlew publish -Psnapshot --refresh-dependencies
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
+          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
+          DJL_STAGING: ${{ github.event.inputs.repo-id }}
+      - name: Publish to staging repository
+        if: ${{ github.event.inputs.mode == 'staging' }}
+        run: ./gradlew publish -Pstaging --refresh-dependencies
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
+          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
+          DJL_STAGING: ${{ github.event.inputs.repo-id }}
