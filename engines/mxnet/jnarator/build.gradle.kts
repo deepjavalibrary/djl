@@ -23,7 +23,7 @@ tasks {
         options.apply {
             release = 8
             encoding = "UTF-8"
-            compilerArgs = listOf("-proc:none", "-Xlint:all,-options,-static")
+            compilerArgs = listOf("-proc:none", "-Xlint:all,-options,-static,-this-escape")
         }
     }
 

@@ -1016,15 +1016,13 @@ public interface NDArray extends NDResource, BytesSupplier {
         return getManager().create(getShape());
     }
 
-    ////////////////////////////////////////
-    ////////////////////////////////////////
+    /*
     // Operations
-    ////////////////////////////////////////
-    ////////////////////////////////////////
+    */
 
-    ////////////////////////////////////////
+    /*
     // Operations: Element Comparison
-    ////////////////////////////////////////
+    */
 
     /**
      * Returns {@code true} if all elements in this {@code NDArray} are equal to the {@link Number}.
@@ -1375,9 +1373,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      */
     NDArray lte(NDArray other);
 
-    ////////////////////////////////////////
+    /*
     // Operations: Element Arithmetic
-    ////////////////////////////////////////
+    */
 
     /**
      * Adds a number to this {@code NDArray} element-wise.
@@ -2006,9 +2004,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      */
     NDArray minimum(NDArray other);
 
-    ////////////////////////////////////////
+    /*
     // Operations: Basic Numeric
-    ////////////////////////////////////////
+    */
 
     /**
      * Returns the numerical negative {@code NDArray} element-wise.
@@ -2516,9 +2514,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      */
     NDArray toRadians();
 
-    ////////////////////////////////////////
+    /*
     // Operations: Reduction
-    ////////////////////////////////////////
+    */
 
     /**
      * Returns the maximum of this {@code NDArray}.
@@ -3161,9 +3159,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      */
     NDArray trace(int offset, int axis1, int axis2);
 
-    ////////////////////////////////////////
+    /*
     // Operations: Shapes and Arrays Manipulation
-    ////////////////////////////////////////
+    */
 
     /**
      * Splits this {@code NDArray} into multiple sub{@code NDArray}s given sections along first
@@ -3885,9 +3883,9 @@ public interface NDArray extends NDResource, BytesSupplier {
         return getNDArrayInternal().concat(new NDList(array), axis);
     }
 
-    ////////////////////////////////////////
+    /*
     // Operations: Logical Op
-    ////////////////////////////////////////
+    */
 
     /**
      * Returns the truth value of this {@code NDArray} AND the other {@code NDArray} element-wise.
@@ -4010,9 +4008,9 @@ public interface NDArray extends NDResource, BytesSupplier {
      */
     NDArray logicalNot();
 
-    ////////////////////////////////////////
+    /*
     // Operations: Other
-    ////////////////////////////////////////
+    */
 
     /**
      * Returns the indices that would sort this {@code NDArray}.
