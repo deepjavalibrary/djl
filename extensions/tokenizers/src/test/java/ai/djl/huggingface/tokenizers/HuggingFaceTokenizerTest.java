@@ -67,6 +67,7 @@ public class HuggingFaceTokenizerTest {
             long[] ids = {101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 1128, 100, 136, 102};
             long[] typeIds = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             long[] wordIds = {-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -1};
+            long[] sequenceIds = {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1};
             long[] attentionMask = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
             long[] specialTokenMask = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 
@@ -74,6 +75,7 @@ public class HuggingFaceTokenizerTest {
             Assert.assertEquals(ids, encoding.getIds());
             Assert.assertEquals(typeIds, encoding.getTypeIds());
             Assert.assertEquals(wordIds, encoding.getWordIds());
+            Assert.assertEquals(sequenceIds, encoding.getSequenceIds());
             Assert.assertEquals(attentionMask, encoding.getAttentionMask());
             Assert.assertEquals(specialTokenMask, encoding.getSpecialTokenMask());
 
@@ -103,6 +105,10 @@ public class HuggingFaceTokenizerTest {
                 Assert.assertEquals(charSpansExpected[i].getStart(), charSpansResult[i].getStart());
                 Assert.assertEquals(charSpansExpected[i].getEnd(), charSpansResult[i].getEnd());
             }
+
+            encoding = tokenizer.encode(inputs[0], inputs[1]);
+            sequenceIds = new long[] {-1, 0, 0, 0, 0, 0, 0, -1, 1, 1, 1, 1, 1, -1};
+            Assert.assertEquals(encoding.getSequenceIds(), sequenceIds);
 
             Assert.assertThrows(() -> tokenizer.encode((String) null));
             Assert.assertThrows(() -> tokenizer.encode(new String[] {null}));

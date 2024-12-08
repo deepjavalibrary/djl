@@ -50,6 +50,8 @@ public final class TokenizersLibrary {
 
     public native long[] getWordIds(long encoding);
 
+    public native long[] getSequenceIds(long encoding);
+
     public native String[] getTokens(long encoding);
 
     public native long[] getAttentionMask(long encoding);

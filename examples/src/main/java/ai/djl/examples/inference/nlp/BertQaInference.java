@@ -48,7 +48,7 @@ public final class BertQaInference {
 
     public static void main(String[] args) throws IOException, TranslateException, ModelException {
         String answer = BertQaInference.predict();
-        logger.info("Answer: {}", answer);
+        logger.info("Output: {}", answer);
     }
 
     public static String predict() throws IOException, TranslateException, ModelException {
@@ -69,6 +69,7 @@ public final class BertQaInference {
                                 "djl://ai.djl.huggingface.pytorch/deepset/minilm-uncased-squad2")
                         .optEngine("PyTorch")
                         .optTranslatorFactory(new QuestionAnsweringTranslatorFactory())
+                        .optArgument("detail", true)
                         .optProgress(new ProgressBar())
                         .build();
 

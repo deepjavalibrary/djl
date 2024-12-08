@@ -39,8 +39,8 @@ use tk::models::bpe::BPE;
 use tk::tokenizer::{EncodeInput, Encoding};
 use tk::utils::padding::{PaddingParams, PaddingStrategy};
 use tk::utils::truncation::{TruncationParams, TruncationStrategy};
-use tk::Tokenizer;
 use tk::Offsets;
+use tk::Tokenizer;
 
 #[cfg(not(target_os = "android"))]
 use tk::FromPretrainedParameters;
@@ -397,6 +397,31 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
     for i in word_ids {
         if let Some(word_id) = i {
             long_ids.push(*word_id as jlong)
+        } else {
+            long_ids.push(-1)
+        }
+    }
+
+    let array = env.new_long_array(len).unwrap();
+    env.set_long_array_region(&array, 0, &long_ids).unwrap();
+    array
+}
+
+#[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_getSequenceIds<
+    'local,
+>(
+    env: JNIEnv<'local>,
+    _: JObject,
+    handle: jlong,
+) -> JLongArray<'local> {
+    let encoding = cast_handle::<Encoding>(handle);
+    let sequence_ids = encoding.get_sequence_ids();
+    let len = sequence_ids.len() as jsize;
+    let mut long_ids: Vec<jlong> = Vec::new();
+    for i in sequence_ids {
+        if let Some(sequence_id) = i {
+            long_ids.push(sequence_id as jlong)
         } else {
             long_ids.push(-1)
         }
