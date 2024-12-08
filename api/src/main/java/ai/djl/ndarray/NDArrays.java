@@ -32,9 +32,9 @@ public final class NDArrays {
         }
     }
 
-    ////////////////////////////////////////
+    /*
     // Operations: Element Comparison
-    ////////////////////////////////////////
+    */
 
     /**
      * Returns {@code true} if all elements in {@link NDArray} a are equal to {@link NDArray} b.
@@ -788,9 +788,9 @@ public final class NDArrays {
         return data.sequenceMask(sequenceLength);
     }
 
-    ////////////////////////////////////////
+    /*
     // Operations: Element Arithmetic
-    ////////////////////////////////////////
+    */
 
     /**
      * Adds a number to the {@link NDArray} element-wise.

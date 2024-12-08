@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /** {@code MxNDArrayEx} is the MXNet implementation of the {@link NDArrayEx}. */
+@SuppressWarnings("dangling-doc-comments")
 class MxNDArrayEx implements NDArrayEx {
 
     private MxNDArray array;

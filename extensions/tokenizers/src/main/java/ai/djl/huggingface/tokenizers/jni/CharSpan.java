@@ -10,8 +10,6 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-
-/** A class holds character span information. */
 package ai.djl.huggingface.tokenizers.jni;
 
 /** A class holds character span information. */
