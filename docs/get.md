@@ -99,7 +99,7 @@ dependencies {
     implementation platform("ai.djl:bom:<UPCOMING VERSION>-SNAPSHOT")
 }
 ```
-Currently, the `<UPCOMING VERSION> = 0.31.0`.
+Currently, the `<UPCOMING VERSION> = 0.32.0`.
 This snapshot version is the same as the custom DJL repository. 
 
 You also need to change directory to `djl/bom`. Then build and publish it to maven local same as what was done in `djl`.
