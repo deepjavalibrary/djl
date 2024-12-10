@@ -28,13 +28,13 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 
 You can pull the TensorFlow engine from the central Maven repository by including the following dependency:
 
-- ai.djl.tensorflow:tensorflow-engine:0.31.0
+- ai.djl.tensorflow:tensorflow-engine:0.31.1
 
 ```xml
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-engine</artifactId>
-    <version>0.31.0</version>
+    <version>0.31.1</version>
     <scope>runtime</scope>
 </dependency>
 ```

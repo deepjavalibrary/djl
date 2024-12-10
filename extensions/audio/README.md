@@ -23,6 +23,6 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl.audio</groupId>
     <artifactId>audio</artifactId>
-    <version>0.31.0</version>
+    <version>0.31.1</version>
 </dependency>
 ```
