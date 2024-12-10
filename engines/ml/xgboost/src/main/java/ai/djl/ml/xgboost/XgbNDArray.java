@@ -92,7 +92,8 @@ public class XgbNDArray extends NDArrayAdapter {
             throw new IllegalArgumentException("The replaced NDArray cannot be null.");
         }
         if (!(replaced instanceof XgbNDArray)) {
-            throw new IllegalArgumentException("The replaced NDArray must be an instance of XgbNDArray.");
+            throw new IllegalArgumentException(
+                    "The replaced NDArray must be an instance of XgbNDArray.");
         }
         XgbNDArray array = (XgbNDArray) replaced;
 
