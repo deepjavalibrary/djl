@@ -13,6 +13,7 @@
 package ai.djl.translate;
 
 import ai.djl.ndarray.NDList;
+import ai.djl.util.ClassLoaderUtils;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -47,7 +48,12 @@ public interface Batchifier extends Serializable {
             case "none":
                 return null;
             default:
-                throw new IllegalArgumentException("Invalid batchifier name");
+                ClassLoader cl = ClassLoaderUtils.getContextClassLoader();
+                Batchifier b = ClassLoaderUtils.initClass(cl, Batchifier.class, name);
+                if (b == null) {
+                    throw new IllegalArgumentException("Invalid batchifier name: " + name);
+                }
+                return b;
         }
     }
 
