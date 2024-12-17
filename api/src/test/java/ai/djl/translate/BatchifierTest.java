@@ -22,6 +22,17 @@ public class BatchifierTest {
         Batchifier batchifier = Batchifier.fromString("stack");
         Assert.assertEquals(batchifier, Batchifier.STACK);
 
+        batchifier = Batchifier.fromString("none");
+        Assert.assertNull(batchifier);
+
+        batchifier = Batchifier.fromString("padding");
+        Assert.assertNotNull(batchifier);
+        Assert.assertEquals(batchifier.getClass(), SimplePaddingStackBatchifier.class);
+
+        batchifier = Batchifier.fromString("ai.djl.translate.SimplePaddingStackBatchifier");
+        Assert.assertNotNull(batchifier);
+        Assert.assertEquals(batchifier.getClass(), SimplePaddingStackBatchifier.class);
+
         Assert.assertThrows(() -> Batchifier.fromString("invalid"));
     }
 }
