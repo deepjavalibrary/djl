@@ -25,6 +25,7 @@ public class Encoding {
     private long[] typeIds;
     private String[] tokens;
     private long[] wordIds;
+    private long[] sequenceIds;
     private long[] attentionMask;
     private long[] specialTokenMask;
     private CharSpan[] charTokenSpans;
@@ -36,6 +37,7 @@ public class Encoding {
             long[] typeIds,
             String[] tokens,
             long[] wordIds,
+            long[] sequenceIds,
             long[] attentionMask,
             long[] specialTokenMask,
             CharSpan[] charTokenSpans,
@@ -45,6 +47,7 @@ public class Encoding {
         this.typeIds = typeIds;
         this.tokens = tokens;
         this.wordIds = wordIds;
+        this.sequenceIds = sequenceIds;
         this.attentionMask = attentionMask;
         this.specialTokenMask = specialTokenMask;
         this.charTokenSpans = charTokenSpans;
@@ -107,6 +110,15 @@ public class Encoding {
      */
     public long[] getWordIds() {
         return wordIds;
+    }
+
+    /**
+     * Returns the sequence ids.
+     *
+     * @return the sequence ids
+     */
+    public long[] getSequenceIds() {
+        return sequenceIds;
     }
 
     /**

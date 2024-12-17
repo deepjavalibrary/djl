@@ -623,6 +623,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         long[] typeIds = TokenizersLibrary.LIB.getTypeIds(encoding);
         String[] tokens = TokenizersLibrary.LIB.getTokens(encoding);
         long[] wordIds = TokenizersLibrary.LIB.getWordIds(encoding);
+        long[] sequenceIds = TokenizersLibrary.LIB.getSequenceIds(encoding);
         long[] attentionMask = TokenizersLibrary.LIB.getAttentionMask(encoding);
         long[] specialTokenMask = TokenizersLibrary.LIB.getSpecialTokenMask(encoding);
         CharSpan[] charSpans = TokenizersLibrary.LIB.getTokenCharSpans(encoding);
@@ -646,6 +647,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
                 typeIds,
                 tokens,
                 wordIds,
+                sequenceIds,
                 attentionMask,
                 specialTokenMask,
                 charSpans,
