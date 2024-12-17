@@ -51,7 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A class containing utilities to interact with the MXNet Engine's Java Native Access (JNA) layer.
  */
-@SuppressWarnings("MissingJavadocMethod")
+@SuppressWarnings({"MissingJavadocMethod", "dangling-doc-comments"})
 public final class JnaUtils {
 
     public static final ObjectPool<PointerByReference> REFS =

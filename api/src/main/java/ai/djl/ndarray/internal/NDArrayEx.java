@@ -28,9 +28,9 @@ import java.util.List;
 @SuppressWarnings("MissingJavadocMethod")
 public interface NDArrayEx {
 
-    ////////////////////////////////////////
+    /*
     // NDArrays
-    ////////////////////////////////////////
+    */
 
     /**
      * Applies reverse division with a scalar - i.e., (n / thisArrayValues).
@@ -144,9 +144,9 @@ public interface NDArrayEx {
      */
     NDArray rpowi(Number n);
 
-    ////////////////////////////////////////
+    /*
     // Activations
-    ////////////////////////////////////////
+    */
 
     /**
      * Computes rectified linear activation.
@@ -179,9 +179,9 @@ public interface NDArrayEx {
         return getArray().exp().add(1).log2().tanh().mul(getArray());
     }
 
-    ////////////////////////////////////////
+    /*
     // Pooling Operations
-    ////////////////////////////////////////
+    */
 
     NDArray maxPool(Shape kernelShape, Shape stride, Shape padding, boolean ceilMode);
 
@@ -201,9 +201,9 @@ public interface NDArrayEx {
 
     NDArray globalLpPool(float normType);
 
-    ////////////////////////////////////////
+    /*
     // Optimizer
-    ////////////////////////////////////////
+    */
 
     void adadeltaUpdate(
             NDList inputs,
@@ -268,9 +268,9 @@ public interface NDArrayEx {
             float momentum,
             boolean lazyUpdate);
 
-    ////////////////////////////////////////
+    /*
     // Neural network
-    ////////////////////////////////////////
+    */
 
     NDList convolution(
             NDArray input,
@@ -398,9 +398,9 @@ public interface NDArrayEx {
             boolean bidirectional,
             boolean batchFirst);
 
-    ////////////////////////////////////////
+    /*
     // Image and CV
-    ////////////////////////////////////////
+    */
 
     /**
      * Normalizes a NDArray of shape CHW or NCHW with mean and standard deviation.
@@ -489,9 +489,9 @@ public interface NDArrayEx {
     // TODO: add TorchVision support
     NDArray randomColorJitter(float brightness, float contrast, float saturation, float hue);
 
-    ////////////////////////////////////////
+    /*
     // Miscellaneous
-    ////////////////////////////////////////
+    */
 
     /**
      * Returns an {@link NDArrayIndexer}.
