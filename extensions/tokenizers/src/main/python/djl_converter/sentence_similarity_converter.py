@@ -32,10 +32,13 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
         self.inputs = "This is an example sentence"
         self.outputs = 0
 
-    def load_model(self, model_id: str):
+    def load_model(self, model_id: str, trust_remote_code: bool):
         logging.info(f"Loading model: {model_id} ...")
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
-        model = AutoModel.from_pretrained(model_id)
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_id, trust_remote_code=trust_remote_code)
+
+        model = AutoModel.from_pretrained(model_id,
+                                          trust_remote_code=trust_remote_code)
 
         return PipelineHolder(tokenizer, model)
 
@@ -78,7 +81,8 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
             if hasattr(hf_pipeline.model, "config"):
                 config = hf_pipeline.model.config
             else:
-                config = AutoConfig.from_pretrained(model_id)
+                config = AutoConfig.from_pretrained(
+                    model_id, trust_remote_code=trust_remote_code)
             tokenizer = hf_pipeline.tokenizer
             if hasattr(config, "max_position_embeddings") and hasattr(
                     tokenizer, "model_max_length"):

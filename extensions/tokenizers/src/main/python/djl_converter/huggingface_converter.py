@@ -136,7 +136,8 @@ class HuggingfaceConverter:
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
 
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_id, trust_remote_code=args.trust_remote_code)
         include_types = config.model_type not in [
             "distilbert", "mistral", "qwen2", "gemma2"
         ]
@@ -208,7 +209,7 @@ class HuggingfaceConverter:
             os.makedirs(temp_dir)
 
         try:
-            hf_pipeline = self.load_model(model_id)
+            hf_pipeline = self.load_model(model_id, args.trust_remote_code)
         except Exception as e:
             logging.warning(f"Failed to load model: {model_id}.")
             logging.warning(e, exc_info=True)
@@ -410,11 +411,12 @@ class HuggingfaceConverter:
 
         return True, None
 
-    def load_model(self, model_id: str):
+    def load_model(self, model_id: str, trust_remote_code: bool):
         logging.info(f"Loading model: {model_id} ...")
         kwargs = {
             "tokenizer": model_id,
-            "device": -1  # always use CPU to trace the model
+            "device": -1,  # always use CPU to trace the model
+            "trust_remote_code": trust_remote_code
         }
         return pipeline(task=self.task,
                         model=model_id,
