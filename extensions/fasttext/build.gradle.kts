@@ -14,6 +14,8 @@ dependencies {
     testImplementation(libs.slf4j.simple)
 }
 
+open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
+
 tasks {
     compileJava { dependsOn(processResources) }
 
@@ -23,6 +25,9 @@ tasks {
             "version" to version))
         val baseResourcePath = "${project.projectDir}/build/resources/main"
         outputs.dir("$baseResourcePath/native/lib")
+        val jnilibDir = project.projectDir / "jnilib/${libs.versions.djl.get()}"
+        val logger = project.logger
+        val hasJni = project.hasProperty("jni")
         doLast {
             val url =
                 "https://publish.djl.ai/fasttext-${libs.versions.fasttext.get()}/jnilib/${libs.versions.djl.get()}"
@@ -30,13 +35,12 @@ tasks {
                 "linux-x86_64" to "libjni_fasttext.so",
                 "osx-aarch64" to "libjni_fasttext.dylib"
             )
-            val jnilibDir = project.projectDir / "jnilib/${libs.versions.djl.get()}"
             for ((key, value) in files) {
                 val file = jnilibDir / key / value
                 if (file.exists())
-                    project.logger.lifecycle("prebuilt or cached file found for $value")
-                else if (!project.hasProperty("jni")) {
-                    project.logger.lifecycle("Downloading $url/$key")
+                    logger.lifecycle("prebuilt or cached file found for $value")
+                else if (!hasJni) {
+                    logger.lifecycle("Downloading $url/$key")
                     file.parentFile.mkdirs()
                     val downloadPath = "$url/$key/$value".url
                     downloadPath into file
@@ -53,15 +57,17 @@ tasks {
         }
     }
 
-    register("compileJNI") {
+    register<Cmd>("compileJNI") {
+        val dir = project.projectDir
         doFirst {
             check("mac" in os || "linux" in os) { "Unknown Architecture $osName" }
-            exec {
+            execOperations.exec {
+                workingDir = dir
                 commandLine("bash", "build.sh")
             }
 
             // for ci to upload to S3
-            val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}"
+            val ciDir = dir / "jnilib/${libs.versions.djl.get()}"
             copy {
                 from(buildDirectory / "jnilib")
                 into(ciDir)
