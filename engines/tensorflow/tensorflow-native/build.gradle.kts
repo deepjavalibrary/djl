@@ -31,8 +31,11 @@ infix fun URL.unzipInto(dir: File) {
     }
 }
 
+open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
+
 tasks {
-    register("uploadTensorflowNativeLibs") {
+    register<Cmd>("uploadTensorflowNativeLibs") {
+        val baseDir = project.projectDir
         doLast {
             val dir = buildDirectory / "download"
             delete(dir)
@@ -54,7 +57,8 @@ tasks {
                 }
             }
 
-            exec {
+            execOperations.exec {
+                workingDir = baseDir
                 commandLine(
                     "aws",
                     "s3",
@@ -71,11 +75,11 @@ tasks {
         // otherwise it don't generate the placeholder jar at times
         // when there is no java code inside src/main
         outputs.dir("build/libs")
+        var versionName = project.version.toString()
         doFirst {
             val dir = buildDirectory / "classes/java/main/native/lib"
             dir.mkdirs()
             val propFile = dir / "tensorflow.properties"
-            var versionName = project.version.toString()
             if (!isRelease)
                 versionName += "-$nowFormatted"
             propFile.text = "placeholder=true\nversion=${versionName}\n"

@@ -33,15 +33,17 @@ project.extensions.create<FormatterConfig>("formatCpp")
 
 project.tasks {
     register("formatCpp") {
+        val rootProject = project.rootProject
+        val clang = rootProject.projectDir / ".clang/clang-format"
+        val formatCpp = project.extensions.getByName<FormatterConfig>("formatCpp")
+        val files = project.fileTree("src")
+        val logger = project.logger
+
         doLast {
             if ("mac" !in os)
                 return@doLast
-            val rootProject = project.rootProject
-            val clang = rootProject.projectDir / ".clang/clang-format"
             checkClang(clang)
-            val files = project.fileTree("src")
             files.include("**/*.cc", "**/*.cpp", "**/*.h")
-            val formatCpp = project.extensions.getByName<FormatterConfig>("formatCpp")
             if (formatCpp.exclusions.isPresent)
                 for (exclusion in formatCpp.exclusions.get())
                     files.exclude(exclusion)
@@ -49,25 +51,27 @@ project.tasks {
             for (f in files) {
                 if (!f.isFile())
                     continue
-                project.logger.info("formatting cpp file: $f")
+                logger.info("formatting cpp file: $f")
                 f.text = formatCpp(f, clang)
             }
         }
     }
 
     register("verifyCpp") {
+        val rootProject = project.rootProject
+        val clang = rootProject.projectDir / ".clang/clang-format"
+        val files = project.fileTree("src")
+        val logger = project.logger
+
         doLast {
             if ("mac" !in os)
                 return@doLast
-            val rootProject = project.rootProject
-            val clang = rootProject.projectDir / ".clang/clang-format"
             checkClang(clang)
-            val files = project.fileTree("src")
             files.include("**/*.cc", "**/*.cpp", "**/*.h")
             for (f in files) {
                 if (!f.isFile())
                     continue
-                project.logger.info("checking cpp file: $f")
+                logger.info("checking cpp file: $f")
                 if (f.text != formatCpp(f, clang))
                     throw GradleException("File not formatted: " + f.absolutePath)
             }
