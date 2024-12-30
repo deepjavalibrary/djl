@@ -37,16 +37,19 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
 
     private HuggingFaceTokenizer tokenizer;
     private boolean includeTokenTypes;
+    private boolean int32;
     private Batchifier batchifier;
     private boolean detail;
 
     QuestionAnsweringTranslator(
             HuggingFaceTokenizer tokenizer,
             boolean includeTokenTypes,
+            boolean int32,
             Batchifier batchifier,
             boolean detail) {
         this.tokenizer = tokenizer;
         this.includeTokenTypes = includeTokenTypes;
+        this.int32 = int32;
         this.batchifier = batchifier;
         this.detail = detail;
     }
@@ -62,7 +65,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
     public NDList processInput(TranslatorContext ctx, QAInput input) {
         Encoding encoding = tokenizer.encode(input.getQuestion(), input.getParagraph());
         ctx.setAttachment("encoding", encoding);
-        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes);
+        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes, int32);
     }
 
     /** {@inheritDoc} */
@@ -77,7 +80,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
         ctx.setAttachment("encodings", encodings);
         NDList[] batch = new NDList[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
-            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes, int32);
         }
         return batchifier.batchify(batch);
     }
@@ -190,6 +193,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
 
         private HuggingFaceTokenizer tokenizer;
         private boolean includeTokenTypes;
+        private boolean int32;
         private Batchifier batchifier = Batchifier.STACK;
         private boolean detail;
 
@@ -205,6 +209,17 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
          */
         public Builder optIncludeTokenTypes(boolean includeTokenTypes) {
             this.includeTokenTypes = includeTokenTypes;
+            return this;
+        }
+
+        /**
+         * Sets if use int32 datatype for the {@link Translator}.
+         *
+         * @param int32 true to include token types
+         * @return this builder
+         */
+        public Builder optInt32(boolean int32) {
+            this.int32 = int32;
             return this;
         }
 
@@ -237,6 +252,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
          */
         public void configure(Map<String, ?> arguments) {
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
+            optInt32(ArgumentsUtil.booleanValue(arguments, "int32"));
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
             optDetail(ArgumentsUtil.booleanValue(arguments, "detail"));
             optBatchifier(Batchifier.fromString(batchifierStr));
@@ -250,7 +266,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
          */
         public QuestionAnsweringTranslator build() throws IOException {
             return new QuestionAnsweringTranslator(
-                    tokenizer, includeTokenTypes, batchifier, detail);
+                    tokenizer, includeTokenTypes, int32, batchifier, detail);
         }
     }
 }
