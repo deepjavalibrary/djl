@@ -17,6 +17,9 @@ import sys
 from argparse import Namespace
 
 import onnx
+from torch import nn
+from transformers.modeling_outputs import TokenClassifierOutput
+
 from djl_converter.safetensors_convert import convert_file
 import torch
 from huggingface_hub import hf_hub_download, HfApi
@@ -38,6 +41,28 @@ class ModelHolder(object):
 
     def __init__(self, config):
         self.config = config
+
+
+class ModelWrapper(nn.Module):
+
+    def __init__(self, model, include_types: bool) -> None:
+        super().__init__()
+        self.model = model
+        self.include_types = include_types
+
+    def forward(self,
+                input_ids: torch.Tensor,
+                attention_mask: torch.Tensor,
+                token_type_ids: torch.Tensor = None):
+        if self.include_types:
+            output = self.model(input_ids, attention_mask)
+        else:
+            output = self.model(input_ids, attention_mask, token_type_ids)
+        if isinstance(output, TokenClassifierOutput):
+            # TokenClassifierOutput may contains mix of Tensor and Tuple(Tensor)
+            return {"logits": output["logits"]}
+
+        return output
 
 
 class HuggingfaceConverter:
@@ -279,11 +304,12 @@ class HuggingfaceConverter:
         try:
             if include_types:
                 script_module = torch.jit.trace(
-                    hf_pipeline.model,
+                    ModelWrapper(hf_pipeline.model, include_types),
                     (input_ids, attention_mask, token_type_ids),
                     strict=False)
             else:
-                script_module = torch.jit.trace(hf_pipeline.model,
+                script_module = torch.jit.trace(ModelWrapper(
+                    hf_pipeline.model, include_types),
                                                 (input_ids, attention_mask),
                                                 strict=False)
 
