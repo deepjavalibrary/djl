@@ -40,7 +40,7 @@ public abstract class NDArrayAdapter implements NDArray {
 
     protected NDManager manager;
     protected NDManager alternativeManager;
-    private NDArray alternativeArray;
+    protected NDArray alternativeArray;
 
     protected Shape shape;
     protected DataType dataType;
