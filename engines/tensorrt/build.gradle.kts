@@ -17,26 +17,34 @@ dependencies {
     testRuntimeOnly(project(":engines:pytorch:pytorch-engine"))
 }
 
+open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
+
 tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        inputs.properties(mapOf("djlVersion" to libs.versions.djl, "trtVersion" to libs.versions.tensorrt.get(),
-            "version" to version))
+        inputs.properties(
+            mapOf(
+                "djlVersion" to libs.versions.djl, "trtVersion" to libs.versions.tensorrt.get(),
+                "version" to version
+            )
+        )
         val baseResourcePath = "${project.projectDir}/build/resources/main"
         outputs.dir(file("${baseResourcePath}/native/lib"))
+        val trtVersion = libs.versions.tensorrt.get()
+        val djlVersion = libs.versions.djl.get()
+        val url = "https://publish.djl.ai/tensorrt/${trtVersion}/jnilib/${djlVersion}"
+        val files = listOf("linux-x86_64/libdjl_trt.so")
+        val jnilibDir = project.projectDir / "jnilib/${djlVersion}"
+
+        val logger = project.logger
         doLast {
-            val trtVersion = libs.versions.tensorrt.get()
-            val djlVersion = libs.versions.djl.get()
-            val url = "https://publish.djl.ai/tensorrt/${trtVersion}/jnilib/${djlVersion}"
-            val files = listOf("linux-x86_64/libdjl_trt.so")
-            val jnilibDir = project.projectDir / "jnilib/${djlVersion}"
             for (entry in files) {
                 val file = jnilibDir / entry
                 if (file.exists()) {
-                    project.logger.lifecycle("prebuilt or cached file found for $entry")
+                    logger.lifecycle("prebuilt or cached file found for $entry")
                 } else if (!project.hasProperty("jni")) {
-                    project.logger.lifecycle("Downloading $url/$entry")
+                    logger.lifecycle("Downloading $url/$entry")
                     file.parentFile.mkdirs()
                     "$url/$entry".url into file
                 }
@@ -53,10 +61,12 @@ tasks {
         }
     }
 
-    register("compileJNI") {
+    register<Cmd>("compileJNI") {
+        val dir = project.projectDir
         doFirst {
             if ("linux" in os) {
-                exec {
+                execOperations.exec {
+                    workingDir = dir
                     commandLine("bash", "build.sh")
                 }
             } else {
@@ -65,7 +75,7 @@ tasks {
 
             // for nightly ci
             val classifier = "${os}-x86_64"
-            val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/${classifier}"
+            val ciDir = dir / "jnilib/${libs.versions.djl.get()}/${classifier}"
             copy {
                 from(fileTree(buildDirectory) {
                     include("libdjl_trt.*")

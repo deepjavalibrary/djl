@@ -13,6 +13,8 @@ dependencies {
     testImplementation(libs.slf4j.simple)
 }
 
+open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
+
 tasks {
     compileJava { dependsOn(processResources) }
 
@@ -20,6 +22,8 @@ tasks {
         val baseResourcePath = "${project.projectDir}/build/resources/main"
         inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(), "sentencepieceVersion" to libs.versions.sentencepiece.get()))
         outputs.dir("$baseResourcePath/native/lib")
+        val jnilibDir = project.projectDir / "jnilib/${libs.versions.djl.get()}"
+        val logger = project.logger
         doLast {
             val url =
                 "https://publish.djl.ai/sentencepiece-${libs.versions.sentencepiece.get()}/jnilib/${libs.versions.djl.get()}"
@@ -29,13 +33,12 @@ tasks {
                 "linux-aarch64" to "libsentencepiece_native.so",
                 "osx-aarch64" to "libsentencepiece_native.dylib"
             )
-            val jnilibDir = project.projectDir / "jnilib/${libs.versions.djl.get()}"
             for ((key, value) in files) {
                 val file = jnilibDir / key / value
                 if (file.exists())
-                    project.logger.lifecycle("prebuilt or cached file found for $value")
+                    logger.lifecycle("prebuilt or cached file found for $value")
                 else if (!project.hasProperty("jni")) {
-                    project.logger.lifecycle("Downloading $url/$key")
+                    logger.lifecycle("Downloading $url/$key")
                     file.parentFile.mkdirs()
                     val downloadPath = "$url/$key/$value".url
                     downloadPath into file
@@ -52,22 +55,25 @@ tasks {
         }
     }
 
-    register("compileJNI") {
+    register<Cmd>("compileJNI") {
+        val dir = project.projectDir
         doFirst {
             if ("win" in os)
-                exec {
-                    commandLine("${project.projectDir}/build.cmd", "v${libs.versions.sentencepiece.get()}")
+                execOperations.exec {
+                    workingDir = dir
+                    commandLine("${dir}/build.cmd", "v${libs.versions.sentencepiece.get()}")
                 }
             else if ("mac" in os || "linux" in os) {
                 val arch = if (arch == "amd64") "x86_64" else arch
-                exec {
+                execOperations.exec {
+                    workingDir = dir
                     commandLine("bash", "build.sh", "v${libs.versions.sentencepiece.get()}", arch)
                 }
             } else
                 throw IllegalStateException("Unknown Architecture $osName")
 
             // for ci to upload to S3
-            val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/"
+            val ciDir = dir / "jnilib/${libs.versions.djl.get()}/"
             copy {
                 from(buildDirectory / "jnilib")
                 into(ciDir)

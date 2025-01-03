@@ -42,9 +42,12 @@ tasks {
             .withPropertyName("jna/mapping.properties file")
         outputs.dir(buildDirectory / "generated-src")
         outputs.cacheIf { true }
+
+        val dir = project.projectDir
         doLast {
             val jnaGenerator = jnaratorJar.get().outputs.files.singleFile
-            javaexec {
+            providers.javaexec {
+                workingDir = dir
                 mainClass = "-jar"
                 args(
                     jnaGenerator.absolutePath,
@@ -55,12 +58,12 @@ tasks {
                     "-o",
                     "$buildDirectory/generated-src",
                     "-m",
-                    "${project.projectDir}/src/main/jna/mapping.properties",
+                    "${dir}/src/main/jna/mapping.properties",
                     "-f",
                     "src/main/include/mxnet/c_api.h",
                     "src/main/include/nnvm/c_api.h"
                 )
-            }
+            }.result.get()
         }
     }
 

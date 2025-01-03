@@ -15,6 +15,7 @@ dependencies {
 }
 
 tasks.register<Exec>("syncS3") {
+    workingDir = project.projectDir
     commandLine(
         "sh",
         "-c",

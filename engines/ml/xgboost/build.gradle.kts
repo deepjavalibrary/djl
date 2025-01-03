@@ -46,12 +46,14 @@ tasks {
         val jnilibDir = buildDirectory / "resources/main/lib/linux/aarch64/"
         inputs.properties(mapOf("xgboostVersion" to libs.versions.xgboost.get()))
         outputs.dir(jnilibDir)
+
+        val logger = project.logger
         doLast {
             val url =
                 "https://publish.djl.ai/xgboost/${libs.versions.xgboost.get()}/jnilib/linux/aarch64/libxgboost4j.so"
             val file = jnilibDir / "libxgboost4j.so"
             if (!file.exists()) {
-                project.logger.lifecycle("Downloading $url")
+                logger.lifecycle("Downloading $url")
                 url.url into file
             }
         }

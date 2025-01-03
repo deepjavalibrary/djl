@@ -21,6 +21,8 @@ dependencies {
     testImplementation(libs.slf4j.simple)
 }
 
+open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
+
 tasks {
     compileJava { dependsOn(processResources) }
 
@@ -35,6 +37,9 @@ tasks {
         val baseResourcePath = "${project.projectDir}/build/resources/main"
         outputs.dirs(File("${baseResourcePath}/native/lib"), File("${baseResourcePath}/nlp"))
 
+        val logger = project.logger
+        val dir = project.projectDir
+        val hasJni = project.hasProperty("jni")
         doLast {
             var url = "https://publish.djl.ai/tokenizers"
             val (tokenizers, djl) = libs.versions.tokenizers.get() to libs.versions.djl.get()
@@ -47,18 +52,18 @@ tasks {
                 "linux-aarch64/cpu/libtokenizers.so" to "$tokenizers/jnilib/$djl",
                 "osx-aarch64/cpu/libtokenizers.dylib" to "$tokenizers/jnilib/$djl"
             )
-            val jnilibDir = project.projectDir / "jnilib/$djl"
+            val jnilibDir = dir / "jnilib/$djl"
             for ((key, value) in files) {
                 val file = jnilibDir / URLDecoder.decode(key, "UTF-8")
                 if (file.exists())
-                    project.logger.lifecycle("prebuilt or cached file found for $key")
+                    logger.lifecycle("prebuilt or cached file found for $key")
                 else if (value.startsWith("extra")) {
-                    project.logger.lifecycle("Downloading $url/$value")
+                    logger.lifecycle("Downloading $url/$value")
                     file.parentFile.mkdirs()
                     val downloadPath = "$url/$value".url
                     downloadPath into file
-                } else if (!project.hasProperty("jni")) {
-                    project.logger.lifecycle("Downloading $url/$value/$key")
+                } else if (!hasJni) {
+                    logger.lifecycle("Downloading $url/$value/$key")
                     file.parentFile.mkdirs()
                     val downloadPath = "$url/$value/$key".url
                     downloadPath into file
@@ -81,9 +86,9 @@ tasks {
             for (task in tasks) {
                 var file = prefix / task / "ai.djl.huggingface.pytorch.json"
                 if (file.exists())
-                    project.logger.lifecycle("PyTorch model zoo metadata already exists: $task")
+                    logger.lifecycle("PyTorch model zoo metadata already exists: $task")
                 else {
-                    project.logger.lifecycle("Downloading PyTorch model zoo metadata: $task")
+                    logger.lifecycle("Downloading PyTorch model zoo metadata: $task")
                     file.parentFile.mkdirs()
                     val downloadPath = "$url/$task/ai/djl/huggingface/pytorch/models.json.gz".url
                     downloadPath gzipInto file
@@ -94,9 +99,9 @@ tasks {
 
                 file = prefix / task / "ai.djl.huggingface.rust.json"
                 if (file.exists())
-                    project.logger.lifecycle("Rust model zoo metadata alrady exists: $task")
+                    logger.lifecycle("Rust model zoo metadata alrady exists: $task")
                 else {
-                    project.logger.lifecycle("Downloading Rust model zoo metadata: $task")
+                    logger.lifecycle("Downloading Rust model zoo metadata: $task")
                     file.parentFile.mkdirs()
                     val downloadPath = "$url/$task/ai/djl/huggingface/rust/models.json.gz".url
                     downloadPath gzipInto file
@@ -109,20 +114,23 @@ tasks {
         }
     }
 
-    register("compileJNI") {
+    register<Cmd>("compileJNI") {
+        val dir = project.projectDir
         doFirst {
             if ("mac" in os || "linux" in os) {
                 val arch = if (arch == "amd64") "x86_64" else arch
-                exec {
+                execOperations.exec {
+                    workingDir = dir
                     commandLine("bash", "build.sh", arch, flavor)
                 }
             } else
-                exec {
-                    commandLine("${project.projectDir}/build.cmd")
+                execOperations.exec {
+                    workingDir = dir
+                    commandLine("${dir}/build.cmd")
                 }
 
             // for ci to upload to S3
-            val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/"
+            val ciDir = dir / "jnilib/${libs.versions.djl.get()}/"
             copy {
                 from(buildDirectory / "jnilib")
                 into(ciDir)
@@ -131,15 +139,17 @@ tasks {
         }
     }
 
-    register("compileAndroidJNI"){
+    register<Cmd>("compileAndroidJNI") {
+        val dir = project.projectDir
         doFirst {
             for (abi in listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")) {
-                exec {
+                execOperations.exec {
+                    workingDir = dir
                     commandLine("bash", "build_android.sh", abi)
                 }
-                val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/android/$abi"
+                val ciDir = dir / "jnilib/${libs.versions.djl.get()}/android/$abi"
                 copy {
-                    from(buildDirectory / "jnilib" / "$abi")
+                    from(buildDirectory / "jnilib" / abi)
                     into(ciDir)
                 }
                 delete("$buildDirectory/jnilib")
@@ -147,12 +157,9 @@ tasks {
         }
     }
 
-    register("formatPython") {
-        doFirst {
-            exec {
-                commandLine("bash", "-c", "find . -name '*.py' -print0 | xargs -0 yapf --in-place")
-            }
-        }
+    register<Exec>("formatPython") {
+        workingDir = project.projectDir
+        commandLine("bash", "-c", "find . -name '*.py' -print0 | xargs -0 yapf --in-place")
     }
 
     clean {

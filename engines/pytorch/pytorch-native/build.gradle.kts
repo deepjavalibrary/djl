@@ -24,9 +24,11 @@ val isAarch64 = project.hasProperty("aarch64") || arch == "aarch64"
 
 version = ptVersion + if (isRelease) "" else "-SNAPSHOT"
 
+
 fun downloadBuild(ver: String, os: String, flavor: String, isPrecxx11: Boolean = false, isAarch64: Boolean = false) {
     val arch = if (isAarch64) "aarch64" else "x86_64"
-    exec {
+    providers.exec {
+        workingDir = project.projectDir
         if (os == "win")
             commandLine(project.projectDir / "build.cmd", ver, flavor)
         else
@@ -50,7 +52,8 @@ fun downloadBuild(ver: String, os: String, flavor: String, isPrecxx11: Boolean =
 
 fun downloadBuildAndroid(ver: String) {
     for (abi in listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")) {
-        exec {
+        providers.exec {
+            workingDir = project.projectDir
             commandLine("bash", "build_android.sh", ver, abi)
         }
         val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/android/$abi"
@@ -93,7 +96,8 @@ fun prepareNativeLib(binaryRoot: String, ver: String, packageType: String?) {
         copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
         copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
 
-        exec {
+        providers.exec {
+            workingDir = project.projectDir
             commandLine(
                 "install_name_tool",
                 "-add_rpath",
@@ -101,7 +105,8 @@ fun prepareNativeLib(binaryRoot: String, ver: String, packageType: String?) {
                 "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib"
             )
         }
-        exec {
+        providers.exec {
+            workingDir = project.projectDir
             commandLine(
                 "install_name_tool",
                 "-add_rpath",
@@ -188,6 +193,8 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
     }
 }
 
+open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
+
 tasks {
     register("compileAndroidJNI") {
         doFirst {
@@ -228,13 +235,15 @@ tasks {
         }
     }
 
-    register("uploadS3") {
+    register<Cmd>("uploadS3") {
+        val dir = project.projectDir
         doLast {
             delete("$binaryRoot")
             prepareNativeLib("$binaryRoot", ptVersion, "cpu")
             prepareNativeLib("$binaryRoot", ptVersion, "gpu")
 
-            exec {
+            execOperations.exec {
+                workingDir = dir
                 commandLine("sh", "-c", "find $binaryRoot -type f | xargs gzip")
             }
 
@@ -255,13 +264,15 @@ tasks {
                         appendLine(out + "/" + URLEncoder.encode(it, "UTF-8"))
                     }
             }
-            exec {
+            execOperations.exec {
+                workingDir = dir
                 commandLine("aws", "s3", "sync", "$binaryRoot", "s3://djl-ai/publish/pytorch/$ptVersion/")
             }
         }
     }
 
     // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
+    val version = project.version
     jar {
         val placeholder = buildDirectory / "placeholder"
         // this line is to enforce gradle to build the jar
@@ -272,7 +283,7 @@ tasks {
             val dir = placeholder / "native/lib"
             dir.mkdirs()
             val propFile = placeholder / "native/lib/pytorch.properties"
-            propFile.text = "placeholder=true\nversion=${project.version}\n"
+            propFile.text = "placeholder=true\nversion=${version}\n"
         }
 
         from(placeholder)
@@ -442,9 +453,10 @@ tasks {
     }
 
     clean {
+        val dir = project.projectDir
         doFirst {
-            delete(project.projectDir / "jnilib")
-            delete(project.projectDir.parentFile / "pytorch-jni/jnilib")
+            delete(dir / "jnilib")
+            delete(dir.parentFile / "pytorch-jni/jnilib")
         }
     }
 }
