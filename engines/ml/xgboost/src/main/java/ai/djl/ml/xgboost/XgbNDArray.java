@@ -88,14 +88,31 @@ public class XgbNDArray extends NDArrayAdapter {
     /** {@inheritDoc} */
     @Override
     public void intern(NDArray replaced) {
-        if (handle != null && handle.get() != 0L) {
-            long pointer = handle.getAndSet(0L);
-            JniUtils.deleteDMatrix(pointer);
+        if (!(replaced instanceof XgbNDArray)) {
+            throw new IllegalArgumentException(
+                    "The replaced NDArray must be an instance of XgbNDArray.");
         }
         XgbNDArray array = (XgbNDArray) replaced;
+        if (isReleased()) {
+            throw new IllegalArgumentException("This array is already closed");
+        }
+        if (replaced.isReleased()) {
+            throw new IllegalArgumentException("This target array is already closed");
+        }
+
+        long pointer = handle.getAndSet(0L);
+        JniUtils.deleteDMatrix(pointer);
+        if (alternativeArray != null) {
+            alternativeArray.close();
+        }
+
         data = array.data;
         handle = array.handle;
         format = array.format;
+        alternativeArray = array.alternativeArray;
+        array.handle = null;
+        array.alternativeArray = null;
+        array.close();
     }
 
     /** {@inheritDoc} */
