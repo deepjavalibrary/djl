@@ -116,6 +116,26 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
          */
         public T setPipeline(Pipeline pipeline) {
             this.pipeline = pipeline;
+            for (Transform transform : pipeline.getTransforms()) {
+                if (transform instanceof Resize) {
+                    Resize resize = (Resize) transform;
+                    width = resize.getWidth();
+                    height = resize.getHeight();
+                }
+            }
+            return self();
+        }
+
+        /**
+         * Sets the image size.
+         *
+         * @param width the image width
+         * @param height the image height
+         * @return this builder
+         */
+        public T setImageSize(int width, int height) {
+            this.width = width;
+            this.height = height;
             return self();
         }
 
@@ -129,6 +149,12 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             if (pipeline == null) {
                 pipeline = new Pipeline();
             }
+            if (transform instanceof Resize) {
+                Resize resize = (Resize) transform;
+                width = resize.getWidth();
+                height = resize.getHeight();
+            }
+
             pipeline.add(transform);
             return self();
         }
@@ -167,13 +193,14 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             } else if (!"false".equals(resize)) {
                 String[] tokens = resize.split("\\s*,\\s*");
                 if (tokens.length > 1) {
-                    addTransform(
-                            new Resize(
-                                    (int) Double.parseDouble(tokens[0]),
-                                    (int) Double.parseDouble(tokens[1])));
+                    setImageSize(
+                            (int) Double.parseDouble(tokens[0]),
+                            (int) Double.parseDouble(tokens[1]));
                 } else {
-                    addTransform(new Resize((int) Double.parseDouble(tokens[0])));
+                    int size = (int) Double.parseDouble(tokens[0]);
+                    setImageSize(size, size);
                 }
+                addTransform(new Resize(width, height));
             }
             if (ArgumentsUtil.booleanValue(arguments, "centerCrop", false)) {
                 addTransform(new CenterCrop(width, height));

@@ -57,6 +57,24 @@ public class Resize implements Transform {
         this.interpolation = interpolation;
     }
 
+    /**
+     * Returns the width.
+     *
+     * @return the width
+     */
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * Returns the height.
+     *
+     * @return the height
+     */
+    public int getHeight() {
+        return height;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray transform(NDArray array) {
