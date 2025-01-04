@@ -129,7 +129,7 @@ export PYTORCH_FLAVOR=cpu
 **Note:**
 
 - x86_64 macOS is no longer supported since 0.30.0
-- PyTorch 1.13+ doesn't support mac 11 any more, you must use DJL 0.19.0 ane lower version.
+- PyTorch 1.13+ doesn't support mac 11 any more, you must use DJL 0.19.0 or a lower version.
 
 ### macOS M1
 
