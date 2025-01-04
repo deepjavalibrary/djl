@@ -3,7 +3,7 @@
 
 ![Continuous](https://github.com/deepjavalibrary/djl/workflows/Continuous/badge.svg)
 [![Docs](https://github.com/deepjavalibrary/djl/workflows/Docs/badge.svg)](https://docs.djl.ai/master/index.html)
-![Nightly Publish](https://github.com/deepjavalibrary/djl/workflows/Nightly%20Publish/badge.svg)
+[![Nightly Publish](https://github.com/deepjavalibrary/djl/workflows/Nightly%20Publish/badge.svg)](https://github.com/deepjavalibrary/djl/actions/workflows/nightly_publish.yml)
 
 # Deep Java Library (DJL)
 
