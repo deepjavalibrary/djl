@@ -13,6 +13,7 @@
 package ai.djl.huggingface.tokenizers;
 
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 
@@ -56,22 +57,84 @@ public class Encoding {
     }
 
     /**
+     * Returns the {@link NDList} representation of the encodings.
+     *
+     * @param encodings the {@code Encoding} batch
+     * @param manager the {@link NDManager} to create the NDList
+     * @param withTokenType true to include the token type id
+     * @param int32 true to use int32 datatype
+     * @return the {@link NDList}
+     */
+    public static NDList toNDList(
+            Encoding[] encodings, NDManager manager, boolean withTokenType, boolean int32) {
+        NDList list = new NDList();
+        if (!int32) {
+            long[][] ids = new long[encodings.length][];
+            long[][] attentionMask = new long[encodings.length][];
+            long[][] typeIds = new long[encodings.length][];
+            for (int i = 0; i < encodings.length; i++) {
+                ids[i] = encodings[i].getIds();
+                attentionMask[i] = encodings[i].getAttentionMask();
+                if (withTokenType) {
+                    typeIds[i] = encodings[i].getTypeIds();
+                }
+            }
+            list.add(manager.create(ids));
+            NDArray inputAttentionMask = manager.create(attentionMask);
+            list.add(inputAttentionMask);
+            if (withTokenType) {
+                list.add(manager.create(typeIds));
+            }
+            return list;
+        }
+
+        int[][] ids = new int[encodings.length][];
+        int[][] attentionMask = new int[encodings.length][];
+        int[][] typeIds = new int[encodings.length][];
+        for (int i = 0; i < encodings.length; i++) {
+            ids[i] = Arrays.stream(encodings[i].getIds()).mapToInt(l -> (int) l).toArray();
+            attentionMask[i] =
+                    Arrays.stream(encodings[i].getAttentionMask()).mapToInt(l -> (int) l).toArray();
+            if (withTokenType) {
+                typeIds[i] =
+                        Arrays.stream(encodings[i].getTypeIds()).mapToInt(l -> (int) l).toArray();
+            }
+        }
+        list.add(manager.create(ids));
+        NDArray inputAttentionMask = manager.create(attentionMask);
+        list.add(inputAttentionMask);
+        if (withTokenType) {
+            list.add(manager.create(typeIds));
+        }
+        return list;
+    }
+
+    /**
      * Returns the {@link NDList} representation of the encoding.
      *
      * @param manager the {@link NDManager} to create the NDList
      * @param withTokenType true to include the token type id
+     * @param int32 true to use int32 datatype
      * @return the {@link NDList}
      */
-    public NDList toNDList(NDManager manager, boolean withTokenType) {
+    public NDList toNDList(NDManager manager, boolean withTokenType, boolean int32) {
         // Converting encoding to int32 NDList because candle can't convert int64 to fp16 in cuda
         NDList list = new NDList(withTokenType ? 3 : 2);
-        int[] intIds = Arrays.stream(ids).mapToInt(i -> (int) i).toArray();
-        int[] intAttentionMask = Arrays.stream(attentionMask).mapToInt(i -> (int) i).toArray();
-        list.add(manager.create(intIds));
-        list.add(manager.create(intAttentionMask));
-        if (withTokenType) {
-            int[] intTypeIds = Arrays.stream(typeIds).mapToInt(i -> (int) i).toArray();
-            list.add(manager.create(intTypeIds));
+        if (int32) {
+            int[] intIds = Arrays.stream(ids).mapToInt(i -> (int) i).toArray();
+            int[] intAttentionMask = Arrays.stream(attentionMask).mapToInt(i -> (int) i).toArray();
+            list.add(manager.create(intIds));
+            list.add(manager.create(intAttentionMask));
+            if (withTokenType) {
+                int[] intTypeIds = Arrays.stream(typeIds).mapToInt(i -> (int) i).toArray();
+                list.add(manager.create(intTypeIds));
+            }
+        } else {
+            list.add(manager.create(ids));
+            list.add(manager.create(attentionMask));
+            if (withTokenType) {
+                list.add(manager.create(typeIds));
+            }
         }
         return list;
     }

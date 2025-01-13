@@ -38,6 +38,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
 
     private HuggingFaceTokenizer tokenizer;
     private boolean includeTokenTypes;
+    private boolean int32;
     private boolean softmax;
     private Batchifier batchifier;
     private PretrainedConfig config;
@@ -45,10 +46,12 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
     TokenClassificationTranslator(
             HuggingFaceTokenizer tokenizer,
             boolean includeTokenTypes,
+            boolean int32,
             boolean softmax,
             Batchifier batchifier) {
         this.tokenizer = tokenizer;
         this.includeTokenTypes = includeTokenTypes;
+        this.int32 = int32;
         this.softmax = softmax;
         this.batchifier = batchifier;
     }
@@ -74,7 +77,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
     public NDList processInput(TranslatorContext ctx, String input) {
         Encoding encoding = tokenizer.encode(input);
         ctx.setAttachment("encoding", encoding);
-        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes);
+        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes, int32);
     }
 
     /** {@inheritDoc} */
@@ -85,7 +88,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
         ctx.setAttachment("encodings", encodings);
         NDList[] batch = new NDList[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
-            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes, int32);
         }
         return batchifier.batchify(batch);
     }
@@ -170,6 +173,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
 
         private HuggingFaceTokenizer tokenizer;
         private boolean includeTokenTypes;
+        private boolean int32;
         private boolean softmax = true;
         private Batchifier batchifier = Batchifier.STACK;
 
@@ -185,6 +189,17 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          */
         public Builder optIncludeTokenTypes(boolean includeTokenTypes) {
             this.includeTokenTypes = includeTokenTypes;
+            return this;
+        }
+
+        /**
+         * Sets if use int32 datatype for the {@link Translator}.
+         *
+         * @param int32 true to include token types
+         * @return this builder
+         */
+        public Builder optInt32(boolean int32) {
+            this.int32 = int32;
             return this;
         }
 
@@ -217,6 +232,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          */
         public void configure(Map<String, ?> arguments) {
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
+            optInt32(ArgumentsUtil.booleanValue(arguments, "int32"));
             optSoftmax(ArgumentsUtil.booleanValue(arguments, "softmax", true));
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
             optBatchifier(Batchifier.fromString(batchifierStr));
@@ -230,7 +246,7 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          */
         public TokenClassificationTranslator build() throws IOException {
             return new TokenClassificationTranslator(
-                    tokenizer, includeTokenTypes, softmax, batchifier);
+                    tokenizer, includeTokenTypes, int32, softmax, batchifier);
         }
     }
 }

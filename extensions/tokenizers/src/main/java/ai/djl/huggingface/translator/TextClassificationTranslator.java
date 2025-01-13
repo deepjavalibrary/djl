@@ -37,13 +37,18 @@ public class TextClassificationTranslator implements Translator<String, Classifi
 
     private HuggingFaceTokenizer tokenizer;
     private boolean includeTokenTypes;
+    private boolean int32;
     private Batchifier batchifier;
     private PretrainedConfig config;
 
     TextClassificationTranslator(
-            HuggingFaceTokenizer tokenizer, boolean includeTokenTypes, Batchifier batchifier) {
+            HuggingFaceTokenizer tokenizer,
+            boolean includeTokenTypes,
+            boolean int32,
+            Batchifier batchifier) {
         this.tokenizer = tokenizer;
         this.includeTokenTypes = includeTokenTypes;
+        this.int32 = int32;
         this.batchifier = batchifier;
     }
 
@@ -67,7 +72,7 @@ public class TextClassificationTranslator implements Translator<String, Classifi
     @Override
     public NDList processInput(TranslatorContext ctx, String input) {
         Encoding encoding = tokenizer.encode(input);
-        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes);
+        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes, int32);
     }
 
     /** {@inheritDoc} */
@@ -77,7 +82,7 @@ public class TextClassificationTranslator implements Translator<String, Classifi
         Encoding[] encodings = tokenizer.batchEncode(inputs);
         NDList[] batch = new NDList[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
-            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes, int32);
         }
         return batchifier.batchify(batch);
     }
@@ -148,6 +153,7 @@ public class TextClassificationTranslator implements Translator<String, Classifi
 
         private HuggingFaceTokenizer tokenizer;
         private boolean includeTokenTypes;
+        private boolean int32;
         private Batchifier batchifier = Batchifier.STACK;
 
         Builder(HuggingFaceTokenizer tokenizer) {
@@ -162,6 +168,17 @@ public class TextClassificationTranslator implements Translator<String, Classifi
          */
         public Builder optIncludeTokenTypes(boolean includeTokenTypes) {
             this.includeTokenTypes = includeTokenTypes;
+            return this;
+        }
+
+        /**
+         * Sets if use int32 datatype for the {@link Translator}.
+         *
+         * @param int32 true to include token types
+         * @return this builder
+         */
+        public Builder optInt32(boolean int32) {
+            this.int32 = int32;
             return this;
         }
 
@@ -183,6 +200,7 @@ public class TextClassificationTranslator implements Translator<String, Classifi
          */
         public void configure(Map<String, ?> arguments) {
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
+            optInt32(ArgumentsUtil.booleanValue(arguments, "int32"));
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
             optBatchifier(Batchifier.fromString(batchifierStr));
         }
@@ -194,7 +212,8 @@ public class TextClassificationTranslator implements Translator<String, Classifi
          * @throws IOException if I/O error occurs
          */
         public TextClassificationTranslator build() throws IOException {
-            return new TextClassificationTranslator(tokenizer, includeTokenTypes, batchifier);
+            return new TextClassificationTranslator(
+                    tokenizer, includeTokenTypes, int32, batchifier);
         }
     }
 }
