@@ -97,6 +97,9 @@ public class Application {
             case "nlp/token_classification":
             case "token_classification":
                 return NLP.TOKEN_CLASSIFICATION;
+            case "nlp/zero_shot_classification":
+            case "zero_shot_classification":
+                return NLP.ZERO_SHOT_CLASSIFICATION;
             case "nlp/word_embedding":
             case "word_embedding":
                 return NLP.WORD_EMBEDDING;
@@ -279,6 +282,12 @@ public class Application {
          * #TEXT_CLASSIFICATION}.
          */
         Application SENTIMENT_ANALYSIS = new Application("nlp/sentiment_analysis");
+
+        /**
+         * An application that classifies text into arbitrary label, a specific case of {@link
+         * #TEXT_CLASSIFICATION}.
+         */
+        Application ZERO_SHOT_CLASSIFICATION = new Application("nlp/zero_shot_classification");
 
         /**
          * A natural language understanding application that assigns a label to some tokens in a
