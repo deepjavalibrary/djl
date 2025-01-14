@@ -15,10 +15,11 @@ import os.path
 import shutil
 import sys
 from argparse import Namespace
+from collections import OrderedDict
 
 import onnx
 from torch import nn
-from transformers.modeling_outputs import TokenClassifierOutput
+from transformers.modeling_outputs import TokenClassifierOutput, Seq2SeqSequenceClassifierOutput
 
 from djl_converter.safetensors_convert import convert_file
 import torch
@@ -58,9 +59,16 @@ class ModelWrapper(nn.Module):
             output = self.model(input_ids, attention_mask)
         else:
             output = self.model(input_ids, attention_mask, token_type_ids)
-        if isinstance(output, TokenClassifierOutput):
-            # TokenClassifierOutput may contains mix of Tensor and Tuple(Tensor)
-            return {"logits": output["logits"]}
+        if isinstance(output, TokenClassifierOutput) or isinstance(
+                output, Seq2SeqSequenceClassifierOutput):
+            # TokenClassifierOutput/Seq2SeqSequenceClassifierOutput
+            # may contains mix of Tensor and Tuple(Tensor)
+            # filter out non-Tensor items
+            ret = OrderedDict()
+            for k, v in output.items():
+                if isinstance(v, torch.Tensor):
+                    ret[k] = v
+            return ret
 
         return output
 
@@ -127,7 +135,7 @@ class HuggingfaceConverter:
         hf_pipeline = PipelineHolder(tokenizer, ModelHolder(config))
         arguments = self.save_serving_properties(model_info, "OnnxRuntime",
                                                  temp_dir, hf_pipeline,
-                                                 include_types)
+                                                 include_types, args.cpu_only)
         if model_zoo:
             model_size = self.get_dir_size(temp_dir)
             if model_size > self.max_model_size:
@@ -203,6 +211,8 @@ class HuggingfaceConverter:
             if sf_files:
                 for f in sf_files:
                     file = hf_hub_download(repo_id=model_id, filename=f)
+                    dest_file = os.path.join(temp_dir, f)
+                    os.makedirs(os.path.dirname(dest_file), exist_ok=True)
                     shutil.copyfile(file, os.path.join(temp_dir, f))
             elif pt_files:
                 for f in pt_files:
@@ -215,7 +225,8 @@ class HuggingfaceConverter:
                 return False, f"No model file found for: {model_id}", -1
 
         arguments = self.save_serving_properties(model_info, "Rust", temp_dir,
-                                                 hf_pipeline, include_types)
+                                                 hf_pipeline, include_types,
+                                                 args.cpu_only)
         if model_zoo:
             model_size = self.get_dir_size(temp_dir)
             if model_size > self.max_model_size:
@@ -266,7 +277,7 @@ class HuggingfaceConverter:
 
         arguments = self.save_serving_properties(model_info, "PyTorch",
                                                  temp_dir, hf_pipeline,
-                                                 include_types)
+                                                 include_types, args.cpu_only)
         if model_zoo:
             model_size = self.get_dir_size(temp_dir)
             if model_size > self.max_model_size:
@@ -303,14 +314,13 @@ class HuggingfaceConverter:
 
         # noinspection PyBroadException
         try:
+            wrapper = ModelWrapper(hf_pipeline.model, include_types)
             if include_types:
                 script_module = torch.jit.trace(
-                    ModelWrapper(hf_pipeline.model, include_types),
-                    (input_ids, attention_mask, token_type_ids),
+                    wrapper, (input_ids, attention_mask, token_type_ids),
                     strict=False)
             else:
-                script_module = torch.jit.trace(ModelWrapper(
-                    hf_pipeline.model, include_types),
+                script_module = torch.jit.trace(wrapper,
                                                 (input_ids, attention_mask),
                                                 strict=False)
 
@@ -326,7 +336,8 @@ class HuggingfaceConverter:
         return model_file
 
     def save_serving_properties(self, model_info, engine: str, temp_dir: str,
-                                hf_pipeline, include_types: bool) -> dict:
+                                hf_pipeline, include_types: bool,
+                                cpu_only: bool) -> dict:
         model_id = model_info.modelId
         model_name = model_id.split("/")[-1]
 
@@ -334,6 +345,8 @@ class HuggingfaceConverter:
         arguments = self.get_extra_arguments(hf_pipeline, model_id, temp_dir)
         if include_types:
             arguments["includeTokenTypes"] = "true"
+        if cpu_only:
+            arguments["load_on_devices"] = "-1"
         arguments["translatorFactory"] = self.translator
 
         with open(serving_file, 'w') as f:
