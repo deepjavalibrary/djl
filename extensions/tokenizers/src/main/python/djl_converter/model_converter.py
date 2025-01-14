@@ -63,6 +63,10 @@ def main():
     if not task:
         if "sentence-similarity" in model_info.tags:
             task = "sentence-similarity"
+    else:
+        if "zero-shot-classification" in model_info.tags:
+            task = "zero-shot-classification"
+
     if not task:
         logging.error(
             f"Unsupported model architecture: {arch} for {args.model_id}.")

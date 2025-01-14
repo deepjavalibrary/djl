@@ -25,6 +25,7 @@ from djl_converter.question_answering_converter import QuestionAnsweringConverte
 from djl_converter.sentence_similarity_converter import SentenceSimilarityConverter
 from djl_converter.text_classification_converter import TextClassificationConverter
 from djl_converter.token_classification_converter import TokenClassificationConverter
+from djl_converter.zero_shot_classification_converter import ZeroShotClassificationConverter
 
 ARCHITECTURES_2_TASK = {
     "ForQuestionAnswering": "question-answering",
@@ -42,6 +43,7 @@ SUPPORTED_TASKS = {
     "sentence-similarity": SentenceSimilarityConverter(),
     "text-classification": TextClassificationConverter(),
     "token-classification": TokenClassificationConverter(),
+    "zero-shot-classification": ZeroShotClassificationConverter(),
 }
 
 
@@ -127,6 +129,9 @@ class HuggingfaceModels:
             if not task:
                 if "sentence-similarity" in model_info.tags:
                     task = "sentence-similarity"
+            else:
+                if "zero-shot-classification" in model_info.tags:
+                    task = "zero-shot-classification"
 
             if not task:
                 logging.info(
