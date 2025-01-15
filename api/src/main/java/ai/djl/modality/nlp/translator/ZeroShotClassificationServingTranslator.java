@@ -32,9 +32,9 @@ public class ZeroShotClassificationServingTranslator
     private Translator<ZeroShotClassificationInput, ZeroShotClassificationOutput> translator;
 
     /**
-     * Constructs a {@code TokenClassificationServingTranslator} instance.
+     * Constructs a {@code ZeroShotClassificationServingTranslator} instance.
      *
-     * @param translator a {@code Translator} processes token classification input
+     * @param translator a {@code Translator} processes zero-shot-classification input
      */
     public ZeroShotClassificationServingTranslator(
             Translator<ZeroShotClassificationInput, ZeroShotClassificationOutput> translator) {
