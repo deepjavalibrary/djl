@@ -144,7 +144,10 @@ public class Predictor<I, O> implements AutoCloseable {
     protected NDList predictInternal(TranslatorContext ctx, NDList ndList)
             throws TranslateException {
         logger.trace("Predictor input data: {}", ndList);
-        if (ndList.isEmpty()) {
+        // TODO: this check was (partially) introduced in
+        // https://github.com/deepjavalibrary/djl/pull/3579,
+        // but should ideally not be needed.
+        if (ndList != null && ndList.isEmpty()) {
             return new NDList();
         }
         return block.forward(parameterStore, ndList, false);
