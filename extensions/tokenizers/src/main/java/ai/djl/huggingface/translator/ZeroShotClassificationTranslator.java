@@ -116,7 +116,7 @@ public class ZeroShotClassificationTranslator
             return template + arg;
         }
         int len = template.length();
-        return template.substring(0, pos) + arg + template.substring(pos + 1, len);
+        return template.substring(0, pos) + arg + template.substring(pos + 2, len);
     }
 
     /**
