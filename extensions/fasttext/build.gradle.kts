@@ -33,6 +33,7 @@ tasks {
                 "https://publish.djl.ai/fasttext-${libs.versions.fasttext.get()}/jnilib/${libs.versions.djl.get()}"
             val files = mapOf(
                 "linux-x86_64" to "libjni_fasttext.so",
+                "linux-aarch64" to "libjni_fasttext.so",
                 "osx-aarch64" to "libjni_fasttext.dylib"
             )
             for ((key, value) in files) {
