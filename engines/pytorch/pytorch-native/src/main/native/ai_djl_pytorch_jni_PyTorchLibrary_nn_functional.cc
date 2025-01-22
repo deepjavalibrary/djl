@@ -80,7 +80,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpolat
       torch::nn::functional::InterpolateFuncOptions().size(size_vec).mode(utils::GetInterpolationMode(jmode));
   // kNearest, kArea interpolate can't set align_corners
   if (jmode != 0 && jmode != 5) {
-    options = options.align_corners(jalign_corners);
+    options = options.align_corners(jalign_corners).antialias(true);
   }
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::interpolate(*tensor_ptr, options));
 #endif

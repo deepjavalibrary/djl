@@ -12,15 +12,14 @@
  */
 package ai.djl.modality.cv.translator;
 
+import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Mask;
-import ai.djl.modality.cv.util.NDImageUtils;
+import ai.djl.modality.cv.transform.ResizeShort;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.ArgumentsUtil;
-import ai.djl.translate.Transform;
 import ai.djl.translate.TranslatorContext;
 
 import java.io.IOException;
@@ -36,11 +35,6 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
 
     private SynsetLoader synsetLoader;
     private float threshold;
-    private int shortEdge;
-    private int maxEdge;
-
-    private int rescaledWidth;
-    private int rescaledHeight;
 
     private List<String> classes;
 
@@ -53,10 +47,6 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
         super(builder);
         this.synsetLoader = builder.synsetLoader;
         this.threshold = builder.threshold;
-        this.shortEdge = builder.shortEdge;
-        this.maxEdge = builder.maxEdge;
-
-        pipeline.insert(0, null, new ResizeShort());
     }
 
     /** {@inheritDoc} */
@@ -70,6 +60,9 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
     /** {@inheritDoc} */
     @Override
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
+        int rescaledWidth = (Integer) ctx.getAttachment("processedWidth");
+        int rescaledHeight = (Integer) ctx.getAttachment("processedHeight");
+
         float[] ids = list.get(0).toFloatArray();
         float[] scores = list.get(1).toFloatArray();
         NDArray boundingBoxes = list.get(2);
@@ -127,28 +120,6 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
         builder.configPostProcess(arguments);
 
         return builder;
-    }
-
-    /** Resizes the image based on the shorter edge or maximum edge length. */
-    private class ResizeShort implements Transform {
-
-        /** {@inheritDoc} */
-        @Override
-        public NDArray transform(NDArray array) {
-            Shape shape = array.getShape();
-            int width = (int) shape.get(1);
-            int height = (int) shape.get(0);
-            int min = Math.min(width, height);
-            int max = Math.max(width, height);
-            float scale = shortEdge / (float) min;
-            if (Math.round(scale * max) > maxEdge) {
-                scale = maxEdge / (float) max;
-            }
-            rescaledHeight = Math.round(height * scale);
-            rescaledWidth = Math.round(width * scale);
-
-            return NDImageUtils.resize(array, rescaledWidth, rescaledHeight);
-        }
     }
 
     /** The builder for Instance Segmentation translator. */
@@ -217,6 +188,9 @@ public class InstanceSegmentationTranslator extends BaseImageTranslator<Detected
          */
         public InstanceSegmentationTranslator build() {
             validate();
+            ResizeShort resize = new ResizeShort(shortEdge, maxEdge, Image.Interpolation.BILINEAR);
+            pipeline.insert(0, null, resize);
+
             return new InstanceSegmentationTranslator(this);
         }
     }
