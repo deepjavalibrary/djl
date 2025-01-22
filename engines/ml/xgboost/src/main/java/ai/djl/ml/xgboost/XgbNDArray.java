@@ -100,8 +100,10 @@ public class XgbNDArray extends NDArrayAdapter {
             throw new IllegalArgumentException("This target array is already closed");
         }
 
-        long pointer = handle.getAndSet(0L);
-        JniUtils.deleteDMatrix(pointer);
+        if (handle != null && handle.get() != 0L) {
+            long pointer = handle.getAndSet(0L);
+            JniUtils.deleteDMatrix(pointer);
+        }
         if (alternativeArray != null) {
             alternativeArray.close();
         }
