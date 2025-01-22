@@ -73,6 +73,7 @@ public class HfModelZoo extends ModelZoo {
                     addModels(NLP.TEXT_CLASSIFICATION, version);
                     addModels(NLP.TEXT_EMBEDDING, version);
                     addModels(NLP.TOKEN_CLASSIFICATION, version);
+                    addModels(NLP.ZERO_SHOT_CLASSIFICATION, version);
                     initialized = true;
                 }
             }
