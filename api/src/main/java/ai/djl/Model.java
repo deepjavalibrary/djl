@@ -312,6 +312,15 @@ public interface Model extends AutoCloseable {
     PairList<String, Shape> describeInput();
 
     /**
+     * Returns the custom metadata of the model.
+     *
+     * <p>It contains the custom metadata information that can be obtained from the model.
+     *
+     * @return a PairList of String and String
+     */
+    PairList<String, String> getCustomMetadata();
+
+    /**
      * Returns the output descriptor of the model.
      *
      * <p>It contains the output information that can be obtained from the model.

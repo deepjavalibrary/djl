@@ -377,4 +377,12 @@ public abstract class AbstractBaseBlock implements Block {
     public DataType[] getOutputDataTypes() {
         return outputDataTypes;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PairList<String, String> getCustomMetadata() {
+        return null;
+    }
 }

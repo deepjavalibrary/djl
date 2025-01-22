@@ -63,6 +63,7 @@ public abstract class BaseModel implements Model {
     protected DataType dataType;
     protected boolean wasLoaded;
     protected PairList<String, Shape> inputData;
+    protected PairList<String, String> metadata;
     protected Map<String, Object> artifacts = new ConcurrentHashMap<>();
     protected Map<String, String> properties = new ConcurrentHashMap<>();
 
@@ -139,6 +140,14 @@ public abstract class BaseModel implements Model {
             inputData = block.describeInput();
         }
         return inputData;
+    }
+
+    @Override
+    public PairList<String, String> getCustomMetadata() {
+        if (metadata == null) {
+            metadata = block.getCustomMetadata();
+        }
+        return metadata;
     }
 
     /** {@inheritDoc} */

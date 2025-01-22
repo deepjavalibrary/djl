@@ -26,6 +26,7 @@ import ai.djl.training.ParameterStore;
 import ai.djl.util.PairList;
 import ai.onnxruntime.OnnxJavaType;
 import ai.onnxruntime.OnnxMap;
+import ai.onnxruntime.OnnxModelMetadata;
 import ai.onnxruntime.OnnxSequence;
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OnnxValue;
@@ -126,6 +127,19 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             result.add(name, null);
         }
         return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PairList<String, String> getCustomMetadata() {
+        try {
+            OnnxModelMetadata modelMetadata = session.getMetadata();
+            return new PairList<>(modelMetadata.getCustomMetadata());
+        } catch (OrtException e) {
+            throw new EngineException(e);
+        }
     }
 
     private NDList evaluateOutput(OrtSession.Result results) {
