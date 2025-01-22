@@ -602,6 +602,7 @@ public class PtNDArrayEx implements NDArrayEx {
             if (dim == 3) {
                 result = result.squeeze(0);
             }
+            result = result.toType(array.getDataType(), false);
             array.attach(subManager.getParentManager());
             result.attach(subManager.getParentManager());
             return (PtNDArray) result;

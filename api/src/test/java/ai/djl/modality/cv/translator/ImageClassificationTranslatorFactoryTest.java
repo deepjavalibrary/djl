@@ -48,18 +48,27 @@ public class ImageClassificationTranslatorFactoryTest {
     public void testNewInstance() {
         Map<String, String> arguments = new HashMap<>();
         try (Model model = Model.newInstance("test")) {
+            arguments.put("resizeShort", "true");
+            arguments.put("resize", "true");
             Translator<Image, Classifications> translator1 =
                     factory.newInstance(Image.class, Classifications.class, model, arguments);
             Assert.assertTrue(translator1 instanceof ImageClassificationTranslator);
 
+            arguments.put("resize", "224");
+            arguments.put("resizeShort", "224");
             Translator<Path, Classifications> translator2 =
                     factory.newInstance(Path.class, Classifications.class, model, arguments);
             Assert.assertTrue(translator2 instanceof BasicTranslator);
 
+            arguments.put("resize", "224,224");
+            arguments.put("resizeShort", "224,500,BICUBIC");
             Translator<URL, Classifications> translator3 =
                     factory.newInstance(URL.class, Classifications.class, model, arguments);
             Assert.assertTrue(translator3 instanceof BasicTranslator);
 
+            arguments.put("resize", "2,224,BICUBIC");
+            arguments.put("resizeShort", "224,500,BILINEAR");
+            arguments.put("centerCrop", "true");
             Translator<InputStream, Classifications> translator4 =
                     factory.newInstance(InputStream.class, Classifications.class, model, arguments);
             Assert.assertTrue(translator4 instanceof BasicTranslator);
@@ -75,6 +84,13 @@ public class ImageClassificationTranslatorFactoryTest {
             Assert.assertThrows(
                     IllegalArgumentException.class,
                     () -> factory.newInstance(Image.class, Output.class, model, arguments));
+
+            arguments.put("centerCrop", "false");
+            Assert.assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            factory.newInstance(
+                                    Image.class, Classifications.class, model, arguments));
         }
     }
 }

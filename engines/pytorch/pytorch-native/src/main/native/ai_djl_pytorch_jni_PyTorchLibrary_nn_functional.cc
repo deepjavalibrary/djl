@@ -82,6 +82,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNInterpolat
   if (jmode != 0 && jmode != 5) {
     options = options.align_corners(jalign_corners);
   }
+  options.antialias(true);
   const auto* result_ptr = new torch::Tensor(torch::nn::functional::interpolate(*tensor_ptr, options));
 #endif
   return reinterpret_cast<uintptr_t>(result_ptr);
