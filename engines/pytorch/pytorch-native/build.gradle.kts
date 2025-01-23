@@ -25,9 +25,16 @@ val isAarch64 = project.hasProperty("aarch64") || arch == "aarch64"
 version = ptVersion + if (isRelease) "" else "-SNAPSHOT"
 
 
-fun downloadBuild(ver: String, os: String, flavor: String, isPrecxx11: Boolean = false, isAarch64: Boolean = false) {
+fun downloadBuild(
+    execOperations: ExecOperations,
+    ver: String,
+    os: String,
+    flavor: String,
+    isPrecxx11: Boolean = false,
+    isAarch64: Boolean = false
+) {
     val arch = if (isAarch64) "aarch64" else "x86_64"
-    providers.exec {
+    execOperations.exec {
         workingDir = project.projectDir
         if (os == "win")
             commandLine(project.projectDir / "build.cmd", ver, flavor)
@@ -50,9 +57,9 @@ fun downloadBuild(ver: String, os: String, flavor: String, isPrecxx11: Boolean =
     }
 }
 
-fun downloadBuildAndroid(ver: String) {
+fun downloadBuildAndroid(execOperations: ExecOperations, ver: String) {
     for (abi in listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")) {
-        providers.exec {
+        execOperations.exec {
             workingDir = project.projectDir
             commandLine("bash", "build_android.sh", ver, abi)
         }
@@ -65,7 +72,7 @@ fun downloadBuildAndroid(ver: String) {
     }
 }
 
-fun prepareNativeLib(binaryRoot: String, ver: String, packageType: String?) {
+fun prepareNativeLib(execOperations: ExecOperations, binaryRoot: String, ver: String, packageType: String?) {
     if ("mac" !in os)
         throw GradleException("This command must be run from osx")
 
@@ -96,7 +103,7 @@ fun prepareNativeLib(binaryRoot: String, ver: String, packageType: String?) {
         copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
         copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
 
-        providers.exec {
+        execOperations.exec {
             workingDir = project.projectDir
             commandLine(
                 "install_name_tool",
@@ -105,7 +112,7 @@ fun prepareNativeLib(binaryRoot: String, ver: String, packageType: String?) {
                 "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib"
             )
         }
-        providers.exec {
+        execOperations.exec {
             workingDir = project.projectDir
             commandLine(
                 "install_name_tool",
@@ -196,9 +203,9 @@ fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: Stri
 open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
 
 tasks {
-    register("compileAndroidJNI") {
+    register<Cmd>("compileAndroidJNI") {
         doFirst {
-            downloadBuildAndroid(ptVersion)
+            downloadBuildAndroid(execOperations, ptVersion)
         }
     }
 
@@ -211,13 +218,13 @@ tasks {
         }
     }
 
-    register("compileJNI") {
+    register<Cmd>("compileJNI") {
         doFirst {
             // You have to use an environment with CUDA persets for Linux and Windows
             when {
-                "windows" in os -> downloadBuild(ptVersion, "win", ptFlavor)
-                "mac" in os -> downloadBuild(ptVersion, "osx", ptFlavor, false, isAarch64)
-                "linux" in os -> downloadBuild(ptVersion, "linux", ptFlavor, isPrecxx11, isAarch64)
+                "windows" in os -> downloadBuild(execOperations, ptVersion, "win", ptFlavor)
+                "mac" in os -> downloadBuild(execOperations, ptVersion, "osx", ptFlavor, false, isAarch64)
+                "linux" in os -> downloadBuild(execOperations, ptVersion, "linux", ptFlavor, isPrecxx11, isAarch64)
                 else -> throw IllegalStateException("Unknown Architecture $osName-$ptFlavor")
             }
 
@@ -228,10 +235,10 @@ tasks {
     }
 
     val binaryRoot = buildDirectory / "download"
-    register("downloadPyTorchNativeLib") {
+    register<Cmd>("downloadPyTorchNativeLib") {
         doLast {
             val packageType = project.findProperty("package_type")?.toString()
-            prepareNativeLib("$binaryRoot", ptVersion, packageType)
+            prepareNativeLib(execOperations, "$binaryRoot", ptVersion, packageType)
         }
     }
 
@@ -239,8 +246,8 @@ tasks {
         val dir = project.projectDir
         doLast {
             delete("$binaryRoot")
-            prepareNativeLib("$binaryRoot", ptVersion, "cpu")
-            prepareNativeLib("$binaryRoot", ptVersion, "gpu")
+            prepareNativeLib(execOperations, "$binaryRoot", ptVersion, "cpu")
+            prepareNativeLib(execOperations, "$binaryRoot", ptVersion, "gpu")
 
             execOperations.exec {
                 workingDir = dir
