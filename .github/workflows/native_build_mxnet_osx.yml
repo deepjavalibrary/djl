@@ -23,7 +23,7 @@ jobs:
           clang --version
           CMAKE_STATICBUILD=1 ./tools/staticbuild/build.sh cpu
       - name: Upload libmxnet.dylib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: libmxnet.dylib
           path: build/libmxnet.dylib
