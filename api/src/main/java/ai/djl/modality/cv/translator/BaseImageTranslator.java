@@ -17,6 +17,7 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.CenterFit;
 import ai.djl.modality.cv.transform.Normalize;
+import ai.djl.modality.cv.transform.Pad;
 import ai.djl.modality.cv.transform.Resize;
 import ai.djl.modality.cv.transform.ResizeShort;
 import ai.djl.modality.cv.transform.ToTensor;
@@ -191,6 +192,14 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             if (arguments.containsKey("flag")) {
                 flag = Image.Flag.valueOf(arguments.get("flag").toString());
             }
+            String pad = ArgumentsUtil.stringValue(arguments, "pad", "false");
+            if ("true".equals(pad)) {
+                addTransform(new Pad(0));
+            } else if (!"false".equals(pad)) {
+                double padding = Double.parseDouble(pad);
+                addTransform(new Pad(padding));
+            }
+
             String resize = ArgumentsUtil.stringValue(arguments, "resize", "false");
             if ("true".equals(resize)) {
                 addTransform(new Resize(width, height));
