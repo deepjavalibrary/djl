@@ -64,7 +64,7 @@ jobs:
             src:
               - 'extensions/fasttext/**'
       - name: Compile fastText JNI
-        if: steps.fasttext_changes.outputs.src == 'true'
+        if: ${{ steps.fasttext_changes.outputs.src == 'true' && runner.os != 'Windows' }}
         run: ./gradlew :extensions:fasttext:compileJNI
       - uses: dorny/paths-filter@v2
         id: tokenizers_changes
