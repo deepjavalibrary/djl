@@ -45,7 +45,7 @@ if [[ $PLATFORM == 'darwin' ]]; then
     cp -f build/libjni_fasttext.dylib build/jnilib/osx-x86_64/
   fi
 elif [[ $PLATFORM == 'linux' ]]; then
-  if [[ $(uname -m) == 'arm64' ]]; then
+  if [[ $(uname -m) == 'aarch64' ]]; then
     mkdir -p build/jnilib/linux-aarch64
     cp -f build/libjni_fasttext.so build/jnilib/linux-aarch64/
   else
