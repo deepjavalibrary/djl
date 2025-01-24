@@ -353,11 +353,4 @@ public interface Block {
             }
         }
     }
-
-    /**
-     * Returns a map of all the custom metadata of the block.
-     *
-     * @return the map of {@link PairList}
-     */
-    PairList<String, String> getCustomMetadata();
 }

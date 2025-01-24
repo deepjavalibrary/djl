@@ -176,11 +176,6 @@ public class ZooModel<I, O> implements Model {
         return model.describeOutput();
     }
 
-    @Override
-    public PairList<String, String> getCustomMetadata() {
-        return model.getCustomMetadata();
-    }
-
     /** {@inheritDoc} */
     @Override
     public String[] getArtifactNames() {
