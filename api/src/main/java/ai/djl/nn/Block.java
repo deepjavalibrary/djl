@@ -26,6 +26,8 @@ import ai.djl.util.PairList;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 import java.util.function.Predicate;
 
 /**
@@ -352,5 +354,14 @@ public interface Block {
                                 + LayoutType.toString(actualLayout));
             }
         }
+    }
+
+    /**
+     * Returns a map of all the custom metadata of the block.
+     *
+     * @return the map of {@link PairList}
+     */
+    default Map<String, String> getCustomMetadata() {
+        return Collections.emptyMap();
     }
 }
