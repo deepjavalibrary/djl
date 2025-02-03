@@ -45,79 +45,13 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray rdiv(Number n) {
-        return rdiv(array.getManager().create(n));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rdiv(NDArray b) {
-        return (PtNDArray) b.div(array);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rdivi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PtNDArray rdivi(NDArray b) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray rsub(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rsub(NDArray b) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rsubi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rsubi(NDArray b) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rmod(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rmod(NDArray b) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rmodi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PtNDArray rmodi(NDArray b) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rpow(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
