@@ -38,7 +38,11 @@ public interface NDArrayEx {
      * @param n the Value to use for reverse division
      * @return a copy of the array after applying reverse division
      */
-    NDArray rdiv(Number n);
+    default NDArray rdiv(Number n) {
+        NDArray array = getArray();
+        NDArray b = array.getManager().create(n).toType(array.getDataType(), false);
+        return rdiv(b);
+    }
 
     /**
      * Applies reverse division with a scalar - i.e., (n / thisArrayValues).
@@ -46,7 +50,9 @@ public interface NDArrayEx {
      * @param b the ndarray to use for reverse division
      * @return a copy of the array after applying reverse division
      */
-    NDArray rdiv(NDArray b);
+    default NDArray rdiv(NDArray b) {
+        return b.div(getArray());
+    }
 
     /**
      * Applies in place reverse division - i.e., (n / thisArrayValues).
@@ -54,7 +60,11 @@ public interface NDArrayEx {
      * @param n the value to use for reverse division
      * @return this array after applying reverse division
      */
-    NDArray rdivi(Number n);
+    default NDArray rdivi(Number n) {
+        NDArray array = getArray();
+        NDArray b = array.getManager().create(n).toType(array.getDataType(), false);
+        return rdivi(b);
+    }
 
     /**
      * Applies in place reverse division - i.e., (n / thisArrayValues).
@@ -70,7 +80,9 @@ public interface NDArrayEx {
      * @param n the value to use for reverse subtraction
      * @return a copy of array after reverse subtraction
      */
-    NDArray rsub(Number n);
+    default NDArray rsub(Number n) {
+        return getArray().sub(n).neg();
+    }
 
     /**
      * Applies reverse subtraction with duplicates - i.e., (n - thisArrayValues).
@@ -78,7 +90,9 @@ public interface NDArrayEx {
      * @param b the ndarray to use for reverse subtraction
      * @return a copy of the array after reverse subtraction
      */
-    NDArray rsub(NDArray b);
+    default NDArray rsub(NDArray b) {
+        return b.sub(getArray());
+    }
 
     /**
      * Applies reverse subtraction in place - i.e., (n - thisArrayValues).
@@ -86,7 +100,9 @@ public interface NDArrayEx {
      * @param n the value to use for reverse subtraction
      * @return this array after reverse subtraction
      */
-    NDArray rsubi(Number n);
+    default NDArray rsubi(Number n) {
+        return getArray().subi(n).negi();
+    }
 
     /**
      * Applies reverse subtraction in place - i.e., (n - thisArrayValues).
@@ -94,7 +110,9 @@ public interface NDArrayEx {
      * @param b the ndarray to use for reverse subtraction
      * @return this array after reverse subtraction
      */
-    NDArray rsubi(NDArray b);
+    default NDArray rsubi(NDArray b) {
+        return getArray().subi(b).negi();
+    }
 
     /**
      * Applies reverse remainder of division with a scalar.
@@ -102,7 +120,11 @@ public interface NDArrayEx {
      * @param n the value to use for reverse division
      * @return a copy of array after applying reverse division
      */
-    NDArray rmod(Number n);
+    default NDArray rmod(Number n) {
+        NDArray array = getArray();
+        NDArray b = array.getManager().create(n).toType(array.getDataType(), false);
+        return rmod(b);
+    }
 
     /**
      * Applies reverse remainder of division.
@@ -110,7 +132,9 @@ public interface NDArrayEx {
      * @param b the ndarray to use for reverse division
      * @return a copy of array after applying reverse division
      */
-    NDArray rmod(NDArray b);
+    default NDArray rmod(NDArray b) {
+        return b.mod(getArray());
+    }
 
     /**
      * Applies in place reverse remainder of division with a scalar.
@@ -118,7 +142,11 @@ public interface NDArrayEx {
      * @param n the value to use for reverse division
      * @return this array after applying reverse division
      */
-    NDArray rmodi(Number n);
+    default NDArray rmodi(Number n) {
+        NDArray array = getArray();
+        NDArray b = array.getManager().create(n).toType(array.getDataType(), false);
+        return rmodi(b);
+    }
 
     /**
      * Applies in place reverse remainder of division.
@@ -134,7 +162,11 @@ public interface NDArrayEx {
      * @param n the value to use for reverse power
      * @return a copy of array after applying reverse power
      */
-    NDArray rpow(Number n);
+    default NDArray rpow(Number n) {
+        NDArray array = getArray();
+        NDArray b = array.getManager().create(n).toType(array.getDataType(), false);
+        return b.pow(array);
+    }
 
     /**
      * Reverses the power of each element being raised in the {@code NDArray} in place.

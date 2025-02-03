@@ -90,12 +90,6 @@ class MxNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rdiv(NDArray b) {
-        return b.div(array);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray rdivi(Number n) {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
