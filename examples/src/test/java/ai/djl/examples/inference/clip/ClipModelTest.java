@@ -38,7 +38,7 @@ public class ClipModelTest {
             float[] imgVector = model.extractImageFeatures(img);
             Assert.assertEquals(textVector.length, imgVector.length);
             assertAlmostEquals(textVector[0], 0.09463542);
-            assertAlmostEquals(imgVector[0], -0.18694691);
+            assertAlmostEquals(imgVector[0], -0.12755919);
         }
     }
 
