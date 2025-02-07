@@ -16,6 +16,6 @@ You can pull the TensorFlow core java API from the central Maven repository by i
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-api</artifactId>
-    <version>0.31.0</version>
+    <version>0.32.0</version>
 </dependency>
 ```
