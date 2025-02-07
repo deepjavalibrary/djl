@@ -15,6 +15,7 @@ package ai.djl.examples.training;
 import ai.djl.ModelException;
 import ai.djl.examples.inference.cv.ImageClassification;
 import ai.djl.modality.Classifications;
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 
@@ -27,6 +28,8 @@ public class TrainMnistTest {
 
     @Test
     public void testTrainMnist() throws ModelException, TranslateException, IOException {
+        TestRequirements.engine("PyTorch", "TensorFlow", "OnnxRuntime");
+
         double expectedProb;
         if (Boolean.getBoolean("nightly")) {
             String[] args = new String[] {"-g", "1"};
