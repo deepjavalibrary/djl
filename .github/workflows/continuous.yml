@@ -63,8 +63,15 @@ jobs:
           filters: |
             src:
               - 'extensions/fasttext/**'
-      - name: Compile fastText JNI
-        if: ${{ steps.fasttext_changes.outputs.src == 'true' && runner.os != 'Windows' }}
+      - name: Compile fastText JNI macOs
+        if: ${{ steps.fasttext_changes.outputs.src == 'true' && runner.os == 'macOs' }}
+        run: ./gradlew :extensions:fasttext:compileJNI
+      - name: Compile fastText JNI linux
+        if: ${{ steps.fasttext_changes.outputs.src == 'true' && runner.os == 'Linux' }}
+        # fasttext on linux requires gcc12, but ubuntu-latest uses at least gcc13
+        env:
+          CC: gcc-12
+          CXX: g++-12
         run: ./gradlew :extensions:fasttext:compileJNI
       - uses: dorny/paths-filter@v2
         id: tokenizers_changes
