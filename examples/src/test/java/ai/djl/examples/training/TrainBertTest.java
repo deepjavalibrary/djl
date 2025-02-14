@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.training;
 
+import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
 
 import org.testng.annotations.Test;
@@ -22,6 +23,8 @@ public class TrainBertTest {
 
     @Test
     public void testTrainBert() throws IOException, TranslateException {
+        TestRequirements.engine("PyTorch", "OnnxRuntime");
+
         String[] args = {"-g", "1", "-m", "1", "-e", "1"};
         TrainBertOnCode.runExample(args);
     }

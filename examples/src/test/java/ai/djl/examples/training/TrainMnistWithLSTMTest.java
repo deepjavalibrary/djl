@@ -12,6 +12,7 @@
  */
 package ai.djl.examples.training;
 
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 
@@ -24,6 +25,8 @@ public class TrainMnistWithLSTMTest {
 
     @Test
     public void testTrainMnistWithLSTM() throws IOException, TranslateException {
+        TestRequirements.engine("PyTorch", "TensorFlow", "OnnxRuntime");
+
         String[] args = {"-g", "1", "-e", "1", "-m", "2"};
         TrainingResult result = TrainMnistWithLSTM.runExample(args);
         Assert.assertNotNull(result);

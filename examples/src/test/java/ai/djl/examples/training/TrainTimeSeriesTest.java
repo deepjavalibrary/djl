@@ -13,6 +13,7 @@
 
 package ai.djl.examples.training;
 
+import ai.djl.testing.TestRequirements;
 import ai.djl.training.TrainingResult;
 import ai.djl.translate.TranslateException;
 
@@ -25,6 +26,8 @@ public class TrainTimeSeriesTest {
 
     @Test
     public void testTrainTimeSeries() throws TranslateException, IOException {
+        TestRequirements.engine("PyTorch", "OnnxRuntime");
+
         String[] args = {"-g", "1", "-e", "5", "-b", "32"};
         TrainingResult result = TrainTimeSeries.runExample(args);
         Assert.assertNotNull(result);
