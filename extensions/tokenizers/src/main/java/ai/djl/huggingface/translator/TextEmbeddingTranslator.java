@@ -177,6 +177,9 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
             case "cls":
                 embedding = embedding.get(new NDIndex(":, 0"));
                 break;
+            case "lasttoken":
+                embedding = lastTokenPool(embedding, attentionMask);
+                break;
             default:
                 throw new AssertionError("Unexpected pooling mode: " + pooling);
         }
@@ -237,6 +240,20 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         NDArray maskSum = attentionMask.sum(AXIS);
         NDArray embeddingSum = embeddings.mul(attentionMask).sum(AXIS);
         return embeddingSum.div(maskSum);
+    }
+
+    private static NDArray lastTokenPool(NDArray embeddings, NDArray attentionMask) {
+        long sum = attentionMask.get(":, -1").sum().getLong();
+        if (sum == attentionMask.getShape().get(0)) {
+            // left padding
+            return embeddings.get(":, -1");
+        }
+
+        long sequenceLength = attentionMask.sum(new int[] {1}).getLong() - 1;
+        long batchSize = embeddings.getShape().get(0);
+        embeddings = embeddings.get(":, " + sequenceLength);
+        NDArray index = embeddings.getManager().arange(batchSize);
+        return embeddings.get(index);
     }
 
     /**
@@ -313,10 +330,11 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
                     && !"max".equals(poolingMode)
                     && !"cls".equals(poolingMode)
                     && !"mean_sqrt_len".equals(poolingMode)
+                    && !"lasttoken".equals(poolingMode)
                     && !"weightedmean".equals(poolingMode)) {
                 throw new IllegalArgumentException(
                         "Invalid pooling model, must be one of [mean, max, cls, mean_sqrt_len,"
-                                + " weightedmean].");
+                                + " weightedmean, lasttoken].");
             }
             this.pooling = poolingMode;
             return this;

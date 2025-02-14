@@ -163,6 +163,52 @@ public class TextEmbeddingTranslatorTest {
             Assertions.assertAlmostEquals(res[0], 0.05103104);
         }
 
+        // pooling_lasttokens with left padding
+        criteria =
+                Criteria.builder()
+                        .setTypes(String.class, float[].class)
+                        .optModelPath(modelDir)
+                        .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                        .optArgument("block_shapes", "(1,7,384)")
+                        .optArgument("block_names", "last_hidden_state")
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "intfloat/e5-mistral-7b-instruct")
+                        .optArgument("pooling", "lasttoken")
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String, float[]> model = criteria.loadModel();
+                Predictor<String, float[]> predictor = model.newPredictor()) {
+            float[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 384);
+            Assertions.assertAlmostEquals(res[0], 0.05103104);
+        }
+
+        // pooling_lasttokens
+        criteria =
+                Criteria.builder()
+                        .setTypes(String.class, float[].class)
+                        .optModelPath(modelDir)
+                        .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                        .optArgument("block_shapes", "(1,7,384)")
+                        .optArgument("block_names", "last_hidden_state")
+                        .optEngine("PyTorch")
+                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("pooling", "lasttoken")
+                        .optArgument("padding", "max_length")
+                        .optArgument("maxLength", 10)
+                        .optOption("hasParameter", "false")
+                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                        .build();
+
+        try (ZooModel<String, float[]> model = criteria.loadModel();
+                Predictor<String, float[]> predictor = model.newPredictor()) {
+            float[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 384);
+            Assertions.assertAlmostEquals(res[0], 0.05103104);
+        }
+
         // dense and layerNorm
         criteria =
                 Criteria.builder()
