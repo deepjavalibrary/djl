@@ -90,14 +90,15 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
-          aws-region: us-east-2
+          aws-region: us-east-1
 
       - name: Copy files to S3 with the AWS CLI
         env:
           DJL_VERSION: ${{ github.event.inputs.version-number || 'master' }}
         run: |
-          aws s3 sync $DJL_VERSION s3://djl-ai/documentation/$DJL_VERSION --delete --debug
-          aws s3 cp versions.json s3://djl-ai/documentation/versions.json --debug
+          aws configure set s3.preferred_transfer_client crt
+          aws s3 sync $DJL_VERSION s3://djl-ai/documentation/$DJL_VERSION --delete 
+          aws s3 cp versions.json s3://djl-ai/documentation/versions.json
           aws cloudfront create-invalidation --distribution-id E733IIDCG0G5U --paths "/*" --debug
 
 
