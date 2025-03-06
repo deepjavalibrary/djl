@@ -13,6 +13,7 @@
 package ai.djl.huggingface.zoo;
 
 import ai.djl.Application;
+import ai.djl.Application.CV;
 import ai.djl.Application.NLP;
 import ai.djl.engine.Engine;
 import ai.djl.repository.Repository;
@@ -68,6 +69,7 @@ public class HfModelZoo extends ModelZoo {
             synchronized (HfModelZoo.class) {
                 if (!initialized) {
                     Version version = new Version(Engine.getDjlVersion());
+                    addModels(CV.ZERO_SHOT_OBJECT_DETECTION, version);
                     addModels(NLP.FILL_MASK, version);
                     addModels(NLP.QUESTION_ANSWER, version);
                     addModels(NLP.TEXT_CLASSIFICATION, version);
