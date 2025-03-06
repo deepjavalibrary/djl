@@ -14,18 +14,17 @@ package ai.djl.huggingface.tokenizers;
 
 import ai.djl.Model;
 import ai.djl.ModelException;
-import ai.djl.huggingface.translator.ZeroShotObjectDetectionTranslatorFactory;
+import ai.djl.huggingface.translator.ZeroShotImageClassificationTranslatorFactory;
 import ai.djl.inference.Predictor;
+import ai.djl.modality.Classifications;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.VisionLanguageInput;
-import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
-import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
@@ -46,58 +45,51 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ZeroShotObjectDetectionTranslatorTest {
+public class ZeroShotImageClassificationTranslatorTest {
 
     @Test
-    public void testZeroShotObjectDetectionTranslator()
+    public void testZeroShotImageClassificationTranslator()
             throws ModelException, IOException, TranslateException {
         Path file = Paths.get("../../examples/src/test/resources/kitten.jpg");
         Image img = ImageFactory.getInstance().fromFile(file);
-        VisionLanguageInput textInput = new VisionLanguageInput(img, new String[] {"a cat"});
+        VisionLanguageInput textInput =
+                new VisionLanguageInput(img, new String[] {"a cat", "a remote control"});
 
         Block block =
                 new LambdaBlock(
                         a -> {
+                            float[] data = {18.4394f, 18.908f};
                             NDManager manager = a.getManager();
-                            NDArray logits = manager.zeros(new Shape(1, 3600, 1));
-                            logits.setName("logits");
-                            logits.set(new NDIndex(0), -4);
-                            logits.set(new NDIndex(0, 0, 0), 2);
-                            NDArray boxes = manager.zeros(new Shape(1, 3600, 4));
-                            boxes.setName("pred_boxes");
-                            boxes.set(new NDIndex(0, 0, 0), 0.76164067);
-                            boxes.set(new NDIndex(0, 0, 1), 0.28735778);
-                            boxes.set(new NDIndex(0, 0, 2), 0.48600525);
-                            boxes.set(new NDIndex(0, 0, 3), 0.50610954);
-                            return new NDList(logits, boxes);
+                            NDArray logits = manager.create(data, new Shape(1, 2));
+                            logits.setName("logits_per_image");
+                            return new NDList(logits);
                         },
                         "model");
 
         Path modelDir = Paths.get("build/model");
         Files.createDirectories(modelDir);
 
-        Criteria<VisionLanguageInput, DetectedObjects> criteria =
+        Criteria<VisionLanguageInput, Classifications> criteria =
                 Criteria.builder()
-                        .setTypes(VisionLanguageInput.class, DetectedObjects.class)
+                        .setTypes(VisionLanguageInput.class, Classifications.class)
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("width", 960)
-                        .optArgument("height", 960)
-                        .optArgument("pad", 128)
-                        .optArgument("resize", "true")
-                        .optArgument("threshold", "0.2")
+                        .optArgument("width", 224)
+                        .optArgument("height", 224)
+                        .optArgument("resizeShort", "true")
+                        .optArgument("centerCrop", "true")
+                        .optArgument("toTensor", "true")
                         .optArgument("tokenizer", "bert-base-uncased")
                         .optOption("hasParameter", "false")
-                        .optArgument("toTensor", true)
-                        .optTranslatorFactory(new ZeroShotObjectDetectionTranslatorFactory())
+                        .optTranslatorFactory(new ZeroShotImageClassificationTranslatorFactory())
                         .build();
 
-        try (ZooModel<VisionLanguageInput, DetectedObjects> model = criteria.loadModel();
-                Predictor<VisionLanguageInput, DetectedObjects> predictor = model.newPredictor()) {
-            DetectedObjects.DetectedObject res = predictor.predict(textInput).best();
-            Assertions.assertAlmostEquals(res.getProbability(), 0.88079);
-            Assert.assertEquals(res.getClassName(), "a cat");
+        try (ZooModel<VisionLanguageInput, Classifications> model = criteria.loadModel();
+                Predictor<VisionLanguageInput, Classifications> predictor = model.newPredictor()) {
+            Classifications.Classification res = predictor.predict(textInput).best();
+            Assertions.assertAlmostEquals(res.getProbability(), 0.61505);
+            Assert.assertEquals(res.getClassName(), "a remote control");
         }
 
         Criteria<Input, Output> criteria2 =
@@ -108,21 +100,22 @@ public class ZeroShotObjectDetectionTranslatorTest {
                         .optEngine("PyTorch")
                         .optArgument("tokenizer", "bert-base-uncased")
                         .optOption("hasParameter", "false")
-                        .optTranslatorFactory(new ZeroShotObjectDetectionTranslatorFactory())
+                        .optTranslatorFactory(new ZeroShotImageClassificationTranslatorFactory())
                         .build();
 
         try (ZooModel<Input, Output> model = criteria2.loadModel();
                 Predictor<Input, Output> predictor = model.newPredictor()) {
             Input input = new Input();
             Map<String, Object> map = new ConcurrentHashMap<>();
-            map.put("image_url", file.toUri());
+            map.put("image_url", file.toUri().toURL());
             map.put("candidate_labels", textInput.getCandidates());
             input.add(JsonUtils.toJson(map));
             Output out = predictor.predict(input);
-            DetectedObjects res = (DetectedObjects) out.getData().getAsObject();
-            DetectedObjects.DetectedObject detection = res.best();
-            Assertions.assertAlmostEquals(detection.getProbability(), 0.88079);
-            Assert.assertEquals(detection.getClassName(), "a cat");
+            Classifications res = (Classifications) out.getData().getAsObject();
+            Assert.assertEquals(res.items().size(), 2);
+            Classifications.Classification classification = res.best();
+            Assertions.assertAlmostEquals(classification.getProbability(), 0.61505);
+            Assert.assertEquals(classification.getClassName(), "a remote control");
 
             map.remove("candidate_labels");
             Input input1 = new Input();
@@ -136,8 +129,8 @@ public class ZeroShotObjectDetectionTranslatorTest {
             options.put("hasParameter", "false");
             model.load(modelDir, "test", options);
 
-            ZeroShotObjectDetectionTranslatorFactory factory =
-                    new ZeroShotObjectDetectionTranslatorFactory();
+            ZeroShotImageClassificationTranslatorFactory factory =
+                    new ZeroShotImageClassificationTranslatorFactory();
             Map<String, String> arguments = new HashMap<>();
 
             Assert.assertThrows(
