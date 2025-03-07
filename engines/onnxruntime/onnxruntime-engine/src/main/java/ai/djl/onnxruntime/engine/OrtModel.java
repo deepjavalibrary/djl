@@ -170,7 +170,7 @@ public class OrtModel extends BaseModel {
             ortSession.setInterOpNumThreads(Integer.parseInt(interOpNumThreads));
         }
         String intraOpNumThreads = (String) options.get("intraOpNumThreads");
-        if (interOpNumThreads != null) {
+        if (intraOpNumThreads != null) {
             ortSession.setIntraOpNumThreads(Integer.parseInt(intraOpNumThreads));
         }
         String executionMode = (String) options.get("executionMode");
