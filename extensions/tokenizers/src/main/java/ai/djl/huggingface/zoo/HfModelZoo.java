@@ -69,6 +69,7 @@ public class HfModelZoo extends ModelZoo {
             synchronized (HfModelZoo.class) {
                 if (!initialized) {
                     Version version = new Version(Engine.getDjlVersion());
+                    addModels(CV.ZERO_SHOT_IMAGE_CLASSIFICATION, version);
                     addModels(CV.ZERO_SHOT_OBJECT_DETECTION, version);
                     addModels(NLP.FILL_MASK, version);
                     addModels(NLP.QUESTION_ANSWER, version);
