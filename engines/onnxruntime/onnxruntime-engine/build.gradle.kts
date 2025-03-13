@@ -29,7 +29,8 @@ tasks {
                 "question_answer",
                 "text_classification",
                 "text_embedding",
-                "token_classification"
+                "token_classification",
+                "zero_shot_classification"
             )
             for (task in tasks) {
                 val file = File("$basePath/$task/ai.djl.huggingface.onnxruntime.json")

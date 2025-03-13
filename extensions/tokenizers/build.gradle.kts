@@ -35,7 +35,11 @@ tasks {
             )
         )
         val baseResourcePath = "${project.projectDir}/build/resources/main"
-        outputs.dirs(File("${baseResourcePath}/native/lib"), File("${baseResourcePath}/nlp"))
+        outputs.dirs(
+            File("${baseResourcePath}/native/lib"),
+            File("${baseResourcePath}/nlp"),
+            File("${baseResourcePath}/cv")
+        )
 
         val logger = project.logger
         val dir = project.projectDir
@@ -74,15 +78,18 @@ tasks {
                 into("$baseResourcePath/native/lib")
             }
 
-            url = "https://mlrepo.djl.ai/model/nlp"
+            url = "https://mlrepo.djl.ai/model"
             val tasks = listOf(
-                "fill_mask",
-                "question_answer",
-                "text_classification",
-                "text_embedding",
-                "token_classification"
+                "cv/zero_shot_image_classification",
+                "cv/zero_shot_object_detection",
+                "nlp/fill_mask",
+                "nlp/question_answer",
+                "nlp/text_classification",
+                "nlp/text_embedding",
+                "nlp/token_classification",
+                "nlp/zero_shot_classification"
             )
-            val prefix = File("$baseResourcePath/nlp")
+            val prefix = File(baseResourcePath)
             for (task in tasks) {
                 var file = prefix / task / "ai.djl.huggingface.pytorch.json"
                 if (file.exists())
@@ -94,12 +101,12 @@ tasks {
                     downloadPath gzipInto file
                 }
 
-                if (task !in arrayOf("text_embedding", "text_classification"))
+                if (task !in arrayOf("nlp/text_embedding", "nlp/text_classification"))
                     continue
 
                 file = prefix / task / "ai.djl.huggingface.rust.json"
                 if (file.exists())
-                    logger.lifecycle("Rust model zoo metadata alrady exists: $task")
+                    logger.lifecycle("Rust model zoo metadata already exists: $task")
                 else {
                     logger.lifecycle("Downloading Rust model zoo metadata: $task")
                     file.parentFile.mkdirs()
