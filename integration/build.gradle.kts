@@ -37,9 +37,10 @@ tasks {
     }
 
     run.configure {
-        for (prop in systemProperties.iterator()) {
-            if (prop.key.startsWith("ai.djl.") || prop.key == "nightly") {
-                systemProperty(prop.key, prop.value)
+        for (prop in System.getProperties().iterator()) {
+            val key = prop.key.toString()
+            if (key.startsWith("ai.djl.") || key == "nightly") {
+                systemProperty(key, prop.value)
             }
         }
         environment("TF_CPP_MIN_LOG_LEVEL" to "1") // turn off TensorFlow print out
@@ -47,9 +48,10 @@ tasks {
     }
 
     register<JavaExec>("debugEnv") {
-        for (prop in systemProperties.iterator()) {
-            if (prop.key.startsWith("ai.djl.") || prop.key == "nightly") {
-                systemProperty(prop.key, prop.value)
+        for (prop in System.getProperties().iterator()) {
+            val key = prop.key.toString()
+            if (key.startsWith("ai.djl.") || key == "nightly") {
+                systemProperty(key, prop.value)
             }
         }
         classpath = sourceSets.main.get().runtimeClasspath
