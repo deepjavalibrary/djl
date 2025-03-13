@@ -89,6 +89,15 @@ public class TfSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
         describeOutput();
     }
 
+    /**
+     * Returns the {@code SavedModelBundle} for the model.
+     *
+     * @return the {@code SavedModelBundle} for the model
+     */
+    public SavedModelBundle getSavedModelBundle() {
+        return bundle;
+    }
+
     /** {@inheritDoc} */
     @Override
     public void removeLastBlock() {
