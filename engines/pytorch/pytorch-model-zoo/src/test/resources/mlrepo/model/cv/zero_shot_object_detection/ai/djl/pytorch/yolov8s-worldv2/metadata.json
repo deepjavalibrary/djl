@@ -1,0 +1,41 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/zero_shot_object_detection",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "yolov8s-worldv2",
+  "name": "yolov8s-worldv2",
+  "description": "yolov8s-worldv2 object detection",
+  "website": "http://www.djl.ai/engines/pytorch/pytorch-model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "yolov8s-worldv2",
+      "properties": {
+      },
+      "arguments": {
+        "toTensor": true,
+        "applyRatio": true,
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloWorldTranslatorFactory"
+      },
+      "options": {
+        "mapLocation": "true"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/yolov8s-worldv2.zip",
+          "sha1Hash": "211e7a52e93fb5eabd10e6eb25afe64b8b402b5c",
+          "name": "",
+          "size": 434765025
+        }
+      }
+    }
+  ]
+}

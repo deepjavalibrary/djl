@@ -190,7 +190,7 @@ public class YoloV5Translator extends ObjectDetectionTranslator {
     }
 
     /** The builder for {@link YoloV5Translator}. */
-    public static class Builder extends ObjectDetectionBuilder<YoloV5Translator.Builder> {
+    public static class Builder extends ObjectDetectionBuilder<Builder> {
 
         YoloOutputType outputType = YoloOutputType.AUTO;
         float nmsThreshold = 0.4f;

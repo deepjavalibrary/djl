@@ -12,14 +12,13 @@
  */
 package ai.djl.examples.inference.cv;
 
-import ai.djl.Device;
 import ai.djl.ModelException;
-import ai.djl.huggingface.translator.ZeroShotObjectDetectionTranslatorFactory;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.VisionLanguageInput;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.translator.YoloWorldTranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
@@ -29,48 +28,53 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public final class ZeroShotObjectDetection {
+public final class YoloWorld {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZeroShotObjectDetection.class);
+    private static final Logger logger = LoggerFactory.getLogger(YoloWorld.class);
 
-    private ZeroShotObjectDetection() {}
+    private YoloWorld() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
-        DetectedObjects classifications = predict();
-        logger.info("{}", classifications);
+        DetectedObjects detection = predict();
+        logger.info("{}", detection);
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
         String url = "https://resources.djl.ai/images/000000039769.jpg";
         Image img = ImageFactory.getInstance().fromUrl(url);
-        VisionLanguageInput input = new VisionLanguageInput(img, new String[] {"a cat"});
+        VisionLanguageInput input =
+                new VisionLanguageInput(img, new String[] {"cat", "remote control"});
 
-        // You can use src/main/python/trace_owlv2.py to trace the model
+        // You can use src/main/python/trace_yolo_worldv2.py to trace the model
         Criteria<VisionLanguageInput, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(VisionLanguageInput.class, DetectedObjects.class)
-                        .optModelUrls("djl://ai.djl.huggingface.pytorch/google/owlv2-base-patch16")
+                        .optModelUrls("djl://ai.djl.pytorch/yolov8s-worldv2")
                         .optEngine("PyTorch")
-                        .optDevice(Device.cpu()) // Only support CPU
-                        .optTranslatorFactory(new ZeroShotObjectDetectionTranslatorFactory())
+                        .optTranslatorFactory(new YoloWorldTranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
 
         try (ZooModel<VisionLanguageInput, DetectedObjects> model = criteria.loadModel();
                 Predictor<VisionLanguageInput, DetectedObjects> predictor = model.newPredictor()) {
-            DetectedObjects ret = predictor.predict(input);
-            img.drawBoundingBoxes(ret);
+            Path outputPath = Paths.get("build/output");
+            Files.createDirectories(outputPath);
 
-            Path outputDir = Paths.get("build/output");
-            Files.createDirectories(outputDir);
-            Path imagePath = outputDir.resolve("zero_shot_object_detection.png");
-            // OpenJDK can't save jpg with alpha channel
-            img.save(Files.newOutputStream(imagePath), "png");
-            return ret;
+            DetectedObjects detection = predictor.predict(input);
+            if (detection.getNumberOfObjects() > 0) {
+                img.drawBoundingBoxes(detection);
+                Path output = outputPath.resolve("yolo_world.png");
+                try (OutputStream os = Files.newOutputStream(output)) {
+                    img.save(os, "png");
+                }
+                logger.info("Detected object saved in: {}", output);
+            }
+            return detection;
         }
     }
 }

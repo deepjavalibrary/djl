@@ -79,6 +79,12 @@ public class YoloTranslator extends ObjectDetectionTranslator {
         return new DetectedObjects(retClasses, retProbs, retBB);
     }
 
+    static NDArray xywh2xyxy(NDArray array) {
+        NDArray xy = array.get("..., :2");
+        NDArray wh = array.get("..., 2:").div(2);
+        return xy.sub(wh).concat(xy.add(wh), -1);
+    }
+
     /**
      * Creates a builder to build a {@link YoloTranslator}.
      *

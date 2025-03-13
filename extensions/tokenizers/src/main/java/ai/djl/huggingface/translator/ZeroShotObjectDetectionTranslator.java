@@ -19,7 +19,9 @@ import ai.djl.modality.cv.VisionLanguageInput;
 import ai.djl.modality.cv.output.BoundingBox;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.modality.cv.output.Rectangle;
+import ai.djl.modality.cv.translator.BaseImagePreProcessor;
 import ai.djl.modality.cv.translator.BaseImageTranslator;
+import ai.djl.modality.cv.translator.BaseImageTranslator.BaseBuilder;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -152,7 +154,7 @@ public class ZeroShotObjectDetectionTranslator
     }
 
     /** The builder for zero-shot classification translator. */
-    public static final class Builder extends BaseImageTranslator.BaseBuilder<Builder> {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private HuggingFaceTokenizer tokenizer;
         private boolean int32;
@@ -210,27 +212,9 @@ public class ZeroShotObjectDetectionTranslator
          * @throws IOException if I/O error occurs
          */
         public ZeroShotObjectDetectionTranslator build() throws IOException {
-            ImageTranslator imageProcessor = new ImageTranslator(this);
+            BaseImageTranslator<?> imageProcessor = new BaseImagePreProcessor(this);
             return new ZeroShotObjectDetectionTranslator(
                     tokenizer, imageProcessor, int32, threshold);
-        }
-    }
-
-    private static final class ImageTranslator extends BaseImageTranslator<Void> {
-
-        /**
-         * Constructs an {@code ImageTranslator} with the provided builder.
-         *
-         * @param builder the data to build with
-         */
-        public ImageTranslator(BaseBuilder<?> builder) {
-            super(builder);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Void processOutput(TranslatorContext ctx, NDList list) {
-            return null;
         }
     }
 }
