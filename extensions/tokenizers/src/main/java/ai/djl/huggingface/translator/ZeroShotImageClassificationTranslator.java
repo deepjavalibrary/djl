@@ -17,8 +17,9 @@ import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.VisionLanguageInput;
+import ai.djl.modality.cv.translator.BaseImagePreProcessor;
 import ai.djl.modality.cv.translator.BaseImageTranslator;
-import ai.djl.modality.cv.translator.ImageClassificationTranslator;
+import ai.djl.modality.cv.translator.BaseImageTranslator.BaseBuilder;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -121,14 +122,19 @@ public class ZeroShotImageClassificationTranslator
     }
 
     /** The builder for zero-shot classification translator. */
-    public static final class Builder {
+    public static final class Builder extends BaseBuilder<Builder> {
 
         private HuggingFaceTokenizer tokenizer;
-        private ImageTranslator.Builder builder = new ImageTranslator.Builder();
         private boolean int32;
 
         Builder(HuggingFaceTokenizer tokenizer) {
             this.tokenizer = tokenizer;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected Builder self() {
+            return this;
         }
 
         /**
@@ -148,8 +154,8 @@ public class ZeroShotImageClassificationTranslator
          * @param arguments the model arguments
          */
         public void configure(Map<String, ?> arguments) {
+            configPreProcess(arguments);
             optInt32(ArgumentsUtil.booleanValue(arguments, "int32"));
-            builder.configPreProcess(arguments);
         }
 
         /**
@@ -159,48 +165,8 @@ public class ZeroShotImageClassificationTranslator
          * @throws IOException if I/O error occurs
          */
         public ZeroShotImageClassificationTranslator build() throws IOException {
-            return new ZeroShotImageClassificationTranslator(tokenizer, builder.build(), int32);
-        }
-    }
-
-    private static final class ImageTranslator extends BaseImageTranslator<Classifications> {
-
-        /**
-         * Constructs an {@code ImageTranslator} with the provided builder.
-         *
-         * @param builder the data to build with
-         */
-        public ImageTranslator(BaseBuilder<?> builder) {
-            super(builder);
-        }
-
-        @Override
-        public Classifications processOutput(TranslatorContext ctx, NDList list) {
-            return null;
-        }
-
-        static class Builder extends BaseImageTranslator.BaseBuilder<Builder> {
-
-            /** {@inheritDoc} */
-            @Override
-            protected Builder self() {
-                return this;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            protected void configPreProcess(Map<String, ?> arguments) {
-                super.configPreProcess(arguments);
-            }
-
-            /**
-             * Builds the {@link ImageClassificationTranslator} with the provided data.
-             *
-             * @return an {@link ImageClassificationTranslator}
-             */
-            public ImageTranslator build() {
-                return new ImageTranslator(this);
-            }
+            BaseImagePreProcessor processor = new BaseImagePreProcessor(this);
+            return new ZeroShotImageClassificationTranslator(tokenizer, processor, int32);
         }
     }
 }

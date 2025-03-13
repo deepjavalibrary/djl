@@ -54,7 +54,7 @@ public class YoloSegmentationTranslator extends YoloV5Translator {
         NDArray candidates = pred.get("4:" + maskIndex).max(AXIS_0).gt(threshold);
         pred = pred.transpose();
         NDArray sub = pred.get("..., :4");
-        sub = xywh2xyxy(sub);
+        sub = YoloTranslator.xywh2xyxy(sub);
         pred = sub.concat(pred.get("..., 4:"), -1);
         pred = pred.get(candidates);
 
@@ -117,12 +117,6 @@ public class YoloSegmentationTranslator extends YoloV5Translator {
             retBB.add(bb);
         }
         return new DetectedObjects(retClasses, retProbs, retBB);
-    }
-
-    private NDArray xywh2xyxy(NDArray array) {
-        NDArray xy = array.get("..., :2");
-        NDArray wh = array.get("..., 2:").div(2);
-        return xy.sub(wh).concat(xy.add(wh), -1);
     }
 
     /**

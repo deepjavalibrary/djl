@@ -26,19 +26,23 @@ public class SecurityManagerTest {
 
     @BeforeTest
     public void setUp() {
-        if (Runtime.version().version().get(0) > 17) {
-            throw new SkipException("Skip SecurityManagerTest for JDK 19+");
+        if (Runtime.version().version().get(0) <= 17) {
+            originalSM = System.getSecurityManager();
         }
-        originalSM = System.getSecurityManager();
     }
 
     @AfterTest
     public void tearDown() {
-        System.setSecurityManager(originalSM);
+        if (originalSM != null) {
+            System.setSecurityManager(originalSM);
+        }
     }
 
     @Test
     public void testGetenv() {
+        if (originalSM == null) {
+            throw new SkipException("Skip SecurityManagerTest for JDK 19+");
+        }
         // Disable access to system environment
         SecurityManager sm =
                 new SecurityManager() {

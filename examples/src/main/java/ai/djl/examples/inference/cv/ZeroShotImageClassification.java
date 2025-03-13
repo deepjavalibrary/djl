@@ -42,12 +42,13 @@ public final class ZeroShotImageClassification {
     }
 
     public static Classifications predict() throws IOException, ModelException, TranslateException {
-        String url = "http://images.cocodataset.org/val2017/000000039769.jpg";
+        String url = "https://resources.djl.ai/images/000000039769.jpg";
         Image img = ImageFactory.getInstance().fromUrl(url);
 
         VisionLanguageInput input =
                 new VisionLanguageInput(img, new String[] {"cat", "remote control"});
 
+        // You can use src/main/python/trace_clip_vit.py to trace the model
         Criteria<VisionLanguageInput, Classifications> criteria =
                 Criteria.builder()
                         .setTypes(VisionLanguageInput.class, Classifications.class)
