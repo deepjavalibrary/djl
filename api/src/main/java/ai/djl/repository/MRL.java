@@ -23,6 +23,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * The {@code MRL} (Machine learning Resource Locator) is a pointer to a {@link Metadata} "resource"
@@ -243,7 +244,9 @@ public final class MRL {
      * @throws IOException for errors while loading the model
      */
     public List<Artifact> listArtifacts() throws IOException {
-        return getMetadata().getArtifacts();
+        return getMetadata().getArtifacts().stream()
+                .filter(a -> version == null || version.equals(a.getVersion()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -305,6 +308,6 @@ public final class MRL {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return toURI().toString();
+        return "djl://" + groupId + '/' + artifactId;
     }
 }

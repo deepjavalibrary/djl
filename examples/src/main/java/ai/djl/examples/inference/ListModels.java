@@ -14,6 +14,7 @@ package ai.djl.examples.inference;
 
 import ai.djl.Application;
 import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 
@@ -31,11 +32,25 @@ public final class ListModels {
     private ListModels() {}
 
     public static void main(String[] args) throws IOException, ModelNotFoundException {
-        Map<Application, List<Artifact>> models = ModelZoo.listModels();
-        models.forEach(
-                (app, list) -> {
-                    String appName = app.toString();
-                    list.forEach(artifact -> logger.info("{} {}", appName, artifact));
-                });
+        boolean withArtifacts =
+                args.length > 0 && ("--artifact".equals(args[0]) || "-a".equals(args[0]));
+        if (!withArtifacts) {
+            logger.info("============================================================");
+            logger.info("user ./gradlew listModel --args='-a' to show artifact detail");
+            logger.info("============================================================");
+        }
+        Map<Application, List<MRL>> models = ModelZoo.listModels();
+        for (Map.Entry<Application, List<MRL>> entry : models.entrySet()) {
+            String appName = entry.getKey().toString();
+            for (MRL mrl : entry.getValue()) {
+                if (withArtifacts) {
+                    for (Artifact artifact : mrl.listArtifacts()) {
+                        logger.info("{} djl://{}", appName, artifact);
+                    }
+                } else {
+                    logger.info("{} {}", appName, mrl);
+                }
+            }
+        }
     }
 }

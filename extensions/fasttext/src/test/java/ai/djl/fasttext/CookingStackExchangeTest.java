@@ -24,7 +24,7 @@ import ai.djl.modality.nlp.DefaultVocabulary;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
@@ -91,11 +91,11 @@ public class CookingStackExchangeTest {
                         .optArtifactId("ai.djl.fasttext:cooking_stackexchange")
                         .optOption("label-prefix", "__label")
                         .build();
-        Map<Application, List<Artifact>> models = ModelZoo.listModels(criteria);
+        Map<Application, List<MRL>> models = ModelZoo.listModels(criteria);
         models.forEach(
                 (app, list) -> {
                     String appName = app.toString();
-                    list.forEach(artifact -> logger.info("{} {}", appName, artifact));
+                    list.forEach(mrl -> logger.info("{} {}", appName, mrl));
                 });
         try (ZooModel<String, Classifications> model = criteria.loadModel()) {
             String input = "Which baking dish is best to bake a banana bread ?";
