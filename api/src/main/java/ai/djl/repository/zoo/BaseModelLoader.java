@@ -38,10 +38,8 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 /** Shared code for the {@link ModelLoader} implementations. */
 public class BaseModelLoader implements ModelLoader {
@@ -77,6 +75,12 @@ public class BaseModelLoader implements ModelLoader {
     @Override
     public Application getApplication() {
         return mrl.getApplication();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MRL getMrl() {
+        return mrl;
     }
 
     /** {@inheritDoc} */
@@ -203,16 +207,6 @@ public class BaseModelLoader implements ModelLoader {
         mrl.prepare(artifact, progress);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public List<Artifact> listModels() throws IOException {
-        List<Artifact> list = mrl.listArtifacts();
-        String version = mrl.getVersion();
-        return list.stream()
-                .filter(a -> version == null || version.equals(a.getVersion()))
-                .collect(Collectors.toList());
-    }
-
     protected Model createModel(
             Path modelPath,
             String name,
@@ -251,14 +245,9 @@ public class BaseModelLoader implements ModelLoader {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append(mrl.getGroupId())
-                .append(':')
-                .append(mrl.getArtifactId())
-                .append(' ')
-                .append(getApplication())
-                .append(" [\n");
+        sb.append(mrl).append(" [\n");
         try {
-            for (Artifact artifact : listModels()) {
+            for (Artifact artifact : mrl.listArtifacts()) {
                 sb.append('\t').append(artifact).append('\n');
             }
         } catch (IOException e) {
