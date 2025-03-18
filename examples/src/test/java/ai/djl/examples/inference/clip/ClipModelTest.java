@@ -32,7 +32,7 @@ public class ClipModelTest {
 
         try (ClipModel model = new ClipModel()) {
             String input = "This is a nice day";
-            String url = "http://images.cocodataset.org/val2017/000000039769.jpg";
+            String url = "https://resources.djl.ai/images/000000039769.jpg";
             float[] textVector = model.extractTextFeatures(input);
             Image img = ImageFactory.getInstance().fromUrl(url);
             float[] imgVector = model.extractImageFeatures(img);

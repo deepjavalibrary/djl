@@ -40,7 +40,7 @@ public final class ImageTextComparison {
     static double[] compareTextAndImage(String text, String text2)
             throws ModelException, IOException, TranslateException {
         try (ClipModel model = new ClipModel()) {
-            String url = "http://images.cocodataset.org/val2017/000000039769.jpg";
+            String url = "https://resources.djl.ai/images/000000039769.jpg";
             Image img = ImageFactory.getInstance().fromUrl(url);
             float[] logit0 = model.compareTextAndImage(img, text);
             float[] logit1 = model.compareTextAndImage(img, text2);
