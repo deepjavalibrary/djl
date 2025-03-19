@@ -14,11 +14,10 @@ package ai.djl.repository.zoo;
 
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
-import ai.djl.repository.Artifact;
+import ai.djl.repository.MRL;
 import ai.djl.util.Progress;
 
 import java.io.IOException;
-import java.util.List;
 
 /** A ModelLoader loads a particular {@link ZooModel} from a Repository for a model zoo. */
 public interface ModelLoader {
@@ -43,6 +42,13 @@ public interface ModelLoader {
      * @return the application of the {@code ModelLoader}
      */
     Application getApplication();
+
+    /**
+     * Returns the {@line MRL} of the {@code ModelLoader}.
+     *
+     * @return the {@line MRL} of the {@code ModelLoader}
+     */
+    MRL getMrl();
 
     /**
      * Loads the model with the given criteria.
@@ -82,13 +88,4 @@ public interface ModelLoader {
      */
     <I, O> void downloadModel(Criteria<I, O> criteria, Progress progress)
             throws IOException, ModelNotFoundException;
-
-    /**
-     * Returns a list of the available artifacts that can be loaded.
-     *
-     * @return a list of the available artifacts that can be loaded
-     * @throws IOException for errors reading the artifact list
-     * @throws ModelNotFoundException if models with the mrl defined within this loader are found
-     */
-    List<Artifact> listModels() throws IOException, ModelNotFoundException;
 }
