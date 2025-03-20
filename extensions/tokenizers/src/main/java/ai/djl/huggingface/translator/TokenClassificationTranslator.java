@@ -242,9 +242,8 @@ public class TokenClassificationTranslator implements Translator<String, NamedEn
          * Builds the translator.
          *
          * @return the new translator
-         * @throws IOException if I/O error occurs
          */
-        public TokenClassificationTranslator build() throws IOException {
+        public TokenClassificationTranslator build() {
             return new TokenClassificationTranslator(
                     tokenizer, includeTokenTypes, int32, softmax, batchifier);
         }

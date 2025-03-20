@@ -19,6 +19,7 @@ import ai.djl.modality.nlp.translator.ZeroShotClassificationInput;
 import ai.djl.modality.nlp.translator.ZeroShotClassificationOutput;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
 
@@ -51,6 +52,7 @@ public final class ZeroShotClassification {
                         .optModelUrls("djl://ai.djl.huggingface.pytorch/facebook/bart-large-mnli")
                         .optEngine("PyTorch")
                         .optTranslatorFactory(new ZeroShotClassificationTranslatorFactory())
+                        .optProgress(new ProgressBar())
                         .build();
         String prompt = "one day I will see the world";
         String[] candidates = {"travel", "cooking", "dancing", "exploration"};

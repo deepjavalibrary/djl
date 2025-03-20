@@ -209,9 +209,8 @@ public class TextClassificationTranslator implements Translator<String, Classifi
          * Builds the translator.
          *
          * @return the new translator
-         * @throws IOException if I/O error occurs
          */
-        public TextClassificationTranslator build() throws IOException {
+        public TextClassificationTranslator build() {
             return new TextClassificationTranslator(
                     tokenizer, includeTokenTypes, int32, batchifier);
         }

@@ -52,7 +52,7 @@ public interface JsonSerializable extends Serializable, BytesSupplier {
     /** {@inheritDoc} */
     JsonElement serialize();
 
-    /** A customized Gson serializer to serialize the {@code Segmentation} object. */
+    /** A customized Gson serializer to serialize the {@code JsonSerializable} object. */
     final class Serializer implements JsonSerializer<JsonSerializable> {
 
         /** {@inheritDoc} */
