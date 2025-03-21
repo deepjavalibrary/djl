@@ -44,7 +44,7 @@ reporting {
     @Suppress("UnstableApiUsage")
     reports {
         register<JacocoCoverageReport>("testCodeCoverageReport") {
-            testType = TestSuiteType.UNIT_TEST
+            testSuiteName = "test"
         }
     }
 }
