@@ -91,7 +91,7 @@ public class TextClassificationTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextClassificationTranslatorFactory())
                         .build();
@@ -108,7 +108,7 @@ public class TextClassificationTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextClassificationTranslatorFactory())
                         .build();
@@ -135,7 +135,7 @@ public class TextClassificationTranslatorTest {
                     TranslateException.class,
                     () -> factory.newInstance(String.class, Integer.class, model, arguments));
 
-            arguments.put("tokenizer", "bert-base-uncased");
+            arguments.put("tokenizer", "google-bert/bert-base-uncased");
 
             Assert.assertThrows(
                     IllegalArgumentException.class,

@@ -66,7 +66,7 @@ public class CrossEncoderTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-cased")
+                        .optArgument("tokenizer", "google-bert/bert-base-cased")
                         .optArgument("tokenizerPath", modelDir)
                         .optArgument("reranking", true)
                         .optOption("hasParameter", "false")
@@ -86,7 +86,7 @@ public class CrossEncoderTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-cased")
+                        .optArgument("tokenizer", "google-bert/bert-base-cased")
                         .optArgument("tokenizerPath", modelDir)
                         .optArgument("reranking", true)
                         .optOption("hasParameter", "false")
@@ -106,7 +106,7 @@ public class CrossEncoderTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-cased")
+                        .optArgument("tokenizer", "google-bert/bert-base-cased")
                         .optArgument("reranking", true)
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
@@ -205,7 +205,7 @@ public class CrossEncoderTranslatorTest {
                     TranslateException.class,
                     () -> factory.newInstance(String.class, Integer.class, model, arguments));
 
-            arguments.put("tokenizer", "bert-base-cased");
+            arguments.put("tokenizer", "google-bert/bert-base-cased");
             arguments.put("reranking", "true");
 
             Assert.assertThrows(
@@ -238,7 +238,7 @@ public class CrossEncoderTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-cased")
+                        .optArgument("tokenizer", "google-bert/bert-base-cased")
                         .optArgument("reranking", true)
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
