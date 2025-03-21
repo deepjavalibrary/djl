@@ -84,7 +84,7 @@ public class TextEmbeddingTranslatorTest {
                         .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
                         .optArgument("block_shapes", "(1,7,384)")
                         .optArgument("block_names", "last_hidden_state")
-                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .build();
@@ -106,7 +106,7 @@ public class TextEmbeddingTranslatorTest {
                         .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
                         .optDevice(Device.cpu())
-                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
                         .optArgument("pooling", "max")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
@@ -128,7 +128,7 @@ public class TextEmbeddingTranslatorTest {
                         .optArgument("block_shapes", "(1,7,384)")
                         .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
                         .optArgument("pooling", "mean_sqrt_len")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
@@ -150,7 +150,7 @@ public class TextEmbeddingTranslatorTest {
                         .optArgument("block_shapes", "(1,7,384)")
                         .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
                         .optArgument("pooling", "weightedmean")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
@@ -194,7 +194,7 @@ public class TextEmbeddingTranslatorTest {
                         .optArgument("block_shapes", "(1,7,384)")
                         .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
                         .optArgument("pooling", "lasttoken")
                         .optArgument("padding", "max_length")
                         .optArgument("maxLength", 10)
@@ -218,7 +218,7 @@ public class TextEmbeddingTranslatorTest {
                         .optArgument("block_shapes", "(1,7,384)")
                         .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
                         .optArgument("dense", "linear.safetensors")
                         .optArgument("denseActivation", "Tanh")
                         .optArgument("layerNorm", "norm.safetensors")
@@ -240,7 +240,7 @@ public class TextEmbeddingTranslatorTest {
                         .optArgument("block_shapes", "(1,7,384)")
                         .optArgument("block_names", "last_hidden_state")
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
                         .optArgument("pooling", "cls")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
@@ -281,7 +281,7 @@ public class TextEmbeddingTranslatorTest {
                     TranslateException.class,
                     () -> factory.newInstance(String.class, Integer.class, model, arguments));
 
-            arguments.put("tokenizer", "bert-base-uncased");
+            arguments.put("tokenizer", "google-bert/bert-base-uncased");
 
             Assert.assertThrows(
                     IllegalArgumentException.class,
@@ -312,7 +312,7 @@ public class TextEmbeddingTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-uncased")
+                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
                         .build();
