@@ -23,10 +23,10 @@ serde_json = "1.0.116"
 
 [patch.crates-io]
 cudarc = { git = "https://github.com/coreylowman/cudarc", rev = "c388e724af93a3e8fbe484f5ded2d8b3c1badd8e" }
-candle = { git = "https://github.com/huggingface/candle", rev = "f76bb7794aa8659c5023797979a3392cdfc01f32", package = "candle-core" }
-candle-nn = { git = "https://github.com/huggingface/candle", rev = "f76bb7794aa8659c5023797979a3392cdfc01f32", package = "candle-nn" }
-candle-transformers = { git = "https://github.com/huggingface/candle", rev = "f76bb7794aa8659c5023797979a3392cdfc01f32", package = "candle-transformers" }
-candle-flash-attn = { git = "https://github.com/huggingface/candle", rev = "f76bb7794aa8659c5023797979a3392cdfc01f32", package = "candle-flash-attn" }
+candle = { git = "https://github.com/huggingface/candle", rev = "468d1d525fe206a35d6962c02cfa7b9918b31076", package = "candle-core" }
+candle-nn = { git = "https://github.com/huggingface/candle", rev = "468d1d525fe206a35d6962c02cfa7b9918b31076", package = "candle-nn" }
+candle-transformers = { git = "https://github.com/huggingface/candle", rev = "468d1d525fe206a35d6962c02cfa7b9918b31076", package = "candle-transformers" }
+candle-flash-attn = { git = "https://github.com/huggingface/candle", rev = "468d1d525fe206a35d6962c02cfa7b9918b31076", package = "candle-flash-attn" }
 # openssl-src 300.3.2 is broken for AL2
 openssl-src = { git = "https://github.com/alexcrichton/openssl-src-rs", rev = "c591de676017446c9f1d719e77eb162159ce8886", package = "openssl-src" }
 
