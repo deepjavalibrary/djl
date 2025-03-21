@@ -24,7 +24,6 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -250,9 +249,8 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
          * Builds the translator.
          *
          * @return the new translator
-         * @throws IOException if I/O error occurs
          */
-        public FillMaskTranslator build() throws IOException {
+        public FillMaskTranslator build() {
             return new FillMaskTranslator(
                     tokenizer, maskedToken, topK, includeTokenTypes, int32, batchifier);
         }

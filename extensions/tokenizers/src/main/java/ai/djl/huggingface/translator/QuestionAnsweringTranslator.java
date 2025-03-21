@@ -26,7 +26,6 @@ import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.PairList;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -262,9 +261,8 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
          * Builds the translator.
          *
          * @return the new translator
-         * @throws IOException if I/O error occurs
          */
-        public QuestionAnsweringTranslator build() throws IOException {
+        public QuestionAnsweringTranslator build() {
             return new QuestionAnsweringTranslator(
                     tokenizer, includeTokenTypes, int32, batchifier, detail);
         }

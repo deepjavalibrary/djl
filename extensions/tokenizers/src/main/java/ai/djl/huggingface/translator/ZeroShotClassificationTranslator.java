@@ -177,9 +177,8 @@ public class ZeroShotClassificationTranslator
          * Builds the translator.
          *
          * @return the new translator
-         * @throws IOException if I/O error occurs
          */
-        public ZeroShotClassificationTranslator build() throws IOException {
+        public ZeroShotClassificationTranslator build() {
             return new ZeroShotClassificationTranslator(tokenizer, int32);
         }
     }

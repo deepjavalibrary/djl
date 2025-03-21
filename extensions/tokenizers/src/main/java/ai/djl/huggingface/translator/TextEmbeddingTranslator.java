@@ -24,7 +24,6 @@ import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,25 +50,16 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     private NDList denseModel;
     private NDList layerNormModel;
 
-    TextEmbeddingTranslator(
-            HuggingFaceTokenizer tokenizer,
-            Batchifier batchifier,
-            String pooling,
-            boolean normalize,
-            boolean includeTokenTypes,
-            boolean int32,
-            String dense,
-            String denseActivation,
-            String layerNorm) {
-        this.tokenizer = tokenizer;
-        this.batchifier = batchifier;
-        this.pooling = pooling;
-        this.normalize = normalize;
-        this.includeTokenTypes = includeTokenTypes;
-        this.int32 = int32;
-        this.dense = dense;
-        this.denseActivation = denseActivation;
-        this.layerNorm = layerNorm;
+    TextEmbeddingTranslator(Builder builder) {
+        this.tokenizer = builder.tokenizer;
+        this.batchifier = builder.batchifier;
+        this.pooling = builder.pooling;
+        this.normalize = builder.normalize;
+        this.includeTokenTypes = builder.includeTokenTypes;
+        this.int32 = builder.int32;
+        this.dense = builder.dense;
+        this.denseActivation = builder.denseActivation;
+        this.layerNorm = builder.layerNorm;
     }
 
     /** {@inheritDoc} */
@@ -155,7 +145,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         return ret;
     }
 
-    private NDArray processEmbedding(NDList list, NDArray attentionMask) {
+    NDArray processEmbedding(NDList list, NDArray attentionMask) {
         NDArray embedding = list.get("last_hidden_state");
         if (embedding == null) {
             // For Onnx model, NDArray name is not present
@@ -283,15 +273,15 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     /** The builder for token classification translator. */
     public static final class Builder {
 
-        private HuggingFaceTokenizer tokenizer;
-        private Batchifier batchifier = Batchifier.STACK;
-        private boolean normalize = true;
-        private String pooling = "mean";
-        private boolean includeTokenTypes;
-        private boolean int32;
-        private String dense;
-        private String denseActivation;
-        private String layerNorm;
+        HuggingFaceTokenizer tokenizer;
+        Batchifier batchifier = Batchifier.STACK;
+        boolean normalize = true;
+        String pooling = "mean";
+        boolean includeTokenTypes;
+        boolean int32;
+        String dense;
+        String denseActivation;
+        String layerNorm;
 
         Builder(HuggingFaceTokenizer tokenizer) {
             this.tokenizer = tokenizer;
@@ -416,19 +406,9 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
          * Builds the translator.
          *
          * @return the new translator
-         * @throws IOException if I/O error occurs
          */
-        public TextEmbeddingTranslator build() throws IOException {
-            return new TextEmbeddingTranslator(
-                    tokenizer,
-                    batchifier,
-                    pooling,
-                    normalize,
-                    includeTokenTypes,
-                    int32,
-                    dense,
-                    denseActivation,
-                    layerNorm);
+        public TextEmbeddingTranslator build() {
+            return new TextEmbeddingTranslator(this);
         }
     }
 }

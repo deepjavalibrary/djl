@@ -20,6 +20,7 @@ import torch
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 
 from djl_converter.huggingface_converter import HuggingfaceConverter, PipelineHolder
+from djl_converter.safetensors_convert import convert_file
 
 
 class SentenceSimilarityConverter(HuggingfaceConverter):
@@ -161,6 +162,21 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
 
         if not normalize:
             args["normalize"] = "false"
+
+        try:
+            file = self.get_file(model_id, "sparse_linear.pt")
+            if os.path.exists(file):
+                target = os.path.join(temp_dir, "sparse_linear.safetensors")
+                convert_file(file, target)
+        except requests.exceptions.HTTPError:
+            pass
+
+        try:
+            file = self.get_file(model_id, "sparse_linear.safetensors")
+            if os.path.exists(file):
+                shutil.copyfile(file, os.path.join(temp_dir, "sparse_linear.safetensors"))
+        except requests.exceptions.HTTPError:
+            pass
 
         return args
 

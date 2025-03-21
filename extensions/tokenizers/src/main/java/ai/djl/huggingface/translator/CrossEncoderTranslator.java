@@ -143,7 +143,7 @@ public class CrossEncoderTranslator implements Translator<StringPair, float[]> {
         return builder;
     }
 
-    /** The builder for question answering translator. */
+    /** The builder for cross encoder translator. */
     public static final class Builder {
 
         private HuggingFaceTokenizer tokenizer;
