@@ -510,7 +510,7 @@ public final class Utils {
         String protocol = url.getProtocol();
         if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
             if (isOfflineMode()) {
-                throw new IOException("Offline model is enabled.");
+                throw new IOException("Offline mode is enabled.");
             }
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             for (Map.Entry<String, String> entry : headers.entrySet()) {

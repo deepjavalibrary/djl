@@ -132,9 +132,9 @@ dependencies = [
 
 [[package]]
 name = "bytemuck_derive"
-version = "1.8.1"
+version = "1.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fa76293b4f7bb636ab88fd78228235b5248b4d05cc589aed610f954af5d7c7a"
+checksum = "2ff22c2722516255d1823ce3cc4bc0b154dbc9364be5c905d6baa6eccbbc8774"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -190,7 +190,8 @@ dependencies = [
 [[package]]
 name = "candle-flash-attn"
 version = "0.8.4"
-source = "git+https://github.com/huggingface/candle?rev=468d1d525fe206a35d6962c02cfa7b9918b31076#468d1d525fe206a35d6962c02cfa7b9918b31076"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2dc08e6b4740a54e30d70cca5759de9c805b85279de662b091ea135077f24ce3"
 dependencies = [
  "anyhow",
  "bindgen_cuda",
@@ -221,7 +222,8 @@ dependencies = [
 [[package]]
 name = "candle-nn"
 version = "0.8.4"
-source = "git+https://github.com/huggingface/candle?rev=468d1d525fe206a35d6962c02cfa7b9918b31076#468d1d525fe206a35d6962c02cfa7b9918b31076"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be1160c3b63f47d40d91110a3e1e1e566ae38edddbbf492a60b40ffc3bc1ff38"
 dependencies = [
  "candle-core",
  "half",
@@ -246,7 +248,8 @@ dependencies = [
 [[package]]
 name = "candle-transformers"
 version = "0.8.4"
-source = "git+https://github.com/huggingface/candle?rev=468d1d525fe206a35d6962c02cfa7b9918b31076#468d1d525fe206a35d6962c02cfa7b9918b31076"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94a0900d49f8605e0e7e6693a1f560e6271279de98e5fa369e7abf3aac245020"
 dependencies = [
  "byteorder",
  "candle-core",
@@ -264,9 +267,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.2.16"
+version = "1.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be714c154be609ec7f5dad223a33bf1482fff90472de28f7362806e6d4832b8c"
+checksum = "1fcb57c740ae1daf453ae85f16e37396f672b039e00d9d866e07ddb24e328e3a"
 dependencies = [
  "shlex",
 ]
@@ -487,10 +490,8 @@ dependencies = [
  "half",
  "jni",
  "openssl",
- "safetensors",
  "serde",
  "serde_json",
- "thiserror 1.0.69",
  "tokenizers",
  "tracing",
 ]
@@ -1181,7 +1182,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc2f4eb4bc735547cfed7c0a4922cbd04a4655978c09b54f1f7b228750664c34"
 dependencies = [
  "cfg-if",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -2642,18 +2643,18 @@ dependencies = [
 
 [[package]]
 name = "zerocopy"
-version = "0.8.23"
+version = "0.8.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd97444d05a4328b90e75e503a34bad781f14e28a823ad3557f0750df1ebcbc6"
+checksum = "2586fea28e186957ef732a5f8b3be2da217d65c5969d4b1e17f973ebbe876879"
 dependencies = [
  "zerocopy-derive",
 ]
 
 [[package]]
 name = "zerocopy-derive"
-version = "0.8.23"
+version = "0.8.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6352c01d0edd5db859a63e2605f4ea3183ddbd15e2c4a9e7d32184df75e4f154"
+checksum = "a996a8f63c5c4448cd959ac1bab0aaa3306ccfd060472f85943ee0750f0169be"
 dependencies = [
  "proc-macro2",
  "quote",
