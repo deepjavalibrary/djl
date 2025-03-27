@@ -44,9 +44,9 @@ public interface ModelLoader {
     Application getApplication();
 
     /**
-     * Returns the {@line MRL} of the {@code ModelLoader}.
+     * Returns the {@link MRL} of the {@code ModelLoader}.
      *
-     * @return the {@line MRL} of the {@code ModelLoader}
+     * @return the {@link MRL} of the {@code ModelLoader}
      */
     MRL getMrl();
 
