@@ -59,6 +59,7 @@ jobs:
         run: |
           export CMAKE_POLICY_VERSION_MINIMUM=3.5
           ./gradlew :extensions:sentencepiece:compileJNI
+        shell: bash
       - uses: dorny/paths-filter@v2
         id: fasttext_changes
         with:
@@ -77,6 +78,7 @@ jobs:
         run: |
           export CMAKE_POLICY_VERSION_MINIMUM=3.5
           ./gradlew :extensions:fasttext:compileJNI
+        shell: bash
       - uses: dorny/paths-filter@v2
         id: tokenizers_changes
         with:
