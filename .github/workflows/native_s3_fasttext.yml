@@ -27,6 +27,7 @@ jobs:
       - name: Release JNI prep
         run: |
           export PYTORCH_PRECXX11=true
+          export CMAKE_POLICY_VERSION_MINIMUM=3.5
           ./gradlew :extensions:fasttext:compileJNI
           ./gradlew -Pjni :extensions:fasttext:test
       - name: Configure AWS Credentials
@@ -75,6 +76,7 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         run: |
+          export CMAKE_POLICY_VERSION_MINIMUM=3.5
           ./gradlew :extensions:fasttext:compileJNI
           ./gradlew -Pjni :extensions:fasttext:test
       - name: Configure Deployment AWS Credentials
@@ -108,6 +110,7 @@ jobs:
       - uses: taiki-e/checkout-action@v1
       - name: Release JNI prep
         run: |
+          export CMAKE_POLICY_VERSION_MINIMUM=3.5
           ./gradlew :extensions:fasttext:compileJNI
           ./gradlew -Pjni :extensions:fasttext:test
       - name: Configure AWS Credentials

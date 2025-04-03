@@ -74,7 +74,9 @@ jobs:
         env:
           CC: gcc-12
           CXX: g++-12
-        run: ./gradlew :extensions:fasttext:compileJNI
+        run: |
+          export CMAKE_POLICY_VERSION_MINIMUM=3.5
+          ./gradlew :extensions:fasttext:compileJNI
       - uses: dorny/paths-filter@v2
         id: tokenizers_changes
         with:
