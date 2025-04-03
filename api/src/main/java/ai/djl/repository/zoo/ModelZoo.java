@@ -14,7 +14,6 @@ package ai.djl.repository.zoo;
 
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
-import ai.djl.repository.Artifact;
 import ai.djl.repository.MRL;
 import ai.djl.repository.Repository;
 import ai.djl.util.ClassLoaderUtils;
@@ -184,11 +183,8 @@ public abstract class ModelZoo {
      * Returns the available {@link Application} and their model artifact metadata.
      *
      * @return the available {@link Application} and their model artifact metadata
-     * @throws IOException if failed to download to repository metadata
-     * @throws ModelNotFoundException if failed to parse repository metadata
      */
-    public static Map<Application, List<Artifact>> listModels()
-            throws IOException, ModelNotFoundException {
+    public static Map<Application, List<MRL>> listModels() {
         return listModels(Criteria.builder().build());
     }
 
@@ -197,11 +193,8 @@ public abstract class ModelZoo {
      *
      * @param criteria the requirements for the model
      * @return the available {@link Application} and their model artifact metadata
-     * @throws IOException if failed to download to repository metadata
-     * @throws ModelNotFoundException if failed to parse repository metadata
      */
-    public static Map<Application, List<Artifact>> listModels(Criteria<?, ?> criteria)
-            throws IOException, ModelNotFoundException {
+    public static Map<Application, List<MRL>> listModels(Criteria<?, ?> criteria) {
         String artifactId = criteria.getArtifactId();
         ModelZoo modelZoo = criteria.getModelZoo();
         String groupId = criteria.getGroupId();
@@ -209,7 +202,7 @@ public abstract class ModelZoo {
         Application application = criteria.getApplication();
 
         @SuppressWarnings("PMD.UseConcurrentHashMap")
-        Map<Application, List<Artifact>> models =
+        Map<Application, List<MRL>> models =
                 new TreeMap<>(Comparator.comparing(Application::getPath));
         for (ModelZoo zoo : listModelZoo()) {
             if (modelZoo != null) {
@@ -234,14 +227,13 @@ public abstract class ModelZoo {
                     // filter out ModelLoader by application
                     continue;
                 }
-                final List<Artifact> artifacts = loader.listModels();
                 models.compute(
                         app,
                         (key, val) -> {
                             if (val == null) {
                                 val = new ArrayList<>();
                             }
-                            val.addAll(artifacts);
+                            val.add(loader.getMrl());
                             return val;
                         });
             }

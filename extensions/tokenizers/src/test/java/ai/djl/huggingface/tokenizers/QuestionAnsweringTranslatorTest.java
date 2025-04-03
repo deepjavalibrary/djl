@@ -73,7 +73,7 @@ public class QuestionAnsweringTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-cased")
+                        .optArgument("tokenizer", "google-bert/bert-base-cased")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new QuestionAnsweringTranslatorFactory())
                         .build();
@@ -91,7 +91,7 @@ public class QuestionAnsweringTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "bert-base-cased")
+                        .optArgument("tokenizer", "google-bert/bert-base-cased")
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new QuestionAnsweringTranslatorFactory())
                         .build();
@@ -102,7 +102,7 @@ public class QuestionAnsweringTranslatorTest {
             input.add("question", question);
             input.add("paragraph", paragraph);
             Output res = predictor.predict(input);
-            Assert.assertEquals(res.getAsString(0), "December 2004");
+            Assert.assertEquals(res.getAsString(0), "{\"answer\":\"December 2004\"}");
 
             Assert.assertThrows(
                     "Input data is empty.",
@@ -152,7 +152,7 @@ public class QuestionAnsweringTranslatorTest {
                     TranslateException.class,
                     () -> factory.newInstance(String.class, Integer.class, model, arguments));
 
-            arguments.put("tokenizer", "bert-base-cased");
+            arguments.put("tokenizer", "google-bert/bert-base-cased");
 
             Assert.assertThrows(
                     IllegalArgumentException.class,

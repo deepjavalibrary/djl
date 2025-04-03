@@ -96,8 +96,8 @@ jobs:
         env:
           DJL_VERSION: ${{ github.event.inputs.version-number || 'master' }}
         run: |
-          aws s3 sync $DJL_VERSION s3://djl-ai/documentation/$DJL_VERSION --delete
-          aws s3 cp versions.json s3://djl-ai/documentation/versions.json
-          aws cloudfront create-invalidation --distribution-id E733IIDCG0G5U --paths "/*"
+          aws s3 sync $DJL_VERSION s3://djl-ai/documentation/$DJL_VERSION --delete --debug
+          aws s3 cp versions.json s3://djl-ai/documentation/versions.json --debug
+          aws cloudfront create-invalidation --distribution-id E733IIDCG0G5U --paths "/*" --debug
 
 

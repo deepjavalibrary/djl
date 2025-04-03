@@ -66,6 +66,11 @@ public final class LibUtils {
     }
 
     private static void loadLibrary() {
+        if ("http://www.android.com/".equals(System.getProperty("java.vendor.url"))) {
+            System.loadLibrary("djl_tokenizer"); // NOPMD
+            return;
+        }
+
         String[] libs;
         if (System.getProperty("os.name").startsWith("Windows")) {
             libs =

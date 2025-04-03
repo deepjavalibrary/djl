@@ -16,7 +16,9 @@ import ai.djl.Model;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.modality.nlp.EmbeddingOutput;
 import ai.djl.modality.nlp.translator.CrossEncoderServingTranslator;
+import ai.djl.modality.nlp.translator.SparseRetrievalServingTranslator;
 import ai.djl.modality.nlp.translator.TextEmbeddingServingTranslator;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.TranslateException;
@@ -42,6 +44,7 @@ public class TextEmbeddingTranslatorFactory implements TranslatorFactory, Serial
 
     static {
         SUPPORTED_TYPES.add(new Pair<>(String.class, float[].class));
+        SUPPORTED_TYPES.add(new Pair<>(String.class, EmbeddingOutput.class));
         SUPPORTED_TYPES.add(new Pair<>(StringPair.class, float[].class));
         SUPPORTED_TYPES.add(new Pair<>(Input.class, Output.class));
     }
@@ -72,6 +75,15 @@ public class TextEmbeddingTranslatorFactory implements TranslatorFactory, Serial
                     return (Translator<I, O>) translator;
                 } else if (input == Input.class && output == Output.class) {
                     return (Translator<I, O>) new CrossEncoderServingTranslator(translator);
+                }
+                throw new IllegalArgumentException("Unsupported input/output types.");
+            } else if (ArgumentsUtil.booleanValue(arguments, "sparse")) {
+                SparseRetrievalTranslator translator =
+                        SparseRetrievalTranslator.builder(tokenizer, arguments).build();
+                if (input == String.class && output == EmbeddingOutput.class) {
+                    return (Translator<I, O>) translator;
+                } else if (input == Input.class && output == Output.class) {
+                    return (Translator<I, O>) new SparseRetrievalServingTranslator(translator);
                 }
                 throw new IllegalArgumentException("Unsupported input/output types.");
             }

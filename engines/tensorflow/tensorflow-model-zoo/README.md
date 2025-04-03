@@ -26,7 +26,7 @@ from the central Maven repository by including the following dependency:
 <dependency>
     <groupId>ai.djl.tensorflow</groupId>
     <artifactId>tensorflow-model-zoo</artifactId>
-    <version>0.30.0</version>
+    <version>0.32.0</version>
 </dependency>
 ```
 

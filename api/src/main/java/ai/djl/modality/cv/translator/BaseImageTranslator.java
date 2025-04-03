@@ -17,10 +17,14 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.transform.CenterCrop;
 import ai.djl.modality.cv.transform.CenterFit;
 import ai.djl.modality.cv.transform.Normalize;
+import ai.djl.modality.cv.transform.Pad;
 import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ResizeShort;
 import ai.djl.modality.cv.transform.ToTensor;
+import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Pipeline;
@@ -77,9 +81,23 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
     @Override
     public NDList processInput(TranslatorContext ctx, Image input) {
         NDArray array = input.toNDArray(ctx.getNDManager(), flag);
+        NDList list = pipeline.transform(new NDList(array));
+        Shape shape = list.get(0).getShape();
+        int processedWidth;
+        int processedHeight;
+        long[] dim = shape.getShape();
+        if (NDImageUtils.isCHW(shape)) {
+            processedWidth = (int) dim[dim.length - 1];
+            processedHeight = (int) dim[dim.length - 2];
+        } else {
+            processedWidth = (int) dim[dim.length - 2];
+            processedHeight = (int) dim[dim.length - 3];
+        }
         ctx.setAttachment("width", input.getWidth());
         ctx.setAttachment("height", input.getHeight());
-        return pipeline.transform(new NDList(array));
+        ctx.setAttachment("processedWidth", processedWidth);
+        ctx.setAttachment("processedHeight", processedHeight);
+        return list;
     }
 
     /**
@@ -116,6 +134,19 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
          */
         public T setPipeline(Pipeline pipeline) {
             this.pipeline = pipeline;
+            return self();
+        }
+
+        /**
+         * Sets the image size.
+         *
+         * @param width the image width
+         * @param height the image height
+         * @return this builder
+         */
+        public T setImageSize(int width, int height) {
+            this.width = width;
+            this.height = height;
             return self();
         }
 
@@ -161,25 +192,59 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             if (arguments.containsKey("flag")) {
                 flag = Image.Flag.valueOf(arguments.get("flag").toString());
             }
+            String pad = ArgumentsUtil.stringValue(arguments, "pad", "false");
+            if ("true".equals(pad)) {
+                addTransform(new Pad(0));
+            } else if (!"false".equals(pad)) {
+                double padding = Double.parseDouble(pad);
+                addTransform(new Pad(padding));
+            }
+
             String resize = ArgumentsUtil.stringValue(arguments, "resize", "false");
             if ("true".equals(resize)) {
                 addTransform(new Resize(width, height));
             } else if (!"false".equals(resize)) {
                 String[] tokens = resize.split("\\s*,\\s*");
+                int w = (int) Double.parseDouble(tokens[0]);
+                int h;
+                Image.Interpolation interpolation;
                 if (tokens.length > 1) {
-                    addTransform(
-                            new Resize(
-                                    (int) Double.parseDouble(tokens[0]),
-                                    (int) Double.parseDouble(tokens[1])));
+                    h = (int) Double.parseDouble(tokens[1]);
                 } else {
-                    addTransform(new Resize((int) Double.parseDouble(tokens[0])));
+                    h = w;
                 }
+                if (tokens.length > 2) {
+                    interpolation = Image.Interpolation.valueOf(tokens[2]);
+                } else {
+                    interpolation = Image.Interpolation.BILINEAR;
+                }
+                addTransform(new Resize(w, h, interpolation));
+            }
+            String resizeShort = ArgumentsUtil.stringValue(arguments, "resizeShort", "false");
+            if ("true".equals(resizeShort)) {
+                int shortEdge = Math.max(width, height);
+                addTransform(new ResizeShort(shortEdge));
+            } else if (!"false".equals(resizeShort)) {
+                String[] tokens = resizeShort.split("\\s*,\\s*");
+                int shortEdge = (int) Double.parseDouble(tokens[0]);
+                int longEdge;
+                Image.Interpolation interpolation;
+                if (tokens.length > 1) {
+                    longEdge = (int) Double.parseDouble(tokens[1]);
+                } else {
+                    longEdge = -1;
+                }
+                if (tokens.length > 2) {
+                    interpolation = Image.Interpolation.valueOf(tokens[2]);
+                } else {
+                    interpolation = Image.Interpolation.BILINEAR;
+                }
+                addTransform(new ResizeShort(shortEdge, longEdge, interpolation));
             }
             if (ArgumentsUtil.booleanValue(arguments, "centerCrop", false)) {
                 addTransform(new CenterCrop(width, height));
             }
-            String centerFit = ArgumentsUtil.stringValue(arguments, "centerFit", "false");
-            if ("true".equals(centerFit)) {
+            if (ArgumentsUtil.booleanValue(arguments, "centerFit")) {
                 addTransform(new CenterFit(width, height));
             }
             if (ArgumentsUtil.booleanValue(arguments, "toTensor", true)) {
@@ -269,6 +334,21 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             super.validate();
             if (synsetLoader == null) {
                 synsetLoader = new SynsetLoader("synset.txt");
+            }
+            boolean hasCrop = false;
+            boolean sizeMismatch = false;
+            for (Transform transform : pipeline.getTransforms()) {
+                if (transform instanceof Resize) {
+                    Resize resize = (Resize) transform;
+                    if (width != resize.getWidth() || height != resize.getHeight()) {
+                        sizeMismatch = true;
+                    }
+                } else if (transform instanceof CenterCrop || transform instanceof CenterFit) {
+                    hasCrop = true;
+                }
+            }
+            if (sizeMismatch && !hasCrop) {
+                throw new IllegalArgumentException("resized image has mismatched target size");
             }
         }
 

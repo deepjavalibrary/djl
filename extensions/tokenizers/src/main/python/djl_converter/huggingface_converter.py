@@ -15,8 +15,12 @@ import os.path
 import shutil
 import sys
 from argparse import Namespace
+from collections import OrderedDict
 
 import onnx
+from torch import nn
+from transformers.modeling_outputs import TokenClassifierOutput, Seq2SeqSequenceClassifierOutput
+
 from djl_converter.safetensors_convert import convert_file
 import torch
 from huggingface_hub import hf_hub_download, HfApi
@@ -38,6 +42,35 @@ class ModelHolder(object):
 
     def __init__(self, config):
         self.config = config
+
+
+class ModelWrapper(nn.Module):
+
+    def __init__(self, model, include_types: bool) -> None:
+        super().__init__()
+        self.model = model
+        self.include_types = include_types
+
+    def forward(self,
+                input_ids: torch.Tensor,
+                attention_mask: torch.Tensor,
+                token_type_ids: torch.Tensor = None):
+        if self.include_types:
+            output = self.model(input_ids, attention_mask)
+        else:
+            output = self.model(input_ids, attention_mask, token_type_ids)
+        if isinstance(output, TokenClassifierOutput) or isinstance(
+                output, Seq2SeqSequenceClassifierOutput):
+            # TokenClassifierOutput/Seq2SeqSequenceClassifierOutput
+            # may contains mix of Tensor and Tuple(Tensor)
+            # filter out non-Tensor items
+            ret = OrderedDict()
+            for k, v in output.items():
+                if isinstance(v, torch.Tensor):
+                    ret[k] = v
+            return ret
+
+        return output
 
 
 class HuggingfaceConverter:
@@ -84,7 +117,7 @@ class HuggingfaceConverter:
             sys.argv.extend(["--dtype", args.dtype])
         if args.trust_remote_code:
             sys.argv.append("--trust-remote-code")
-        if os.path.exists(model_id):
+        if task:
             sys.argv.extend(["--task", task])
         sys.argv.append(temp_dir)
 
@@ -102,7 +135,7 @@ class HuggingfaceConverter:
         hf_pipeline = PipelineHolder(tokenizer, ModelHolder(config))
         arguments = self.save_serving_properties(model_info, "OnnxRuntime",
                                                  temp_dir, hf_pipeline,
-                                                 include_types)
+                                                 include_types, args.cpu_only)
         if model_zoo:
             model_size = self.get_dir_size(temp_dir)
             if model_size > self.max_model_size:
@@ -136,7 +169,8 @@ class HuggingfaceConverter:
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
 
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_id, trust_remote_code=args.trust_remote_code)
         include_types = config.model_type not in [
             "distilbert", "mistral", "qwen2", "gemma2"
         ]
@@ -177,6 +211,8 @@ class HuggingfaceConverter:
             if sf_files:
                 for f in sf_files:
                     file = hf_hub_download(repo_id=model_id, filename=f)
+                    dest_file = os.path.join(temp_dir, f)
+                    os.makedirs(os.path.dirname(dest_file), exist_ok=True)
                     shutil.copyfile(file, os.path.join(temp_dir, f))
             elif pt_files:
                 for f in pt_files:
@@ -189,7 +225,8 @@ class HuggingfaceConverter:
                 return False, f"No model file found for: {model_id}", -1
 
         arguments = self.save_serving_properties(model_info, "Rust", temp_dir,
-                                                 hf_pipeline, include_types)
+                                                 hf_pipeline, include_types,
+                                                 args.cpu_only)
         if model_zoo:
             model_size = self.get_dir_size(temp_dir)
             if model_size > self.max_model_size:
@@ -208,7 +245,7 @@ class HuggingfaceConverter:
             os.makedirs(temp_dir)
 
         try:
-            hf_pipeline = self.load_model(model_id)
+            hf_pipeline = self.load_model(model_id, args.trust_remote_code)
         except Exception as e:
             logging.warning(f"Failed to load model: {model_id}.")
             logging.warning(e, exc_info=True)
@@ -240,7 +277,7 @@ class HuggingfaceConverter:
 
         arguments = self.save_serving_properties(model_info, "PyTorch",
                                                  temp_dir, hf_pipeline,
-                                                 include_types)
+                                                 include_types, args.cpu_only)
         if model_zoo:
             model_size = self.get_dir_size(temp_dir)
             if model_size > self.max_model_size:
@@ -277,13 +314,13 @@ class HuggingfaceConverter:
 
         # noinspection PyBroadException
         try:
+            wrapper = ModelWrapper(hf_pipeline.model, include_types)
             if include_types:
                 script_module = torch.jit.trace(
-                    hf_pipeline.model,
-                    (input_ids, attention_mask, token_type_ids),
+                    wrapper, (input_ids, attention_mask, token_type_ids),
                     strict=False)
             else:
-                script_module = torch.jit.trace(hf_pipeline.model,
+                script_module = torch.jit.trace(wrapper,
                                                 (input_ids, attention_mask),
                                                 strict=False)
 
@@ -299,7 +336,8 @@ class HuggingfaceConverter:
         return model_file
 
     def save_serving_properties(self, model_info, engine: str, temp_dir: str,
-                                hf_pipeline, include_types: bool) -> dict:
+                                hf_pipeline, include_types: bool,
+                                cpu_only: bool) -> dict:
         model_id = model_info.modelId
         model_name = model_id.split("/")[-1]
 
@@ -307,6 +345,8 @@ class HuggingfaceConverter:
         arguments = self.get_extra_arguments(hf_pipeline, model_id, temp_dir)
         if include_types:
             arguments["includeTokenTypes"] = "true"
+        if cpu_only:
+            arguments["load_on_devices"] = "-1"
         arguments["translatorFactory"] = self.translator
 
         with open(serving_file, 'w') as f:
@@ -410,11 +450,12 @@ class HuggingfaceConverter:
 
         return True, None
 
-    def load_model(self, model_id: str):
+    def load_model(self, model_id: str, trust_remote_code: bool):
         logging.info(f"Loading model: {model_id} ...")
         kwargs = {
             "tokenizer": model_id,
-            "device": -1  # always use CPU to trace the model
+            "device": -1,  # always use CPU to trace the model
+            "trust_remote_code": trust_remote_code
         }
         return pipeline(task=self.task,
                         model=model_id,

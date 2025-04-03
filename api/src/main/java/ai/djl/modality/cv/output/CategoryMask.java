@@ -18,15 +18,11 @@ import ai.djl.util.JsonSerializable;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.RandomUtils;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.JsonObject;
 
-import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A class representing the segmentation result of an image in an {@link
@@ -38,12 +34,9 @@ public class CategoryMask implements JsonSerializable {
 
     private static final int COLOR_BLACK = 0xFF000000;
 
-    private static final Gson GSON =
-            JsonUtils.builder()
-                    .registerTypeAdapter(CategoryMask.class, new SegmentationSerializer())
-                    .create();
+    @SuppressWarnings("serial")
+    private List<String> classes;
 
-    private transient List<String> classes;
     private int[][] mask;
 
     /**
@@ -77,14 +70,22 @@ public class CategoryMask implements JsonSerializable {
 
     /** {@inheritDoc} */
     @Override
-    public ByteBuffer toByteBuffer() {
-        return ByteBuffer.wrap(toJson().getBytes(StandardCharsets.UTF_8));
+    public JsonElement serialize() {
+        JsonObject ret = new JsonObject();
+        ret.add("classes", JsonUtils.GSON.toJsonTree(classes));
+        ret.add("mask", JsonUtils.GSON.toJsonTree(mask));
+        return ret;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String toJson() {
-        return GSON.toJson(this) + '\n';
+    public String toString() {
+        StringBuilder sb = new StringBuilder(4096);
+        String list = classes.stream().map(s -> '"' + s + '"').collect(Collectors.joining(", "));
+        sb.append("{\n\t\"classes\": [").append(list).append("],\n\t\"mask\": ");
+        sb.append(JsonUtils.GSON_COMPACT.toJson(mask));
+        sb.append("\n}");
+        return sb.toString();
     }
 
     /**
@@ -194,15 +195,5 @@ public class CategoryMask implements JsonSerializable {
             colors[i] = opacity << 24 | red << 16 | green << 8 | blue;
         }
         return colors;
-    }
-
-    /** A customized Gson serializer to serialize the {@code Segmentation} object. */
-    public static final class SegmentationSerializer implements JsonSerializer<CategoryMask> {
-
-        /** {@inheritDoc} */
-        @Override
-        public JsonElement serialize(CategoryMask src, Type type, JsonSerializationContext ctx) {
-            return ctx.serialize(src.getMask());
-        }
     }
 }

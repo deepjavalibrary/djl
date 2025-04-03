@@ -37,7 +37,9 @@ Then, right click the resources folder and select `Rebuild<default>`.
 ![FAQ1](https://resources.djl.ai/images/FAQ_engine_not_found.png)
 
 ## UnsatisfiedLinkError issue
+If a dependency is missing, it throws an `UnsatisfiedLinkError` exception. If you have encountered one, please create an issue at `https://github.com/deepjavalibrary/djl`.
 
+### Causes on Linux / MacOs
 ```
 Caused by: java.lang.UnsatisfiedLinkError: /home/ubuntu/.tensorflow/cache/2.3.1-cu101-linux-x86_64/libjni$
 ensorflow.so: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `CXXABI_1.3.11' not found (required by /home/ubuntu/.te
@@ -60,50 +62,59 @@ libtorch.dylib:
 ```
 
 It shows the `libtorch.dylib` depends on `libiomp5.dylib` and `libc10.dylib`.
-If one of them is missing, it throws an `UnsatisfiedLinkError` exception, please create an issue at `https://github.com/deepjavalibrary/djl`.
 
-For Windows specifically, DJL many fail due to missing [Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
-You can install this package and reboot again to see if the issue persist. You can also check the below instruction to do further investigation.
+### Causes on Windows
 
-CN: Windows 10 加载失败常常是因为缺少 Windows Visual C++ 相关扩展包而导致的。您可以通过下面Windows的步骤来修复系统缺失依赖项。
+For Windows specifically, DJL many fail due to
 
+1. Pytorch CUDA library paths are not added to PATH in the Windows system environment variables. Usually caused by having multiple CUDAs installed on your system.
+2. missing [Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
+   You can install this package and reboot again to see if the issue persist.
 
-**Windows**
+   CN: Windows 10 加载失败常常是因为缺少 Windows Visual C++ 相关扩展包而导致的。您可以通过下面Windows的步骤来修复系统缺失依赖项。
 
+### Causes on any Operating System:
+
+   1. **Failed to extract native file issue**  
+      Sometimes you may only have read-only access on the machine.
+      It will cause a failure during engine loading because the cache attempts to write to the home directory.
+      For more information, please refer to [DJL Cache Management](cache_management.md).
+
+   2. **Package version mismatch**  
+   It happened when you had a wrong version with DJL and Deep Engines. 
+   You can check the combination [here](dependency_management.md) and use DJL BOM to solve the issue.
+
+### Solutions:
+
+1. **Visual C++ Redistributable Packages**  
+DJL requires Visual C++ Redistributable Packages. If you encounter an UnsatisfiedLinkError while building DJL on Windows, please download and install [Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot.  
+
+   CN: 如果您在中国，可以使用 [DirectX 修复工具](https://blog.csdn.net/VBcom/article/details/6962388) 来安装遗失依赖项。
+
+3. **Add environment variables**.  
+The Pytorch CUDA library paths (C:\Users\USER\.djl.ai\pytorch\CUDA-VERSION) can be manually added to PATH in the Windows system environment variables by copying the folder path (search for "variable" or open Control Panel -> System -> Advanced System Settings. Click on Environment Variables. Under System variables, select Path and click Edit.). See also [how to edit environment variables on Windows 10 or 11](https://www.howtogeek.com/787217/how-to-edit-environment-variables-on-windows-10-or-11/).
+
+### Advanced Dependencies Handling:
+
+#### Visual Studio Tools CMD:
 You can run the following if you have Visual Studio tools CMD:
 
 ```cmd
 dumpbin /dependents your_dll_file.dll
 ```
 
-or install a [Dependency Walker](http://www.dependencywalker.com/).
-It's an application that can check the dependencies for a specific DLL by simply
-drag and drop.
+#### Dependency Walker
+Install a Dependency Walker. For example [Dependency Walker](http://www.dependencywalker.com/) or [a more recent fork](https://github.com/lhak/Dependencies) of it.
+It's an application that can check the dependencies for a specific DLL by simply drag and drop.
 
-DJL requires Visual C++ Redistributable Packages. If you encounter an UnsatisfiedLinkError while building
-DJL on Windows, please download and install
-[Visual C++ 2019 Redistributable Packages](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) and reboot. 
-
-CN: 如果您在中国，可以使用 [DirectX 修复工具](https://blog.csdn.net/VBcom/article/details/6962388) 来安装遗失依赖项。
-
-If the issue continues to persist, you can use the [docker file](https://github.com/deepjavalibrary/djl/blob/master/docker/windows/Dockerfile) provided by us.
+### If nothing else helps
+If the issue continues to persist, check you can use the [docker file](https://github.com/deepjavalibrary/djl/blob/master/docker/windows/Dockerfile) provided by us.
 Please note that this docker will only work with Windows server 2019 by default. If you want it to work with other
 versions of Windows, you need to pass the version as an argument as follows:
 
 ```bash
 docker build --build-arg version=<YOUR_VERSION>
 ```
-
-### 1.4 Failed to extract native file issue
-Sometimes you may only have read-only access on the machine.
-It will cause a failure during engine loading because the cache attempts to write to the home directory.
-For more information, please refer to [DJL Cache Management](cache_management.md).
-
-
-### 1.5 Package version mismatch
-
-It happened when you had a wrong version with DJL and Deep Engines. 
-You can check the combination [here](dependency_management.md) and use DJL BOM to solve the issue.
 
 ## 2. IntelliJ throws the `No Log4j 2 configuration file found.` exception.
 The following exception may appear after running the `./gradlew clean` command:

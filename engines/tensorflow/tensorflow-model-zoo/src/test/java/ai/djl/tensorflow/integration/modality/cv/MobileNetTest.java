@@ -20,15 +20,19 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.tensorflow.engine.SavedModelBundle;
+import ai.djl.tensorflow.engine.TfSymbolBlock;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 
+import org.tensorflow.proto.SignatureDef;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class MobileNetTest {
 
@@ -49,6 +53,11 @@ public class MobileNetTest {
                 Predictor<Image, Classifications> predictor = model.newPredictor()) {
             Classifications result = predictor.predict(img);
             Assert.assertEquals(result.best().getClassName(), "n02124075 Egyptian cat");
+
+            TfSymbolBlock block = (TfSymbolBlock) model.getBlock();
+            SavedModelBundle bundle = block.getSavedModelBundle();
+            Map<String, SignatureDef> map = bundle.getMetaGraphDef().getSignatureDefMap();
+            Assert.assertEquals(map.size(), 2);
         }
     }
 }

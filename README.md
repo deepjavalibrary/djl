@@ -2,14 +2,14 @@
 ![DeepJavaLibrary](website/img/deepjavalibrary.png?raw=true "Deep Java Library")
 
 ![Continuous](https://github.com/deepjavalibrary/djl/workflows/Continuous/badge.svg)
-![Docs](https://github.com/deepjavalibrary/djl/workflows/Docs/badge.svg)
-![Nightly Publish](https://github.com/deepjavalibrary/djl/workflows/Nightly%20Publish/badge.svg)
+[![Docs](https://github.com/deepjavalibrary/djl/workflows/Docs/badge.svg)](https://docs.djl.ai/master/index.html)
+[![Nightly Publish](https://github.com/deepjavalibrary/djl/workflows/Nightly%20Publish/badge.svg)](https://github.com/deepjavalibrary/djl/actions/workflows/nightly_publish.yml)
 
 # Deep Java Library (DJL)
 
 ## Overview
 
-Deep Java Library (DJL) is an open-source, high-level, engine-agnostic Java framework for deep learning. DJL is designed to be easy to get started with and simple to
+[Deep Java Library (DJL)](https://docs.djl.ai/master/index.html) is an open-source, high-level, engine-agnostic Java framework for deep learning. DJL is designed to be easy to get started with and simple to
 use for Java developers. DJL provides a native Java development experience and functions like any other regular Java library.
 
 You don't have to be machine learning/deep learning expert to get started. You can use your existing Java expertise as an on-ramp to learn and use machine learning and deep learning. You can
@@ -85,14 +85,14 @@ The following pseudocode demonstrates running training:
 
 ## Release Notes
 
+* [0.32.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.32.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.32.0))
+* [0.31.1](https://github.com/deepjavalibrary/djl/releases/tag/v0.31.1) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.31.1))
 * [0.30.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.30.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.30.0))
 * [0.29.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.29.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.29.0))
 * [0.28.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.28.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.28.0))
-* [0.27.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.27.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.27.0))
-* [0.26.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.26.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.26.0))
-* [+25 releases](https://github.com/deepjavalibrary/djl/releases)
+* [+27 releases](https://github.com/deepjavalibrary/djl/releases)
 
-The release of DJL 0.30.0 is planned for November 2024.
+The release of DJL 0.33.0 is planned for April 2025. 
 
 ## Building From Source
 
@@ -142,7 +142,7 @@ You can read our guide to [community forums, following DJL, issues, discussions,
 
 Join our [<img src='https://cdn3.iconfinder.com/data/icons/social-media-2169/24/social_media_social_media_logo_slack-512.png' width='20px' /> slack channel](http://tiny.cc/djl_slack) to get in touch with the development team, for questions and discussions.
 
-Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/512/1_Twitter_colored_svg-512.png' width='20px' /> twitter](https://twitter.com/deepjavalibrary) to see updates about new content, features, and releases.
+Follow our [<img src='https://cdn2.iconfinder.com/data/icons/social-media-2285/512/1_Twitter_colored_svg-512.png' width='20px' /> X (formerly Twitter)](https://x.com/deepjavalibrary) to see updates about new content, features, and releases.
 
 关注我们 [<img src='https://www.iconfinder.com/icons/5060515/download/svg/512' width='20px' /> 知乎专栏](https://zhuanlan.zhihu.com/c_1255493231133417472) 获取DJL最新的内容！
 

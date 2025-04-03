@@ -157,7 +157,7 @@ public class MnistTest {
                             .optUsage(Dataset.Usage.TEST)
                             .optRepository(repository)
                             .setSampling(32, false)
-                            .optLabelBatchifier(new StackBatchifier() {})
+                            .optLabelBatchifier(new StackBatchifier())
                             .build();
 
             try (Trainer trainer = model.newTrainer(config)) {

@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /** {@code MxNDArrayEx} is the MXNet implementation of the {@link NDArrayEx}. */
+@SuppressWarnings("dangling-doc-comments")
 class MxNDArrayEx implements NDArrayEx {
 
     private MxNDArray array;
@@ -85,12 +86,6 @@ class MxNDArrayEx implements NDArrayEx {
         MxOpParams params = new MxOpParams();
         params.add("scalar", n.toString());
         return getManager().invoke("_rdiv_scalar", array, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(NDArray b) {
-        return b.div(array);
     }
 
     /** {@inheritDoc} */

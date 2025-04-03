@@ -15,6 +15,9 @@ package ai.djl.examples.inference.nlp;
 import ai.djl.ModelException;
 import ai.djl.testing.TestRequirements;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.JsonUtils;
+
+import com.google.gson.JsonObject;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -28,6 +31,8 @@ public class BertQaTest {
         TestRequirements.linux();
 
         String result = BertQaInference.predict();
-        Assert.assertEquals(result, "december 2004");
+        JsonObject json = JsonUtils.GSON.fromJson(result, JsonObject.class);
+        String answer = json.get("answer").getAsString();
+        Assert.assertEquals(answer, "december 2004");
     }
 }

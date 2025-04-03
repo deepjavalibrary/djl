@@ -47,7 +47,6 @@ public class OpenCVImageFactoryTest {
     @BeforeClass
     public void setUp() {
         TestRequirements.notWindows(); // failed on Windows ServerCore container
-        TestRequirements.notArm();
     }
 
     @Test

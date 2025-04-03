@@ -45,79 +45,13 @@ public class PtNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray rdiv(Number n) {
-        return rdiv(array.getManager().create(n));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rdiv(NDArray b) {
-        return (PtNDArray) b.div(array);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rdivi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PtNDArray rdivi(NDArray b) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     /** {@inheritDoc} */
     @Override
-    public PtNDArray rsub(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rsub(NDArray b) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rsubi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rsubi(NDArray b) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rmod(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rmod(NDArray b) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rmodi(Number n) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PtNDArray rmodi(NDArray b) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public PtNDArray rpow(Number n) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -602,6 +536,7 @@ public class PtNDArrayEx implements NDArrayEx {
             if (dim == 3) {
                 result = result.squeeze(0);
             }
+            result = result.toType(array.getDataType(), false);
             array.attach(subManager.getParentManager());
             result.attach(subManager.getParentManager());
             return (PtNDArray) result;

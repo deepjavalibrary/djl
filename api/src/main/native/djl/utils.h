@@ -14,6 +14,7 @@
 #ifndef DJL_UTILS_H
 #define DJL_UTILS_H
 
+#include <cstdint>
 #include <jni.h>
 #include <vector>
 #include <string>

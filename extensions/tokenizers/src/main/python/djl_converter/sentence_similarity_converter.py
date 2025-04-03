@@ -20,6 +20,7 @@ import torch
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 
 from djl_converter.huggingface_converter import HuggingfaceConverter, PipelineHolder
+from djl_converter.safetensors_convert import convert_file
 
 
 class SentenceSimilarityConverter(HuggingfaceConverter):
@@ -32,10 +33,13 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
         self.inputs = "This is an example sentence"
         self.outputs = 0
 
-    def load_model(self, model_id: str):
+    def load_model(self, model_id: str, trust_remote_code: bool):
         logging.info(f"Loading model: {model_id} ...")
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
-        model = AutoModel.from_pretrained(model_id)
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_id, trust_remote_code=trust_remote_code)
+
+        model = AutoModel.from_pretrained(model_id,
+                                          trust_remote_code=trust_remote_code)
 
         return PipelineHolder(tokenizer, model)
 
@@ -78,7 +82,8 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
             if hasattr(hf_pipeline.model, "config"):
                 config = hf_pipeline.model.config
             else:
-                config = AutoConfig.from_pretrained(model_id)
+                config = AutoConfig.from_pretrained(
+                    model_id, trust_remote_code=trust_remote_code)
             tokenizer = hf_pipeline.tokenizer
             if hasattr(config, "max_position_embeddings") and hasattr(
                     tokenizer, "model_max_length"):
@@ -157,6 +162,21 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
 
         if not normalize:
             args["normalize"] = "false"
+
+        try:
+            file = self.get_file(model_id, "sparse_linear.pt")
+            if os.path.exists(file):
+                target = os.path.join(temp_dir, "sparse_linear.safetensors")
+                convert_file(file, target)
+        except requests.exceptions.HTTPError:
+            pass
+
+        try:
+            file = self.get_file(model_id, "sparse_linear.safetensors")
+            if os.path.exists(file):
+                shutil.copyfile(file, os.path.join(temp_dir, "sparse_linear.safetensors"))
+        except requests.exceptions.HTTPError:
+            pass
 
         return args
 

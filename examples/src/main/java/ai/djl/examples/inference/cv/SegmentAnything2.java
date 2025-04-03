@@ -12,13 +12,14 @@
  */
 package ai.djl.examples.inference.cv;
 
-import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.translator.Sam2Translator;
+import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.translator.Sam2Translator.Sam2Input;
+import ai.djl.modality.cv.translator.Sam2TranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
@@ -46,15 +47,16 @@ public final class SegmentAnything2 {
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
         String url =
                 "https://raw.githubusercontent.com/facebookresearch/segment-anything-2/main/notebooks/images/truck.jpg";
-        Sam2Input input = Sam2Input.newInstance(url, 500, 375);
+        Image image = ImageFactory.getInstance().fromUrl(url);
+        Sam2Input input =
+                Sam2Input.builder(image).addPoint(575, 750).addBox(425, 600, 700, 875).build();
 
         Criteria<Sam2Input, DetectedObjects> criteria =
                 Criteria.builder()
                         .setTypes(Sam2Input.class, DetectedObjects.class)
-                        .optModelUrls("djl://ai.djl.pytorch/sam2-hiera-tiny")
-                        .optEngine("PyTorch")
-                        .optDevice(Device.cpu()) // use sam2-hiera-tiny-gpu for GPU
-                        .optTranslator(new Sam2Translator())
+                        .optModelUrls("djl://ai.djl.onnxruntime/sam2-hiera-tiny")
+                        // .optModelUrls("djl://ai.djl.pytorch/sam2-hiera-tiny") // for PyTorch
+                        .optTranslatorFactory(new Sam2TranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
 
@@ -73,6 +75,9 @@ public final class SegmentAnything2 {
         Image img = input.getImage();
         img.drawBoundingBoxes(detection, 0.8f);
         img.drawMarks(input.getPoints());
+        for (Rectangle rect : input.getBoxes()) {
+            img.drawRectangle(rect, 0xff0000, 6);
+        }
 
         Path imagePath = outputDir.resolve("sam2.png");
         img.save(Files.newOutputStream(imagePath), "png");

@@ -13,9 +13,6 @@
 package ai.djl.modality.cv.output;
 
 import ai.djl.modality.Classifications;
-import ai.djl.util.JsonUtils;
-
-import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -26,11 +23,6 @@ import java.util.List;
 public class DetectedObjects extends Classifications {
 
     private static final long serialVersionUID = 1L;
-
-    private static final Gson GSON =
-            JsonUtils.builder()
-                    .registerTypeAdapter(DetectedObjects.class, new ClassificationsSerializer())
-                    .create();
 
     @SuppressWarnings("serial")
     private List<BoundingBox> boundingBoxes;
@@ -69,12 +61,6 @@ public class DetectedObjects extends Classifications {
         return boundingBoxes.size();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String toJson() {
-        return GSON.toJson(this) + '\n';
-    }
-
     /** A {@code DetectedObject} represents a single potential detected Object for an image. */
     public static final class DetectedObject extends Classification {
 
@@ -106,15 +92,15 @@ public class DetectedObjects extends Classifications {
         public String toString() {
             double probability = getProbability();
             StringBuilder sb = new StringBuilder(200);
-            sb.append("{\"class\": \"").append(getClassName()).append("\", \"probability\": ");
+            sb.append("{\"className\": \"").append(getClassName()).append("\", \"probability\": ");
             if (probability < 0.00001) {
                 sb.append(String.format("%.1e", probability));
             } else {
                 probability = (int) (probability * 100000) / 100000f;
                 sb.append(String.format("%.5f", probability));
             }
-            if (getBoundingBox() != null) {
-                sb.append(", \"bounds\": ").append(getBoundingBox());
+            if (boundingBox != null) {
+                sb.append(", \"boundingBox\": ").append(boundingBox);
             }
             sb.append('}');
             return sb.toString();

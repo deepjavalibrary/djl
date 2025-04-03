@@ -23,25 +23,34 @@ import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.JsonUtils;
 import ai.djl.util.PairList;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** The translator for Huggingface question answering model. */
 public class QuestionAnsweringTranslator implements Translator<QAInput, String> {
 
     private HuggingFaceTokenizer tokenizer;
     private boolean includeTokenTypes;
+    private boolean int32;
     private Batchifier batchifier;
+    private boolean detail;
 
     QuestionAnsweringTranslator(
-            HuggingFaceTokenizer tokenizer, boolean includeTokenTypes, Batchifier batchifier) {
+            HuggingFaceTokenizer tokenizer,
+            boolean includeTokenTypes,
+            boolean int32,
+            Batchifier batchifier,
+            boolean detail) {
         this.tokenizer = tokenizer;
         this.includeTokenTypes = includeTokenTypes;
+        this.int32 = int32;
         this.batchifier = batchifier;
+        this.detail = detail;
     }
 
     /** {@inheritDoc} */
@@ -55,7 +64,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
     public NDList processInput(TranslatorContext ctx, QAInput input) {
         Encoding encoding = tokenizer.encode(input.getQuestion(), input.getParagraph());
         ctx.setAttachment("encoding", encoding);
-        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes);
+        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes, int32);
     }
 
     /** {@inheritDoc} */
@@ -70,7 +79,7 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
         ctx.setAttachment("encodings", encodings);
         NDList[] batch = new NDList[encodings.length];
         for (int i = 0; i < encodings.length; ++i) {
-            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes, int32);
         }
         return batchifier.batchify(batch);
     }
@@ -102,6 +111,27 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
             startLogits = startLogits.duplicate();
             endLogits = endLogits.duplicate();
         }
+        if (detail) {
+            // exclude undesired sequences
+            long[] sequenceIds = encoding.getSequenceIds();
+            List<Integer> undesired = new ArrayList<>();
+            for (int i = 0; i < sequenceIds.length; ++i) {
+                if (sequenceIds[i] == 0) {
+                    undesired.add(i);
+                }
+            }
+            int[] idx = undesired.stream().mapToInt(Integer::intValue).toArray();
+            NDIndex ndIndex = new NDIndex("{}", list.getManager().create(idx));
+            startLogits.set(ndIndex, -100000f);
+            endLogits.set(ndIndex, -100000f);
+
+            // normalize
+            startLogits = startLogits.sub(startLogits.max()).exp();
+            startLogits = startLogits.div(startLogits.sum());
+            endLogits = endLogits.sub(endLogits.max()).exp();
+            endLogits = endLogits.div(endLogits.sum());
+        }
+
         // exclude <CLS>, TODO: exclude impossible ids properly and handle max answer length
         startLogits.set(new NDIndex(0), -100000);
         endLogits.set(new NDIndex(0), -100000);
@@ -111,12 +141,26 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
             int tmp = startIdx;
             startIdx = endIdx;
             endIdx = tmp;
+            NDArray tmpArray = startLogits;
+            startLogits = endLogits;
+            endLogits = tmpArray;
         }
         long[] indices = encoding.getIds();
         int len = endIdx - startIdx + 1;
         long[] ids = new long[len];
         System.arraycopy(indices, startIdx, ids, 0, len);
-        return tokenizer.decode(ids).trim();
+        String answer = tokenizer.decode(ids).trim();
+        if (detail) {
+            float score = startLogits.getFloat(startIdx) * endLogits.getFloat(endIdx);
+
+            Map<String, Object> dict = new ConcurrentHashMap<>();
+            dict.put("score", score);
+            dict.put("start", startIdx);
+            dict.put("end", endIdx);
+            dict.put("answer", answer);
+            return JsonUtils.toJson(dict);
+        }
+        return answer;
     }
 
     /**
@@ -148,7 +192,9 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
 
         private HuggingFaceTokenizer tokenizer;
         private boolean includeTokenTypes;
+        private boolean int32;
         private Batchifier batchifier = Batchifier.STACK;
+        private boolean detail;
 
         Builder(HuggingFaceTokenizer tokenizer) {
             this.tokenizer = tokenizer;
@@ -166,6 +212,17 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
         }
 
         /**
+         * Sets if use int32 datatype for the {@link Translator}.
+         *
+         * @param int32 true to include token types
+         * @return this builder
+         */
+        public Builder optInt32(boolean int32) {
+            this.int32 = int32;
+            return this;
+        }
+
+        /**
          * Sets the {@link Batchifier} for the {@link Translator}.
          *
          * @param batchifier true to include token types
@@ -177,13 +234,26 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
         }
 
         /**
+         * Sets if output detail for the {@link Translator}.
+         *
+         * @param detail true to output detail
+         * @return this builder
+         */
+        public Builder optDetail(boolean detail) {
+            this.detail = detail;
+            return this;
+        }
+
+        /**
          * Configures the builder with the model arguments.
          *
          * @param arguments the model arguments
          */
         public void configure(Map<String, ?> arguments) {
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
+            optInt32(ArgumentsUtil.booleanValue(arguments, "int32"));
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
+            optDetail(ArgumentsUtil.booleanValue(arguments, "detail"));
             optBatchifier(Batchifier.fromString(batchifierStr));
         }
 
@@ -191,10 +261,10 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
          * Builds the translator.
          *
          * @return the new translator
-         * @throws IOException if I/O error occurs
          */
-        public QuestionAnsweringTranslator build() throws IOException {
-            return new QuestionAnsweringTranslator(tokenizer, includeTokenTypes, batchifier);
+        public QuestionAnsweringTranslator build() {
+            return new QuestionAnsweringTranslator(
+                    tokenizer, includeTokenTypes, int32, batchifier, detail);
         }
     }
 }

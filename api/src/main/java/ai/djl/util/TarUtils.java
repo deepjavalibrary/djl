@@ -48,10 +48,8 @@ public final class TarUtils {
         try (TarArchiveInputStream tis = new TarArchiveInputStream(bis)) {
             TarArchiveEntry entry;
             while ((entry = tis.getNextEntry()) != null) {
-                String entryName = ZipUtils.removeLeadingFileSeparator(entry.getName());
-                if (entryName.contains("..")) {
-                    throw new IOException("Malicious zip entry: " + entryName);
-                }
+                String entryName = entry.getName();
+                ZipUtils.validateArchiveEntry(entryName, dir);
                 Path file = dir.resolve(entryName).toAbsolutePath();
                 if (entry.isDirectory()) {
                     Files.createDirectories(file);

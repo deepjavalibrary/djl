@@ -72,6 +72,7 @@ public class OrtHfModelZoo extends ModelZoo {
                     addModels(Application.NLP.TEXT_CLASSIFICATION, version);
                     addModels(Application.NLP.TEXT_EMBEDDING, version);
                     addModels(Application.NLP.TOKEN_CLASSIFICATION, version);
+                    addModels(Application.NLP.ZERO_SHOT_CLASSIFICATION, version);
                     initialized = true;
                 }
             }

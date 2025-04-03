@@ -17,8 +17,9 @@ tasks {
         // this line is to enforce gradle to build the jar otherwise it doesn't generate the placeholder jar at times
         // when there is no java code inside src/main
         outputs.dir("build/libs")
+
+        var versionName = project.version.toString()
         doFirst {
-            var versionName = project.version.toString()
             if (!isRelease)
                 versionName += "-$nowFormatted"
             val dir = placeholder / "native/lib"

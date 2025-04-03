@@ -15,8 +15,9 @@ jobs:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: [ macos-latest, ubuntu-latest ]
+        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
 
     steps:
       - uses: actions/checkout@v4
@@ -40,10 +41,10 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew -Dnightly=true build :jacoco:testCodeCoverageReport
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: reports
+          name: reports-${{ matrix.operating-system }}
           path: |
             ${{ github.workspace }}/**/build/reports/**/*
             !${{ github.workspace }}/**/build/reports/jacoco/*
@@ -52,6 +53,7 @@ jobs:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
+      fail-fast: false
       matrix:
         operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
 
@@ -76,8 +78,9 @@ jobs:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ${{ matrix.operating-system }}
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: [ ubuntu-latest, windows-latest ]
+        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
 
     steps:
       - uses: actions/checkout@v4
@@ -95,6 +98,30 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Test with Gradle
         run: ./gradlew :integration:test "-Dai.djl.default_engine=TensorFlow"
+
+  test-onnx:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 17
+      - uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Test with Gradle
+        run: ./gradlew :integration:test "-Dai.djl.default_engine=OnnxRuntime"
 
   test-aarch64:
     if: github.repository == 'deepjavalibrary/djl'
@@ -175,11 +202,15 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Publish to snapshot repository
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'snapshot' }}
+        # PT 1.13.1 is for PT 1.x support, and CUDA 11.x support
+        # PT 2.1.2 is for Neuron support (latest supported version on neuron)
+        # PT 2.3.1 is for CUDA 12.1 support
+        # PT 2.5.1 is for CUDA 12.4 support
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.1.2 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.3.1 -Psnapshot
-          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.4.0 -Psnapshot
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.5.1 -Psnapshot
           ./gradlew clean engines:ml:xgboost:publish -Pgpu -Psnapshot
           ./gradlew clean publish -Psnapshot
           cd bom
@@ -195,7 +226,7 @@ jobs:
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.1.2 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.3.1 -P${{ github.event.inputs.mode }}
-          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.4.0 -P${{ github.event.inputs.mode }}
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.5.1 -P${{ github.event.inputs.mode }}
           ./gradlew clean engines:ml:xgboost:publish -Pgpu -P${{ github.event.inputs.mode }}
           ./gradlew clean publish -P${{ github.event.inputs.mode }}
           cd bom

@@ -285,6 +285,35 @@ public class BitmapImageFactory extends ImageFactory {
 
         /** {@inheritDoc} */
         @Override
+        public void drawRectangle(Rectangle rect, int rgb, int thickness) {
+            Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            Canvas canvas = new Canvas(mutableBitmap);
+            int color = darker(rgb);
+
+            // set the paint configure
+            Paint paint = new Paint();
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(thickness);
+            paint.setAntiAlias(true);
+            paint.setColor(color);
+
+            int imageWidth = mutableBitmap.getWidth();
+            int imageHeight = mutableBitmap.getHeight();
+            int x = (int) (rect.getX() * imageWidth);
+            int y = (int) (rect.getY() * imageHeight);
+            canvas.drawRect(
+                    x,
+                    y,
+                    x + (int) (rect.getWidth() * imageWidth),
+                    y + (int) (rect.getHeight() * imageHeight),
+                    paint);
+            Bitmap oldBitmap = bitmap;
+            bitmap = mutableBitmap;
+            oldBitmap.recycle();
+        }
+
+        /** {@inheritDoc} */
+        @Override
         public void drawMarks(List<Point> points, int radius) {
             Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
             Canvas canvas = new Canvas(mutableBitmap);

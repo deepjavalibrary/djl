@@ -27,7 +27,7 @@ You can pull the MXNet engine from the central Maven repository by including the
 <dependency>
     <groupId>ai.djl.mxnet</groupId>
     <artifactId>mxnet-model-zoo</artifactId>
-    <version>0.30.0</version>
+    <version>0.32.0</version>
 </dependency>
 ```
 

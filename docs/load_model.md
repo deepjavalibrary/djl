@@ -181,20 +181,20 @@ Here is a few tips you can use to help you debug model loading issue:
 See [here](development/configure_logging.md#configure-logging-level) for how to enable debug log
 
 #### List models programmatically in your code
-You can use [ModelZoo.listModels()](https://javadoc.io/static/ai.djl/api/0.30.0/ai/djl/repository/zoo/ModelZoo.html#listModels--) API to query available models.
+You can use [ModelZoo.listModels()](https://javadoc.io/static/ai.djl/api/0.32.0/ai/djl/repository/zoo/ModelZoo.html#listModels--) API to query available models.
 
 #### List available models using DJL command line
 
 Use the following command to list models in the DJL model zoo:
 
 ```shell
-./gradlew :examples:listmodels
+./gradlew listmodels
 
-[INFO ] - CV.ACTION_RECOGNITION ai.djl.mxnet:action_recognition:0.0.1 {"backbone":"vgg16","dataset":"ucf101"}
-[INFO ] - CV.ACTION_RECOGNITION ai.djl.mxnet:action_recognition:0.0.1 {"backbone":"inceptionv3","dataset":"ucf101"}
-[INFO ] - CV.IMAGE_CLASSIFICATION ai.djl.zoo:resnet:0.0.1 {"layers":"50","flavor":"v1","dataset":"cifar10"}
-[INFO ] - CV.IMAGE_CLASSIFICATION ai.djl.zoo:mlp:0.0.2 {"dataset":"mnist"}
-[INFO ] - NLP.QUESTION_ANSWER ai.djl.mxnet:bertqa:0.0.1 {"backbone":"bert","dataset":"book_corpus_wiki_en_uncased"}
+[INFO ] - CV.ACTION_RECOGNITION djl://ai.djl.mxnet/action_recognition
+[INFO ] - CV.ACTION_RECOGNITION djl://ai.djl.mxnet/action_recognition
+[INFO ] - CV.IMAGE_CLASSIFICATION djl://ai.djl.zoo/resnet
+[INFO ] - CV.IMAGE_CLASSIFICATION djl://ai.djl.zoo/mlp
+[INFO ] - NLP.QUESTION_ANSWER djl://ai.djl.mxnet/bertqa
 
 ...
 
@@ -203,5 +203,11 @@ Use the following command to list models in the DJL model zoo:
 You can list models from your model folder with debug log:
 
 ```shell
-./gradlew :examples:listmodels -Dai.djl.logging.level=debug -Dai.djl.repository.zoo.location=file:///mymodels
+./gradlew listmodels --args="-a"
+
+[INFO ] - CV.ACTION_RECOGNITION djl://ai.djl.mxnet/action_recognition/0.0.1 {"backbone":"vgg16","dataset":"ucf101"}
+[INFO ] - CV.ACTION_RECOGNITION djl://ai.djl.mxnet/action_recognition/0.0.1 {"backbone":"inceptionv3","dataset":"ucf101"}
+[INFO ] - CV.IMAGE_CLASSIFICATION djl://ai.djl.zoo/resnet/0.0.1 {"layers":"50","flavor":"v1","dataset":"cifar10"}
+[INFO ] - CV.IMAGE_CLASSIFICATION djl://ai.djl.zoo/mlp/0.0.2 {"dataset":"mnist"}
+[INFO ] - NLP.QUESTION_ANSWER djl://ai.djl.mxnet/bertqa/0.0.1 {"backbone":"bert","dataset":"book_corpus_wiki_en_uncased"}
 ```

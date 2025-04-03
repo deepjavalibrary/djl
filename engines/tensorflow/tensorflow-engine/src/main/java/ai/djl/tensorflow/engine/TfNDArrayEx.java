@@ -43,24 +43,6 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rdiv(Number n) {
-        return rdiv(array.getManager().create(n).toType(array.getDataType(), false));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdiv(NDArray b) {
-        return b.div(array);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rdivi(Number n) {
-        return rdivi(array.getManager().create(n).toType(array.getDataType(), false));
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray rdivi(NDArray b) {
         TFE_TensorHandle newHandle =
                 array.getManager()
@@ -70,24 +52,6 @@ public class TfNDArrayEx implements NDArrayEx {
                         .buildRawPointer(1)[0];
         array.setHandle(newHandle);
         return array;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(Number n) {
-        return rsub(array.getManager().create(n).toType(array.getDataType(), false));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsub(NDArray b) {
-        return b.sub(array);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rsubi(Number n) {
-        return rsubi(array.getManager().create(n).toType(array.getDataType(), false));
     }
 
     /** {@inheritDoc} */
@@ -105,24 +69,6 @@ public class TfNDArrayEx implements NDArrayEx {
 
     /** {@inheritDoc} */
     @Override
-    public NDArray rmod(Number n) {
-        return rmod(array.getManager().create(n).toType(array.getDataType(), false));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rmod(NDArray b) {
-        return b.mod(array);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rmodi(Number n) {
-        return rmodi(array.getManager().create(n).toType(array.getDataType(), false));
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public NDArray rmodi(NDArray b) {
         TFE_TensorHandle newHandle =
                 array.getManager()
@@ -132,12 +78,6 @@ public class TfNDArrayEx implements NDArrayEx {
                         .buildRawPointer(1)[0];
         array.setHandle(newHandle);
         return array;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray rpow(Number n) {
-        return array.getManager().create(n).toType(array.getDataType(), false).pow(array);
     }
 
     /** {@inheritDoc} */

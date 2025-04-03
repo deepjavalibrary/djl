@@ -1,0 +1,125 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+android {
+    compileSdkVersion 34
+    namespace "ai.djl.android.tokenizer_native"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0"
+
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["jnilib/"]
+        }
+    }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+}
+
+// TODO: Making publish as an individual gradle file
+signing {
+    required(project.hasProperty("staging") || project.hasProperty("snapshot"))
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                pom {
+                    name = "Tokenizer Android native library"
+                    description = "Tokenizer Android native library binary distribution"
+                    url = "http://www.djl.ai/android"
+                    packaging = "aar"
+
+                    licenses {
+                        license {
+                            name = "The Apache License, Version 2.0"
+                            url = "https://www.apache.org/licenses/LICENSE-2.0"
+                        }
+                    }
+
+                    scm {
+                        connection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                        developerConnection = "scm:git:git@github.com:deepjavalibrary/djl.git"
+                        url = "https://github.com/deepjavalibrary/djl"
+                        tag = "HEAD"
+                    }
+
+                    developers {
+                        developer {
+                            name = "DJL.AI Team"
+                            email = "djl-dev@amazon.com"
+                            organization = "Amazon AI"
+                            organizationUrl = "https://amazon.com"
+                        }
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                if (project.hasProperty("snapshot")) {
+                    name = "snapshot"
+                    url = "https://oss.sonatype.org/content/repositories/snapshots/"
+                    credentials {
+                        username = findProperty("ossrhUsername")
+                        password = findProperty("ossrhPassword")
+                    }
+                } else if (project.hasProperty("staging")) {
+                    name = "staging"
+                    url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    credentials {
+                        username = findProperty("ossrhUsername")
+                        password = findProperty("ossrhPassword")
+                    }
+                } else {
+                    name = "local"
+                    url = "build/repo"
+                }
+            }
+        }
+    }
+}
+
+
+tasks.register('processResources') {
+    doLast {
+        def url = "https://publish.djl.ai/tokenizers/${tokenizers_version}/jnilib/${djl_version}/android"
+        def abis = ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"]
+        abis.each { abi ->
+            def downloadPath = new URL("${url}/${abi}/libdjl_tokenizer.so")
+            def file = file("${project.projectDir}/jnilib/${abi}/libdjl_tokenizer.so")
+            if (!file.exists()) {
+                project.logger.lifecycle("${url}/${abi}/libdjl_tokenizer.so")
+                file.getParentFile().mkdirs()
+                downloadPath.withInputStream { i -> file.withOutputStream { it << i } }
+            }
+        }
+    }
+}
+
+assemble.dependsOn processResources

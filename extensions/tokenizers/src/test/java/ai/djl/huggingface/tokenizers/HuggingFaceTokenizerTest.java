@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class HuggingFaceTokenizerTest {
     public void testVersion() {
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
             String djlVersion = Engine.getDjlVersion();
-            Assert.assertEquals(tokenizer.getVersion(), "0.20.0-" + djlVersion);
+            Assert.assertEquals(tokenizer.getVersion(), "0.21.0-" + djlVersion);
         }
     }
 
@@ -52,7 +53,9 @@ public class HuggingFaceTokenizerTest {
         };
 
         try (HuggingFaceTokenizer tokenizer =
-                HuggingFaceTokenizer.builder().optTokenizerName("bert-base-cased").build()) {
+                HuggingFaceTokenizer.builder()
+                        .optTokenizerName("google-bert/bert-base-cased")
+                        .build()) {
             Assert.assertEquals(tokenizer.getTruncation(), "LONGEST_FIRST");
             Assert.assertEquals(tokenizer.getPadding(), "LONGEST");
             Assert.assertEquals(tokenizer.getMaxLength(), 512);
@@ -66,6 +69,7 @@ public class HuggingFaceTokenizerTest {
             long[] ids = {101, 8667, 117, 194, 112, 1155, 106, 1731, 1132, 1128, 100, 136, 102};
             long[] typeIds = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             long[] wordIds = {-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -1};
+            long[] sequenceIds = {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1};
             long[] attentionMask = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
             long[] specialTokenMask = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 
@@ -73,6 +77,7 @@ public class HuggingFaceTokenizerTest {
             Assert.assertEquals(ids, encoding.getIds());
             Assert.assertEquals(typeIds, encoding.getTypeIds());
             Assert.assertEquals(wordIds, encoding.getWordIds());
+            Assert.assertEquals(sequenceIds, encoding.getSequenceIds());
             Assert.assertEquals(attentionMask, encoding.getAttentionMask());
             Assert.assertEquals(specialTokenMask, encoding.getSpecialTokenMask());
 
@@ -102,6 +107,21 @@ public class HuggingFaceTokenizerTest {
                 Assert.assertEquals(charSpansExpected[i].getStart(), charSpansResult[i].getStart());
                 Assert.assertEquals(charSpansExpected[i].getEnd(), charSpansResult[i].getEnd());
             }
+
+            encoding = tokenizer.encode(inputs[0], inputs[1]);
+            sequenceIds = new long[] {-1, 0, 0, 0, 0, 0, 0, -1, 1, 1, 1, 1, 1, -1};
+            Assert.assertEquals(encoding.getSequenceIds(), sequenceIds);
+
+            Assert.assertThrows(() -> tokenizer.encode((String) null));
+            Assert.assertThrows(() -> tokenizer.encode(new String[] {null}));
+            Assert.assertThrows(() -> tokenizer.encode(null, null));
+            Assert.assertThrows(() -> tokenizer.encode("null", null));
+            Assert.assertThrows(() -> tokenizer.batchEncode(new String[] {null}));
+            List<String> empty = Collections.singletonList(null);
+            List<String> some = Collections.singletonList("null");
+
+            Assert.assertThrows(() -> tokenizer.batchEncode(new PairList<>(empty, some)));
+            Assert.assertThrows(() -> tokenizer.batchEncode(new PairList<>(some, empty)));
         }
 
         Map<String, String> options = new ConcurrentHashMap<>();
@@ -147,7 +167,7 @@ public class HuggingFaceTokenizerTest {
         String[] inputs = {"Hello, y'all!", "How are you 😁 ?"};
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optAddSpecialTokens(false)
                         .optDoLowerCase(true)
                         .build()) {
@@ -185,7 +205,8 @@ public class HuggingFaceTokenizerTest {
             "[CLS] Hello, y ' all! How are you [UNK]? [SEP]",
             "[CLS] Today is a sunny day. Good weather I ' d say [SEP]"
         };
-        try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.newInstance("google-bert/bert-base-cased")) {
             for (int i = 0; i < testIds.length; ++i) {
                 String ret = tokenizer.decode(testIds[i]);
                 Assert.assertEquals(ret, expectedDecodedWithSpecialTokens[i]);
@@ -196,7 +217,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optAddSpecialTokens(false)
                         .build()) {
             for (int i = 0; i < testIds.length; ++i) {
@@ -215,7 +236,7 @@ public class HuggingFaceTokenizerTest {
         };
 
         Map<String, String> options = new ConcurrentHashMap<>();
-        options.put("tokenizer", "bert-base-cased");
+        options.put("tokenizer", "google-bert/bert-base-cased");
         options.put("truncation", "longest_first"); // true
         options.put("padding", "longest"); // true
         options.put("maxLength", "10");
@@ -256,7 +277,7 @@ public class HuggingFaceTokenizerTest {
         }
         List<String> inputs = Arrays.asList(stringBuilder.toString(), "This is a short sentence");
         Map<String, String> options = new ConcurrentHashMap<>();
-        options.put("tokenizer", "bert-base-cased");
+        options.put("tokenizer", "google-bert/bert-base-cased");
         options.put("truncation", "false");
         options.put("padding", "false");
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.builder(options).build()) {
@@ -268,7 +289,8 @@ public class HuggingFaceTokenizerTest {
             }
         }
 
-        try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.newInstance("google-bert/bert-base-cased")) {
             Encoding[] encodings = tokenizer.batchEncode(inputs);
             for (Encoding encoding : encodings) {
                 Assert.assertEquals(encoding.getIds().length, 512);
@@ -277,7 +299,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optPadding(false)
                         .build()) {
             int[] expectedSize = new int[] {512, 7};
@@ -293,7 +315,8 @@ public class HuggingFaceTokenizerTest {
         String[] inputs = {
             "Hello, y'all! How are you?", "Today is a sunny day. Good weather I'd say", "I am happy"
         };
-        try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.newInstance("google-bert/bert-base-cased")) {
             int expectedSize = 14;
             for (Encoding encoding : tokenizer.batchEncode(inputs)) {
                 Assert.assertEquals(encoding.getIds().length, expectedSize);
@@ -301,7 +324,7 @@ public class HuggingFaceTokenizerTest {
         }
 
         Map<String, String> options = new ConcurrentHashMap<>();
-        options.put("tokenizer", "bert-base-cased");
+        options.put("tokenizer", "google-bert/bert-base-cased");
         options.put("padding", "false");
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.builder(options).build()) {
             int[] expectedSize = {12, 14, 5};
@@ -313,7 +336,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optPadToMaxLength()
                         .build()) {
             for (Encoding encoding : tokenizer.batchEncode(inputs)) {
@@ -323,7 +346,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optPadToMaxLength()
                         .optMaxLength(15)
                         .build()) {
@@ -335,7 +358,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optPadToMaxLength()
                         .optMaxLength(15)
                         .optPadToMultipleOf(8)
@@ -351,7 +374,7 @@ public class HuggingFaceTokenizerTest {
     public void testTruncationStride() throws IOException {
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optAddSpecialTokens(false)
                         .optWithOverflowingTokens(true)
                         .optTruncation(true)
@@ -375,7 +398,7 @@ public class HuggingFaceTokenizerTest {
         }
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optAddSpecialTokens(false)
                         .optWithOverflowingTokens(true)
                         .optTruncation(true)
@@ -406,7 +429,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optTruncateFirstOnly()
                         .optPadding(true)
                         .optMaxLength(8)
@@ -417,7 +440,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optTruncateFirstOnly()
                         .optPadding(true)
                         .optMaxLength(8)
@@ -429,7 +452,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optTruncateSecondOnly()
                         .optMaxLength(8)
                         .optDoLowerCase(Locale.ROOT.toLanguageTag())
@@ -440,7 +463,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optTruncateSecondOnly()
                         .optMaxLength(8)
                         .optPadToMultipleOf(3)
@@ -452,7 +475,7 @@ public class HuggingFaceTokenizerTest {
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optTruncation(true)
                         .optPadding(true)
                         .optMaxLength(8)
@@ -466,7 +489,7 @@ public class HuggingFaceTokenizerTest {
     public void testSpecialTokenHandling() throws IOException {
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("distilbert-base-uncased")
+                        .optTokenizerName("distilbert/distilbert-base-uncased")
                         .build()) {
             String someText = "¥$9";
             Encoding encodedText = tokenizer.encode(someText);
@@ -509,7 +532,7 @@ public class HuggingFaceTokenizerTest {
                 };
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerName("bert-base-cased")
+                        .optTokenizerName("google-bert/bert-base-cased")
                         .optPadding(false)
                         .build()) {
 

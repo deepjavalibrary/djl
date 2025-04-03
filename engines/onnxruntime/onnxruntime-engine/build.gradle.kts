@@ -18,8 +18,9 @@ dependencies {
 }
 
 tasks {
+    val basePath = "${project.projectDir}/build/resources/main/nlp"
+    val logger = project.logger
     processResources {
-        val basePath = "${project.projectDir}/build/resources/main/nlp"
         outputs.dir(basePath)
         doLast {
             val url = "https://mlrepo.djl.ai/model/nlp"
@@ -28,14 +29,15 @@ tasks {
                 "question_answer",
                 "text_classification",
                 "text_embedding",
-                "token_classification"
+                "token_classification",
+                "zero_shot_classification"
             )
             for (task in tasks) {
                 val file = File("$basePath/$task/ai.djl.huggingface.onnxruntime.json")
                 if (file.exists())
-                    project.logger.lifecycle("model zoo metadata already exists: $task")
+                    logger.lifecycle("model zoo metadata already exists: $task")
                 else {
-                    project.logger.lifecycle("Downloading model zoo metadata: $task")
+                    logger.lifecycle("Downloading model zoo metadata: $task")
                     file.parentFile.mkdirs()
                     "$url/$task/ai/djl/huggingface/onnxruntime/models.json.gz".url gzipInto file
                 }

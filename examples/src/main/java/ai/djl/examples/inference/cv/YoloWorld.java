@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -16,8 +16,9 @@ import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.VisionLanguageInput;
 import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.modality.cv.translator.YoloV8TranslatorFactory;
+import ai.djl.modality.cv.translator.YoloWorldTranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.ProgressBar;
@@ -32,12 +33,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/** An example of inference using an yolov8 model. */
-public final class Yolov8Detection {
+public final class YoloWorld {
 
-    private static final Logger logger = LoggerFactory.getLogger(Yolov8Detection.class);
+    private static final Logger logger = LoggerFactory.getLogger(YoloWorld.class);
 
-    private Yolov8Detection() {}
+    private YoloWorld() {}
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
         DetectedObjects detection = predict();
@@ -45,38 +45,30 @@ public final class Yolov8Detection {
     }
 
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
-        Path imgPath = Paths.get("src/test/resources/yolov8_test.jpg");
-        Image img = ImageFactory.getInstance().fromFile(imgPath);
+        String url = "https://resources.djl.ai/images/000000039769.jpg";
+        Image img = ImageFactory.getInstance().fromUrl(url);
+        VisionLanguageInput input =
+                new VisionLanguageInput(img, new String[] {"cat", "remote control"});
 
-        // Use DJL OnnxRuntime model zoo model, model can be found:
-        // https://mlrepo.djl.ai/model/cv/object_detection/ai/djl/onnxruntime/yolov8n/0.0.1/yolov8n.zip
-        Criteria<Path, DetectedObjects> criteria =
+        // You can use src/main/python/trace_yolo_worldv2.py to trace the model
+        Criteria<VisionLanguageInput, DetectedObjects> criteria =
                 Criteria.builder()
-                        .setTypes(Path.class, DetectedObjects.class)
-                        .optModelUrls("djl://ai.djl.onnxruntime/yolov8n")
-                        .optEngine("OnnxRuntime")
-                        .optArgument("width", 640)
-                        .optArgument("height", 640)
-                        .optArgument("resize", true)
-                        .optArgument("toTensor", true)
-                        .optArgument("applyRatio", true)
-                        .optArgument("threshold", 0.6f)
-                        // for performance optimization maxBox parameter can reduce number of
-                        // considered boxes from 8400
-                        .optArgument("maxBox", 1000)
-                        .optTranslatorFactory(new YoloV8TranslatorFactory())
+                        .setTypes(VisionLanguageInput.class, DetectedObjects.class)
+                        .optModelUrls("djl://ai.djl.pytorch/yolov8s-worldv2")
+                        .optEngine("PyTorch")
+                        .optTranslatorFactory(new YoloWorldTranslatorFactory())
                         .optProgress(new ProgressBar())
                         .build();
 
-        try (ZooModel<Path, DetectedObjects> model = criteria.loadModel();
-                Predictor<Path, DetectedObjects> predictor = model.newPredictor()) {
+        try (ZooModel<VisionLanguageInput, DetectedObjects> model = criteria.loadModel();
+                Predictor<VisionLanguageInput, DetectedObjects> predictor = model.newPredictor()) {
             Path outputPath = Paths.get("build/output");
             Files.createDirectories(outputPath);
 
-            DetectedObjects detection = predictor.predict(imgPath);
+            DetectedObjects detection = predictor.predict(input);
             if (detection.getNumberOfObjects() > 0) {
                 img.drawBoundingBoxes(detection);
-                Path output = outputPath.resolve("yolov8_detected.png");
+                Path output = outputPath.resolve("yolo_world.png");
                 try (OutputStream os = Files.newOutputStream(output)) {
                     img.save(os, "png");
                 }

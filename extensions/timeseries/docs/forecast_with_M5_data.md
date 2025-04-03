@@ -56,7 +56,7 @@ repositories {
 }
 dependencies {
   implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.17.1"
-  implementation platform("ai.djl:bom:0.30.0")
+  implementation platform("ai.djl:bom:0.32.0")
   implementation "ai.djl:api"
   implementation "ai.djl.timeseries"
   runtimeOnly "ai.djl.mxnet:mxnet-engine"

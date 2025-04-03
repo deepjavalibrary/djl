@@ -14,12 +14,10 @@ package ai.djl.modality.cv.translator;
 
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.CategoryMask;
-import ai.djl.modality.cv.util.NDImageUtils;
-import ai.djl.ndarray.NDArray;
+import ai.djl.modality.cv.transform.ResizeShort;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.ArgumentsUtil;
-import ai.djl.translate.Transform;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
@@ -34,8 +32,6 @@ import java.util.Map;
 public class SemanticSegmentationTranslator extends BaseImageTranslator<CategoryMask> {
 
     private SynsetLoader synsetLoader;
-    private final int shortEdge;
-    private final int maxEdge;
 
     private List<String> classes;
 
@@ -47,10 +43,6 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Category
     public SemanticSegmentationTranslator(Builder builder) {
         super(builder);
         this.synsetLoader = builder.synsetLoader;
-        this.shortEdge = builder.shortEdge;
-        this.maxEdge = builder.maxEdge;
-
-        pipeline.insert(0, null, new ResizeShort());
     }
 
     /** {@inheritDoc} */
@@ -59,12 +51,6 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Category
         if (classes == null) {
             classes = synsetLoader.load(ctx.getModel());
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList processInput(TranslatorContext ctx, Image image) {
-        return super.processInput(ctx, image);
     }
 
     /** {@inheritDoc} */
@@ -124,27 +110,6 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Category
         return builder;
     }
 
-    /** Resizes the image based on the shorter edge or maximum edge length. */
-    private class ResizeShort implements Transform {
-        /** {@inheritDoc} */
-        @Override
-        public NDArray transform(NDArray array) {
-            Shape shape = array.getShape();
-            int width = (int) shape.get(1);
-            int height = (int) shape.get(0);
-            int min = Math.min(width, height);
-            int max = Math.max(width, height);
-            float scale = shortEdge / (float) min;
-            if (Math.round(scale * max) > maxEdge) {
-                scale = maxEdge / (float) max;
-            }
-            int rescaledHeight = Math.round(height * scale);
-            int rescaledWidth = Math.round(width * scale);
-
-            return NDImageUtils.resize(array, rescaledWidth, rescaledHeight);
-        }
-    }
-
     /** The builder for Semantic Segmentation translator. */
     public static class Builder extends ClassificationBuilder<Builder> {
         int shortEdge = 600;
@@ -173,6 +138,9 @@ public class SemanticSegmentationTranslator extends BaseImageTranslator<Category
          */
         public SemanticSegmentationTranslator build() {
             validate();
+            ResizeShort resize = new ResizeShort(shortEdge, maxEdge, Image.Interpolation.BILINEAR);
+            pipeline.insert(0, null, resize);
+
             return new SemanticSegmentationTranslator(this);
         }
     }

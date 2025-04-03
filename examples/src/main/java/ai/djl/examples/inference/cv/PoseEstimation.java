@@ -57,7 +57,7 @@ public final class PoseEstimation {
         Criteria<Image, Joints[]> criteria =
                 Criteria.builder()
                         .setTypes(Image.class, Joints[].class)
-                        .optModelUrls("djl://ai.djl.pytorch/yolov8n-pose")
+                        .optModelUrls("djl://ai.djl.pytorch/yolo11n-pose")
                         .optTranslatorFactory(new YoloPoseTranslatorFactory())
                         .build();
 

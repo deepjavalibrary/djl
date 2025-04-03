@@ -17,39 +17,26 @@ import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.CategoryMask;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorFactory;
-import ai.djl.util.Pair;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /** A {@link TranslatorFactory} that creates a {@link SemanticSegmentationTranslator} instance. */
-public class SemanticSegmentationTranslatorFactory implements TranslatorFactory, Serializable {
+public class SemanticSegmentationTranslatorFactory extends BaseImageTranslatorFactory<CategoryMask>
+        implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Set<Pair<Type, Type>> SUPPORTED_TYPES = new HashSet<>();
-
-    static {
-        SUPPORTED_TYPES.add(new Pair<>(Image.class, CategoryMask.class));
+    /** {@inheritDoc} */
+    @Override
+    protected Translator<Image, CategoryMask> buildBaseTranslator(
+            Model model, Map<String, ?> arguments) {
+        return SemanticSegmentationTranslator.builder(arguments).build();
     }
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
-    public <I, O> Translator<I, O> newInstance(
-            Class<I> input, Class<O> output, Model model, Map<String, ?> arguments) {
-        if (input == Image.class && output == CategoryMask.class) {
-            return (Translator<I, O>) SemanticSegmentationTranslator.builder(arguments).build();
-        }
-        throw new IllegalArgumentException("Unsupported input/output types.");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Set<Pair<Type, Type>> getSupportedTypes() {
-        return SUPPORTED_TYPES;
+    public Class<CategoryMask> getBaseOutputType() {
+        return CategoryMask.class;
     }
 }

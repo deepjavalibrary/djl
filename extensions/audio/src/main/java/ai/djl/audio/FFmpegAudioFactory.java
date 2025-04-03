@@ -89,12 +89,12 @@ public class FFmpegAudioFactory extends AudioFactory {
             if (buf instanceof ShortBuffer) {
                 ShortBuffer buffer = (ShortBuffer) buf;
                 for (int i = 0; i < buffer.limit(); i++) {
-                    list.add(buffer.get() / (float) Short.MAX_VALUE);
+                    list.add(buffer.get() / 32768.0f);
                 }
             } else if (buf instanceof IntBuffer) {
                 IntBuffer buffer = (IntBuffer) buf;
                 for (int i = 0; i < buffer.limit(); i++) {
-                    list.add(buffer.get() / (float) Integer.MAX_VALUE);
+                    list.add(buffer.get() / 2147483648.0f);
                 }
             } else {
                 throw new UnsupportedOperationException(

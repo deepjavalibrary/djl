@@ -53,9 +53,15 @@ public class Application {
             case "cv/image_classification":
             case "image_classification":
                 return CV.IMAGE_CLASSIFICATION;
+            case "cv/zero_shot_image_classification":
+            case "zero_shot_image_classification":
+                return CV.ZERO_SHOT_IMAGE_CLASSIFICATION;
             case "cv/object_detection":
             case "object_detection":
                 return CV.OBJECT_DETECTION;
+            case "cv/zero_shot_object_detection":
+            case "zero_shot_object_detection":
+                return CV.ZERO_SHOT_OBJECT_DETECTION;
             case "cv/semantic_segmentation":
             case "semantic_segmentation":
                 return CV.SEMANTIC_SEGMENTATION;
@@ -97,6 +103,9 @@ public class Application {
             case "nlp/token_classification":
             case "token_classification":
                 return NLP.TOKEN_CLASSIFICATION;
+            case "nlp/zero_shot_classification":
+            case "zero_shot_classification":
+                return NLP.ZERO_SHOT_CLASSIFICATION;
             case "nlp/word_embedding":
             case "word_embedding":
                 return NLP.WORD_EMBEDDING;
@@ -179,6 +188,15 @@ public class Application {
         Application IMAGE_CLASSIFICATION = new Application("cv/image_classification");
 
         /**
+         * An application where images are assigned a single class name.
+         *
+         * <p>The typical signature is Model&lt;{@link ai.djl.modality.cv.VisionLanguageInput},
+         * {@link ai.djl.modality.Classifications}&gt;.
+         */
+        Application ZERO_SHOT_IMAGE_CLASSIFICATION =
+                new Application("cv/zero_shot_image_classification");
+
+        /**
          * An application that finds zero or more objects in an image, the object class (see image
          * classification), and their locations as a {@link ai.djl.modality.cv.output.BoundingBox}.
          *
@@ -189,6 +207,18 @@ public class Application {
          *     chapter on object detection</a>
          */
         Application OBJECT_DETECTION = new Application("cv/object_detection");
+
+        /**
+         * An application that finds zero or more objects in an image, the object class (see image
+         * classification), and their locations as a {@link ai.djl.modality.cv.output.BoundingBox}.
+         *
+         * <p>The typical signature is Model&lt;{@link ai.djl.modality.cv.VisionLanguageInput},
+         * {@link ai.djl.modality.cv.output.DetectedObjects}&gt;.
+         *
+         * @see <a href="https://d2l.djl.ai/chapter_computer-vision/bounding-box.html">The D2L
+         *     chapter on object detection</a>
+         */
+        Application ZERO_SHOT_OBJECT_DETECTION = new Application("cv/zero_shot_object_detection");
 
         /** An application that classifies each pixel in an image into a category. */
         Application SEMANTIC_SEGMENTATION = new Application("cv/semantic_segmentation");
@@ -279,6 +309,12 @@ public class Application {
          * #TEXT_CLASSIFICATION}.
          */
         Application SENTIMENT_ANALYSIS = new Application("nlp/sentiment_analysis");
+
+        /**
+         * An application that classifies text into arbitrary label, a specific case of {@link
+         * #TEXT_CLASSIFICATION}.
+         */
+        Application ZERO_SHOT_CLASSIFICATION = new Application("nlp/zero_shot_classification");
 
         /**
          * A natural language understanding application that assigns a label to some tokens in a

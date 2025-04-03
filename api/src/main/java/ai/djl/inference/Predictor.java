@@ -144,6 +144,9 @@ public class Predictor<I, O> implements AutoCloseable {
     protected NDList predictInternal(TranslatorContext ctx, NDList ndList)
             throws TranslateException {
         logger.trace("Predictor input data: {}", ndList);
+        if (ndList.isEmpty()) {
+            return new NDList();
+        }
         return block.forward(parameterStore, ndList, false);
     }
 
@@ -154,9 +157,9 @@ public class Predictor<I, O> implements AutoCloseable {
      * @return a list of output objects defined by the user
      * @throws TranslateException if an error occurs during prediction
      */
-    @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.IdenticalCatchBranches", "unchecked"})
+    @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.IdenticalCatchBranches"})
     public List<O> batchPredict(List<I> inputs) throws TranslateException {
-        try (PredictorContext context = new PredictorContext()) {
+        try (PredictorContext context = new PredictorContext(model, manager, metrics)) {
             if (!prepared) {
                 translator.prepare(context);
                 prepared = true;
@@ -217,7 +220,7 @@ public class Predictor<I, O> implements AutoCloseable {
         StreamingTranslator<I, O> streamingTranslator = (StreamingTranslator<I, O>) translator;
 
         try {
-            PredictorContext context = new PredictorContext();
+            PredictorContext context = new PredictorContext(model, manager, metrics);
             if (!prepared) {
                 translator.prepare(context);
                 prepared = true;
@@ -354,14 +357,21 @@ public class Predictor<I, O> implements AutoCloseable {
         super.finalize();
     }
 
-    protected class PredictorContext implements TranslatorContext {
+    /** An implementation of {@link TranslatorContext}. */
+    public static final class PredictorContext implements TranslatorContext {
 
+        private Model model;
+        private NDManager predictorManager;
+        private Metrics metrics;
         private NDManager ctxManager;
         private Map<String, Object> attachments;
 
         /** Constructs a new {@code PredictorContext} instance. */
-        public PredictorContext() {
-            ctxManager = manager.newSubManager();
+        public PredictorContext(Model model, NDManager predictorManager, Metrics metrics) {
+            this.model = model;
+            this.predictorManager = predictorManager;
+            this.metrics = metrics;
+            ctxManager = predictorManager.newSubManager();
             ctxManager.setName("predictor ctx");
             attachments = new ConcurrentHashMap<>();
         }
@@ -381,13 +391,13 @@ public class Predictor<I, O> implements AutoCloseable {
         /** {@inheritDoc} */
         @Override
         public NDManager getPredictorManager() {
-            return manager;
+            return predictorManager;
         }
 
         /** {@inheritDoc} */
         @Override
         public Block getBlock() {
-            return block;
+            return model.getBlock();
         }
 
         /** {@inheritDoc} */

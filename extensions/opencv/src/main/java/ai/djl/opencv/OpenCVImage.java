@@ -202,6 +202,22 @@ class OpenCVImage implements Image {
 
     /** {@inheritDoc} */
     @Override
+    public void drawRectangle(Rectangle rectangle, int rgb, int stroke) {
+        Rect rect =
+                new Rect(
+                        (int) rectangle.getX(),
+                        (int) rectangle.getY(),
+                        (int) rectangle.getWidth(),
+                        (int) rectangle.getHeight());
+        int r = (rgb & 0xff0000) >> 16;
+        int g = (rgb & 0x00ff00) >> 8;
+        int b = rgb & 0x0000ff;
+        Scalar color = new Scalar(b, g, r);
+        Imgproc.rectangle(image, rect.tl(), rect.br(), color, stroke);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void drawMarks(List<ai.djl.modality.cv.output.Point> points, int radius) {
         Scalar color = new Scalar(190, 150, 37);
         for (ai.djl.modality.cv.output.Point point : points) {

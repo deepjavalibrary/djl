@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
 
 set -e
-WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 
-VERSION=v$1
-ARCH=$2
-FLAVOR=$3
-
-pushd "$WORK_DIR"
-if [ ! -d "tokenizers" ]; then
-  git clone https://github.com/huggingface/tokenizers -b "$VERSION"
-fi
+ARCH=$1
+FLAVOR=$2
 
 if [ ! -d "build" ]; then
   mkdir build
@@ -28,10 +21,10 @@ function copy_files() {
   flavor="$2"
   if [[ $PLATFORM == 'darwin' ]]; then
     mkdir -p "build/jnilib/osx-$arch/$flavor"
-    cp -f rust/target/release/libdjl.dylib "build/jnilib/osx-$arch/$flavor/libtokenizers.dylib"
+    cp -f rust/target/release/libdjl_tokenizer.dylib "build/jnilib/osx-$arch/$flavor/libtokenizers.dylib"
   elif [[ $PLATFORM == 'linux' ]]; then
     mkdir -p "build/jnilib/linux-$arch/$flavor"
-    cp -f rust/target/release/libdjl.so "build/jnilib/linux-$arch/$flavor/libtokenizers.so"
+    cp -f rust/target/release/libdjl_tokenizer.so "build/jnilib/linux-$arch/$flavor/libtokenizers.so"
   fi
 }
 

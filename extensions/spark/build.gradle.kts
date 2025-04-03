@@ -27,12 +27,9 @@ tasks {
         scalaCompileOptions.setAdditionalParameters(listOf("-target:jvm-1.8"))
     }
 
-    register("formatPython") {
-        doFirst {
-            exec {
-                commandLine("bash", "-c", "find . -name '*.py' -print0 | xargs -0 yapf --in-place")
-            }
-        }
+    register<Exec>("formatPython") {
+        workingDir = project.projectDir
+        commandLine("bash", "-c", "find . -name '*.py' -print0 | xargs -0 yapf --in-place")
     }
 }
 

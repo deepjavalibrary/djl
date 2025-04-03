@@ -38,6 +38,7 @@ jobs:
         run: |
           export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}
           export ANDROID_ABI=${{ matrix.format }}
+          export CMAKE_POLICY_VERSION_MINIMUM=3.5
           cd android_pytorch_tmp
           BUILD_LITE_INTERPRETER=0 ./scripts/build_android.sh
           cd build_android

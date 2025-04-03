@@ -1,5 +1,3 @@
-import java.net.URL
-
 plugins {
     ai.djl.javaProject
     ai.djl.publish
@@ -23,6 +21,13 @@ tasks {
 
     processResources {
         outputs.dir(buildDirectory / "classes/java/main/jnilib")
+
+        val logger = project.logger
+        val dir = project.projectDir
+        val nativeDir = project.parent!!.projectDir / "pytorch-native/jnilib/${libs.versions.djl.get()}/"
+        val version = project.version
+        val hasJni = project.hasProperty("jni")
+
         doFirst {
             val url = "https://publish.djl.ai/pytorch/$ptVersion/jnilib/${libs.versions.djl.get()}"
             val files = listOf(
@@ -32,7 +37,7 @@ tasks {
                 "osx-aarch64/cpu/libdjl_torch.dylib",
                 "win-x86_64/cpu/djl_torch.dll"
             ) + when {
-                ptVersion.startsWith("2.4.") -> listOf(
+                ptVersion.matches(Regex("2.[4-5].\\d")) -> listOf(
                     "linux-x86_64/cu124/libdjl_torch.so",
                     "linux-x86_64/cu124-precxx11/libdjl_torch.so",
                     "win-x86_64/cu124/djl_torch.dll"
@@ -51,22 +56,21 @@ tasks {
 
                 else -> throw GradleException("Unsupported version: $ptVersion.")
             }
-            val jnilibDir = project.projectDir / "jnilib" / libs.versions.djl.get()
+            val jnilibDir = dir / "jnilib" / libs.versions.djl.get()
             for (entry in files) {
                 val file = jnilibDir / entry
                 if (file.exists())
-                    project.logger.lifecycle("prebuilt or cached file found for $entry")
+                    logger.lifecycle("prebuilt or cached file found for $entry")
                 else {
-                    val nativeDir = project.parent!!.projectDir / "pytorch-native/jnilib/${libs.versions.djl.get()}/"
                     val jnilibFile = nativeDir / entry
                     if (jnilibFile.exists()) {
-                        project.logger.lifecycle("Copying $jnilibFile")
+                        logger.lifecycle("Copying $jnilibFile")
                         copy {
                             from(jnilibFile)
                             into(file.parent)
                         }
-                    } else if (!project.hasProperty("jni")) {
-                        project.logger.lifecycle("Downloading $url/$entry")
+                    } else if (!hasJni) {
+                        logger.lifecycle("Downloading $url/$entry")
                         file.parentFile.mkdirs()
                         "$url/$entry".url into file
                     }
@@ -79,7 +83,7 @@ tasks {
 
             // write properties
             val propFile = buildDirectory / "classes/java/main/jnilib/pytorch.properties"
-            propFile.text = "jni_version=" + project.version
+            propFile.text = "jni_version=$version"
         }
     }
 

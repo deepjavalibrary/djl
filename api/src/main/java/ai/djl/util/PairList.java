@@ -14,11 +14,11 @@ package ai.djl.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -369,7 +369,7 @@ public class PairList<K, V> implements Iterable<Pair<K, V>> {
      */
     public Map<K, V> toMap(boolean checkDuplicate) {
         int size = keys.size();
-        Map<K, V> map = new ConcurrentHashMap<>(size * 3 / 2);
+        Map<K, V> map = new LinkedHashMap<>(size * 3 / 2); // NOPMD
         for (int i = 0; i < size; ++i) {
             if (map.put(keys.get(i), values.get(i)) != null && checkDuplicate) {
                 throw new IllegalStateException("Duplicate keys: " + keys.get(i));

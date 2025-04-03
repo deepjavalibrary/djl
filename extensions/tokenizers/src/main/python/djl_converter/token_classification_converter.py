@@ -61,10 +61,14 @@ class TokenClassificationConverter(HuggingfaceConverter):
                         or self.outputs[2] in entity):
                     return True, None
 
+        pipeline_output = hf_pipeline(self.inputs)
+        if len(pipeline_output) == 0:
+            logging.warning(f"Warning: pipeline output is empty")
+            return True, None
+
         if len(entities) == 0:
             return False, "TokenClassification returns with empty result"
 
-        pipeline_output = hf_pipeline(self.inputs)
         for e in pipeline_output:
             if e["word"] == entities[0]["word"]:
                 if e["entity"] == entities[0]["entity"]:

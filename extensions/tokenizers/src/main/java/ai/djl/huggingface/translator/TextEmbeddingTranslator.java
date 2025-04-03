@@ -24,7 +24,6 @@ import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,29 +43,23 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     private boolean normalize;
     private String pooling;
     private boolean includeTokenTypes;
+    private boolean int32;
     private String dense;
     private String denseActivation;
     private String layerNorm;
     private NDList denseModel;
     private NDList layerNormModel;
 
-    TextEmbeddingTranslator(
-            HuggingFaceTokenizer tokenizer,
-            Batchifier batchifier,
-            String pooling,
-            boolean normalize,
-            boolean includeTokenTypes,
-            String dense,
-            String denseActivation,
-            String layerNorm) {
-        this.tokenizer = tokenizer;
-        this.batchifier = batchifier;
-        this.pooling = pooling;
-        this.normalize = normalize;
-        this.includeTokenTypes = includeTokenTypes;
-        this.dense = dense;
-        this.denseActivation = denseActivation;
-        this.layerNorm = layerNorm;
+    TextEmbeddingTranslator(Builder builder) {
+        this.tokenizer = builder.tokenizer;
+        this.batchifier = builder.batchifier;
+        this.pooling = builder.pooling;
+        this.normalize = builder.normalize;
+        this.includeTokenTypes = builder.includeTokenTypes;
+        this.int32 = builder.int32;
+        this.dense = builder.dense;
+        this.denseActivation = builder.denseActivation;
+        this.layerNorm = builder.layerNorm;
     }
 
     /** {@inheritDoc} */
@@ -108,14 +101,8 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     public NDList processInput(TranslatorContext ctx, String input) {
         NDManager manager = ctx.getNDManager();
         Encoding encoding = tokenizer.encode(input);
-        NDList list = new NDList();
-        list.add(manager.create(encoding.getIds()));
-        NDArray inputAttentionMask = manager.create(encoding.getAttentionMask());
-        list.add(inputAttentionMask);
-        ctx.setAttachment("attentionMask", inputAttentionMask);
-        if (includeTokenTypes) {
-            list.add(manager.create(encoding.getTypeIds()));
-        }
+        NDList list = encoding.toNDList(manager, includeTokenTypes, int32);
+        ctx.setAttachment("attentionMask", list.get(1));
         return list;
     }
 
@@ -124,24 +111,8 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     public NDList batchProcessInput(TranslatorContext ctx, List<String> inputs) {
         NDManager manager = ctx.getNDManager();
         Encoding[] encodings = tokenizer.batchEncode(inputs);
-        long[][] ids = new long[encodings.length][];
-        long[][] attentionMask = new long[encodings.length][];
-        long[][] typeIds = new long[encodings.length][];
-        for (int i = 0; i < encodings.length; i++) {
-            ids[i] = encodings[i].getIds();
-            attentionMask[i] = encodings[i].getAttentionMask();
-            if (includeTokenTypes) {
-                typeIds[i] = encodings[i].getTypeIds();
-            }
-        }
-        NDList list = new NDList();
-        list.add(manager.create(ids));
-        NDArray inputAttentionMask = manager.create(attentionMask);
-        list.add(inputAttentionMask);
-        ctx.setAttachment("attentionMask", inputAttentionMask);
-        if (includeTokenTypes) {
-            list.add(manager.create(typeIds));
-        }
+        NDList list = Encoding.toNDList(encodings, manager, includeTokenTypes, int32);
+        ctx.setAttachment("attentionMask", list.get(1));
         return list;
     }
 
@@ -174,7 +145,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         return ret;
     }
 
-    private NDArray processEmbedding(NDList list, NDArray attentionMask) {
+    NDArray processEmbedding(NDList list, NDArray attentionMask) {
         NDArray embedding = list.get("last_hidden_state");
         if (embedding == null) {
             // For Onnx model, NDArray name is not present
@@ -195,6 +166,9 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
                 break;
             case "cls":
                 embedding = embedding.get(new NDIndex(":, 0"));
+                break;
+            case "lasttoken":
+                embedding = lastTokenPool(embedding, attentionMask);
                 break;
             default:
                 throw new AssertionError("Unexpected pooling mode: " + pooling);
@@ -258,6 +232,20 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
         return embeddingSum.div(maskSum);
     }
 
+    private static NDArray lastTokenPool(NDArray embeddings, NDArray attentionMask) {
+        long sum = attentionMask.get(":, -1").sum().getLong();
+        if (sum == attentionMask.getShape().get(0)) {
+            // left padding
+            return embeddings.get(":, -1");
+        }
+
+        long sequenceLength = attentionMask.sum(new int[] {1}).getLong() - 1;
+        long batchSize = embeddings.getShape().get(0);
+        embeddings = embeddings.get(":, " + sequenceLength);
+        NDArray index = embeddings.getManager().arange(batchSize);
+        return embeddings.get(index);
+    }
+
     /**
      * Creates a builder to build a {@code TextEmbeddingTranslator}.
      *
@@ -285,14 +273,15 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     /** The builder for token classification translator. */
     public static final class Builder {
 
-        private HuggingFaceTokenizer tokenizer;
-        private Batchifier batchifier = Batchifier.STACK;
-        private boolean normalize = true;
-        private String pooling = "mean";
-        private boolean includeTokenTypes;
-        private String dense;
-        private String denseActivation;
-        private String layerNorm;
+        HuggingFaceTokenizer tokenizer;
+        Batchifier batchifier = Batchifier.STACK;
+        boolean normalize = true;
+        String pooling = "mean";
+        boolean includeTokenTypes;
+        boolean int32;
+        String dense;
+        String denseActivation;
+        String layerNorm;
 
         Builder(HuggingFaceTokenizer tokenizer) {
             this.tokenizer = tokenizer;
@@ -331,10 +320,11 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
                     && !"max".equals(poolingMode)
                     && !"cls".equals(poolingMode)
                     && !"mean_sqrt_len".equals(poolingMode)
+                    && !"lasttoken".equals(poolingMode)
                     && !"weightedmean".equals(poolingMode)) {
                 throw new IllegalArgumentException(
                         "Invalid pooling model, must be one of [mean, max, cls, mean_sqrt_len,"
-                                + " weightedmean].");
+                                + " weightedmean, lasttoken].");
             }
             this.pooling = poolingMode;
             return this;
@@ -348,6 +338,17 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
          */
         public Builder optIncludeTokenTypes(boolean includeTokenTypes) {
             this.includeTokenTypes = includeTokenTypes;
+            return this;
+        }
+
+        /**
+         * Sets if use int32 datatype for the {@link Translator}.
+         *
+         * @param int32 true to include token types
+         * @return this builder
+         */
+        public Builder optInt32(boolean int32) {
+            this.int32 = int32;
             return this;
         }
 
@@ -395,6 +396,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
             optNormalize(ArgumentsUtil.booleanValue(arguments, "normalize", true));
             optPoolingMode(ArgumentsUtil.stringValue(arguments, "pooling", "mean"));
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
+            optInt32(ArgumentsUtil.booleanValue(arguments, "int32"));
             optDense(ArgumentsUtil.stringValue(arguments, "dense"));
             optDenseActivation(ArgumentsUtil.stringValue(arguments, "denseActivation"));
             optLayerNorm(ArgumentsUtil.stringValue(arguments, "layerNorm"));
@@ -404,18 +406,9 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
          * Builds the translator.
          *
          * @return the new translator
-         * @throws IOException if I/O error occurs
          */
-        public TextEmbeddingTranslator build() throws IOException {
-            return new TextEmbeddingTranslator(
-                    tokenizer,
-                    batchifier,
-                    pooling,
-                    normalize,
-                    includeTokenTypes,
-                    dense,
-                    denseActivation,
-                    layerNorm);
+        public TextEmbeddingTranslator build() {
+            return new TextEmbeddingTranslator(this);
         }
     }
 }

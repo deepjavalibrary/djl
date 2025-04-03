@@ -1,0 +1,43 @@
+{
+  "metadataVersion": "0.2",
+  "resourceType": "model",
+  "application": "cv/instance_segmentation",
+  "groupId": "ai.djl.pytorch",
+  "artifactId": "yolo11n-seg",
+  "name": "yolo11n seg",
+  "description": "yolo11n Instance Segmentation",
+  "website": "http://www.djl.ai/engines/pytorch/pytorch-model-zoo",
+  "licenses": {
+    "license": {
+      "name": "The Apache License, Version 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "artifacts": [
+    {
+      "version": "0.0.1",
+      "snapshot": false,
+      "name": "yolo11n-seg",
+      "properties": {
+      },
+      "arguments": {
+        "width": 640,
+        "height": 640,
+        "resize": true,
+        "threshold": 0.25,
+        "translatorFactory": "ai.djl.modality.cv.translator.YoloSegmentationTranslatorFactory"
+      },
+      "options": {
+        "mapLocation": "true"
+      },
+      "files": {
+        "model": {
+          "uri": "0.0.1/yolo11n-seg.zip",
+          "sha1Hash": "22a1d6a33fb9a5da738d04fc82c2faab8104ecc7",
+          "name": "",
+          "size": 10380298
+        }
+      }
+    }
+  ]
+}

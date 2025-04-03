@@ -1,0 +1,57 @@
+name: Native JNI S3 Tokenizers Android
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-huggingface-jni-android:
+    if: github.repository == 'deepjavalibrary/djl'
+    runs-on: ubuntu-latest
+    env:
+      NDK_VERSION: "21.1.6352462"
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 17
+      - uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Install NDK
+        run: echo "y" | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --install "ndk;${NDK_VERSION}"
+      - name: Install Rust
+        run: |
+          source "$HOME/.cargo/env"
+          cargo install cargo-ndk
+          rustup target add \
+            aarch64-linux-android \
+            armv7-linux-androideabi \
+            x86_64-linux-android \
+            i686-linux-android
+      - name: build android
+        run: |
+          export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}
+          ./gradlew :extensions:tokenizers:compileAndroidJNI
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
+          aws-region: us-east-2
+      - name: Copy files to S3 with the AWS CLI
+        run: |
+          DJL_VERSION=$(awk -F '=' '/djl / {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)
+          TOKENIZERS_VERSION="$(awk -F '=' '/tokenizers/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)"
+          aws s3 sync extensions/tokenizers/jnilib/${DJL_VERSION}/android s3://djl-ai/publish/tokenizers/${TOKENIZERS_VERSION}/jnilib/${DJL_VERSION}/android
+          aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/tokenizers/${TOKENIZERS_VERSION}/jnilib*"

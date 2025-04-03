@@ -12,6 +12,8 @@
  */
 package ai.djl.modality.cv.output;
 
+import ai.djl.util.JsonUtils;
+
 import java.io.Serializable;
 
 /**
@@ -20,6 +22,7 @@ import java.io.Serializable;
 public class Point implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     private double x;
     private double y;
 
@@ -51,5 +54,11 @@ public class Point implements Serializable {
      */
     public double getY() {
         return y;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return JsonUtils.GSON_COMPACT.toJson(this);
     }
 }

@@ -27,14 +27,14 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 
 You can pull the PyTorch engine from the central Maven repository by including the following dependency:
 
-- ai.djl.pytorch:pytorch-engine:0.30.0
+- ai.djl.pytorch:pytorch-engine:0.32.0
 
 ```xml
 
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-engine</artifactId>
-    <version>0.30.0</version>
+    <version>0.32.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -51,6 +51,8 @@ The following table illustrates which pytorch version that DJL supports:
 
 | PyTorch engine version | PyTorch native library version            |
 |------------------------|-------------------------------------------|
+| pytorch-engine:0.32.0  | 1.13.1, 2.1.2, 2.3.1, **2.5.1**           |
+| pytorch-engine:0.31.0  | 1.13.1, 2.1.2, 2.3.1, 2.4.0, **2.5.1**    |
 | pytorch-engine:0.30.0  | 1.13.1, 2.1.2, 2.3.1, **2.4.0**           |
 | pytorch-engine:0.29.0  | 1.13.1, 2.1.2, 2.2.2, **2.3.1**           |
 | pytorch-engine:0.28.0  | 1.13.1, 2.1.2, **2.2.2**                  |
@@ -127,7 +129,7 @@ export PYTORCH_FLAVOR=cpu
 **Note:**
 
 - x86_64 macOS is no longer supported since 0.30.0
-- PyTorch 1.13+ doesn't support mac 11 any more, you must use DJL 0.19.0 ane lower version.
+- PyTorch 1.13+ doesn't support mac 11 any more, you must use DJL 0.19.0 or a lower version.
 
 ### macOS M1
 

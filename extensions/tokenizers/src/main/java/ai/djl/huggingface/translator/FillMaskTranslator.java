@@ -24,7 +24,6 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +37,7 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
     private long maskTokenId;
     private int topK;
     private boolean includeTokenTypes;
+    private boolean int32;
     private Batchifier batchifier;
 
     FillMaskTranslator(
@@ -45,11 +45,13 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
             String maskToken,
             int topK,
             boolean includeTokenTypes,
+            boolean int32,
             Batchifier batchifier) {
         this.tokenizer = tokenizer;
         this.maskToken = maskToken;
         this.topK = topK;
         this.includeTokenTypes = includeTokenTypes;
+        this.int32 = int32;
         this.batchifier = batchifier;
         Encoding encoding = tokenizer.encode(maskToken, false, false);
         maskTokenId = encoding.getIds()[0];
@@ -68,7 +70,7 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
         long[] indices = encoding.getIds();
         int maskIndex = getMaskIndex(indices);
         ctx.setAttachment("maskIndex", maskIndex);
-        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes);
+        return encoding.toNDList(ctx.getNDManager(), includeTokenTypes, int32);
     }
 
     /** {@inheritDoc} */
@@ -83,7 +85,7 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
         for (int i = 0; i < batch.length; ++i) {
             long[] indices = encodings[i].getIds();
             maskIndices[i] = getMaskIndex(indices);
-            batch[i] = encodings[i].toNDList(manager, includeTokenTypes);
+            batch[i] = encodings[i].toNDList(manager, includeTokenTypes, int32);
         }
         return batchifier.batchify(batch);
     }
@@ -167,6 +169,7 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
         private String maskedToken = "[MASK]";
         private int topK = 5;
         private boolean includeTokenTypes;
+        private boolean int32;
         private Batchifier batchifier = Batchifier.STACK;
 
         Builder(HuggingFaceTokenizer tokenizer) {
@@ -207,6 +210,17 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
         }
 
         /**
+         * Sets if use int32 datatype for the {@link Translator}.
+         *
+         * @param int32 true to include token types
+         * @return this builder
+         */
+        public Builder optInt32(boolean int32) {
+            this.int32 = int32;
+            return this;
+        }
+
+        /**
          * Sets the {@link Batchifier} for the {@link Translator}.
          *
          * @param batchifier true to include token types
@@ -224,6 +238,7 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
          */
         public void configure(Map<String, ?> arguments) {
             optMaskToken(ArgumentsUtil.stringValue(arguments, "maskToken", "[MASK]"));
+            optInt32(ArgumentsUtil.booleanValue(arguments, "int32"));
             optTopK(ArgumentsUtil.intValue(arguments, "topK", 5));
             optIncludeTokenTypes(ArgumentsUtil.booleanValue(arguments, "includeTokenTypes"));
             String batchifierStr = ArgumentsUtil.stringValue(arguments, "batchifier", "stack");
@@ -234,11 +249,10 @@ public class FillMaskTranslator implements Translator<String, Classifications> {
          * Builds the translator.
          *
          * @return the new translator
-         * @throws IOException if I/O error occurs
          */
-        public FillMaskTranslator build() throws IOException {
+        public FillMaskTranslator build() {
             return new FillMaskTranslator(
-                    tokenizer, maskedToken, topK, includeTokenTypes, batchifier);
+                    tokenizer, maskedToken, topK, includeTokenTypes, int32, batchifier);
         }
     }
 }
