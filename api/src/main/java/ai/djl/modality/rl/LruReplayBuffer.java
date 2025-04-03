@@ -57,7 +57,7 @@ public class LruReplayBuffer implements ReplayBuffer {
     @Override
     public void addStep(Step step) {
         if (stepsActualSize == steps.length) {
-            int stepToReplace = Math.floorMod(firstStepIndex - 1, steps.length);
+            int stepToReplace = Math.floorMod(firstStepIndex, steps.length);
             steps[stepToReplace].close();
             steps[stepToReplace] = step;
             firstStepIndex = Math.floorMod(firstStepIndex + 1, steps.length);
