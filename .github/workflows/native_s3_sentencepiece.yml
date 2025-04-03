@@ -27,6 +27,7 @@ jobs:
       - uses: taiki-e/checkout-action@v1
       - name: Release JNI prep
         run: |
+          export CMAKE_POLICY_VERSION_MINIMUM=3.5
           ./gradlew :extensions:sentencepiece:compileJNI
           ./gradlew -Pjni :extensions:sentencepiece:test
       - name: Configure AWS Credentials
