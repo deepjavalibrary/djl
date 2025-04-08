@@ -5491,4 +5491,6 @@ public interface NDArray extends NDResource, BytesSupplier {
      *     type, this function just returns input.
      */
     NDArray conj();
+
+    NDArray diff(int n, int dim);
 }
