@@ -1657,6 +1657,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     public NDArray conj() {
         return JniUtils.conj(this);
     }
+
     @Override
     public NDArray diff(int n, int dim) {
         return JniUtils.diff(this, n, dim);

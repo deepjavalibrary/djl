@@ -1641,6 +1641,12 @@ public class RsNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray diff(int n, int dim) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public String toString() {
         if (isReleased()) {
             return "This array is already closed";

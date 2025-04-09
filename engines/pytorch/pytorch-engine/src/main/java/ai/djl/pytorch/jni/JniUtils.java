@@ -1927,10 +1927,8 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.torchNonZeros(ndArray.getHandle()));
     }
 
-    public static PtNDArray diff(PtNDArray ndArray, int n, int dim){
+    public static PtNDArray diff(PtNDArray ndArray, int n, int dim) {
         return new PtNDArray(
-                ndArray.getManager(),
-                PyTorchLibrary.LIB.torchDiff(ndArray.getHandle(), n, dim)
-        );
+                ndArray.getManager(), PyTorchLibrary.LIB.torchDiff(ndArray.getHandle(), n, dim));
     }
 }

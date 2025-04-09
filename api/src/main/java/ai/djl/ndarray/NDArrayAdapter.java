@@ -1286,6 +1286,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray diff(int n, int dim) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArrayEx getNDArrayInternal() {
         NDArray array = getAlternativeArray();
         if (array instanceof NDArrayAdapter) {
