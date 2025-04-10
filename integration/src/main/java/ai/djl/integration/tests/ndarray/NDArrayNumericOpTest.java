@@ -775,4 +775,17 @@ public class NDArrayNumericOpTest {
             Assert.assertEquals(array.sign(), array);
         }
     }
+
+    @Test
+    public void testDiff() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array = manager.create(new float[] {1f, 2f, 5f, 1f, 2f, 3f, 8f, 9f, 0f});
+
+            // Applying diff once along the only axis (0) of 1D array
+            NDArray expected = manager.create(new float[] {1f, 3f, -4f, 1f, 1f, 5f, 1f, -9f});
+
+            NDArray diff = array.diff(1, 0);
+            Assert.assertEquals(expected, diff);
+        }
+    }
 }

@@ -701,4 +701,6 @@ final class PyTorchLibrary {
     native void torchIndexAppendFixed(long torchIndexHandle, long idx);
 
     native void torchIndexAppendArray(long torchIndexHandle, long arrayHandle);
+
+    native long torchDiff(long self, int n, int dim);
 }

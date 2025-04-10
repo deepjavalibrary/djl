@@ -1660,6 +1660,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray diff(int n, int dim) {
+        return JniUtils.diff(this, n, dim);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArrayEx getNDArrayInternal() {
         if (ptNDArrayEx == null) {
             throw new UnsupportedOperationException(

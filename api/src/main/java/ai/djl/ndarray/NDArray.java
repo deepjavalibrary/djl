@@ -5491,4 +5491,13 @@ public interface NDArray extends NDResource, BytesSupplier {
      *     type, this function just returns input.
      */
     NDArray conj();
+
+    /**
+     * Calculates the n-th order discrete difference along a given dimension.
+     *
+     * @param n the number of times to apply the difference
+     * @param dim the dimension to perform the difference along
+     * @return a new {@link NDArray} containing the differenced values
+     */
+    NDArray diff(int n, int dim);
 }

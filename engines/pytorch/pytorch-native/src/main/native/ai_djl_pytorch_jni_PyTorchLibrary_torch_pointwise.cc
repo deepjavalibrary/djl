@@ -529,3 +529,11 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchInverse(JNIE
   return reinterpret_cast<uintptr_t>(result_ptr);
   API_END_RETURN()
 }
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDiff(JNIEnv* env, jobject jthis, jlong jself, jint n, jint dim) {
+  API_BEGIN()
+  const auto* input_ptr = reinterpret_cast<torch::Tensor*>(jself);
+  const auto* result_ptr = new torch::Tensor(torch::diff(*input_ptr, n, dim));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}
