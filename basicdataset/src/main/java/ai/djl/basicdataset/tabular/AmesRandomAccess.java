@@ -123,7 +123,7 @@ public class AmesRandomAccess extends CsvDataset {
                             .setSkipHeaderRecord(true)
                             .setIgnoreHeaderCase(true)
                             .setTrim(true)
-                            .build();
+                            .get();
         }
 
         /** {@inheritDoc} */

@@ -101,7 +101,7 @@ public class GoEmotions extends TextDataset {
         }
 
         CSVFormat csvFormat =
-                CSVFormat.TDF.builder().setQuote(null).setHeader(HeaderEnum.class).build();
+                CSVFormat.TDF.builder().setQuote(null).setHeader(HeaderEnum.class).get();
         URL csvUrl = csvFile.toUri().toURL();
         List<CSVRecord> csvRecords;
         List<String> sourceTextData = new ArrayList<>();
@@ -109,7 +109,7 @@ public class GoEmotions extends TextDataset {
         try (Reader reader =
                 new InputStreamReader(
                         new BufferedInputStream(csvUrl.openStream()), StandardCharsets.UTF_8)) {
-            CSVParser csvParser = new CSVParser(reader, csvFormat);
+            CSVParser csvParser = CSVParser.parse(reader, csvFormat);
             csvRecords = csvParser.getRecords();
         }
 

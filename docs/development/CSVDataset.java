@@ -68,15 +68,15 @@ public class CSVDataset extends RandomAccessDataset {
 
         CSVDataset build() throws IOException {
             String csvFilePath = "path/malicious_url_data.csv";
+            CSVFormat csvFormat = CSVFormat.DEFAULT
+                    .builder()
+                    .setHeader("url", "isMalicious")
+                    .setSkipHeaderRecord(true)
+                    .setIgnoreHeaderCase(true)
+                    .setTrim(true)
+                    .get();
             try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));
-                 CSVParser csvParser =
-                         new CSVParser(
-                                 reader,
-                                 CSVFormat.DEFAULT
-                                         .withHeader("url", "isMalicious")
-                                         .withFirstRecordAsHeader()
-                                         .withIgnoreHeaderCase()
-                                         .withTrim())) {
+                 CSVParser csvParser = CSVParser.parse(reader, csvFormat)) {
                 csvRecords = csvParser.getRecords();
             }
             return new CSVDataset(this);

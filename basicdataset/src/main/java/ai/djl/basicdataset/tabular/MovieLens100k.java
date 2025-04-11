@@ -146,12 +146,12 @@ public final class MovieLens100k extends CsvDataset {
     private Map<String, Map<String, String>> prepareFeaturesMap(
             Path featureFile, String[] featureNames) throws IOException {
         URL featureFileUrl = featureFile.toUri().toURL();
-        CSVFormat format = CSVFormat.Builder.create(CSVFormat.newFormat('|')).build();
+        CSVFormat format = CSVFormat.Builder.create(CSVFormat.newFormat('|')).get();
         Reader reader =
                 new InputStreamReader(
                         new BufferedInputStream(featureFileUrl.openStream()),
                         StandardCharsets.UTF_8);
-        CSVParser csvParser = new CSVParser(reader, format);
+        CSVParser csvParser = CSVParser.parse(reader, format);
         List<CSVRecord> featureRecords = csvParser.getRecords();
 
         Map<String, Map<String, String>> featuresMap = new ConcurrentHashMap<>();
@@ -220,7 +220,7 @@ public final class MovieLens100k extends CsvDataset {
             groupId = BasicDatasets.GROUP_ID;
             artifactId = ARTIFACT_ID;
             usage = Usage.TRAIN;
-            csvFormat = CSVFormat.TDF.builder().setHeader(HeaderEnum.class).setQuote(null).build();
+            csvFormat = CSVFormat.TDF.builder().setHeader(HeaderEnum.class).setQuote(null).get();
         }
 
         /** {@inheritDoc} */
