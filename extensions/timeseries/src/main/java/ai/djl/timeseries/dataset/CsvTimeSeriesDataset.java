@@ -70,7 +70,7 @@ public class CsvTimeSeriesDataset extends TimeSeriesDataset {
     @Override
     public void prepare(Progress progress) throws IOException {
         try (Reader reader = new InputStreamReader(getCsvStream(), StandardCharsets.UTF_8)) {
-            CSVParser csvParser = new CSVParser(reader, csvFormat);
+            CSVParser csvParser = CSVParser.parse(reader, csvFormat);
             csvRecords = csvParser.getRecords();
         }
         prepareFeaturizers();

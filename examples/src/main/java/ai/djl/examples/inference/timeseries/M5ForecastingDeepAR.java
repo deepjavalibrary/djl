@@ -191,7 +191,7 @@ public final class M5ForecastingDeepAR {
             try (Reader reader =
                     new InputStreamReader(
                             new BufferedInputStream(csvUrl.openStream()), StandardCharsets.UTF_8)) {
-                CSVParser csvParser = new CSVParser(reader, builder.csvFormat);
+                CSVParser csvParser = CSVParser.parse(reader, builder.csvFormat);
                 csvRecords = csvParser.getRecords();
             }
         }
@@ -256,7 +256,7 @@ public final class M5ForecastingDeepAR {
                                 .setSkipHeaderRecord(true)
                                 .setIgnoreHeaderCase(true)
                                 .setTrim(true)
-                                .build();
+                                .get();
                 target = new ArrayList<>();
                 for (int i = 1; i <= 277; i++) {
                     target.add(new Feature("w_" + i, true));

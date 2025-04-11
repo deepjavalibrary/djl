@@ -138,7 +138,7 @@ public class M5Forecast extends CsvTimeSeriesDataset {
                             .setSkipHeaderRecord(true)
                             .setIgnoreHeaderCase(true)
                             .setTrim(true)
-                            .build();
+                            .get();
             cardinality = new ArrayList<>();
         }
 

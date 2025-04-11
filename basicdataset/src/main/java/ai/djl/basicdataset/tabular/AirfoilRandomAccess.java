@@ -121,7 +121,7 @@ public final class AirfoilRandomAccess extends CsvDataset {
                             .setHeader(COLUMNS)
                             .setIgnoreHeaderCase(true)
                             .setTrim(true)
-                            .build();
+                            .get();
         }
 
         /** {@inheritDoc} */

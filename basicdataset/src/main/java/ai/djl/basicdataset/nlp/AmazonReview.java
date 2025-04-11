@@ -93,7 +93,7 @@ public class AmazonReview extends CsvDataset {
             repository = BasicDatasets.REPOSITORY;
             groupId = BasicDatasets.GROUP_ID;
             artifactId = ARTIFACT_ID;
-            csvFormat = CSVFormat.TDF.builder().setQuote(null).setHeader().build();
+            csvFormat = CSVFormat.TDF.builder().setQuote(null).setHeader().get();
             datasetName = "us_Digital_Software";
         }
 
