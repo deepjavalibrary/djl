@@ -1,7 +1,7 @@
 
 ![DeepJavaLibrary](website/img/deepjavalibrary.png?raw=true "Deep Java Library")
 
-![Continuous](https://github.com/deepjavalibrary/djl/workflows/Continuous/badge.svg)
+[![Continuous](https://github.com/deepjavalibrary/djl/workflows/Continuous/badge.svg)](https://github.com/deepjavalibrary/djl/actions/workflows/continuous.yml)
 [![Docs](https://github.com/deepjavalibrary/djl/workflows/Docs/badge.svg)](https://docs.djl.ai/master/index.html)
 [![Nightly Publish](https://github.com/deepjavalibrary/djl/workflows/Nightly%20Publish/badge.svg)](https://github.com/deepjavalibrary/djl/actions/workflows/nightly_publish.yml)
 
