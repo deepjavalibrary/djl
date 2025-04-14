@@ -73,7 +73,7 @@ Maven:
 <dependency>
     <groupId>com.microsoft.onnxruntime</groupId>
     <artifactId>onnxruntime_gpu</artifactId>
-    <version>1.18.0</version>
+    <version>1.20.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -84,7 +84,7 @@ Gradle:
 implementation("ai.djl.onnxruntime:onnxruntime-engine:0.32.0") {
     exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
 }
-implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.18.0"
+implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.20.0"
 ```
 
 #### Enable TensorRT execution
@@ -93,4 +93,22 @@ ONNXRuntime offers TensorRT execution as the backend. In DJL, user can specify t
 
 ```
 optOption("ortDevice", "TensorRT")
+```
+
+The full example looks like the following:
+
+```
+String text = "What is deep learning?";
+String url = "djl://ai.djl.huggingface.onnxruntime/TaylorAI/bge-micro-v2";
+Criteria<String, float[]> criteria =
+        Criteria.builder().setTypes(String.class, float[].class)
+                .optModelUrls(url)
+                .optOption("ortDevice", "TensorRT")
+                .build();
+
+try (ZooModel<String, float[]> model = criteria.loadModel();
+        Predictor<String, float[]> predictor = model.newPredictor()) {
+    float[] res = predictor.predict(text);
+    Assert.assertEquals(res.length, 384);
+}
 ```
