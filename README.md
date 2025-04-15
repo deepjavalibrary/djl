@@ -1,9 +1,10 @@
 
 ![DeepJavaLibrary](website/img/deepjavalibrary.png?raw=true "Deep Java Library")
 
+[![Docs](https://img.shields.io/badge/docs-up-green)](https://docs.djl.ai/master/index.html)
 [![Continuous](https://github.com/deepjavalibrary/djl/workflows/Continuous/badge.svg)](https://github.com/deepjavalibrary/djl/actions/workflows/continuous.yml)
-[![Docs](https://github.com/deepjavalibrary/djl/workflows/Docs/badge.svg)](https://docs.djl.ai/master/index.html)
 [![Nightly Publish](https://github.com/deepjavalibrary/djl/workflows/Nightly%20Publish/badge.svg)](https://github.com/deepjavalibrary/djl/actions/workflows/nightly_publish.yml)
+[![CodeQL](https://github.com/deepjavalibrary/djl/actions/workflows/codeql-analysis-java.yml/badge.svg)](https://github.com/deepjavalibrary/djl/actions/workflows/codeql-analysis-java.yml)
 
 # Deep Java Library (DJL)
 
