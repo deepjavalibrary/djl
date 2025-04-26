@@ -70,7 +70,7 @@ The following shows how to load a pre-trained model from a file path:
 ```java
 Criteria<Image, Classifications> criteria = Criteria.builder()
         .setTypes(Image.class, Classifications.class) // defines input and output data type
-        .optTranslator(ImageClassificationTranslator.builder().setSynsetArtifactName("synset.txt").build())
+        .optTranslator(ImageClassificationTranslator.builder().optSynsetArtifactName("synset.txt").build())
         .optModelPath(Paths.get("/var/models/my_resnet50")) // search models in specified path
         .optModelName("model/resnet50") // specify model file prefix
         .build();
