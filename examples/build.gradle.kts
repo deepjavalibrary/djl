@@ -16,6 +16,7 @@ dependencies {
     runtimeOnly(project(":engines:tensorflow:tensorflow-model-zoo"))
     runtimeOnly(project(":engines:mxnet:mxnet-model-zoo"))
     runtimeOnly(project(":engines:onnxruntime:onnxruntime-engine"))
+    runtimeOnly("com.microsoft.onnxruntime:onnxruntime-extensions:${libs.versions.onnxruntimeExtensions.get()}")
 
     testImplementation(libs.testng) {
         exclude("junit", "junit")

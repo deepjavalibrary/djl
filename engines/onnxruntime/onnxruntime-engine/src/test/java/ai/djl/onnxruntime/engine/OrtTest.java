@@ -179,7 +179,9 @@ public class OrtTest {
             array = manager.create(new Shape(1), DataType.INT64);
             Assert.assertEquals(array.getDataType(), DataType.INT64);
 
-            Assert.assertThrows(() -> manager.create(new Shape(0), DataType.FLOAT32));
+            array = manager.create(new Shape(0), DataType.FLOAT32);
+            Assert.assertEquals(array.getShape().get(0), 0);
+
             Assert.assertThrows(() -> manager.create(new Shape(1), DataType.UINT32));
         }
     }
