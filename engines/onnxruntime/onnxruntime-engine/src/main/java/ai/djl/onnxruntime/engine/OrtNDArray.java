@@ -108,8 +108,21 @@ public class OrtNDArray extends NDArrayAdapter {
             if (obj instanceof String) {
                 // Scalar type;
                 return new String[] {(String) obj};
+            } else if (obj instanceof String[]) {
+                return (String[]) obj;
+            } else if (obj instanceof String[][]) {
+                String[][] data = (String[][]) obj;
+                if (data.length == 0) {
+                    return new String[0];
+                }
+                String[] ret = new String[data.length * data[0].length];
+                for (int i = 0; i < data.length; ++i) {
+                    System.arraycopy(data[i], 0, ret, i * data.length, data[i].length);
+                }
+                return ret;
+            } else {
+                throw new UnsupportedOperationException("Unsupported Data type: " + obj.getClass());
             }
-            return (String[]) obj;
         } catch (OrtException e) {
             throw new EngineException(e);
         }

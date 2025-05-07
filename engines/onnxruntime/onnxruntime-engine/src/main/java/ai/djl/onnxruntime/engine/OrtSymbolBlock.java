@@ -145,12 +145,16 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
         for (Map.Entry<String, OnnxValue> r : results) {
             OnnxValue value = r.getValue();
             if ((value instanceof OnnxTensor)) {
-                output.add(manager.createInternal((OnnxTensor) value));
+                NDArray array = manager.createInternal((OnnxTensor) value);
+                array.setName(r.getKey());
+                output.add(array);
             } else if (value instanceof OnnxSequence) {
                 // TODO: avoid memory copying to heap
                 OnnxSequence seq = (OnnxSequence) value;
                 if (seq.getInfo().isSequenceOfMaps()) {
-                    output.add(seq2Nd(seq));
+                    NDArray array = seq2Nd(seq);
+                    array.setName(r.getKey());
+                    output.add(array);
                 } else {
                     output.addAll(seq2NdList(seq));
                 }

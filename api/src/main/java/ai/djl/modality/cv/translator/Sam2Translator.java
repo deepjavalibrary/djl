@@ -132,6 +132,9 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
 
         NDArray mask = manager.zeros(new Shape(1, 1, 256, 256));
         NDArray hasMask = manager.zeros(new Shape(1));
+        for (NDArray arr : embeddings) {
+            arr.setName(null);
+        }
         return new NDList(
                 embeddings.get(2),
                 embeddings.get(0),

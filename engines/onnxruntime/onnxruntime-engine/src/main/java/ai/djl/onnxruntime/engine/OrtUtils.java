@@ -33,9 +33,6 @@ final class OrtUtils {
 
     public static OnnxTensor toTensor(
             OrtEnvironment env, Buffer data, Shape shape, DataType dataType) {
-        if (shape.size() == 0) {
-            throw new UnsupportedOperationException("OnnxRuntime doesn't support 0 length tensor.");
-        }
         long[] sh = shape.getShape();
         try {
             switch (dataType) {
