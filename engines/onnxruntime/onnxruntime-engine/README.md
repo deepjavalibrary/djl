@@ -35,6 +35,16 @@ Read the [System Requirements](https://github.com/microsoft/onnxruntime/blob/mas
 for the official ONNX Runtime project.
 
 ## Installation
+
+> [!CAUTION]
+> OnnxRuntime 1.21.0+ compiled with VC 14.42 for Windows, which has conflict with some of JDK distribution
+> and will cause `UnsatisfiedLinkError`.
+> We tested with `temurin17` and `zulu17`, they works on Windows:
+> ```
+> choco install temurin17
+> choco install zulu17
+> ```
+
 You can pull the ONNX Runtime engine from the central Maven repository by including the following dependency:
 
 - ai.djl.onnxruntime:onnxruntime-engine:0.32.0
@@ -73,7 +83,7 @@ Maven:
 <dependency>
     <groupId>com.microsoft.onnxruntime</groupId>
     <artifactId>onnxruntime_gpu</artifactId>
-    <version>1.20.0</version>
+    <version>1.21.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -84,7 +94,7 @@ Gradle:
 implementation("ai.djl.onnxruntime:onnxruntime-engine:0.32.0") {
     exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
 }
-implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.20.0"
+implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.21.1"
 ```
 
 #### Enable TensorRT execution

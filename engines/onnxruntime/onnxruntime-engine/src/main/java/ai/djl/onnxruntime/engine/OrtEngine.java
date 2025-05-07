@@ -108,7 +108,7 @@ public final class OrtEngine extends Engine {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.20.0";
+        return "1.21.1";
     }
 
     /** {@inheritDoc} */
