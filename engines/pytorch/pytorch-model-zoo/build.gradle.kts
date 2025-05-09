@@ -10,9 +10,7 @@ group = "ai.djl.pytorch"
 dependencies {
     api(project(":engines:pytorch:pytorch-engine"))
 
-    testImplementation(libs.testng) {
-        exclude("junit", "junit")
-    }
+    testImplementation(libs.testng)
     testImplementation(libs.slf4j.simple)
     testImplementation(project(":testing"))
 }

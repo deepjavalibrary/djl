@@ -9,9 +9,7 @@ group = "ai.djl.tensorrt"
 dependencies {
     api(project(":api"))
 
-    testImplementation(libs.testng) {
-        exclude("junit", "junit")
-    }
+    testImplementation(libs.testng)
     testImplementation(libs.slf4j.simple)
     testRuntimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
     testRuntimeOnly(project(":engines:pytorch:pytorch-engine"))

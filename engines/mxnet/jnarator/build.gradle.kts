@@ -10,9 +10,7 @@ dependencies {
     api(libs.antlrRuntime)
     api(libs.apache.log4j.slf4j)
 
-    testImplementation(libs.testng) {
-        exclude("junit", "junit")
-    }
+    testImplementation(libs.testng)
 }
 
 tasks {

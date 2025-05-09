@@ -10,9 +10,7 @@ dependencies {
     testImplementation(libs.slf4j.simple)
 
     testImplementation(project(":testing"))
-    testImplementation(libs.testng) {
-        exclude("junit", "junit")
-    }
+    testImplementation(libs.testng)
 
     // Current engines and model zoos used for inference
     // runtimeOnly(project(":engines:pytorch:pytorch-engine"))

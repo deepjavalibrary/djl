@@ -8,9 +8,7 @@ group = "ai.djl.pytorch"
 dependencies {
     api(project(":api"))
 
-    testImplementation(libs.testng) {
-        exclude("junit", "junit")
-    }
+    testImplementation(libs.testng)
     testImplementation(libs.slf4j.simple)
     testImplementation(project(":testing"))
     testRuntimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
