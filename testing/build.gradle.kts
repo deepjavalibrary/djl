@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     api(project(":api"))
-    api(libs.testng) { exclude("junit", "junit") }
+    api(libs.testng)
 }
 
 tasks.compileJava {

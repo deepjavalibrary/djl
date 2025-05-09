@@ -11,9 +11,7 @@ dependencies {
     }
     api(libs.slf4j.api)
 
-    testImplementation(libs.testng) {
-        exclude("junit", "junit")
-    }
+    testImplementation(libs.testng)
     testImplementation(libs.slf4j.simple)
     testRuntimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
     testRuntimeOnly(project(":engines:pytorch:pytorch-jni"))

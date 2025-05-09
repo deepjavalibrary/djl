@@ -12,9 +12,7 @@ dependencies {
 
     testImplementation(project(":engines:pytorch:pytorch-model-zoo"))
 
-    testImplementation(libs.testng) {
-        exclude("junit", "junit")
-    }
+    testImplementation(libs.testng)
     testImplementation(libs.apache.log4j.slf4j)
 }
 

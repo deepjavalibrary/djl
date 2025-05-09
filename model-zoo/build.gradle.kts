@@ -8,9 +8,7 @@ plugins {
 dependencies {
     api(project(":api"))
 
-    testImplementation(libs.testng) {
-        exclude("junit", "junit")
-    }
+    testImplementation(libs.testng)
     testImplementation(libs.slf4j.simple)
 }
 

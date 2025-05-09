@@ -18,9 +18,7 @@ dependencies {
     runtimeOnly(project(":engines:onnxruntime:onnxruntime-engine"))
     runtimeOnly("com.microsoft.onnxruntime:onnxruntime-extensions:${libs.versions.onnxruntimeExtensions.get()}")
 
-    testImplementation(libs.testng) {
-        exclude("junit", "junit")
-    }
+    testImplementation(libs.testng)
 }
 
 application {
