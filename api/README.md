@@ -45,7 +45,7 @@ For testing the current nightly build, use the following:
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>api</artifactId>
-    <version>0.33.0-SNAPSHOT</version>
+    <version>0.34.0-SNAPSHOT</version>
 </dependency>
 ```
 
