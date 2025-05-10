@@ -54,14 +54,14 @@ First, decide which model family you want to use. Then, define your key/values s
 to narrow down the model you want. If there are multiple models that match your search criteria, the first
 model found is returned. *ModelNotFoundException* will be thrown if no matching model is found.
 
-The following is an example of the criteria to find a Resnet50-v1 model that has been trained on the imagenet dataset:
+The following is an example of the criteria to find a Resnet50-v2 model that has been trained on the imagenet dataset:
 
 ```java
 Criteria<Image, Classifications> criteria = Criteria.builder()
         .setTypes(Image.class, Classifications.class)
         .optArtifactId("resnet")
         .optFilter("layers", "50")
-        .optFilter("flavor", "v1")
+        .optFilter("flavor", "v2")
         .optFilter("dataset", "imagenet")
         .optDevice(device)
         .build();
