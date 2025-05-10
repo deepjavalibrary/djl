@@ -54,27 +54,15 @@ The following is an example of the criteria to find a Resnet50-v1 model that has
 ```java
     Criteria<Image, Classifications> criteria =
             Criteria.builder()
-                    .optApplication(Application.CV.OBJECT_DETECTION)
+                    .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                     .setTypes(Image.class, Classifications.class)
-                    .optFilter("layer", "50")
+                    .optFilter("layers", "50")
                     .optFilter("flavor", "v1")
                     .optFilter("dataset", "cifar10")
                     .build();
 
     ZooModel<Image, Classifications> ssd = criteria.loadModel();
 ```
-
-If you already know which `ModelLoader` to use, you can simply do the following:
-
-```java
-    Map<String, String> filter = new HashMap<>();
-    filter.put("layers", "50");
-    filter.put("flavor", "v1");
-    filter.put("dataset", "cifar10");
-
-    ZooModel<Image, Classifications> model = BasicModelZoo.RESNET.loadModel(filter);
-```
-
 
 ## Contributor Guides and Documentation
 
