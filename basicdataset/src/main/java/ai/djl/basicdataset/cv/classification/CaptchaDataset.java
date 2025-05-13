@@ -49,7 +49,7 @@ public class CaptchaDataset extends RandomAccessDataset {
     public static final int IMAGE_WIDTH = 160;
     public static final int IMAGE_HEIGHT = 60;
     public static final int CAPTCHA_LENGTH = 6;
-    public static final int CAPTCHA_OPTIONS = 11;
+    public static final int CAPTCHA_OPTIONS = 12;
 
     private Usage usage;
     private List<String> items;
