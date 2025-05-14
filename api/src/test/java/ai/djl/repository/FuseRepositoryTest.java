@@ -55,7 +55,7 @@ public class FuseRepositoryTest {
     @Test
     public void testS3Repository() throws IOException {
         if (System.getProperty("os.name").startsWith("Win")) {
-            throw new SkipException("GcsRepository is not supported on Windows");
+            throw new SkipException("S3Repository is not supported on Windows");
         }
 
         Path gcsfuse = Paths.get("build/mount-s3");
