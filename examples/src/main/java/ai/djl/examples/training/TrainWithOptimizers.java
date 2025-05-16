@@ -16,6 +16,7 @@ import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.basicdataset.cv.classification.Cifar10;
 import ai.djl.basicmodelzoo.cv.classification.ResNetV1;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.metric.Metrics;
 import ai.djl.modality.Classifications;
@@ -184,6 +185,7 @@ public final class TrainWithOptimizers {
                         .setSampling(arguments.getBatchSize(), true)
                         .optLimit(arguments.getLimit())
                         .optPipeline(pipeline)
+                        .optManager(Engine.getEngine(arguments.getEngine()).newBaseManager())
                         .build();
         cifar10.prepare(new ProgressBar());
         return cifar10;
