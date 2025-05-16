@@ -15,6 +15,7 @@ package ai.djl.examples.training;
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.Mnist;
 import ai.djl.basicmodelzoo.basic.Mlp;
+import ai.djl.engine.Engine;
 import ai.djl.examples.training.util.Arguments;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Block;
@@ -103,6 +104,7 @@ public final class TrainWithHpo {
                             .optUsage(usage)
                             .setSampling(arguments.getBatchSize(), true)
                             .optLimit(arguments.getLimit())
+                            .optManager(Engine.getEngine(arguments.getEngine()).newBaseManager())
                             .build();
             mnist.prepare(new ProgressBar());
             return mnist;
