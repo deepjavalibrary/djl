@@ -181,11 +181,11 @@ public final class TrainWithOptimizers {
                         new Normalize(Cifar10.NORMALIZE_MEAN, Cifar10.NORMALIZE_STD));
         Cifar10 cifar10 =
                 Cifar10.builder()
+                       .optManager(Engine.getEngine(arguments.getEngine()).newBaseManager())
                         .optUsage(usage)
                         .setSampling(arguments.getBatchSize(), true)
                         .optLimit(arguments.getLimit())
                         .optPipeline(pipeline)
-                        .optManager(Engine.getEngine(arguments.getEngine()).newBaseManager())
                         .build();
         cifar10.prepare(new ProgressBar());
         return cifar10;
