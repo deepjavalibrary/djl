@@ -16,13 +16,16 @@ import ai.djl.repository.zoo.ModelLoader;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.Utils;
 
 import com.google.gson.JsonParseException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -113,6 +116,12 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         registry.put("file", new LocalRepositoryFactory());
         registry.put("jar", new JarRepositoryFactory());
         registry.put("djl", new DjlRepositoryFactory());
+        if (S3RepositoryFactory.findS3Fuse() != null) {
+            registry.put("s3", new S3RepositoryFactory());
+        }
+        if (GcsRepositoryFactory.findGcsFuse() != null) {
+            registry.put("gs", new GcsRepositoryFactory());
+        }
 
         ServiceLoader<RepositoryFactory> factories = ServiceLoader.load(RepositoryFactory.class);
         for (RepositoryFactory factory : factories) {
@@ -136,6 +145,34 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             uriPath = uriPath.substring(1);
         }
         return uriPath;
+    }
+
+    private static String exec(String... cmd) throws IOException, InterruptedException {
+        Process exec = new ProcessBuilder(cmd).redirectErrorStream(true).start();
+        String logOutput;
+        try (InputStream is = exec.getInputStream()) {
+            logOutput = Utils.toString(is);
+        }
+        int exitCode = exec.waitFor();
+        if (0 != exitCode) {
+            logger.error("exit: {}, {}", exitCode, logOutput);
+            throw new IOException("Failed to execute: [" + String.join(" ", cmd) + "]");
+        } else {
+            logger.debug("{}", logOutput);
+        }
+        return logOutput;
+    }
+
+    private static boolean isMounted(String path) throws IOException, InterruptedException {
+        String out = exec("df");
+        String[] lines = out.split("\\s");
+        for (String line : lines) {
+            if (line.trim().equals(path)) {
+                logger.debug("Mount point already mounted");
+                return true;
+            }
+        }
+        return false;
     }
 
     private static final class JarRepositoryFactory implements RepositoryFactory {
@@ -272,6 +309,128 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         @Override
         public Set<String> getSupportedScheme() {
             return Collections.singleton("djl");
+        }
+    }
+
+    static final class S3RepositoryFactory implements RepositoryFactory {
+
+        /** {@inheritDoc} */
+        @Override
+        public Repository newInstance(String name, URI uri) {
+            try {
+                Path path = mount(uri);
+                return new SimpleRepository(name, uri, path);
+            } catch (IOException | InterruptedException e) {
+                throw new IllegalArgumentException("Failed to mount s3 bucket", e);
+            }
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Set<String> getSupportedScheme() {
+            return Collections.singleton("s3");
+        }
+
+        static String findS3Fuse() {
+            if (System.getProperty("os.name").startsWith("Win")) {
+                logger.debug("mount-s3 is not supported on Windows");
+                return null;
+            }
+            String gcsFuse = Utils.getEnvOrSystemProperty("MOUNT_S3", "/usr/bin/mount-s3");
+            if (Files.isRegularFile(Paths.get(gcsFuse))) {
+                return gcsFuse;
+            }
+            String path = System.getenv("PATH");
+            String[] directories = path.split(File.pathSeparator);
+            for (String dir : directories) {
+                Path file = Paths.get(dir, "mount-s3");
+                if (Files.isRegularFile(file)) {
+                    return file.toAbsolutePath().toString();
+                }
+            }
+            return null;
+        }
+
+        private static Path mount(URI uri) throws IOException, InterruptedException {
+            String bucket = uri.getHost();
+            String prefix = uri.getPath();
+            if (!prefix.isEmpty()) {
+                prefix = prefix.substring(1);
+            }
+            Path dir = Utils.getCacheDir().toAbsolutePath().normalize();
+            dir = dir.resolve("s3").resolve(Utils.hash(uri.toString()));
+            String path = dir.toString();
+            if (Files.isDirectory(dir)) {
+                if (isMounted(path)) {
+                    return dir.resolve(prefix);
+                }
+            } else {
+                Files.createDirectories(dir);
+            }
+
+            exec(findS3Fuse(), bucket, path);
+            return dir.resolve(prefix);
+        }
+    }
+
+    static final class GcsRepositoryFactory implements RepositoryFactory {
+
+        /** {@inheritDoc} */
+        @Override
+        public Repository newInstance(String name, URI uri) {
+            try {
+                Path path = mount(uri);
+                return new SimpleRepository(name, uri, path);
+            } catch (IOException | InterruptedException e) {
+                throw new IllegalArgumentException("Failed to mount gs bucket", e);
+            }
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Set<String> getSupportedScheme() {
+            return Collections.singleton("gs");
+        }
+
+        static String findGcsFuse() {
+            if (System.getProperty("os.name").startsWith("Win")) {
+                logger.debug("gcsfuse is not supported on Windows");
+                return null;
+            }
+            String gcsFuse = Utils.getEnvOrSystemProperty("GCSFUSE", "/usr/bin/gcsfuse");
+            if (Files.isRegularFile(Paths.get(gcsFuse))) {
+                return gcsFuse;
+            }
+            String path = System.getenv("PATH");
+            String[] directories = path.split(File.pathSeparator);
+            for (String dir : directories) {
+                Path file = Paths.get(dir, "gcsfuse");
+                if (Files.isRegularFile(file)) {
+                    return file.toAbsolutePath().toString();
+                }
+            }
+            return null;
+        }
+
+        private static Path mount(URI uri) throws IOException, InterruptedException {
+            String bucket = uri.getHost();
+            String prefix = uri.getPath();
+            if (!prefix.isEmpty()) {
+                prefix = prefix.substring(1);
+            }
+            Path dir = Utils.getCacheDir().toAbsolutePath().normalize();
+            dir = dir.resolve("gs").resolve(Utils.hash(uri.toString()));
+            String path = dir.toString();
+            if (Files.isDirectory(dir)) {
+                if (isMounted(path)) {
+                    return dir.resolve(prefix);
+                }
+            } else {
+                Files.createDirectories(dir);
+            }
+
+            exec(findGcsFuse(), "--implicit-dirs", bucket, path);
+            return dir.resolve(prefix);
         }
     }
 }
