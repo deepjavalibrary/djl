@@ -17,9 +17,15 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.convolutional.Convolution;
+import ai.djl.nn.norm.BatchNorm;
+import ai.djl.training.Trainer;
+import ai.djl.training.loss.Loss;
 import ai.djl.util.Pair;
 import ai.djl.util.PairList;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -164,6 +170,222 @@ public final class Blocks {
                     Stream.of(outputShapes)
                             .map(shape -> shape.slice(beginAxis).toString())
                             .collect(Collectors.joining("+")));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Builds an equivalent tensorflow model from the the DJL model using functional or sequential
+     * API.
+     *
+     * @param trainer The trainer containing the DJL model
+     * @param functionalApi if <code>true</code>, keras's functional API is used, otherwise the
+     *     sequential API. The model should be initialized when using the functional API.
+     * @return Python code
+     */
+    public static String describeAsTensorflow(Trainer trainer, boolean functionalApi) {
+        Block block = trainer.getModel().getBlock();
+        String model =
+                describeAsTensorflow(block, "SequentialBlock", "", functionalApi ? "inputs" : null);
+        if (functionalApi) {
+            String inputLayer =
+                    block.isInitialized()
+                            ? String.format(
+                                    "inputs = tf.keras.layers.InputLayer(input_shape = %s).output",
+                                    block.getInputShapes()[0].slice(1))
+                            : "# define input tensor here";
+            return String.format(
+                    "%s%n%s%nmodel = tf.keras.Model(inputs=inputs, outputs=outputs)%n%nloss = %s",
+                    inputLayer, model, describeAsTensorflow(trainer.getLoss()));
+        }
+        return String.format(
+                "model = %s%n%nloss = %s", model, describeAsTensorflow(trainer.getLoss()));
+    }
+
+    static String describeAsTensorflow(Loss loss) {
+        switch (loss.getClass().getSimpleName()) {
+            case "SoftmaxCrossEntropyLoss":
+                return "tf.keras.losses.categorical_crossentropy";
+            default:
+                return "tf.keras.losses.mean_squared_error";
+        }
+    }
+
+    /**
+     * Builds a tensorflow layer equivalent to the passed {@link Block}.
+     *
+     * @param block the block to translate
+     * @param blockName the DJL name of the passed block, or <code>null</code> if the block's class
+     *     name is to be used
+     * @param pythonName the name to be used for the keras layer name
+     * @param input if not <code>null</code>, the input tensor to call the layer with required by
+     *     functional API, otherwise sequential API is used
+     * @return Python expression for sequential API or Python statements for functional API
+     */
+    public static String describeAsTensorflow(
+            Block block, String blockName, String pythonName, String input) {
+        if (block instanceof LambdaBlock
+                && !LambdaBlock.DEFAULT_NAME.equals(((LambdaBlock) block).getName())) {
+            blockName = ((LambdaBlock) block).getName();
+        }
+        switch (blockName) {
+            case "ParallelBlock":
+                {
+                    Object[][] args = {{-1}};
+                    return format("tf.keras.layers.Concatenate", args, block, pythonName, input);
+                }
+            case "batchFlatten":
+                {
+                    Object[][] args = {};
+                    return format("tf.keras.layers.Flatten", args, block, pythonName, input);
+                }
+            case "SequentialBlock":
+                {
+                    Object[][] args = {{-1}};
+                    String op =
+                            pythonName.isEmpty()
+                                    ? "tf.keras.models.Sequential"
+                                    : "tf.keras.Sequential";
+                    return format(op, args, block, pythonName, input);
+                }
+            case "Add":
+                {
+                    Object[][] args = {{-1}};
+                    return format("tf.keras.layers.Add", args, block, pythonName, input);
+                }
+            case "Linear":
+                {
+                    Object[][] args = {
+                        {block.getOutputShapes(new Shape[] {new Shape(0)})[0].get(0)}
+                    };
+                    return format("tf.keras.layers.Dense", args, block, pythonName, input);
+                }
+            case "GELU":
+            case "Mish":
+            case "ReLU6":
+            case "ReLU":
+            case "SELU":
+            case "sigmoid":
+            case "softPlus":
+            case "softSign":
+            case "Tanh":
+                {
+                    Object[][] args = {{"tf.keras.activations." + blockName.toLowerCase()}};
+                    return format("tf.keras.layers.Activation", args, block, pythonName, input);
+                }
+            case "identity":
+                {
+                    Object[][] args = {};
+                    return format("tf.keras.layers.Identity", args, block, pythonName, input);
+                }
+            case "Conv2d":
+                {
+                    Convolution conv = (Convolution) block;
+                    String padding =
+                            new Shape(0, 0).equals(conv.getPadding()) ? "'VALID'" : "'SAME'";
+                    Object[][] args = {
+                        {conv.getFilters(), "filters"},
+                        {conv.getKernelShape(), "kernel_size"},
+                        {conv.getStride(), "strides"},
+                        {null, "padding", padding},
+                        {conv.getDilation(), "dilation_rate"},
+                        {null, "data_format", "'channels_first'"},
+                        {null, "use_bias", conv.isIncludeBias()}
+                    };
+                    return format("tf.keras.layers.Conv2D", args, block, pythonName, input);
+                }
+
+            case "BatchNorm":
+                {
+                    BatchNorm norm = (BatchNorm) block;
+                    Object[][] args = {
+                        {norm.getScale(), "scale"},
+                        {norm.getCenter(), "center"},
+                        {norm.getEpsilon(), "epsilon"},
+                        {norm.getMomentum(), "momentum"},
+                        {norm.getAxis(), "axis"}
+                    };
+                    return format(
+                            "tf.keras.layers.BatchNormalization", args, block, pythonName, input);
+                }
+
+            case "globalAvgPool2d":
+                {
+                    Object[][] args = {{null, "data_format", "'channels_first'"}};
+                    return format(
+                            "tf.keras.layers.GlobalAveragePooling2D",
+                            args,
+                            block,
+                            pythonName,
+                            input);
+                }
+            default:
+                {
+                    Object[][] args = {{-1}};
+                    return format(blockName, args, block, pythonName, input);
+                }
+        }
+    }
+
+    static String format(String op, Object[][] args, Block block, String pythonName, String input) {
+        String pref = "";
+        StringBuilder sb = new StringBuilder(op + "(");
+        for (Object[] arg : args) {
+            String s = arg.length >= 3 ? String.valueOf(arg[2]) : null;
+            if (Integer.valueOf(-1).equals(arg[0])) {
+                List<String> nameOfLayers = new ArrayList<>();
+                List<String> layers = new ArrayList<>();
+                for (Pair<String, Block> pair : block.getChildren()) {
+                    String name = pair.getKey().substring(2);
+                    String pythonNameOfLayer =
+                            pythonName
+                                    + (pythonName.isEmpty() ? "" : "_")
+                                    + name
+                                    + pair.getKey().substring(0, 2);
+                    String layer =
+                            describeAsTensorflow(pair.getValue(), name, pythonNameOfLayer, input);
+                    layers.add(layer);
+                    if (input != null) {
+                        nameOfLayers.add(
+                                layer.substring(
+                                        layer.lastIndexOf('\n') + 1, layer.lastIndexOf(" = ")));
+                        if (op.endsWith("Sequential")) {
+                            input = nameOfLayers.get(nameOfLayers.size() - 1);
+                        }
+                    }
+                }
+                if (input != null) {
+                    pref = layers.stream().collect(Collectors.joining("\n", "", "\n"));
+                    if (!op.endsWith("Sequential")) {
+                        input = nameOfLayers.stream().collect(Collectors.joining(", ", "[", "]"));
+                    }
+                    continue;
+                } else {
+                    s =
+                            layers.stream()
+                                    .map(b -> b.replaceAll("(?m)^", "    "))
+                                    .collect(Collectors.joining(",\n", "[\n", "\n]"));
+                }
+            } else if (arg[0] != null) {
+                s = arg[0].toString();
+            } else if (s == null) {
+                continue; // cannot resolve index, so skip
+            }
+            s = "true".equals(s) ? "True" : "false".equals(s) ? "False" : s;
+            if (arg.length >= 2 && arg[1] != null) {
+                s = String.format("%s=%s", arg[1], s);
+            }
+            sb.append(s);
+            sb.append(", ");
+        }
+        String name = pythonName.isEmpty() ? "outputs" : pythonName;
+        sb.append(String.format("name='%s'", name));
+        sb.append(')');
+        if (input != null) {
+            if (op.endsWith("Sequential")) {
+                return String.format("%s%s = %s", pref, name, input);
+            }
+            return String.format("%s%s = %s(%s)", pref, name, sb, input);
         }
         return sb.toString();
     }
