@@ -2,7 +2,7 @@
 
 There are two ways to convert your model to TorchScript: tracing and scripting.
 We will only demonstrate the first one, tracing, but you can find information about scripting from the PyTorch documentation.
-When tracing, we use an example input to record the actions taken and capture the the model architecture.
+When tracing, we use an example input to record the actions taken and capture the model architecture.
 This works best when your model doesn't have control flow. 
 If you do have control flow, you will need to use the scripting approach.
 In DJL, we use tracing to create TorchScript for our ModelZoo models.
@@ -60,7 +60,7 @@ converted = torch.jit.trace_module(model,  {'get_text_features': [text_inputs['i
 torch.jit.save(converted, "cliptext.pt")
 ```
 
-You can trace by using the `torch.traceModule` function.
+You can trace by using the `torch.jit.trace_module` function.
 
 To run inference with such model in DJL, you could provide a placeholder NDArray like below:
 
