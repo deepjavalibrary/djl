@@ -51,7 +51,7 @@ public class SeqBatcher {
         this.manager = manager.newSubManager();
         this.data = data;
         this.batchUid = batchUid.getShape().dimension() == 2 ? batchUid : batchUid.reshape(-1, 1);
-        this.offSets = offSets.getShape().hashCode() == 2 ? offSets : offSets.reshape(-1, 1);
+        this.offSets = offSets.getShape().dimension() == 2 ? offSets : offSets.reshape(-1, 1);
         batchSize = data.getPastOutputIds().getShape().get(0);
         seqLength = data.getPastOutputIds().getShape().get(1);
         exitIndexEndPosition = new ConcurrentHashMap<>();
