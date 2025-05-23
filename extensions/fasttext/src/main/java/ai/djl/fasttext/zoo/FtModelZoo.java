@@ -14,6 +14,7 @@ package ai.djl.fasttext.zoo;
 
 import ai.djl.engine.Engine;
 import ai.djl.fasttext.zoo.nlp.textclassification.TextClassificationModelLoader;
+import ai.djl.repository.RemoteRepository;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 
@@ -23,8 +24,7 @@ import java.util.Set;
 /** FtModelZoo is a repository that contains all fastText models for DJL. */
 public class FtModelZoo extends ModelZoo {
 
-    private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
-    private static final Repository REPOSITORY = Repository.newInstance("Fasttext", DJL_REPO_URL);
+    private static final Repository REPOSITORY = new RemoteRepository("Fasttext", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.fasttext";
 
     FtModelZoo() {

@@ -14,6 +14,7 @@ package ai.djl.engine.rust.zoo;
 
 import ai.djl.Application;
 import ai.djl.engine.Engine;
+import ai.djl.repository.RemoteRepository;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Version;
 import ai.djl.repository.VersionRange;
@@ -28,8 +29,7 @@ import java.util.Set;
 /** RsModelZoo is a repository that contains HuggingFace models. */
 public class RsModelZoo extends ModelZoo {
 
-    private static final String REPO = "https://mlrepo.djl.ai/";
-    private static final Repository REPOSITORY = Repository.newInstance("Rust", REPO);
+    private static final Repository REPOSITORY = new RemoteRepository("Rust", DJL_REPO_URL);
     private static final String GROUP_ID = "ai.djl.huggingface.rust";
 
     private volatile boolean initialized; // NOPMD
