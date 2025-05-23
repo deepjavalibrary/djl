@@ -13,6 +13,7 @@
 package ai.djl.basicmodelzoo;
 
 import ai.djl.Application.CV;
+import ai.djl.repository.RemoteRepository;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 
@@ -22,8 +23,7 @@ import java.util.Set;
 /** Model Zoo is a repository that contains all models for DJL. */
 public class BasicModelZoo extends ModelZoo {
 
-    private static final String REPO_URL = "https://mlrepo.djl.ai/";
-    private static final Repository REPOSITORY = Repository.newInstance("zoo", REPO_URL);
+    private static final Repository REPOSITORY = new RemoteRepository("zoo", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.zoo";
 
     BasicModelZoo() {

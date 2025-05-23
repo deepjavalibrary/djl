@@ -16,6 +16,7 @@ import ai.djl.Application.CV;
 import ai.djl.Application.NLP;
 import ai.djl.Application.TimeSeries;
 import ai.djl.pytorch.engine.PtEngine;
+import ai.djl.repository.RemoteRepository;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 
@@ -28,8 +29,7 @@ import java.util.Set;
  */
 public class PtModelZoo extends ModelZoo {
 
-    private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
-    private static final Repository REPOSITORY = Repository.newInstance("PyTorch", DJL_REPO_URL);
+    private static final Repository REPOSITORY = new RemoteRepository("PyTorch", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.pytorch";
 
     PtModelZoo() {

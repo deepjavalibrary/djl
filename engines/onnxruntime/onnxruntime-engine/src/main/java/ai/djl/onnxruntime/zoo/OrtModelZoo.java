@@ -15,6 +15,7 @@ package ai.djl.onnxruntime.zoo;
 import ai.djl.Application.CV;
 import ai.djl.Application.Tabular;
 import ai.djl.onnxruntime.engine.OrtEngine;
+import ai.djl.repository.RemoteRepository;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 
@@ -24,8 +25,7 @@ import java.util.Set;
 /** OrtModelZoo is a repository that contains all Onnx models for DJL. */
 public class OrtModelZoo extends ModelZoo {
 
-    private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
-    private static final Repository REPOSITORY = Repository.newInstance("Ort", DJL_REPO_URL);
+    private static final Repository REPOSITORY = new RemoteRepository("Ort", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.onnxruntime";
 
     OrtModelZoo() {

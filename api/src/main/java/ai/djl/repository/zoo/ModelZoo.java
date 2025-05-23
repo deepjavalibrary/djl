@@ -49,6 +49,9 @@ import java.util.zip.GZIPInputStream;
 /** An interface represents a collection of models. */
 public abstract class ModelZoo {
 
+    public static final URI DJL_REPO_URL =
+            URI.create(Utils.getEnvOrSystemProperty("DJL_REPO_URL", "https://mlrepo.djl.ai/"));
+
     private static final Logger logger = LoggerFactory.getLogger(ModelZoo.class);
 
     private static final Map<String, ModelZoo> MODEL_ZOO_MAP = new ConcurrentHashMap<>();

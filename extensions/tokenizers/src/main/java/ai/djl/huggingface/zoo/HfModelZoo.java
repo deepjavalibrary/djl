@@ -16,6 +16,7 @@ import ai.djl.Application;
 import ai.djl.Application.CV;
 import ai.djl.Application.NLP;
 import ai.djl.engine.Engine;
+import ai.djl.repository.RemoteRepository;
 import ai.djl.repository.Repository;
 import ai.djl.repository.Version;
 import ai.djl.repository.VersionRange;
@@ -30,8 +31,7 @@ import java.util.Set;
 /** HfModelZoo is a repository that contains HuggingFace models. */
 public class HfModelZoo extends ModelZoo {
 
-    private static final String REPO = "https://mlrepo.djl.ai/";
-    private static final Repository REPOSITORY = Repository.newInstance("Huggingface", REPO);
+    private static final Repository REPOSITORY = new RemoteRepository("Huggingface", DJL_REPO_URL);
     private static final String GROUP_ID = "ai.djl.huggingface.pytorch";
 
     private volatile boolean initialized; // NOPMD

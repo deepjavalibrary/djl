@@ -96,7 +96,7 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             fileName = FilenameUtils.getNamePart(fileName);
             return new SimpleUrlRepository(name, uri, fileName);
         }
-        return new RemoteRepository(name, uri);
+        throw new IllegalArgumentException("============: " + uri);
     }
 
     /** {@inheritDoc} */
