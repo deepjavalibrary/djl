@@ -67,14 +67,15 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
         ]:
             try:
                 file = self.get_file(model_id, config_name)
-                with open(file) as f:
-                    config = json.load(f)
-                    if config.get("max_seq_length"):
-                        args["maxLength"] = config.get("max_seq_length")
-                    if config.get("do_lower_case"):
-                        args["doLowerCase"] = config.get("do_lower_case")
+                if os.path.exists(file):
+                    with open(file) as f:
+                        config = json.load(f)
+                        if config.get("max_seq_length"):
+                            args["maxLength"] = config.get("max_seq_length")
+                        if config.get("do_lower_case"):
+                            args["doLowerCase"] = config.get("do_lower_case")
 
-                break
+                    break
             except requests.exceptions.HTTPError:
                 pass
 
@@ -82,8 +83,7 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
             if hasattr(hf_pipeline.model, "config"):
                 config = hf_pipeline.model.config
             else:
-                config = AutoConfig.from_pretrained(
-                    model_id, trust_remote_code=trust_remote_code)
+                config = AutoConfig.from_pretrained(model_id)
             tokenizer = hf_pipeline.tokenizer
             if hasattr(config, "max_position_embeddings") and hasattr(
                     tokenizer, "model_max_length"):
@@ -97,21 +97,22 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
         normalize = False
         try:
             file = self.get_file(model_id, "modules.json")
-            with open(file, "r") as f:
-                modules = json.load(f)
+            if os.path.exists(file):
+                with open(file, "r") as f:
+                    modules = json.load(f)
 
-            for module in modules:
-                module_type = module.get("type")
-                if module_type == "sentence_transformers.models.Pooling":
-                    pooling_path = module["path"]
-                elif module_type == "sentence_transformers.models.Dense":
-                    dense_path = module["path"]
-                elif module_type == "sentence_transformers.models.LayerNorm":
-                    layer_norm_path = module["path"]
-                elif module_type == "sentence_transformers.models.Normalize":
-                    normalize = "true"
-                elif module_type != "sentence_transformers.models.Transformer":
-                    logging.warning(f"Unexpected module: {module_type}.")
+                for module in modules:
+                    module_type = module.get("type")
+                    if module_type == "sentence_transformers.models.Pooling":
+                        pooling_path = module["path"]
+                    elif module_type == "sentence_transformers.models.Dense":
+                        dense_path = module["path"]
+                    elif module_type == "sentence_transformers.models.LayerNorm":
+                        layer_norm_path = module["path"]
+                    elif module_type == "sentence_transformers.models.Normalize":
+                        normalize = "true"
+                    elif module_type != "sentence_transformers.models.Transformer":
+                        logging.warning(f"Unexpected module: {module_type}.")
         except requests.exceptions.HTTPError:
             logging.warning(f"{model_id}: modules.json not found.")
 
@@ -138,17 +139,19 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
         if dense_path:
             try:
                 file = self.get_file(model_id, f"{dense_path}/config.json")
-                with open(file, "r") as f:
-                    dense = json.load(f)
-                    activation = dense.get("activation_function")
-                    if activation == "torch.nn.modules.activation.Tanh":
-                        args["denseActivation"] = "Tanh"
-                    elif activation != "torch.nn.modules.linear.Identity":
-                        logging.warning(
-                            f"Unexpected activation function: {activation}.")
-                self.save_module_weight(model_id, temp_dir, dense_path,
-                                        "linear")
-                args["dense"] = "linear.safetensors"
+                if os.path.exists(file):
+                    with open(file, "r") as f:
+                        dense = json.load(f)
+                        activation = dense.get("activation_function")
+                        if activation == "torch.nn.modules.activation.Tanh":
+                            args["denseActivation"] = "Tanh"
+                        elif activation != "torch.nn.modules.linear.Identity":
+                            logging.warning(
+                                f"Unexpected activation function: {activation}."
+                            )
+                    self.save_module_weight(model_id, temp_dir, dense_path,
+                                            "linear")
+                    args["dense"] = "linear.safetensors"
             except requests.exceptions.HTTPError:
                 logging.debug(f"{model_id}: {dense_path} not found.")
 
@@ -174,7 +177,8 @@ class SentenceSimilarityConverter(HuggingfaceConverter):
         try:
             file = self.get_file(model_id, "sparse_linear.safetensors")
             if os.path.exists(file):
-                shutil.copyfile(file, os.path.join(temp_dir, "sparse_linear.safetensors"))
+                shutil.copyfile(
+                    file, os.path.join(temp_dir, "sparse_linear.safetensors"))
         except requests.exceptions.HTTPError:
             pass
 

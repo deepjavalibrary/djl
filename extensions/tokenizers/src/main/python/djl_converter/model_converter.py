@@ -24,6 +24,7 @@ class ModelInfoHolder(object):
 
     def __init__(self, model_id: str):
         self.modelId = model_id
+        self.tags = []
         with open(os.path.join(model_id, "config.json")) as f:
             self.config = json.load(f)
 
