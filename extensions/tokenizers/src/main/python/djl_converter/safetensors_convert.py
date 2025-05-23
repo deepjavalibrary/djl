@@ -64,7 +64,7 @@ def _remove_duplicate_names(
 
 
 def convert_file(pt_filename: str, sf_filename: str):
-    loaded = torch.load(pt_filename, map_location="cpu")
+    loaded = torch.load(pt_filename, weights_only=False, map_location="cpu")
     if "state_dict" in loaded:
         loaded = loaded["state_dict"]
     to_removes = _remove_duplicate_names(loaded)
