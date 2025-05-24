@@ -150,7 +150,7 @@ public abstract class AbstractImageFolder extends ImageClassificationDataset {
     /** {@inheritDoc} */
     @Override
     public Optional<Integer> getImageHeight() {
-        return Optional.ofNullable(imageWidth);
+        return Optional.ofNullable(imageHeight);
     }
 
     /** {@inheritDoc} */
