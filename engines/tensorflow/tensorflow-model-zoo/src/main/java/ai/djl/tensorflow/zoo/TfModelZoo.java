@@ -14,6 +14,7 @@
 package ai.djl.tensorflow.zoo;
 
 import ai.djl.Application.CV;
+import ai.djl.repository.RemoteRepository;
 import ai.djl.repository.Repository;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.tensorflow.engine.TfEngine;
@@ -24,8 +25,7 @@ import java.util.Set;
 /** TfModelZoo is a repository that contains the TensorFlow models for DJL. */
 public class TfModelZoo extends ModelZoo {
 
-    private static final String DJL_REPO_URL = "https://mlrepo.djl.ai/";
-    private static final Repository REPOSITORY = Repository.newInstance("TensorFlow", DJL_REPO_URL);
+    private static final Repository REPOSITORY = new RemoteRepository("TensorFlow", DJL_REPO_URL);
     public static final String GROUP_ID = "ai.djl.tensorflow";
 
     TfModelZoo() {

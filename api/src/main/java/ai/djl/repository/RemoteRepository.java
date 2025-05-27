@@ -43,14 +43,12 @@ public class RemoteRepository extends AbstractRepository {
     private List<MRL> resources;
 
     /**
-     * (Internal) Constructs a remote repository.
-     *
-     * <p>Use {@link Repository#newInstance(String, String)}.
+     * Constructs a remote repository.
      *
      * @param name the repository name
      * @param uri the repository location
      */
-    protected RemoteRepository(String name, URI uri) {
+    public RemoteRepository(String name, URI uri) {
         super(name, uri);
     }
 

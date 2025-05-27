@@ -12,14 +12,17 @@
  */
 package ai.djl.basicdataset;
 
+import ai.djl.repository.RemoteRepository;
 import ai.djl.repository.Repository;
+
+import java.net.URI;
 
 /** An interface which contains datasets that are hosted on https://mlrepo.djl.ai/. */
 public interface BasicDatasets {
 
-    String DJL_REPO_URL = "https://mlrepo.djl.ai/";
+    URI DJL_REPO_URL = URI.create("https://mlrepo.djl.ai/");
 
-    Repository REPOSITORY = Repository.newInstance("BasicDataset", DJL_REPO_URL);
+    Repository REPOSITORY = new RemoteRepository("BasicDataset", DJL_REPO_URL);
 
     String GROUP_ID = "ai.djl.basicdataset";
 }
