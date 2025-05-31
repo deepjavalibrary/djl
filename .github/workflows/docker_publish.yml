@@ -43,7 +43,9 @@ jobs:
           echo "DJL_VERSION=$DJL_VERSION" >> $GITHUB_ENV
       - name: Build djl_spark wheel
         working-directory: extensions/spark/setup/
-        run: ./setup.py bdist_wheel
+        run: |
+          python3 -m pip install -U build
+          python3 -m build
       - name: Build and push nightly docker image
         if: ${{ github.event.inputs.mode == '' || github.event.inputs.mode == 'nightly' }}
         uses: docker/build-push-action@v4

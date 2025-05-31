@@ -31,6 +31,19 @@ tasks {
         workingDir = project.projectDir
         commandLine("bash", "-c", "find . -name '*.py' -print0 | xargs -0 yapf --in-place")
     }
+
+    clean {
+        doFirst {
+            val initFile = projectDir / "setup/djl_spark/__init__.py"
+            initFile.text = initFile.text.replace(Regex("\\n*__version__.*"), "\n")
+
+            delete("setup/build/")
+            delete("setup/dist/")
+            delete("setup/__pycache__/")
+            delete("setup/djl_spark.egg-info/")
+            delete("setup/djl_spark/__pycache__/")
+        }
+    }
 }
 
 // need to fall back to this, probably the conditionality on the plugin apply breaks the accessor generation

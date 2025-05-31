@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "djl_converter"
+description = "Model converter utility package"
+authors = [
+    { name = "Deep Java Library team", email = "djl-dev@amazon.com" }
+]
+license = "Apache-2.0"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "huggingface-hub",
+    "transformers",
+    "sentence-transformers",
+    "torch",
+    "optimum[exporters]",
+    "safetensors",
+    "requests"
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/deepjavalibrary/djl.git"
+Issues = "https://github.com/deepjavalibrary/djl-serving/issues"
+Documentation = "https://docs.djl.ai/master/extensions/tokenizers/index.html#use-djl-huggingface-model-converter"
+
+[project.scripts]
+djl-import = "djl_converter.model_zoo_importer:main"
+djl-convert = "djl_converter.model_converter:main"

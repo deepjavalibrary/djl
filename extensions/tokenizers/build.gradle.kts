@@ -172,7 +172,16 @@ tasks {
     clean {
         doFirst {
             delete("$home/.djl.ai/tokenizers")
+            delete("jnilib")
             delete("rust/target")
+            delete("src/main/python/build/")
+            delete("src/main/python/dist/")
+            delete("src/main/python/__pycache__/")
+            delete("src/main/python/djl_converter.egg-info/")
+            delete("src/main/python/djl_converter/__pycache__/")
+
+            val initFile = projectDir / "src/main/python/djl_converter/__init__.py"
+            initFile.text = initFile.text.replace(Regex("\\n*__version__.*"), "\n")
         }
     }
 }

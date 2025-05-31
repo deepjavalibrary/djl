@@ -27,7 +27,7 @@ jobs:
           yum -y install java-17-amazon-corretto-devel
           ln -s /usr/bin/cmake3 /usr/bin/cmake
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          pip3 install awscli wheel setuptools --upgrade
+          pip3 install awscli wheel setuptools build --upgrade
       - uses: taiki-e/checkout-action@v1
       - name: Release JNI prep
         run: |
@@ -36,7 +36,7 @@ jobs:
           PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
       - name: Build djl-converter wheel
         working-directory: extensions/tokenizers/src/main/python/
-        run: ./setup.py bdist_wheel
+        run: python3 -m build
       - name: Configure AWS Credentials
         run: |
           oidc_token=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
