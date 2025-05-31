@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "djl_spark"
+description = "djl_spark is a DJL extension to support Spark"
+readme = "PyPiDescription.rst"
+authors = [
+    { name = "Deep Java Library team", email = "djl-dev@amazon.com" }
+]
+license = "Apache-2.0"
+requires-python = ">=3.9"
+keywords = ["DJL", "Spark"]
+dependencies = [
+    "packaging",
+    "wheel",
+    "pillow",
+    "pandas",
+    "numpy",
+    "pyarrow"
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "numpy",
+    "requests"
+]
+
+[project.urls]
+Homepage = "https://github.com/deepjavalibrary/djl.git"
+Issues = "https://github.com/deepjavalibrary/djl-serving/issues"

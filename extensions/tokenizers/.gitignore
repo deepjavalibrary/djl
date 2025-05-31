@@ -1,5 +1,6 @@
 /tokenizers
 /jnilib
+dist/
 model/
 tmp/
 models.json

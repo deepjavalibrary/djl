@@ -10,21 +10,33 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS"
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
+import os
 
 import setuptools.command.build_py
-from setuptools import setup, find_packages
+from setuptools import setup
 
-pkgs = find_packages(exclude='src')
+def read_from_file(file, key):
+    with open(file, "r") as f:
+        for line in f:
+            if not line.startswith('#'):
+                prop = line.split("=")
+                if prop[0].strip() == key:
+                    return prop[1].strip().replace('"', '')
+    return None
 
 
 def detect_version():
-    with open("../../../gradle/libs.versions.toml", "r") as f:
-        for line in f:
-            if not line.startswith('#'):
-                prop = line.split('=')
-                if prop[0].strip() == "djl":
-                    return prop[1].strip().strip('\"')
-    return None
+    version_file = os.path.join("djl_spark", "__init__.py")
+    djl_version = read_from_file(version_file, "__version__")
+
+    if not djl_version:
+        current_dir = os.path.dirname(__file__)
+        toml_file = f"{current_dir}/../../../gradle/libs.versions.toml"
+        djl_version = read_from_file(toml_file, "djl")
+        with open(version_file, "a") as f:
+            f.writelines(['\n', f"__version__ = \"{djl_version}\""])
+
+    return djl_version
 
 
 class BuildPy(setuptools.command.build_py.build_py):
@@ -35,26 +47,4 @@ class BuildPy(setuptools.command.build_py.build_py):
 
 if __name__ == '__main__':
     version = detect_version()
-
-    requirements = [
-        'packaging', 'wheel', 'pillow', 'pandas', 'numpy', 'pyarrow'
-    ]
-
-    test_requirements = ['numpy', 'requests']
-
-    setup(name='djl_spark',
-          version=version,
-          description='djl_spark is a DJL extension to support Spark',
-          author='Deep Java Library team',
-          author_email='djl-dev@amazon.com',
-          long_description=open('PyPiDescription.rst').read(),
-          url='https://github.com/deepjavalibrary/djl.git',
-          keywords='DJL Spark',
-          packages=pkgs,
-          cmdclass={
-              'build_py': BuildPy,
-          },
-          install_requires=requirements,
-          extras_require={'test': test_requirements + requirements},
-          include_package_data=True,
-          license='Apache License Version 2.0')
+    setup(version=version)
