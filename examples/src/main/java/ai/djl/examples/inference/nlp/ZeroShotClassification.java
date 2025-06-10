@@ -49,7 +49,7 @@ public final class ZeroShotClassification {
                         .setTypes(
                                 ZeroShotClassificationInput.class,
                                 ZeroShotClassificationOutput.class)
-                        .optModelUrls("djl://ai.djl.huggingface.pytorch/facebook/bart-large-mnli")
+                        .optModelUrls("djl://ai.djl.huggingface.pytorch/MoritzLaurer/ModernBERT-large-zeroshot-v2.0")
                         .optEngine("PyTorch")
                         .optTranslatorFactory(new ZeroShotClassificationTranslatorFactory())
                         .optProgress(new ProgressBar())
