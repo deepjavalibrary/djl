@@ -31,22 +31,23 @@ import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.Pair;
 
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.AbstractMap;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -89,74 +90,49 @@ public class ZeroShotClassificationTranslator
         predictor = model.newPredictor(new NoopTranslator(null));
         ctx.getPredictorManager().attachInternal(UUID.randomUUID().toString(), predictor);
 
-        URL configUrl = null;
-        try {
-            configUrl = model.getArtifact("config.json");
-        } catch (IOException e) {
-            logger.error("Error reading config.json of model: {}", model.getName(), e);
+        Path configFile = model.getModelPath().resolve("config.json");
+        if (!Files.isRegularFile(configFile)) {
+            return;
         }
-
-        if (configUrl != null) {
-            try (InputStream is = configUrl.openStream();
-                    InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-
-                Map<String, Object> config =
-                        JsonUtils.GSON.fromJson(
-                                reader, new TypeToken<Map<String, Object>>() {}.getType());
-
-                if (config != null) {
-                    if (config.containsKey("label2id")) {
-                        String label2IdJson = JsonUtils.GSON.toJson(config.get("label2id"));
-                        Map<String, Double> label2idDouble =
-                                JsonUtils.GSON.fromJson(
-                                        label2IdJson,
-                                        new TypeToken<Map<String, Double>>() {}.getType());
-
-                        Map<String, Integer> label2id = new HashMap<>();
-                        label2idDouble.forEach(
-                                (k, v) -> label2id.put(k, v != null ? v.intValue() : null));
-
-                        for (Map.Entry<String, Integer> entry : label2id.entrySet()) {
-                            if (entry.getKey().toLowerCase().startsWith("entail")
-                                    && entry.getValue() != null) {
-                                entailmentId = entry.getValue();
-                            } else if (entry.getKey().toLowerCase().startsWith("contra")
-                                    && entry.getValue() != null) {
-                                contradictionId = entry.getValue();
-                            }
-                        }
+        try (Reader reader = Files.newBufferedReader(configFile)) {
+            JsonObject config = JsonUtils.GSON.fromJson(reader, JsonObject.class);
+            if (config.has("label2id")) {
+                JsonObject label2Id = config.getAsJsonObject("label2id");
+                for (Map.Entry<String, JsonElement> entry : label2Id.entrySet()) {
+                    String key = entry.getKey().toLowerCase(Locale.ROOT);
+                    int value = entry.getValue().getAsInt();
+                    if (key.startsWith("entail")) {
+                        entailmentId = value;
+                    } else if (key.startsWith("contra")) {
+                        contradictionId = value;
                     }
-
-                    boolean inferredWithTokenType = false; // Default assumption
-
-                    if (config.containsKey("type_vocab_size")) {
-                        Object typeVocabSizeObj = config.get("type_vocab_size");
-                        if (typeVocabSizeObj instanceof Number) {
-                            int typeVocabSize = ((Number) typeVocabSizeObj).intValue();
-                            if (typeVocabSize > 1) {
-                                inferredWithTokenType = true;
-                            }
-                        }
-                    }
-
-                    if (!inferredWithTokenType && config.containsKey("model_type")) {
-                        String modelType = (String) config.get("model_type");
-                        if (modelType != null) {
-                            if ("bert".equals(modelType)
-                                    || "albert".equals(modelType)
-                                    || "xlnet".equals(modelType)
-                                    || "deberta".startsWith(modelType)) {
-                                inferredWithTokenType = true;
-                            }
-                        }
-                    }
-
-                    tokenTypeId = inferredWithTokenType;
                 }
-            } catch (IOException e) {
-                logger.error(
-                        "Failed to read or parse config.json for label2id: {}", e.getMessage(), e);
             }
+
+            boolean inferredWithTokenType = false; // Default assumption
+            if (config.has("type_vocab_size")) {
+                JsonElement typeVocabSizeObj = config.get("type_vocab_size");
+                if (typeVocabSizeObj.isJsonPrimitive()) {
+                    int typeVocabSize = typeVocabSizeObj.getAsInt();
+                    if (typeVocabSize > 1) {
+                        inferredWithTokenType = true;
+                    }
+                }
+            }
+
+            if (!inferredWithTokenType && config.has("model_type")) {
+                String modelType = config.get("model_type").getAsString().toLowerCase(Locale.ROOT);
+                if ("bert".equals(modelType)
+                        || "albert".equals(modelType)
+                        || "xlnet".equals(modelType)
+                        || modelType.startsWith("deberta")) {
+                    inferredWithTokenType = true;
+                }
+            }
+
+            tokenTypeId = inferredWithTokenType;
+        } catch (IOException | JsonParseException e) {
+            logger.error("Failed to read or parse config.json for label2id", e);
         }
     }
 
@@ -213,20 +189,14 @@ public class ZeroShotClassificationTranslator
             }
 
             float[] floatScores = entailmentScores.toFloatArray();
-            double[] tempScores = new double[floatScores.length];
+
+            List<Pair<Double, String>> pairs = new ArrayList<>();
             for (int i = 0; i < floatScores.length; i++) {
-                tempScores[i] = floatScores[i];
+                Pair<Double, String> pair = new Pair<>((double) floatScores[i], candidates[i]);
+                pairs.add(pair);
             }
-
-            List<AbstractMap.SimpleEntry<Double, String>> pairs = new ArrayList<>();
-            for (int i = 0; i < candidates.length; i++) {
-                pairs.add(new AbstractMap.SimpleEntry<>(tempScores[i], candidates[i]));
-            }
-
             pairs.sort(
-                    Comparator.comparingDouble(
-                                    (AbstractMap.SimpleEntry<Double, String> e) -> e.getKey())
-                            .reversed());
+                    Comparator.comparingDouble((Pair<Double, String> e) -> e.getKey()).reversed());
 
             finalLabels = new String[candidates.length];
             finalScores = new double[candidates.length];
@@ -234,7 +204,6 @@ public class ZeroShotClassificationTranslator
                 finalLabels[i] = pairs.get(i).getValue();
                 finalScores[i] = pairs.get(i).getKey();
             }
-
         } else { // Single-label classification (len(candidate_labels) > 1 and not multi_label)
             NDArray entailLogits = combinedLogits.get(":, " + entailmentId);
             NDArray exp = entailLogits.exp();
@@ -282,9 +251,8 @@ public class ZeroShotClassificationTranslator
      * @param arguments the models' arguments
      * @return a new builder
      */
-    public static ZeroShotClassificationTranslator.Builder builder(
-            HuggingFaceTokenizer tokenizer, Map<String, ?> arguments) {
-        ZeroShotClassificationTranslator.Builder builder = builder(tokenizer);
+    public static Builder builder(HuggingFaceTokenizer tokenizer, Map<String, ?> arguments) {
+        Builder builder = builder(tokenizer);
         builder.configure(arguments);
 
         return builder;
