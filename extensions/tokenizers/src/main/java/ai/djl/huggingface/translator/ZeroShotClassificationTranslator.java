@@ -29,50 +29,60 @@ import ai.djl.translate.Batchifier;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
-import com.google.gson.Gson;
+import ai.djl.util.JsonUtils;
+
 import com.google.gson.reflect.TypeToken;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.net.URL;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /** The translator for Huggingface zero-shot-classification model. */
 public class ZeroShotClassificationTranslator
         implements NoBatchifyTranslator<ZeroShotClassificationInput, ZeroShotClassificationOutput> {
 
-    private final static Logger logger = LoggerFactory.getLogger(ZeroShotClassificationTranslator.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(ZeroShotClassificationTranslator.class);
 
-    private final HuggingFaceTokenizer tokenizer;
+    private HuggingFaceTokenizer tokenizer;
     private int entailmentId;
     private int contradictionId;
     private boolean tokenTypeId;
-    private final boolean int32;
+    private boolean int32;
     private Predictor<NDList, NDList> predictor;
 
-    ZeroShotClassificationTranslator(HuggingFaceTokenizer tokenizer, boolean tokenTypeId, boolean int32) {
+    ZeroShotClassificationTranslator(
+            HuggingFaceTokenizer tokenizer, boolean tokenTypeId, boolean int32) {
         this.tokenizer = tokenizer;
         this.tokenTypeId = tokenTypeId;
         this.int32 = int32;
     }
 
-    // Constructor to allow passing entailment/contradiction IDs if known
-    ZeroShotClassificationTranslator(HuggingFaceTokenizer tokenizer, boolean tokenTypeId, boolean int32, int entailmentId, int contradictionId) {
+    ZeroShotClassificationTranslator(
+            HuggingFaceTokenizer tokenizer,
+            boolean tokenTypeId,
+            boolean int32,
+            int entailmentId,
+            int contradictionId) {
         this(tokenizer, tokenTypeId, int32);
         this.entailmentId = entailmentId;
         this.contradictionId = contradictionId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings({"unchecked"})
+    /** {@inheritDoc} */
     @Override
     public void prepare(TranslatorContext ctx) throws IOException, ModelException {
         Model model = ctx.getModel();
@@ -88,24 +98,30 @@ public class ZeroShotClassificationTranslator
 
         if (configUrl != null) {
             try (InputStream is = configUrl.openStream();
-                 InputStreamReader reader = new InputStreamReader(is)) {
+                    InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
 
-                Gson gson = new Gson();
-                Type type = new TypeToken<Map<String, Object>>() {
-                }.getType();
-                Map<String, Object> config = gson.fromJson(reader, type);
+                Map<String, Object> config =
+                        JsonUtils.GSON.fromJson(
+                                reader, new TypeToken<Map<String, Object>>() {}.getType());
 
                 if (config != null) {
                     if (config.containsKey("label2id")) {
-                        Map<String, Double> label2idDouble = (Map<String, Double>) config.get("label2id");
-                        Map<String, Integer> label2id = new HashMap<>();
-                        label2idDouble.forEach((k, v) -> label2id.put(k, v != null ? v.intValue() : null));
+                        String label2IdJson = JsonUtils.GSON.toJson(config.get("label2id"));
+                        Map<String, Double> label2idDouble =
+                                JsonUtils.GSON.fromJson(
+                                        label2IdJson,
+                                        new TypeToken<Map<String, Double>>() {}.getType());
 
+                        Map<String, Integer> label2id = new HashMap<>();
+                        label2idDouble.forEach(
+                                (k, v) -> label2id.put(k, v != null ? v.intValue() : null));
 
                         for (Map.Entry<String, Integer> entry : label2id.entrySet()) {
-                            if (entry.getKey().toLowerCase().startsWith("entail") && entry.getValue() != null) {
+                            if (entry.getKey().toLowerCase().startsWith("entail")
+                                    && entry.getValue() != null) {
                                 entailmentId = entry.getValue();
-                            } else if (entry.getKey().toLowerCase().startsWith("contra") && entry.getValue() != null) {
+                            } else if (entry.getKey().toLowerCase().startsWith("contra")
+                                    && entry.getValue() != null) {
                                 contradictionId = entry.getValue();
                             }
                         }
@@ -126,11 +142,10 @@ public class ZeroShotClassificationTranslator
                     if (!inferredWithTokenType && config.containsKey("model_type")) {
                         String modelType = (String) config.get("model_type");
                         if (modelType != null) {
-                            // Use .equals() or .startsWith() for precise matching, avoiding false positives like "roberta" containing "bert"
-                            if (modelType.equals("bert")
-                                    || modelType.equals("albert")
-                                    || modelType.equals("xlnet")
-                                    || modelType.startsWith("deberta")) { // Covers "deberta" and "deberta-v2"
+                            if ("bert".equals(modelType)
+                                    || "albert".equals(modelType)
+                                    || "xlnet".equals(modelType)
+                                    || "deberta".startsWith(modelType)) {
                                 inferredWithTokenType = true;
                             }
                         }
@@ -138,24 +153,21 @@ public class ZeroShotClassificationTranslator
 
                     tokenTypeId = inferredWithTokenType;
                 }
-            } catch (Exception e) {
-                logger.error("Failed to read or parse config.json for label2id: {}", e.getMessage(), e);
+            } catch (IOException e) {
+                logger.error(
+                        "Failed to read or parse config.json for label2id: {}", e.getMessage(), e);
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, ZeroShotClassificationInput input) {
         ctx.setAttachment("input", input);
         return new NDList();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public ZeroShotClassificationOutput processOutput(TranslatorContext ctx, NDList list)
             throws TranslateException {
@@ -174,7 +186,7 @@ public class ZeroShotClassificationTranslator
             String hypothesis = applyTemplate(template, candidate);
             Encoding encoding = tokenizer.encode(input.getText(), hypothesis);
             NDList in = encoding.toNDList(manager, tokenTypeId, int32);
-            NDList batch = Batchifier.STACK.batchify(new NDList[]{in});
+            NDList batch = Batchifier.STACK.batchify(new NDList[] {in});
             output.add(predictor.predict(batch).get(0));
         }
 
@@ -191,7 +203,11 @@ public class ZeroShotClassificationTranslator
                 entailmentScores = probs.get(":, 0");
             } else {
                 // 3-class NLI output (e.g., entailment, neutral, contradiction)
-                NDArray entailContrLogits = combinedLogits.get(new NDIndex(":, {}", manager.create(new int[]{contradictionId, entailmentId})));
+                NDArray entailContrLogits =
+                        combinedLogits.get(
+                                new NDIndex(
+                                        ":, {}",
+                                        manager.create(new int[] {contradictionId, entailmentId})));
                 NDArray scoresProbs = entailContrLogits.softmax(1);
                 entailmentScores = scoresProbs.get(":, 1");
             }
@@ -207,7 +223,10 @@ public class ZeroShotClassificationTranslator
                 pairs.add(new AbstractMap.SimpleEntry<>(tempScores[i], candidates[i]));
             }
 
-            pairs.sort(Comparator.comparingDouble((AbstractMap.SimpleEntry<Double, String> e) -> e.getKey()).reversed());
+            pairs.sort(
+                    Comparator.comparingDouble(
+                                    (AbstractMap.SimpleEntry<Double, String> e) -> e.getKey())
+                            .reversed());
 
             finalLabels = new String[candidates.length];
             finalScores = new double[candidates.length];
@@ -252,8 +271,8 @@ public class ZeroShotClassificationTranslator
      * @param tokenizer the tokenizer
      * @return a new builder
      */
-    public static ZeroShotClassificationTranslator.Builder builder(HuggingFaceTokenizer tokenizer) {
-        return new ZeroShotClassificationTranslator.Builder(tokenizer);
+    public static Builder builder(HuggingFaceTokenizer tokenizer) {
+        return new Builder(tokenizer);
     }
 
     /**
@@ -263,64 +282,69 @@ public class ZeroShotClassificationTranslator
      * @param arguments the models' arguments
      * @return a new builder
      */
-    public static ZeroShotClassificationTranslator.Builder builder(HuggingFaceTokenizer tokenizer, Map<String, ?> arguments) {
+    public static ZeroShotClassificationTranslator.Builder builder(
+            HuggingFaceTokenizer tokenizer, Map<String, ?> arguments) {
         ZeroShotClassificationTranslator.Builder builder = builder(tokenizer);
         builder.configure(arguments);
 
         return builder;
     }
 
-    /**
-     * The builder for zero-shot classification translator.
-     */
+    /** The builder for zero-shot classification translator. */
     public static final class Builder {
 
-        private final HuggingFaceTokenizer tokenizer;
+        private HuggingFaceTokenizer tokenizer;
         private boolean tokenTypeId;
         private boolean int32;
-        private int entailmentId = 2; // Default
-        private int contradictionId = 0; // Default
+        private int entailmentId = 2;
+        private int contradictionId;
 
         Builder(HuggingFaceTokenizer tokenizer) {
             this.tokenizer = tokenizer;
         }
 
-        public ZeroShotClassificationTranslator.Builder optTokenTypeId(boolean withTokenType) {
-            this.tokenTypeId = withTokenType;
+        /**
+         * Specifies whether to include token type IDs in the input tensors.
+         *
+         * @param tokenTypeId {@code true} to include token type IDs, {@code false} to omit them
+         * @return this builder instance for method chaining
+         */
+        public Builder optTokenTypeId(boolean tokenTypeId) {
+            this.tokenTypeId = tokenTypeId;
             return this;
         }
 
         /**
-         * Sets if use int32 datatype for the {@link Translator}.
+         * Specifies whether to use int32 as the data type for input token tensors.
          *
-         * @param int32 true to include token types
-         * @return this builder
+         * @param int32 {@code true} to use int32 inputs, {@code false} to use the default type
+         * @return this builder instance for method chaining
          */
-        public ZeroShotClassificationTranslator.Builder optInt32(boolean int32) {
+        public Builder optInt32(boolean int32) {
             this.int32 = int32;
             return this;
         }
 
         /**
-         * Optional: Set custom entailment ID if different from default (2).
-         * This value usually comes from the model's `config.json` `label2id` mapping.
+         * Optional: Set custom entailment ID if different from default (2). This value usually
+         * comes from the model's `config.json` `label2id` mapping.
          *
          * @param entailmentId The index for the 'entailment' label.
          * @return this builder
          */
-        public ZeroShotClassificationTranslator.Builder optEntailmentId(int entailmentId) {
+        public Builder optEntailmentId(int entailmentId) {
             this.entailmentId = entailmentId;
             return this;
         }
 
         /**
-         * Optional: Set custom contradiction ID if different from default (0).
-         * This value usually comes from the model's `config.json` `label2id` mapping.
+         * Optional: Set custom contradiction ID if different from default (0). This value usually
+         * comes from the model's `config.json` `label2id` mapping.
          *
          * @param contradictionId The index for the 'contradiction' label.
          * @return this builder
          */
-        public ZeroShotClassificationTranslator.Builder optContradictionId(int contradictionId) {
+        public Builder optContradictionId(int contradictionId) {
             this.contradictionId = contradictionId;
             return this;
         }
@@ -342,7 +366,8 @@ public class ZeroShotClassificationTranslator
          * @throws IOException if I/O error occurs
          */
         public ZeroShotClassificationTranslator build() throws IOException {
-            return new ZeroShotClassificationTranslator(tokenizer, tokenTypeId, int32, entailmentId, contradictionId);
+            return new ZeroShotClassificationTranslator(
+                    tokenizer, tokenTypeId, int32, entailmentId, contradictionId);
         }
     }
 }
