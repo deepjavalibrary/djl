@@ -89,7 +89,7 @@ public class ZeroShotClassificationTranslatorTest {
                         model.newPredictor()) {
             ZeroShotClassificationInput input = new ZeroShotClassificationInput(text, candidates);
             ZeroShotClassificationOutput res = predictor.predict(input);
-            Assertions.assertAlmostEquals(res.getScores()[1], 0.940441);
+            Assertions.assertAlmostEquals(res.getScores()[1], 0.251434);
             Assert.assertEquals(res.getLabels()[1], "exploration");
         }
 
@@ -113,7 +113,7 @@ public class ZeroShotClassificationTranslatorTest {
             Output out = predictor.predict(input);
             ZeroShotClassificationOutput res =
                     (ZeroShotClassificationOutput) out.getData().getAsObject();
-            Assertions.assertAlmostEquals(res.getScores()[1], 0.251434);
+            Assertions.assertAlmostEquals(res.getScores()[1], 0.940441);
             Assert.assertEquals(res.getLabels()[0], "travel");
         }
 
