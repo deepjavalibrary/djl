@@ -130,7 +130,7 @@ public class StableDiffusionModel {
             // Step 3: Start iterating/generating
             ProgressBar pb = new ProgressBar("Generating", steps);
             pb.start(0);
-            for (int i = 0; i < steps; i++) {
+            for (int i = 0; i < scheduler.getTimesteps().length; i++) {
                 long t = scheduler.getTimesteps()[i];
                 NDArray latentModelOutput = latent.concat(latent);
                 NDArray noisePred =
