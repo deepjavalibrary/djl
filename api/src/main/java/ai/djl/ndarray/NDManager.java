@@ -36,6 +36,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * NDArray managers are used to create <I>NDArrays</I> (n-dimensional array on native engine).
@@ -105,6 +106,12 @@ import java.util.List;
  *     Memory Management Guide</a>
  */
 public interface NDManager extends AutoCloseable {
+
+    AtomicLong UID_GENERATOR = new AtomicLong();
+
+    static String nextUID() {
+        return "uid-" + System.nanoTime() + "-" + UID_GENERATOR.incrementAndGet();
+    }
 
     /**
      * Creates a new top-level {@code NDManager}.
