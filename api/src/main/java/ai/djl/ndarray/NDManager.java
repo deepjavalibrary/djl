@@ -109,6 +109,10 @@ public interface NDManager extends AutoCloseable {
 
     AtomicLong UID_GENERATOR = new AtomicLong();
 
+    /**
+     * Returns a low-cost, unique UID.
+     * @return a string UID.
+     */
     static String nextUID() {
         return "uid-" + System.nanoTime() + "-" + UID_GENERATOR.incrementAndGet();
     }
