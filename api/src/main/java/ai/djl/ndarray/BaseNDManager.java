@@ -33,7 +33,6 @@ import java.nio.ShortBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -60,7 +59,7 @@ public abstract class BaseNDManager implements NDManager {
         this.device = device == null ? defaultDevice() : device;
         resources = new ConcurrentHashMap<>();
         tempResources = new ConcurrentHashMap<>();
-        uid = UUID.randomUUID().toString();
+        uid = NDManager.nextUID();
         Engine engine = getEngine().getAlternativeEngine();
         if (engine != null) {
             // Use the same device if possible for efficiency
