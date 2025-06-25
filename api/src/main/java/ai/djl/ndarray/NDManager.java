@@ -111,6 +111,7 @@ public interface NDManager extends AutoCloseable {
 
     /**
      * Returns a low-cost unique ID.
+     *
      * @return a string UID.
      */
     static String nextUID() {
