@@ -24,7 +24,6 @@ import ai.onnxruntime.OrtException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 /** {@code OrtNDArray} is the ONNX Runtime implementation of {@link NDArray}. */
@@ -41,7 +40,7 @@ public class OrtNDArray extends NDArrayAdapter {
      * @param tensor the {@link OnnxTensor} to the ONNX Runtime
      */
     OrtNDArray(OrtNDManager manager, NDManager alternativeManager, OnnxTensor tensor) {
-        super(manager, alternativeManager, null, null, UUID.randomUUID().toString());
+        super(manager, alternativeManager, null, null, NDManager.nextUid());
         this.tensor = new AtomicReference<>(tensor);
         manager.attachInternal(uid, this);
     }

@@ -22,7 +22,6 @@ import ai.djl.ndarray.types.SparseFormat;
 import ml.dmlc.xgboost4j.java.JniUtils;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 /** {@code XgbNDArray} is the XGBoost implementation of {@link NDArray}. */
@@ -50,7 +49,7 @@ public class XgbNDArray extends NDArrayAdapter {
             ByteBuffer data,
             Shape shape,
             DataType dataType) {
-        super(manager, alternativeManager, shape, dataType, UUID.randomUUID().toString());
+        super(manager, alternativeManager, shape, dataType, NDManager.nextUid());
         this.data = data;
         this.format = SparseFormat.DENSE;
         manager.attachInternal(uid, this);

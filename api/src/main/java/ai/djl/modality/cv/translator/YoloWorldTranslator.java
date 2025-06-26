@@ -52,7 +52,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** A translator for Yolo-world models. */
@@ -92,8 +91,8 @@ public class YoloWorldTranslator
         Model clip = manager.getEngine().newModel("clip", manager.getDevice());
         clip.load(path);
         predictor = clip.newPredictor(new NoopTranslator(null));
-        model.getNDManager().attachInternal(UUID.randomUUID().toString(), predictor);
-        model.getNDManager().attachInternal(UUID.randomUUID().toString(), clip);
+        model.getNDManager().attachInternal(NDManager.nextUid(), predictor);
+        model.getNDManager().attachInternal(NDManager.nextUid(), clip);
         tokenizer = SimpleBpeTokenizer.newInstance(modelPath);
     }
 

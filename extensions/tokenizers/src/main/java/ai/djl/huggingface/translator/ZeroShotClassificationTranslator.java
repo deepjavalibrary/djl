@@ -49,7 +49,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 /** The translator for Huggingface zero-shot-classification model. */
 public class ZeroShotClassificationTranslator
@@ -88,7 +87,7 @@ public class ZeroShotClassificationTranslator
     public void prepare(TranslatorContext ctx) throws IOException, ModelException {
         Model model = ctx.getModel();
         predictor = model.newPredictor(new NoopTranslator(null));
-        ctx.getPredictorManager().attachInternal(UUID.randomUUID().toString(), predictor);
+        ctx.getPredictorManager().attachInternal(NDManager.nextUid(), predictor);
 
         Path configFile = model.getModelPath().resolve("config.json");
         if (!Files.isRegularFile(configFile)) {

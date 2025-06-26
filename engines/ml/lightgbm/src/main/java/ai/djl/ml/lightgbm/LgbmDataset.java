@@ -23,7 +23,6 @@ import com.microsoft.ml.lightgbm.SWIGTYPE_p_p_void;
 
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 /** A special {@link NDArray} used by LightGBM for training models. */
@@ -42,14 +41,14 @@ public class LgbmDataset extends NDArrayAdapter {
                 alternativeManager,
                 array.getShape(),
                 array.getDataType(),
-                UUID.randomUUID().toString());
+                NDManager.nextUid());
         srcType = SrcType.ARRAY;
         srcArray = array;
         handle = new AtomicReference<>();
     }
 
     LgbmDataset(NDManager manager, NDManager alternativeManager, Path file) {
-        super(manager, alternativeManager, null, DataType.FLOAT32, UUID.randomUUID().toString());
+        super(manager, alternativeManager, null, DataType.FLOAT32, NDManager.nextUid());
         srcType = SrcType.FILE;
         srcFile = file;
         handle = new AtomicReference<>();
