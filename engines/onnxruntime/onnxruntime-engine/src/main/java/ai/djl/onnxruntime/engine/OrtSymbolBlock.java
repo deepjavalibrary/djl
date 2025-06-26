@@ -37,7 +37,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -64,7 +63,7 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
     public OrtSymbolBlock(OrtSession session, OrtNDManager manager) {
         this.session = session;
         this.manager = manager;
-        manager.attachInternal(UUID.randomUUID().toString(), this);
+        manager.attachInternal(NDManager.nextUid(), this);
     }
 
     /** {@inheritDoc} */

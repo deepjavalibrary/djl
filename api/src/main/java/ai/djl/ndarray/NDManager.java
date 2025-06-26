@@ -114,7 +114,7 @@ public interface NDManager extends AutoCloseable {
      *
      * @return a string UID.
      */
-    static String nextUID() {
+    static String nextUid() {
         return "uid-" + System.nanoTime() + "-" + UID_GENERATOR.incrementAndGet();
     }
 

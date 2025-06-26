@@ -28,7 +28,6 @@ import com.microsoft.ml.lightgbm.lightgbmlibConstants;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 /** {@code LgbmNDArray} is the LightGBM implementation of {@link NDArray}. */
@@ -48,7 +47,7 @@ public class LgbmNDArray extends NDArrayAdapter {
             ByteBuffer data,
             Shape shape,
             DataType dataType) {
-        super(manager, alternativeManager, shape, dataType, UUID.randomUUID().toString());
+        super(manager, alternativeManager, shape, dataType, NDManager.nextUid());
         this.data = data;
         this.format = SparseFormat.DENSE;
         manager.attachInternal(uid, this);

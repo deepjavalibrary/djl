@@ -21,7 +21,6 @@ import ai.djl.ndarray.types.Shape;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
 /** {@code TrtNDArray} is the TensorRT implementation of {@link NDArray}. */
 public class TrtNDArray extends NDArrayAdapter {
@@ -35,7 +34,7 @@ public class TrtNDArray extends NDArrayAdapter {
             ByteBuffer data,
             Shape shape,
             DataType dataType) {
-        super(manager, alternativeManager, shape, dataType, UUID.randomUUID().toString());
+        super(manager, alternativeManager, shape, dataType, NDManager.nextUid());
         this.data = data;
         manager.attachInternal(uid, this);
     }

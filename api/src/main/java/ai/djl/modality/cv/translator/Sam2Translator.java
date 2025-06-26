@@ -49,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /** A {@link Translator} that handles mask generation task. */
 public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedObjects> {
@@ -80,7 +79,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
             if (encodeMethod != null) {
                 Model model = ctx.getModel();
                 predictor = model.newPredictor(new NoopTranslator(null));
-                model.getNDManager().attachInternal(UUID.randomUUID().toString(), predictor);
+                model.getNDManager().attachInternal(NDManager.nextUid(), predictor);
             }
             return;
         }
@@ -96,8 +95,8 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         Model encoder = manager.getEngine().newModel("encoder", manager.getDevice());
         encoder.load(path);
         predictor = encoder.newPredictor(new NoopTranslator(null));
-        model.getNDManager().attachInternal(UUID.randomUUID().toString(), predictor);
-        model.getNDManager().attachInternal(UUID.randomUUID().toString(), encoder);
+        model.getNDManager().attachInternal(NDManager.nextUid(), predictor);
+        model.getNDManager().attachInternal(NDManager.nextUid(), encoder);
     }
 
     /** {@inheritDoc} */

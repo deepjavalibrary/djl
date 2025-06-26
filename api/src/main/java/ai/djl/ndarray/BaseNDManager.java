@@ -59,7 +59,7 @@ public abstract class BaseNDManager implements NDManager {
         this.device = device == null ? defaultDevice() : device;
         resources = new ConcurrentHashMap<>();
         tempResources = new ConcurrentHashMap<>();
-        uid = NDManager.nextUID();
+        uid = NDManager.nextUid();
         Engine engine = getEngine().getAlternativeEngine();
         if (engine != null) {
             // Use the same device if possible for efficiency

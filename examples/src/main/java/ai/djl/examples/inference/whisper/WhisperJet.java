@@ -40,7 +40,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 public final class WhisperJet {
@@ -123,25 +122,25 @@ public final class WhisperJet {
 
             ZooModel<NDList, NDList> initModel = loadChildModel(modelPath, "WhisperJET_init");
             preprocessor = initModel.newPredictor();
-            manager.attachInternal(UUID.randomUUID().toString(), initModel);
-            manager.attachInternal(UUID.randomUUID().toString(), preprocessor);
+            manager.attachInternal(NDManager.nextUid(), initModel);
+            manager.attachInternal(NDManager.nextUid(), preprocessor);
 
             ZooModel<NDList, NDList> cacheInitModel =
                     loadChildModel(modelPath, "WhisperJET_cache_initializer");
             cacheInitializer = cacheInitModel.newPredictor();
-            manager.attachInternal(UUID.randomUUID().toString(), cacheInitModel);
-            manager.attachInternal(UUID.randomUUID().toString(), cacheInitializer);
+            manager.attachInternal(NDManager.nextUid(), cacheInitModel);
+            manager.attachInternal(NDManager.nextUid(), cacheInitializer);
 
             ZooModel<NDList, NDList> decoderModel = loadChildModel(modelPath, "WhisperJET_decoder");
             decoder = decoderModel.newPredictor();
-            manager.attachInternal(UUID.randomUUID().toString(), decoderModel);
-            manager.attachInternal(UUID.randomUUID().toString(), decoder);
+            manager.attachInternal(NDManager.nextUid(), decoderModel);
+            manager.attachInternal(NDManager.nextUid(), decoder);
 
             ZooModel<NDList, NDList> detokenizerModel =
                     loadChildModel(modelPath, "WhisperJET_detokenizer");
             detokenizer = detokenizerModel.newPredictor();
-            manager.attachInternal(UUID.randomUUID().toString(), detokenizerModel);
-            manager.attachInternal(UUID.randomUUID().toString(), detokenizer);
+            manager.attachInternal(NDManager.nextUid(), detokenizerModel);
+            manager.attachInternal(NDManager.nextUid(), detokenizer);
         }
 
         @Override

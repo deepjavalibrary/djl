@@ -24,7 +24,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * {@code Parameter} is a container class that holds a learnable parameter of a model.
@@ -50,7 +49,7 @@ public class Parameter implements AutoCloseable {
     private boolean requiresGrad;
 
     Parameter(Builder builder) {
-        this.id = UUID.randomUUID().toString();
+        this.id = NDManager.nextUid();
         this.name = builder.name;
         this.shape = builder.shape;
         this.type = builder.type;
