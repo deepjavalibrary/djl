@@ -527,6 +527,32 @@ public class NDArrayOtherOpTest {
         }
     }
 
+    @Test
+    public void testDiagonal() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array = manager.arange(4.0f).reshape(2, 2);
+            NDArray expected = manager.create(new float[] {0f, 3f});
+            Assert.assertEquals(array.diagonal(), expected);
+
+            array = manager.arange(9.0f).reshape(3, 3);
+            expected = manager.create(new float[] {0f, 4f, 8f});
+            Assert.assertEquals(array.diagonal(), expected);
+
+            array = manager.arange(9.0f).reshape(3, 3);
+            expected = manager.create(new float[] {1f, 5f});
+            Assert.assertEquals(array.diagonal(1), expected);
+
+            array = manager.arange(9.0f).reshape(3, 3);
+            expected = manager.create(new float[] {3f, 7f});
+            Assert.assertEquals(array.diagonal(-1), expected);
+
+            array = manager.arange(27f).reshape(3, 3, 3);
+            expected =
+                    manager.create(new float[][] {{0f, 4f, 8f}, {9f, 13f, 17f}, {18f, 22f, 26f}});
+            Assert.assertEquals(array.diagonal(0, 1, 2), expected);
+        }
+    }
+
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testTile() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {

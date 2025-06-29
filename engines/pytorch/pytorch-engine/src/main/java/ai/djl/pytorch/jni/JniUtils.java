@@ -943,6 +943,12 @@ public final class JniUtils {
                 ndArray.getManager(), PyTorchLibrary.LIB.torchCumSum(ndArray.getHandle(), dim));
     }
 
+    public static PtNDArray diagonal(PtNDArray ndArray, long offset, long axis1, long axis2) {
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchDiagonal(ndArray.getHandle(), offset, axis1, axis2));
+    }
+
     public static PtNDArray oneHot(PtNDArray ndArray, int depth, DataType dataType) {
         return new PtNDArray(
                         ndArray.getManager(),

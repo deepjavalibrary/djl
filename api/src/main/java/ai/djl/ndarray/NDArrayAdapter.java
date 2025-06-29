@@ -1040,6 +1040,24 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray diagonal() {
+        return getAlternativeArray().diagonal(0);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diagonal(int offset) {
+        return getAlternativeArray().diagonal(offset);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diagonal(int offset, int axis1, int axis2) {
+        return getAlternativeArray().diagonal(offset, axis1, axis2);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArray isInfinite() {
         return getAlternativeArray().isInfinite();
     }

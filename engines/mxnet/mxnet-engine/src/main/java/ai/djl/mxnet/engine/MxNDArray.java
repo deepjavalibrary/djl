@@ -1355,6 +1355,24 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray diagonal() {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diagonal(int offset) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diagonal(int offset, int axis1, int axis2) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void intern(NDArray replaced) {
         MxNDArray arr = (MxNDArray) replaced;
         Pointer oldHandle = handle.getAndSet(arr.handle.getAndSet(null));

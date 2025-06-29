@@ -1465,6 +1465,24 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDArray diagonal() {
+        return manager.opExecutor("DiagPart").addInput(this).buildSingletonOrThrow();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diagonal(int offset) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diagonal(int offset, int axis1, int axis2) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void intern(NDArray replaced) {
         throw new UnsupportedOperationException("Not implemented");
     }

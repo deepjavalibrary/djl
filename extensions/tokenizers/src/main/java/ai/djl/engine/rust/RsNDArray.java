@@ -1278,6 +1278,24 @@ public class RsNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray diagonal() {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diagonal(int offset) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diagonal(int offset, int axis1, int axis2) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void intern(NDArray replaced) {
         RsNDArray arr = (RsNDArray) replaced;
         Long oldHandle = handle.getAndSet(arr.handle.getAndSet(null));
