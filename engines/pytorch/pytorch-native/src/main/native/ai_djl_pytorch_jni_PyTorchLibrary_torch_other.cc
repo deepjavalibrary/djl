@@ -137,3 +137,12 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchViewAsComple
   API_END_RETURN()
 #endif
 }
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchDiagonal(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlong offset, jlong axis1, jlong axis2) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const auto* result_ptr = new torch::Tensor(tensor_ptr->diagonal(offset, axis1, axis2));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}

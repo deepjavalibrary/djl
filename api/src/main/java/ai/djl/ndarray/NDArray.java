@@ -4216,6 +4216,66 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray cumSum(int axis);
 
     /**
+     * Return specified diagonals.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(9.0f).reshape(3, 3);
+     * jshell&gt; array.diagonal();
+     * ND: (3) cpu() float32
+     * [0., 4., 8.]
+     * </pre>
+     *
+     * @return specified diagonals
+     */
+    NDArray diagonal();
+
+    /**
+     * Return specified diagonals.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(9.0f).reshape(3, 3);
+     * jshell&gt; array.diagonal(1);
+     * ND: (2) cpu() float32
+     * [1., 5.]
+     * jshell&gt; array.diagonal(-1);
+     * ND: (2) cpu() float32
+     * [3., 7.]
+     * </pre>
+     *
+     * @param offset Offset of the diagonal from the main diagonal. Can be positive or negative.
+     * @return specified diagonals
+     */
+    NDArray diagonal(int offset);
+
+    /**
+     * Return specified diagonals.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(27f).reshape(3, 3, 3);
+     * jshell&gt; array.diagonal(0, 1, 2);
+     * ND: (3, 3) cpu() float32
+     * [[ 0.,  4.,  8.],
+     * [ 9., 13., 17.],
+     * [18., 22., 26.],
+     * ]
+     * </pre>
+     *
+     * @param offset Offset of the diagonal from the main diagonal. Can be positive or negative.
+     * @param axis1 Axis to be used as the first axis of the 2-D sub-arrays from which the diagonals
+     *     should be taken.
+     * @param axis2 Axis to be used as the second axis of the 2-D sub-arrays from which the
+     *     diagonals should be taken.
+     * @return specified diagonals
+     */
+    NDArray diagonal(int offset, int axis1, int axis2);
+
+    /**
      * Replace the handle of the NDArray with the other. The NDArray used for replacement will be
      * killed.
      *

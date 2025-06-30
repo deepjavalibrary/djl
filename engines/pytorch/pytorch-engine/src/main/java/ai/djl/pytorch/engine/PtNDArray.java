@@ -1290,6 +1290,24 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray diagonal() {
+        return JniUtils.diagonal(this, 0, 0, 1);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diagonal(int offset) {
+        return JniUtils.diagonal(this, offset, 0, 1);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NDArray diagonal(int offset, int axis1, int axis2) {
+        return JniUtils.diagonal(this, offset, axis1, axis2);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void intern(NDArray replaced) {
         PtNDArray arr = (PtNDArray) replaced;
         Long oldHandle = handle.getAndSet(arr.handle.getAndSet(null));

@@ -268,6 +268,8 @@ final class PyTorchLibrary {
 
     native long torchCumSum(long handle, long dim);
 
+    native long torchDiagonal(long handle, long offset, long axis1, long axis2);
+
     native long torchFlatten(long handle, long startDim, long endDim);
 
     native long torchFft(long handle, long length, long axis);
