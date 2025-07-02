@@ -207,7 +207,7 @@ jobs:
         # PT 2.3.1 is for CUDA 12.1 support
         # PT 2.5.1 is for CUDA 12.4 support
         # PT 2.6.0 is for CUDA 12.4 support
-        # PT 2.7.0 is for CUDA 12.4 support
+        # PT 2.7.0 is for CUDA 12.8 support
         run: |
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -Psnapshot
           ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.1.2 -Psnapshot
