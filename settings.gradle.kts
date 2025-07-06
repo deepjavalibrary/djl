@@ -54,3 +54,4 @@ dependencyResolutionManagement {
 // we need to disable this because of this bug: https://github.com/gradle/gradle/issues/19254
 // Method org/gradle/accessors/dm/RootProjectAccessor_Decorated.getExtensions()Lorg/gradle/api/plugins/ExtensionContainer; is abstract
 //enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+include("extensions:genai")

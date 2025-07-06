@@ -43,6 +43,9 @@ final class TfOpExecutor implements AutoCloseable {
 
     @SuppressWarnings({"unchecked", "try"})
     TfOpExecutor(TfNDManager manager, TFE_Context eagerSessionHandle, String operation) {
+        if (manager == null || eagerSessionHandle == null) {
+            throw new IllegalArgumentException("eagerSessionHandle cannot be null");
+        }
         this.manager = manager;
         closed = new AtomicBoolean(false);
         try (PointerScope ignore = new PointerScope()) {

@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -53,7 +54,7 @@ public final class CoverageUtils {
             if (clazz.isEnum()) {
                 obj = clazz.getEnumConstants()[0];
             } else {
-                Constructor<?>[] constructors = clazz.getConstructors();
+                Constructor<?>[] constructors = clazz.getDeclaredConstructors();
                 for (Constructor<?> con : constructors) {
                     try {
                         Class<?>[] types = con.getParameterTypes();
@@ -72,6 +73,8 @@ public final class CoverageUtils {
                 continue;
             }
 
+            Field[] f = clazz.getDeclaredFields();
+            Set<String> fields = Arrays.stream(f).map(Field::getName).collect(Collectors.toSet());
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
                 String methodName = method.getName();
@@ -84,7 +87,9 @@ public final class CoverageUtils {
                                     || "hashCode".equals(methodName))) {
                         method.invoke(obj);
                     } else if (parameterCount == 1
-                            && (methodName.startsWith("set") || "fromValue".equals(methodName))) {
+                            && (methodName.startsWith("set")
+                                    || "fromValue".equals(methodName)
+                                    || fields.contains(methodName))) {
                         Class<?> type = method.getParameterTypes()[0];
                         method.invoke(obj, getMockInstance(type, true));
                     } else if ("equals".equals(methodName)) {

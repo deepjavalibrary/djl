@@ -37,6 +37,8 @@ public class MxGradientCollectorIntegrationTest {
     public void testMxAutograd() {
         TestRequirements.notArm();
 
+        MxGradientCollector.setRecording(false);
+        MxGradientCollector.setTraining(false);
         try (Model model = Model.newInstance("model");
                 NDManager manager = model.getNDManager()) {
             model.setBlock(Blocks.identityBlock());
