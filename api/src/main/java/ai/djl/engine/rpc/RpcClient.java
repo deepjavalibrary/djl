@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -123,7 +124,7 @@ public final class RpcClient {
             throw new IOException("Offline mode is enabled.");
         }
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        boolean isSse = false;
+        boolean isStream = false;
         try {
             conn.setRequestMethod(method);
             if ("POST".equals(method) || "PUT".equals(method)) {
@@ -153,43 +154,18 @@ public final class RpcClient {
                 String value = entry.getValue().get(0);
                 if (key != null) {
                     if ("content-type".equalsIgnoreCase(key)
-                            && "text/event-stream".equalsIgnoreCase(value)) {
-                        isSse = true;
+                            && ("text/event-stream".equalsIgnoreCase(value)
+                                    || "application/jsonlines".equalsIgnoreCase(value))) {
+                        isStream = true;
                     }
                     out.addProperty(key, value);
                 }
             }
             if (code == 200) {
-                if (isSse) {
+                if (isStream) {
                     ChunkedBytesSupplier cbs = new ChunkedBytesSupplier();
                     out.add(cbs);
-                    CompletableFuture.<Void>supplyAsync(
-                            () -> {
-                                try (BufferedReader reader =
-                                        new BufferedReader(
-                                                new InputStreamReader(
-                                                        conn.getInputStream(),
-                                                        StandardCharsets.UTF_8))) {
-                                    String line;
-                                    while ((line = reader.readLine()) != null) {
-                                        if (line.startsWith("data: ")) {
-                                            line = line.substring(6);
-                                        }
-                                        if (!line.isEmpty()) {
-                                            cbs.appendContent(BytesSupplier.wrap(line), false);
-                                        }
-                                    }
-                                } catch (IOException e) {
-                                    logger.warn("Failed run inference.", e);
-                                    cbs.appendContent(
-                                            BytesSupplier.wrap("connection abort exceptionally"),
-                                            false);
-                                } finally {
-                                    cbs.appendContent(new byte[0], true);
-                                    conn.disconnect();
-                                }
-                                return null;
-                            });
+                    CompletableFuture.supplyAsync(() -> handleStream(conn, cbs));
                 } else {
                     try (InputStream is = conn.getInputStream()) {
                         out.add(Utils.toByteArray(is));
@@ -208,7 +184,7 @@ public final class RpcClient {
             }
             return out;
         } finally {
-            if (!isSse) {
+            if (!isStream) {
                 conn.disconnect();
             }
         }
@@ -221,6 +197,35 @@ public final class RpcClient {
             }
         }
         return def;
+    }
+
+    private static Void handleStream(HttpURLConnection conn, ChunkedBytesSupplier cbs) {
+        try (Reader r = new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(r)) {
+            String line;
+            StringBuilder sb = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("data: ")) {
+                    if (sb.length() > 0) {
+                        sb.append('\n');
+                    }
+                    sb.append(line.substring(6));
+                } else if (!line.isEmpty()) {
+                    // jsonlines
+                    cbs.appendContent(BytesSupplier.wrap(line), false);
+                } else if (sb.length() > 0) {
+                    cbs.appendContent(BytesSupplier.wrap(sb.toString()), false);
+                    sb.setLength(0);
+                }
+            }
+        } catch (IOException e) {
+            logger.warn("Failed run inference.", e);
+            cbs.appendContent(BytesSupplier.wrap("connection abort exceptionally"), false);
+        } finally {
+            cbs.appendContent(new byte[0], true);
+            conn.disconnect();
+        }
+        return null;
     }
 
     static final class CaseInsensitiveKey {

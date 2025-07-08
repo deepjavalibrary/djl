@@ -26,6 +26,7 @@ import ai.djl.util.JsonUtils;
 import ai.djl.util.Pair;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -129,8 +130,18 @@ public class RpcTranslatorFactoryTest {
                 Assert.assertEquals(ret.data, "echo");
 
                 // test SSE response
-                server.setContent("data: line1\n\ndata:  line2\n\n");
+                server.setContent(
+                        "data: {\"value\":\n"
+                                + "data: \"line1\"}\n\n"
+                                + "data: {\"value\"\n"
+                                + "data: :\" line2\"}\n\n");
                 server.setContentType("text/event-stream");
+                ret = predictor.predict(testInput);
+                Assert.assertEquals(ret.data, "line1 line2");
+
+                // test jsonlines response
+                server.setContent("{\"value\":\"line1\"}\n{\"value\":\" line2\"}\n\n");
+                server.setContentType("application/jsonlines");
                 ret = predictor.predict(testInput);
                 Assert.assertEquals(ret.data, "line1 line2");
 
@@ -156,7 +167,13 @@ public class RpcTranslatorFactoryTest {
 
         public static TestData fromJson(Iterator<String> it) {
             StringBuilder sb = new StringBuilder();
-            it.forEachRemaining(sb::append);
+            while (it.hasNext()) {
+                String line = it.next();
+                if (!line.isEmpty()) {
+                    JsonObject json = JsonUtils.GSON.fromJson(line, JsonObject.class);
+                    sb.append(json.get("value").getAsString());
+                }
+            }
             return new TestData(sb.toString());
         }
 
