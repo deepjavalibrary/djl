@@ -90,8 +90,8 @@ class RepositoryFactoryImpl implements RepositoryFactory {
             return new SimpleUrlRepository(name, uri, modelName);
         }
 
-        Path path = Paths.get(parseFilePath(uri));
-        String fileName = path.toFile().getName();
+        String[] paths = parseFilePath(uri).split("/");
+        String fileName = paths[paths.length - 1];
         if (FilenameUtils.isArchiveFile(fileName)) {
             fileName = FilenameUtils.getNamePart(fileName);
             return new SimpleUrlRepository(name, uri, fileName);
