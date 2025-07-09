@@ -124,7 +124,13 @@ public class RpcTranslatorFactory implements TranslatorFactory {
                 return (Input) in;
             }
             Input converted = new Input();
-            converted.add(BytesSupplier.wrapAsJson(in));
+            if (in instanceof String) {
+                converted.add((String) in);
+            } else if (in instanceof byte[]) {
+                converted.add((byte[]) in);
+            } else {
+                converted.add(BytesSupplier.wrapAsJson(in));
+            }
             return converted;
         }
 

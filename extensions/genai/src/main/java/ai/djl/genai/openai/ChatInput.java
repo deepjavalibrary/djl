@@ -15,6 +15,7 @@ package ai.djl.genai.openai;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,9 @@ public class ChatInput {
     @SerializedName("presence_penalty")
     private Float presencePenalty;
 
+    @SerializedName("reasoning_effort")
+    private String reasoningEffort;
+
     private Integer seed;
     private List<String> stop;
     private Boolean stream;
@@ -61,6 +65,9 @@ public class ChatInput {
     @SerializedName("tool_choice")
     private Object toolChoice;
 
+    @SerializedName("extra_body")
+    private Object extraBody;
+
     ChatInput(Builder builder) {
         model = builder.model;
         messages = builder.messages;
@@ -71,6 +78,7 @@ public class ChatInput {
         maxCompletionTokens = builder.maxCompletionTokens;
         n = builder.n;
         presencePenalty = builder.presencePenalty;
+        reasoningEffort = builder.reasoningEffort;
         seed = builder.seed;
         stop = builder.stop;
         stream = builder.stream;
@@ -80,6 +88,7 @@ public class ChatInput {
         ignoreEos = builder.ignoreEos;
         tools = builder.tools;
         toolChoice = builder.toolChoice;
+        extraBody = builder.extraBody;
     }
 
     /**
@@ -164,6 +173,15 @@ public class ChatInput {
     }
 
     /**
+     * Returns the reasoning effort.
+     *
+     * @return the reasoning effort
+     */
+    public String getReasoningEffort() {
+        return reasoningEffort;
+    }
+
+    /**
      * Returns the seed.
      *
      * @return the seed
@@ -245,6 +263,15 @@ public class ChatInput {
     }
 
     /**
+     * Returns the extra body.
+     *
+     * @return the extra body
+     */
+    public Object getExtraBody() {
+        return extraBody;
+    }
+
+    /**
      * Creates a builder to build a {@code ChatInput}.
      *
      * @return a new builder
@@ -274,13 +301,24 @@ public class ChatInput {
     }
 
     /**
-     * Creates a builder with the specified file uri.
+     * Creates a builder with the specified image url.
      *
-     * @param imageUrl the file uri
+     * @param imageUrl the image url
      * @return a new builder
      */
     public static Builder image(String imageUrl) {
         return builder().addImage(imageUrl);
+    }
+
+    /**
+     * Creates a builder with the specified image data.
+     *
+     * @param image the image binary data
+     * @param mimeType the mime type of the image
+     * @return a new builder
+     */
+    public static Builder image(byte[] image, String mimeType) {
+        return builder().addImage(image, mimeType);
     }
 
     /**
@@ -306,6 +344,7 @@ public class ChatInput {
         Integer maxCompletionTokens;
         Integer n;
         Float presencePenalty;
+        String reasoningEffort;
         Integer seed;
         List<String> stop;
         Boolean stream;
@@ -315,6 +354,7 @@ public class ChatInput {
         Boolean ignoreEos;
         List<Tool> tools;
         Object toolChoice;
+        Object extraBody;
 
         /**
          * Sets the model.
@@ -369,6 +409,18 @@ public class ChatInput {
          */
         public Builder addImage(String imageUrl) {
             this.messages.add(Message.fromImage(imageUrl));
+            return this;
+        }
+
+        /**
+         * Adds the image content.
+         *
+         * @param image the image data
+         * @param mimeType the mime type of the image
+         * @return the builder
+         */
+        public Builder addImage(byte[] image, String mimeType) {
+            this.messages.add(Message.fromImage(image, mimeType));
             return this;
         }
 
@@ -462,6 +514,17 @@ public class ChatInput {
         }
 
         /**
+         * Sets the reasoning effort.
+         *
+         * @param reasoningEffort the reasoning effort
+         * @return the builder
+         */
+        public Builder reasoningEffort(String reasoningEffort) {
+            this.reasoningEffort = reasoningEffort;
+            return this;
+        }
+
+        /**
          * Sets the seed.
          *
          * @param seed the seed
@@ -550,6 +613,16 @@ public class ChatInput {
         }
 
         /**
+         * Sets the tools.
+         *
+         * @param tools the tools
+         * @return the tools
+         */
+        public Builder tools(Tool... tools) {
+            return tools(Arrays.asList(tools));
+        }
+
+        /**
          * Sets the tool choice mode.
          *
          * @param toolChoice the tool choice mode
@@ -568,6 +641,17 @@ public class ChatInput {
          */
         public Builder toolChoice(Tool toolChoice) {
             this.toolChoice = toolChoice;
+            return this;
+        }
+
+        /**
+         * Sets the extra body.
+         *
+         * @param extraBody the extra body
+         * @return the builder
+         */
+        public Builder extraBody(Tool extraBody) {
+            this.extraBody = extraBody;
             return this;
         }
 
