@@ -12,6 +12,10 @@
  */
 package ai.djl.genai.openai;
 
+import ai.djl.util.JsonUtils;
+
+import com.google.gson.JsonObject;
+
 /** A data class represents chat completion schema. */
 @SuppressWarnings("MissingJavadocMethod")
 public class Function {
@@ -64,8 +68,13 @@ public class Function {
             return this;
         }
 
-        public Builder parameters(String parameters) {
+        public Builder parameters(Object parameters) {
             this.parameters = parameters;
+            return this;
+        }
+
+        public Builder parameters(String parameters) {
+            this.parameters = JsonUtils.GSON.fromJson(parameters, JsonObject.class);
             return this;
         }
 

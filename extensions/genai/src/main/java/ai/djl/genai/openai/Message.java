@@ -25,6 +25,9 @@ public class Message {
     private Object content;
     private String name;
 
+    @SerializedName("tool_calls")
+    private List<ToolCall> toolCalls;
+
     @SerializedName("tool_call_id")
     private String toolCallId;
 
@@ -51,6 +54,10 @@ public class Message {
         return name;
     }
 
+    public List<ToolCall> getToolCalls() {
+        return toolCalls;
+    }
+
     public String getToolCallId() {
         return toolCallId;
     }
@@ -65,6 +72,14 @@ public class Message {
 
     public static Message fromImage(String imageUrl) {
         return fromImage(imageUrl, "user");
+    }
+
+    public static Message fromImage(byte[] image, String mimeType) {
+        return fromImage(image, mimeType, "user");
+    }
+
+    public static Message fromImage(byte[] image, String mimeType, String role) {
+        return builder().addImage(image, mimeType).role(role).build();
     }
 
     public static Message fromImage(String imageUrl, String role) {
@@ -124,6 +139,11 @@ public class Message {
 
         public Builder addImage(String imageUrl) {
             contents.add(Content.fromImage(imageUrl));
+            return this;
+        }
+
+        public Builder addImage(byte[] image, String mimeType) {
+            contents.add(Content.fromImage(image, mimeType));
             return this;
         }
 

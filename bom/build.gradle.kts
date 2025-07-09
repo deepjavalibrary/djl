@@ -22,6 +22,7 @@ dependencies {
         api("ai.djl.audio:audio:${version}")
         api("ai.djl.aws:aws-ai:${version}")
         api("ai.djl.fasttext:fasttext-engine:${version}")
+        api("ai.djl.genai:genai:${version}")
         api("ai.djl.hadoop:hadoop:${version}")
         api("ai.djl.huggingface:tokenizers:${version}")
         api("ai.djl.ml.lightgbm:lightgbm:${version}")

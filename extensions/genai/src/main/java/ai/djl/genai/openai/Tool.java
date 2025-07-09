@@ -33,6 +33,26 @@ public class Tool {
     }
 
     /**
+     * Creates a new function {@code Tool}.
+     *
+     * @param function the function for the tool
+     * @return a new {@code Tool} instance
+     */
+    public static Tool of(Function function) {
+        return builder().type("function").function(function).build();
+    }
+
+    /**
+     * Creates a new function {@code Tool}.
+     *
+     * @param function the function for the tool
+     * @return a new {@code Tool} instance
+     */
+    public static Tool of(Function.Builder function) {
+        return builder().type("function").function(function).build();
+    }
+
+    /**
      * Creates a builder to build a {@code Tool}.
      *
      * @return a new builder

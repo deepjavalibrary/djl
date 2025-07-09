@@ -127,4 +127,22 @@ public class ChatOutput {
         }
         return "";
     }
+
+    /**
+     * Returns the {@link ToolCall} response.
+     *
+     * @return the {@link ToolCall} response
+     */
+    public ToolCall getToolCall() {
+        if (choices != null && !choices.isEmpty()) {
+            Message message = choices.get(0).getMessage();
+            if (message != null) {
+                List<ToolCall> toolsCalls = message.getToolCalls();
+                if (toolsCalls != null && !toolsCalls.isEmpty()) {
+                    return toolsCalls.get(0);
+                }
+            }
+        }
+        return null;
+    }
 }
