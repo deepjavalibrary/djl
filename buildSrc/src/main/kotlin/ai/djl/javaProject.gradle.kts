@@ -25,7 +25,7 @@ tasks {
         options.apply {
             release = 11
             encoding = "UTF-8"
-            compilerArgs = listOf("-proc:none", "-Xlint:all,-options,-static,-removal", "-Werror")
+            compilerArgs = listOf("-proc:none", "-Xlint:all,-options,-static,-removal", "-Werror", "-parameters")
         }
     }
     javadoc {
