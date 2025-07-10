@@ -13,6 +13,7 @@
 package ai.djl.genai.openai;
 
 import ai.djl.ModelException;
+import ai.djl.genai.FunctionUtils;
 import ai.djl.inference.Predictor;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
@@ -25,6 +26,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -87,6 +89,43 @@ public class ChatCompletionTest {
                     sb.append(out.getTextOutput());
                 }
                 Assert.assertEquals(sb.toString(), "This is a test.");
+            }
+        }
+    }
+
+    @Test
+    public void testGenerateContentWithFunction()
+            throws ModelException, IOException, TranslateException, ReflectiveOperationException {
+        String mockResponse = loadFunctionContent();
+        try (TestServer server = TestServer.newInstance(mockResponse)) {
+            String endpoint = "http://localhost:" + server.getPort();
+            // endpoint = "https://generativelanguage.googleapis.com";
+            String url = endpoint + "/v1beta/openai/chat/completions";
+            Criteria<ChatInput, ChatOutput> criteria =
+                    Criteria.builder()
+                            .setTypes(ChatInput.class, ChatOutput.class)
+                            .optModelUrls(url)
+                            .optArgument("API_KEY", "1234") // override env var
+                            .build();
+
+            try (ZooModel<ChatInput, ChatOutput> model = criteria.loadModel();
+                    Predictor<ChatInput, ChatOutput> predictor = model.newPredictor()) {
+                Method method = ChatCompletionTest.class.getMethod("getWeather", String.class);
+                Function function =
+                        Function.function(method)
+                                .description("Get the current weather in a given location")
+                                .build();
+                ChatInput in =
+                        ChatInput.text("What's the weather like in New York today?")
+                                .model("gemini-2.5-flash")
+                                .tools(Tool.of(function))
+                                .toolChoice("auto")
+                                .build();
+
+                ChatOutput ret = predictor.predict(in);
+                String arguments = ret.getToolCall().getFunction().getArguments();
+                String weather = (String) FunctionUtils.invoke(method, this, arguments);
+                Assert.assertEquals(weather, "nice");
             }
         }
     }
@@ -200,5 +239,18 @@ public class ChatCompletionTest {
                 + "\"created\":1751755529,\"id\":\"1\",\"model\":\"gemini-2.5-flash\","
                 + "\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":5,"
                 + "\"prompt_tokens\":7,\"total_tokens\":49}}\n\n";
+    }
+
+    private String loadFunctionContent() {
+        return "{\"id\":\"\",\"object\":\"chat.completion\",\"created\":1,\"choices\":["
+                + "{\"index\":0,\"message\":{\"role\":\"assistant\",\"tool_calls\":["
+                + "{\"id\":\"\",\"type\":\"function\",\"function\":{\"arguments\":\""
+                + "{\\\"location\\\":\\\"New York\\\"}\",\"name\":\"getWeather\"}}]},"
+                + "\"finish_reason\":\"tool_calls\"}],\"model\":\"gemini-2.5-flash\",\"usage\":"
+                + "{\"completion_tokens\":15,\"prompt_tokens\":50,\"total_tokens\":127}}";
+    }
+
+    public String getWeather(String location) {
+        return "nice";
     }
 }

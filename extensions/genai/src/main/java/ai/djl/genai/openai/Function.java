@@ -12,9 +12,16 @@
  */
 package ai.djl.genai.openai;
 
+import ai.djl.genai.FunctionUtils;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 
 import com.google.gson.JsonObject;
+
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** A data class represents chat completion schema. */
 @SuppressWarnings("MissingJavadocMethod")
@@ -49,6 +56,23 @@ public class Function {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static Builder function(Method method) {
+        Map<String, Object> parameters = new ConcurrentHashMap<>();
+        PairList<String, String> pairs = FunctionUtils.getParameters(method);
+        Map<String, Map<String, String>> properties = new ConcurrentHashMap<>();
+        for (Pair<String, String> pair : pairs) {
+            Map<String, String> prop = new ConcurrentHashMap<>();
+            prop.put("type", pair.getValue());
+            properties.put(pair.getKey(), prop);
+        }
+
+        parameters.put("type", "object");
+        parameters.put("properties", properties);
+        parameters.put("required", pairs.keys());
+
+        return builder().name(method.getName()).parameters(parameters);
     }
 
     /** The builder for {@code Function}. */
