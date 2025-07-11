@@ -12,6 +12,15 @@
  */
 package ai.djl.genai.gemini.types;
 
+import ai.djl.genai.FunctionUtils;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
+
+import java.lang.reflect.Method;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /** A data class represents Gemini schema. */
 @SuppressWarnings("MissingJavadocMethod")
 public class FunctionDeclaration {
@@ -64,6 +73,25 @@ public class FunctionDeclaration {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static Builder function(Method method) {
+        Map<String, Schema> properties = new ConcurrentHashMap<>();
+        PairList<String, String> pairs = FunctionUtils.getParameters(method);
+        for (Pair<String, String> pair : pairs) {
+            Schema schema =
+                    Schema.builder()
+                            .type(Type.valueOf(pair.getValue().toUpperCase(Locale.ROOT)))
+                            .build();
+            properties.put(pair.getKey(), schema);
+        }
+        Schema parameters =
+                Schema.builder()
+                        .type(Type.OBJECT)
+                        .required(pairs.keys())
+                        .properties(properties)
+                        .build();
+        return builder().name(method.getName()).parameters(parameters);
     }
 
     /** Builder class for {@code FunctionDeclaration}. */

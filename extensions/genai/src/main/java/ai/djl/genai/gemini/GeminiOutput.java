@@ -13,10 +13,11 @@
 package ai.djl.genai.gemini;
 
 import ai.djl.genai.gemini.types.Candidate;
-import ai.djl.genai.gemini.types.Content;
+import ai.djl.genai.gemini.types.FunctionCall;
 import ai.djl.genai.gemini.types.Part;
 import ai.djl.genai.gemini.types.UsageMetadata;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -58,6 +59,23 @@ public class GeminiOutput {
     }
 
     /**
+     * Returns the content parts.
+     *
+     * @return the content parts
+     */
+    public List<Part> getParts() {
+        Candidate candidate = getCandidate();
+        if (candidate == null) {
+            return Collections.emptyList();
+        }
+        List<Part> parts = candidate.getContent().getParts();
+        if (parts == null) {
+            return Collections.emptyList();
+        }
+        return parts;
+    }
+
+    /**
      * Returns the usage metadata.
      *
      * @return the usage metadata
@@ -81,21 +99,41 @@ public class GeminiOutput {
      * @return the aggregated text output
      */
     public String getTextOutput() {
-        if (candidates == null || candidates.isEmpty()) {
-            return "";
-        }
-        Content content = candidates.get(0).getContent();
-        List<Part> parts = content.getParts();
-        if (parts == null || parts.isEmpty()) {
-            return "";
-        }
-
         StringBuilder sb = new StringBuilder();
-        for (Part part : content.getParts()) {
+        for (Part part : getParts()) {
             if (part.getText() != null) {
                 sb.append(part.getText());
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Returns the {@link FunctionCall}s in the response.
+     *
+     * @return the {@link FunctionCall}s in the response
+     */
+    public List<FunctionCall> getFunctionCalls() {
+        List<FunctionCall> list = new ArrayList<>();
+        for (Part part : getParts()) {
+            FunctionCall call = part.getFunctionCall();
+            if (call != null) {
+                list.add(call);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Returns the first {@link FunctionCall} in the response.
+     *
+     * @return the first {@link FunctionCall} in the response
+     */
+    public FunctionCall getFunctionCall() {
+        List<FunctionCall> list = getFunctionCalls();
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
     }
 }
