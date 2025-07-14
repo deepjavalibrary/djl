@@ -27,6 +27,7 @@ public class TrainPikachuTest {
 
     @Test
     public void testDetection() throws IOException, MalformedModelException, TranslateException {
+        TestRequirements.notArm();
         TestRequirements.linux();
         TestRequirements.nightly();
 

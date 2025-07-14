@@ -25,6 +25,7 @@ public class TrainCaptchaTest {
 
     @Test
     public void testTrainCaptcha() throws IOException, TranslateException {
+        TestRequirements.notArm();
         TestRequirements.linux();
 
         // TODO: PyTorch

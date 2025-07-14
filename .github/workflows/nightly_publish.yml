@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
+        operating-system: [ macos-latest, ubuntu-latest, ubuntu-24.04-arm, windows-latest ]
 
     steps:
       - uses: actions/checkout@v4
@@ -40,6 +40,12 @@ jobs:
         run: brew install libomp
       - name: Build with Gradle
         run: ./gradlew -Dnightly=true build :jacoco:testCodeCoverageReport
+      - name: PyTorch integration test
+        run: ./gradlew :integration:clean :integration:test "-Dai.djl.default_engine=PyTorch"
+      - name: TensorFlow integration test
+        run: ./gradlew :integration:clean :integration:test "-Dai.djl.default_engine=TensorFlow"
+      - name: OnnxRuntime integration test
+        run: ./gradlew :integration:clean :integration:test "-Dai.djl.default_engine=OnnxRuntime"
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
@@ -49,143 +55,10 @@ jobs:
             ${{ github.workspace }}/**/build/reports/**/*
             !${{ github.workspace }}/**/build/reports/jacoco/*
 
-  test-pytorch:
-    if: github.repository == 'deepjavalibrary/djl'
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      fail-fast: false
-      matrix:
-        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'corretto'
-          java-version: 17
-      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
-      - uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Test with Gradle
-        run: ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
-
-  test-tensorflow:
-    if: github.repository == 'deepjavalibrary/djl'
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      fail-fast: false
-      matrix:
-        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'corretto'
-          java-version: 17
-      # Enable gradle cache: https://github.com/actions/cache/blob/master/examples.md#java---gradle
-      - uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Test with Gradle
-        run: ./gradlew :integration:test "-Dai.djl.default_engine=TensorFlow"
-
-  test-onnx:
-    if: github.repository == 'deepjavalibrary/djl'
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      fail-fast: false
-      matrix:
-        operating-system: [ macos-latest, ubuntu-latest, windows-latest ]
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: 17
-      - uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Test with Gradle
-        run: ./gradlew :integration:test "-Dai.djl.default_engine=OnnxRuntime"
-
-  test-aarch64:
-    if: github.repository == 'deepjavalibrary/djl'
-    runs-on: [ self-hosted, aarch64 ]
-    container:
-      image: amazonlinux:2
-      env:
-        JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto.aarch64
-    timeout-minutes: 30
-    needs: create-runners
-    steps:
-      - name: Setup Environment
-        run: |
-          yum install -y tar gzip
-          yum -y install java-17-amazon-corretto-devel
-      - uses: taiki-e/checkout-action@v1
-      - name: Test with Gradle
-        run: |
-          ./gradlew :integration:test "-Dai.djl.default_engine=PyTorch"
-          ./gradlew :integration:clean
-          # OnnxRuntime 1.17.1 requires GLIBC 2.27
-          # ./gradlew :integration:test "-Dai.djl.default_engine=OnnxRuntime"
-          # ./gradlew :integration:clean
-
-  test-cuda-124:
-    if: github.repository == 'deepjavalibrary/djl'
-    runs-on: [ self-hosted, gpu ]
-    container:
-      image: nvidia/cuda:12.4.1-devel-ubuntu22.04
-      options: --gpus all --runtime=nvidia
-    timeout-minutes: 30
-    needs: create-runners
-    steps:
-      - name: Setup Environment
-        run: |
-          apt-get update
-          DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common wget locales libfontconfig1
-          locale-gen en_US.UTF-8
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: corretto
-      - uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Test with Gradle
-        run: |
-          ./gradlew :integration:test -Dai.djl.default_engine=PyTorch
-          ./gradlew :integration:clean :integration:test -Dai.djl.default_engine=TensorFlow
-          ./gradlew :engines:pytorch:pytorch-model-zoo:test
-          ./gradlew :engines:tensorflow:tensorflow-model-zoo:test
-          # manually install cudnn9, PyTorch doesn't work with cudnn9, but OnnxRuntime requires cudnn9
-          apt-get update && apt-get install -y --no-install-recommends libcudnn9-cuda-12
-          ./gradlew :engines:onnxruntime:onnxruntime-engine:test
-
   publish:
     if: github.repository == 'deepjavalibrary/djl'
     runs-on: ubuntu-latest
-    needs: [ build, test-pytorch, test-tensorflow, test-aarch64, test-cuda-124 ]
+    needs: [ build ]
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -236,43 +109,3 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
           ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ORG_GRADLE_PROJECT_ossrhUsername }}
           ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ORG_GRADLE_PROJECT_ossrhPassword }}
-
-  create-runners:
-    if: github.repository == 'deepjavalibrary/djl'
-    runs-on: [ self-hosted, scheduler ]
-    steps:
-      - name: Create new Graviton instance
-        id: create_aarch64
-        run: |
-          cd /home/ubuntu/djl_benchmark_script/scripts
-          token=$( curl -X POST -H "Authorization: token ${{ secrets.ACTION_RUNNER_PERSONAL_TOKEN }}" \
-          https://api.github.com/repos/deepjavalibrary/djl/actions/runners/registration-token \
-          --fail \
-          | jq '.token' | tr -d '"' )
-          ./start_instance.sh action_graviton $token djl
-      - name: Create new GPU instance 1
-        id: create_gpu_1
-        run: |
-          cd /home/ubuntu/djl_benchmark_script/scripts
-          token=$( curl -X POST -H "Authorization: token ${{ secrets.ACTION_RUNNER_PERSONAL_TOKEN }}" \
-          https://api.github.com/repos/deepjavalibrary/djl/actions/runners/registration-token \
-          --fail \
-          | jq '.token' | tr -d '"' )
-          ./start_instance.sh action_gpu $token djl
-    outputs:
-      aarch64_instance_id: ${{ steps.create_aarch64.outputs.action_graviton_instance_id }}
-      gpu_1_instance_id: ${{ steps.create_gpu_1.outputs.action_gpu_instance_id }}
-
-  stop-runners:
-    if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
-    runs-on: [ self-hosted, scheduler ]
-    needs: [ create-runners, test-aarch64, test-cuda-124 ]
-    steps:
-      - name: Stop all instances
-        run: |
-          cd /home/ubuntu/djl_benchmark_script/scripts
-          instance_id=${{ needs.create-runners.outputs.aarch64_instance_id }}
-          ./stop_instance.sh $instance_id
-          cd /home/ubuntu/djl_benchmark_script/scripts
-          instance_id=${{ needs.create-runners.outputs.gpu_1_instance_id }}
-          ./stop_instance.sh $instance_id

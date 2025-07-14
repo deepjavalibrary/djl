@@ -31,6 +31,7 @@ public class TimeSeriesTest {
 
     @Test
     public void testM5Forecasting() throws ModelException, TranslateException, IOException {
+        TestRequirements.notArm();
         TestRequirements.linux();
 
         Map<String, Float> result = M5ForecastingDeepAR.predict();
@@ -53,6 +54,7 @@ public class TimeSeriesTest {
 
     @Test
     public void testAirPassenger() throws ModelException, TranslateException, IOException {
+        TestRequirements.notArm();
         TestRequirements.linux();
 
         float[] result = AirPassengersDeepAR.predict();

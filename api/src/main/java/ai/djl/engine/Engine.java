@@ -81,9 +81,14 @@ public abstract class Engine {
 
         String def = System.getProperty("ai.djl.default_engine");
         String defaultEngine = Utils.getenv("DJL_DEFAULT_ENGINE", def);
+        boolean aarch64 = "aarch64".equals(System.getProperty("os.arch"));
         if (defaultEngine == null || defaultEngine.isEmpty()) {
             int rank = Integer.MAX_VALUE;
             for (EngineProvider provider : ALL_ENGINES.values()) {
+                if (aarch64 && "MXNet".equals(provider.getEngineName())) {
+                    // exclude MXNet on aarch64 machine
+                    continue;
+                }
                 if (provider.getEngineRank() < rank) {
                     defaultEngine = provider.getEngineName();
                     rank = provider.getEngineRank();
