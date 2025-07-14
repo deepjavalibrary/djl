@@ -13,6 +13,9 @@
 package ai.djl.genai.gemini;
 
 import ai.djl.ModelException;
+import ai.djl.genai.FunctionUtils;
+import ai.djl.genai.gemini.types.FunctionCall;
+import ai.djl.genai.gemini.types.FunctionDeclaration;
 import ai.djl.genai.gemini.types.GenerationConfig;
 import ai.djl.genai.gemini.types.GoogleSearch;
 import ai.djl.genai.gemini.types.HarmBlockThreshold;
@@ -31,9 +34,11 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class GeminiTest {
 
@@ -90,6 +95,53 @@ public class GeminiTest {
                     sb.append(out.getTextOutput());
                 }
                 Assert.assertEquals(sb.toString(), "This is a test.");
+            }
+        }
+    }
+
+    @Test
+    public void testGenerateContentWithFunction()
+            throws ModelException, IOException, TranslateException, ReflectiveOperationException {
+        String mockResponse = loadFunctionContent();
+
+        Method method = GeminiTest.class.getMethod("getWeather", String.class, boolean.class);
+        FunctionDeclaration function =
+                FunctionDeclaration.function(method)
+                        .description(
+                                "Get the current weather in a given location, set unit to true for"
+                                        + " celsius")
+                        .build();
+        GenerationConfig config =
+                GenerationConfig.builder()
+                        .candidateCount(1)
+                        .addTool(Tool.builder().addFunctionDeclaration(function))
+                        .build();
+
+        try (TestServer server = TestServer.newInstance(mockResponse)) {
+            String endpoint = "http://localhost:" + server.getPort();
+            // endpoint = "https://generativelanguage.googleapis.com";
+            String url = endpoint + "/v1beta/models/gemini-2.5-flash:generateContent";
+            Criteria<GeminiInput, GeminiOutput> criteria =
+                    Criteria.builder()
+                            .setTypes(GeminiInput.class, GeminiOutput.class)
+                            .optModelUrls(url)
+                            .optArgument("API_KEY", "1234") // override env var
+                            .build();
+
+            try (ZooModel<GeminiInput, GeminiOutput> model = criteria.loadModel();
+                    Predictor<GeminiInput, GeminiOutput> predictor = model.newPredictor()) {
+
+                GeminiInput in =
+                        GeminiInput.text("What is the weather like in celsius in New York today?")
+                                .generationConfig(config)
+                                .build();
+
+                GeminiOutput ret = predictor.predict(in);
+                FunctionCall functionCall = ret.getFunctionCall();
+                Assert.assertNotNull(functionCall);
+                Map<String, Object> arguments = functionCall.getArgs();
+                String weather = (String) FunctionUtils.invoke(method, this, arguments);
+                Assert.assertEquals(weather, "nice");
             }
         }
     }
@@ -203,5 +255,15 @@ public class GeminiTest {
                 + "\"role\": \"model\"},\"finishReason\": \"STOP\",\"index\":0}]}\n\n"
                 + "data: {\"candidates\":[{\"content\":{\"parts\":[{\"text\":\" is a test.\"}],"
                 + "\"role\": \"model\"},\"finishReason\": \"STOP\",\"index\":0}]}\n\n";
+    }
+
+    private String loadFunctionContent() {
+        return "{\"candidates\":[{\"content\":{\"parts\":[{\"functionCall\":{"
+                + "\"args\":{\"unit\":true,\"location\":\"New York\"},\"name\":\"getWeather\"}}],"
+                + "\"role\":\"model\"},\"finishReason\":\"STOP\",\"index\":0}]}";
+    }
+
+    public String getWeather(String location, boolean unit) {
+        return "nice";
     }
 }
