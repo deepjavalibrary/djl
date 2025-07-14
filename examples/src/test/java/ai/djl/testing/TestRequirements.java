@@ -89,4 +89,11 @@ public final class TestRequirements {
             throw new SkipException("This test requires CPU only machine to run");
         }
     }
+
+    /** Requires that the test runs on x86_64 arch. */
+    public static void notArm() {
+        if ("aarch64".equals(System.getProperty("os.arch"))) {
+            throw new SkipException("This test requires a non-arm os.");
+        }
+    }
 }

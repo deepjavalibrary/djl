@@ -25,6 +25,7 @@ public class TrainSentimentAnalysisTest {
     @Test
     public void testTrainSentimentAnalysis()
             throws ModelException, TranslateException, IOException {
+        TestRequirements.notArm();
         TestRequirements.linux();
         TestRequirements.nightly();
         TestRequirements.gpu("MXNet", 1);

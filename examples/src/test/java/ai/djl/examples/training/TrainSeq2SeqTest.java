@@ -26,6 +26,7 @@ public class TrainSeq2SeqTest {
 
     @Test
     public void testTrainSeq2Seq() throws IOException, TranslateException {
+        TestRequirements.notArm();
         TestRequirements.linux();
 
         // TODO: PyTorch -- PtNDArray.sequenceMask not implemented
