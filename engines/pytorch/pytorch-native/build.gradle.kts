@@ -78,13 +78,12 @@ fun prepareNativeLib(execOperations: ExecOperations, binaryRoot: String, ver: St
 
     val officialPytorchUrl = "https://download.pytorch.org/libtorch"
     val aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
-    val cuda = "cu124"
+    val cuda = "cu128"
     if (packageType == "gpu") {
         // @formatter:off
         val files = mapOf(
             "$cuda/libtorch-cxx11-abi-shared-with-deps-$ver%2B$cuda.zip" to "$cuda/linux-x86_64",
             "$cuda/libtorch-win-shared-with-deps-$ver%2B$cuda.zip"       to "$cuda/win-x86_64",
-            "$cuda/libtorch-shared-with-deps-$ver%2B$cuda.zip"           to "$cuda-precxx11/linux-x86_64",
         )
         // @formatter:on
 
@@ -95,11 +94,10 @@ fun prepareNativeLib(execOperations: ExecOperations, binaryRoot: String, ver: St
             "cpu/libtorch-cxx11-abi-shared-with-deps-$ver%2Bcpu.zip"     to "cpu/linux-x86_64",
             "cpu/libtorch-macos-arm64-$ver.zip"                          to "cpu/osx-aarch64",
             "cpu/libtorch-win-shared-with-deps-$ver%2Bcpu.zip"           to "cpu/win-x86_64",
-            "cpu/libtorch-shared-with-deps-$ver%2Bcpu.zip"               to "cpu-precxx11/linux-x86_64",
         )
         // @formatter:on
 
-        val aarch64Files = mapOf("$ver/libtorch-shared-with-deps-$ver-aarch64.zip" to "cpu-precxx11/linux-aarch64")
+        val aarch64Files = mapOf("$ver/libtorch-linux-aarch64-$ver.zip" to "cpu/linux-aarch64")
         copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
         copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
 
@@ -257,13 +255,11 @@ tasks {
             (binaryRoot / "files.txt").text = buildString {
                 val uploadDirs = listOf(
                     binaryRoot / "cpu/linux-x86_64/native/lib/",
+                    binaryRoot / "cpu/linux-aarch64/native/lib/",
                     binaryRoot / "cpu/osx-aarch64/native/lib/",
                     binaryRoot / "cpu/win-x86_64/native/lib/",
-                    binaryRoot / "cpu-precxx11/linux-aarch64/native/lib/",
-                    binaryRoot / "cpu-precxx11/linux-x86_64/native/lib/",
-                    binaryRoot / "cu124/linux-x86_64/native/lib/",
-                    binaryRoot / "cu124/win-x86_64/native/lib/",
-                    binaryRoot / "cu124-precxx11/linux-x86_64/native/lib/"
+                    binaryRoot / "cu128/linux-x86_64/native/lib/",
+                    binaryRoot / "cu128/win-x86_64/native/lib/",
                 )
                 for (item in uploadDirs)
                     fileTree(item).files.map { it.name }.forEach {
