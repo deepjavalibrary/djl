@@ -182,7 +182,7 @@ jobs:
           PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
           export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
-          if [[ $PYTORCH_VERSION != "2.7.1" ]]; then \
+          if [[ $PYTORCH_VERSION == "2.7.1" ]]; then \
             ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION; \
           else \
             ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION; \
