@@ -246,6 +246,12 @@ public final class EarlyStoppingListener implements TrainingListener {
             return this;
         }
 
+        /**
+         * Sets the name of the metric to monitor for early stopping.
+         *
+         * @param metricName the name of the metric (e.g., "validateLoss", "trainAccuracy", etc.)
+         * @return this builder instance
+         */
         public Builder optMonitoredMetric(String metricName) {
             this.monitoredMetric = metricName;
             return this;
