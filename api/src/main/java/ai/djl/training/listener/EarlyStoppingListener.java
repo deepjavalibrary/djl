@@ -246,6 +246,11 @@ public final class EarlyStoppingListener implements TrainingListener {
             return this;
         }
 
+        public Builder optMonitoredMetric(String metricName) {
+            this.monitoredMetric = metricName;
+            return this;
+        }
+
         /**
          * Builds a {@link EarlyStoppingListener} with the specified values.
          *
