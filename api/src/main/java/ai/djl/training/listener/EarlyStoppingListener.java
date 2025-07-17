@@ -125,13 +125,13 @@ public final class EarlyStoppingListener implements TrainingListener {
     private double getMetric(TrainingResult trainingResult) {
         if ("validateLoss".equals(monitoredMetric)) {
             Float vLoss = trainingResult.getValidateLoss();
-            return vLoss != null ? vLoss : Double.NaN;
+            return vLoss != null ? vLoss.doubleValue() : Double.NaN;
         } else if ("trainLoss".equals(monitoredMetric)) {
             Float tLoss = trainingResult.getTrainLoss();
-            return tLoss != null ? tLoss : Double.NaN;
+            return tLoss != null ? tLoss.doubleValue() : Double.NaN;
         } else {
             Float val = trainingResult.getEvaluations().get(monitoredMetric);
-            return val != null ? val : Double.NaN;
+            return val != null ? val.doubleValue() : Double.NaN;
         }
     }
 
