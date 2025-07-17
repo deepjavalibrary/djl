@@ -177,6 +177,7 @@ public final class EarlyStoppingListener implements TrainingListener {
         private long maxMillis;
         private double earlyStopPctImprovement;
         private int epochPatience;
+        private String monitoredMetric;
 
         /** Constructs a {@link Builder} with default values. */
         public Builder() {
@@ -185,6 +186,7 @@ public final class EarlyStoppingListener implements TrainingListener {
             this.maxMillis = Long.MAX_VALUE;
             this.earlyStopPctImprovement = 0;
             this.epochPatience = 0;
+            this.monitoredMetric = "validateLoss";
         }
 
         /**
@@ -251,7 +253,7 @@ public final class EarlyStoppingListener implements TrainingListener {
          */
         public EarlyStoppingListener build() {
             return new EarlyStoppingListener(
-                    objectiveSuccess, minEpochs, maxMillis, earlyStopPctImprovement, epochPatience);
+                    objectiveSuccess, minEpochs, maxMillis, earlyStopPctImprovement, epochPatience, monitoredMetric);
         }
     }
 
