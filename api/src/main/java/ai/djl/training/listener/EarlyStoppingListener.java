@@ -84,14 +84,14 @@ public final class EarlyStoppingListener implements TrainingListener {
     public void onEpoch(Trainer trainer) {
         int currentEpoch = trainer.getTrainingResult().getEpoch();
         // stopping criteria
-        final double loss = getLoss(trainer.getTrainingResult());
+        final double metricValue = getMetric(trainer.getTrainingResult());
         if (currentEpoch >= minEpochs) {
-            if (loss < objectiveSuccess) {
+            if (metricValue < objectiveSuccess) {
                 throw new EarlyStoppedException(
                         currentEpoch,
                         String.format(
                                 "validation loss %s < objectiveSuccess %s",
-                                loss, objectiveSuccess));
+                                metricValue, objectiveSuccess));
             }
             long elapsedMillis = System.currentTimeMillis() - startTimeMills;
             if (elapsedMillis >= maxMillis) {
@@ -102,7 +102,7 @@ public final class EarlyStoppingListener implements TrainingListener {
             // consider early stopping?
             if (Double.isFinite(prevLoss)) {
                 double goalImprovement = prevLoss * (100 - earlyStopPctImprovement) / 100.0;
-                boolean improved = loss <= goalImprovement; // false if any NANs
+                boolean improved = metricValue <= goalImprovement; // false if any NANs
                 if (improved) {
                     numberOfEpochsWithoutImprovements = 0;
                 } else {
@@ -117,8 +117,8 @@ public final class EarlyStoppingListener implements TrainingListener {
                 }
             }
         }
-        if (Double.isFinite(loss)) {
-            prevLoss = loss;
+        if (Double.isFinite(metricValue)) {
+            prevLoss = metricValue;
         }
     }
 
