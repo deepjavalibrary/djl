@@ -62,17 +62,21 @@ public final class EarlyStoppingListener implements TrainingListener {
     private double prevLoss;
     private int numberOfEpochsWithoutImprovements;
 
+    private final String monitoredMetric;
+
     private EarlyStoppingListener(
             double objectiveSuccess,
             int minEpochs,
             long maxMillis,
             double earlyStopPctImprovement,
-            int earlyStopPatience) {
+            int earlyStopPatience,
+            String monitoredMetric) {
         this.objectiveSuccess = objectiveSuccess;
         this.minEpochs = minEpochs;
         this.maxMillis = maxMillis;
         this.earlyStopPctImprovement = earlyStopPctImprovement;
         this.epochPatience = earlyStopPatience;
+        this.monitoredMetric = monitoredMetric;
     }
 
     /** {@inheritDoc} */
