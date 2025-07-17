@@ -122,7 +122,7 @@ public final class EarlyStoppingListener implements TrainingListener {
         }
     }
 
-    private static double getMetric(TrainingResult trainingResult) {
+    private double getMetric(TrainingResult trainingResult) {
         if ("validateLoss".equals(monitoredMetric)) {
             Float vLoss = trainingResult.getValidateLoss();
             return vLoss != null ? vLoss : Double.NaN;
