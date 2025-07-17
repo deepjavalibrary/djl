@@ -59,7 +59,7 @@ public final class EarlyStoppingListener implements TrainingListener {
     private final int epochPatience;
 
     private long startTimeMills;
-    private double prevLoss;
+    private double prevMetricValue;
     private int numberOfEpochsWithoutImprovements;
 
     private final String monitoredMetric;
@@ -100,8 +100,8 @@ public final class EarlyStoppingListener implements TrainingListener {
                         String.format("%s ms elapsed >= %s maxMillis", elapsedMillis, maxMillis));
             }
             // consider early stopping?
-            if (Double.isFinite(prevLoss)) {
-                double goalImprovement = prevLoss * (100 - earlyStopPctImprovement) / 100.0;
+            if (Double.isFinite(prevMetricValue)) {
+                double goalImprovement = prevMetricValue * (100 - earlyStopPctImprovement) / 100.0;
                 boolean improved = metricValue <= goalImprovement; // false if any NANs
                 if (improved) {
                     numberOfEpochsWithoutImprovements = 0;
@@ -118,7 +118,7 @@ public final class EarlyStoppingListener implements TrainingListener {
             }
         }
         if (Double.isFinite(metricValue)) {
-            prevLoss = metricValue;
+            prevMetricValue = metricValue;
         }
     }
 
@@ -151,7 +151,7 @@ public final class EarlyStoppingListener implements TrainingListener {
     @Override
     public void onTrainingBegin(Trainer trainer) {
         this.startTimeMills = System.currentTimeMillis();
-        this.prevLoss = Double.NaN;
+        this.prevMetricValue = Double.NaN;
         this.numberOfEpochsWithoutImprovements = 0;
     }
 
