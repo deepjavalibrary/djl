@@ -264,7 +264,12 @@ public final class EarlyStoppingListener implements TrainingListener {
          */
         public EarlyStoppingListener build() {
             return new EarlyStoppingListener(
-                    objectiveSuccess, minEpochs, maxMillis, earlyStopPctImprovement, epochPatience, monitoredMetric);
+                    objectiveSuccess,
+                    minEpochs,
+                    maxMillis,
+                    earlyStopPctImprovement,
+                    epochPatience,
+                    monitoredMetric);
         }
     }
 
