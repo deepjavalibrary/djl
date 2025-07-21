@@ -795,6 +795,60 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
 }
 
 #[no_mangle]
+pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_setPaddingWithTokenAndId<
+    'local,
+>(
+    mut env: JNIEnv<'local>,
+    _: JObject,
+    handle: jlong,
+    max_length: jint,
+    padding_strategy: JString,
+    padding_token: JString,
+    pad_id: jint,
+    pad_to_multiple_of: jint,
+) {
+    let strategy: String = env
+        .get_string(&padding_strategy)
+        .expect("Couldn't get java string!")
+        .into();
+
+    let pad_token: String = env
+        .get_string(&padding_token)
+        .expect("Couldn't get java string!")
+        .into();
+    let len = max_length as usize;
+    let id = pad_id as u32;
+    let res_strategy = match strategy.as_ref() {
+        "LONGEST" => Ok(PaddingStrategy::BatchLongest),
+        "MAX_LENGTH" => Ok(PaddingStrategy::Fixed(len)),
+        _ => Err("strategy must be one of [longest, max_length]"),
+    };
+
+    let res_pad_to_multiple_of = match pad_to_multiple_of as usize {
+        0 => None,
+        val => Some(val),
+    };
+
+    let tokenizer = cast_handle::<Tokenizer>(handle);
+
+    if let Some(padding_params) = tokenizer.get_padding_mut() {
+        padding_params.strategy = res_strategy.unwrap();
+        padding_params.pad_to_multiple_of = res_pad_to_multiple_of;
+        padding_params.pad_token = pad_token;
+        padding_params.pad_id = id;
+    } else {
+        let padding_params = PaddingParams {
+            strategy: res_strategy.unwrap(),
+            pad_to_multiple_of: res_pad_to_multiple_of,
+            pad_token: pad_token,
+            pad_id: id,
+            ..Default::default()
+        };
+        tokenizer.with_padding(Some(padding_params));
+    }
+}
+
+#[no_mangle]
 pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_disablePadding(
     _: JNIEnv,
     _: JObject,
