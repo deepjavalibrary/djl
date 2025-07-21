@@ -32,12 +32,14 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 /**
  * {@code HuggingFaceTokenizer} is a Huggingface tokenizer implementation of the {@link Tokenizer}
@@ -56,15 +58,21 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     private int stride;
     private int padToMultipleOf;
     private int modelMaxLength;
+    private Boolean cleanupTokenizationSpaces;
+    private Boolean stripAccents;
+    private Boolean addPrefixSpace;
 
-    private HuggingFaceTokenizer(long handle, Map<String, String> options) {
+    private HuggingFaceTokenizer(
+            long handle,
+            Map<String, String> options,
+            TokenizerConfig config,
+            PadTokenResolver.PadInfo padInfo) {
         super(handle);
         truncation = TruncationStrategy.LONGEST_FIRST;
         padding = PaddingStrategy.LONGEST;
         maxLength = TokenizersLibrary.LIB.getMaxLength(handle);
         stride = TokenizersLibrary.LIB.getStride(handle);
         padToMultipleOf = TokenizersLibrary.LIB.getPadToMultipleOf(handle);
-
         if (options != null) {
             String val = options.getOrDefault("addSpecialTokens", "true");
             addSpecialTokens = Boolean.parseBoolean(val);
@@ -90,8 +98,34 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
             addSpecialTokens = true;
             modelMaxLength = 512;
         }
+        if (config != null) {
+            applyConfig(config);
+        }
+        updateTruncationAndPadding(padInfo);
+    }
 
-        updateTruncationAndPadding();
+    private void applyConfig(TokenizerConfig config) {
+        this.modelMaxLength = config.getModelMaxLength();
+        if (config.hasExplicitDoLowerCase() && config.isDoLowerCase()) {
+            this.doLowerCase = Locale.getDefault();
+        }
+        this.cleanupTokenizationSpaces = config.isCleanUpTokenizationSpaces();
+        if (Stream.of(
+                        config.getBosToken(),
+                        config.getClsToken(),
+                        config.getEosToken(),
+                        config.getSepToken(),
+                        config.getUnkToken(),
+                        config.getPadToken())
+                .anyMatch(token -> token != null && !token.isEmpty())) {
+            this.addSpecialTokens = true;
+        }
+        if (config.hasExplicitStripAccents()) {
+            this.stripAccents = config.isStripAccents();
+        }
+        if (config.hasExplicitAddPrefixSpace()) {
+            this.addPrefixSpace = config.isAddPrefixSpace();
+        }
     }
 
     /**
@@ -118,9 +152,8 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         if (options != null) {
             autoToken = options.getOrDefault("hf_token", autoToken);
         }
-
         long handle = TokenizersLibrary.LIB.createTokenizer(identifier, autoToken);
-        return new HuggingFaceTokenizer(handle, options);
+        return new HuggingFaceTokenizer(handle, options, null, null);
     }
 
     /**
@@ -144,11 +177,17 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      */
     public static HuggingFaceTokenizer newInstance(Path modelPath, Map<String, String> options)
             throws IOException {
+        TokenizerConfig config = null;
         if (Files.isDirectory(modelPath)) {
+            Path configPath = modelPath.resolve("tokenizer_config.json");
             modelPath = modelPath.resolve("tokenizer.json");
+            if (Files.exists(configPath)) {
+                config = TokenizerConfig.load(configPath);
+                logger.debug("Loaded tokenizer_config.json from {}", configPath);
+            }
         }
         try (InputStream is = Files.newInputStream(modelPath)) {
-            return newInstance(is, options);
+            return newInstance(is, options, config);
         }
     }
 
@@ -169,7 +208,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         String vocabFile = vocab.toAbsolutePath().toString();
         String mergesFile = merges.toAbsolutePath().toString();
         long handle = TokenizersLibrary.LIB.createBpeTokenizer(vocabFile, mergesFile);
-        return new HuggingFaceTokenizer(handle, options);
+        return new HuggingFaceTokenizer(handle, options, null, null);
     }
 
     /**
@@ -177,17 +216,19 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      *
      * @param is {@code InputStream}
      * @param options tokenizer options
+     * @param config TokenizerConfig with special tokens and padding details
      * @return a {@code HuggingFaceTokenizer} instance
      * @throws IOException when IO operation fails in loading a resource
      */
-    public static HuggingFaceTokenizer newInstance(InputStream is, Map<String, String> options)
+    public static HuggingFaceTokenizer newInstance(
+            InputStream is, Map<String, String> options, TokenizerConfig config)
             throws IOException {
         Ec2Utils.callHome("Huggingface");
         LibUtils.checkStatus();
         String json = Utils.toString(is);
-
+        PadTokenResolver.PadInfo padInfo = PadTokenResolver.extractPadInfo(json, config);
         long handle = TokenizersLibrary.LIB.createTokenizerFromString(json);
-        return new HuggingFaceTokenizer(handle, options);
+        return new HuggingFaceTokenizer(handle, options, config, padInfo);
     }
 
     /**
@@ -236,10 +277,8 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         if (text == null) {
             throw new NullPointerException("text cannot be null");
         }
-        if (doLowerCase != null) {
-            text = text.toLowerCase(doLowerCase);
-        }
-        long encoding = TokenizersLibrary.LIB.encode(getHandle(), text, addSpecialTokens);
+        String processedText = prepareForTokenization(text);
+        long encoding = TokenizersLibrary.LIB.encode(getHandle(), processedText, addSpecialTokens);
         return toEncoding(encoding, withOverflowingTokens);
     }
 
@@ -466,7 +505,10 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * @return the decoded String from the input ids
      */
     public String decode(long[] ids, boolean skipSpecialTokens) {
-        return TokenizersLibrary.LIB.decode(getHandle(), ids, skipSpecialTokens);
+        String decodedText = TokenizersLibrary.LIB.decode(getHandle(), ids, skipSpecialTokens);
+        return this.cleanupTokenizationSpaces != null && this.cleanupTokenizationSpaces
+                ? cleanUpTokenization(decodedText)
+                : decodedText;
     }
 
     /**
@@ -572,7 +614,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     /*
      * See: https://huggingface.co/docs/transformers/pad_truncation
      */
-    private void updateTruncationAndPadding() {
+    private void updateTruncationAndPadding(PadTokenResolver.PadInfo padInfo) {
         boolean isTruncate = truncation != TruncationStrategy.DO_NOT_TRUNCATE;
         if (padding == PaddingStrategy.MAX_LENGTH || isTruncate) {
             if (maxLength == -1) {
@@ -609,9 +651,23 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         } else {
             TokenizersLibrary.LIB.disableTruncation(getHandle());
         }
+        updatePadding(padInfo);
+    }
 
+    private void updatePadding(PadTokenResolver.PadInfo padInfo) {
         if (padding == PaddingStrategy.DO_NOT_PAD) {
             TokenizersLibrary.LIB.disablePadding(getHandle());
+            return;
+        }
+
+        if (padInfo != null) {
+            TokenizersLibrary.LIB.setPaddingWithTokenAndId(
+                    getHandle(),
+                    maxLength,
+                    padding.name(),
+                    padInfo.getPadToken(),
+                    padInfo.getPadId(),
+                    padToMultipleOf);
         } else {
             TokenizersLibrary.LIB.setPadding(
                     getHandle(), maxLength, padding.name(), padToMultipleOf);
@@ -653,6 +709,19 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
                 charSpans,
                 exceedMaxLength,
                 overflowing);
+    }
+
+    private String cleanUpTokenization(String text) {
+        return text.replace(" .", ".")
+                .replace(" ?", "?")
+                .replace(" !", "!")
+                .replace(" ,", ",")
+                .replace(" ' ", "'")
+                .replace(" n't", "n't")
+                .replace(" 'm", "'m")
+                .replace(" 's", "'s")
+                .replace(" 've", "'ve")
+                .replace(" 're", "'re");
     }
 
     /** {@inheritDoc} */
@@ -718,6 +787,20 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
             }
             throw new IllegalArgumentException("Invalid PaddingStrategy: " + value);
         }
+    }
+
+    private String prepareForTokenization(String text) {
+        if (Boolean.TRUE.equals(addPrefixSpace) && !text.startsWith(" ")) {
+            text = " " + text;
+        }
+        if (doLowerCase != null) {
+            text = text.toLowerCase(doLowerCase);
+        }
+        if (Boolean.TRUE.equals(stripAccents)) {
+            text = Normalizer.normalize(text, Normalizer.Form.NFKD);
+            text = text.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        }
+        return text;
     }
 
     /** The builder for creating huggingface tokenizer. */

@@ -81,6 +81,14 @@ public final class TokenizersLibrary {
     public native void setPadding(
             long tokenizer, int maxLength, String paddingStrategy, int padToMultipleOf);
 
+    public native void setPaddingWithTokenAndId(
+            long tokenizer,
+            int maxLength,
+            String paddingStrategy,
+            String padToken,
+            int id,
+            int padToMultipleOf);
+
     public native void disableTruncation(long tokenizer);
 
     public native void setTruncation(
