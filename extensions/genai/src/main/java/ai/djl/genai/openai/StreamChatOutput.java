@@ -12,8 +12,6 @@
  */
 package ai.djl.genai.openai;
 
-import ai.djl.util.JsonUtils;
-
 import java.util.Iterator;
 
 /** A stream version of {@link ChatOutput}. */
@@ -43,7 +41,7 @@ public class StreamChatOutput implements Iterable<ChatOutput> {
                 if (json.isEmpty() || "[DONE]".equals(json)) {
                     return new ChatOutput();
                 }
-                return JsonUtils.GSON.fromJson(json, ChatOutput.class);
+                return ChatOutput.fromJson(json);
             }
         };
     }

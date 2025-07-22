@@ -12,6 +12,8 @@
  */
 package ai.djl.genai.gemini;
 
+import static ai.djl.genai.gemini.types.Type.STRING;
+
 import ai.djl.ModelException;
 import ai.djl.genai.FunctionUtils;
 import ai.djl.genai.gemini.types.FunctionCall;
@@ -20,13 +22,16 @@ import ai.djl.genai.gemini.types.GenerationConfig;
 import ai.djl.genai.gemini.types.GoogleSearch;
 import ai.djl.genai.gemini.types.HarmBlockThreshold;
 import ai.djl.genai.gemini.types.HarmCategory;
+import ai.djl.genai.gemini.types.LogprobsResultCandidate;
 import ai.djl.genai.gemini.types.SafetySetting;
+import ai.djl.genai.gemini.types.Schema;
 import ai.djl.genai.gemini.types.Tool;
 import ai.djl.inference.Predictor;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestServer;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +43,8 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class GeminiTest {
@@ -48,13 +55,12 @@ public class GeminiTest {
     public void testGenerateContent() throws ModelException, IOException, TranslateException {
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String endpoint = "http://localhost:" + server.getPort();
-            // endpoint = "https://generativelanguage.googleapis.com";
-            String url = endpoint + "/v1beta/models/gemini-2.5-flash:generateContent";
+            String baseUrl = "http://localhost:" + server.getPort();
+            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(url)
+                            .optModelUrls(gemini.getUrl())
                             .optArgument("API_KEY", "1234")
                             .build();
 
@@ -74,14 +80,14 @@ public class GeminiTest {
         try (TestServer server = TestServer.newInstance(mockResponse)) {
             server.setContentType("text/event-stream");
 
-            String endpoint = "http://localhost:" + server.getPort();
-            // endpoint = "https://generativelanguage.googleapis.com";
-            String url = endpoint + "/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse";
+            String baseUrl = "http://localhost:" + server.getPort();
+            Gemini gemini =
+                    Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).stream(true).build();
 
             Criteria<GeminiInput, StreamGeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, StreamGeminiOutput.class)
-                            .optModelUrls(url)
+                            .optModelUrls(gemini.getUrl())
                             .optArgument("API_KEY", "1234")
                             .build();
 
@@ -118,13 +124,12 @@ public class GeminiTest {
                         .build();
 
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String endpoint = "http://localhost:" + server.getPort();
-            // endpoint = "https://generativelanguage.googleapis.com";
-            String url = endpoint + "/v1beta/models/gemini-2.5-flash:generateContent";
+            String baseUrl = "http://localhost:" + server.getPort();
+            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(url)
+                            .optModelUrls(gemini.getUrl())
                             .optArgument("API_KEY", "1234") // override env var
                             .build();
 
@@ -150,14 +155,13 @@ public class GeminiTest {
     public void testImageUnderstand() throws ModelException, IOException, TranslateException {
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String endpoint = "http://localhost:" + server.getPort();
-            // endpoint = "https://generativelanguage.googleapis.com";
-            String url = endpoint + "/v1beta/models/gemini-2.5-flash:generateContent";
+            String baseUrl = "http://localhost:" + server.getPort();
+            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
 
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(url)
+                            .optModelUrls(gemini.getUrl())
                             .optArgument("API_KEY", "1234")
                             .build();
             Path testImage = Paths.get("../../examples/src/test/resources/kitten.jpg");
@@ -180,17 +184,17 @@ public class GeminiTest {
     public void testFileUri() throws ModelException, IOException, TranslateException {
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String endpoint = "http://localhost:" + server.getPort();
-            // endpoint = "https://aiplatform.googleapis.com";
-            // file uri only requires Vertex URL
-            String url =
-                    endpoint
-                            + "/v1/projects/$PROJECT/locations/global/publishers/google/models/gemini-2.5-flash:generateContent";
-
+            String baseUrl = "http://localhost:" + server.getPort();
+            Gemini gemini =
+                    Gemini.GEMINI_2_5_FLASH.toBuilder()
+                            .baseUrl(baseUrl)
+                            .useVertex(true)
+                            .project("test")
+                            .build();
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(url)
+                            .optModelUrls(gemini.getUrl())
                             .optArgument("API_KEY", "1234")
                             .build();
             try (ZooModel<GeminiInput, GeminiOutput> model = criteria.loadModel();
@@ -225,14 +229,13 @@ public class GeminiTest {
 
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String endpoint = "http://localhost:" + server.getPort();
-            // endpoint = "https://generativelanguage.googleapis.com";
-            String url = endpoint + "/v1beta/models/gemini-2.5-flash:generateContent";
+            String baseUrl = "http://localhost:" + server.getPort();
+            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
 
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(url)
+                            .optModelUrls(gemini.getUrl())
                             .optArgument("API_KEY", "1234")
                             .build();
 
@@ -241,6 +244,62 @@ public class GeminiTest {
                 GeminiInput in = GeminiInput.text("Tell me the history of LLM", config).build();
                 GeminiOutput ret = predictor.predict(in);
                 logger.info(ret.getTextOutput());
+            }
+        }
+    }
+
+    @Test
+    public void testGenerateContentWithLogprobs()
+            throws ModelException, IOException, TranslateException {
+        GenerationConfig config =
+                GenerationConfig.builder()
+                        .candidateCount(1)
+                        .maxOutputTokens(1024)
+                        .logprobs(3)
+                        .responseLogprobs(true)
+                        .responseSchema(
+                                Schema.builder()
+                                        .type(STRING)
+                                        .enumName(Arrays.asList("Positive", "Negative", "Neutral")))
+                        .responseMimeType("application/json")
+                        .build();
+
+        String mockResponse = loadLogprobsContent();
+        try (TestServer server = TestServer.newInstance(mockResponse)) {
+            String baseUrl = "http://localhost:" + server.getPort();
+            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
+
+            Criteria<GeminiInput, GeminiOutput> criteria =
+                    Criteria.builder()
+                            .setTypes(GeminiInput.class, GeminiOutput.class)
+                            .optModelUrls(gemini.getUrl())
+                            .optArgument("API_KEY", "1234")
+                            .build();
+
+            try (ZooModel<GeminiInput, GeminiOutput> model = criteria.loadModel();
+                    Predictor<GeminiInput, GeminiOutput> predictor = model.newPredictor()) {
+                GeminiInput in =
+                        GeminiInput.text(
+                                        "I am not sure if I really like this restaurant a lot.",
+                                        config)
+                                .build();
+                GeminiOutput ret = predictor.predict(in);
+                for (Pair<LogprobsResultCandidate, List<LogprobsResultCandidate>> pair :
+                        ret.getLogprobsResult()) {
+                    LogprobsResultCandidate lr = pair.getKey();
+                    List<LogprobsResultCandidate> alternatives = pair.getValue();
+                    String token = lr.getToken();
+                    float prob = lr.getLogProbability();
+                    logger.info("Token: {} ({})", token, String.format("%.03f", prob));
+                    if (!alternatives.isEmpty()) {
+                        logger.info(
+                                "Alternative tokens: {} ({})", token, String.format("%.03f", prob));
+                        for (LogprobsResultCandidate alt : alternatives) {
+                            logger.info("\t{} ({})", alt.getToken(), alt.getLogProbability());
+                        }
+                    }
+                }
+                Assert.assertEquals(ret.getTextOutput(), "\"Neutral\"");
             }
         }
     }
@@ -261,6 +320,70 @@ public class GeminiTest {
         return "{\"candidates\":[{\"content\":{\"parts\":[{\"functionCall\":{"
                 + "\"args\":{\"unit\":true,\"location\":\"New York\"},\"name\":\"getWeather\"}}],"
                 + "\"role\":\"model\"},\"finishReason\":\"STOP\",\"index\":0}]}";
+    }
+
+    private String loadLogprobsContent() {
+        return "{\"candidates\":[{\"content\":{\"role\":\"model\",\"parts\":["
+                   + " {\"text\":\"\\\"Neutral\\\"\"}]},\"finishReason\":\"STOP\",\"avgLogprobs\":-10.37,"
+                   + " \"logprobsResult\":{\"topCandidates\":[{\"candidates\":["
+                   + " {\"token\":\"H\",\"logProbability\":-0.19,\"tokenId\":236814},"
+                   + " {\"token\":\"He\",\"logProbability\":-2.37,\"tokenId\":2209}]},"
+                   + " {\"candidates\":[{\"token\":\"ere\",\"logProbability\":-0.13,\"tokenId\":627},"
+                   + " {\"token\":\"e\",\"logProbability\":-2.30,\"tokenId\":236744}]},"
+                   + " {\"candidates\":[{\"token\":\"is\",\"logProbability\":0,\"tokenId\":563},"
+                   + " {\"token\":\"i\",\"logProbability\":-16.70,\"tokenId\":858}]},"
+                   + " {\"candidates\":[{\"token\":\"the\",\"logProbability\":-3.57e-07,\"tokenId\":506},"
+                   + " {\"token\":\"\",\"logProbability\":-14.70,\"tokenId\":236743}]},"
+                   + " {\"candidates\":[{\"token\":\"JSON\",\"logProbability\":-1.19e-06,\"tokenId\":10434},"
+                   + " {\"token\":\"\",\"logProbability\":-14.12,\"tokenId\":236743}]},"
+                   + " {\"candidates\":[{\"token\":\"requested\",\"logProbability\":-0.41,\"tokenId\":15633},"
+                   + " {\"token\":\"re\",\"logProbability\":-1.51,\"tokenId\":544}]},"
+                   + " {\"candidates\":[{\"token\":\":\",\"logProbability\":0,\"tokenId\":236787},"
+                   + " {\"token\":\"har\",\"logProbability\":-1.26e+30,\"tokenId\":3968}]},"
+                   + " {\"candidates\":[{\"token\":\"\\n"
+                   + "\",\"logProbability\":0,\"tokenId\":107},"
+                   + " {\"token\":\"har\",\"logProbability\":-1.26e+30,\"tokenId\":3968}]},"
+                   + " {\"candidates\":[{\"token\":\"```\",\"logProbability\":-0.00,\"tokenId\":2717},"
+                   + " {\"token\":\"`\",\"logProbability\":-4.89,\"tokenId\":236929}]},"
+                   + " {\"candidates\":[{\"token\":\"json\",\"logProbability\":0,\"tokenId\":3723},"
+                   + " {\"token\":\"j\",\"logProbability\":-18.95,\"tokenId\":236804}]},"
+                   + " {\"candidates\":[{\"token\":\"\\n"
+                   + "\",\"logProbability\":0,\"tokenId\":107},"
+                   + " {\"token\":\"har\",\"logProbability\":-1.26e+30,\"tokenId\":3968}]},"
+                   + " {\"candidates\":[{\"token\":\"\\\"\",\"logProbability\":-1.19e-06,\"tokenId\":236775},"
+                   + " {\"token\":\"\\\"\",\"logProbability\":-13.65,\"tokenId\":623}]},"
+                   + " {\"candidates\":[{\"token\":\"Neutral\",\"logProbability\":-6.67e-06,\"tokenId\":20809},"
+                   + " {\"token\":\"Negative\",\"logProbability\":-11.97,\"tokenId\":63702}]},"
+                   + " {\"candidates\":[{\"token\":\"\\\"\",\"logProbability\":0,\"tokenId\":236775},"
+                   + " {\"token\":\"har\",\"logProbability\":-1.26e+30,\"tokenId\":3968}]},"
+                   + " {\"candidates\":[{\"token\":\"\\n"
+                   + "\",\"logProbability\":-7.15e-07,\"tokenId\":107},"
+                   + " {\"token\":\"\",\"logProbability\":-14.64,\"tokenId\":236743}]},"
+                   + " {\"candidates\":[{\"token\":\"```\",\"logProbability\":-1.19e-07,\"tokenId\":2717},"
+                   + " {\"token\":\"``\",\"logProbability\":-16.53,\"tokenId\":2629}]}],"
+                   + " \"chosenCandidates\":[{\"token\":\"H\",\"logProbability\":-0.19,\"tokenId\":236814},"
+                   + " {\"token\":\"ere\",\"logProbability\":-0.13,\"tokenId\":627},"
+                   + " {\"token\":\"is\",\"logProbability\":0,\"tokenId\":563},"
+                   + " {\"token\":\"the\",\"logProbability\":-3.57e-07,\"tokenId\":506},"
+                   + " {\"token\":\"JSON\",\"logProbability\":-1.19e-06,\"tokenId\":10434},"
+                   + " {\"token\":\"requested\",\"logProbability\":-0.41,\"tokenId\":15633},"
+                   + " {\"token\":\":\",\"logProbability\":0,\"tokenId\":236787}, {\"token\":\"\\n"
+                   + "\",\"logProbability\":0,\"tokenId\":107}, "
+                   + " {\"token\":\"```\",\"logProbability\":-0.00,\"tokenId\":2717},"
+                   + " {\"token\":\"json\",\"logProbability\":0,\"tokenId\":3723}, {\"token\":\"\\n"
+                   + "\",\"logProbability\":0,\"tokenId\":107},"
+                   + " {\"token\":\"\\\"\",\"logProbability\":-1.19e-06,\"tokenId\":236775},"
+                   + " {\"token\":\"Neutral\",\"logProbability\":-6.67e-06,\"tokenId\":20809},"
+                   + " {\"token\":\"\\\"\",\"logProbability\":0,\"tokenId\":236775},"
+                   + " {\"token\":\"\\n"
+                   + "\",\"logProbability\":-7.15e-07,\"tokenId\":107},"
+                   + " {\"token\":\"```\",\"logProbability\":-1.19e-07,\"tokenId\":2717}]}}],"
+                   + " \"usageMetadata\":{\"promptTokenCount\":17,\"candidatesTokenCount\":3,"
+                   + " \"totalTokenCount\":115,\"trafficType\":\"ON_DEMAND\",\"promptTokensDetails\":"
+                   + " [{\"modality\":\"TEXT\",\"tokenCount\":17}],\"candidatesTokensDetails\":"
+                   + " [{\"modality\":\"TEXT\",\"tokenCount\":3}],\"thoughtsTokenCount\":95},"
+                   + " \"modelVersion\":\"gemini-2.5-flash\",\"createTime\":\"2025-07-21T03:01:13.244502Z\","
+                   + " \"responseId\":\"1\"}";
     }
 
     public String getWeather(String location, boolean unit) {

@@ -12,16 +12,44 @@
  */
 package ai.djl.genai.openai;
 
+import ai.djl.genai.gemini.GeminiInput;
+import ai.djl.genai.gemini.types.Blob;
+import ai.djl.genai.gemini.types.FunctionDeclaration;
+import ai.djl.genai.gemini.types.GenerationConfig;
+import ai.djl.genai.gemini.types.Part;
+import ai.djl.genai.gemini.types.Schema;
+import ai.djl.genai.gemini.types.ThinkingConfig;
+import ai.djl.util.JsonSerializable;
+import ai.djl.util.JsonUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** The chat completion style input. */
-public class ChatInput {
+@SuppressWarnings("serial")
+public class ChatInput implements JsonSerializable {
 
+    private static final long serialVersionUID = 1L;
+
+    private static final Logger logger = LoggerFactory.getLogger(ChatInput.class);
+
+    private static final Pattern URL_PATTERN = Pattern.compile("data:([\\w/]+);base64,(.+)");
+    static final Gson GSON = new Gson();
+
+    private transient Type inputType;
     private String model;
     private List<Message> messages;
 
@@ -69,6 +97,7 @@ public class ChatInput {
     private Object extraBody;
 
     ChatInput(Builder builder) {
+        inputType = builder.inputType;
         model = builder.model;
         messages = builder.messages;
         frequencyPenalty = builder.frequencyPenalty;
@@ -89,6 +118,119 @@ public class ChatInput {
         tools = builder.tools;
         toolChoice = builder.toolChoice;
         extraBody = builder.extraBody;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public JsonElement serialize() {
+        if (inputType == Type.GEMINI) {
+            return JsonUtils.GSON.toJsonTree(toGemini());
+        }
+        return GSON.toJsonTree(this);
+    }
+
+    @SuppressWarnings("unchecked")
+    private GeminiInput toGemini() {
+        GeminiInput.Builder builder = GeminiInput.builder();
+        GenerationConfig.Builder config = GenerationConfig.builder();
+        for (Message message : messages) {
+            String role = message.getRole();
+            Object obj = message.getContent();
+            ai.djl.genai.gemini.types.Content.Builder cb =
+                    ai.djl.genai.gemini.types.Content.builder();
+            if (obj instanceof String) {
+                cb.addPart(Part.text((String) obj));
+            } else {
+                for (Content content : (List<Content>) obj) {
+                    String type = content.getType();
+                    if ("image_url".equals(type)) {
+                        Content.ImageContent ic = content.getImageUrl();
+                        String url = ic.getUrl();
+                        Matcher m = URL_PATTERN.matcher(url);
+                        if (m.matches()) {
+                            Blob blob =
+                                    Blob.builder().data(m.group(2)).mimeType(m.group(1)).build();
+                            cb.addPart(Part.builder().inlineData(blob));
+                        } else {
+                            Blob blob = Blob.builder().data(url).build();
+                            cb.addPart(Part.builder().inlineData(blob));
+                        }
+                    } else if ("file".equals(type)) {
+                        Content.FileContent fc = content.getFile();
+                        cb.addPart(Part.fileData(fc.getFileData(), null));
+                    } else if ("text".equals(type)) {
+                        cb.addPart(Part.text(content.getText()));
+                    } else {
+                        throw new IllegalArgumentException("Unsupported type: " + type);
+                    }
+                }
+            }
+
+            if ("system".equals(role)) {
+                config.systemInstruction(cb.build().getParts().get(0).getText());
+            } else {
+                builder.addContent(cb.role(role));
+            }
+        }
+        if (tools != null && !tools.isEmpty()) {
+            for (Tool tool : tools) {
+                if (!"function".equals(tool.getType())) {
+                    logger.warn("Unsupported tool type: {}", tool.getType());
+                    continue;
+                }
+                Function function = tool.getFunction();
+                Object param = function.getParameters();
+                Map<String, Object> parameters = (Map<String, Object>) param;
+                Map<String, Map<String, String>> properties =
+                        (Map<String, Map<String, String>>) parameters.get("properties");
+                List<String> required = (List<String>) parameters.get("required");
+                String returnType = ((String) parameters.get("type")).toUpperCase(Locale.ROOT);
+
+                Map<String, Schema> prop = new LinkedHashMap<>(); // NOPMD
+                for (Map.Entry<String, Map<String, String>> entry : properties.entrySet()) {
+                    String t = entry.getValue().get("type").toUpperCase(Locale.ROOT);
+                    Schema schema =
+                            Schema.builder()
+                                    .type(ai.djl.genai.gemini.types.Type.valueOf(t))
+                                    .build();
+                    prop.put(entry.getKey(), schema);
+                }
+                Schema sc =
+                        Schema.builder()
+                                .type(ai.djl.genai.gemini.types.Type.valueOf(returnType))
+                                .required(required)
+                                .properties(prop)
+                                .build();
+
+                FunctionDeclaration fd =
+                        FunctionDeclaration.builder()
+                                .name(function.getName())
+                                .description(function.getDescription())
+                                .parameters(sc)
+                                .build();
+
+                ai.djl.genai.gemini.types.Tool t =
+                        ai.djl.genai.gemini.types.Tool.builder().addFunctionDeclaration(fd).build();
+                config.addTool(t);
+            }
+        }
+        config.responseLogprobs(logprobs);
+        config.logprobs(topLogprobs);
+        config.frequencyPenalty(frequencyPenalty);
+        config.presencePenalty(presencePenalty);
+        config.maxOutputTokens(maxCompletionTokens);
+        config.seed(seed);
+        config.stopSequences(stop);
+        config.candidateCount(n);
+        config.topP(topP);
+        config.temperature(temperature);
+        if ("high".equalsIgnoreCase(reasoningEffort)) {
+            config.thinkingConfig(ThinkingConfig.builder().includeThoughts(true));
+        } else if ("medium".equalsIgnoreCase(reasoningEffort)) {
+            config.thinkingConfig(
+                    ThinkingConfig.builder().includeThoughts(true).thinkingBudget(512));
+        }
+        return builder.build();
     }
 
     /**
@@ -297,7 +439,7 @@ public class ChatInput {
      * @return a new builder
      */
     public static Builder text(String text) {
-        return builder().addMessage(Message.fromText(text));
+        return builder().addMessage(Message.text(text));
     }
 
     /**
@@ -335,6 +477,7 @@ public class ChatInput {
 
     /** The builder for {@code ChatInput}. */
     public static final class Builder {
+        Type inputType = Type.CHAT_COMPLETION;
         String model;
         List<Message> messages = new ArrayList<>();
         Float frequencyPenalty;
@@ -355,6 +498,17 @@ public class ChatInput {
         List<Tool> tools;
         Object toolChoice;
         Object extraBody;
+
+        /**
+         * Sets the input type.
+         *
+         * @param inputType the model
+         * @return the builder
+         */
+        public Builder inputType(Type inputType) {
+            this.inputType = inputType;
+            return this;
+        }
 
         /**
          * Sets the model.
@@ -391,13 +545,23 @@ public class ChatInput {
         }
 
         /**
+         * Adds the message.
+         *
+         * @param message the message
+         * @return the builder
+         */
+        public Builder addMessage(Message.Builder message) {
+            return addMessage(message.build());
+        }
+
+        /**
          * Adds the text content.
          *
          * @param text the text
          * @return the builder
          */
         public Builder addText(String text) {
-            this.messages.add(Message.fromText(text));
+            this.messages.add(Message.text(text).build());
             return this;
         }
 
@@ -408,7 +572,7 @@ public class ChatInput {
          * @return the builder
          */
         public Builder addImage(String imageUrl) {
-            this.messages.add(Message.fromImage(imageUrl));
+            this.messages.add(Message.image(imageUrl).build());
             return this;
         }
 
@@ -420,7 +584,7 @@ public class ChatInput {
          * @return the builder
          */
         public Builder addImage(byte[] image, String mimeType) {
-            this.messages.add(Message.fromImage(image, mimeType));
+            this.messages.add(Message.image(image, mimeType).build());
             return this;
         }
 
@@ -432,7 +596,7 @@ public class ChatInput {
          * @return the builder
          */
         public Builder addFile(String id, byte[] data, String fileName) {
-            this.messages.add(Message.fromFile(id, data, fileName));
+            this.messages.add(Message.file(id, data, fileName).build());
             return this;
         }
 
@@ -650,7 +814,7 @@ public class ChatInput {
          * @param extraBody the extra body
          * @return the builder
          */
-        public Builder extraBody(Tool extraBody) {
+        public Builder extraBody(Object extraBody) {
             this.extraBody = extraBody;
             return this;
         }
@@ -661,10 +825,13 @@ public class ChatInput {
          * @return the {@code ChatInput} instance
          */
         public ChatInput build() {
-            if (model == null) {
-                throw new IllegalArgumentException("model is not specified");
-            }
             return new ChatInput(this);
         }
+    }
+
+    /** The target model server input schema type. */
+    public enum Type {
+        CHAT_COMPLETION,
+        GEMINI,
     }
 }

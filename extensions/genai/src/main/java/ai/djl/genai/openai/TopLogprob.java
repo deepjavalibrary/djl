@@ -12,26 +12,20 @@
  */
 package ai.djl.genai.openai;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
 
 /** A data class represents chat completion schema. */
 @SuppressWarnings("MissingJavadocMethod")
-public class Logprobs {
+public class TopLogprob {
 
     private String token;
     private float logprob;
-    private List<Float> bytes;
+    private List<Byte> bytes;
 
-    @SerializedName("top_logprobs")
-    private TopLogprobs topLogprobs;
-
-    public Logprobs(String token, float logprob, List<Float> bytes, TopLogprobs topLogprobs) {
+    public TopLogprob(String token, float logprob, List<Byte> bytes) {
         this.token = token;
         this.logprob = logprob;
         this.bytes = bytes;
-        this.topLogprobs = topLogprobs;
     }
 
     public String getToken() {
@@ -42,11 +36,7 @@ public class Logprobs {
         return logprob;
     }
 
-    public List<Float> getBytes() {
+    public List<Byte> getBytes() {
         return bytes;
-    }
-
-    public TopLogprobs getTopLogprobs() {
-        return topLogprobs;
     }
 }
