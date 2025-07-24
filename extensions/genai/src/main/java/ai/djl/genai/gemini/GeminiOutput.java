@@ -14,8 +14,12 @@ package ai.djl.genai.gemini;
 
 import ai.djl.genai.gemini.types.Candidate;
 import ai.djl.genai.gemini.types.FunctionCall;
+import ai.djl.genai.gemini.types.LogprobsResult;
+import ai.djl.genai.gemini.types.LogprobsResultCandidate;
+import ai.djl.genai.gemini.types.LogprobsResultTopCandidates;
 import ai.djl.genai.gemini.types.Part;
 import ai.djl.genai.gemini.types.UsageMetadata;
+import ai.djl.util.PairList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,11 +31,20 @@ public class GeminiOutput {
     private List<Candidate> candidates;
     private UsageMetadata usageMetadata;
     private String modelVersion;
+    private String createTime;
+    private String responseId;
 
-    GeminiOutput(List<Candidate> candidates, UsageMetadata usageMetadata, String modelVersion) {
+    GeminiOutput(
+            List<Candidate> candidates,
+            UsageMetadata usageMetadata,
+            String modelVersion,
+            String createTime,
+            String responseId) {
         this.candidates = candidates;
         this.usageMetadata = usageMetadata;
         this.modelVersion = modelVersion;
+        this.createTime = createTime;
+        this.responseId = responseId;
     }
 
     /**
@@ -56,6 +69,39 @@ public class GeminiOutput {
             return null;
         }
         return candidates.get(0);
+    }
+
+    /**
+     * Returns the per token log probability and the alternative tokens.
+     *
+     * @return the per token log probability and the alternative tokens.
+     */
+    public PairList<LogprobsResultCandidate, List<LogprobsResultCandidate>> getLogprobsResult() {
+        Candidate candidate = getCandidate();
+        if (candidate == null) {
+            return null;
+        }
+        LogprobsResult result = candidate.getLogprobsResult();
+        if (result == null) {
+            return null;
+        }
+        PairList<LogprobsResultCandidate, List<LogprobsResultCandidate>> pairs = new PairList<>();
+        List<LogprobsResultTopCandidates> top = result.getTopCandidates();
+        int i = 0;
+        for (LogprobsResultCandidate lr : result.getChosenCandidates()) {
+            List<LogprobsResultCandidate> alternatives = new ArrayList<>();
+            if (top != null && i < top.size()) {
+                String token = lr.getToken();
+                for (LogprobsResultCandidate alt : top.get(i).getCandidates()) {
+                    if (!alt.getToken().equals(token)) {
+                        alternatives.add(alt);
+                    }
+                }
+            }
+            pairs.add(lr, alternatives);
+            ++i;
+        }
+        return pairs;
     }
 
     /**
@@ -91,6 +137,24 @@ public class GeminiOutput {
      */
     public String getModelVersion() {
         return modelVersion;
+    }
+
+    /**
+     * Returns the creation time.
+     *
+     * @return the creation time
+     */
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * Returns the response id.
+     *
+     * @return the response id
+     */
+    public String getResponseId() {
+        return responseId;
     }
 
     /**

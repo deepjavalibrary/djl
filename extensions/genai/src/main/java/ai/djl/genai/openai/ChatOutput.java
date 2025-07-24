@@ -12,6 +12,24 @@
  */
 package ai.djl.genai.openai;
 
+import ai.djl.genai.gemini.GeminiOutput;
+import ai.djl.genai.gemini.types.Blob;
+import ai.djl.genai.gemini.types.Candidate;
+import ai.djl.genai.gemini.types.FileData;
+import ai.djl.genai.gemini.types.FinishReason;
+import ai.djl.genai.gemini.types.FunctionCall;
+import ai.djl.genai.gemini.types.LogprobsResult;
+import ai.djl.genai.gemini.types.LogprobsResultCandidate;
+import ai.djl.genai.gemini.types.LogprobsResultTopCandidates;
+import ai.djl.genai.gemini.types.Part;
+import ai.djl.genai.gemini.types.UsageMetadata;
+import ai.djl.util.JsonUtils;
+
+import com.google.gson.JsonObject;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** The chat completion style output. */
@@ -144,5 +162,119 @@ public class ChatOutput {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the per token log probability.
+     *
+     * @return the per token log probability
+     */
+    public List<Logprob> getLogprobs() {
+        if (choices != null && !choices.isEmpty()) {
+            List<Logprob> logprobs = choices.get(0).getLogprobs();
+            if (logprobs != null) {
+                return logprobs;
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * Customizes schema deserialization.
+     *
+     * @param json the output json string
+     * @return the deserialized {@code ChatOutput} instance
+     */
+    public static ChatOutput fromJson(String json) {
+        JsonObject element = JsonUtils.GSON.fromJson(json, JsonObject.class);
+        if (element.has("candidates")) {
+            GeminiOutput gemini = JsonUtils.GSON.fromJson(element, GeminiOutput.class);
+            return fromGemini(gemini);
+        }
+        return ChatInput.GSON.fromJson(element, ChatOutput.class);
+    }
+
+    static ChatOutput fromGemini(GeminiOutput gemini) {
+        String id = gemini.getResponseId();
+        String create = gemini.getCreateTime();
+        Long time = null;
+        if (create != null) {
+            time = Instant.parse(create).toEpochMilli();
+        }
+
+        Usage usage = null;
+        UsageMetadata um = gemini.getUsageMetadata();
+        if (um != null) {
+            usage =
+                    new Usage(
+                            um.getCandidatesTokenCount(),
+                            um.getPromptTokenCount(),
+                            um.getTotalTokenCount());
+        }
+        String model = gemini.getModelVersion();
+
+        List<Candidate> candidates = gemini.getCandidates();
+        List<Choice> choices = new ArrayList<>(candidates.size());
+        for (Candidate candidate : candidates) {
+            ai.djl.genai.gemini.types.Content content = candidate.getContent();
+            String role = content.getRole();
+            List<Part> parts = content.getParts();
+            Message.Builder message = Message.builder().role(role);
+            if (parts != null) {
+                for (Part part : parts) {
+                    String text = part.getText();
+                    Blob inline = part.getInlineData();
+                    FileData fileData = part.getFileData();
+                    FunctionCall func = part.getFunctionCall();
+                    if (text != null) {
+                        message.addText(text);
+                    } else if (inline != null) {
+                        String url = "data:" + inline.getMimeType() + ";base64," + inline.getData();
+                        message.addContent(new Content(new Content.ImageContent(url)));
+                    } else if (fileData != null) {
+                        String fileUri = fileData.getFileUri();
+                        String fileName = fileData.getDisplayName();
+                        message.addContent(
+                                new Content(new Content.FileContent(fileUri, null, fileName)));
+                    } else if (func != null) {
+                        String callId = func.getId();
+                        String args = JsonUtils.GSON_COMPACT.toJson(func.getArgs());
+                        ToolCall.Function function = new ToolCall.Function(args, func.getName());
+                        ToolCall toolCall = new ToolCall(callId, "function", function);
+                        message.toolCalls(toolCall).toolCallId(callId);
+                    }
+                }
+            }
+            List<Logprob> logprobs = null;
+            LogprobsResult lr = candidate.getLogprobsResult();
+            if (lr != null) {
+                List<LogprobsResultCandidate> lrcs = lr.getChosenCandidates();
+                List<LogprobsResultTopCandidates> tlcs = lr.getTopCandidates();
+                logprobs = new ArrayList<>();
+                int index = 0;
+                for (LogprobsResultCandidate lrc : lrcs) {
+                    List<TopLogprob> topLogprobs = null;
+                    if (tlcs != null && index < tlcs.size()) {
+                        topLogprobs = new ArrayList<>();
+                        for (LogprobsResultCandidate tlc : tlcs.get(index).getCandidates()) {
+                            topLogprobs.add(
+                                    new TopLogprob(tlc.getToken(), tlc.getLogProbability(), null));
+                        }
+                    }
+                    logprobs.add(
+                            new Logprob(
+                                    lrc.getToken(), lrc.getLogProbability(), null, topLogprobs));
+                    ++index;
+                }
+            }
+
+            FinishReason reason = candidate.getFinishReason();
+            Choice choice =
+                    new Choice(
+                            candidate.getIndex(), message.build(), logprobs, null, reason.name());
+            choices.add(choice);
+        }
+
+        return new ChatOutput(id, "chat.completion", time, choices, model, usage);
     }
 }

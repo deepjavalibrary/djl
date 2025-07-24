@@ -19,13 +19,17 @@ import ai.djl.util.PairList;
 
 import com.google.gson.JsonObject;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** A data class represents chat completion schema. */
-@SuppressWarnings("MissingJavadocMethod")
-public class Function {
+@SuppressWarnings({"MissingJavadocMethod", "serial"})
+public class Function implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String name;
     private String description;
@@ -61,7 +65,7 @@ public class Function {
     public static Builder function(Method method) {
         Map<String, Object> parameters = new ConcurrentHashMap<>();
         PairList<String, String> pairs = FunctionUtils.getParameters(method);
-        Map<String, Map<String, String>> properties = new ConcurrentHashMap<>();
+        Map<String, Map<String, String>> properties = new LinkedHashMap<>(); // NOPMD
         for (Pair<String, String> pair : pairs) {
             Map<String, String> prop = new ConcurrentHashMap<>();
             prop.put("type", pair.getValue());

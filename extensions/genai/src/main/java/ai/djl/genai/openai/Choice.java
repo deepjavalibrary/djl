@@ -14,20 +14,26 @@ package ai.djl.genai.openai;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /** A data class represents chat completion schema. */
 @SuppressWarnings("MissingJavadocMethod")
 public class Choice {
 
-    private int index;
+    private Integer index;
     private Message message;
-    private Logprobs logprobs;
+    private List<Logprob> logprobs;
     private Message delta;
 
     @SerializedName("finish_reason")
     private String finishReason;
 
     public Choice(
-            int index, Message message, Logprobs logprobs, Message delta, String finishReason) {
+            Integer index,
+            Message message,
+            List<Logprob> logprobs,
+            Message delta,
+            String finishReason) {
         this.index = index;
         this.message = message;
         this.logprobs = logprobs;
@@ -35,7 +41,7 @@ public class Choice {
         this.finishReason = finishReason;
     }
 
-    public int getIndex() {
+    public Integer getIndex() {
         return index;
     }
 
@@ -47,7 +53,7 @@ public class Choice {
         return delta;
     }
 
-    public Logprobs getLogprobs() {
+    public List<Logprob> getLogprobs() {
         return logprobs;
     }
 

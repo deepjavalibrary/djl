@@ -12,9 +12,13 @@
  */
 package ai.djl.genai.openai;
 
+import java.io.Serializable;
+
 /** A data class represents chat completion schema. */
 @SuppressWarnings("MissingJavadocMethod")
-public class ToolCall {
+public class ToolCall implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String id;
     private String type;
@@ -39,7 +43,9 @@ public class ToolCall {
     }
 
     /** A data class represents chat completion schema. */
-    public static final class Function {
+    public static final class Function implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         private String arguments;
         private String name;

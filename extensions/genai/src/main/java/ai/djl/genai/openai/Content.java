@@ -59,20 +59,20 @@ public class Content {
         return file;
     }
 
-    public static Content fromText(String text) {
+    public static Content text(String text) {
         return new Content(text);
     }
 
-    public static Content fromImage(String imageUrl) {
+    public static Content image(String imageUrl) {
         return new Content(new ImageContent(imageUrl));
     }
 
-    public static Content fromImage(byte[] image, String mimeType) {
+    public static Content image(byte[] image, String mimeType) {
         String data = "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(image);
         return new Content(new ImageContent(data));
     }
 
-    public static Content fromFile(String id, byte[] data, String fileName) {
+    public static Content file(String id, byte[] data, String fileName) {
         String encoded = Base64.getEncoder().encodeToString(data);
         return new Content(new FileContent(id, encoded, fileName));
     }

@@ -41,7 +41,7 @@ public class StreamGeminiOutput implements Iterable<GeminiOutput> {
             public GeminiOutput next() {
                 String json = output.next();
                 if (json.isEmpty()) {
-                    return new GeminiOutput(null, null, null);
+                    return new GeminiOutput(null, null, null, null, null);
                 }
                 return JsonUtils.GSON.fromJson(json, GeminiOutput.class);
             }

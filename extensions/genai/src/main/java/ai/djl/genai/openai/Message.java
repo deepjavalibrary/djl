@@ -14,12 +14,16 @@ package ai.djl.genai.openai;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /** A data class represents chat completion schema. */
-@SuppressWarnings("MissingJavadocMethod")
-public class Message {
+@SuppressWarnings({"MissingJavadocMethod", "serial"})
+public class Message implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String role;
     private Object content;
@@ -39,6 +43,7 @@ public class Message {
             content = builder.text;
         }
         name = builder.name;
+        toolCalls = builder.toolCalls;
         toolCallId = builder.toolCallId;
     }
 
@@ -62,36 +67,36 @@ public class Message {
         return toolCallId;
     }
 
-    public static Message fromText(String text) {
-        return fromText(text, "user");
+    public static Builder text(String text) {
+        return text(text, "user");
     }
 
-    public static Message fromText(String text, String role) {
-        return builder().text(text).role(role).build();
+    public static Builder text(String text, String role) {
+        return builder().text(text).role(role);
     }
 
-    public static Message fromImage(String imageUrl) {
-        return fromImage(imageUrl, "user");
+    public static Builder image(String imageUrl) {
+        return image(imageUrl, "user");
     }
 
-    public static Message fromImage(byte[] image, String mimeType) {
-        return fromImage(image, mimeType, "user");
+    public static Builder image(byte[] image, String mimeType) {
+        return image(image, mimeType, "user");
     }
 
-    public static Message fromImage(byte[] image, String mimeType, String role) {
-        return builder().addImage(image, mimeType).role(role).build();
+    public static Builder image(byte[] image, String mimeType, String role) {
+        return builder().addImage(image, mimeType).role(role);
     }
 
-    public static Message fromImage(String imageUrl, String role) {
-        return builder().addImage(imageUrl).role(role).build();
+    public static Builder image(String imageUrl, String role) {
+        return builder().addImage(imageUrl).role(role);
     }
 
-    public static Message fromFile(String id, byte[] data, String fileName) {
-        return fromFile(id, data, fileName, "user");
+    public static Builder file(String id, byte[] data, String fileName) {
+        return file(id, data, fileName, "user");
     }
 
-    public static Message fromFile(String id, byte[] data, String fileName, String role) {
-        return builder().addFile(id, data, fileName).role(role).build();
+    public static Builder file(String id, byte[] data, String fileName, String role) {
+        return builder().addFile(id, data, fileName).role(role);
     }
 
     /**
@@ -110,6 +115,7 @@ public class Message {
         String text;
         List<Content> contents = new ArrayList<>();
         String name;
+        List<ToolCall> toolCalls;
         String toolCallId;
 
         public Builder role(String role) {
@@ -127,28 +133,37 @@ public class Message {
             return this;
         }
 
+        public Builder toolCalls(List<ToolCall> toolCalls) {
+            this.toolCalls = toolCalls;
+            return this;
+        }
+
+        public Builder toolCalls(ToolCall... toolCalls) {
+            return toolCalls(Arrays.asList(toolCalls));
+        }
+
         public Builder toolCallId(String toolCallId) {
             this.toolCallId = toolCallId;
             return this;
         }
 
         public Builder addText(String text) {
-            contents.add(Content.fromText(text));
+            contents.add(Content.text(text));
             return this;
         }
 
         public Builder addImage(String imageUrl) {
-            contents.add(Content.fromImage(imageUrl));
+            contents.add(Content.image(imageUrl));
             return this;
         }
 
         public Builder addImage(byte[] image, String mimeType) {
-            contents.add(Content.fromImage(image, mimeType));
+            contents.add(Content.image(image, mimeType));
             return this;
         }
 
         public Builder addFile(String id, byte[] data, String fileName) {
-            contents.add(Content.fromFile(id, data, fileName));
+            contents.add(Content.file(id, data, fileName));
             return this;
         }
 

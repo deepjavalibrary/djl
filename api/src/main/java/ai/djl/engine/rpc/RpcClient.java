@@ -210,6 +210,9 @@ public final class RpcClient {
                         sb.append('\n');
                     }
                     sb.append(line.substring(6));
+                } else if (line.startsWith("event: ")) {
+                    // ignore
+                    continue;
                 } else if (!line.isEmpty()) {
                     // jsonlines
                     cbs.appendContent(BytesSupplier.wrap(line), false);

@@ -52,7 +52,11 @@ public class Blob {
         String mimeType;
 
         public Builder data(byte[] data) {
-            this.data = Base64.getEncoder().encodeToString(data);
+            return data(Base64.getEncoder().encodeToString(data));
+        }
+
+        public Builder data(String data) {
+            this.data = data;
             return this;
         }
 
