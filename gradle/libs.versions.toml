@@ -3,7 +3,7 @@ format.version = "1.1"
 
 [versions]
 djl = "0.34.0"
-pytorch = "2.5.1"
+pytorch = "2.7.0"
 tensorflow = "2.16.1"
 tensorflowCore = "1.0.0-rc.1"
 mxnet = "1.9.1"
@@ -83,4 +83,3 @@ antlrRuntime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
 testng = { module = "org.testng:testng", version.ref = "testng" }
 junit = { module = "junit:junit", version.ref = "junit" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
-
