@@ -8,7 +8,7 @@ description = "Model converter utility package"
 authors = [
     { name = "Deep Java Library team", email = "djl-dev@amazon.com" }
 ]
-license = "Apache-2.0"
+license = { text = "Apache-2.0" }
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
