@@ -66,19 +66,19 @@ tasks {
             maven {
                 if (project.hasProperty("snapshot")) {
                     name = "snapshot"
-                    url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+                    url = uri("https://central.sonatype.com/repository/maven-snapshots/")
                     // TODO switch name to ossrh and skip credentials with
                     // credentials(PasswordCredentials::class)
                     credentials {
-                        username = findProperty("ossrhUsername").toString()
-                        password = findProperty("ossrhPassword").toString()
+                        username = findProperty("sonatypeUsername").toString()
+                        password = findProperty("sonatypePassword").toString()
                     }
                 } else if (project.hasProperty("staging")) {
                     name = "staging"
-                    url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                    url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
                     credentials {
-                        username = findProperty("ossrhUsername").toString()
-                        password = findProperty("ossrhPassword").toString()
+                        username = findProperty("sonatypeUsername").toString()
+                        password = findProperty("sonatypePassword").toString()
                     }
                 } else {
                     name = "local"
