@@ -587,4 +587,62 @@ public class HuggingFaceTokenizerTest {
             System.clearProperty("HF_TOKEN");
         }
     }
+
+    @Test
+    public void testConfigParameters() throws IOException {
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.builder()
+                        .optTokenizerPath(
+                                Paths.get("src/test/resources/fake-tokenizer-with-null-padding/"))
+                        .optTokenizerConfigPath(
+                                "src/test/resources/fake-tokenizer-with-null-padding/tokenizer_config.json")
+                        .build()) {
+            String input = "Hello World";
+            Encoding encoding = tokenizer.encode(input); // with special tokens
+            String[] tokens = encoding.getTokens();
+
+            // Verify special tokens from tokenizer.json are used
+            Assert.assertEquals(tokens[0], "<s>"); // bos_token/cls_token
+            Assert.assertEquals(tokens[tokens.length - 1], "</s>"); // eos_token/sep_token
+
+            String[] testInputs = {
+                "Hello World", // Basic text
+                "Hello  World", // Multiple spaces
+                String.join(" ", Collections.nCopies(1000, "hello")), // Long text
+                "résumé café", // Accented characters
+                "Hello\nWorld", // Newlines
+                "Hello    World" // Extra spaces
+            };
+
+            for (String testInput : testInputs) {
+                encoding = tokenizer.encode(testInput);
+
+                // Verify encoding basics
+                Assert.assertNotNull(encoding);
+                Assert.assertNotNull(encoding.getIds());
+                Assert.assertNotNull(encoding.getTokens());
+
+                // Verify model_max_length constraint
+                Assert.assertTrue(
+                        encoding.getIds().length <= 256,
+                        "Encoding length should not exceed model_max_length (256)");
+
+                // Verify clean_up_tokenization_spaces
+                String decoded = tokenizer.decode(encoding.getIds());
+                if (testInput.contains("  ")) {
+                    Assert.assertFalse(
+                            decoded.contains("  "), "Multiple spaces should be normalized");
+                }
+            }
+
+            String[] inputs = {"hi", "hello world"};
+            Encoding[] paddedEncoding = tokenizer.batchEncode(inputs);
+            List<String> paddedTokens = Arrays.asList(paddedEncoding[0].getTokens());
+            Assert.assertTrue(paddedTokens.contains("<pad>"), "Should contain <pad> token");
+
+            // Verify IDs match tokenizer.json
+            long[] ids = encoding.getIds();
+            Assert.assertEquals(0, ids[0], "First token should have id 0 (<s>)");
+        }
+    }
 }
