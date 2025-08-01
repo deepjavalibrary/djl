@@ -32,24 +32,34 @@ tasks {
             val url = "https://publish.djl.ai/pytorch/$ptVersion/jnilib/${libs.versions.djl.get()}"
             val files = listOf(
                 "linux-x86_64/cpu/libdjl_torch.so",
-                "linux-x86_64/cpu-precxx11/libdjl_torch.so",
-                "linux-aarch64/cpu-precxx11/libdjl_torch.so",
                 "osx-aarch64/cpu/libdjl_torch.dylib",
                 "win-x86_64/cpu/djl_torch.dll"
             ) + when {
+                ptVersion.matches(Regex("2.7.\\d")) -> listOf(
+                    "linux-aarch64/cpu/libdjl_torch.so",
+                    "linux-x86_64/cu128/libdjl_torch.so",
+                    "win-x86_64/cu128/djl_torch.dll"
+                )
+
                 ptVersion.matches(Regex("2.[4-5].\\d")) -> listOf(
+                    "linux-x86_64/cpu-precxx11/libdjl_torch.so",
+                    "linux-aarch64/cpu-precxx11/libdjl_torch.so",
                     "linux-x86_64/cu124/libdjl_torch.so",
                     "linux-x86_64/cu124-precxx11/libdjl_torch.so",
                     "win-x86_64/cu124/djl_torch.dll"
                 )
 
                 ptVersion.matches(Regex("2.[1-3].\\d")) -> listOf(
+                    "linux-x86_64/cpu-precxx11/libdjl_torch.so",
+                    "linux-aarch64/cpu-precxx11/libdjl_torch.so",
                     "linux-x86_64/cu121/libdjl_torch.so",
                     "linux-x86_64/cu121-precxx11/libdjl_torch.so",
                     "win-x86_64/cu121/djl_torch.dll",
                 )
 
                 ptVersion.startsWith("1.13.") -> listOf(
+                    "linux-x86_64/cpu-precxx11/libdjl_torch.so",
+                    "linux-aarch64/cpu-precxx11/libdjl_torch.so",
                     "linux-x86_64/cu117/libdjl_torch.so",
                     "win-x86_64/cu117/djl_torch.dll",
                 )

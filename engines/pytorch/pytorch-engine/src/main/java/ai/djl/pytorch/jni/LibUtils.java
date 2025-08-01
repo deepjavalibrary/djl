@@ -13,6 +13,7 @@
 package ai.djl.pytorch.jni;
 
 import ai.djl.engine.EngineException;
+import ai.djl.repository.Version;
 import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Platform;
 import ai.djl.util.Utils;
@@ -390,7 +391,8 @@ public final class LibUtils {
             flavor = platform.getFlavor();
             if (System.getProperty("os.name").startsWith("Linux")
                     && (Boolean.parseBoolean(Utils.getEnvOrSystemProperty("PYTORCH_PRECXX11"))
-                            || "aarch64".equals(platform.getOsArch()))) {
+                            || ("aarch64".equals(platform.getOsArch())
+                                    && new Version(version).compareTo(new Version("2.7.1")) < 0))) {
                 precxx11 = "-precxx11";
             } else {
                 precxx11 = "";
