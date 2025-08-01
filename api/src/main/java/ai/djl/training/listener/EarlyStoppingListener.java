@@ -59,20 +59,24 @@ public final class EarlyStoppingListener implements TrainingListener {
     private final int epochPatience;
 
     private long startTimeMills;
-    private double prevLoss;
+    private double prevMetricValue;
     private int numberOfEpochsWithoutImprovements;
+
+    private final String monitoredMetric;
 
     private EarlyStoppingListener(
             double objectiveSuccess,
             int minEpochs,
             long maxMillis,
             double earlyStopPctImprovement,
-            int earlyStopPatience) {
+            int earlyStopPatience,
+            String monitoredMetric) {
         this.objectiveSuccess = objectiveSuccess;
         this.minEpochs = minEpochs;
         this.maxMillis = maxMillis;
         this.earlyStopPctImprovement = earlyStopPctImprovement;
         this.epochPatience = earlyStopPatience;
+        this.monitoredMetric = monitoredMetric;
     }
 
     /** {@inheritDoc} */
@@ -80,14 +84,14 @@ public final class EarlyStoppingListener implements TrainingListener {
     public void onEpoch(Trainer trainer) {
         int currentEpoch = trainer.getTrainingResult().getEpoch();
         // stopping criteria
-        final double loss = getLoss(trainer.getTrainingResult());
+        final double metricValue = getMetric(trainer.getTrainingResult());
         if (currentEpoch >= minEpochs) {
-            if (loss < objectiveSuccess) {
+            if (metricValue < objectiveSuccess) {
                 throw new EarlyStoppedException(
                         currentEpoch,
                         String.format(
                                 "validation loss %s < objectiveSuccess %s",
-                                loss, objectiveSuccess));
+                                metricValue, objectiveSuccess));
             }
             long elapsedMillis = System.currentTimeMillis() - startTimeMills;
             if (elapsedMillis >= maxMillis) {
@@ -96,9 +100,9 @@ public final class EarlyStoppingListener implements TrainingListener {
                         String.format("%s ms elapsed >= %s maxMillis", elapsedMillis, maxMillis));
             }
             // consider early stopping?
-            if (Double.isFinite(prevLoss)) {
-                double goalImprovement = prevLoss * (100 - earlyStopPctImprovement) / 100.0;
-                boolean improved = loss <= goalImprovement; // false if any NANs
+            if (Double.isFinite(prevMetricValue)) {
+                double goalImprovement = prevMetricValue * (100 - earlyStopPctImprovement) / 100.0;
+                boolean improved = metricValue <= goalImprovement; // false if any NANs
                 if (improved) {
                     numberOfEpochsWithoutImprovements = 0;
                 } else {
@@ -113,21 +117,22 @@ public final class EarlyStoppingListener implements TrainingListener {
                 }
             }
         }
-        if (Double.isFinite(loss)) {
-            prevLoss = loss;
+        if (Double.isFinite(metricValue)) {
+            prevMetricValue = metricValue;
         }
     }
 
-    private static double getLoss(TrainingResult trainingResult) {
-        Float vLoss = trainingResult.getValidateLoss();
-        if (vLoss != null) {
-            return vLoss;
+    private double getMetric(TrainingResult trainingResult) {
+        if ("validateLoss".equals(monitoredMetric)) {
+            Float vLoss = trainingResult.getValidateLoss();
+            return vLoss != null ? vLoss.doubleValue() : Double.NaN;
+        } else if ("trainLoss".equals(monitoredMetric)) {
+            Float tLoss = trainingResult.getTrainLoss();
+            return tLoss != null ? tLoss.doubleValue() : Double.NaN;
+        } else {
+            Float val = trainingResult.getEvaluations().get(monitoredMetric);
+            return val != null ? val.doubleValue() : Double.NaN;
         }
-        Float tLoss = trainingResult.getTrainLoss();
-        if (tLoss == null) {
-            return Double.NaN;
-        }
-        return tLoss;
     }
 
     /** {@inheritDoc} */
@@ -146,7 +151,7 @@ public final class EarlyStoppingListener implements TrainingListener {
     @Override
     public void onTrainingBegin(Trainer trainer) {
         this.startTimeMills = System.currentTimeMillis();
-        this.prevLoss = Double.NaN;
+        this.prevMetricValue = Double.NaN;
         this.numberOfEpochsWithoutImprovements = 0;
     }
 
@@ -172,6 +177,7 @@ public final class EarlyStoppingListener implements TrainingListener {
         private long maxMillis;
         private double earlyStopPctImprovement;
         private int epochPatience;
+        private String monitoredMetric;
 
         /** Constructs a {@link Builder} with default values. */
         public Builder() {
@@ -180,6 +186,7 @@ public final class EarlyStoppingListener implements TrainingListener {
             this.maxMillis = Long.MAX_VALUE;
             this.earlyStopPctImprovement = 0;
             this.epochPatience = 0;
+            this.monitoredMetric = "validateLoss";
         }
 
         /**
@@ -240,13 +247,29 @@ public final class EarlyStoppingListener implements TrainingListener {
         }
 
         /**
+         * Sets the name of the metric to monitor for early stopping.
+         *
+         * @param metricName the name of the metric (e.g., "validateLoss", "trainAccuracy", etc.)
+         * @return this builder instance
+         */
+        public Builder optMonitoredMetric(String metricName) {
+            this.monitoredMetric = metricName;
+            return this;
+        }
+
+        /**
          * Builds a {@link EarlyStoppingListener} with the specified values.
          *
          * @return a new {@link EarlyStoppingListener}
          */
         public EarlyStoppingListener build() {
             return new EarlyStoppingListener(
-                    objectiveSuccess, minEpochs, maxMillis, earlyStopPctImprovement, epochPatience);
+                    objectiveSuccess,
+                    minEpochs,
+                    maxMillis,
+                    earlyStopPctImprovement,
+                    epochPatience,
+                    monitoredMetric);
         }
     }
 
