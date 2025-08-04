@@ -104,7 +104,7 @@ public final class SuperResolution {
             throws IOException, ModelException, TranslateException {
 
         String modelUrl =
-                "https://storage.googleapis.com/tfhub-modules/captain-pool/esrgan-tf2/1.tar.gz";
+                "https://resources.djl.ai/test-models/tensorflow/captain-pool/esrgan-tf2/1.tar.gz";
         Criteria<Image, Image> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_ENHANCEMENT)
