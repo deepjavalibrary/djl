@@ -10,14 +10,17 @@ Most of our documentation including the module documentation provides explanatio
   
 If you are looking for the latest features from the DJL development team, using the releases will mean that you have to wait for the next release to get them. Instead, you could also use the DJL nightly snapshots.
 
-The nightly snapshots, like the releases, can also be added through a build system like Maven or Gradle. The first thing you will need to do is add the snapshot repository `https://oss.sonatype.org/content/repositories/snapshots/` to your build system.
+The nightly snapshots, like the releases, can also be added through a build system like Maven or Gradle.
+The first thing you will need to do is add the snapshot repository
+`https://central.sonatype.com/repository/maven-snapshots/` to your build system.
+
 
 In Gradle, this is done by adding it to the repository block such as in [this example](https://github.com/deepjavalibrary/djl-serving/blob/master/build.gradle#L23):
 
 ```groovy
 repositories {
     maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        url 'https://central.sonatype.com/repository/maven-snapshots/'
     }
 }
 ```
@@ -28,7 +31,7 @@ In Maven, you can create a repositories tag such as [here](https://github.com/de
 <repositories>
     <repository>
         <id>djl.ai</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        <url>https://central.sonatype.com/repository/maven-snapshots/</url>
     </repository>
 </repositories>
 
