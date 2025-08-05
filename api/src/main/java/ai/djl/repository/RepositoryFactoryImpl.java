@@ -76,24 +76,20 @@ class RepositoryFactoryImpl implements RepositoryFactory {
         if ("tfhub.dev".equals(uri.getHost().toLowerCase(Locale.ROOT))) {
             // Handle tfhub case
             String path = uri.getPath();
-            if (path.endsWith("/")) {
-                path = path.substring(0, path.length() - 1);
-            }
-            path = "/tfhub-modules" + path + ".tar.gz";
+            String query = "tf-hub-format=compressed";
             try {
-                uri = new URI("https", null, "storage.googleapis.com", -1, path, null, null);
+                uri = new URI(uri.getScheme(), null, "tfhub.dev", uri.getPort(), path, query, null);
             } catch (URISyntaxException e) {
                 throw new IllegalArgumentException("Failed to append query string: " + uri, e);
             }
             String[] tokens = path.split("/");
             String modelName = tokens[tokens.length - 2];
-            return new SimpleUrlRepository(name, uri, modelName);
+            return new SimpleUrlRepository(name, uri, modelName + ".tar.gz");
         }
 
         String[] paths = parseFilePath(uri).split("/");
         String fileName = paths[paths.length - 1];
         if (FilenameUtils.isArchiveFile(fileName)) {
-            fileName = FilenameUtils.getNamePart(fileName);
             return new SimpleUrlRepository(name, uri, fileName);
         }
         return new RpcRepository(name, uri);

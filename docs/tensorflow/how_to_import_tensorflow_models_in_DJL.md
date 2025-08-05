@@ -72,7 +72,7 @@ TensorFlow Java `TensorFlow.loadLibrary(...)` API before loading the model in DJ
 
 ```java
 // Build Criteria for Multilingual Universal Sentence Encoder from TensorFlow Hub
-String modelUrl = "https://resources.djl.ai/test-models/tensorflow/google/universal-sentence-encoder-multilingual/3.tar.gz";
+String modelUrl = "https://tfhub.dev/google/universal-sentence-encoder-multilingual/3";
 Criteria<String[], float[][]> criteria =
     Criteria.builder()
         .optApplication(Application.NLP.TEXT_EMBEDDING)
