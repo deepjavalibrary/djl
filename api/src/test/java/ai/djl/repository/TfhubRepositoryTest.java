@@ -15,14 +15,19 @@ package ai.djl.repository;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+
 public class TfhubRepositoryTest {
 
     @Test
-    public void testResource() {
-        Repository repo =
-                Repository.newInstance(
-                        "tfhub",
-                        "https://tfhub.dev/tensorflow/faster_rcnn/inception_resnet_v2_640x640/1/");
+    public void testResource() throws IOException {
+        String modelUrl = "https://tfhub.dev/tensorflow/faster_rcnn/inception_resnet_v2_640x640/1/";
+        Repository repo = Repository.newInstance("tfhub", modelUrl);
         Assert.assertEquals(repo.getResources().size(), 1);
+        MRL mrl = repo.getResources().get(0);
+        Artifact artifact = repo.resolve(mrl, null);
+        for (Artifact.Item item : artifact.getFiles().values()) {
+            Assert.assertEquals(item.getExtension(), "tgz");
+        }
     }
 }

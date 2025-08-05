@@ -65,8 +65,7 @@ public final class UniversalSentenceEncoder {
                     ModelNotFoundException,
                     IOException,
                     TranslateException {
-        String modelUrl =
-                "https://resources.djl.ai/test-models/tensorflow/google/universal-sentence-encoder/4.tar.gz";
+        String modelUrl = "https://tfhub.dev/google/universal-sentence-encoder/4/";
 
         Criteria<String[], float[][]> criteria =
                 Criteria.builder()

@@ -102,9 +102,7 @@ public final class SuperResolution {
 
     public static List<Image> enhance(List<Image> inputImages)
             throws IOException, ModelException, TranslateException {
-
-        String modelUrl =
-                "https://resources.djl.ai/test-models/tensorflow/captain-pool/esrgan-tf2/1.tar.gz";
+        String modelUrl = "https://tfhub.dev/captain-pool/esrgan-tf2/1/";
         Criteria<Image, Image> criteria =
                 Criteria.builder()
                         .optApplication(Application.CV.IMAGE_ENHANCEMENT)

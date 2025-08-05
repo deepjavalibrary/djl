@@ -40,6 +40,7 @@ public class SimpleUrlRepository extends AbstractRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleUrlRepository.class);
 
+    private String fileName;
     private String artifactId;
     private String modelName;
 
@@ -48,10 +49,11 @@ public class SimpleUrlRepository extends AbstractRepository {
 
     SimpleUrlRepository(String name, URI uri, String fileName) {
         super(name, uri);
+        this.fileName = fileName;
         modelName = arguments.get("model_name");
         artifactId = arguments.get("artifact_id");
         if (artifactId == null) {
-            artifactId = fileName;
+            artifactId = FilenameUtils.getNamePart(fileName);
         }
         if (modelName == null) {
             modelName = artifactId;
@@ -117,6 +119,7 @@ public class SimpleUrlRepository extends AbstractRepository {
         Artifact.Item item = new Artifact.Item();
         item.setUri(uri.getPath());
         item.setName(""); // avoid creating extra folder
+        item.setExtension(FilenameUtils.getFileType(fileName));
         item.setArtifact(artifact);
         item.setSize(getContentLength());
         files.put(artifactId, item);
@@ -141,7 +144,7 @@ public class SimpleUrlRepository extends AbstractRepository {
                 conn.setRequestMethod("HEAD");
                 int code = conn.getResponseCode();
                 if (code != 200) {
-                    logger.info("request error: {}", code);
+                    logger.debug("Failed detect content length, error code: {}", code);
                     return -1;
                 }
                 return conn.getContentLength();
