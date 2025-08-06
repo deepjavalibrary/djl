@@ -17,7 +17,7 @@ You can install `djl_converter` from djl main branch or clone the repository and
 
 ```
 # install release version of djl_converter
-pip install https://publish.djl.ai/djl_converter/djl_converter-0.33.0-py3-none-any.whl
+pip install https://publish.djl.ai/djl_converter/djl_converter-0.34.0-py3-none-any.whl
 
 # install from djl master branch
 pip install "git+https://github.com/deepjavalibrary/djl.git#subdirectory=extensions/tokenizers/src/main/python"
