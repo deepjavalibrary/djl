@@ -24,6 +24,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.zip.GZIPInputStream;
 
+import java.net.MalformedURLException;
+import java.nio.file.InvalidPathException;
+
 /** A utility class downloads the file from specified url. */
 public final class DownloadUtils {
 
