@@ -95,7 +95,7 @@ public final class DownloadUtils {
     }
 
     /**
-     * Validates the safety and validity of a URL.
+     * [Sample] Validates the safety and validity of a URL.
      * It now specifically checks if the URL starts with the allowed domain.
      * @param url The URL object to validate.
      * @throws IOException If the URL is not from the allowed domain or is unsafe.
@@ -114,7 +114,7 @@ public final class DownloadUtils {
     }
     
     /**
-     * Validates the safety and validity of an output path.
+     * [Sample] Validates the safety and validity of an output path.
      * It prevents directory traversal attacks by checking for parent directory access (e.g., ../).
      * @param output The Path object to validate.
      * @throws IOException If the path is invalid or unsafe.
