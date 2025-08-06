@@ -16,24 +16,24 @@ jobs:
   build-tokenizers-jni-linux:
     runs-on: ubuntu-latest
     container:
-      image: amazonlinux:2
+      image: amazonlinux:2023
       env:
         JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto
     steps:
       - name: Install Environment
         run: |
-          yum -y groupinstall "Development Tools"
-          yum -y install patch perl-IPC-Cmd cmake3 curl jq
-          yum -y install java-17-amazon-corretto-devel
-          ln -s /usr/bin/cmake3 /usr/bin/cmake
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          pip3 install awscli wheel setuptools build --upgrade
-      - uses: taiki-e/checkout-action@v1
+          dnf -y group install "Development Tools"
+          dnf -y install patch git cmake3 python3-devel python3-pip java-17-amazon-corretto-devel jq perl
+          pip3 install awscli wheel build --upgrade
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions/checkout@v4
       - name: Release JNI prep
         run: |
           source "$HOME/.cargo/env"
           ./gradlew :extensions:tokenizers:compileJNI
-          PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
+          ./gradlew -Pjni :extensions:tokenizers:test
       - name: Build djl-converter wheel
         working-directory: extensions/tokenizers/src/main/python/
         run: python3 -m build
@@ -175,24 +175,24 @@ jobs:
     timeout-minutes: 30
     needs: create-runners
     container:
-      image: amazonlinux:2
+      image: amazonlinux:2023
       env:
         JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto.aarch64
     steps:
       - name: Install Environment
         run: |
-          yum -y groupinstall "Development Tools"
-          yum -y install patch perl-IPC-Cmd cmake3 curl jq
-          yum -y install java-17-amazon-corretto-devel
-          ln -s /usr/bin/cmake3 /usr/bin/cmake
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          dnf -y group install "Development Tools"
+          dnf -y install patch git cmake3 python3-devel python3-pip java-17-amazon-corretto-devel jq perl
           pip3 install awscli --upgrade
-      - uses: taiki-e/checkout-action@v1
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions/checkout@v4
       - name: Release JNI prep
         run: |
           source "$HOME/.cargo/env"
           ./gradlew :extensions:tokenizers:compileJNI
-          PYTORCH_PRECXX11=true ./gradlew -Pjni :extensions:tokenizers:test
+          ./gradlew -Pjni :extensions:tokenizers:test
       - name: Configure AWS Credentials
         run: |
           oidc_token=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \

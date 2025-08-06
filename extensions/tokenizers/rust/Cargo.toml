@@ -10,20 +10,26 @@ candle = { version = "*", package = "candle-core" }
 candle-nn = "0.8.4"
 candle-transformers = "0.8.4"
 candle-flash-attn = { version = "0.8.4", optional = true }
-candle-cublaslt = { git = "https://github.com/huggingface/candle-cublaslt", rev = "cf789b7dd6d4abb19b03b9556442f94f0588b4a0", optional = true }
-candle-layer-norm = { git = "https://github.com/xyang16/candle-layer-norm", rev = "e574de6a7f88bafbede8edf9ee43170c6a8ce51a", optional = true }
-candle-rotary = { git = "https://github.com/huggingface/candle-rotary", rev = "0a718a0856569a92f3112e64f10d07e4447822e8", optional = true }
+candle-cublaslt = { version = "0.0.1", optional = true }
+candle-layer-norm = { version = "0.0.1", optional = true }
+candle-rotary = { version = "0.0.1", optional = true }
+cudarc = { version = "0.13", features = ["cuda-12020", "static-linking"], default-features = false, optional = true }
+#intel-mkl-src = { version = "0.8", features = ["mkl-static-lp64-iomp"] }
+#candle-flash-attn-v1 = { version = "0.0.1", optional = true }
+
 tokenizers = "0.21.1"
-half = "2.5.0"
+half = { version = "2.5.0", features = ["num-traits"] }
 tracing = "0.1.41"
 serde = { version = "1.0.219", features = ["serde_derive"] }
 serde_json = "1.0.140"
 
 [patch.crates-io]
-cudarc = { git = "https://github.com/coreylowman/cudarc", rev = "c388e724af93a3e8fbe484f5ded2d8b3c1badd8e" }
-candle = { git = "https://github.com/huggingface/candle", rev = "468d1d525fe206a35d6962c02cfa7b9918b31076", package = "candle-core" }
-# openssl-src 300.3.2 is broken for AL2
-openssl-src = { git = "https://github.com/alexcrichton/openssl-src-rs", rev = "c591de676017446c9f1d719e77eb162159ce8886", package = "openssl-src" }
+candle-layer-norm = { git = "https://github.com/frankfliu/candle-layer-norm", rev = "e82bb97605d815aedfa1835c38b0111bed2085b5" }
+cudarc = { git = "https://github.com/Narsil/cudarc", rev = "8b4f18b4bcd5e4b1a9daf40abc3a2e27f83f06e9" }
+candle = { git = "https://github.com/huggingface/candle", rev = "6381023982251959a2c9bab7378b3013304e192b", package = "candle-core" }
+candle-nn = { git = "https://github.com/huggingface/candle", rev = "6381023982251959a2c9bab7378b3013304e192b", package = "candle-nn" }
+candle-transformers = { git = "https://github.com/huggingface/candle", rev = "6381023982251959a2c9bab7378b3013304e192b", package = "candle-transformers" }
+candle-flash-attn = { git = "https://github.com/huggingface/candle", rev = "6381023982251959a2c9bab7378b3013304e192b", package = "candle-flash-attn" }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = { version = "0.10", features = ["vendored"] }
@@ -35,5 +41,6 @@ tokenizers = { version = "0.21.0", features = ["http"] }
 crate-type = ["cdylib"]
 
 [features]
-cuda = ["candle/cuda", "candle-nn/cuda", "candle-transformers/cuda", "dep:candle-cublaslt", "dep:candle-layer-norm", "dep:candle-rotary"]
+cuda = ["candle/cuda", "candle-nn/cuda", "candle-transformers/cuda", "dep:candle-cublaslt", "dep:candle-layer-norm", "dep:candle-rotary", "dep:cudarc"]
 flash-attn = ["cuda", "candle-transformers/flash-attn", "dep:candle-flash-attn"]
+
