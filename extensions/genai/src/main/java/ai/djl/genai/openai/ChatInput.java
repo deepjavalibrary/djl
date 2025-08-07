@@ -12,6 +12,9 @@
  */
 package ai.djl.genai.openai;
 
+import ai.djl.genai.anthropic.AnthropicInput;
+import ai.djl.genai.anthropic.Source;
+import ai.djl.genai.anthropic.ToolChoice;
 import ai.djl.genai.gemini.GeminiInput;
 import ai.djl.genai.gemini.types.Blob;
 import ai.djl.genai.gemini.types.FunctionDeclaration;
@@ -125,6 +128,8 @@ public class ChatInput implements JsonSerializable {
     public JsonElement serialize() {
         if (inputType == Type.GEMINI) {
             return JsonUtils.GSON.toJsonTree(toGemini());
+        } else if (inputType == Type.ANTHROPIC || inputType == Type.ANTHROPIC_VERTEX) {
+            return JsonUtils.GSON.toJsonTree(toAnthropic());
         }
         return GSON.toJsonTree(this);
     }
@@ -229,6 +234,85 @@ public class ChatInput implements JsonSerializable {
         } else if ("medium".equalsIgnoreCase(reasoningEffort)) {
             config.thinkingConfig(
                     ThinkingConfig.builder().includeThoughts(true).thinkingBudget(512));
+        }
+        builder.generationConfig(config.build());
+        return builder.build();
+    }
+
+    @SuppressWarnings("unchecked")
+    private AnthropicInput toAnthropic() {
+        AnthropicInput.Builder builder = AnthropicInput.builder();
+        builder.model(model).stream(stream).stopSequences(stop).temperature(temperature).topP(topP);
+        if (maxCompletionTokens != null) {
+            builder.maxTokens(maxCompletionTokens);
+        }
+        for (Message message : messages) {
+            String role = message.getRole();
+            if ("system".equals(role)) {
+                builder.systemInstructions((String) message.getContent());
+                continue;
+            }
+
+            ai.djl.genai.anthropic.Message.Builder mb = ai.djl.genai.anthropic.Message.builder();
+            mb.role(role);
+            Object obj = message.getContent();
+            if (obj instanceof String) {
+                mb.text((String) obj);
+            } else {
+                for (Content content : (List<Content>) obj) {
+                    String type = content.getType();
+                    if ("image_url".equals(type)) {
+                        Content.ImageContent ic = content.getImageUrl();
+                        String url = ic.getUrl();
+                        Matcher m = URL_PATTERN.matcher(url);
+                        if (m.matches()) {
+                            String mimeType = m.group(1);
+                            String data = m.group(2);
+                            ai.djl.genai.anthropic.Content.Builder cb =
+                                    ai.djl.genai.anthropic.Content.builder();
+                            cb.type("image")
+                                    .source(
+                                            Source.builder()
+                                                    .type("base64")
+                                                    .mediaType(mimeType)
+                                                    .data(data));
+                            mb.addContent(cb);
+                        } else {
+                            mb.addContent(ai.djl.genai.anthropic.Content.image(url));
+                        }
+                    } else if ("text".equals(type)) {
+                        mb.addContent(ai.djl.genai.anthropic.Content.text(content.getText()));
+                    } else {
+                        throw new IllegalArgumentException("Unsupported type: " + type);
+                    }
+                }
+            }
+            builder.addMessage(mb);
+        }
+        if (tools != null && !tools.isEmpty()) {
+            for (Tool tool : tools) {
+                if (!"function".equals(tool.getType())) {
+                    logger.warn("Unsupported tool type: {}", tool.getType());
+                    continue;
+                }
+                Function function = tool.getFunction();
+                Object param = function.getParameters();
+                ai.djl.genai.anthropic.Tool t =
+                        ai.djl.genai.anthropic.Tool.builder()
+                                .name(function.getName())
+                                .description(function.getDescription())
+                                .inputSchema(param)
+                                .build();
+                builder.addTool(t);
+            }
+        }
+        if ("auto".equals(toolChoice)) {
+            builder.toolChoice(ToolChoice.builder().type("auto").build());
+        }
+        if (inputType == Type.ANTHROPIC_VERTEX) {
+            builder.anthropicVersion("vertex-2023-10-16");
+        } else if (inputType == Type.ANTHROPIC) {
+            builder.anthropicVersion("2023-10-16");
         }
         return builder.build();
     }
@@ -833,5 +917,7 @@ public class ChatInput implements JsonSerializable {
     public enum Type {
         CHAT_COMPLETION,
         GEMINI,
+        ANTHROPIC,
+        ANTHROPIC_VERTEX,
     }
 }
