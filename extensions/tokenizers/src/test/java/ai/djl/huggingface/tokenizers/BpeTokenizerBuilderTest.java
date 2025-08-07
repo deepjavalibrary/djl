@@ -31,9 +31,9 @@ public class BpeTokenizerBuilderTest {
         Path merges = bpe.resolve("merges.txt");
 
         DownloadUtils.download(
-                new URL("https://resources.djl.ai/test-models/tokenizer/vocab.json"), vocab, null);
+                new URL("https://resources.djl.ai/test-models/tokenizer/vocab.json"), vocab);
         DownloadUtils.download(
-                new URL("https://resources.djl.ai/test-models/tokenizer/merges.txt"), merges, null);
+                new URL("https://resources.djl.ai/test-models/tokenizer/merges.txt"), merges);
 
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder().optTokenizerPath(bpe).build()) {

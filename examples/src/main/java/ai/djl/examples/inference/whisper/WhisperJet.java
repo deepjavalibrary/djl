@@ -24,7 +24,6 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.training.util.DownloadUtils;
-import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
@@ -73,7 +72,7 @@ public final class WhisperJet {
 
         String url = "https://resources.djl.ai/audios/testEN.wav";
         Path file = Paths.get("build/tmp/testEn.wav");
-        DownloadUtils.download(new URL(url), file, new ProgressBar());
+        DownloadUtils.download(new URL(url), file);
         Audio audio = AudioFactory.newInstance().fromFile(file);
         AudioInput input = new AudioInput(audio, "en");
         try (ZooModel<AudioInput, String> model = criteria.loadModel();
