@@ -36,6 +36,8 @@ import ai.djl.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -51,17 +53,31 @@ public class GeminiTest {
 
     private static final Logger logger = LoggerFactory.getLogger(GeminiTest.class);
 
+    private String baseUrl;
+
+    private void setMockBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    @BeforeClass
+    public void setUp() {
+        System.setProperty("PROJECT", "MY_FIRST_PROJECT");
+    }
+
+    @AfterClass
+    public void tierDown() {
+        System.clearProperty("PROJECT");
+    }
+
     @Test
     public void testGenerateContent() throws ModelException, IOException, TranslateException {
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234")
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getUrl(baseUrl))
                             .build();
 
             try (ZooModel<GeminiInput, GeminiOutput> model = criteria.loadModel();
@@ -71,6 +87,11 @@ public class GeminiTest {
                 logger.info(ret.getTextOutput());
                 Assert.assertEquals(ret.getTextOutput(), "This is a test.");
             }
+            String receivedInput = server.setReceivedInput();
+            Assert.assertEquals(
+                    receivedInput,
+                    "{\"contents\":[{\"parts\":[{\"text\":\"Say this is a"
+                            + " test.\"}],\"role\":\"user\"}]}");
         }
     }
 
@@ -79,16 +100,12 @@ public class GeminiTest {
         String mockResponse = loadGeneratedStreamContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
             server.setContentType("text/event-stream");
-
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini =
-                    Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).stream(true).build();
+            setMockBaseUrl("http://localhost:" + server.getPort());
 
             Criteria<GeminiInput, StreamGeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, StreamGeminiOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234")
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getUrl(baseUrl, true))
                             .build();
 
             try (ZooModel<GeminiInput, StreamGeminiOutput> model = criteria.loadModel();
@@ -102,6 +119,11 @@ public class GeminiTest {
                 }
                 Assert.assertEquals(sb.toString(), "This is a test.");
             }
+            String receivedInput = server.setReceivedInput();
+            Assert.assertEquals(
+                    receivedInput,
+                    "{\"contents\":[{\"parts\":[{\"text\":\"Say this is a"
+                            + " test.\"}],\"role\":\"user\"}]}");
         }
     }
 
@@ -124,13 +146,11 @@ public class GeminiTest {
                         .build();
 
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234") // override env var
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getUrl(baseUrl))
                             .build();
 
             try (ZooModel<GeminiInput, GeminiOutput> model = criteria.loadModel();
@@ -148,6 +168,8 @@ public class GeminiTest {
                 String weather = (String) FunctionUtils.invoke(method, this, arguments);
                 Assert.assertEquals(weather, "nice");
             }
+            String receivedInput = server.setReceivedInput();
+            Assert.assertEquals(receivedInput, getExpectedFunctionContent());
         }
     }
 
@@ -155,14 +177,11 @@ public class GeminiTest {
     public void testImageUnderstand() throws ModelException, IOException, TranslateException {
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
-
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234")
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getUrl(baseUrl))
                             .build();
             Path testImage = Paths.get("../../examples/src/test/resources/kitten.jpg");
             byte[] bytes = Files.readAllBytes(testImage);
@@ -184,18 +203,11 @@ public class GeminiTest {
     public void testFileUri() throws ModelException, IOException, TranslateException {
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini =
-                    Gemini.GEMINI_2_5_FLASH.toBuilder()
-                            .baseUrl(baseUrl)
-                            .useVertex(true)
-                            .project("test")
-                            .build();
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234")
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getUrl(baseUrl, false))
                             .build();
             try (ZooModel<GeminiInput, GeminiOutput> model = criteria.loadModel();
                     Predictor<GeminiInput, GeminiOutput> predictor = model.newPredictor()) {
@@ -229,14 +241,11 @@ public class GeminiTest {
 
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
-
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234")
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getUrl(baseUrl))
                             .build();
 
             try (ZooModel<GeminiInput, GeminiOutput> model = criteria.loadModel();
@@ -266,14 +275,11 @@ public class GeminiTest {
 
         String mockResponse = loadLogprobsContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
-
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<GeminiInput, GeminiOutput> criteria =
                     Criteria.builder()
                             .setTypes(GeminiInput.class, GeminiOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234")
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getUrl(baseUrl))
                             .build();
 
             try (ZooModel<GeminiInput, GeminiOutput> model = criteria.loadModel();
@@ -301,6 +307,8 @@ public class GeminiTest {
                 }
                 Assert.assertEquals(ret.getTextOutput(), "\"Neutral\"");
             }
+            String receivedInput = server.setReceivedInput();
+            Assert.assertEquals(receivedInput, getExpectedLogprobInput());
         }
     }
 
@@ -320,6 +328,18 @@ public class GeminiTest {
         return "{\"candidates\":[{\"content\":{\"parts\":[{\"functionCall\":{"
                 + "\"args\":{\"unit\":true,\"location\":\"New York\"},\"name\":\"getWeather\"}}],"
                 + "\"role\":\"model\"},\"finishReason\":\"STOP\",\"index\":0}]}";
+    }
+
+    private String getExpectedFunctionContent() {
+        return "{\"contents\":[{\"parts\":[{\"text\":"
+                + "\"What is the weather like in celsius in New York today?\"}],"
+                + "\"role\":\"user\"}],\"generationConfig\":{\"candidateCount\":1},"
+                + "\"safetySettings\":[],\"tools\":[{\"functionDeclarations\":"
+                + "[{\"description\":\"Get the current weather in a given location,"
+                + " set unit to true for celsius\",\"name\":\"getWeather\",\"parameters\":"
+                + "{\"anyOf\":[],\"properties\":{\"unit\":{\"anyOf\":[],\"type\":\"BOOLEAN\"},"
+                + "\"location\":{\"anyOf\":[],\"type\":\"STRING\"}},\"required\":[\"location\","
+                + "\"unit\"],\"type\":\"OBJECT\"}}]}]}";
     }
 
     private String loadLogprobsContent() {
@@ -384,6 +404,15 @@ public class GeminiTest {
                    + " [{\"modality\":\"TEXT\",\"tokenCount\":3}],\"thoughtsTokenCount\":95},"
                    + " \"modelVersion\":\"gemini-2.5-flash\",\"createTime\":\"2025-07-21T03:01:13.244502Z\","
                    + " \"responseId\":\"1\"}";
+    }
+
+    private String getExpectedLogprobInput() {
+        return "{\"contents\":[{\"parts\":[{\"text\":\"I am not sure if I really like this"
+                   + " restaurant a lot.\"}],"
+                   + "\"role\":\"user\"}],\"generationConfig\":{\"candidateCount\":1,\"logprobs\":3,"
+                   + "\"maxOutputTokens\":1024,\"responseLogprobs\":true,\"responseMimeType\":\"application/json\","
+                   + "\"responseSchema\":{\"anyOf\":[],\"enum\":[\"Positive\",\"Negative\",\"Neutral\"],"
+                   + "\"type\":\"STRING\"}},\"safetySettings\":[],\"tools\":[]}";
     }
 
     public String getWeather(String location, boolean unit) {

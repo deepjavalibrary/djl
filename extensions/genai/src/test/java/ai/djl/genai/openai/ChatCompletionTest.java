@@ -37,31 +37,38 @@ public class ChatCompletionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatCompletionTest.class);
 
+    private String baseUrl;
+
+    private void setMockBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
     @Test
     public void testGenerateContent() throws ModelException, IOException, TranslateException {
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini =
-                    Gemini.GEMINI_2_5_FLASH.toBuilder()
-                            .baseUrl(baseUrl)
-                            .chatCompletions(true)
-                            .build();
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<ChatInput, ChatOutput> criteria =
                     Criteria.builder()
                             .setTypes(ChatInput.class, ChatOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234") // override env var
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getChatCompletionsUrl(baseUrl))
                             .build();
 
             try (ZooModel<ChatInput, ChatOutput> model = criteria.loadModel();
                     Predictor<ChatInput, ChatOutput> predictor = model.newPredictor()) {
                 ChatInput in =
-                        ChatInput.text("Say this is a test.").model("gemini-2.5-flash").build();
+                        ChatInput.text("Say this is a test.")
+                                .model(Gemini.GEMINI_2_5_FLASH.name())
+                                .build();
                 ChatOutput ret = predictor.predict(in);
                 logger.info(ret.getTextOutput());
                 Assert.assertEquals(ret.getTextOutput(), "This is a test.");
             }
+            String receivedInput = server.setReceivedInput();
+            Assert.assertEquals(
+                    receivedInput,
+                    "{\"model\":\"gemini-2.5-flash\",\"messages\":[{\"role\":\"user\",\"content\":\"Say"
+                        + " this is a test.\"}]}");
         }
     }
 
@@ -70,25 +77,20 @@ public class ChatCompletionTest {
         String mockResponse = loadGeneratedStreamContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
             server.setContentType("text/event-stream");
-
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini =
-                    Gemini.GEMINI_2_5_FLASH.toBuilder()
-                            .baseUrl(baseUrl)
-                            .chatCompletions(true)
-                            .build();
+            setMockBaseUrl("http://localhost:" + server.getPort());
 
             Criteria<ChatInput, StreamChatOutput> criteria =
                     Criteria.builder()
                             .setTypes(ChatInput.class, StreamChatOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234")
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getChatCompletionsUrl(baseUrl))
                             .build();
 
             try (ZooModel<ChatInput, StreamChatOutput> model = criteria.loadModel();
                     Predictor<ChatInput, StreamChatOutput> predictor = model.newPredictor()) {
                 ChatInput in =
-                        ChatInput.text("Say this is a test.").model("gemini-2.5-flash").stream(true)
+                        ChatInput.text("Say this is a test.")
+                                .model(Gemini.GEMINI_2_5_FLASH.name())
+                                .stream(true)
                                 .build();
                 StreamChatOutput ret = predictor.predict(in);
                 StringBuilder sb = new StringBuilder();
@@ -98,6 +100,11 @@ public class ChatCompletionTest {
                 }
                 Assert.assertEquals(sb.toString(), "This is a test.");
             }
+            String receivedInput = server.setReceivedInput();
+            Assert.assertEquals(
+                    receivedInput,
+                    "{\"model\":\"gemini-2.5-flash\",\"messages\":[{\"role\":\"user\",\"content\":\"Say"
+                        + " this is a test.\"}],\"stream\":true}");
         }
     }
 
@@ -106,17 +113,11 @@ public class ChatCompletionTest {
             throws ModelException, IOException, TranslateException, ReflectiveOperationException {
         String mockResponse = loadFunctionContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini =
-                    Gemini.GEMINI_2_5_FLASH.toBuilder()
-                            .baseUrl(baseUrl)
-                            .chatCompletions(true)
-                            .build();
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<ChatInput, ChatOutput> criteria =
                     Criteria.builder()
                             .setTypes(ChatInput.class, ChatOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234") // override env var
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getChatCompletionsUrl(baseUrl))
                             .build();
 
             try (ZooModel<ChatInput, ChatOutput> model = criteria.loadModel();
@@ -128,7 +129,7 @@ public class ChatCompletionTest {
                                 .build();
                 ChatInput in =
                         ChatInput.text("What's the weather like in New York today?")
-                                .model("gemini-2.5-flash")
+                                .model(Gemini.GEMINI_2_5_FLASH.name())
                                 .tools(Tool.of(function))
                                 .toolChoice("auto")
                                 .build();
@@ -138,6 +139,8 @@ public class ChatCompletionTest {
                 String weather = (String) FunctionUtils.invoke(method, this, arguments);
                 Assert.assertEquals(weather, "nice");
             }
+            String receivedInput = server.setReceivedInput();
+            Assert.assertEquals(receivedInput, getExpectedFunctionInput());
         }
     }
 
@@ -153,22 +156,20 @@ public class ChatCompletionTest {
                         .build();
 
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<ChatInput, ChatOutput> criteria =
                     Criteria.builder()
                             .setTypes(ChatInput.class, ChatOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234") // override env var
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getUrl(baseUrl))
                             .build();
 
             try (ZooModel<ChatInput, ChatOutput> model = criteria.loadModel();
                     Predictor<ChatInput, ChatOutput> predictor = model.newPredictor()) {
 
                 ChatInput in =
-                        ChatInput.text("What is the weather like in celsius in New York today?")
+                        ChatInput.text("What's the weather like in New York today?")
                                 .inputType(ChatInput.Type.GEMINI)
-                                .tools(ai.djl.genai.openai.Tool.of(function))
+                                .tools(Tool.of(function))
                                 .toolChoice("auto")
                                 .build();
 
@@ -177,6 +178,8 @@ public class ChatCompletionTest {
                 String weather = (String) FunctionUtils.invoke(method, this, arguments);
                 Assert.assertEquals(weather, "nice");
             }
+            String receivedInput = server.setReceivedInput();
+            Assert.assertEquals(receivedInput, getExpectedGeminiFunctionInput());
         }
     }
 
@@ -184,18 +187,11 @@ public class ChatCompletionTest {
     public void testImageUnderstand() throws ModelException, IOException, TranslateException {
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini =
-                    Gemini.GEMINI_2_5_FLASH.toBuilder()
-                            .baseUrl(baseUrl)
-                            .chatCompletions(true)
-                            .build();
-
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<ChatInput, ChatOutput> criteria =
                     Criteria.builder()
                             .setTypes(ChatInput.class, ChatOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234") // override env var
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getChatCompletionsUrl(baseUrl))
                             .build();
             Path testImage = Paths.get("../../examples/src/test/resources/kitten.jpg");
             byte[] bytes = Files.readAllBytes(testImage);
@@ -203,36 +199,9 @@ public class ChatCompletionTest {
             try (ZooModel<ChatInput, ChatOutput> model = criteria.loadModel();
                     Predictor<ChatInput, ChatOutput> predictor = model.newPredictor()) {
                 ChatInput in =
-                        ChatInput.file("1", bytes, "test.jpg")
+                        ChatInput.image(bytes, "image/jpeg")
                                 .addText("Caption this image.")
-                                .model("gemini-2.5-flash")
-                                .build();
-                ChatOutput ret = predictor.predict(in);
-                logger.info(ret.getTextOutput());
-                Assert.assertEquals(ret.getTextOutput(), "This is a test.");
-            }
-        }
-    }
-
-    @Test
-    public void testFileUri() throws ModelException, IOException, TranslateException {
-        String mockResponse = loadGeneratedContent();
-        try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini = Gemini.GEMINI_2_5_FLASH.toBuilder().baseUrl(baseUrl).build();
-
-            Criteria<ChatInput, ChatOutput> criteria =
-                    Criteria.builder()
-                            .setTypes(ChatInput.class, ChatOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234") // override env var
-                            .build();
-            try (ZooModel<ChatInput, ChatOutput> model = criteria.loadModel();
-                    Predictor<ChatInput, ChatOutput> predictor = model.newPredictor()) {
-                ChatInput in =
-                        ChatInput.image("https://resources.djl.ai/images/kitten.jpg")
-                                .addText("Caption this image.")
-                                .model("gemini-2.5-flash")
+                                .model(Gemini.GEMINI_2_5_FLASH.name())
                                 .build();
                 ChatOutput ret = predictor.predict(in);
                 logger.info(ret.getTextOutput());
@@ -246,50 +215,39 @@ public class ChatCompletionTest {
             throws ModelException, IOException, TranslateException {
         String mockResponse = loadGeneratedContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini =
-                    Gemini.GEMINI_2_5_FLASH.toBuilder()
-                            .baseUrl(baseUrl)
-                            .chatCompletions(true)
-                            .build();
-
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<ChatInput, ChatOutput> criteria =
                     Criteria.builder()
                             .setTypes(ChatInput.class, ChatOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234")
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getChatCompletionsUrl(baseUrl))
                             .build();
 
             try (ZooModel<ChatInput, ChatOutput> model = criteria.loadModel();
                     Predictor<ChatInput, ChatOutput> predictor = model.newPredictor()) {
                 ChatInput in =
                         ChatInput.text("Tell me the history of LLM")
-                                .model("gemini-2.5-flash")
+                                .model(Gemini.GEMINI_2_5_FLASH.name())
                                 .maxCompletionTokens(2000)
                                 .build();
                 ChatOutput ret = predictor.predict(in);
                 logger.info(ret.getTextOutput());
                 Assert.assertEquals(ret.getTextOutput(), "This is a test.");
             }
+            String receivedInput = server.setReceivedInput();
+            Assert.assertEquals(receivedInput, getExpectedInputWithConfig());
         }
     }
 
     @Test
     public void testGeminiWithLogprobs() throws ModelException, IOException, TranslateException {
+        // Gemini chatcompletions mode doesn't support logprobs
         String mockResponse = loadLogprobsContent();
         try (TestServer server = TestServer.newInstance(mockResponse)) {
-            String baseUrl = "http://localhost:" + server.getPort();
-            Gemini gemini =
-                    Gemini.GEMINI_2_5_FLASH.toBuilder()
-                            .baseUrl(baseUrl)
-                            .chatCompletions(true)
-                            .build();
-
+            setMockBaseUrl("http://localhost:" + server.getPort());
             Criteria<ChatInput, ChatOutput> criteria =
                     Criteria.builder()
                             .setTypes(ChatInput.class, ChatOutput.class)
-                            .optModelUrls(gemini.getUrl())
-                            .optArgument("API_KEY", "1234")
+                            .optModelUrls(Gemini.GEMINI_2_5_FLASH.getUrl(baseUrl))
                             .build();
 
             try (ZooModel<ChatInput, ChatOutput> model = criteria.loadModel();
@@ -314,6 +272,8 @@ public class ChatCompletionTest {
                 }
                 Assert.assertEquals(ret.getTextOutput(), "\"Neutral\"");
             }
+            String receivedInput = server.setReceivedInput();
+            Assert.assertEquals(receivedInput, getExpectedLogprobsInput());
         }
     }
 
@@ -349,10 +309,33 @@ public class ChatCompletionTest {
                 + "{\"completion_tokens\":15,\"prompt_tokens\":50,\"total_tokens\":127}}";
     }
 
+    private String getExpectedFunctionInput() {
+        return "{\"model\":\"gemini-2.5-flash\",\"messages\":[{\"role\":\"user\","
+                + "\"content\":\"What\\u0027s the weather like in New York today?\"}],"
+                + "\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"getWeather\","
+                + "\"description\":\"Get the current weather in a given location\",\"parameters\":"
+                + "{\"type\":\"object\",\"properties\":{\"location\":{\"type\":\"string\"}},"
+                + "\"required\":[\"location\"]}}}],\"tool_choice\":\"auto\"}";
+    }
+
     private String loadGeminiFunctionContent() {
         return "{\"candidates\":[{\"content\":{\"parts\":[{\"functionCall\":{"
                 + "\"args\":{\"unit\":true,\"location\":\"New York\"},\"name\":\"getWeather\"}}],"
                 + "\"role\":\"model\"},\"finishReason\":\"STOP\",\"index\":0}]}";
+    }
+
+    private String getExpectedGeminiFunctionInput() {
+        return "{\"contents\":[{\"parts\":[{\"text\":\"What\\u0027s the weather like in New York"
+                   + " today?\"}]"
+                   + ",\"role\":\"user\"}],\"generationConfig\":{},\"safetySettings\":[],\"tools\":[{\"functionDeclarations\":[{\"description\":\"Get"
+                   + " the current weather in a given location\","
+                   + "\"name\":\"getWeather\",\"parameters\":{\"anyOf\":[],\"properties\":{\"location\":"
+                   + "{\"anyOf\":[],\"type\":\"STRING\"}},\"required\":[\"location\"],\"type\":\"OBJECT\"}}]}]}";
+    }
+
+    private String getExpectedInputWithConfig() {
+        return "{\"model\":\"gemini-2.5-flash\",\"messages\":[{\"role\":\"user\",\"content\":"
+                + "\"Tell me the history of LLM\"}],\"max_completion_tokens\":2000}";
     }
 
     private String loadLogprobsContent() {
@@ -417,6 +400,13 @@ public class ChatCompletionTest {
                    + " [{\"modality\":\"TEXT\",\"tokenCount\":3}],\"thoughtsTokenCount\":95},"
                    + " \"modelVersion\":\"gemini-2.5-flash\",\"createTime\":\"2025-07-21T03:01:13.244502Z\","
                    + " \"responseId\":\"1\"}";
+    }
+
+    private String getExpectedLogprobsInput() {
+        return "{\"contents\":[{\"parts\":[{\"text\":\"I am not sure if I really like this"
+                   + " restaurant a lot.\"}],"
+                   + "\"role\":\"user\"}],\"generationConfig\":{\"logprobs\":2,\"responseLogprobs\":true},"
+                   + "\"safetySettings\":[],\"tools\":[]}";
     }
 
     public String getWeather(String location) {

@@ -34,6 +34,7 @@ public final class TestServer implements Runnable, AutoCloseable {
     private int code = 200;
     private String content;
     private String contentType;
+    private String receivedInput;
 
     private TestServer(ServerSocket serverSocket, String content) {
         this.serverSocket = serverSocket;
@@ -73,6 +74,15 @@ public final class TestServer implements Runnable, AutoCloseable {
      */
     public void setContent(String content) {
         this.content = content;
+    }
+
+    /**
+     * Returns the received input.
+     *
+     * @return the received input
+     */
+    public String setReceivedInput() {
+        return receivedInput;
     }
 
     /**
@@ -116,7 +126,8 @@ public final class TestServer implements Runnable, AutoCloseable {
                     while (true) {
                         String line = readLine(in);
                         if (line.isEmpty()) {
-                            in.readNBytes(length);
+                            byte[] buf = in.readNBytes(length);
+                            receivedInput = new String(buf, StandardCharsets.UTF_8);
                             break;
                         } else {
                             String[] header = line.split(":");

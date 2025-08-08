@@ -12,6 +12,7 @@
  */
 package ai.djl.genai.openai;
 
+import ai.djl.genai.anthropic.AnthropicOutput;
 import ai.djl.genai.gemini.GeminiOutput;
 import ai.djl.genai.gemini.types.Blob;
 import ai.djl.genai.gemini.types.Candidate;
@@ -152,16 +153,32 @@ public class ChatOutput {
      * @return the {@link ToolCall} response
      */
     public ToolCall getToolCall() {
+        List<ToolCall> list = getToolCalls();
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+
+    /**
+     * Returns a list of {@link ToolCall} response.
+     *
+     * @return a list of {@link ToolCall} response
+     */
+    public List<ToolCall> getToolCalls() {
+        List<ToolCall> ret = new ArrayList<>();
         if (choices != null && !choices.isEmpty()) {
-            Message message = choices.get(0).getMessage();
-            if (message != null) {
-                List<ToolCall> toolsCalls = message.getToolCalls();
-                if (toolsCalls != null && !toolsCalls.isEmpty()) {
-                    return toolsCalls.get(0);
+            for (Choice choice : choices) {
+                Message message = choice.getMessage();
+                if (message != null) {
+                    List<ToolCall> toolsCalls = message.getToolCalls();
+                    if (toolsCalls != null && !toolsCalls.isEmpty()) {
+                        ret.add(toolsCalls.get(0));
+                    }
                 }
             }
         }
-        return null;
+        return ret;
     }
 
     /**
@@ -190,6 +207,9 @@ public class ChatOutput {
         if (element.has("candidates")) {
             GeminiOutput gemini = JsonUtils.GSON.fromJson(element, GeminiOutput.class);
             return fromGemini(gemini);
+        } else if (element.has("type")) {
+            AnthropicOutput ant = JsonUtils.GSON.fromJson(element, AnthropicOutput.class);
+            return fromAnthropic(ant);
         }
         return ChatInput.GSON.fromJson(element, ChatOutput.class);
     }
@@ -276,5 +296,48 @@ public class ChatOutput {
         }
 
         return new ChatOutput(id, "chat.completion", time, choices, model, usage);
+    }
+
+    static ChatOutput fromAnthropic(AnthropicOutput ant) {
+        String id = ant.getId();
+        Usage usage = null;
+        ai.djl.genai.anthropic.Usage um = ant.getUsage();
+        if (um != null) {
+            usage =
+                    new Usage(
+                            um.getOutputTokens(),
+                            um.getInputTokens(),
+                            um.getOutputTokens() + um.getInputTokens());
+        }
+        String model = ant.getModel();
+        List<Choice> choices = new ArrayList<>();
+        int index = 0;
+        for (ai.djl.genai.anthropic.Content content : ant.getContent()) {
+            Message.Builder message = Message.builder().role("model");
+            String type = content.getType();
+            if ("text".equals(type)) {
+                message.text(content.getText());
+            } else if ("tool_use".equals(type)) {
+                String callId = content.getId();
+                String args = JsonUtils.GSON_COMPACT.toJson(content.getInput());
+                ToolCall.Function function = new ToolCall.Function(args, content.getName());
+                ToolCall toolCall = new ToolCall(callId, "function", function);
+                message.toolCalls(toolCall).toolCallId(callId);
+            } else {
+                // tool_result, server_tool_use, web_search_tool_result, thinking, redacted_thinking
+                throw new IllegalArgumentException("Unsupported response type: " + type);
+            }
+            Integer idx = content.getIndex();
+            if (idx != null) {
+                index = idx;
+            } else {
+                index++;
+            }
+            Choice choice = new Choice(index, message.build(), null, null, ant.getStopReason());
+            choices.add(choice);
+        }
+
+        return new ChatOutput(
+                id, "chat.completion", System.currentTimeMillis(), choices, model, usage);
     }
 }

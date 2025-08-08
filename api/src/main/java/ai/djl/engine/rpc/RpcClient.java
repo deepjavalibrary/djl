@@ -106,7 +106,18 @@ public final class RpcClient {
                     httpHeaders.put(new CaseInsensitiveKey("x-goog-api-key"), apiKey);
                 }
             }
-        } else if (apiKey != null) {
+        } else if (url.startsWith("https://api.anthropic.com")) {
+            if (apiKey == null) {
+                apiKey = Utils.getEnvOrSystemProperty("ANTHROPIC_API_KEY");
+            }
+            if (apiKey != null) {
+                httpHeaders.put(new CaseInsensitiveKey("x-api-key"), apiKey);
+            }
+        }
+        if (apiKey == null) {
+            apiKey = Utils.getEnvOrSystemProperty("GENAI_API_KEY");
+        }
+        if (apiKey != null) {
             httpHeaders.put(new CaseInsensitiveKey("Authorization"), "Bearer " + apiKey);
         }
         return new RpcClient(new URL(url), method, httpHeaders);
@@ -152,10 +163,11 @@ public final class RpcClient {
             for (Map.Entry<String, List<String>> entry : respHeaders.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue().get(0);
-                if (key != null) {
+                if (key != null && value != null) {
+                    value = value.toLowerCase(Locale.ROOT);
                     if ("content-type".equalsIgnoreCase(key)
-                            && ("text/event-stream".equalsIgnoreCase(value)
-                                    || "application/jsonlines".equalsIgnoreCase(value))) {
+                            && (value.startsWith("text/event-stream")
+                                    || value.startsWith("application/jsonlines"))) {
                         isStream = true;
                     }
                     out.addProperty(key, value);
@@ -200,6 +212,7 @@ public final class RpcClient {
     }
 
     private static Void handleStream(HttpURLConnection conn, ChunkedBytesSupplier cbs) {
+        BytesSupplier pendingChunk = null;
         try (Reader r = new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8);
                 BufferedReader reader = new BufferedReader(r)) {
             String line;
@@ -215,9 +228,15 @@ public final class RpcClient {
                     continue;
                 } else if (!line.isEmpty()) {
                     // jsonlines
-                    cbs.appendContent(BytesSupplier.wrap(line), false);
+                    if (pendingChunk != null) {
+                        cbs.appendContent(pendingChunk, false);
+                    }
+                    pendingChunk = BytesSupplier.wrap(line);
                 } else if (sb.length() > 0) {
-                    cbs.appendContent(BytesSupplier.wrap(sb.toString()), false);
+                    if (pendingChunk != null) {
+                        cbs.appendContent(pendingChunk, false);
+                    }
+                    pendingChunk = BytesSupplier.wrap(sb.toString());
                     sb.setLength(0);
                 }
             }
@@ -225,7 +244,10 @@ public final class RpcClient {
             logger.warn("Failed run inference.", e);
             cbs.appendContent(BytesSupplier.wrap("connection abort exceptionally"), false);
         } finally {
-            cbs.appendContent(new byte[0], true);
+            if (pendingChunk == null) {
+                pendingChunk = BytesSupplier.wrap(new byte[0]);
+            }
+            cbs.appendContent(pendingChunk, true);
             conn.disconnect();
         }
         return null;
