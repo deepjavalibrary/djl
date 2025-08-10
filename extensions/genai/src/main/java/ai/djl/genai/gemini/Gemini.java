@@ -14,234 +14,165 @@ package ai.djl.genai.gemini;
 
 import ai.djl.util.Utils;
 
-import java.net.URI;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /** Utility class to hold the Gemini models url. */
 public final class Gemini {
 
-    public static final Gemini GEMINI_2_5_PRO = builder().model("gemini-2.5-pro").build();
-    public static final Gemini GEMINI_2_5_FLASH = builder().model("gemini-2.5-flash").build();
-    public static final Gemini GEMINI_2_0_FLASH = builder().model("gemini-2.0-flash").build();
-    public static final Gemini GEMINI_2_0_FLASH_LITE =
-            builder().model("gemini-2.0-flash-lite").build();
+    public static final Gemini GEMINI_2_5_PRO = new Gemini("gemini-2.5-pro");
+    public static final Gemini GEMINI_2_5_FLASH = new Gemini("gemini-2.5-flash");
+    public static final Gemini GEMINI_2_0_FLASH = new Gemini("gemini-2.0-flash");
+    public static final Gemini GEMINI_2_0_FLASH_LITE = new Gemini("gemini-2.0-flash-lite");
 
-    private static final Pattern PATTERN =
-            Pattern.compile(
-                    "/([^/]+)/(openai/chat/completions|(projects/([^/]+)/locations/([^/]+)/publishers/google/)?models/([^/]+):(.+))");
+    private String model;
 
-    private String url;
-
-    Gemini(String url) {
-        this.url = url;
+    Gemini(String model) {
+        this.model = model;
     }
 
     /**
-     * Returns the Gemini model URL.
+     * Returns the model name.
      *
-     * @return the Gemini model URL
+     * @return the model name.
+     */
+    public String name() {
+        return model;
+    }
+
+    /**
+     * Returns the chatcompletions compatible endpoint URL.
+     *
+     * @return the chatcompletions compatible endpoint URL
+     */
+    public String getChatCompletionsUrl() {
+        return getUrl(false, true, false, null, null, null, null);
+    }
+
+    /**
+     * Returns the chatcompletions compatible endpoint URL with override base URL.
+     *
+     * @return the chatcompletions compatible endpoint URL with override base URL
+     */
+    public String getChatCompletionsUrl(String baseUrl) {
+        return getUrl(false, true, false, null, null, null, baseUrl);
+    }
+
+    /**
+     * Returns the model's endpoint URL.
+     *
+     * @return the model's endpoint URL
      */
     public String getUrl() {
-        return url;
+        return getUrl(null);
     }
 
     /**
-     * Returns the {@code Builder} based on current model.
+     * Returns the model's streaming endpoint URL.
      *
-     * @return the {@code Builder} based on current model
+     * @return the model's streaming endpoint URL
      */
-    public Builder toBuilder() {
-        URI uri = URI.create(url);
-        String baseUrl = uri.getScheme() + "://" + uri.getAuthority();
-        String path = uri.getPath();
-        Matcher m = PATTERN.matcher(path);
-        if (!m.matches()) {
-            throw new IllegalArgumentException("Invalid gemini URL: " + url);
-        }
-        String apiVersion = m.group(1);
-        String project = m.group(4);
-        String location = m.group(5);
-        String model = m.group(6);
-        String verb = m.group(7);
-        boolean vertex = project != null;
-        boolean chatCompletions = m.group(3) != null;
-
-        return builder()
-                .baseUrl(baseUrl)
-                .model(model)
-                .apiVersion(apiVersion)
-                .useVertex(vertex)
-                .project(project)
-                .location(location)
-                .verb(verb)
-                .chatCompletions(chatCompletions);
+    public String getUrl(boolean stream) {
+        return getUrl(stream, false);
     }
 
     /**
-     * Creates a builder to build a {@code Gemini}.
+     * Returns the model's streaming endpoint URL on Vertex.
      *
-     * @return a new builder
+     * @return the model's streaming endpoint URL on Vertex
      */
-    public static Builder builder() {
-        return new Builder();
+    public String getUrl(boolean stream, boolean useVertex) {
+        return getUrl(stream, false, useVertex, null, null, null, null);
     }
 
-    /** The builder for {@code Gemini}. */
-    public static final class Builder {
-        private String model;
-        private String baseUrl;
-        private boolean useVertex;
-        private boolean chatCompletions;
-        private String apiVersion;
-        private String project = Utils.getenv("PROJECT");
-        private String location = Utils.getenv("REGION", "global");
-        private String verb = "generateContent";
+    /**
+     * Returns the endpoint URL with override base URL.
+     *
+     * @return the endpoint URL with override base URL
+     */
+    public String getUrl(String baseUrl) {
+        return getUrl(false, false, false, null, null, null, baseUrl);
+    }
 
-        /**
-         * Sets the model.
-         *
-         * @param model the model
-         * @return the builder
-         */
-        public Builder model(String model) {
-            this.model = model;
-            return this;
+    /**
+     * Returns the endpoint URL with override base URL.
+     *
+     * @return the endpoint URL with override base URL
+     */
+    public String getUrl(String baseUrl, boolean stream) {
+        return getUrl(stream, false, true, null, null, null, baseUrl);
+    }
+
+    /**
+     * Returns the model's endpoint URL with specified project and location.
+     *
+     * @return the model's endpoint URL with specified project and location
+     */
+    public String getUrl(boolean stream, String project, String location) {
+        return getUrl(stream, project, location, null);
+    }
+
+    /**
+     * Returns the vertex model's endpoint URL with specified project, location and api version.
+     *
+     * @return the vertex model's endpoint URL with specified project, location and api version
+     */
+    public String getUrl(boolean stream, String project, String location, String apiVersion) {
+        return getUrl(stream, false, true, project, location, apiVersion, null);
+    }
+
+    String getUrl(
+            boolean stream,
+            boolean chatCompletions,
+            boolean useVertex,
+            String project,
+            String location,
+            String apiVersion,
+            String baseUrl) {
+        if (location == null) {
+            location = Utils.getEnvOrSystemProperty("REGION", "global");
         }
-
-        /**
-         * Sets the override base url.
-         *
-         * @param baseUrl the override base url
-         * @return the builder
-         */
-        public Builder baseUrl(String baseUrl) {
-            this.baseUrl = baseUrl;
-            return this;
+        if (project == null) {
+            project = Utils.getEnvOrSystemProperty("PROJECT");
         }
-
-        /**
-         * Sets the api version.
-         *
-         * @param apiVersion the api version
-         * @return the builder
-         */
-        public Builder apiVersion(String apiVersion) {
-            this.apiVersion = apiVersion;
-            return this;
-        }
-
-        /**
-         * Sets if use Vertex endpoint.
-         *
-         * @param useVertex if use Vertex endpoint
-         * @return the builder
-         */
-        public Builder useVertex(boolean useVertex) {
-            this.useVertex = useVertex;
-            return this;
-        }
-
-        /**
-         * Sets the Vertex project.
-         *
-         * @param project the Vertex project
-         * @return the builder
-         */
-        public Builder project(String project) {
-            this.project = project;
-            return this;
-        }
-
-        /**
-         * Sets the Vertex location.
-         *
-         * @param location the Vertex location, default is global
-         * @return the builder
-         */
-        public Builder location(String location) {
-            this.location = location;
-            return this;
-        }
-
-        /**
-         * Sets the prediction verb.
-         *
-         * @param verb the prediction verb, default is generateContent
-         * @return the builder
-         */
-        public Builder verb(String verb) {
-            this.verb = verb;
-            return this;
-        }
-
-        /**
-         * Sets if use chat completions mode.
-         *
-         * @param chatCompletions if use chat completions mode
-         * @return the builder
-         */
-        public Builder chatCompletions(boolean chatCompletions) {
-            this.chatCompletions = chatCompletions;
-            return this;
-        }
-
-        /**
-         * Sets if use streamGenerateContent verb.
-         *
-         * @param stream if use streamGenerateContent verb
-         * @return the builder
-         */
-        public Builder stream(boolean stream) {
-            if (stream) {
-                verb = "streamGenerateContent?alt=sse";
-            }
-            return this;
-        }
-
-        /**
-         * Returns the {@code Gemini} instance.
-         *
-         * @return the {@code Gemini} instance
-         */
-        public Gemini build() {
-            if (baseUrl == null) {
-                if (useVertex && !"global".equals(location)) {
-                    baseUrl = "https://" + location + "-generativelanguage.googleapis.com";
-                } else {
-                    baseUrl = "https://generativelanguage.googleapis.com";
-                }
-            }
-            StringBuilder sb = new StringBuilder(baseUrl);
-            sb.append('/');
-            if (chatCompletions) {
-                if (apiVersion == null) {
-                    apiVersion = "v1beta";
-                }
-                sb.append(apiVersion).append("/openai/chat/completions");
-            } else if (useVertex) {
-                if (project == null) {
-                    throw new IllegalArgumentException("project is required.");
-                }
-                if (apiVersion == null) {
-                    apiVersion = "v1";
-                }
-                sb.append(apiVersion)
-                        .append("/projects/")
-                        .append(project)
-                        .append("/locations/")
-                        .append(location)
-                        .append("/publishers/google/models/")
-                        .append(model)
-                        .append(':')
-                        .append(verb);
+        if (baseUrl == null) {
+            if (useVertex && !"global".equals(location)) {
+                baseUrl = "https://" + location + "-generativelanguage.googleapis.com";
             } else {
-                if (apiVersion == null) {
-                    apiVersion = "v1beta";
-                }
-                sb.append(apiVersion).append("/models/").append(model).append(':').append(verb);
+                baseUrl = "https://generativelanguage.googleapis.com";
             }
-            return new Gemini(sb.toString());
         }
+        StringBuilder sb = new StringBuilder(baseUrl);
+        sb.append('/');
+        if (chatCompletions) {
+            if (apiVersion == null) {
+                apiVersion = "v1beta";
+            }
+            sb.append(apiVersion).append("/openai/chat/completions");
+            return sb.toString();
+        } else if (useVertex) {
+            if (project == null) {
+                throw new IllegalArgumentException("project is required.");
+            }
+            if (apiVersion == null) {
+                apiVersion = "v1";
+            }
+            sb.append(apiVersion)
+                    .append("/projects/")
+                    .append(project)
+                    .append("/locations/")
+                    .append(location)
+                    .append("/publishers/google/models/")
+                    .append(model)
+                    .append(':');
+        } else {
+            if (apiVersion == null) {
+                apiVersion = "v1beta";
+            }
+            sb.append(apiVersion).append("/models/").append(model).append(':');
+        }
+        if (stream) {
+            sb.append("streamGenerateContent?alt=sse");
+        } else {
+            sb.append("generateContent");
+        }
+        return sb.toString();
     }
 }

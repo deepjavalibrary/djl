@@ -12,6 +12,12 @@
  */
 package ai.djl.genai.openai;
 
+import ai.djl.genai.anthropic.AnthropicOutput;
+import ai.djl.genai.anthropic.StreamAnthropicOutput;
+import ai.djl.util.JsonUtils;
+
+import com.google.gson.JsonObject;
+
 import java.util.Iterator;
 
 /** A stream version of {@link ChatOutput}. */
@@ -40,6 +46,13 @@ public class StreamChatOutput implements Iterable<ChatOutput> {
                 String json = output.next();
                 if (json.isEmpty() || "[DONE]".equals(json)) {
                     return new ChatOutput();
+                }
+                JsonObject element = JsonUtils.GSON.fromJson(json, JsonObject.class);
+                if (element.has("type")) {
+                    AnthropicOutput.Builder builder = AnthropicOutput.builder();
+                    StreamAnthropicOutput.next(builder, element, output);
+                    AnthropicOutput ant = builder.build();
+                    return ChatOutput.fromAnthropic(ant);
                 }
                 return ChatOutput.fromJson(json);
             }
