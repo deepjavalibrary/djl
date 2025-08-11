@@ -132,7 +132,6 @@ nav:
               - Load a ONNX Model: 'docs/demos/jupyter/onnxruntime/machine_learning_with_ONNXRuntime.ipynb'
           - XGBoost: 'engines/ml/xgboost/README.md'
           - LightGBM: 'engines/ml/lightgbm/README.md'
-          - TensorRT: 'engines/tensorrt/README.md'
   - Extensions:
       - Android: 'android/README.md'
       - AWS S3 support: 'extensions/aws-ai/README.md'

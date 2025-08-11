@@ -5,7 +5,6 @@
 Many of DJL engines only has limited support for NDArray operations. Here is a list of such engines:
 
 - [ONNX Runtime](../engines/onnxruntime/onnxruntime-engine/README.md)
-- [TensorRT](../engines/tensorrt/README.md)
 - [XGBoost](../engines/ml/xgboost/README.md)
 - [LightGBM](../engines/ml/lightgbm/README.md)
 
@@ -45,9 +44,6 @@ at runtime, you can disable this behavior by setting the following system proper
 ```
 # disable hybrid engine for OnnxRuntime
 System.setProperty("ai.djl.onnx.disable_alternative", "true");
-
-# disable hybrid engine for TensorRT
-System.setProperty("ai.djl.tensorrt.disable_alternative", "true");
 ```
 
 

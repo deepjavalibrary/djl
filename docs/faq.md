@@ -18,7 +18,6 @@ support the following models:
 - TensorFlow SavedModel bundle
 - Apache MXNet model
 - ONNX model
-- TensorRT model
 - Python script model
 - XGBoost model
 - LightGBM model

@@ -45,7 +45,6 @@ dependencies {
         api("ai.djl.tensorflow:tensorflow-api:${version}")
         api("ai.djl.tensorflow:tensorflow-engine:${version}")
         api("ai.djl.tensorflow:tensorflow-model-zoo:${version}")
-        api("ai.djl.tensorrt:tensorrt:${version}")
         api("ai.djl.timeseries:timeseries:${version}")
         api("com.microsoft.onnxruntime:onnxruntime:${libs.versions.onnxruntime.get()}")
         api("com.microsoft.onnxruntime:onnxruntime_gpu:${libs.versions.onnxruntime.get()}")
