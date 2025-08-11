@@ -19,29 +19,29 @@ tokenizers = "0.21.0"
 slf4j = "2.0.17"
 log4j_slf4j = "2.24.3"
 gson = "2.13.1"
-jna = "5.14.0"
+jna = "5.17.0"
 commonCli = "1.9.0"
 commonsCompress = "1.27.1"
-commonsCsv = "1.14.0"
+commonsCsv = "1.14.1"
 commonsLogging = "1.3.5"
 
-awssdk = "2.31.36"
+awssdk = "2.32.19"
 ffmpeg = "7.1-1.5.11"
 hadoop = "3.4.1"
 javacpp = "1.5.11"
 javacv = "1.5.11"
 openpnpOpencv = "4.9.0-0"
 spark = "3.5.5"
-tablesaw = "0.44.1"
+tablesaw = "0.44.4"
 rapis = "25.02.2"
-protobuf = "4.30.2"
-jackson = "2.19.0"
+protobuf = "4.31.1"
+jackson = "2.19.2"
 jtransforms = "3.1"
 
 antlr = "4.11.1"
 testng = "7.11.0"
 junit = "4.13.2"
-mockito = "5.17.0"
+mockito = "5.18.0"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -83,4 +83,3 @@ antlrRuntime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
 testng = { module = "org.testng:testng", version.ref = "testng" }
 junit = { module = "junit:junit", version.ref = "junit" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
-
