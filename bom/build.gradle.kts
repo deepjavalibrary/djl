@@ -1,3 +1,6 @@
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.Base64
 import org.w3c.dom.Element
 
 plugins {
@@ -182,5 +185,30 @@ signing {
         val signingPassword = findProperty("signingPassword").toString()
         useInMemoryPgpKeys(signingKey, signingPassword)
         sign(publishing.publications["bom"])
+    }
+}
+
+// Post-publish task to make deployment visible in Central Publisher Portal.
+// See https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#ensuring-deployment-visibility-in-the-central-publisher-portal
+if (project.hasProperty("staging")) {
+    val url = "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${project.group}"
+    val username = findProperty("sonatypeUsername").toString()
+    val password = findProperty("sonatypePassword").toString()
+    val token = Base64.getEncoder().encodeToString("${username}:${password}".toByteArray())
+
+    tasks.register("postPublish") {
+        doLast {
+            val conn = URL(url).openConnection() as HttpURLConnection
+            conn.requestMethod = "POST"
+            conn.setRequestProperty("Authorization", "Bearer ${token}")
+            val status = conn.responseCode
+            if (status != HttpURLConnection.HTTP_OK) {
+                throw GradleException("Failed to POST '${url}'. Received status code ${status}: ${conn.responseMessage}")
+            }
+        }
+    }
+
+    tasks.named("publish") {
+        finalizedBy(tasks.named("postPublish"))
     }
 }
