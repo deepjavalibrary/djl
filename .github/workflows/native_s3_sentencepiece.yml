@@ -12,19 +12,16 @@ jobs:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: ubuntu-latest
     container:
-      image: amazonlinux:2
+      image: amazonlinux:2023
       env:
         JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto
     steps:
       - name: Install Environment
         run: |
-          yum -y update
-          yum -y groupinstall "Development Tools"
-          yum -y install patch cmake3 jq
-          yum -y install java-17-amazon-corretto-devel
-          ln -sf /usr/bin/cmake3 /usr/bin/cmake
+          dnf -y group install "Development Tools"
+          dnf -y install patch git cmake3 python3-devel python3-pip java-17-amazon-corretto-devel jq
           pip3 install awscli --upgrade
-      - uses: taiki-e/checkout-action@v1
+      - uses: actions/checkout@v4
       - name: Release JNI prep
         run: |
           export CMAKE_POLICY_VERSION_MINIMUM=3.5
@@ -130,18 +127,16 @@ jobs:
     timeout-minutes: 30
     needs: create-aarch64-runner
     container:
-      image: amazonlinux:2
+      image: amazonlinux:2023
       env:
         JAVA_HOME: /usr/lib/jvm/java-17-amazon-corretto.aarch64
     steps:
       - name: Install Environment
         run: |
-          yum -y groupinstall "Development Tools"
-          yum -y install patch perl-IPC-Cmd cmake3 curl jq
-          yum -y install java-17-amazon-corretto-devel
-          ln -s /usr/bin/cmake3 /usr/bin/cmake
+          dnf -y group install "Development Tools"
+          dnf -y install patch git cmake3 python3-devel python3-pip java-17-amazon-corretto-devel jq
           pip3 install awscli --upgrade
-      - uses: taiki-e/checkout-action@v1
+      - uses: actions/checkout@v4
       - name: Release JNI prep
         run: |
           ./gradlew :extensions:sentencepiece:compileJNI
