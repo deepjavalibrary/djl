@@ -29,7 +29,7 @@ if [[ ! -d "libtorch" ]]; then
     fi
 
     if [[ $ARCH == 'aarch64' ]]; then
-      if [[ "$VERSION" =~ ^(2.[2-9].*)$ ]]; then
+      if [[ "$VERSION" =~ ^(2.[7-9].*)$ ]]; then
         curl -s "https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-linux-aarch64-${VERSION}.zip" | jar xv >/dev/null
       else
         curl -s "https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch${AARCH64_CXX11ABI}-shared-with-deps-${VERSION}-aarch64.zip" | jar xv >/dev/null
