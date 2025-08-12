@@ -1,3 +1,7 @@
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.Base64
+
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
@@ -105,6 +109,30 @@ afterEvaluate {
     }
 }
 
+// Post-publish task to make deployment visible in Central Publisher Portal.
+// See https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#ensuring-deployment-visibility-in-the-central-publisher-portal
+if (project.hasProperty("staging")) {
+    def url = "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${project.group}"
+    def username = findProperty("sonatypeUsername").toString()
+    def password = findProperty("sonatypePassword").toString()
+    def token = Base64.encoder.encodeToString("${username}:${password}".bytes)
+
+    tasks.register("postPublish") {
+        doLast {
+            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection()
+            conn.requestMethod = "POST"
+            conn.setRequestProperty("Authorization", "Bearer ${token}")
+            int status = conn.responseCode
+            if (status != HttpURLConnection.HTTP_OK) {
+                throw new GradleException("Failed to POST '${url}'. Received status code ${status}: ${conn.responseMessage}")
+            }
+        }
+    }
+
+    tasks.named("publish") {
+        finalizedBy("postPublish")
+    }
+}
 
 tasks.register('processResources') {
     doLast {

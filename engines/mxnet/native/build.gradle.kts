@@ -1,3 +1,8 @@
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.Base64
+import kotlin.collections.ArrayList
+
 plugins {
     ai.djl.javaProject
     `maven-publish`
@@ -225,5 +230,30 @@ tasks {
                 into(binaryRoot / "cu112mkl/linux/native/lib")
             }
         }
+    }
+}
+
+// Post-publish task to make deployment visible in Central Publisher Portal.
+// See https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#ensuring-deployment-visibility-in-the-central-publisher-portal
+if (project.hasProperty("staging")) {
+    val url = "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${project.group}"
+    val username = findProperty("sonatypeUsername").toString()
+    val password = findProperty("sonatypePassword").toString()
+    val token = Base64.getEncoder().encodeToString("${username}:${password}".toByteArray())
+
+    tasks.register("postPublish") {
+        doLast {
+            val conn = URL(url).openConnection() as HttpURLConnection
+            conn.requestMethod = "POST"
+            conn.setRequestProperty("Authorization", "Bearer ${token}")
+            val status = conn.responseCode
+            if (status != HttpURLConnection.HTTP_OK) {
+                project.logger.error("Failed to POST '${url}'. Received status code ${status}: ${conn.responseMessage}")
+            }
+        }
+    }
+
+    tasks.named("publish") {
+        finalizedBy(tasks.named("postPublish"))
     }
 }
