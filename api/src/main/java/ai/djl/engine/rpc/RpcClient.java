@@ -92,33 +92,42 @@ public final class RpcClient {
             httpHeaders.put(new CaseInsensitiveKey(key), value);
         }
         httpHeaders.put(new CaseInsensitiveKey("Content-Type"), contentType);
-        if (url.startsWith("https://generativelanguage.googleapis.com")) {
+        String authHeader = "Authorization";
+        if (url.startsWith("https://generativelanguage.googleapis.com/")) {
             if (apiKey == null) {
                 apiKey = Utils.getenv("GEMINI_API_KEY");
                 if (apiKey == null) {
                     apiKey = Utils.getenv("GOOGLE_API_KEY");
                 }
             }
-            if (apiKey != null) {
-                if (url.endsWith("/openai/chat/completions")) {
-                    httpHeaders.put(new CaseInsensitiveKey("Authorization"), "Bearer " + apiKey);
-                } else {
-                    httpHeaders.put(new CaseInsensitiveKey("x-goog-api-key"), apiKey);
-                }
+            if (!url.endsWith("/openai/chat/completions")) {
+                authHeader = "x-goog-api-key";
             }
-        } else if (url.startsWith("https://api.anthropic.com")) {
+        } else if (url.startsWith("https://api.anthropic.com/")) {
             if (apiKey == null) {
                 apiKey = Utils.getEnvOrSystemProperty("ANTHROPIC_API_KEY");
             }
-            if (apiKey != null) {
-                httpHeaders.put(new CaseInsensitiveKey("x-api-key"), apiKey);
+            authHeader = "x-api-key";
+        } else if (url.startsWith("https://api.openai.com/")) {
+            if (apiKey == null) {
+                apiKey = Utils.getEnvOrSystemProperty("OPENAI_API_KEY");
+            }
+            httpHeaders.put(
+                    new CaseInsensitiveKey("OpenAI-Organization"), "org-IS5aEokdvmbYXyWeJhhwe5Xn");
+            String project = Utils.getEnvOrSystemProperty("OPENAI_PROJECT");
+            if (project != null) {
+                httpHeaders.put(new CaseInsensitiveKey("OpenAI-Project"), project);
             }
         }
         if (apiKey == null) {
             apiKey = Utils.getEnvOrSystemProperty("GENAI_API_KEY");
         }
         if (apiKey != null) {
-            httpHeaders.put(new CaseInsensitiveKey("Authorization"), "Bearer " + apiKey);
+            if ("Authorization".equals(authHeader)) {
+                httpHeaders.put(new CaseInsensitiveKey(authHeader), "Bearer " + apiKey);
+            } else {
+                httpHeaders.put(new CaseInsensitiveKey(authHeader), apiKey);
+            }
         }
         return new RpcClient(new URL(url), method, httpHeaders);
     }
