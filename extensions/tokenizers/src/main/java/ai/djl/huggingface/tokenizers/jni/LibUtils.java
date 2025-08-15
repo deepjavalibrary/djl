@@ -167,6 +167,7 @@ public final class LibUtils {
                         flavor,
                         cudaArch);
                 flavor = "cpu"; // Fallback to CPU
+                cudaArch = "";
             }
         }
 
