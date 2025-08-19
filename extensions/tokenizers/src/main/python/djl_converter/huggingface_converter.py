@@ -324,7 +324,7 @@ class HuggingfaceConverter:
                                                 (input_ids, attention_mask),
                                                 strict=False)
 
-            model_name = model_id.split("/")[-1]
+            model_name = model_id.rstrip("/").split("/")[-1]
             logging.info(f"Saving torchscript model: {model_name}.pt ...")
             model_file = os.path.join(temp_dir, f"{model_name}.pt")
             script_module.save(model_file)
