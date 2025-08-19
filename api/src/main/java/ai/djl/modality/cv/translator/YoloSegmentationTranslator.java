@@ -110,8 +110,9 @@ public class YoloSegmentationTranslator extends YoloV5Translator {
             retProbs.add((double) confidences[id]);
 
             float[][] maskFloat = new float[maskH][maskW];
+            int pos = i * maskH * maskW;
             for (int j = 0; j < maskH; j++) {
-                System.arraycopy(maskArray, j * maskW, maskFloat[j], 0, maskW);
+                System.arraycopy(maskArray, pos + j * maskW, maskFloat[j], 0, maskW);
             }
             Mask bb = new Mask(x, y, w, h, maskFloat, true);
             retBB.add(bb);
