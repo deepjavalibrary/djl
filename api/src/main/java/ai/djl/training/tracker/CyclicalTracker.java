@@ -240,6 +240,7 @@ public class CyclicalTracker implements Tracker {
 
     /** {@code ScaleFunction} is an interface to implement a custom scale function. */
     public interface ScaleFunction {
+
         /**
          * Custom scaling policy. Return value has to satisfy 0&lt;=func(steps)&lt;=1 for all
          * steps&gt;1.
@@ -251,27 +252,33 @@ public class CyclicalTracker implements Tracker {
         float func(int steps);
     }
 
-    private static class TriangularScaleFunction implements ScaleFunction {
+    private static final class TriangularScaleFunction implements ScaleFunction {
+
+        /** {@inheritDoc} */
         @Override
         public float func(int steps) {
             return 1f;
         }
     }
 
-    private static class Triangular2ScaleFunction implements ScaleFunction {
+    private static final class Triangular2ScaleFunction implements ScaleFunction {
+
+        /** {@inheritDoc} */
         @Override
         public float func(int steps) {
             return (float) (1 / (Math.pow(2f, steps - 1)));
         }
     }
 
-    private static class ExpRangeScaleFunction implements ScaleFunction {
+    private static final class ExpRangeScaleFunction implements ScaleFunction {
+
         float gamma;
 
         ExpRangeScaleFunction(float gamma) {
             this.gamma = gamma;
         }
 
+        /** {@inheritDoc} */
         @Override
         public float func(int steps) {
             return (float) Math.pow(this.gamma, steps);

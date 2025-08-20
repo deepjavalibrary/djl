@@ -347,7 +347,7 @@ final class NDSerializer {
         int chararrCount = 0;
         int count = 0;
         while (count < len) {
-            int c = (int) buf[count] & 0xff;
+            int c = buf[count] & 0xff;
             if (c > 127) {
                 break;
             }
@@ -356,7 +356,7 @@ final class NDSerializer {
         }
 
         while (count < len) {
-            int c = (int) buf[count] & 0xff;
+            int c = buf[count] & 0xff;
             switch (c >> 4) {
                 case 0:
                 case 1:
@@ -389,8 +389,8 @@ final class NDSerializer {
                     if (count > len) {
                         throw new IllegalArgumentException("malformed UTF-8 input");
                     }
-                    char2 = (int) buf[count - 2];
-                    int char3 = (int) buf[count - 1];
+                    char2 = buf[count - 2];
+                    int char3 = buf[count - 1];
                     if (((char2 & 0xC0) != 0x80) || ((char3 & 0xC0) != 0x80)) {
                         throw new IllegalArgumentException("malformed UTF-8 input");
                     }

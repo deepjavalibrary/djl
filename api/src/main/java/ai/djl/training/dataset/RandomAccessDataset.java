@@ -318,7 +318,7 @@ public abstract class RandomAccessDataset implements Dataset {
     private Number[] flattenRecord(NDList data) {
         NDList flattened =
                 new NDList(data.stream().map(NDArray::flatten).collect(Collectors.toList()));
-        if (flattened.size() == 0) {
+        if (flattened.isEmpty()) {
             return null; // NOPMD
         }
         if (flattened.size() == 1) {

@@ -302,7 +302,7 @@ public class Criteria<I, O> {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(128);
+        StringBuilder sb = new StringBuilder(200);
         sb.append("Criteria:\n");
         if (application != null) {
             sb.append("\tApplication: ").append(application).append('\n');

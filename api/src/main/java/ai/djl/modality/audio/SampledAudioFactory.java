@@ -113,7 +113,7 @@ public class SampledAudioFactory extends AudioFactory {
         // Feed in float values between -1.0f and 1.0f.
         float[] floats = new float[shorts.length];
         for (int i = 0; i < shorts.length; i++) {
-            floats[i] = ((float) shorts[i]) / (float) Short.MAX_VALUE;
+            floats[i] = ((float) shorts[i]) / Short.MAX_VALUE;
         }
         return floats;
     }

@@ -309,7 +309,7 @@ public final class MovieLens100k extends CsvDataset {
                         addCategoricalFeature(name, false);
                         break;
                     case "movie_genres":
-                        movieGenres.forEach(genre -> addNumericFeature(genre));
+                        movieGenres.forEach(this::addNumericFeature);
                         break;
                     default:
                         break;
@@ -331,7 +331,7 @@ public final class MovieLens100k extends CsvDataset {
         @Override
         public MovieLens100k build() {
             if (features.isEmpty()) {
-                featureArray.forEach(feature -> addFeature(feature));
+                featureArray.forEach(this::addFeature);
             }
             if (labels.isEmpty()) {
                 addCategoricalLabel("rating", true);

@@ -144,6 +144,7 @@ public class ZeroShotClassificationTranslator
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings("PMD.LambdaCanBeMethodReference")
     public ZeroShotClassificationOutput processOutput(TranslatorContext ctx, NDList list)
             throws TranslateException {
         ZeroShotClassificationInput input =

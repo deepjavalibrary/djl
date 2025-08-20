@@ -951,7 +951,7 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray randomFlipLeftRight() {
-        if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
+        if (Device.Type.GPU.equals(array.getDevice().getDeviceType())) {
             throw new UnsupportedOperationException("randomFlipLeftRight is not supported on GPU");
         }
         return getManager().invoke("_npx__image_random_flip_left_right", array, null);
@@ -960,7 +960,7 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray randomFlipTopBottom() {
-        if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
+        if (Device.Type.GPU.equals(array.getDevice().getDeviceType())) {
             throw new UnsupportedOperationException("randomFlipTopBottom is not supported on GPU");
         }
         return getManager().invoke("_npx__image_random_flip_top_bottom", array, null);
@@ -969,7 +969,7 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray randomBrightness(float brightness) {
-        if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
+        if (Device.Type.GPU.equals(array.getDevice().getDeviceType())) {
             throw new UnsupportedOperationException("randomBrightness is not supported on GPU");
         }
         MxOpParams params = new MxOpParams();
@@ -983,7 +983,7 @@ class MxNDArrayEx implements NDArrayEx {
     /** {@inheritDoc} */
     @Override
     public NDArray randomHue(float hue) {
-        if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
+        if (Device.Type.GPU.equals(array.getDevice().getDeviceType())) {
             throw new UnsupportedOperationException("randomHue is not supported on GPU");
         }
         MxOpParams params = new MxOpParams();
@@ -998,7 +998,7 @@ class MxNDArrayEx implements NDArrayEx {
     @Override
     public NDArray randomColorJitter(
             float brightness, float contrast, float saturation, float hue) {
-        if (array.getDevice().getDeviceType().equals(Device.Type.GPU)) {
+        if (Device.Type.GPU.equals(array.getDevice().getDeviceType())) {
             throw new UnsupportedOperationException("randomColorJitter is not supported on GPU");
         }
         MxOpParams params = new MxOpParams();

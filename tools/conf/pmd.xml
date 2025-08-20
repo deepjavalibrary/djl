@@ -325,30 +325,29 @@
         <exclude name="AvoidReassigningParameters"/>
         <exclude name="AvoidUsingHardCodedIP"/>
         <exclude name="ConstantsInInterface"/>
-        <exclude name="DefaultLabelNotLastInSwitchStmt"/>
+        <exclude name="ExhaustiveSwitchHasDefault"/>
         <exclude name="GuardLogStatement"/>
-        <exclude name="JUnit4SuitesShouldUseSuiteAnnotation"/>
-        <exclude name="JUnit4TestShouldUseAfterAnnotation"/>
-        <exclude name="JUnit4TestShouldUseBeforeAnnotation"/>
-        <exclude name="JUnit4TestShouldUseTestAnnotation"/>
-        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
-        <exclude name="JUnitTestContainsTooManyAsserts"/>
-        <exclude name="JUnitTestsShouldIncludeAssert"/>
-        <exclude name="JUnitUseExpected"/>
+        <exclude name="LooseCoupling"/>
+        <exclude name="ImplicitFunctionalInterface"/>
         <exclude name="MethodReturnsInternalArray"/>
+        <exclude name="UnitTestShouldIncludeAssert"/>
+        <exclude name="UnitTestContainsTooManyAsserts"/>
+        <exclude name="UnitTestAssertionsShouldIncludeMessage"/>
+        <exclude name="UnitTestShouldUseBeforeAnnotation"/>
+        <exclude name="UnusedLocalVariable"/>
+        <exclude name="UnusedPrivateField"/>
         <exclude name="UnusedPrivateMethod"/>
+        <exclude name="UseTryWithResources"/>
         <exclude name="UseVarargs"/>
     </rule>
 
     <rule ref="category/java/codestyle.xml">
-        <exclude name="AbstractNaming"/>
         <exclude name="AtLeastOneConstructor"/>
         <exclude name="BooleanGetMethodName"/>
         <exclude name="CallSuperInConstructor"/>
         <exclude name="ClassNamingConventions"/>
         <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="ConfusingTernary"/>
-        <exclude name="DefaultPackage"/>
         <exclude name="EmptyMethodInAbstractClassShouldBeAbstract"/>
         <exclude name="FieldNamingConventions"/>
         <exclude name="LinguisticNaming"/>
@@ -361,10 +360,11 @@
         <exclude name="ShortClassName"/>
         <exclude name="ShortMethodName"/>
         <exclude name="ShortVariable"/>
+        <exclude name="UnnecessaryFullyQualifiedName"/>
         <exclude name="UnnecessaryModifier"/>
         <exclude name="UselessParentheses"/>
+        <exclude name="UseDiamondOperator"/>
         <exclude name="UseUnderscoresInNumericLiterals"/>
-        <exclude name="VariableNamingConventions"/>
     </rule>
 
     <rule ref="category/java/design.xml">
@@ -373,22 +373,21 @@
         <exclude name="AvoidThrowingNullPointerException"/>
         <exclude name="CollapsibleIfStatements"/>
         <exclude name="CognitiveComplexity"/>
+        <exclude name="CouplingBetweenObjects"/>
         <exclude name="CyclomaticComplexity"/>
         <exclude name="DataClass"/>
-        <exclude name="ExcessiveClassLength"/>
+        <exclude name="ExceptionAsFlowControl"/>
         <exclude name="ExcessiveImports"/>
-        <exclude name="ExcessiveMethodLength"/>
         <exclude name="ExcessiveParameterList"/>
         <exclude name="ExcessivePublicCount"/>
         <exclude name="GodClass"/>
         <exclude name="ImmutableField"/>
         <exclude name="LawOfDemeter"/>
         <exclude name="LoosePackageCoupling"/>
-        <exclude name="NcssConstructorCount"/>
         <exclude name="NcssCount"/>
-        <exclude name="NcssMethodCount"/>
-        <exclude name="NcssTypeCount"/>
         <exclude name="NPathComplexity"/>
+        <exclude name="SimplifyBooleanReturns"/>
+        <exclude name="SingularField"/>
         <exclude name="SwitchDensity"/>
         <exclude name="TooManyFields"/>
         <exclude name="TooManyMethods"/>
@@ -410,18 +409,14 @@
         <exclude name="CloneMethodMustImplementCloneable"/>
         <exclude name="CloseResource"/>
         <exclude name="CompareObjectsWithEquals"/>
-        <exclude name="DataflowAnomalyAnalysis"/>
+        <exclude name="ConstructorCallsOverridableMethod"/>
         <exclude name="EmptyCatchBlock"/>
-        <exclude name="EmptyIfStmt"/>
         <exclude name="JumbledIncrementer"/>
-        <exclude name="LoggerIsNotStaticFinal"/>
         <exclude name="ImplicitSwitchFallThrough"/>
         <exclude name="MoreThanOneLogger"/>
-        <exclude name="NonCaseLabelInSwitchStatement"/>
         <exclude name="NonStaticInitializer"/>
         <exclude name="NullAssignment"/>
         <exclude name="OverrideBothEqualsAndHashcode"/>
-        <exclude name="ReturnEmptyArrayRatherThanNull"/>
         <exclude name="SimpleDateFormatNeedsLocale"/>
         <exclude name="UnnecessaryConversionTemporary"/>
         <exclude name="UseEqualsToCompareStrings"/>
@@ -429,6 +424,7 @@
     </rule>
 
     <rule ref="category/java/multithreading.xml">
+        <exclude name="AvoidSynchronizedStatement"/>
         <exclude name="AvoidSynchronizedAtMethodLevel"/>
         <exclude name="DoNotUseThreads"/>
     </rule>
@@ -439,8 +435,7 @@
         <exclude name="ConsecutiveAppendsShouldReuse"/>
         <exclude name="InefficientStringBuffering"/>
         <exclude name="OptimizableToArrayCall"/>
-        <exclude name="SimplifyStartsWith"/>
-        <exclude name="TooFewBranchesForASwitchStatement"/>
+        <exclude name="TooFewBranchesForSwitch"/>
         <exclude name="UseArrayListInsteadOfVector"/>
     </rule>
 

@@ -85,7 +85,7 @@ public class NDArrayElementArithmeticOpTest {
         float x2 = 2f;
         NDArray ndArray2 = manager.create(x2);
         NDArray result = arrayArithmeticOp.apply(ndArray2);
-        Assert.assertEquals(result.getFloat(), arithmeticOp.apply(x1, x2).floatValue());
+        Assert.assertEquals(result.getFloat(), arithmeticOp.apply(x1, x2));
         if (inplace) {
             Assertions.assertSame(scalarNDArray, result);
         }

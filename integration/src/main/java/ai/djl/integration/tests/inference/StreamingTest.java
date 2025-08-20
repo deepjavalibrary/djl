@@ -69,7 +69,8 @@ public class StreamingTest {
         }
     }
 
-    private static class TestTranslator implements StreamingTranslator<Double, Iterator<Double>> {
+    private static final class TestTranslator
+            implements StreamingTranslator<Double, Iterator<Double>> {
 
         /** {@inheritDoc} */
         @Override

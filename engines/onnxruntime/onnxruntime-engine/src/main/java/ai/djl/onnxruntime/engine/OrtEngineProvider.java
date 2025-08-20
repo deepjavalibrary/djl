@@ -36,7 +36,7 @@ public class OrtEngineProvider implements EngineProvider {
         return InstanceHolder.INSTANCE;
     }
 
-    private static class InstanceHolder {
+    private static final class InstanceHolder {
         static final Engine INSTANCE = OrtEngine.newInstance();
     }
 }
