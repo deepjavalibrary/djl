@@ -352,7 +352,7 @@ public final class M5ForecastingDeepAR {
         public Map<String, Float> computeTotalMetrics() {
             for (Map.Entry<String, Integer> entry : totalNum.entrySet()) {
                 if (!entry.getKey().contains("sum")) {
-                    totalMetrics.compute(entry.getKey(), (k, v) -> v / (float) entry.getValue());
+                    totalMetrics.compute(entry.getKey(), (k, v) -> v / entry.getValue());
                 }
             }
 

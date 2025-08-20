@@ -36,7 +36,7 @@ public class LgbmEngineProvider implements EngineProvider {
         return InstanceHolder.INSTANCE;
     }
 
-    private static class InstanceHolder {
+    private static final class InstanceHolder {
         static final Engine INSTANCE = LgbmEngine.newInstance();
     }
 }

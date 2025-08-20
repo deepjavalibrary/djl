@@ -47,8 +47,7 @@ public class PolynomialDecayTracker implements Tracker {
     public float getNewValue(int numUpdate) {
         int step = Math.max(0, Math.min(numUpdate, decaySteps));
         return (float)
-                ((baseValue - endLearningRate)
-                                * Math.pow(1.0 - (double) step / (double) decaySteps, power)
+                ((baseValue - endLearningRate) * Math.pow(1.0 - (double) step / decaySteps, power)
                         + endLearningRate);
     }
 

@@ -12,7 +12,6 @@
  */
 package ai.djl.modality.cv.translator;
 
-import ai.djl.modality.cv.Image;
 import ai.djl.ndarray.NDList;
 import ai.djl.translate.TranslatorContext;
 
@@ -32,11 +31,5 @@ public class BaseImagePreProcessor extends BaseImageTranslator<Void> {
     @Override
     public Void processOutput(TranslatorContext ctx, NDList list) {
         return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDList processInput(TranslatorContext ctx, Image input) {
-        return super.processInput(ctx, input);
     }
 }

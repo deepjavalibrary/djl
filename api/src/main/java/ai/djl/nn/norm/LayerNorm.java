@@ -147,10 +147,7 @@ public class LayerNorm extends AbstractBlock {
         normalizedShape =
                 axis == null
                         ? inputShapes[0].slice(1)
-                        : new Shape(
-                                Arrays.stream(axis)
-                                        .mapToLong(dim -> inputShapes[0].get(dim))
-                                        .toArray());
+                        : new Shape(Arrays.stream(axis).mapToLong(inputShapes[0]::get).toArray());
     }
 
     /** {@inheritDoc} */

@@ -86,7 +86,7 @@ public class AudioData {
      */
     private float[] toFloat(String path) {
         List<Float> list = new ArrayList<>();
-        float scale = (float) 1.0 / (float) (1 << (8 * 2) - 1);
+        float scale = (float) 1.0 / (1 << (8 * 2) - 1);
         try (FFmpegFrameGrabber audioGrabber = new FFmpegFrameGrabber(path)) {
             audioGrabber.start();
             audioChannels = audioGrabber.getAudioChannels();

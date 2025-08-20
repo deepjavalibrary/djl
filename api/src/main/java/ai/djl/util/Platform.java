@@ -63,6 +63,7 @@ public final class Platform {
      * @param engine the name of the engine
      * @return the platform that matches current operating system
      */
+    @SuppressWarnings("PMD.UseStringBufferForStringAppends")
     public static Platform detectPlatform(String engine) {
         String nativeProp = "native/lib/" + engine + ".properties";
         Enumeration<URL> urls;

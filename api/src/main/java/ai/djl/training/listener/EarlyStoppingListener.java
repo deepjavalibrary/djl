@@ -122,6 +122,7 @@ public final class EarlyStoppingListener implements TrainingListener {
         }
     }
 
+    @SuppressWarnings("PMD.UnnecessaryBoxing")
     private double getMetric(TrainingResult trainingResult) {
         if ("validateLoss".equals(monitoredMetric)) {
             Float vLoss = trainingResult.getValidateLoss();

@@ -234,7 +234,7 @@ public class TicTacToe implements RlEnv {
         /** {@inheritDoc} */
         @Override
         public String toString() {
-            StringBuilder s = new StringBuilder();
+            StringBuilder s = new StringBuilder(64);
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 3; col++) {
                     int ind = 3 * row + col;

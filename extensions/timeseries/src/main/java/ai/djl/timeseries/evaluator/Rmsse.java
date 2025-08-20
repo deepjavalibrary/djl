@@ -128,6 +128,6 @@ public class Rmsse extends Evaluator {
             return Float.NaN;
         }
 
-        return (float) totalLoss.get(key) / totalInstances.get(key);
+        return totalLoss.get(key) / totalInstances.get(key);
     }
 }

@@ -42,7 +42,7 @@ public class MxEngineProvider implements EngineProvider {
         return InstanceHolder.INSTANCE;
     }
 
-    private static class InstanceHolder {
+    private static final class InstanceHolder {
         static final Engine INSTANCE = MxEngine.newInstance();
     }
 }

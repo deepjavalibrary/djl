@@ -471,9 +471,9 @@ public final class JavacppUtils {
     }
 
     public static String toTfDevice(Device device) {
-        if (device.getDeviceType().equals(Device.Type.CPU)) {
+        if (Device.Type.CPU.equals(device.getDeviceType())) {
             return "/device:CPU:0";
-        } else if (device.getDeviceType().equals(Device.Type.GPU)) {
+        } else if (Device.Type.GPU.equals(device.getDeviceType())) {
             return "/device:GPU:" + device.getDeviceId();
         } else {
             throw new EngineException("Unknown device type to TensorFlow Engine: " + device);

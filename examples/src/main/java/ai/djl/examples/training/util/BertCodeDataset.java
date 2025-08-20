@@ -255,7 +255,7 @@ public class BertCodeDataset implements Dataset {
             try {
                 return Files.lines(file, StandardCharsets.UTF_8)
                         .map(ParsedFile::normalizeLine)
-                        .filter(line -> !line.trim().isEmpty())
+                        .filter(line -> !line.trim().isEmpty()) // NOPMD
                         .collect(Collectors.toList());
             } catch (IOException ioe) {
                 throw new IllegalArgumentException("Could not read file " + file, ioe);

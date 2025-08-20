@@ -186,7 +186,7 @@ public abstract class BaseModel implements Model {
         } catch (RuntimeException e) {
             Throwable t = e.getCause();
             if (t instanceof IOException) {
-                throw (IOException) e.getCause();
+                throw (IOException) e.getCause(); // NOPMD
             }
             throw e;
         }

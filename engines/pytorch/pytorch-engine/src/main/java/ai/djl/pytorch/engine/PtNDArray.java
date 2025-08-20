@@ -1468,7 +1468,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public NDArray flip(int... axes) {
-        return JniUtils.flip(this, Arrays.stream(axes).mapToLong(ele -> (long) ele).toArray());
+        return JniUtils.flip(this, Arrays.stream(axes).mapToLong(ele -> ele).toArray());
     }
 
     /** {@inheritDoc} */

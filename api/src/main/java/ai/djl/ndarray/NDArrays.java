@@ -1260,7 +1260,7 @@ public final class NDArrays {
      */
     public static NDArray addi(NDArray... arrays) {
         checkInputs(arrays);
-        Arrays.stream(arrays).skip(1).forEachOrdered(array -> arrays[0].addi(array));
+        Arrays.stream(arrays).skip(1).forEachOrdered(arrays[0]::addi);
         return arrays[0];
     }
 
@@ -1412,7 +1412,7 @@ public final class NDArrays {
      */
     public static NDArray muli(NDArray... arrays) {
         checkInputs(arrays);
-        Arrays.stream(arrays).skip(1).forEachOrdered(array -> arrays[0].muli(array));
+        Arrays.stream(arrays).skip(1).forEachOrdered(arrays[0]::muli);
         return arrays[0];
     }
 
@@ -1820,7 +1820,7 @@ public final class NDArrays {
      *     the the {@link NDArray}
      */
     public static NDArray stack(NDList arrays, int axis) {
-        Preconditions.checkArgument(arrays.size() > 0, "need at least one array to stack");
+        Preconditions.checkArgument(!arrays.isEmpty(), "need at least one array to stack");
         NDArray array = arrays.head();
         return array.getNDArrayInternal().stack(arrays.subNDList(1), axis);
     }
@@ -1874,7 +1874,7 @@ public final class NDArrays {
      * @return the concatenated {@link NDArray}
      */
     public static NDArray concat(NDList arrays, int axis) {
-        Preconditions.checkArgument(arrays.size() > 0, "need at least one array to concatenate");
+        Preconditions.checkArgument(!arrays.isEmpty(), "need at least one array to concatenate");
         if (arrays.size() == 1) {
             return arrays.singletonOrThrow().duplicate();
         }
