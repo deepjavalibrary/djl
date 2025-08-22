@@ -423,7 +423,7 @@ public abstract class BaseNDManager implements NDManager {
             sb.append("    ");
         }
         sb.append("\\--- NDManager(")
-                .append(uid.substring(24))
+                .append(uid)
                 .append(") resource count: ")
                 .append(resources.size());
 
