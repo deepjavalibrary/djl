@@ -21,20 +21,20 @@ dependencies {
     testImplementation(libs.slf4j.simple)
 }
 
-open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
-
 tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
+        val djlVersion = libs.versions.djl.get()
+        val tokenizersVersion = libs.versions.tokenizers.get()
         inputs.properties(
             mapOf(
-                "djlVersion" to libs.versions.djl.get(),
-                "tokenizersVersion" to libs.versions.tokenizers.get(),
+                "djlVersion" to djlVersion,
+                "tokenizersVersion" to tokenizersVersion,
                 "version" to version
             )
         )
-        val baseResourcePath = "${project.projectDir}/build/resources/main"
+        val baseResourcePath = "${projectDir}/build/resources/main"
         outputs.dirs(
             File("${baseResourcePath}/native/lib"),
             File("${baseResourcePath}/nlp"),
@@ -42,21 +42,23 @@ tasks {
         )
 
         val logger = project.logger
-        val dir = project.projectDir
+        val dir = projectDir
         val hasJni = project.hasProperty("jni")
+        val injected = project.objects.newInstance<InjectedOps>()
+        val version = project.version
+
         doLast {
             var url = "https://publish.djl.ai/tokenizers"
-            val (tokenizers, djl) = libs.versions.tokenizers.get() to libs.versions.djl.get()
             val files = mapOf(
                 "win-x86_64/cpu/libwinpthread-1.dll" to "extra/win-x86_64/libwinpthread-1.dll",
                 "win-x86_64/cpu/libgcc_s_seh-1.dll" to "extra/win-x86_64/libgcc_s_seh-1.dll",
                 "win-x86_64/cpu/libstdc%2B%2B-6.dll" to "extra/win-x86_64/libstdc%2B%2B-6.dll",
-                "win-x86_64/cpu/tokenizers.dll" to "$tokenizers/jnilib/$djl",
-                "linux-x86_64/cpu/libtokenizers.so" to "$tokenizers/jnilib/$djl",
-                "linux-aarch64/cpu/libtokenizers.so" to "$tokenizers/jnilib/$djl",
-                "osx-aarch64/cpu/libtokenizers.dylib" to "$tokenizers/jnilib/$djl"
+                "win-x86_64/cpu/tokenizers.dll" to "$tokenizersVersion/jnilib/$djlVersion",
+                "linux-x86_64/cpu/libtokenizers.so" to "$tokenizersVersion/jnilib/$djlVersion",
+                "linux-aarch64/cpu/libtokenizers.so" to "$tokenizersVersion/jnilib/$djlVersion",
+                "osx-aarch64/cpu/libtokenizers.dylib" to "$tokenizersVersion/jnilib/$djlVersion"
             )
-            val jnilibDir = dir / "jnilib/$djl"
+            val jnilibDir = dir / "jnilib/$djlVersion"
             for ((key, value) in files) {
                 val file = jnilibDir / URLDecoder.decode(key, "UTF-8")
                 if (file.exists())
@@ -73,7 +75,7 @@ tasks {
                     downloadPath into file
                 }
             }
-            copy {
+            injected.fs.copy {
                 from(jnilibDir)
                 into("$baseResourcePath/native/lib")
             }
@@ -117,49 +119,56 @@ tasks {
         }
 
         filesMatching("**/tokenizers.properties") {
-            expand(mapOf("tokenizersVersion" to libs.versions.tokenizers.get(), "version" to version))
+            expand(mapOf("tokenizersVersion" to tokenizersVersion, "version" to version))
         }
     }
 
-    register<Cmd>("compileJNI") {
+    register("compileJNI") {
+        val djlVersion = libs.versions.djl.get()
         val dir = project.projectDir
+        val buildDir = buildDirectory
+        val injected = project.objects.newInstance<InjectedOps>()
+        val flavor = flavor
         doFirst {
             if ("mac" in os || "linux" in os) {
                 val arch = if (arch == "amd64") "x86_64" else arch
-                execOperations.exec {
+                injected.exec.exec {
                     workingDir = dir
                     commandLine("bash", "build.sh", arch, flavor)
                 }
             } else
-                execOperations.exec {
+                injected.exec.exec {
                     workingDir = dir
                     commandLine("${dir}/build.cmd")
                 }
 
             // for ci to upload to S3
-            val ciDir = dir / "jnilib/${libs.versions.djl.get()}/"
-            copy {
-                from(buildDirectory / "jnilib")
+            val ciDir = dir / "jnilib/${djlVersion}/"
+            injected.fs.copy {
+                from(buildDir / "jnilib")
                 into(ciDir)
             }
-            delete("$home/.djl.ai/tokenizers")
+            injected.fs.delete { delete("$home/.djl.ai/tokenizers") }
         }
     }
 
-    register<Cmd>("compileAndroidJNI") {
+    register("compileAndroidJNI") {
+        val djlVersion = libs.versions.djl.get()
         val dir = project.projectDir
+        val buildDir = buildDirectory
+        val injected = project.objects.newInstance<InjectedOps>()
         doFirst {
             for (abi in listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")) {
-                execOperations.exec {
+                injected.exec.exec {
                     workingDir = dir
                     commandLine("bash", "build_android.sh", abi)
                 }
-                val ciDir = dir / "jnilib/${libs.versions.djl.get()}/android/$abi"
-                copy {
-                    from(buildDirectory / "jnilib" / abi)
+                val ciDir = dir / "jnilib/${djlVersion}/android/$abi"
+                injected.fs.copy {
+                    from(buildDir / "jnilib" / abi)
                     into(ciDir)
                 }
-                delete("$buildDirectory/jnilib")
+                injected.fs.delete { delete("$buildDir/jnilib") }
             }
         }
     }
@@ -170,17 +179,19 @@ tasks {
     }
 
     clean {
+        val injected = project.objects.newInstance<InjectedOps>()
+        val dir = projectDir
         doFirst {
-            delete("$home/.djl.ai/tokenizers")
-            delete("jnilib")
-            delete("rust/target")
-            delete("src/main/python/build/")
-            delete("src/main/python/dist/")
-            delete("src/main/python/__pycache__/")
-            delete("src/main/python/djl_converter.egg-info/")
-            delete("src/main/python/djl_converter/__pycache__/")
+            injected.fs.delete { delete("$home/.djl.ai/tokenizers") }
+            injected.fs.delete { delete("jnilib") }
+            injected.fs.delete { delete("rust/target") }
+            injected.fs.delete { delete("src/main/python/build/") }
+            injected.fs.delete { delete("src/main/python/dist/") }
+            injected.fs.delete { delete("src/main/python/__pycache__/") }
+            injected.fs.delete { delete("src/main/python/djl_converter.egg-info/") }
+            injected.fs.delete { delete("src/main/python/djl_converter/__pycache__/") }
 
-            val initFile = projectDir / "src/main/python/djl_converter/__init__.py"
+            val initFile = dir / "src/main/python/djl_converter/__init__.py"
             initFile.text = initFile.text.replace(Regex("\\n*__version__.*"), "\n")
         }
     }
@@ -196,4 +207,12 @@ publishing {
             }
         }
     }
+}
+
+interface InjectedOps {
+    @get:Inject
+    val fs: FileSystemOperations
+
+    @get:Inject
+    val exec: ExecOperations
 }

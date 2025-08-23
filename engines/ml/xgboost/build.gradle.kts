@@ -61,13 +61,18 @@ tasks {
     }
 
     publishing {
+        val rapisVersion = libs.versions.rapis.get()
+        val projectName = project.name
+        val xgbFlavor = xgbFlavor
+        val isGpu = isGpu
+
         publications {
             named<MavenPublication>("maven") {
-                artifactId = "${project.name}$xgbFlavor"
+                artifactId = "${projectName}$xgbFlavor"
                 pom {
                     name = "DJL Engine Adapter for XGBoost"
                     description = "Deep Java Library (DJL) Engine Adapter for XGBoost"
-                    url = "https://djl.ai/engines/ml/${project.name}"
+                    url = "https://djl.ai/engines/ml/${projectName}"
 
                     withXml {
                         val pomNode = asElement()
@@ -89,7 +94,7 @@ tasks {
                                     }
                                     "groupId" addWith "ai.rapids"
                                     "artifactId" addWith "cudf"
-                                    "version" addWith libs.versions.rapis.get()
+                                    "version" addWith rapisVersion
                                     "classifier" addWith "cuda11"
                                     "scope" addWith "compile"
                                 }

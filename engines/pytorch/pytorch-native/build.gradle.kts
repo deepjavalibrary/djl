@@ -28,230 +28,243 @@ val isAarch64 = project.hasProperty("aarch64") || arch == "aarch64"
 
 version = ptVersion + if (isRelease) "" else "-SNAPSHOT"
 
+tasks {
+    val injected = project.objects.newInstance<InjectedOps>()
+    val binaryRoot = buildDirectory / "download"
+    val dir = projectDir
+    val buildDir = buildDirectory
+    val djlVersion = libs.versions.djl.get()
+    val ptVersion = ptVersion
+    val logger = project.logger
 
-fun downloadBuild(
-    execOperations: ExecOperations,
-    ver: String,
-    os: String,
-    flavor: String,
-    isPrecxx11: Boolean = false,
-    isAarch64: Boolean = false
-) {
-    val arch = if (isAarch64) "aarch64" else "x86_64"
-    execOperations.exec {
-        workingDir = project.projectDir
-        if (os == "win")
-            commandLine(project.projectDir / "build.cmd", ver, flavor)
-        else
-            commandLine("bash", "build.sh", ver, flavor, if (isPrecxx11) "precxx11" else "cxx11", arch)
-    }
-
-    // for nightly ci
-    // the reason why we duplicate the folder here is to insert djl_version into the path
-    // so different versions of JNI wouldn't override each other. We don't also want publishDir
-    // to have djl_version as engine would require to know that during the System.load()
-    val classifier = "$os-$arch"
-    val maybePrecxx11 = if (isPrecxx11) "-precxx11" else ""
-    val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/$classifier/$flavor$maybePrecxx11"
-    copy {
-        val tree = fileTree(buildDirectory)
-        tree.include("**/libdjl_torch.*", "**/djl_torch.dll")
-        from(tree.files)
-        into(ciDir)
-    }
-}
-
-fun downloadBuildAndroid(execOperations: ExecOperations, ver: String) {
-    for (abi in listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")) {
-        execOperations.exec {
-            workingDir = project.projectDir
-            commandLine("bash", "build_android.sh", ver, abi)
+    fun downloadBuild(
+        os: String,
+        flavor: String,
+        isPrecxx11: Boolean = false,
+        isAarch64: Boolean = false
+    ) {
+        val arch = if (isAarch64) "aarch64" else "x86_64"
+        injected.exec.exec {
+            workingDir = dir
+            if (os == "win")
+                commandLine(dir / "build.cmd", ptVersion, flavor)
+            else
+                commandLine("bash", "build.sh", ptVersion, flavor, if (isPrecxx11) "precxx11" else "cxx11", arch)
         }
-        val ciDir = project.projectDir / "jnilib/${libs.versions.djl.get()}/android/$abi"
-        copy {
-            from(buildDirectory / "libdjl_torch.so")
+
+        // for nightly ci
+        // the reason why we duplicate the folder here is to insert djl_version into the path
+        // so different versions of JNI wouldn't override each other. We don't also want publishDir
+        // to have djl_version as engine would require to know that during the System.load()
+        val classifier = "$os-$arch"
+        val maybePrecxx11 = if (isPrecxx11) "-precxx11" else ""
+        val ciDir = dir / "jnilib/${djlVersion}/$classifier/$flavor$maybePrecxx11"
+        injected.fs.copy {
+            from(buildDir) {
+                include("**/libdjl_torch.*", "**/djl_torch.dll")
+            }
             into(ciDir)
         }
-        delete("$buildDirectory/")
     }
-}
 
-fun prepareNativeLib(execOperations: ExecOperations, binaryRoot: String, ver: String, packageType: String?) {
-    if ("mac" !in os)
-        throw GradleException("This command must be run from osx")
-
-    val officialPytorchUrl = "https://download.pytorch.org/libtorch"
-    val aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
-    val cuda = "cu128"
-    if (packageType == "gpu") {
-        // @formatter:off
-        val files = mapOf(
-            "$cuda/libtorch-cxx11-abi-shared-with-deps-$ver%2B$cuda.zip" to "$cuda/linux-x86_64",
-            "$cuda/libtorch-win-shared-with-deps-$ver%2B$cuda.zip"       to "$cuda/win-x86_64",
-        )
-        // @formatter:on
-
-        copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
-    } else {
-        // @formatter:off
-        val files = mapOf(
-            "cpu/libtorch-cxx11-abi-shared-with-deps-$ver%2Bcpu.zip"     to "cpu/linux-x86_64",
-            "cpu/libtorch-macos-arm64-$ver.zip"                          to "cpu/osx-aarch64",
-            "cpu/libtorch-win-shared-with-deps-$ver%2Bcpu.zip"           to "cpu/win-x86_64",
-        )
-        // @formatter:on
-
-        val aarch64Files = mapOf("$ver/libtorch-linux-aarch64-$ver.zip" to "cpu/linux-aarch64")
-        copyNativeLibToOutputDir(files, binaryRoot, officialPytorchUrl)
-        copyNativeLibToOutputDir(aarch64Files, binaryRoot, aarch64PytorchUrl)
-
-        execOperations.exec {
-            workingDir = project.projectDir
-            commandLine(
-                "install_name_tool",
-                "-add_rpath",
-                "@loader_path",
-                "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib"
-            )
-        }
-        execOperations.exec {
-            workingDir = project.projectDir
-            commandLine(
-                "install_name_tool",
-                "-add_rpath",
-                "@loader_path",
-                "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch.dylib"
-            )
-        }
-    }
-}
-
-fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, binaryRoot: String, url: String) {
-    for ((key, value) in fileStoreMap) {
-        project.logger.lifecycle("Downloading $url/$key")
-        val outputDir = File("$binaryRoot/$value")
-        val file = outputDir / "libtorch.zip"
-        file.parentFile.mkdirs()
-        "$url/$key".url into file
-        copy {
-            from(zipTree(file))
-            into(outputDir)
-        }
-        delete("$outputDir/libtorch/lib/*.lib")
-        delete("$outputDir/libtorch/lib/*.a")
-
-        copy {
-            from("$outputDir/libtorch/lib/") {
-                include(
-                    "libarm_compute*",
-                    "libc10_cuda.so",
-                    "libc10.*",
-                    "libcaffe2_nvrtc.so",
-                    "libcu*",
-                    "libgfortran-*",
-                    "libgomp*",
-                    "libiomp*",
-                    "libnv*",
-                    "libopenblasp-*",
-                    "libtorch_cpu.*",
-                    "libtorch_cuda*.so",
-                    "libtorch.*",
-                    "asmjit.dll",
-                    "c10_cuda.dll",
-                    "c10.dll",
-                    "caffe2_nvrtc.dll",
-                    "cu*.dll",
-                    "fbgemm.dll",
-                    "nv*.dll",
-                    "torch_cpu.dll",
-                    "torch_cuda*.dll",
-                    "torch.dll",
-                    "uv.dll",
-                    "zlibwapi.dll"
-                )
+    fun downloadBuildAndroid() {
+        for (abi in listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")) {
+            injected.exec.exec {
+                workingDir = dir
+                commandLine("bash", "build_android.sh", ptVersion, abi)
             }
-            into("$outputDir/native/lib")
-        }
-        if ("-precxx11" in value) {
-            val libstd = outputDir / "native/lib/libstdc++.so.6"
-            val stdcUrl = when {
-                "aarch64" in value -> "https://publish.djl.ai/extra/aarch64/libstdc%2B%2B.so.6"
-                else -> "https://publish.djl.ai/extra/libstdc%2B%2B.so.6"
+            val ciDir = dir / "jnilib/${djlVersion}/android/$abi"
+            injected.fs.copy {
+                from(buildDir / "libdjl_torch.so")
+                into(ciDir)
             }
-            stdcUrl.url into libstd
+            injected.fs.delete { delete("$buildDir/") }
         }
-        if ("osx-aarch64" in value) {
-            val libomp = outputDir / "native/lib/libomp.dylib"
-            val ompUrl = "https://publish.djl.ai/extra/macos-arm64/libomp.dylib"
-            ompUrl.url into libomp
-        }
-//        if ("win-x86_64" in value) {
-//            copy {
-//                from("$outputDir/libtorch/lib/") {
-//                    include("mkl_*.dll")
-//                }
-//                into("$outputDir/native/lib")
-//            }
-//            val mklUrl = "https://publish.djl.ai/extra/win-x86_64/mkl_def.1.dll"
-//            mklUrl.url into outputDir / "native/lib/mkl_def.1.dll"
-//            val vmlUrl = "https://publish.djl.ai/extra/win-x86_64/mkl_vml_def.1.dll"
-//            vmlUrl.url into outputDir / "native/lib/mkl_vml_def.1.dll"
-//        }
-        delete(file)
-        delete(outputDir / "libtorch")
     }
-}
 
-open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
+    fun copyNativeLibToOutputDir(fileStoreMap: Map<String, String>, url: String) {
+        for ((key, value) in fileStoreMap) {
+            logger.lifecycle("Downloading $url/$key")
+            val outputDir = File("$binaryRoot/$value")
+            val file = outputDir / "libtorch.zip"
+            file.parentFile.mkdirs()
+            "$url/$key".url into file
+            injected.exec.exec {
+                workingDir = dir
+                commandLine("unzip", "-q", "-d", outputDir.absolutePath, file.absolutePath)
+            }
+            injected.fs.delete { delete("$outputDir/libtorch/lib/*.lib") }
+            injected.fs.delete { delete("$outputDir/libtorch/lib/*.a") }
 
-tasks {
-    register<Cmd>("compileAndroidJNI") {
+            injected.fs.copy {
+                from("$outputDir/libtorch/lib/") {
+                    include(
+                        "libarm_compute*",
+                        "libc10_cuda.so",
+                        "libc10.*",
+                        "libcaffe2_nvrtc.so",
+                        "libcu*",
+                        "libgfortran-*",
+                        "libgomp*",
+                        "libiomp*",
+                        "libnv*",
+                        "libopenblasp-*",
+                        "libtorch_cpu.*",
+                        "libtorch_cuda*.so",
+                        "libtorch.*",
+                        "asmjit.dll",
+                        "c10_cuda.dll",
+                        "c10.dll",
+                        "caffe2_nvrtc.dll",
+                        "cu*.dll",
+                        "fbgemm.dll",
+                        "nv*.dll",
+                        "torch_cpu.dll",
+                        "torch_cuda*.dll",
+                        "torch.dll",
+                        "uv.dll",
+                        "zlibwapi.dll"
+                    )
+                }
+                into("$outputDir/native/lib")
+            }
+            if ("-precxx11" in value) {
+                val libstd = outputDir / "native/lib/libstdc++.so.6"
+                val stdcUrl = when {
+                    "aarch64" in value -> "https://publish.djl.ai/extra/aarch64/libstdc%2B%2B.so.6"
+                    else -> "https://publish.djl.ai/extra/libstdc%2B%2B.so.6"
+                }
+                stdcUrl.url into libstd
+            }
+            if ("osx-aarch64" in value) {
+                val libomp = outputDir / "native/lib/libomp.dylib"
+                val ompUrl = "https://publish.djl.ai/extra/macos-arm64/libomp.dylib"
+                ompUrl.url into libomp
+            }
+            injected.fs.delete { delete(file) }
+            injected.fs.delete { delete(outputDir / "libtorch") }
+        }
+    }
+
+    fun prepareNativeLib(packageType: String?) {
+        if ("mac" !in os)
+            throw GradleException("This command must be run from osx")
+
+        val officialPytorchUrl = "https://download.pytorch.org/libtorch"
+        val aarch64PytorchUrl = "https://djl-ai.s3.amazonaws.com/publish/pytorch"
+        val cuda = "cu128"
+        if (packageType == "gpu") {
+            // @formatter:off
+            val files = mapOf(
+                "$cuda/libtorch-cxx11-abi-shared-with-deps-$ptVersion%2B$cuda.zip" to "$cuda/linux-x86_64",
+                "$cuda/libtorch-win-shared-with-deps-$ptVersion%2B$cuda.zip"       to "$cuda/win-x86_64",
+            )
+            // @formatter:on
+
+            copyNativeLibToOutputDir(files, officialPytorchUrl)
+        } else {
+            // @formatter:off
+            val files = mapOf(
+                "cpu/libtorch-cxx11-abi-shared-with-deps-$ptVersion%2Bcpu.zip"     to "cpu/linux-x86_64",
+                "cpu/libtorch-macos-arm64-$ptVersion.zip"                          to "cpu/osx-aarch64",
+                "cpu/libtorch-win-shared-with-deps-$ptVersion%2Bcpu.zip"           to "cpu/win-x86_64",
+            )
+            // @formatter:on
+
+            val aarch64Files = mapOf("$ptVersion/libtorch-linux-aarch64-$ptVersion.zip" to "cpu/linux-aarch64")
+            copyNativeLibToOutputDir(files, officialPytorchUrl)
+            copyNativeLibToOutputDir(aarch64Files, aarch64PytorchUrl)
+
+            if ("mac" in os) {
+                injected.exec.exec {
+                    workingDir = dir
+                    commandLine(
+                        "install_name_tool",
+                        "-add_rpath",
+                        "@loader_path",
+                        "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch_cpu.dylib"
+                    )
+                }
+                injected.exec.exec {
+                    workingDir = dir
+                    commandLine(
+                        "install_name_tool",
+                        "-add_rpath",
+                        "@loader_path",
+                        "$binaryRoot/cpu/osx-aarch64/native/lib/libtorch.dylib"
+                    )
+                }
+            }
+        }
+    }
+
+    register("compileAndroidJNI") {
         doFirst {
-            downloadBuildAndroid(execOperations, ptVersion)
+            downloadBuildAndroid()
         }
     }
 
     register("cleanJNI") {
+        val injected = project.objects.newInstance<InjectedOps>()
+        val files = fileTree(project.projectDir) { include("**.zip") }
+        val dir = projectDir
         doFirst {
-            delete(project.projectDir / "build",
-                project.projectDir / "libtorch",
-                project.projectDir / "libtorch_android",
-                fileTree(project.projectDir) { include("**.zip") })
+            injected.fs.delete {
+                delete(
+                    dir / "build",
+                    dir / "libtorch",
+                    dir / "libtorch_android"
+                )
+            }
+            injected.fs.delete { delete(files) }
         }
     }
 
-    register<Cmd>("compileJNI") {
+    register("compileJNI") {
+        val ptFlavor = ptFlavor
+        val isPrecxx11 = isPrecxx11
+        val isAarch64 = isAarch64
+        val files = fileTree("$home/.djl.ai/pytorch/") {
+            include("**/*djl_torch.*")
+        }
         doFirst {
             // You have to use an environment with CUDA persets for Linux and Windows
             when {
-                "windows" in os -> downloadBuild(execOperations, ptVersion, "win", ptFlavor)
-                "mac" in os -> downloadBuild(execOperations, ptVersion, "osx", ptFlavor, false, isAarch64)
-                "linux" in os -> downloadBuild(execOperations, ptVersion, "linux", ptFlavor, isPrecxx11, isAarch64)
+                "windows" in os -> downloadBuild("win", ptFlavor)
+                "mac" in os -> downloadBuild(
+                    "osx",
+                    ptFlavor,
+                    false,
+                    isAarch64
+                )
+
+                "linux" in os -> downloadBuild(
+                    "linux",
+                    ptFlavor,
+                    isPrecxx11,
+                    isAarch64
+                )
+
                 else -> throw IllegalStateException("Unknown Architecture $osName-$ptFlavor")
             }
-
-            delete(fileTree("$home/.djl.ai/pytorch/") {
-                include("**/*djl_torch.*")
-            })
+            injected.fs.delete { delete(files) }
         }
     }
 
-    val binaryRoot = buildDirectory / "download"
-    register<Cmd>("downloadPyTorchNativeLib") {
+    register("downloadPyTorchNativeLib") {
+        val packageType = project.findProperty("package_type")?.toString()
         doLast {
-            val packageType = project.findProperty("package_type")?.toString()
-            prepareNativeLib(execOperations, "$binaryRoot", ptVersion, packageType)
+            prepareNativeLib(packageType)
         }
     }
 
-    register<Cmd>("uploadS3") {
-        val dir = project.projectDir
+    register("uploadS3") {
         doLast {
             delete("$binaryRoot")
-            prepareNativeLib(execOperations, "$binaryRoot", ptVersion, "cpu")
-            prepareNativeLib(execOperations, "$binaryRoot", ptVersion, "gpu")
+            prepareNativeLib("cpu")
+            prepareNativeLib("gpu")
 
-            execOperations.exec {
+            injected.exec.exec {
                 workingDir = dir
                 commandLine("sh", "-c", "find $binaryRoot -type f | xargs gzip")
             }
@@ -271,7 +284,7 @@ tasks {
                         appendLine(out + "/" + URLEncoder.encode(it, "UTF-8"))
                     }
             }
-            execOperations.exec {
+            injected.exec.exec {
                 workingDir = dir
                 commandLine("aws", "s3", "sync", "$binaryRoot", "s3://djl-ai/publish/pytorch/$ptVersion/")
             }
@@ -279,13 +292,13 @@ tasks {
     }
 
     // Create a placeholder jar without classifier to pass sonatype tests but throws an Exception if loaded
-    val version = project.version
     jar {
         val placeholder = buildDirectory / "placeholder"
         // this line is to enforce gradle to build the jar
         // otherwise it doesn't generate the placeholder jar at times
         // when there is no java code inside src/main
         outputs.dir("build/libs")
+        val version = project.version
         doFirst {
             val dir = placeholder / "native/lib"
             dir.mkdirs()
@@ -420,7 +433,7 @@ tasks {
     withType<PublishToMavenRepository> {
         for (flavor in flavorNames) {
             if (requireSigning) {
-                dependsOn("sign${flavor.substring(0, 1).uppercase() + flavor.substring(1)}Publication")
+                dependsOn("sign${flavor.take(1).uppercase() + flavor.substring(1)}Publication")
             }
 
             val platformNames = (binaryRoot / flavor).list() ?: emptyArray()
@@ -480,7 +493,7 @@ if (project.hasProperty("staging")) {
         doLast {
             val conn = URL(url).openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
-            conn.setRequestProperty("Authorization", "Bearer ${token}")
+            conn.setRequestProperty("Authorization", "Bearer $token")
             val status = conn.responseCode
             if (status != HttpURLConnection.HTTP_OK) {
                 project.logger.error("Failed to POST '${url}'. Received status code ${status}: ${conn.responseMessage}")
@@ -495,4 +508,12 @@ if (project.hasProperty("staging")) {
 
 formatCpp {
     exclusions = listOf("main/patch/**")
+}
+
+interface InjectedOps {
+    @get:Inject
+    val fs: FileSystemOperations
+
+    @get:Inject
+    val exec: ExecOperations
 }

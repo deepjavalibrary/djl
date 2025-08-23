@@ -14,9 +14,11 @@ dependencies {
 }
 
 tasks.processResources {
-    inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(), "tensorflowVersion" to libs.versions.tensorflow.get()))
+    val djlVersion = libs.versions.djl.get()
+    val tensorflowVersion = libs.versions.tensorflow.get()
+    inputs.properties(mapOf("djlVersion" to djlVersion, "tensorflowVersion" to tensorflowVersion))
     filesMatching("**/tensorflow-engine.properties") {
-        expand(mapOf("djlVersion" to libs.versions.djl.get(), "tensorflowVersion" to libs.versions.tensorflow.get()))
+        expand(mapOf("djlVersion" to djlVersion, "tensorflowVersion" to tensorflowVersion))
     }
 }
 

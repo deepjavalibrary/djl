@@ -22,6 +22,7 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
+        val version = project.version
         inputs.properties(mapOf("version" to version))
         filesMatching("**/api.properties") {
             expand(mapOf("version" to version))
