@@ -13,20 +13,28 @@ dependencies {
     testImplementation(libs.slf4j.simple)
 }
 
-open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
-
 tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
+        val djlVersion = libs.versions.djl.get()
+        val sentencepieceVersion = libs.versions.sentencepiece.get()
         val baseResourcePath = "${project.projectDir}/build/resources/main"
-        inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(), "sentencepieceVersion" to libs.versions.sentencepiece.get()))
+        inputs.properties(
+            mapOf(
+                "djlVersion" to djlVersion,
+                "sentencepieceVersion" to sentencepieceVersion
+            )
+        )
         outputs.dir("$baseResourcePath/native/lib")
-        val jnilibDir = project.projectDir / "jnilib/${libs.versions.djl.get()}"
+        val jnilibDir = project.projectDir / "jnilib/${djlVersion}"
         val logger = project.logger
+        val hasJni = project.hasProperty("jni")
+        val injected = project.objects.newInstance<InjectedOps>()
+        val version = project.version
+
         doLast {
-            val url =
-                "https://publish.djl.ai/sentencepiece-${libs.versions.sentencepiece.get()}/jnilib/${libs.versions.djl.get()}"
+            val url = "https://publish.djl.ai/sentencepiece-${sentencepieceVersion}/jnilib/${djlVersion}"
             val files = mapOf(
                 "win-x86_64" to "sentencepiece_native.dll",
                 "linux-x86_64" to "libsentencepiece_native.so",
@@ -37,54 +45,59 @@ tasks {
                 val file = jnilibDir / key / value
                 if (file.exists())
                     logger.lifecycle("prebuilt or cached file found for $value")
-                else if (!project.hasProperty("jni")) {
+                else if (!hasJni) {
                     logger.lifecycle("Downloading $url/$key")
                     file.parentFile.mkdirs()
                     val downloadPath = "$url/$key/$value".url
                     downloadPath into file
                 }
             }
-            copy {
+            injected.fs.copy {
                 from(jnilibDir)
                 into("$baseResourcePath/native/lib")
             }
         }
 
         filesMatching("**/sentencepiece.properties") {
-            expand(mapOf("sentencepieceVersion" to libs.versions.sentencepiece.get(), "version" to version))
+            expand(mapOf("sentencepieceVersion" to sentencepieceVersion, "version" to version))
         }
     }
 
-    register<Cmd>("compileJNI") {
+    register("compileJNI") {
         val dir = project.projectDir
+        val buildDir = buildDirectory
+        val djlVersion = libs.versions.djl.get()
+        val sentencepieceVersion = libs.versions.sentencepiece.get()
+        val injected = project.objects.newInstance<InjectedOps>()
         doFirst {
             if ("win" in os)
-                execOperations.exec {
+                injected.exec.exec {
                     workingDir = dir
-                    commandLine("${dir}/build.cmd", "v${libs.versions.sentencepiece.get()}")
+                    commandLine("${dir}/build.cmd", "v${sentencepieceVersion}")
                 }
             else if ("mac" in os || "linux" in os) {
                 val arch = if (arch == "amd64") "x86_64" else arch
-                execOperations.exec {
+                injected.exec.exec {
                     workingDir = dir
-                    commandLine("bash", "build.sh", "v${libs.versions.sentencepiece.get()}", arch)
+                    commandLine("bash", "build.sh", "v${sentencepieceVersion}", arch)
                 }
             } else
                 throw IllegalStateException("Unknown Architecture $osName")
 
             // for ci to upload to S3
-            val ciDir = dir / "jnilib/${libs.versions.djl.get()}/"
-            copy {
-                from(buildDirectory / "jnilib")
+            val ciDir = dir / "jnilib/${djlVersion}/"
+            injected.fs.copy {
+                from(buildDir / "jnilib")
                 into(ciDir)
             }
-            delete("$home/.djl.ai/sentencepiece")
+            injected.fs.delete { delete("$home/.djl.ai/sentencepiece") }
         }
     }
 
     clean {
+        val injected = project.objects.newInstance<InjectedOps>()
         doFirst {
-            delete("$home/.djl.ai/sentencepiece")
+            injected.fs.delete { delete("$home/.djl.ai/sentencepiece") }
         }
     }
 }
@@ -99,4 +112,12 @@ publishing {
             }
         }
     }
+}
+
+interface InjectedOps {
+    @get:Inject
+    val fs: FileSystemOperations
+
+    @get:Inject
+    val exec: ExecOperations
 }

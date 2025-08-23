@@ -34,18 +34,21 @@ infix fun URL.unzipInto(dir: File) {
     }
 }
 
-open class Cmd @Inject constructor(@Internal val execOperations: ExecOperations) : DefaultTask()
-
 tasks {
-    register<Cmd>("uploadTensorflowNativeLibs") {
+    register("uploadTensorflowNativeLibs") {
         val baseDir = project.projectDir
+        val tensorflowVersion = libs.versions.tensorflow.get()
+        val buildDir = buildDirectory
+        val tfJavaVer = tfJava
+        val injected = project.objects.newInstance<InjectedOps>()
+
         doLast {
-            val dir = buildDirectory / "download"
-            delete(dir)
+            val dir = buildDir / "download"
+            injected.fs.delete { delete(dir) }
 
             val url =
-                "https://repo1.maven.org/maven2/org/tensorflow/tensorflow-core-native/${tfJava}/tensorflow-core-native-$tfJava"
-            val aarch64Url = "https://publish.djl.ai/tensorflow/${libs.versions.tensorflow.get()}/linux-arm64.jar"
+                "https://repo1.maven.org/maven2/org/tensorflow/tensorflow-core-native/${tfJavaVer}/tensorflow-core-native-$tfJavaVer"
+            val aarch64Url = "https://publish.djl.ai/tensorflow/${tensorflowVersion}/linux-arm64.jar"
 
             "${url}-macosx-arm64.jar".url unzipInto dir / "cpu/osx-aarch64/native/lib"
             "${url}-windows-x86_64.jar".url unzipInto dir / "cpu/win-x86_64/native/lib"
@@ -60,14 +63,14 @@ tasks {
                 }
             }
 
-            execOperations.exec {
+            injected.exec.exec {
                 workingDir = baseDir
                 commandLine(
                     "aws",
                     "s3",
                     "sync",
-                    "$buildDirectory/download/",
-                    "s3://djl-ai/publish/tensorflow/${libs.versions.tensorflow.get()}/"
+                    "$buildDir/download/",
+                    "s3://djl-ai/publish/tensorflow/${tensorflowVersion}/"
                 )
             }
         }
@@ -79,12 +82,13 @@ tasks {
         // when there is no java code inside src/main
         outputs.dir("build/libs")
         var versionName = project.version.toString()
+        if (!isRelease)
+            versionName += "-$nowFormatted"
+
+        val dir = buildDirectory / "classes/java/main/native/lib"
         doFirst {
-            val dir = buildDirectory / "classes/java/main/native/lib"
             dir.mkdirs()
             val propFile = dir / "tensorflow.properties"
-            if (!isRelease)
-                versionName += "-$nowFormatted"
             propFile.text = "placeholder=true\nversion=${versionName}\n"
         }
     }
@@ -198,7 +202,7 @@ tasks {
     withType<PublishToMavenRepository> {
         for (flavor in flavorNames) {
             if (requireSigning) {
-                dependsOn("sign${flavor.substring(0, 1).uppercase() + flavor.substring(1)}Publication")
+                dependsOn("sign${flavor.take(1).uppercase() + flavor.substring(1)}Publication")
             }
 
             val platformNames = (binaryRoot / flavor).list() ?: emptyArray()
@@ -248,7 +252,7 @@ tasks {
                     continue
                 }
                 project.logger.lifecycle("Downloading $f")
-                val file = binaryRoot / f.substring(0, f.length - 3)
+                val file = binaryRoot / f.dropLast(3)
                 file.parentFile.mkdirs()
                 "$url/$f".url gzipInto file
             }
@@ -268,7 +272,7 @@ if (project.hasProperty("staging")) {
         doLast {
             val conn = URL(url).openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
-            conn.setRequestProperty("Authorization", "Bearer ${token}")
+            conn.setRequestProperty("Authorization", "Bearer $token")
             val status = conn.responseCode
             if (status != HttpURLConnection.HTTP_OK) {
                 project.logger.error("Failed to POST '${url}'. Received status code ${status}: ${conn.responseMessage}")
@@ -279,4 +283,11 @@ if (project.hasProperty("staging")) {
     tasks.named("publish") {
         finalizedBy(tasks.named("postPublish"))
     }
+}
+
+interface InjectedOps {
+    @get:Inject
+    val fs: FileSystemOperations
+    @get:Inject
+    val exec: ExecOperations
 }

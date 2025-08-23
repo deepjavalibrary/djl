@@ -11,7 +11,6 @@ val xgbFlavor = if (isGpu) "-gpu" else ""
 
 val exclusion by configurations.registering
 
-@Suppress("UnstableApiUsage")
 dependencies {
     api(project(":api"))
     api(libs.commons.logging)
@@ -44,13 +43,13 @@ tasks {
 
     processResources {
         val jnilibDir = buildDirectory / "resources/main/lib/linux/aarch64/"
-        inputs.properties(mapOf("xgboostVersion" to libs.versions.xgboost.get()))
+        val xgbVersion = libs.versions.xgboost.get()
+        inputs.properties(mapOf("xgboostVersion" to xgbVersion))
         outputs.dir(jnilibDir)
-
         val logger = project.logger
+
         doLast {
-            val url =
-                "https://publish.djl.ai/xgboost/${libs.versions.xgboost.get()}/jnilib/linux/aarch64/libxgboost4j.so"
+            val url = "https://publish.djl.ai/xgboost/${xgbVersion}/jnilib/linux/aarch64/libxgboost4j.so"
             val file = jnilibDir / "libxgboost4j.so"
             if (!file.exists()) {
                 logger.lifecycle("Downloading $url")
@@ -79,13 +78,18 @@ tasks {
     }
 
     publishing {
+        val rapisVersion = libs.versions.rapis.get()
+        val projectName = project.name
+        val xgbFlavor = xgbFlavor
+        val isGpu = isGpu
+
         publications {
             named<MavenPublication>("maven") {
-                artifactId = "${project.name}$xgbFlavor"
+                artifactId = "${projectName}$xgbFlavor"
                 pom {
                     name = "DJL Engine Adapter for XGBoost"
                     description = "Deep Java Library (DJL) Engine Adapter for XGBoost"
-                    url = "https://djl.ai/engines/ml/${project.name}"
+                    url = "https://djl.ai/engines/ml/${projectName}"
 
                     withXml {
                         val pomNode = asElement()
@@ -107,7 +111,7 @@ tasks {
                                     }
                                     "groupId" addWith "ai.rapids"
                                     "artifactId" addWith "cudf"
-                                    "version" addWith libs.versions.rapis.get()
+                                    "version" addWith rapisVersion
                                     "classifier" addWith "cuda11"
                                     "scope" addWith "compile"
                                 }

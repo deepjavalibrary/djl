@@ -19,9 +19,11 @@ tasks {
     compileJava { dependsOn(processResources) }
 
     processResources {
-        inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(), "pytorchVersion" to libs.versions.pytorch.get()))
+        val djlVersion = libs.versions.djl.get()
+        val pytorchVersion = libs.versions.pytorch.get()
+        inputs.properties(mapOf("djlVersion" to djlVersion, "pytorchVersion" to pytorchVersion))
         filesMatching("**/pytorch-engine.properties") {
-            expand(mapOf("djlVersion" to libs.versions.djl.get(), "pytorchVersion" to libs.versions.pytorch.get()))
+            expand(mapOf("djlVersion" to djlVersion, "pytorchVersion" to pytorchVersion))
         }
     }
 
