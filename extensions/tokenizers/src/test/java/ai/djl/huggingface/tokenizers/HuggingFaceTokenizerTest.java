@@ -645,4 +645,49 @@ public class HuggingFaceTokenizerTest {
             Assert.assertEquals(0, ids[0], "First token should have id 0 (<s>)");
         }
     }
+
+    @Test
+    public void testPreferenceWhenBothOptionsAndConfigSet() throws IOException {
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.builder()
+                        .optMaxLength(48)
+                        .optAddSpecialTokens(false)
+                        .optTokenizerPath(
+                                Paths.get("src/test/resources/fake-tokenizer-with-null-padding/"))
+                        .optTokenizerConfigPath(
+                                "src/test/resources/fake-tokenizer-with-null-padding/tokenizer_config.json")
+                        .build()) {
+            String input = "Hello World";
+            Encoding encoding = tokenizer.encode(input); // with special tokens
+            String[] tokens = encoding.getTokens();
+
+            // Verify special tokens from tokenizer.json are used
+            Assert.assertEquals(tokens[0], "▁Hello"); // bos_token/cls_token
+            Assert.assertEquals(
+                    tokens[tokens.length - 1],
+                    "▁World"); // Last actual token without special tokens
+
+            String[] testInputs = {
+                "Hello World", // Basic text
+                "Hello  World", // Multiple spaces
+                String.join(" ", Collections.nCopies(1000, "hello")), // Long text
+                "résumé café", // Accented characters
+                "Hello\nWorld", // Newlines
+                "Hello    World" // Extra spaces
+            };
+
+            for (String testInput : testInputs) {
+                encoding = tokenizer.encode(testInput);
+
+                // Verify encoding basics
+                Assert.assertNotNull(encoding);
+                Assert.assertNotNull(encoding.getIds());
+                Assert.assertNotNull(encoding.getTokens());
+
+                // Verify model_max_length constraint
+                Assert.assertTrue(
+                        encoding.getIds().length <= 48, "Encoding length should not exceed 48");
+            }
+        }
+    }
 }

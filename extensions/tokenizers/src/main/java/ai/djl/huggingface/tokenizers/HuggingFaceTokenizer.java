@@ -100,31 +100,36 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
             modelMaxLength = 512;
         }
         if (config != null) {
-            applyConfig(config);
+            applyConfig(config, options);
         }
         updateTruncationAndPadding(padInfo);
     }
 
-    private void applyConfig(TokenizerConfig config) {
-        this.modelMaxLength = config.getModelMaxLength();
-        if (config.hasExplicitDoLowerCase() && config.isDoLowerCase()) {
-            this.doLowerCase = Locale.getDefault();
+    private void applyConfig(TokenizerConfig config, Map<String, String> options) {
+        if (options != null && !options.containsKey("modelMaxLength")) {
+            this.modelMaxLength = config.getModelMaxLength();
         }
         this.cleanupTokenizationSpaces = config.isCleanUpTokenizationSpaces();
-        if (Stream.of(
-                        config.getBosToken(),
-                        config.getClsToken(),
-                        config.getEosToken(),
-                        config.getSepToken(),
-                        config.getUnkToken(),
-                        config.getPadToken())
-                .anyMatch(token -> token != null && !token.isEmpty())) {
-            this.addSpecialTokens = true;
+        if (options != null && !options.containsKey("addSpecialTokens")) {
+
+            this.addSpecialTokens =
+                    Stream.of(
+                                    config.getBosToken(),
+                                    config.getClsToken(),
+                                    config.getEosToken(),
+                                    config.getSepToken(),
+                                    config.getUnkToken(),
+                                    config.getPadToken())
+                            .anyMatch(token -> token != null && !token.isEmpty());
         }
-        if (config.hasExplicitStripAccents()) {
+        if (options != null
+                && !options.containsKey("stripAccents")
+                && config.hasExplicitStripAccents()) {
             this.stripAccents = config.isStripAccents();
         }
-        if (config.hasExplicitAddPrefixSpace()) {
+        if (options != null
+                && !options.containsKey("addPrefixSpace")
+                && config.hasExplicitAddPrefixSpace()) {
             this.addPrefixSpace = config.isAddPrefixSpace();
         }
     }
