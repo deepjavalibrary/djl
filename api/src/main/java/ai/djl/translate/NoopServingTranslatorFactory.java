@@ -15,14 +15,25 @@ package ai.djl.translate;
 import ai.djl.Model;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.ndarray.BytesSupplier;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.util.JsonUtils;
 import ai.djl.util.Pair;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** A {@link TranslatorFactory} that creates a {@code RawTranslator} instance. */
 public class NoopServingTranslatorFactory implements TranslatorFactory {
@@ -65,6 +76,30 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
             NDManager manager = ctx.getNDManager();
             try {
                 ctx.setAttachment("properties", input.getProperties());
+                String contentType = input.getProperty("Content-Type", null);
+                if (contentType != null) {
+                    int pos = contentType.indexOf(';');
+                    if (pos > 0) {
+                        contentType = contentType.substring(0, pos);
+                    }
+                    if ("application/json".equals(contentType)) {
+                        String data = input.getData().getAsString();
+                        JsonElement element = JsonUtils.GSON.fromJson(data, JsonElement.class);
+                        if (element.isJsonObject()) {
+                            JsonObject obj = element.getAsJsonObject();
+                            element = obj.get("inputs");
+                            if (element == null) {
+                                element = obj.get("instance");
+                            }
+                        }
+                        if (element != null && element.isJsonArray()) {
+                            return toNDList(manager, element);
+                        } else {
+                            throw new TranslateException("Input is not a supported json format");
+                        }
+                    }
+                }
+
                 return input.getDataAsNDList(manager);
             } catch (IllegalArgumentException e) {
                 throw new TranslateException("Input is not a NDList data type", e);
@@ -76,9 +111,13 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
         @SuppressWarnings("unchecked")
         public Output processOutput(TranslatorContext ctx, NDList list) {
             Map<String, String> prop = (Map<String, String>) ctx.getAttachment("properties");
-            String contentType = prop.get("Content-Type");
-            String accept = prop.get("Accept");
+            String contentType = prop.getOrDefault("Content-Type", "tensor/ndlist");
+            int pos = contentType.indexOf(';');
+            if (pos > 0) {
+                contentType = contentType.substring(0, pos);
+            }
 
+            String accept = prop.get("Accept");
             Output output = new Output();
             if ("tensor/npz".equalsIgnoreCase(accept)
                     || "tensor/npz".equalsIgnoreCase(contentType)) {
@@ -88,11 +127,56 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                     || "tensor/safetensors".equalsIgnoreCase(contentType)) {
                 output.add(list.encode(NDList.Encoding.SAFETENSORS));
                 output.addProperty("Content-Type", "tensor/safetensors");
+            } else if ("application/json".equalsIgnoreCase(accept)
+                    || "application/json".equalsIgnoreCase(contentType)) {
+                List<Object> ret;
+                if (list.size() == 1) {
+                    ret = toList(list.get(0));
+                } else {
+                    ret = new ArrayList<>();
+                    for (NDArray array : list) {
+                        ret.add(new Pair<>(array.getName(), toList(array)));
+                    }
+                }
+                Map<String, List<Object>> map = new ConcurrentHashMap<>();
+                map.put("predictions", ret);
+                output.add("predictions", BytesSupplier.wrapAsJson(map));
             } else {
                 output.add(list.encode());
                 output.addProperty("Content-Type", "tensor/ndlist");
             }
             return output;
+        }
+
+        private NDList toNDList(NDManager manager, JsonElement element) {
+            JsonElement e = element.getAsJsonArray().get(0);
+            if (e.isJsonArray()) {
+                float[][] array = JsonUtils.GSON.fromJson(element, float[][].class);
+                return new NDList(manager.create(array));
+            } else {
+                float[] array = JsonUtils.GSON.fromJson(element, float[].class);
+                return new NDList(manager.create(array));
+            }
+        }
+
+        private List<Object> toList(NDArray array) {
+            Number[] data = array.toArray();
+            long[] shape = array.getShape().getShape();
+            return toList(Arrays.asList(data).iterator(), shape, 0);
+        }
+
+        private List<Object> toList(Iterator<Number> data, long[] shape, int pos) {
+            List<Object> ret = new ArrayList<>();
+            if (pos == shape.length - 1) {
+                for (int i = 0; i < shape[pos]; ++i) {
+                    ret.add(data.next());
+                }
+                return ret;
+            }
+            for (int i = 0; i < shape[pos]; ++i) {
+                ret.add(toList(data, shape, pos + 1));
+            }
+            return ret;
         }
     }
 }

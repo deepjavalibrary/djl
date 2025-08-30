@@ -13,8 +13,10 @@
 package ai.djl.translate;
 
 import ai.djl.ModelException;
+import ai.djl.inference.Predictor;
 import ai.djl.modality.Input;
 import ai.djl.modality.Output;
+import ai.djl.ndarray.BytesSupplier;
 import ai.djl.nn.Blocks;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
@@ -25,11 +27,16 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NoopServingTranslatorFactoryTest {
 
     @Test
-    public void testNoopTranslatorFactory() throws ModelException, IOException {
+    public void testNoopTranslatorFactory() throws ModelException, IOException, TranslateException {
         NoopServingTranslatorFactory factory = new NoopServingTranslatorFactory();
         Assert.assertEquals(factory.getSupportedTypes().size(), 1);
 
@@ -42,8 +49,19 @@ public class NoopServingTranslatorFactoryTest {
                         .optTranslatorFactory(factory)
                         .build();
 
-        try (ZooModel<Input, Output> model = criteria.loadModel()) {
-            Assert.assertNotNull(model);
+        try (ZooModel<Input, Output> model = criteria.loadModel();
+                Predictor<Input, Output> predictor = model.newPredictor()) {
+            Input in = new Input();
+            in.addProperty("Content-Type", "application/json; charset=UTF-8");
+            Map<String, List<List<Number>>> data = new ConcurrentHashMap<>();
+            List<List<Number>> list = new ArrayList<>();
+            list.add(Arrays.asList(1.0f, 0.1f));
+            list.add(Arrays.asList(2.0f, 0.2f));
+            data.put("instance", list);
+            in.add(BytesSupplier.wrapAsJson(data));
+            Output out = predictor.predict(in);
+            BytesSupplier outData = out.getData();
+            Assert.assertEquals(outData.getAsString(), "{\"predictions\":[[1.0,0.1],[2.0,0.2]]}");
         }
     }
 }
