@@ -109,8 +109,7 @@ public class XgbNDManager extends BaseNDManager {
      * @return a new instance of {@link NDArray}
      */
     public NDArray create(ColumnBatch columnBatch, float missing, int nthread) {
-        columnBatch.getFeatureArrayInterface();
-        String json = columnBatch.getFeatureArrayInterface();
+        String json = columnBatch.toFeaturesJson();
         JsonArray array = JsonUtils.GSON.fromJson(json, JsonArray.class);
         JsonArray shapeJson = array.get(0).getAsJsonObject().get("shape").getAsJsonArray();
         long[] shapes = new long[shapeJson.size()];

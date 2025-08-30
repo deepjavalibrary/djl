@@ -56,7 +56,7 @@ public final class JniUtils {
 
     public static long createDMatrix(ColumnBatch columnBatch, float missing, int nthread) {
         long[] handles = new long[1];
-        String json = columnBatch.getFeatureArrayInterface();
+        String json = columnBatch.toFeaturesJson();
         if (json == null || json.isEmpty()) {
             throw new IllegalArgumentException(
                     "Expecting non-empty feature columns' array interface");
