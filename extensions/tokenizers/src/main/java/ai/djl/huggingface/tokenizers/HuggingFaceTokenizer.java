@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -61,6 +62,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     private boolean cleanupTokenizationSpaces;
     private boolean stripAccents;
     private boolean addPrefixSpace;
+    private final Map<String, String> options;
 
     private HuggingFaceTokenizer(
             long handle,
@@ -68,6 +70,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
             TokenizerConfig config,
             PadTokenResolver.PadInfo padInfo) {
         super(handle);
+        this.options = options != null ? new HashMap<>(options) : new HashMap<>();
         truncation = TruncationStrategy.LONGEST_FIRST;
         padding = PaddingStrategy.LONGEST;
         maxLength = TokenizersLibrary.LIB.getMaxLength(handle);
@@ -106,25 +109,32 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     private void applyConfig(TokenizerConfig config) {
-        this.modelMaxLength = config.getModelMaxLength();
-        if (config.hasExplicitDoLowerCase() && config.isDoLowerCase()) {
-            this.doLowerCase = Locale.getDefault();
+        // Only apply config values if they haven't been set by options
+        if (!options.containsKey("modelMaxLength")) {
+            this.modelMaxLength = config.getModelMaxLength();
         }
         this.cleanupTokenizationSpaces = config.isCleanUpTokenizationSpaces();
-        if (Stream.of(
-                        config.getBosToken(),
-                        config.getClsToken(),
-                        config.getEosToken(),
-                        config.getSepToken(),
-                        config.getUnkToken(),
-                        config.getPadToken())
-                .anyMatch(token -> token != null && !token.isEmpty())) {
-            this.addSpecialTokens = true;
+        // Only apply addSpecialTokens if not explicitly set in options
+        if (!options.containsKey("addSpecialTokens")) {
+
+            this.addSpecialTokens =
+                    Stream.of(
+                                    config.getBosToken(),
+                                    config.getClsToken(),
+                                    config.getEosToken(),
+                                    config.getSepToken(),
+                                    config.getUnkToken(),
+                                    config.getPadToken())
+                            .anyMatch(token -> token != null && !token.isEmpty());
         }
-        if (config.hasExplicitStripAccents()) {
+
+        // Only apply stripAccents if not set and explicitly specified in config
+        if (!options.containsKey("stripAccents") && config.hasExplicitStripAccents()) {
             this.stripAccents = config.isStripAccents();
         }
-        if (config.hasExplicitAddPrefixSpace()) {
+
+        // Only apply addPrefixSpace if not set and explicitly specified in config
+        if (!options.containsKey("addPrefixSpace") && config.hasExplicitAddPrefixSpace()) {
             this.addPrefixSpace = config.isAddPrefixSpace();
         }
     }
