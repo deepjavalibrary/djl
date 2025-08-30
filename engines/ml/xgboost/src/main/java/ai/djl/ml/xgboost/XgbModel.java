@@ -92,7 +92,7 @@ public class XgbModel extends BaseModel {
         }
         Path modelFile = modelDir.resolve(prefix);
         if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
-            if (prefix.endsWith(".json") || prefix.endsWith(".xgb")) {
+            if (prefix.endsWith(".json") || prefix.endsWith(".xgb") || prefix.endsWith(".bst")) {
                 return null;
             }
             modelFile = modelDir.resolve(prefix + ".json");
@@ -103,7 +103,19 @@ public class XgbModel extends BaseModel {
             if (Files.isRegularFile(modelFile)) {
                 return modelFile;
             }
+            modelFile = modelDir.resolve(prefix + ".bst");
+            if (Files.isRegularFile(modelFile)) {
+                return modelFile;
+            }
             modelFile = modelDir.resolve("model.xgb");
+            if (Files.isRegularFile(modelFile)) {
+                return modelFile;
+            }
+            modelFile = modelDir.resolve("model.bst");
+            if (Files.isRegularFile(modelFile)) {
+                return modelFile;
+            }
+            modelFile = modelDir.resolve("model.json");
             if (Files.isRegularFile(modelFile)) {
                 return modelFile;
             }
