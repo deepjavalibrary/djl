@@ -25,6 +25,8 @@ import ai.djl.util.Pair;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,12 +99,15 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                         } else {
                             throw new TranslateException("Input is not a supported json format");
                         }
+                    } else if ("text/csv".equals(contentType)) {
+                        String data = input.getData().getAsString();
+                        return parseCsv(manager, data);
                     }
                 }
 
                 return input.getDataAsNDList(manager);
-            } catch (IllegalArgumentException e) {
-                throw new TranslateException("Input is not a NDList data type", e);
+            } catch (Exception e) {
+                throw new TranslateException("Input processing failed", e);
             }
         }
 
@@ -127,6 +132,11 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                     || "tensor/safetensors".equalsIgnoreCase(contentType)) {
                 output.add(list.encode(NDList.Encoding.SAFETENSORS));
                 output.addProperty("Content-Type", "tensor/safetensors");
+            } else if ("text/csv".equalsIgnoreCase(accept)) {
+                String csv = toCsv(list);
+                output.add(
+                        BytesSupplier.wrap(csv.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+                output.addProperty("Content-Type", "text/csv");
             } else if ("application/json".equalsIgnoreCase(accept)
                     || "application/json".equalsIgnoreCase(contentType)) {
                 List<Object> ret;
@@ -141,6 +151,7 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                 Map<String, List<Object>> map = new ConcurrentHashMap<>();
                 map.put("predictions", ret);
                 output.add("predictions", BytesSupplier.wrapAsJson(map));
+
             } else {
                 output.add(list.encode());
                 output.addProperty("Content-Type", "tensor/ndlist");
@@ -177,6 +188,86 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                 ret.add(toList(data, shape, pos + 1));
             }
             return ret;
+        }
+
+        private NDList parseCsv(NDManager manager, String csvData) throws TranslateException {
+            try (BufferedReader reader = new BufferedReader(new StringReader(csvData))) {
+                List<float[]> rows = new ArrayList<>();
+                String line;
+                boolean firstLine = true;
+                while ((line = reader.readLine()) != null) {
+                    line = line.trim();
+                    if (line.isEmpty()) {
+                        continue;
+                    }
+
+                    // Skip header if it contains non-numeric data
+                    if (firstLine && !isNumericRow(line)) {
+                        firstLine = false;
+                        continue;
+                    }
+                    firstLine = false;
+
+                    String[] values = line.split(",");
+                    float[] row = new float[values.length];
+                    for (int i = 0; i < values.length; i++) {
+                        row[i] = Float.parseFloat(values[i].trim());
+                    }
+                    rows.add(row);
+                }
+
+                if (rows.isEmpty()) {
+                    throw new TranslateException("No valid numeric data found in CSV");
+                }
+
+                float[][] data = rows.toArray(new float[0][]);
+                return new NDList(manager.create(data));
+            } catch (Exception e) {
+                throw new TranslateException("Failed to parse CSV data", e);
+            }
+        }
+
+        private boolean isNumericRow(String line) {
+            String[] values = line.split(",");
+            for (String value : values) {
+                try {
+                    Float.parseFloat(value.trim());
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private String toCsv(NDList list) {
+            StringBuilder sb = new StringBuilder();
+            for (NDArray array : list) {
+                Number[] data = array.toArray();
+                long[] shape = array.getShape().getShape();
+
+                if (shape.length == 1) {
+                    for (int i = 0; i < data.length; i++) {
+                        if (i > 0) {
+                            sb.append(',');
+                        }
+                        sb.append(data[i]);
+                    }
+                    sb.append('\n');
+                } else if (shape.length == 2) {
+                    int cols = (int) shape[1];
+                    for (int i = 0; i < data.length; i++) {
+                        if (i > 0 && i % cols == 0) {
+                            sb.append('\n');
+                        }
+                        if (i % cols > 0) {
+                            sb.append(',');
+                        }
+                        sb.append(data[i]);
+                    }
+                    sb.append('\n');
+                }
+            }
+            return sb.toString();
         }
     }
 }
