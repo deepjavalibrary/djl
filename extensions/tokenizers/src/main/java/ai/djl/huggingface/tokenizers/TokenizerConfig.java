@@ -41,9 +41,6 @@ public class TokenizerConfig {
     @SerializedName("model_max_length")
     private Integer modelMaxLength;
 
-    @SerializedName("do_lower_case")
-    private Boolean doLowerCase;
-
     @SerializedName("strip_accents")
     private Boolean stripAccents;
 
@@ -101,15 +98,6 @@ public class TokenizerConfig {
             return DEFAULT_MAX_LENGTH;
         }
         return modelMaxLength;
-    }
-
-    /**
-     * Is do lower case boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isDoLowerCase() {
-        return Boolean.TRUE.equals(doLowerCase);
     }
 
     /**
@@ -200,15 +188,6 @@ public class TokenizerConfig {
      */
     public String getTokenizerClass() {
         return tokenizerClass;
-    }
-
-    /**
-     * Has explicit do lower case boolean.
-     *
-     * @return the boolean
-     */
-    public boolean hasExplicitDoLowerCase() {
-        return doLowerCase != null;
     }
 
     /**
