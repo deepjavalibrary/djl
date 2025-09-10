@@ -240,7 +240,7 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
         }
 
         private String toCsv(NDList list) {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(4096);
             for (NDArray array : list) {
                 Number[] data = array.toArray();
                 long[] shape = array.getShape().getShape();
