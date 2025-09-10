@@ -222,7 +222,7 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
 
                 float[][] data = rows.toArray(new float[0][]);
                 return new NDList(manager.create(data));
-            } catch (Exception e) {
+            } catch (IOException | NumberFormatException e) {
                 throw new TranslateException("Failed to parse CSV data", e);
             }
         }
