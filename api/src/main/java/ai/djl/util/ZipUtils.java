@@ -53,9 +53,13 @@ public final class ZipUtils {
         Set<String> set = new HashSet<>();
         while ((entry = zis.getNextEntry()) != null) {
             String entryName = entry.getName();
-            validateArchiveEntry(entry.getName(), dest);
+            // Remove or augment validateArchiveEntry, perform canonical path check
             set.add(entryName);
-            Path file = dest.resolve(entryName).toAbsolutePath();
+            Path file = dest.resolve(entryName).normalize();
+            // Zip Slip protection: ensure extraction stays within dest
+            if (!file.startsWith(dest.normalize())) {
+                throw new IOException("Entry is outside of the target dir: " + entryName);
+            }
             if (entry.isDirectory()) {
                 Files.createDirectories(file);
             } else {
