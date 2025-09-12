@@ -57,7 +57,7 @@ public class NoopServingTranslatorFactoryTest {
             List<List<Number>> list = new ArrayList<>();
             list.add(Arrays.asList(1.0f, 0.1f));
             list.add(Arrays.asList(2.0f, 0.2f));
-            data.put("instance", list);
+            data.put("instances", list);
             in.add(BytesSupplier.wrapAsJson(data));
             Output out = predictor.predict(in);
             BytesSupplier outData = out.getData();

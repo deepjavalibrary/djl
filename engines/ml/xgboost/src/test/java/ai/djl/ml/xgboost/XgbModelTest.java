@@ -57,17 +57,17 @@ public class XgbModelTest {
     }
 
     /*
-    This test depends on rapis, which doesn't work for CPU
+    // This test depends on rapis, which doesn't work for CPU
     @Test
     public void testCudf() {
         Engine engine = Engine.getEngine("XGBoost");
         if (engine.hasCapability(StandardCapabilities.CUDA)) {
-            Float[] data = new Float[]{1.f, null, 5.f, 7.f, 9.f};
+            Float[] data = new Float[] {1.f, null, 5.f, 7.f, 9.f};
             Table x = new Table.TestBuilder().column(data).build();
-            ColumnBatch columnBatch = new CudfColumnBatch(x, null, null, null);
+            ColumnBatch columnBatch = new CudfColumnBatch(x, null, null, null, null);
 
-            try (XgbNDManager manager = (XgbNDManager)engine.newBaseManager()) {
-                NDArray array = manager.create(columnBatch,0, 1);
+            try (XgbNDManager manager = (XgbNDManager) engine.newBaseManager()) {
+                NDArray array = manager.create(columnBatch, 0, 1);
                 Assert.assertEquals(array.getShape().get(0), 5);
             }
         }
