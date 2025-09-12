@@ -8,21 +8,17 @@ plugins {
 group = "ai.djl.ml.xgboost"
 val isGpu = project.hasProperty("gpu")
 val xgbFlavor = if (isGpu) "-gpu" else ""
+val xgbGpu = if (isGpu) "-spark-gpu" else ""
 
 val exclusion by configurations.registering
 
 dependencies {
     api(project(":api"))
     api(libs.commons.logging)
-    api("ml.dmlc:xgboost4j${xgbFlavor}_2.12:${libs.versions.xgboost.get()}") {
+    api("ml.dmlc:xgboost4j${xgbGpu}_2.12:${libs.versions.xgboost.get()}") {
         // get rid of the unused XGBoost Dependencies
-        exclude("org.apache.hadoop", "hadoop-hdfs")
-        exclude("org.apache.hadoop", "hadoop-common")
-        exclude("junit", "junit")
-        exclude("com.typesafe.akka", "akka-actor_2.12")
-        exclude("com.typesafe.akka", "akka-testkit_2.12")
         exclude("com.esotericsoftware", "kryo")
-        exclude("org.scalatest", "scalatest_2.12")
+        exclude("org.scala-lang.modules", "scala-collection-compat_2.12")
         exclude("org.scala-lang.modules", "scala-java8-compat_2.12")
         exclude("org.scala-lang", "scala-compiler")
         exclude("org.scala-lang", "scala-reflect")
@@ -35,7 +31,7 @@ dependencies {
 
     testRuntimeOnly(libs.slf4j.simple)
     if (isGpu)
-        testRuntimeOnly(libs.ai.rapids.cudf) { artifact { classifier = "cuda11" } }
+        testImplementation(libs.ai.rapids.cudf) { artifact { classifier = "cuda12" } }
 }
 
 tasks {

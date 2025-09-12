@@ -89,7 +89,7 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                             JsonObject obj = element.getAsJsonObject();
                             element = obj.get("inputs");
                             if (element == null) {
-                                element = obj.get("instance");
+                                element = obj.get("instances");
                             }
                         }
                         if (element != null && element.isJsonArray()) {
