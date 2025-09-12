@@ -62,6 +62,23 @@ public class NoopServingTranslatorFactoryTest {
             Output out = predictor.predict(in);
             BytesSupplier outData = out.getData();
             Assert.assertEquals(outData.getAsString(), "{\"predictions\":[[1.0,0.1],[2.0,0.2]]}");
+
+            // Test CSV input with JSON output
+            Input csvJsonIn = new Input();
+            csvJsonIn.addProperty("Content-Type", "text/csv");
+            csvJsonIn.addProperty("Accept", "application/json");
+            csvJsonIn.add("1.0,0.1\n2.0,0.2\n");
+            Output csvJsonOut = predictor.predict(csvJsonIn);
+            Assert.assertEquals(
+                    csvJsonOut.getData().getAsString(), "{\"predictions\":[[1.0,0.1],[2.0,0.2]]}");
+
+            // Test CSV input with CSV output
+            Input csvCsvIn = new Input();
+            csvCsvIn.addProperty("Content-Type", "text/csv");
+            csvCsvIn.addProperty("Accept", "text/csv");
+            csvCsvIn.add("1.0,0.1\n2.0,0.2\n");
+            Output csvCsvOut = predictor.predict(csvCsvIn);
+            Assert.assertEquals(csvCsvOut.getData().getAsString(), "1.0,0.1\n2.0,0.2\n");
         }
     }
 }
