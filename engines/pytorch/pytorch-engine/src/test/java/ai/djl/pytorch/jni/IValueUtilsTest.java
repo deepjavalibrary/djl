@@ -24,6 +24,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class IValueUtilsTest {
 
@@ -91,6 +92,47 @@ public class IValueUtilsTest {
 
             NDList input2 = new NDList(array1, array2);
             Assert.assertThrows(() -> IValueUtils.getInputs(input2));
+        }
+    }
+
+    @Test
+    public void testTupleOfMap() {
+        TestRequirements.notMacX86();
+
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
+            NDArray array1 = manager.zeros(new Shape(1));
+            array1.setName("input1[1/key1]");
+            NDArray array2 = manager.ones(new Shape(2));
+            array2.setName("input1[1/key2]");
+            NDArray array3 = manager.ones(new Shape(3));
+            array3.setName("input1[1/key3]");
+            NDArray array4 = manager.ones(new Shape(4));
+            array4.setName("input1[2/a]");
+            NDArray array5 = manager.ones(new Shape(5));
+            array5.setName("input1[2/b]");
+            NDArray array6 = manager.ones(new Shape(6));
+            array6.setName("input1[2/c]");
+            NDList input = new NDList(array1, array2, array3, array4, array5, array6);
+            // the NDList is mapped to (input1: Tuple(Dict(t1, t2, t3), Dict(t34, t5, t6))
+            input.attach(manager);
+
+            Pair<IValue[], String> result = IValueUtils.getInputs(input);
+            IValue[] iValues = result.getKey();
+            Assert.assertEquals(result.getValue(), "forward");
+            Assert.assertEquals(iValues.length, 1);
+            Assert.assertTrue(iValues[0].isTuple());
+
+            IValue[] tuple = iValues[0].toIValueTuple();
+            Assert.assertEquals(tuple.length, 2);
+            Assert.assertTrue(tuple[0].isMap());
+            Map<String, IValue> subMap = tuple[1].toIValueMap();
+            Assert.assertEquals(subMap.size(), 3);
+            Assert.assertTrue(subMap.containsKey("c"));
+            NDList output = iValues[0].toNDList(manager);
+            Assert.assertEquals(output.size(), 6);
+            Assert.assertEquals(output.get(3).getShape().get(0), 4);
+
+            Arrays.stream(iValues).forEach(IValue::close);
         }
     }
 

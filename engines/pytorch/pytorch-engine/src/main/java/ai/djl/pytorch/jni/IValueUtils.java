@@ -35,6 +35,7 @@ public final class IValueUtils {
     private static final Pattern PATTERN_LIST = Pattern.compile("\\w+\\[]");
     private static final Pattern PATTERN_TUPLE = Pattern.compile("\\w+\\(\\)");
     private static final Pattern PATTERN_TUPLE_OF_TUPLE = Pattern.compile("\\w+(\\([\\d,]+\\))");
+    private static final Pattern PATTERN_TUPLE_OF_MAP = Pattern.compile("(\\w+)(\\[\\d+/\\w+])");
     private static final boolean CUDA_STREAM =
             Boolean.getBoolean("ai.djl.pytorch.enable_cuda_stream");
 
@@ -126,6 +127,12 @@ public final class IValueUtils {
                 String key = m.group(1);
                 PairList<String, PtNDArray> pl = outputs.get(index);
                 pl.add(key, (PtNDArray) array);
+            } else if (name != null && (m = PATTERN_TUPLE_OF_MAP.matcher(name)).matches()) {
+                String ivalueName = m.group(1);
+                int index = addToMap(indexMap, ivalueName, outputs);
+                String key = m.group(2);
+                PairList<String, PtNDArray> pl = outputs.get(index);
+                pl.add(key, (PtNDArray) array);
             } else {
                 PairList<String, PtNDArray> pl = new PairList<>();
                 pl.add(null, (PtNDArray) array);
@@ -146,6 +153,29 @@ public final class IValueUtils {
             } else if ("()".equals(key)) {
                 // Tuple
                 IValue[] arrays = pl.values().stream().map(IValue::from).toArray(IValue[]::new);
+                ret[i] = IValue.tupleFrom(arrays);
+            } else if (key.startsWith("[")) {
+                // Tuple of map
+                Map<String, PtNDArray> map = null;
+                List<IValue> ivalues = new ArrayList<>();
+                String index = null;
+                for (Pair<String, PtNDArray> pair : pl) {
+                    String name = pair.getKey();
+                    name = name.substring(1, name.length() - 1);
+                    String[] token = name.split("/");
+                    if (!token[0].equals(index)) {
+                        if (map != null) {
+                            ivalues.add(IValue.stringMapFrom(map));
+                        }
+                        index = token[0];
+                        map = new ConcurrentHashMap<>();
+                    }
+                    map.put(token[1], pair.getValue());
+                }
+                if (map != null) {
+                    ivalues.add(IValue.stringMapFrom(map));
+                }
+                IValue[] arrays = ivalues.toArray(new IValue[0]);
                 ret[i] = IValue.tupleFrom(arrays);
             } else if (key.startsWith("(")) {
                 // Tuple of tuple
