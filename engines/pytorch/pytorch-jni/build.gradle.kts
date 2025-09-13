@@ -22,26 +22,30 @@ tasks {
     processResources {
         outputs.dir(buildDirectory / "classes/java/main/jnilib")
 
+        val djlVersion = libs.versions.djl.get()
         val logger = project.logger
         val dir = project.projectDir
-        val nativeDir = project.parent!!.projectDir / "pytorch-native/jnilib/${libs.versions.djl.get()}/"
+        val buildDir = buildDirectory
+        val nativeDir = project.parent!!.projectDir / "pytorch-native/jnilib/${djlVersion}/"
         val version = project.version
         val hasJni = project.hasProperty("jni")
+        val ptVer = ptVersion
+        val injected = project.objects.newInstance<InjectedOps>()
 
         doFirst {
-            val url = "https://publish.djl.ai/pytorch/$ptVersion/jnilib/${libs.versions.djl.get()}"
+            val url = "https://publish.djl.ai/pytorch/$ptVer/jnilib/${djlVersion}"
             val files = listOf(
                 "linux-x86_64/cpu/libdjl_torch.so",
                 "osx-aarch64/cpu/libdjl_torch.dylib",
                 "win-x86_64/cpu/djl_torch.dll"
             ) + when {
-                ptVersion.matches(Regex("2.7.\\d")) -> listOf(
+                ptVer.matches(Regex("2.7.\\d")) -> listOf(
                     "linux-aarch64/cpu/libdjl_torch.so",
                     "linux-x86_64/cu128/libdjl_torch.so",
                     "win-x86_64/cu128/djl_torch.dll"
                 )
 
-                ptVersion.matches(Regex("2.[4-5].\\d")) -> listOf(
+                ptVer.matches(Regex("2.[4-5].\\d")) -> listOf(
                     "linux-x86_64/cpu-precxx11/libdjl_torch.so",
                     "linux-aarch64/cpu-precxx11/libdjl_torch.so",
                     "linux-x86_64/cu124/libdjl_torch.so",
@@ -49,7 +53,7 @@ tasks {
                     "win-x86_64/cu124/djl_torch.dll"
                 )
 
-                ptVersion.matches(Regex("2.[1-3].\\d")) -> listOf(
+                ptVer.matches(Regex("2.[1-3].\\d")) -> listOf(
                     "linux-x86_64/cpu-precxx11/libdjl_torch.so",
                     "linux-aarch64/cpu-precxx11/libdjl_torch.so",
                     "linux-x86_64/cu121/libdjl_torch.so",
@@ -57,16 +61,16 @@ tasks {
                     "win-x86_64/cu121/djl_torch.dll",
                 )
 
-                ptVersion.startsWith("1.13.") -> listOf(
+                ptVer.startsWith("1.13.") -> listOf(
                     "linux-x86_64/cpu-precxx11/libdjl_torch.so",
                     "linux-aarch64/cpu-precxx11/libdjl_torch.so",
                     "linux-x86_64/cu117/libdjl_torch.so",
                     "win-x86_64/cu117/djl_torch.dll",
                 )
 
-                else -> throw GradleException("Unsupported version: $ptVersion.")
+                else -> throw GradleException("Unsupported version: $ptVer.")
             }
-            val jnilibDir = dir / "jnilib" / libs.versions.djl.get()
+            val jnilibDir = dir / "jnilib" / djlVersion
             for (entry in files) {
                 val file = jnilibDir / entry
                 if (file.exists())
@@ -75,7 +79,7 @@ tasks {
                     val jnilibFile = nativeDir / entry
                     if (jnilibFile.exists()) {
                         logger.lifecycle("Copying $jnilibFile")
-                        copy {
+                        injected.fs.copy {
                             from(jnilibFile)
                             into(file.parent)
                         }
@@ -86,23 +90,27 @@ tasks {
                     }
                 }
             }
-            copy {
+            injected.fs.copy {
                 from(jnilibDir)
-                into(buildDirectory / "classes/java/main/jnilib")
+                into(buildDir / "classes/java/main/jnilib")
             }
 
             // write properties
-            val propFile = buildDirectory / "classes/java/main/jnilib/pytorch.properties"
+            val propFile = buildDir / "classes/java/main/jnilib/pytorch.properties"
             propFile.text = "jni_version=$version"
         }
     }
 
     clean {
+        val injected = project.objects.newInstance<InjectedOps>()
+        val files = fileTree("$home/.djl.ai/pytorch/") {
+            include("**/*djl_torch.*")
+        }
         doFirst {
-            delete("jnilib")
-            delete(fileTree("$home/.djl.ai/pytorch/") {
-                include("**/*djl_torch.*")
-            })
+            injected.fs.delete {
+                delete("jnilib")
+                delete(files)
+            }
         }
     }
 }
@@ -117,4 +125,9 @@ publishing {
             }
         }
     }
+}
+
+interface InjectedOps {
+    @get:Inject
+    val fs: FileSystemOperations
 }

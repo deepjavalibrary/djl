@@ -24,9 +24,10 @@ tasks {
         outputs.dir("build/libs")
 
         var versionName = project.version.toString()
+        if (!isRelease)
+            versionName += "-$nowFormatted"
+
         doFirst {
-            if (!isRelease)
-                versionName += "-$nowFormatted"
             val dir = placeholder / "native/lib"
             dir.mkdirs()
             val propFile = placeholder / "native/lib/mxnet.properties"
@@ -153,7 +154,7 @@ tasks {
     withType<PublishToMavenRepository> {
         for (flavor in flavorNames) {
             if (requireSigning) {
-                dependsOn("sign${flavor.substring(0, 1).uppercase() + flavor.substring(1)}Publication")
+                dependsOn("sign${flavor.take(1).uppercase() + flavor.substring(1)}Publication")
             }
 
             val platformNames = (binaryRoot / flavor).list() ?: emptyArray()
@@ -245,7 +246,7 @@ if (project.hasProperty("staging")) {
         doLast {
             val conn = URL(url).openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
-            conn.setRequestProperty("Authorization", "Bearer ${token}")
+            conn.setRequestProperty("Authorization", "Bearer $token")
             val status = conn.responseCode
             if (status != HttpURLConnection.HTTP_OK) {
                 project.logger.error("Failed to POST '${url}'. Received status code ${status}: ${conn.responseMessage}")

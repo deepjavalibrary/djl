@@ -33,15 +33,17 @@ tasks {
     }
 
     clean {
+        val dir = projectDir
+        val injected = project.objects.newInstance<InjectedOps>()
         doFirst {
-            val initFile = projectDir / "setup/djl_spark/__init__.py"
+            val initFile = dir / "setup/djl_spark/__init__.py"
             initFile.text = initFile.text.replace(Regex("\\n*__version__.*"), "\n")
 
-            delete("setup/build/")
-            delete("setup/dist/")
-            delete("setup/__pycache__/")
-            delete("setup/djl_spark.egg-info/")
-            delete("setup/djl_spark/__pycache__/")
+            injected.fs.delete { delete("setup/build/") }
+            injected.fs.delete { delete("setup/dist/") }
+            injected.fs.delete { delete("setup/__pycache__/") }
+            injected.fs.delete { delete("setup/djl_spark.egg-info/") }
+            injected.fs.delete { delete("setup/djl_spark/__pycache__/") }
         }
     }
 }
@@ -59,4 +61,9 @@ extensions.getByName<PublishingExtension>("publishing").apply {
             }
         }
     }
+}
+
+interface InjectedOps {
+    @get:Inject
+    val fs: FileSystemOperations
 }

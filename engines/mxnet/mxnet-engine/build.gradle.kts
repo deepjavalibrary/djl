@@ -25,9 +25,11 @@ sourceSets.main {
 
 tasks {
     processResources {
-        inputs.properties(mapOf("djlVersion" to libs.versions.djl.get(), "mxnetVersion" to libs.versions.mxnet.get()))
+        val djlVersion = libs.versions.djl.get()
+        val mxnetVersion = libs.versions.mxnet.get()
+        inputs.properties(mapOf("djlVersion" to djlVersion, "mxnetVersion" to mxnetVersion))
         filesMatching("**/mxnet-engine.properties") {
-            expand(mapOf("djlVersion" to libs.versions.djl.get(), "mxnetVersion" to libs.versions.mxnet.get()))
+            expand(mapOf("djlVersion" to djlVersion, "mxnetVersion" to mxnetVersion))
         }
     }
 
@@ -42,11 +44,13 @@ tasks {
             .withPropertyName("jna/mapping.properties file")
         outputs.dir(buildDirectory / "generated-src")
         outputs.cacheIf { true }
+        val jnaGenerator = jnaratorJar.get().outputs.files.singleFile
+        val buildDir = buildDirectory
+        val dir = projectDir
+        val prov = providers
 
-        val dir = project.projectDir
         doLast {
-            val jnaGenerator = jnaratorJar.get().outputs.files.singleFile
-            providers.javaexec {
+            prov.javaexec {
                 workingDir = dir
                 mainClass = "-jar"
                 args(
@@ -56,7 +60,7 @@ tasks {
                     "-p",
                     "ai.djl.mxnet.jna",
                     "-o",
-                    "$buildDirectory/generated-src",
+                    "$buildDir/generated-src",
                     "-m",
                     "${dir}/src/main/jna/mapping.properties",
                     "-f",

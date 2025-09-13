@@ -68,7 +68,9 @@ jobs:
               - 'extensions/fasttext/**'
       - name: Compile fastText JNI macOs
         if: ${{ steps.fasttext_changes.outputs.src == 'true' && runner.os == 'macOs' }}
-        run: ./gradlew :extensions:fasttext:compileJNI
+        run: |
+          export CMAKE_POLICY_VERSION_MINIMUM=3.5
+          ./gradlew :extensions:fasttext:compileJNI
       - name: Compile fastText JNI linux
         if: ${{ steps.fasttext_changes.outputs.src == 'true' && runner.os == 'Linux' }}
         # fasttext on linux requires gcc12, but ubuntu-latest uses at least gcc13

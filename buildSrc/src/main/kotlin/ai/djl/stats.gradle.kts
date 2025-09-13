@@ -1,6 +1,5 @@
 package ai.djl
 
-import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.tooling.events.FinishEvent
 import org.gradle.tooling.events.OperationCompletionListener
@@ -46,21 +45,20 @@ abstract class StatisticsService : BuildService<StatisticsService.Parameters>,
 }
 
 tasks.test {
+    @OptIn(ExperimentalTime::class)
+    val timeSource = timeSource
+    val projectName = project.name
+    val demoListener = demoListener
+    val ext = project.ext
     doFirst {
         @OptIn(ExperimentalTime::class)
-        startTime = timeSource.markNow()
+        ext.set("startTime", timeSource.markNow())
     }
     doLast {
         @OptIn(ExperimentalTime::class)
-        if (state.didWork)
-            demoListener.get().parameters.testsResults[timeSource.markNow() - startTime] = project.name
+        if (state.didWork) {
+            val t = ext.get("startTime") as TimeSource.Monotonic.ValueTimeMark
+            demoListener.get().parameters.testsResults[timeSource.markNow() - t] = projectName
+        }
     }
 }
-
-@ExperimentalTime
-var Task.startTime: TimeSource.Monotonic.ValueTimeMark
-    get() = ext.get("startTime") as TimeSource.Monotonic.ValueTimeMark
-    set(value) = ext.set("startTime", value)
-
-val Task.ext: ExtraPropertiesExtension
-    get() = (this as ExtensionAware).extensions.getByName<ExtraPropertiesExtension>("ext")
