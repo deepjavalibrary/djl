@@ -26,7 +26,6 @@ import ai.djl.nn.Block;
 import ai.djl.nn.LambdaBlock;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.testing.Assertions;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Utils;
@@ -54,8 +53,10 @@ public class TokenClassificationTranslatorTest {
         Map<String, Map<String, String>> map = new HashMap<>();
         Map<String, String> id2label = new HashMap<>();
         id2label.put("0", "O");
-        id2label.put("3", "B-PER");
-        id2label.put("7", "B-LOC");
+        id2label.put("1", "I-PER");
+        id2label.put("2", "ORG");
+        id2label.put("3", "LOC");
+        id2label.put("4", "MISC");
         map.put("id2label", id2label);
         try (Writer writer = Files.newBufferedWriter(path)) {
             writer.write(JsonUtils.GSON.toJson(map));
@@ -70,15 +71,27 @@ public class TokenClassificationTranslatorTest {
     @Test
     public void testTokenClassificationTranslator()
             throws ModelException, IOException, TranslateException {
-        String text = "My name is Wolfgang and I live in Berlin.";
+        String text =
+                "Apple was founded in 1976 by Steve Jobs, Steve Wozniak and Ronald sell Apple I"
+                        + " personal computer.";
 
         Block block =
                 new LambdaBlock(
                         a -> {
                             NDManager manager = a.getManager();
-                            float[][] logits = new float[12][9];
-                            logits[4][3] = 1;
-                            logits[9][7] = 1;
+                            float[][] logits = new float[24][5];
+                            logits[1][2] = 1f;
+                            logits[7][1] = 1f;
+                            logits[8][1] = 1f;
+                            logits[10][1] = 1f;
+                            logits[11][1] = 1f;
+                            logits[12][1] = 1f;
+                            logits[13][1] = 1f;
+                            logits[14][1] = 1f;
+                            logits[16][1] = 1f;
+                            logits[17][1] = 1f;
+                            logits[18][4] = 1f;
+                            logits[19][4] = 1f;
                             NDArray arr = manager.create(logits);
                             arr = arr.expandDims(0);
                             return new NDList(arr);
@@ -92,7 +105,7 @@ public class TokenClassificationTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
+                        .optArgument("tokenizer", "FacebookAI/roberta-base")
                         .optArgument("softmax", true)
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TokenClassificationTranslatorFactory())
@@ -101,12 +114,12 @@ public class TokenClassificationTranslatorTest {
         try (ZooModel<String, NamedEntity[]> model = criteria.loadModel();
                 Predictor<String, NamedEntity[]> predictor = model.newPredictor()) {
             NamedEntity[] res = predictor.predict(text);
-            Assert.assertEquals(res[0].getEntity(), "B-PER");
-            Assertions.assertAlmostEquals(res[0].getScore(), 0.2536117);
-            Assert.assertEquals(res[0].getIndex(), 4);
-            Assert.assertEquals(res[0].getWord(), "wolfgang");
-            Assert.assertEquals(res[0].getStart(), 11);
-            Assert.assertEquals(res[0].getEnd(), 19);
+            Assert.assertEquals(res.length, 12);
+            Assert.assertEquals(res[0].getEntity(), "ORG");
+            Assert.assertEquals(res[0].getIndex(), 1);
+            Assert.assertEquals(res[0].getWord(), "Apple");
+            Assert.assertEquals(res[0].getStart(), 0);
+            Assert.assertEquals(res[0].getEnd(), 5);
         }
 
         Criteria<Input, Output> criteria2 =
@@ -115,7 +128,7 @@ public class TokenClassificationTranslatorTest {
                         .optModelPath(modelDir)
                         .optBlock(block)
                         .optEngine("PyTorch")
-                        .optArgument("tokenizer", "google-bert/bert-base-uncased")
+                        .optArgument("tokenizer", "FacebookAI/roberta-base")
                         .optArgument("softmax", true)
                         .optOption("hasParameter", "false")
                         .optTranslatorFactory(new TokenClassificationTranslatorFactory())
@@ -127,7 +140,54 @@ public class TokenClassificationTranslatorTest {
             input.add(text);
             Output out = predictor.predict(input);
             NamedEntity[] res = (NamedEntity[]) out.getData().getAsObject();
-            Assert.assertEquals(res[0].getEntity(), "B-PER");
+            Assert.assertEquals(res[1].getEntity(), "I-PER");
+            Assert.assertEquals(res[1].getStart(), 29);
+            Assert.assertEquals(res[1].getEnd(), 34);
+        }
+
+        // simple aggregation
+        Criteria<String, NamedEntity[]> criteria3 =
+                criteria.toBuilder().optArgument("aggregation_strategy", "simple").build();
+        try (ZooModel<String, NamedEntity[]> model = criteria3.loadModel();
+                Predictor<String, NamedEntity[]> predictor = model.newPredictor()) {
+            NamedEntity[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 5);
+            Assert.assertEquals(res[1].getEntity(), "PER");
+            Assert.assertEquals(res[1].getWord(), " Steve Jobs");
+            Assert.assertEquals(res[1].getStart(), 29);
+            Assert.assertEquals(res[1].getEnd(), 39);
+        }
+
+        Criteria<String, NamedEntity[]> criteria4 =
+                criteria.toBuilder().optArgument("aggregation_strategy", "first").build();
+        try (ZooModel<String, NamedEntity[]> model = criteria3.loadModel();
+                Predictor<String, NamedEntity[]> predictor = model.newPredictor()) {
+            NamedEntity[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 4);
+            Assert.assertEquals(res[1].getEntity(), "PER");
+            Assert.assertEquals(res[1].getWord(), " Steve Jobs, Steve Wozniak");
+            Assert.assertEquals(res[1].getStart(), 29);
+            Assert.assertEquals(res[1].getEnd(), 54);
+        }
+
+        Criteria<String, NamedEntity[]> criteria5 =
+                criteria.toBuilder().optArgument("aggregation_strategy", "max").build();
+        try (ZooModel<String, NamedEntity[]> model = criteria3.loadModel();
+                Predictor<String, NamedEntity[]> predictor = model.newPredictor()) {
+            NamedEntity[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 4);
+            Assert.assertEquals(res[1].getEntity(), "PER");
+            Assert.assertEquals(res[1].getWord(), " Steve Jobs, Steve Wozniak");
+            Assert.assertEquals(res[1].getStart(), 29);
+            Assert.assertEquals(res[1].getEnd(), 54);
+        }
+
+        Criteria<String, NamedEntity[]> criteria6 =
+                criteria.toBuilder().optArgument("aggregation_strategy", "average").build();
+        try (ZooModel<String, NamedEntity[]> model = criteria3.loadModel();
+                Predictor<String, NamedEntity[]> predictor = model.newPredictor()) {
+            NamedEntity[] res = predictor.predict(text);
+            Assert.assertEquals(res.length, 4);
         }
 
         try (Model model = Model.newInstance("test")) {
@@ -144,7 +204,7 @@ public class TokenClassificationTranslatorTest {
                     TranslateException.class,
                     () -> factory.newInstance(String.class, Integer.class, model, arguments));
 
-            arguments.put("tokenizer", "google-bert/bert-base-uncased");
+            arguments.put("tokenizer", "FacebookAI/roberta-base");
 
             Assert.assertThrows(
                     IllegalArgumentException.class,
