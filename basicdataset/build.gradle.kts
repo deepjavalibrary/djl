@@ -8,6 +8,7 @@ plugins {
 dependencies {
     api(project(":api"))
     api(libs.apache.commons.csv)
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.7.3")
 
     // Add following dependency to your project for COCO dataset
     // runtimeOnly(libs.twelvemonkeys.imageio)
