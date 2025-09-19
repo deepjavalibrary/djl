@@ -37,12 +37,4 @@ tasks {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory()) it else zipTree(it) })
     }
-
-    generateGrammarSource {
-        dependsOn(verifyJava)
-    }
-
-    generateTestGrammarSource {
-        dependsOn(verifyJava)
-    }
 }
