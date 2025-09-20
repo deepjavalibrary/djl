@@ -574,7 +574,7 @@ public final class NDArrays {
      * @return the result {@link NDArray}
      */
     public static NDArray where(NDArray condition, NDArray a, NDArray b) {
-        return a.getNDArrayInternal().where(condition, b);
+        return correctedArray(a.getNDArrayInternal().where(condition, b), a.getManager());
     }
 
     /**
@@ -898,7 +898,7 @@ public final class NDArrays {
      * @return the result {@link NDArray}
      */
     public static NDArray sub(Number n, NDArray a) {
-        return a.getNDArrayInternal().rsub(n);
+        return correctedArray(a.getNDArrayInternal().rsub(n), a.getManager());
     }
 
     /**
@@ -1033,7 +1033,7 @@ public final class NDArrays {
      * @return the result {@link NDArray}
      */
     public static NDArray div(Number n, NDArray a) {
-        return a.getNDArrayInternal().rdiv(n);
+        return correctedArray(a.getNDArrayInternal().rdiv(n), a.getManager());
     }
 
     /**
@@ -1099,7 +1099,7 @@ public final class NDArrays {
      * @return the result {@link NDArray}
      */
     public static NDArray mod(Number n, NDArray a) {
-        return a.getNDArrayInternal().rmod(n);
+        return correctedArray(a.getNDArrayInternal().rmod(n), a.getManager());
     }
 
     /**
@@ -1160,7 +1160,7 @@ public final class NDArrays {
      * @return the result {@link NDArray}
      */
     public static NDArray pow(Number n, NDArray a) {
-        return a.getNDArrayInternal().rpow(n);
+        return correctedArray(a.getNDArrayInternal().rpow(n), a.getManager());
     }
 
     /**
@@ -1307,7 +1307,7 @@ public final class NDArrays {
      * @return the result {@link NDArray}
      */
     public static NDArray subi(Number n, NDArray a) {
-        return a.getNDArrayInternal().rsubi(n);
+        return correctedArray(a.getNDArrayInternal().rsubi(n), a.getManager());
     }
 
     /**
@@ -1459,7 +1459,7 @@ public final class NDArrays {
      * @return the result {@link NDArray}
      */
     public static NDArray divi(Number n, NDArray a) {
-        return a.getNDArrayInternal().rdivi(n);
+        return correctedArray(a.getNDArrayInternal().rdivi(n), a.getManager());
     }
 
     /**
@@ -1536,7 +1536,7 @@ public final class NDArrays {
      * @return the result {@link NDArray}
      */
     public static NDArray modi(Number n, NDArray a) {
-        return a.getNDArrayInternal().rmodi(n);
+        return correctedArray(a.getNDArrayInternal().rmodi(n), a.getManager());
     }
 
     /**
@@ -1606,7 +1606,7 @@ public final class NDArrays {
      * @return the result {@link NDArray}
      */
     public static NDArray powi(Number n, NDArray a) {
-        return a.getNDArrayInternal().rpowi(n);
+        return correctedArray(a.getNDArrayInternal().rpowi(n), a.getManager());
     }
 
     /**
@@ -1822,7 +1822,8 @@ public final class NDArrays {
     public static NDArray stack(NDList arrays, int axis) {
         Preconditions.checkArgument(!arrays.isEmpty(), "need at least one array to stack");
         NDArray array = arrays.head();
-        return array.getNDArrayInternal().stack(arrays.subNDList(1), axis);
+        return correctedArray(
+                array.getNDArrayInternal().stack(arrays.subNDList(1), axis), array.getManager());
     }
 
     /**
@@ -1879,7 +1880,8 @@ public final class NDArrays {
             return arrays.singletonOrThrow().duplicate();
         }
         NDArray array = arrays.head();
-        return array.getNDArrayInternal().concat(arrays.subNDList(1), axis);
+        return correctedArray(
+                array.getNDArrayInternal().concat(arrays.subNDList(1), axis), array.getManager());
     }
 
     /**
@@ -2014,5 +2016,31 @@ public final class NDArrays {
      */
     public static NDArray erf(NDArray input) {
         return input.erf();
+    }
+
+    /**
+     * Returns a corrected array ensuring it is owned by the expected NDManager. This is required
+     * for hybrid engine support.
+     *
+     * @param array the NDArray to return.
+     * @param expectedManager the expected manager.
+     * @return the NDArray to return.
+     */
+    private static NDArray correctedArray(NDArray array, NDManager expectedManager) {
+        if (array.getManager() != expectedManager) {
+            // Handle hybrid engine arrays, copy the data to a new array owned by the expected
+            // manager.
+            NDArray corrected =
+                    expectedManager.create(
+                            array.getShape(), array.getDataType(), array.getDevice());
+            array.copyTo(corrected);
+            corrected.setName(array.getName());
+
+            // No need to keep the old array anymore.
+            array.close();
+            return corrected;
+        } else {
+            return array;
+        }
     }
 }
