@@ -65,6 +65,10 @@ tasks {
             }
             into(ciDir)
         }
+        val dll = ciDir / "Release/djl_torch.dll"
+        if (dll.exists()) {
+            dll.renameTo(ciDir / "djl_torch.dll")
+        }
     }
 
     fun downloadBuildAndroid() {
