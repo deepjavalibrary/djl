@@ -55,7 +55,7 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         run: brew install libomp
       - name: Compile Sentencepiece JNI
-        if: steps.sentencepiece_changes.outputs.src == 'true'
+        if: ${{ steps.sentencepiece_changes.outputs.src == 'true' }}
         run: |
           export CMAKE_POLICY_VERSION_MINIMUM=3.5
           ./gradlew :extensions:sentencepiece:compileJNI
