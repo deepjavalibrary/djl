@@ -248,6 +248,8 @@ final class PyTorchLibrary {
 
     native long[] torchMedian(long self, long dim, boolean keepDim);
 
+    native long torchQuantile(long self, float quantile, long dim, boolean keepDim);
+
     native long torchMin(long handle);
 
     native long torchMin(long handle, long dim, boolean keepDim);

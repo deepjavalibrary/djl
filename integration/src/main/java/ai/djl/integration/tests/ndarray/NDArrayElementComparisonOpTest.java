@@ -612,6 +612,38 @@ public class NDArrayElementComparisonOpTest {
     }
 
     @Test
+    public void testPercentile() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array1 = manager.create(new float[] {1, 3, 2, 5, 4});
+            Assert.assertEquals(array1.percentile(10), manager.create(1.4f));
+            Assert.assertEquals(array1.percentile(90), manager.create(4.6f));
+
+            NDArray array2 =
+                    manager.create(
+                            new float[][] {
+                                {11, 12, 13, 14, 15},
+                                {21, 22, 23, 24, 25},
+                                {31, 32, 33, 34, 35},
+                                {41, 42, 43, 44, 45},
+                                {51, 52, 53, 54, 55}
+                            });
+            Assert.assertEquals(
+                    array2.percentile(10, new int[] {1}),
+                    manager.create(new float[] {11.4f, 21.4f, 31.4f, 41.4f, 51.4f}));
+            Assert.assertEquals(
+                    array2.percentile(90, new int[] {1}),
+                    manager.create(new float[] {14.6f, 24.6f, 34.6f, 44.6f, 54.6f}));
+
+            Assert.assertEquals(
+                    array2.percentile(10, new int[] {0}),
+                    manager.create(new float[] {15, 16, 17, 18, 19}));
+            Assert.assertEquals(
+                    array2.percentile(90, new int[] {0}),
+                    manager.create(new float[] {47, 48, 49, 50, 51}));
+        }
+    }
+
+    @Test
     public void testWhere() {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             NDArray array1 = manager.create(new float[] {1f, 2f, 2f, 4f, 5f, 4f});

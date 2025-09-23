@@ -1547,13 +1547,17 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
     /** {@inheritDoc} */
     @Override
     public PtNDArray percentile(Number percentile) {
-        throw new UnsupportedOperationException("Not implemented");
+        return percentile(percentile, new int[] {-1});
     }
 
     /** {@inheritDoc} */
     @Override
     public PtNDArray percentile(Number percentile, int[] axes) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (axes.length != 1) {
+            throw new UnsupportedOperationException(
+                    "Not supporting zero or multi-dimension percentile");
+        }
+        return JniUtils.percentile(this, percentile, axes[0], false);
     }
 
     /** {@inheritDoc} */

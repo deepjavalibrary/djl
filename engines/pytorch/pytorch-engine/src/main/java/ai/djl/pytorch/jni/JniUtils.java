@@ -888,6 +888,14 @@ public final class JniUtils {
                 new PtNDArray(ndArray.getManager(), handles[1]));
     }
 
+    public static PtNDArray percentile(
+            PtNDArray ndArray, Number percentile, long dim, boolean keepDim) {
+        float quantile = percentile.floatValue() / 100;
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchQuantile(ndArray.getHandle(), quantile, dim, keepDim));
+    }
+
     public static PtNDArray mean(PtNDArray ndArray) {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchMean(ndArray.getHandle()));
