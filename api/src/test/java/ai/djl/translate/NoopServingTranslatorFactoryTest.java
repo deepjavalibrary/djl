@@ -113,14 +113,15 @@ public class NoopServingTranslatorFactoryTest {
                         msg.contains("Non-numeric"), "Unexpected exception message: " + msg);
             }
 
-            // Header row should be skipped
-            Input headerIn = new Input();
-            headerIn.addProperty("Content-Type", "text/csv");
-            headerIn.addProperty("Accept", "application/json");
-            headerIn.add("feature1,feature2\n1.0,0.1\n2.0,0.2\n");
-            Output headerOut = predictor.predict(headerIn);
+            // CSV with header should skip header and return predictions
+            Input csvWithHeaderIn = new Input();
+            csvWithHeaderIn.addProperty("Content-Type", "text/csv");
+            csvWithHeaderIn.addProperty("Accept", "application/json");
+            csvWithHeaderIn.add("feature1,feature2\n1.0,0.1\n2.0,0.2\n");
+            Output csvWithHeaderOut = predictor.predict(csvWithHeaderIn);
             Assert.assertEquals(
-                    headerOut.getData().getAsString(), "{\"predictions\":[[1.0,0.1],[2.0,0.2]]}");
+                    csvWithHeaderOut.getData().getAsString(),
+                    "{\"predictions\":[[1.0,0.1],[2.0,0.2]]}");
 
             // Empty CSV should fail
             Input emptyIn = new Input();

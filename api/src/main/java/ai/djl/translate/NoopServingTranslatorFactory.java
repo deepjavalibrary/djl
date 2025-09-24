@@ -84,7 +84,7 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                         if (csvTranslatorClass == null) {
                             csvTranslatorClass =
                                     Class.forName("ai.djl.basicdataset.tabular.CsvTranslator");
-                            csvConstructor = csvTranslatorClass.getConstructor(Map.class);
+                            csvConstructor = csvTranslatorClass.getConstructor();
                             csvProcessInputMethod =
                                     csvTranslatorClass.getMethod(
                                             "processInput", TranslatorContext.class, String.class);
@@ -94,7 +94,7 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                         }
                     }
                 }
-                csvTranslator = csvConstructor.newInstance(Collections.emptyMap());
+                csvTranslator = csvConstructor.newInstance();
                 this.csvProcessInput = NoopServingTranslatorFactory.csvProcessInputMethod;
                 this.csvProcessOutput = NoopServingTranslatorFactory.csvProcessOutputMethod;
             } catch (ReflectiveOperationException e) {
@@ -201,8 +201,6 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
             }
             return output;
         }
-
-        // --- CSV helper methods ---
 
         private NDList processCsvInput(TranslatorContext ctx, String csvData)
                 throws TranslateException {

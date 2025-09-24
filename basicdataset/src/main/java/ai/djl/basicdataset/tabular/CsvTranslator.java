@@ -14,6 +14,8 @@ package ai.djl.basicdataset.tabular;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
@@ -26,61 +28,64 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /** A {@link Translator} that converts between CSV text and {@link NDList}. */
 public class CsvTranslator implements Translator<String, String> {
 
     private final CSVFormat csvFormat;
 
-    /**
-     * Constructs a CsvTranslator.
-     *
-     * @param arguments the arguments (unused but required for reflection)
-     */
-    @SuppressWarnings({"PMD.UnusedFormalParameter", "deprecation"})
-    public CsvTranslator(Map<String, ?> arguments) {
-        this.csvFormat = CSVFormat.newFormat(',').withRecordSeparator("\n");
+    /** Constructs a CsvTranslator. */
+    public CsvTranslator() {
+        this.csvFormat = CSVFormat.INFORMIX_UNLOAD_CSV;
     }
 
     /** {@inheritDoc} */
     @Override
     public NDList processInput(TranslatorContext ctx, String csvData) throws TranslateException {
-        try (CSVParser parser = csvFormat.parse(new StringReader(csvData))) {
-            List<float[]> rows = new ArrayList<>();
-            int expectedCols = -1;
-            boolean headerSkipped = false;
+        StringReader reader = new StringReader(csvData);
 
-            for (CSVRecord record : parser) {
-                if (!headerSkipped && isHeaderRow(record)) {
-                    headerSkipped = true;
-                    continue;
-                }
-
-                if (expectedCols == -1) {
-                    expectedCols = record.size();
-                } else if (record.size() != expectedCols) {
-                    throw new TranslateException(
-                            String.format(
-                                    "Row %d has %d columns, expected %d",
-                                    record.getRecordNumber(), record.size(), expectedCols));
-                }
-
-                float[] row = new float[expectedCols];
-                for (int j = 0; j < expectedCols; j++) {
-                    row[j] = parseFloat(record.get(j), record.getRecordNumber(), j);
-                }
-                rows.add(row);
-            }
-
-            if (rows.isEmpty()) {
+        try (CSVParser parser = csvFormat.parse(reader)) {
+            List<CSVRecord> records = parser.getRecords();
+            if (records.isEmpty()) {
                 throw new TranslateException("CSV data is empty");
             }
 
-            float[][] data = rows.toArray(new float[0][]);
-            return new NDList(ctx.getNDManager().create(data));
+            int rowStart = 0;
+
+            // Skip header if present
+            if (isHeaderRow(records.get(0))) {
+                rowStart = 1;
+            }
+
+            int numRows = records.size() - rowStart;
+            int expectedCols =
+                    records.get(rowStart).size(); // assume first data row sets column count
+
+            float[][] data = new float[numRows][expectedCols];
+
+            for (int i = 0; i < numRows; i++) {
+                CSVRecord record = records.get(i + rowStart);
+
+                if (record.size() != expectedCols) {
+                    throw new TranslateException(
+                            "Row "
+                                    + record.getRecordNumber()
+                                    + " has "
+                                    + record.size()
+                                    + " columns, expected "
+                                    + expectedCols);
+                }
+
+                for (int j = 0; j < expectedCols; j++) {
+                    data[i][j] = parseFloat(record.get(j), record.getRecordNumber(), j);
+                }
+            }
+
+            NDManager manager = ctx.getNDManager();
+            NDArray ndArray = manager.create(data);
+            return new NDList(ndArray);
+
         } catch (IOException e) {
             throw new TranslateException("Failed to process CSV input", e);
         }
@@ -99,49 +104,65 @@ public class CsvTranslator implements Translator<String, String> {
         if (str == null || str.isEmpty()) {
             return false;
         }
-        try {
-            Float.parseFloat(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
+        int len = str.length();
+        for (int i = 0; i < len; i++) {
+            char c = str.charAt(i);
+            if ((c < '0' || c > '9') && c != '-' && c != '.' && c != 'e' && c != 'E' && c != '+') {
+                return false;
+            }
         }
+        return true;
     }
 
     private float parseFloat(String value, long row, int col) throws TranslateException {
+        if (value == null || value.isEmpty()) {
+            return Float.NaN;
+        }
+
+        int len = value.length();
+        if (len > 0 && (value.charAt(0) <= ' ' || value.charAt(len - 1) <= ' ')) {
+            value = value.trim();
+            if (value.isEmpty()) {
+                return Float.NaN;
+            }
+        }
+
         try {
-            return Float.parseFloat(value.trim());
+            return Float.parseFloat(value);
         } catch (NumberFormatException e) {
             throw new TranslateException(
-                    String.format("Non-numeric value '%s' at row %d, column %d", value, row, col),
-                    e);
+                    "Non-numeric value '" + value + "' at row " + row + ", column " + col, e);
         }
     }
 
     /** {@inheritDoc} */
     @Override
     public String processOutput(TranslatorContext ctx, NDList list) throws TranslateException {
+        NDArray array = list.singletonOrThrow();
+
         try (StringWriter writer = new StringWriter();
                 CSVPrinter printer = new CSVPrinter(writer, csvFormat)) {
 
-            for (NDArray array : list) {
-                float[] data =
-                        array.toType(ai.djl.ndarray.types.DataType.FLOAT32, false).toFloatArray();
-                long[] shape = array.getShape().getShape();
+            // Extract name as column names
+            if (array.getName() != null && !array.getName().isEmpty()) {
+                printer.print(array.getName());
+                printer.println();
+            }
 
-                if (shape.length == 1) {
-                    // 1D array → single row
-                    printRow(printer, data, 0, data.length);
-                } else if (shape.length == 2) {
-                    int rows = (int) shape[0];
-                    int cols = (int) shape[1];
-                    for (int i = 0; i < rows; i++) {
-                        printRow(printer, data, i * cols, cols);
-                    }
-                } else {
-                    throw new TranslateException(
-                            "Only 1D or 2D arrays can be converted to CSV, found shape: "
-                                    + array.getShape());
+            float[] data = array.toType(DataType.FLOAT32, false).toFloatArray();
+            long[] shape = array.getShape().getShape();
+
+            if (shape.length == 1) {
+                printRow(printer, data, 0, data.length);
+            } else if (shape.length == 2) {
+                int rows = (int) shape[0];
+                int cols = (int) shape[1];
+                for (int i = 0; i < rows; i++) {
+                    printRow(printer, data, i * cols, cols);
                 }
+            } else {
+                throw new TranslateException(
+                        "Only 1D or 2D arrays supported, found shape: " + array.getShape());
             }
 
             return writer.toString();
