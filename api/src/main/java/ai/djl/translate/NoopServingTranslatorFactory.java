@@ -19,14 +19,13 @@ import ai.djl.ndarray.BytesSupplier;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.JsonUtils;
 import ai.djl.util.Pair;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,12 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /** A {@link TranslatorFactory} that creates a {@code RawTranslator} instance. */
 public class NoopServingTranslatorFactory implements TranslatorFactory {
-
-    private static final Object LOCK = new Object();
-    private static Class<?> csvTranslatorClass;
-    private static Constructor<?> csvConstructor;
-    private static Method csvProcessInputMethod;
-    private static Method csvProcessOutputMethod;
 
     /** {@inheritDoc} */
     @Override
@@ -66,41 +59,18 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
 
     static final class NoopServingTranslator implements Translator<Input, Output> {
 
-        private Batchifier batchifier;
-        private Object csvTranslator;
-        private Method csvProcessInput;
-        private Method csvProcessOutput;
+        private static final String CSV_TRANSLATOR = "ai.djl.basicdataset.tabular.CsvTranslator";
 
+        private Batchifier batchifier;
+        private Translator<String, String> csvTranslator;
+
+        @SuppressWarnings("unchecked")
         NoopServingTranslator(Batchifier batchifier) {
             this.batchifier = batchifier;
-            initializeCsvTranslator();
-        }
-
-        private void initializeCsvTranslator() {
-            try {
-                // Use cached reflection objects if available
-                if (csvTranslatorClass == null) {
-                    synchronized (LOCK) {
-                        if (csvTranslatorClass == null) {
-                            csvTranslatorClass =
-                                    Class.forName("ai.djl.basicdataset.tabular.CsvTranslator");
-                            csvConstructor = csvTranslatorClass.getConstructor();
-                            csvProcessInputMethod =
-                                    csvTranslatorClass.getMethod(
-                                            "processInput", TranslatorContext.class, String.class);
-                            csvProcessOutputMethod =
-                                    csvTranslatorClass.getMethod(
-                                            "processOutput", TranslatorContext.class, NDList.class);
-                        }
-                    }
-                }
-                csvTranslator = csvConstructor.newInstance();
-                this.csvProcessInput = NoopServingTranslatorFactory.csvProcessInputMethod;
-                this.csvProcessOutput = NoopServingTranslatorFactory.csvProcessOutputMethod;
-            } catch (ReflectiveOperationException e) {
-                // CSV translator not available - silently continue without CSV support
-                csvTranslator = null;
-            }
+            ClassLoader cl = ClassLoaderUtils.getContextClassLoader();
+            csvTranslator =
+                    (Translator<String, String>)
+                            ClassLoaderUtils.initClass(cl, Translator.class, CSV_TRANSLATOR);
         }
 
         /** {@inheritDoc} */
@@ -111,7 +81,7 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
 
         /** {@inheritDoc} */
         @Override
-        public NDList processInput(TranslatorContext ctx, Input input) throws TranslateException {
+        public NDList processInput(TranslatorContext ctx, Input input) throws Exception {
             NDManager manager = ctx.getNDManager();
             try {
                 ctx.setAttachment("properties", input.getProperties());
@@ -141,7 +111,7 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                             throw new TranslateException(
                                     "CSV support not available. Add basicdataset dependency.");
                         }
-                        return processCsvInput(ctx, input.getData().getAsString());
+                        return csvTranslator.processInput(ctx, input.getData().getAsString());
                     }
                 }
 
@@ -154,7 +124,7 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
         /** {@inheritDoc} */
         @Override
         @SuppressWarnings("unchecked")
-        public Output processOutput(TranslatorContext ctx, NDList list) {
+        public Output processOutput(TranslatorContext ctx, NDList list) throws Exception {
             Map<String, String> prop = (Map<String, String>) ctx.getAttachment("properties");
             String contentType = prop.getOrDefault("Content-Type", "tensor/ndlist");
             int pos = contentType.indexOf(';');
@@ -177,7 +147,7 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                     throw new IllegalArgumentException(
                             "CSV support not available. Add basicdataset dependency.");
                 }
-                String csvOutput = processCsvOutput(ctx, list);
+                String csvOutput = csvTranslator.processOutput(ctx, list);
                 output.add(csvOutput);
                 output.addProperty("Content-Type", "text/csv");
             } else if ("application/json".equalsIgnoreCase(accept)
@@ -194,35 +164,11 @@ public class NoopServingTranslatorFactory implements TranslatorFactory {
                 Map<String, List<Object>> map = new ConcurrentHashMap<>();
                 map.put("predictions", ret);
                 output.add("predictions", BytesSupplier.wrapAsJson(map));
-
             } else {
                 output.add(list.encode());
                 output.addProperty("Content-Type", "tensor/ndlist");
             }
             return output;
-        }
-
-        private NDList processCsvInput(TranslatorContext ctx, String csvData)
-                throws TranslateException {
-            try {
-                return (NDList) csvProcessInput.invoke(csvTranslator, ctx, csvData);
-            } catch (ReflectiveOperationException e) {
-                Throwable cause = e.getCause();
-                if (cause instanceof TranslateException) {
-                    TranslateException te = (TranslateException) cause;
-                    te.addSuppressed(e);
-                    throw te;
-                }
-                throw new TranslateException("Failed to process CSV input", e);
-            }
-        }
-
-        private String processCsvOutput(TranslatorContext ctx, NDList list) {
-            try {
-                return (String) csvProcessOutput.invoke(csvTranslator, ctx, list);
-            } catch (ReflectiveOperationException e) {
-                throw new IllegalStateException("Failed to process CSV output", e);
-            }
         }
 
         private NDList toNDList(NDManager manager, JsonElement element) {
