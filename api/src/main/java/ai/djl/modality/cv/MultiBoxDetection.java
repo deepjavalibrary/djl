@@ -143,10 +143,10 @@ public class MultiBoxDetection {
         }
 
         /**
-         * Sets the boolean parameter that indicates whether to clip out-of-boundary boxes. Defaults
+         * Sets the maxmimum number of returned boxes. Defaults
          * to -1 which implies that there is no limit.
          *
-         * @param nmsTopK whether to clip out-of-boundary boxes
+         * @param nmsTopK the maximum number of boxes that will be returned
          * @return this {@code Builder}
          */
         public Builder optNmsTopK(int nmsTopK) {
