@@ -143,8 +143,8 @@ public class MultiBoxDetection {
         }
 
         /**
-         * Sets the maxmimum number of returned boxes. Defaults
-         * to -1 which implies that there is no limit.
+         * Sets the maxmimum number of returned boxes. Defaults to -1 which implies that there is no
+         * limit.
          *
          * @param nmsTopK the maximum number of boxes that will be returned
          * @return this {@code Builder}
