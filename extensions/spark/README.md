@@ -34,7 +34,7 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl.spark</groupId>
     <artifactId>spark_2.12</artifactId>
-    <version>0.34.0</version>
+    <version>0.35.0</version>
 </dependency>
 ```
 

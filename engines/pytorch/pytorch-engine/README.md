@@ -27,14 +27,14 @@ The javadocs output is built in the `build/doc/javadoc` folder.
 
 You can pull the PyTorch engine from the central Maven repository by including the following dependency:
 
-- ai.djl.pytorch:pytorch-engine:0.34.0
+- ai.djl.pytorch:pytorch-engine:0.35.0
 
 ```xml
 
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-engine</artifactId>
-    <version>0.34.0</version>
+    <version>0.35.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
