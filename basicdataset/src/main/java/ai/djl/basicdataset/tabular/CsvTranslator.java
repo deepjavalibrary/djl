@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
  * with the License. A copy of the License is located at
@@ -85,7 +85,6 @@ public class CsvTranslator implements Translator<String, String> {
             NDManager manager = ctx.getNDManager();
             NDArray ndArray = manager.create(data);
             return new NDList(ndArray);
-
         } catch (IOException e) {
             throw new TranslateException("Failed to process CSV input", e);
         }
@@ -120,7 +119,7 @@ public class CsvTranslator implements Translator<String, String> {
         }
 
         int len = value.length();
-        if (len > 0 && (value.charAt(0) <= ' ' || value.charAt(len - 1) <= ' ')) {
+        if (value.charAt(0) <= ' ' || value.charAt(len - 1) <= ' ') {
             value = value.trim();
             if (value.isEmpty()) {
                 return Float.NaN;
@@ -142,13 +141,6 @@ public class CsvTranslator implements Translator<String, String> {
 
         try (StringWriter writer = new StringWriter();
                 CSVPrinter printer = new CSVPrinter(writer, csvFormat)) {
-
-            // Extract name as column names
-            if (array.getName() != null && !array.getName().isEmpty()) {
-                printer.print(array.getName());
-                printer.println();
-            }
-
             float[] data = array.toType(DataType.FLOAT32, false).toFloatArray();
             long[] shape = array.getShape().getShape();
 
