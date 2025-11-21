@@ -104,7 +104,7 @@ tasks {
 // Post-publish task to make deployment visible in Central Publisher Portal.
 // See https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#ensuring-deployment-visibility-in-the-central-publisher-portal
 if (project.hasProperty("staging")) {
-    val url = "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${project.group}"
+    val url = "https://ossrh-staging-api.central.sonatype.com/manual/search/repositories?ip=any&profile_id=${project.group}"
     val username = findProperty("sonatypeUsername").toString()
     val password = findProperty("sonatypePassword").toString()
     val token = Base64.getEncoder().encodeToString("${username}:${password}".toByteArray())
@@ -112,9 +112,12 @@ if (project.hasProperty("staging")) {
     tasks.register("postPublish") {
         doLast {
             val conn = URL(url).openConnection() as HttpURLConnection
-            conn.requestMethod = "POST"
+            conn.requestMethod = "GET"
             conn.setRequestProperty("Authorization", "Bearer ${token}")
             val status = conn.responseCode
+            val stream = if (status in 200..299) conn.inputStream else conn.errorStream
+            val resp = stream?.bufferedReader()?.use { it.readText() } ?: ""
+            println("Response:\n$resp")
             if (status != HttpURLConnection.HTTP_OK) {
                 throw GradleException("Failed to POST '${url}'. Received status code ${status}: ${conn.responseMessage}")
             }
