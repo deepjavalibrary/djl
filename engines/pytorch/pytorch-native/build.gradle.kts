@@ -509,7 +509,7 @@ if (project.hasProperty("staging")) {
     }
 
     tasks.named("publish") {
-        finalizedBy(tasks.named("postPublish"))
+        dependsOn(tasks.named("postPublish"))
     }
 }
 
