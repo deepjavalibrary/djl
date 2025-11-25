@@ -84,7 +84,9 @@ jobs:
         run: bash test_notebook.sh
 
       - name: Build docs website
-        run: tools/scripts/build-website.sh "${{ github.event.inputs.version-number || 'master' }}"
+        env:
+          VERSION_INPUT: ${{ github.event.inputs.version-number || 'master' }}
+        run: tools/scripts/build-website.sh "$VERSION_INPUT"
 
       - name: Configure Deployment AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
