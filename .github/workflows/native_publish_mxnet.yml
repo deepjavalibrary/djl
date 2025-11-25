@@ -30,9 +30,10 @@ jobs:
         run: ./gradlew :engines:mxnet:native:dMNL
       - name: Publish to snapshot/staging repository
         working-directory: engines/mxnet/native
-        run: ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
+          MODE_INPUT: ${{ github.event.inputs.mode }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.ORG_GRADLE_PROJECT_sonatypeUsername }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.ORG_GRADLE_PROJECT_sonatypePassword }}
+        run: ./gradlew publish -P$MODE_INPUT

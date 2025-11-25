@@ -31,12 +31,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Download native binaries
-        run: ./gradlew :engines:pytorch:pytorch-native:dPTNL -Ppackage_type=${{ inputs.package_type }}
+        env:
+          PACKAGE_TYPE_INPUT: ${{ inputs.package_type }}
+        run: ./gradlew :engines:pytorch:pytorch-native:dPTNL -Ppackage_type=$PACKAGE_TYPE_INPUT
       - name: Publish to snapshot/staging repository
         working-directory: engines/pytorch/pytorch-native
-        run: ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
+          MODE_INPUT: ${{ github.event.inputs.mode }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.ORG_GRADLE_PROJECT_sonatypeUsername }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.ORG_GRADLE_PROJECT_sonatypePassword }}
+        run: ./gradlew publish -P$MODE_INPUT
