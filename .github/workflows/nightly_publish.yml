@@ -91,15 +91,16 @@ jobs:
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.ORG_GRADLE_PROJECT_sonatypePassword }}
       - name: Publish to staging repository
         if: ${{ github.event.inputs.mode == 'staging' }}
-        run: |
-          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -P${{ github.event.inputs.mode }}
-          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.5.1 -P${{ github.event.inputs.mode }}
-          ./gradlew clean engines:ml:xgboost:publish -Pgpu -P${{ github.event.inputs.mode }}
-          ./gradlew clean publish -P${{ github.event.inputs.mode }}
-          cd bom
-          ./gradlew publish -P${{ github.event.inputs.mode }}
         env:
+          MODE_INPUT: ${{ github.event.inputs.mode }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.ORG_GRADLE_PROJECT_sonatypeUsername }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.ORG_GRADLE_PROJECT_sonatypePassword }}
+        run: |
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=1.13.1 -P$MODE_INPUT
+          ./gradlew clean engines:pytorch:pytorch-jni:publish -Ppt_version=2.5.1 -P$MODE_INPUT
+          ./gradlew clean engines:ml:xgboost:publish -Pgpu -P$MODE_INPUT
+          ./gradlew clean publish -P$MODE_INPUT
+          cd bom
+          ./gradlew publish -P$MODE_INPUT
