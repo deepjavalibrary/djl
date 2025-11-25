@@ -44,8 +44,11 @@ jobs:
           ln -s /usr/local/bin/cmake /usr/bin/cmake
       - name: Release JNI prep
         shell: bash
+        env:
+          PT_VERSION_INPUT: ${{ github.event.inputs.pt_version }}
+          CUDA_INPUT: ${{ github.event.inputs.cuda }}
         run: |
-          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=$PT_VERSION_INPUT
           export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
@@ -59,7 +62,7 @@ jobs:
             ./gradlew :engines:pytorch:pytorch-native:cleanJNI
           fi
           export TORCH_CUDA_ARCH_LIST="8.0 8.6 8.9 9.0"
-          CUDA_VERSION=${{ github.event.inputs.cuda }}
+          CUDA_VERSION=$CUDA_INPUT
           export CUDA_VERSION=${CUDA_VERSION:-cu128}
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcuda=$CUDA_VERSION -Ppt_version=$PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
@@ -73,8 +76,10 @@ jobs:
           role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
+        env:
+          PT_VERSION_INPUT: ${{ github.event.inputs.pt_version }}
         run: |
-          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=$PT_VERSION_INPUT
           PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
@@ -97,9 +102,11 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release CPU JNI
         shell: cmd
+        env:
+          PT_VERSION_INPUT: ${{ github.event.inputs.pt_version }}
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
-          gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=${{ github.event.inputs.pt_version }}
+          gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=%PT_VERSION_INPUT%
       - name: Install CUDA 11.7
         shell: cmd
         run: |
@@ -112,15 +119,18 @@ jobs:
           rm.exe -Rf cuda.exe cuda.exe cudnn.zip cudnn*
       - name: Release cuda11 JNI
         shell: cmd
+        env:
+          PT_VERSION_INPUT: ${{ github.event.inputs.pt_version }}
+          CUDA_INPUT: ${{ github.event.inputs.cuda }}
         run: |
           rm.exe -Rf engines/pytorch/pytorch-native/libtorch
           rm.exe -Rf engines/pytorch/pytorch-native/build
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
           set "CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.7"
           set "PATH=%CUDA_PATH%\bin;%CUDA_PATH%\libnvvp;%PATH%"
-          set CUDA_VERSION=${{ github.event.inputs.cuda }}
+          set CUDA_VERSION=%CUDA_INPUT%
           if "%CUDA_VERSION%" == "" set CUDA_VERSION=cu128
-          gradlew --rerun-tasks :engines:pytorch:pytorch-native:compileJNI -Pcuda=%CUDA_VERSION% -Ppt_version=${{ github.event.inputs.pt_version }}
+          gradlew --rerun-tasks :engines:pytorch:pytorch-native:compileJNI -Pcuda=%CUDA_VERSION% -Ppt_version=%PT_VERSION_INPUT%
       - name: Configure Deployment AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -128,8 +138,10 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         shell: bash
+        env:
+          PT_VERSION_INPUT: ${{ github.event.inputs.pt_version }}
         run: |
-          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=$PT_VERSION_INPUT
           PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
@@ -153,8 +165,10 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Release JNI prep
         shell: bash
+        env:
+          PT_VERSION_INPUT: ${{ github.event.inputs.pt_version }}
         run: |
-          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=$PT_VERSION_INPUT
           export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
@@ -166,8 +180,10 @@ jobs:
           aws-region: us-east-2
       - name: Copy files to S3 with the AWS CLI
         shell: bash
+        env:
+          PT_VERSION_INPUT: ${{ github.event.inputs.pt_version }}
         run: |
-          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=$PT_VERSION_INPUT
           PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
@@ -187,9 +203,11 @@ jobs:
           pip3 install awscli --upgrade
       - uses: actions/checkout@v4
       - name: Release JNI prep
+        env:
+          PT_VERSION_INPUT: ${{ github.event.inputs.pt_version }}
         run: |
           export PATH=$PATH:$JAVA_HOME/bin
-          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=$PT_VERSION_INPUT
           export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
           if [[ $PYTORCH_VERSION == "2.7.1" ]]; then \
@@ -221,8 +239,10 @@ jobs:
           echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> "$GITHUB_ENV"
 
       - name: Copy files to S3 with the AWS CLI
+        env:
+          PT_VERSION_INPUT: ${{ github.event.inputs.pt_version }}
         run: |
-          PYTORCH_VERSION=${{ github.event.inputs.pt_version }}
+          PYTORCH_VERSION=$PT_VERSION_INPUT
           PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           aws s3 sync engines/pytorch/pytorch-native/jnilib s3://djl-ai/publish/pytorch/${PYTORCH_VERSION}/jnilib
           aws cloudfront create-invalidation --distribution-id E371VB8JQ6NRVY --paths "/pytorch/${PYTORCH_VERSION}/jnilib*"
