@@ -111,32 +111,52 @@ public class QuestionAnsweringTranslator implements Translator<QAInput, String> 
             startLogits = startLogits.duplicate();
             endLogits = endLogits.duplicate();
         }
-        if (detail) {
-            // exclude undesired sequences
-            long[] sequenceIds = encoding.getSequenceIds();
-            List<Integer> undesired = new ArrayList<>();
-            for (int i = 0; i < sequenceIds.length; ++i) {
-                if (sequenceIds[i] == 0) {
-                    undesired.add(i);
-                }
-            }
-            int[] idx = undesired.stream().mapToInt(Integer::intValue).toArray();
-            NDIndex ndIndex = new NDIndex("{}", list.getManager().create(idx));
-            startLogits.set(ndIndex, -100000f);
-            endLogits.set(ndIndex, -100000f);
 
-            // normalize
+        // Exclude non-context tokens (question tokens and special tokens)
+        // sequenceId: -1 = special tokens, 0 = question, 1 = context
+        long[] sequenceIds = encoding.getSequenceIds();
+        List<Integer> undesired = new ArrayList<>();
+        for (int i = 0; i < sequenceIds.length; ++i) {
+            if (sequenceIds[i] != 1) {
+                undesired.add(i);
+            }
+        }
+        int[] idx = undesired.stream().mapToInt(Integer::intValue).toArray();
+        NDIndex ndIndex = new NDIndex("{}", list.getManager().create(idx));
+        startLogits.set(ndIndex, -100000f);
+        endLogits.set(ndIndex, -100000f);
+
+        if (detail) {
+            // normalize with safety check for division by zero
             startLogits = startLogits.sub(startLogits.max()).exp();
-            startLogits = startLogits.div(startLogits.sum());
+            float startSum = startLogits.sum().getFloat();
+            if (startSum <= 0) {
+                throw new IllegalArgumentException(
+                        "No valid answer span found in context. "
+                                + "Ensure the paragraph/context contains relevant information.");
+            }
+            startLogits = startLogits.div(startSum);
+
             endLogits = endLogits.sub(endLogits.max()).exp();
-            endLogits = endLogits.div(endLogits.sum());
+            float endSum = endLogits.sum().getFloat();
+            if (endSum <= 0) {
+                throw new IllegalArgumentException(
+                        "No valid answer span found in context. "
+                                + "Ensure the paragraph/context contains relevant information.");
+            }
+            endLogits = endLogits.div(endSum);
         }
 
-        // exclude <CLS>, TODO: exclude impossible ids properly and handle max answer length
-        startLogits.set(new NDIndex(0), -100000);
-        endLogits.set(new NDIndex(0), -100000);
         int startIdx = (int) startLogits.argMax().getLong();
         int endIdx = (int) endLogits.argMax().getLong();
+
+        // Check if valid answer span exists
+        if (startLogits.getFloat(startIdx) <= -100000f || endLogits.getFloat(endIdx) <= -100000f) {
+            throw new IllegalArgumentException(
+                    "No valid answer span found in context. "
+                            + "Ensure the paragraph/context contains relevant information.");
+        }
+
         if (startIdx > endIdx) {
             int tmp = startIdx;
             startIdx = endIdx;

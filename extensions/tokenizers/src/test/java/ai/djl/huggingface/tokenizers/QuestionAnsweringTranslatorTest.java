@@ -53,12 +53,12 @@ public class QuestionAnsweringTranslatorTest {
                 new LambdaBlock(
                         a -> {
                             NDManager manager = a.getManager();
-                            long[][] start = new long[1][36];
-                            long[][] end = new long[1][36];
-                            start[0][0] = 2;
-                            start[0][21] = 1;
-                            end[0][0] = 2;
-                            end[0][20] = 1;
+                            float[][] start = new float[1][36];
+                            float[][] end = new float[1][36];
+                            start[0][0] = 2f;
+                            start[0][21] = 1f;
+                            end[0][0] = 2f;
+                            end[0][20] = 1f;
                             NDArray arr1 = manager.create(start);
                             NDArray arr2 = manager.create(end);
                             return new NDList(arr1, arr2);
