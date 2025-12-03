@@ -94,7 +94,7 @@ The following pseudocode demonstrates running training:
 * [0.30.0](https://github.com/deepjavalibrary/djl/releases/tag/v0.30.0) ([Code](https://github.com/deepjavalibrary/djl/tree/v0.30.0))
 * [+29 releases](https://github.com/deepjavalibrary/djl/releases)
 
-The release of DJL 0.35.1 is planned for October 2025. 
+The release of DJL 0.36.0 is planned for February 2026. 
 
 ## Building From Source
 
