@@ -47,13 +47,13 @@ for the official ONNX Runtime project.
 
 You can pull the ONNX Runtime engine from the central Maven repository by including the following dependency:
 
-- ai.djl.onnxruntime:onnxruntime-engine:0.34.0
+- ai.djl.onnxruntime:onnxruntime-engine:0.35.1
 
 ```xml
 <dependency>
     <groupId>ai.djl.onnxruntime</groupId>
     <artifactId>onnxruntime-engine</artifactId>
-    <version>0.34.0</version>
+    <version>0.35.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -71,7 +71,7 @@ Maven:
 <dependency>
     <groupId>ai.djl.onnxruntime</groupId>
     <artifactId>onnxruntime-engine</artifactId>
-    <version>0.34.0</version>
+    <version>0.35.1</version>
     <scope>runtime</scope>
     <exclusions>
         <exclusion>
@@ -91,7 +91,7 @@ Maven:
 Gradle:
 
 ```groovy
-implementation("ai.djl.onnxruntime:onnxruntime-engine:0.34.0") {
+implementation("ai.djl.onnxruntime:onnxruntime-engine:0.35.1") {
     exclude group: "com.microsoft.onnxruntime", module: "onnxruntime"
 }
 implementation "com.microsoft.onnxruntime:onnxruntime_gpu:1.21.1"

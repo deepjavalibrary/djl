@@ -13,7 +13,7 @@ FROM 314815235551.dkr.ecr.us-east-2.amazonaws.com/sagemaker-spark-processing:3.5
 LABEL maintainer="djl-dev@amazon.com"
 
 # Install dependencies
-ARG DJL_VERSION=0.34.0
+ARG DJL_VERSION=0.35.1
 ARG JNA_VERSION=5.14.0
 ARG JAVACV_VERSION=1.5.10
 ARG JAVACPP_VERSION=1.5.10
