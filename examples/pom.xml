@@ -5,12 +5,12 @@
 
     <groupId>ai.djl</groupId>
     <artifactId>examples</artifactId>
-    <version>0.35.1-SNAPSHOT</version>
+    <version>0.35.1</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <djl.version>0.35.1-SNAPSHOT</djl.version>
+        <djl.version>0.35.1</djl.version>
         <exec.mainClass>ai.djl.examples.inference.cv.ObjectDetection</exec.mainClass>
     </properties>
 
