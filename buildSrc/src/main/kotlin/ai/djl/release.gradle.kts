@@ -9,13 +9,15 @@ val libs = the<LibrariesForLibs>()
 
 tasks {
     register("increaseBuildVersion") {
-        doLast {
-            if (!project.hasProperty("targetVersion")) {
-                throw GradleException("targetVersion property is required.")
-            }
-            val djlVersion = libs.versions.djl.get()
-            val targetVersion = project.property("targetVersion")
+        // Capture values during configuration time
+        val targetVersion = if (project.hasProperty("targetVersion")) {
+            project.property("targetVersion") as String
+        } else {
+            throw GradleException("targetVersion property is required.")
+        }
+        val djlVersion = libs.versions.djl.get()
 
+        doLast {
             var file = file("examples/pom.xml")
             file.text = file.text.replace(
                 "<djl.version>${djlVersion}-SNAPSHOT</djl.version>",
@@ -37,17 +39,18 @@ tasks {
     }
 
     register("increaseFinalVersion") {
+        // Capture values during configuration time
+        val previousVersion = if (project.hasProperty("previousVersion")) {
+            project.property("previousVersion") as String
+        } else {
+            throw GradleException("previousVersion property is required.")
+        }
+        val djlVersion = libs.versions.djl.get()
+        val collection = fileTree(".").filter {
+            it.name.endsWith(".md") || it.name.endsWith("overview.html")
+        }
+
         doLast {
-            if (!project.hasProperty("previousVersion")) {
-                throw GradleException("previousVersion property is required.")
-            }
-            val previousVersion = project.property("previousVersion")
-
-            val collection = fileTree(".").filter {
-                it.name.endsWith(".md") || it.name.endsWith("overview.html")
-            }
-            val djlVersion = libs.versions.djl.get()
-
             for (file in collection) {
                 file.text = file.text.replace("/${previousVersion}/", "/${djlVersion}/")
                     .replace(">${previousVersion}<", ">${djlVersion}<")
