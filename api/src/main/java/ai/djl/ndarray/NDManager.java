@@ -228,7 +228,7 @@ public interface NDManager extends AutoCloseable {
         } else if (data instanceof Byte) {
             return create(data.byteValue());
         } else {
-            throw new IllegalArgumentException("Short conversion not supported!");
+            throw new IllegalArgumentException("Conversion of " + data.getClass().getName() + " not supported!");
         }
     }
 
