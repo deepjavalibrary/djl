@@ -501,8 +501,25 @@ public final class Utils {
     /**
      * Opens a connection to this URL and returns an InputStream for reading from that connection.
      *
-     * @param url the url to open
-     * @param headers the HTTP headers
+     * <p><b>Security Warning:</b> This method should NOT be used with untrusted URL inputs. Using
+     * untrusted URLs can lead to:
+     *
+     * <ul>
+     *   <li>Server-Side Request Forgery (SSRF) attacks - allowing access to internal resources
+     *   <li>Local file access via file:// protocol
+     *   <li>Arbitrary network requests to unintended destinations
+     * </ul>
+     *
+     * <p>Always validate and sanitize URL inputs before passing them to this method. Consider:
+     *
+     * <ul>
+     *   <li>Restricting allowed protocols (e.g., only https://)
+     *   <li>Validating against an allowlist of trusted domains
+     *   <li>Blocking access to private IP ranges and localhost
+     * </ul>
+     *
+     * @param url the URL to open
+     * @param headers HTTP headers
      * @return an input stream for reading from the URL connection.
      * @throws IOException if an I/O exception occurs
      */
