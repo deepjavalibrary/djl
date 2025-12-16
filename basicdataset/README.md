@@ -29,7 +29,7 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>basicdataset</artifactId>
-    <version>0.35.1</version>
+    <version>0.36.0</version>
 </dependency>
 ```
 

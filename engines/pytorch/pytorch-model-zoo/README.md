@@ -25,7 +25,7 @@ You can pull the PyTorch engine from the central Maven repository by including t
 <dependency>
     <groupId>ai.djl.pytorch</groupId>
     <artifactId>pytorch-model-zoo</artifactId>
-    <version>0.35.1</version>
+    <version>0.36.0</version>
 </dependency>
 ```
 
