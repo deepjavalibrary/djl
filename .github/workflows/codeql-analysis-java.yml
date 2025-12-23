@@ -23,6 +23,10 @@ jobs:
     if: github.repository == 'deepjavalibrary/djl'
     name: Analyze
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      pull-requests: read
 
     strategy:
       fail-fast: false
