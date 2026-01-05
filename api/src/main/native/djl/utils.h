@@ -169,7 +169,7 @@ inline jlongArray GetPtrArrayFromContainer(JNIEnv* env, T1 list) {
       // Security: Use RAII-style allocation tracking
       T2* element_ptr = new T2(list[i]);
       allocated_ptrs.push_back(element_ptr);
-      jptrs[i] = reinterpret_cast<jlong>(reinterpret_cast<uintptr_t>(element_ptr));
+      jptrs[i] = static_cast<jlong>(reinterpret_cast<uintptr_t>(element_ptr));
     }
     
     env->SetLongArrayRegion(jarray, 0, static_cast<jsize>(len), jptrs.data());
