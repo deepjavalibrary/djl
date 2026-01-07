@@ -247,7 +247,7 @@ JNIEXPORT jbooleanArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToB
   size_t len = list.size();
   jbooleanArray jarray = env->NewBooleanArray(len);
   std::vector<jboolean> jptrs;
-  jptrs.reserve(len);
+  jptrs.resize(len);
   for (size_t i = 0; i < len; ++i) {
     jptrs[i] = list[i];
   }
@@ -264,7 +264,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToLong
   size_t len = list.size();
   jlongArray jarray = env->NewLongArray(len);
   std::vector<jlong> jptrs;
-  jptrs.reserve(len);
+  jptrs.resize(len);
   for (size_t i = 0; i < len; ++i) {
     jptrs[i] = list[i];
   }
@@ -281,7 +281,7 @@ JNIEXPORT jdoubleArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToDo
   size_t len = list.size();
   jdoubleArray jarray = env->NewDoubleArray(len);
   std::vector<jdouble> jptrs;
-  jptrs.reserve(len);
+  jptrs.resize(len);
   for (size_t i = 0; i < len; ++i) {
     jptrs[i] = list[i];
   }
@@ -325,7 +325,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToMap(
   size_t len = dict.size() * 2;
   jlongArray jarray = env->NewLongArray(len);
   std::vector<jlong> jptrs;
-  jptrs.reserve(len);
+  jptrs.resize(len);
   size_t array_iter = 0;
   for (auto it = dict.begin(); it != dict.end(); ++it) {
     const auto* key_ptr = new torch::IValue(it->key());
