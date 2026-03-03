@@ -64,6 +64,7 @@ public class SingleShotDetectionTranslator extends ObjectDetectionTranslator {
                 double y = box[1];
                 double w = box[2] - x;
                 double h = box[3] - y;
+                Rectangle rect;
                 if (applyRatio) {
                     rect = new Rectangle(x / width, y / height, w / width, h / height);
                 } else {
