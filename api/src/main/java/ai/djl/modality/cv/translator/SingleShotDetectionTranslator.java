@@ -20,7 +20,6 @@ import ai.djl.ndarray.NDList;
 import ai.djl.translate.TranslatorContext;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
