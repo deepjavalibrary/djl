@@ -59,7 +59,6 @@ public class SingleShotDetectionTranslator extends ObjectDetectionTranslator {
                 }
                 String className = classes.get(classId);
                 float[] box = boundingBoxes.get(i).toFloatArray();
-                // rescale box coordinates by width and height
                 double x = box[0];
                 double y = box[1];
                 double w = box[2] - x;
