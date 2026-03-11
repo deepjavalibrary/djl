@@ -24,7 +24,7 @@ public class NDIndexPickTest {
                         .reshape(new Shape(1, 5, 2));
                 NDIndex pickIndex =
                         new NDIndex()
-                                .addAllDim(Math.floorMod(-1, 3))
+                                .addAllDim(2)
                                 .addPickDim(picker);
                 NDArray out = values.get(pickIndex);
                 for (int i = 0; i < out.size(1); i++) {
