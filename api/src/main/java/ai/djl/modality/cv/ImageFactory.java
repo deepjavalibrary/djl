@@ -122,6 +122,10 @@ public abstract class ImageFactory {
 
         URI uri = URI.create(url);
         if (uri.isAbsolute()) {
+            String scheme = uri.getScheme().toLowerCase(java.util.Locale.ROOT);
+            if (!"http".equals(scheme) && !"https".equals(scheme)) {
+                throw new IOException("Unsupported URL scheme: " + scheme);
+            }
             return fromUrl(uri.toURL());
         }
         return fromFile(Paths.get(url));
