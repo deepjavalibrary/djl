@@ -516,15 +516,15 @@ pub extern "system" fn Java_ai_djl_huggingface_tokenizers_jni_TokenizersLibrary_
             JObject::null(),
         )
         .unwrap();
+    let class_id = "ai/djl/huggingface/tokenizers/jni/CharSpan";
+    let method_id = "<init>";
+    let params = "(II)V";
+    let cls: JClass = env.find_class(class_id).unwrap();
+    let constructor: JMethodID = env.get_method_id(&cls, method_id, params).unwrap();
     for (i, _) in tokens.iter().enumerate() {
         let opt_offsets: Option<(usize, Offsets)> = encoding.token_to_chars(i);
         match &opt_offsets {
             Some((_, offsets)) => unsafe {
-                let class_id = "ai/djl/huggingface/tokenizers/jni/CharSpan";
-                let method_id = "<init>";
-                let params = "(II)V";
-                let cls: JClass = env.find_class(class_id).unwrap();
-                let constructor: JMethodID = env.get_method_id(&cls, method_id, params).unwrap();
                 let offsets_vec: Vec<jvalue> = vec![
                     JValue::Int((*offsets).0 as jint).as_jni(),
                     JValue::Int((*offsets).1 as jint).as_jni(),
