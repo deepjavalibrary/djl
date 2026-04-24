@@ -24,7 +24,7 @@ jobs:
         run: |
           dnf -y group install "Development Tools"
           dnf -y install patch git cmake3 python3-devel python3-pip java-17-amazon-corretto-devel jq perl
-          pip3 install awscli wheel build --upgrade
+          pip3 install awscli wheel build --ignore-installed
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
