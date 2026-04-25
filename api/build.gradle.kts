@@ -14,7 +14,9 @@ dependencies {
     testImplementation(project(":testing"))
     testImplementation(libs.testng)
     testImplementation(libs.slf4j.simple)
+
     testRuntimeOnly(project(":basicdataset"))
+    testRuntimeOnly(project(":engines:mxnet:mxnet-engine"))
     testRuntimeOnly(project(":engines:pytorch:pytorch-model-zoo"))
     testRuntimeOnly(project(":engines:pytorch:pytorch-jni"))
 }
