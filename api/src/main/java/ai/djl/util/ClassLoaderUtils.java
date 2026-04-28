@@ -235,5 +235,4 @@ public final class ClassLoaderUtils {
             throw new IllegalArgumentException("Invalid native_helper: " + nativeHelper, e);
         }
     }
-
 }
