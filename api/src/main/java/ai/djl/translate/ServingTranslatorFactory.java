@@ -85,8 +85,6 @@ public class ServingTranslatorFactory implements TranslatorFactory {
     }
 
     private ServingTranslator findTranslator(Path path, String className) {
-        Path classesDir = path.resolve("classes");
-        ClassLoaderUtils.compileJavaClass(classesDir);
         return ClassLoaderUtils.findImplementation(path, ServingTranslator.class, className);
     }
 
