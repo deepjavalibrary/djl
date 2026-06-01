@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -236,7 +237,7 @@ public class RpcTranslatorFactoryTest {
                     "/invocations",
                     exchange -> {
                         authorization.set(exchange.getRequestHeaders().getFirst("Authorization"));
-                        byte[] body = "{}".getBytes();
+                        byte[] body = "{}".getBytes(StandardCharsets.UTF_8);
                         exchange.sendResponseHeaders(200, body.length);
                         try (OutputStream os = exchange.getResponseBody()) {
                             os.write(body);
