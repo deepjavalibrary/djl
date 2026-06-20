@@ -193,7 +193,7 @@ public class GcsRepository extends AbstractRepository {
         artifact.setName(modelName);
         artifact.getArguments().putAll(arguments);
         Map<String, Artifact.Item> files = new ConcurrentHashMap<>();
-        for (Blob blob : blobs.getValues()) {
+        for (Blob blob : blobs.iterateAll()) {
             Artifact.Item item = new Artifact.Item();
             String key = blob.getName();
             if (!key.endsWith("/")) {

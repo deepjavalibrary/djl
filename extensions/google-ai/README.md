@@ -19,7 +19,7 @@ The following pseudocode demonstrates how to load a model from GCS:
                 .optApplication(Application.CV.IMAGE_CLASSIFICATION)
                 .setTypes(Image.class, Classifications.class)
                 .optModelUrls("gs://djl-misc/test/models/resnet18")
-                .optModelName("resent18_v1")
+                .optModelName("resnet18_v1")
                 .optProgress(new ProgressBar())
                 .build();
 

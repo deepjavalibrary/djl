@@ -44,7 +44,7 @@ public class GcsRepositoryFactory implements RepositoryFactory {
     public Repository newInstance(String name, URI uri) {
         String scheme = uri.getScheme();
         if (!"gs".equalsIgnoreCase(scheme)) {
-            throw new IllegalArgumentException("Invalid gcs url: " + uri);
+            throw new IllegalArgumentException("Invalid gs url: " + uri);
         }
 
         if (storage == null) {
