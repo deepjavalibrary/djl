@@ -90,7 +90,7 @@ public class GcsRepositoryTest {
     private Storage mockStorage(Blob... blobs) {
         Storage storage = Mockito.mock(Storage.class);
         Page<Blob> page = Mockito.mock(Page.class);
-        Mockito.when(page.getValues())
+        Mockito.when(page.iterateAll())
                 .thenReturn(blobs.length == 0 ? Collections.emptyList() : Arrays.asList(blobs));
         Mockito.when(storage.list(Mockito.anyString(), Mockito.any(Storage.BlobListOption[].class)))
                 .thenReturn(page);
