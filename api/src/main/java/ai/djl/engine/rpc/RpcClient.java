@@ -99,6 +99,9 @@ public final class RpcClient {
                 if (apiKey == null) {
                     apiKey = Utils.getenv("GOOGLE_API_KEY");
                 }
+                if (apiKey == null) {
+                    apiKey = Utils.getEnvOrSystemProperty("GENAI_API_KEY");
+                }
             }
             if (!url.endsWith("/openai/chat/completions")) {
                 authHeader = "x-goog-api-key";
@@ -106,11 +109,17 @@ public final class RpcClient {
         } else if (url.startsWith("https://api.anthropic.com/")) {
             if (apiKey == null) {
                 apiKey = Utils.getEnvOrSystemProperty("ANTHROPIC_API_KEY");
+                if (apiKey == null) {
+                    apiKey = Utils.getEnvOrSystemProperty("GENAI_API_KEY");
+                }
             }
             authHeader = "x-api-key";
         } else if (url.startsWith("https://api.openai.com/")) {
             if (apiKey == null) {
                 apiKey = Utils.getEnvOrSystemProperty("OPENAI_API_KEY");
+                if (apiKey == null) {
+                    apiKey = Utils.getEnvOrSystemProperty("GENAI_API_KEY");
+                }
             }
             httpHeaders.put(
                     new CaseInsensitiveKey("OpenAI-Organization"), "org-IS5aEokdvmbYXyWeJhhwe5Xn");
@@ -118,9 +127,6 @@ public final class RpcClient {
             if (project != null) {
                 httpHeaders.put(new CaseInsensitiveKey("OpenAI-Project"), project);
             }
-        }
-        if (apiKey == null) {
-            apiKey = Utils.getEnvOrSystemProperty("GENAI_API_KEY");
         }
         if (apiKey != null) {
             if ("Authorization".equals(authHeader)) {

@@ -27,14 +27,19 @@ import ai.djl.util.Pair;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.sun.net.httpserver.HttpServer;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class RpcTranslatorFactoryTest {
 
@@ -151,6 +156,43 @@ public class RpcTranslatorFactoryTest {
         }
     }
 
+    @Test
+    public void testGenericRpcUrlDoesNotReceiveProviderEnvKey() throws IOException {
+        String previous = System.getProperty("GENAI_API_KEY");
+        System.setProperty("GENAI_API_KEY", "provider-secret");
+        try (HeaderServer server = new HeaderServer()) {
+            RpcClient client =
+                    RpcClient.getClient(
+                            Map.of(
+                                    "djl_rpc_uri",
+                                    server.getUrl(),
+                                    "method",
+                                    "POST",
+                                    "content-type",
+                                    "text/plain"));
+            client.send(new Input());
+            Assert.assertNull(server.getAuthorization());
+
+            client =
+                    RpcClient.getClient(
+                            Map.of(
+                                    "djl_rpc_uri",
+                                    server.getUrl(),
+                                    "method",
+                                    "POST",
+                                    "api_key",
+                                    "explicit-secret"));
+            client.send(new Input());
+            Assert.assertEquals(server.getAuthorization(), "Bearer explicit-secret");
+        } finally {
+            if (previous == null) {
+                System.clearProperty("GENAI_API_KEY");
+            } else {
+                System.setProperty("GENAI_API_KEY", previous);
+            }
+        }
+    }
+
     private static final class TestData implements JsonSerializable {
 
         private static final long serialVersionUID = 1L;
@@ -181,6 +223,41 @@ public class RpcTranslatorFactoryTest {
         @Override
         public JsonElement serialize() {
             return JsonUtils.GSON.toJsonTree(data);
+        }
+    }
+
+    private static final class HeaderServer implements AutoCloseable {
+
+        private final HttpServer server;
+        private final AtomicReference<String> authorization = new AtomicReference<>();
+
+        HeaderServer() throws IOException {
+            server = HttpServer.create(new InetSocketAddress(0), 0);
+            server.createContext(
+                    "/invocations",
+                    exchange -> {
+                        authorization.set(exchange.getRequestHeaders().getFirst("Authorization"));
+                        byte[] body = "{}".getBytes(StandardCharsets.UTF_8);
+                        exchange.sendResponseHeaders(200, body.length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(body);
+                        }
+                    });
+            server.start();
+        }
+
+        String getUrl() {
+            return "http://localhost:" + server.getAddress().getPort() + "/invocations";
+        }
+
+        String getAuthorization() {
+            return authorization.get();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void close() {
+            server.stop(0);
         }
     }
 }
