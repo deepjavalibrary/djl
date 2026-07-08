@@ -25,6 +25,7 @@ commonsCsv = "1.14.1"
 commonsLogging = "1.3.5"
 
 awssdk = "2.32.19"
+googleCloud = "26.50.0"
 ffmpeg = "7.1-1.5.11"
 hadoop = "3.4.1"
 javacpp = "1.5.11"
@@ -61,6 +62,8 @@ bytedeco-javacv = { module = "org.bytedeco:javacv", version.ref = "javacv" }
 bytedeco-ffmpeg = { module = "org.bytedeco:ffmpeg", version.ref = "ffmpeg" }
 awssdk-bom = { module = "software.amazon.awssdk:bom", version.ref = "awssdk" }
 awssdk-s3 = { module = "software.amazon.awssdk:s3" }
+google-cloud-bom = { module = "com.google.cloud:libraries-bom", version.ref = "googleCloud" }
+google-cloud-storage = { module = "com.google.cloud:google-cloud-storage" }
 openpnp-opencv = { module = "org.openpnp:opencv", version.ref = "openpnpOpencv" }
 spark-core = { module = "org.apache.spark:spark-core_2.12", version.ref = "spark" }
 spark-sql = { module = "org.apache.spark:spark-sql_2.12", version.ref = "spark" }

@@ -118,6 +118,7 @@ Current supported URL scheme:
 - jar:// load a model from an archive file in the class path
 - djl:// load a model from the model zoo
 - s3:// load a model from S3 bucket (requires [djl aws extension](https://github.com/deepjavalibrary/djl/tree/master/extensions/aws-ai))
+- gs:// load a model from Google Cloud Storage bucket (requires [djl google extension](https://github.com/deepjavalibrary/djl/tree/master/extensions/google-ai))
 - hdfs:// load a model from HDFS file system (requires [djl hadoop extension](https://github.com/deepjavalibrary/djl/tree/master/extensions/hadoop))
 
 ```java
@@ -134,6 +135,9 @@ You can customize the artifactId and modelName the same way as loading model fro
 
 ### Load model from AWS S3 bucket
 DJL supports loading a model from an S3 bucket using `s3://` URL and the AWS plugin. See [here](../extensions/aws-ai/README.md) for details.
+
+### Load model from Google Cloud Storage bucket
+DJL supports loading a model from a Google Cloud Storage bucket using `gs://` URL and the Google Cloud plugin. See [here](../extensions/google-ai/README.md) for details.
 
 ### Load model from Hadoop HDFS
 DJL supports loading a model from a Hadoop HDFS file system using `hdfs://` URL and the Hadoop plugin. See [here](../extensions/hadoop/README.md) for details.

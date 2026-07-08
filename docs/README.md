@@ -65,6 +65,7 @@ Note: when searching in JavaDoc, if your access is denied, please try removing t
 - [Android support](../android/README.md)
 - [Audio support](../extensions/audio/README.md)
 - [AWS S3 support](../extensions/aws-ai/README.md)
+- [Google Cloud Storage support](../extensions/google-ai/README.md)
 - [NLP support with fastText](../extensions/fasttext/README.md)
 - [Hadoop support](../extensions/hadoop/README.md)
 - [Image support with OpenCV](../extensions/opencv/README.md)

@@ -1,0 +1,37 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<p>This document is the API specification for the Google Cloud toolkit for DJL.
+
+<p>The google-ai module contains classes that make it easy for DJL to access Google Cloud services.
+
+<p>You can use this toolkit to load models from a Google Cloud Storage bucket directly:
+
+<pre>
+    // Set model zoo search path system property. The value can be
+    // comma-delimited URL string. You can add multiple gs URLs.
+    // The GCS URL should point to a folder in your bucket.
+    // In current implementation, DJL will only download files directly
+    // in that folder. The archive file like .zip, .tar.gz, .tgz, .tar.z
+    // files will be extracted automatically.
+    // The folder name will be interpreted as artifactId and modelName.
+    // If your model file has a different name than the folder name, you
+    // need use query string to tell DJL which model you want to load.
+    System.setProperty("ai.djl.repository.zoo.location",
+            "gs://djl-misc/test/models/<b>resnet18</b>?model_name=<i>resnet18_v1</i>");
+
+    Criteria&lt;Image, Classifications&gt; criteria =
+        Criteria.builder()
+                .optApplication(Application.CV.IMAGE_CLASSIFICATION)
+                .setTypes(Image.class, Classifications.class)
+                .optArtifactId("ai.djl.localmodelzoo:<b>resnet18</b>")
+                .optProgress(new ProgressBar())
+                .build();
+
+    ZooModel&lt;Image, Classifications&gt; model = criteria.loadModel();
+</pre>
+
+</body>
+</html>
