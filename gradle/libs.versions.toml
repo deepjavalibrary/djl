@@ -35,7 +35,7 @@ spark = "3.5.5"
 tablesaw = "0.44.4"
 rapis = "25.08.0"
 protobuf = "4.31.1"
-jackson = "2.19.2"
+jackson = "2.21.5"
 jtransforms = "3.1"
 
 antlr = "4.11.1"
