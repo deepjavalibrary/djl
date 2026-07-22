@@ -39,6 +39,9 @@ public class StackBatchifierTest {
             Assert.assertEquals(actual.size(), 2);
             Assert.assertEquals(actual.get(0).getShape(), new Shape(5, 10, 11));
             Assert.assertEquals(actual.get(1).getShape(), new Shape(5));
+
+            // Ensure for hybrid engines the returned array is correct.
+            Assert.assertEquals(actual.get(0).getManager(), manager);
         }
     }
 
@@ -55,6 +58,9 @@ public class StackBatchifierTest {
                 Assert.assertEquals(arrays.size(), 2);
                 Assert.assertEquals(arrays.get(0).getShape(), new Shape(11));
                 Assert.assertEquals(arrays.get(1).getShape(), new Shape());
+
+                // Ensure for hybrid engines the returned array is correct.
+                Assert.assertEquals(arrays.get(0).getManager(), manager);
             }
         }
     }
