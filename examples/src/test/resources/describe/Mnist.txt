@@ -1,0 +1,8 @@
+SequentialBlock {
+	batchFlatten
+	Linear
+	ReLU
+	Linear
+	ReLU
+	Linear
+}
