@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,8 +74,9 @@ public class FFmpegAudioFactoryTest {
 
     @Test
     public void testPcm16Normalization() throws IOException {
-        Path path = Paths.get("build/test/pcm16_extremes.wav");
-        Files.createDirectories(path.getParent());
+        Path dir = Paths.get("build/test");
+        Files.createDirectories(dir);
+        Path path = dir.resolve("pcm16_extremes.wav");
         writeMonoPcm16Wav(path, new short[] {Short.MIN_VALUE, Short.MAX_VALUE, 0});
 
         Audio audio =
@@ -93,10 +95,10 @@ public class FFmpegAudioFactoryTest {
     private static void writeMonoPcm16Wav(Path path, short[] samples) throws IOException {
         int dataSize = samples.length * 2;
         ByteBuffer buf = ByteBuffer.allocate(44 + dataSize).order(ByteOrder.LITTLE_ENDIAN);
-        buf.put("RIFF".getBytes());
+        buf.put("RIFF".getBytes(StandardCharsets.US_ASCII));
         buf.putInt(36 + dataSize);
-        buf.put("WAVE".getBytes());
-        buf.put("fmt ".getBytes());
+        buf.put("WAVE".getBytes(StandardCharsets.US_ASCII));
+        buf.put("fmt ".getBytes(StandardCharsets.US_ASCII));
         buf.putInt(16);
         buf.putShort((short) 1);
         buf.putShort((short) 1);
@@ -104,7 +106,7 @@ public class FFmpegAudioFactoryTest {
         buf.putInt(32000);
         buf.putShort((short) 2);
         buf.putShort((short) 16);
-        buf.put("data".getBytes());
+        buf.put("data".getBytes(StandardCharsets.US_ASCII));
         buf.putInt(dataSize);
         for (short sample : samples) {
             buf.putShort(sample);
