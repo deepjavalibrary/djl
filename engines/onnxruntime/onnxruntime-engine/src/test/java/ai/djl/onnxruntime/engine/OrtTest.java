@@ -225,6 +225,22 @@ public class OrtTest {
         setAlternativeEngineDisabled(false);
     }
 
+    @Test
+    public void testCappedManagerAllowsSubManagers() {
+        // cap() blocks resource attachment but must still allow sub-managers (#3837)
+        try (NDManager manager = OrtNDManager.getSystemManager().newSubManager()) {
+            manager.cap();
+            Assert.expectThrows(IllegalStateException.class, () -> manager.ones(new Shape(1)));
+            try (NDManager subManager = manager.newSubManager()) {
+                Assert.assertTrue(subManager.isOpen());
+                Assert.assertEquals(subManager.getParentManager(), manager);
+                NDArray array = subManager.ones(new Shape(2));
+                Assert.assertEquals(array.getManager(), subManager);
+                Assert.assertEquals(array.toFloatArray(), new float[] {1f, 1f});
+            }
+        }
+    }
+
     private void setAlternativeEngineDisabled(boolean enable) {
         System.setProperty("ai.djl.onnx.disable_alternative", String.valueOf(enable));
         Engine engine = Engine.getEngine(OrtEngine.ENGINE_NAME);

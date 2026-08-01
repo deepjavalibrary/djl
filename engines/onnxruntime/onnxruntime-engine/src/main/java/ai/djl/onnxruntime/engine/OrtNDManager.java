@@ -150,7 +150,7 @@ public class OrtNDManager extends BaseNDManager {
     @Override
     public OrtNDManager newSubManager(Device device) {
         OrtNDManager manager = new OrtNDManager(this, device, env);
-        attachInternal(manager.uid, manager);
+        attachUncappedInternal(manager.uid, manager);
         return manager;
     }
 
