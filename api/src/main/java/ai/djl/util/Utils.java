@@ -23,7 +23,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -48,6 +50,8 @@ import java.util.stream.Stream;
 public final class Utils {
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+
+    private static final int MAX_REDIRECTS = 5;
 
     public static final String[] EMPTY_ARRAY = new String[0];
 
@@ -524,18 +528,115 @@ public final class Utils {
      * @throws IOException if an I/O exception occurs
      */
     public static InputStream openUrl(URL url, Map<String, String> headers) throws IOException {
+        // Remote fetches are limited to public http(s) destinations by default, and redirects are
+        // resolved explicitly so each hop is checked against the same rule. Local-resource schemes
+        // (file:, jar:) are unrestricted, since they do not perform a network fetch. Other schemes
+        // are not supported. Set DJL_ALLOW_INSECURE_URL=true (or -Dai.djl.allow_insecure_url=true)
+        // to restore the previous unrestricted behavior.
+        boolean insecureAllowed = isInsecureUrlAllowed();
         String protocol = url.getProtocol();
         if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
             if (isOfflineMode()) {
                 throw new IOException("Offline mode is enabled.");
             }
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            if (insecureAllowed) {
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    conn.addRequestProperty(entry.getKey(), entry.getValue());
+                }
+                return conn.getInputStream();
+            }
+            return openHttpUrlSecurely(url, headers);
+        }
+        // Local-resource schemes and full-opt-out use the legacy direct stream.
+        if (insecureAllowed
+                || "file".equalsIgnoreCase(protocol)
+                || "jar".equalsIgnoreCase(protocol)) {
+            return new BufferedInputStream(url.openStream());
+        }
+        throw new IOException(
+                "Blocked request using unsupported URL protocol: "
+                        + protocol
+                        + ". Set DJL_ALLOW_INSECURE_URL=true to override.");
+    }
+
+    private static InputStream openHttpUrlSecurely(URL url, Map<String, String> headers)
+            throws IOException {
+        URL current = url;
+        for (int i = 0; i <= MAX_REDIRECTS; ++i) {
+            String protocol = current.getProtocol();
+            if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
+                throw new IOException("Blocked redirect to non-public URL protocol: " + protocol);
+            }
+            if (!isPublicHost(current.getHost())) {
+                throw new IOException(
+                        "Blocked request to non-public address: " + current.getHost());
+            }
+            HttpURLConnection conn = (HttpURLConnection) current.openConnection();
+            conn.setInstanceFollowRedirects(false);
             for (Map.Entry<String, String> entry : headers.entrySet()) {
                 conn.addRequestProperty(entry.getKey(), entry.getValue());
             }
-            return conn.getInputStream();
+            int code = conn.getResponseCode();
+            if (code < 300 || code >= 400) {
+                return conn.getInputStream();
+            }
+            // Redirect: re-validate the target on the next loop iteration instead of letting
+            // HttpURLConnection follow it blindly (which would defeat the host check above).
+            String location = conn.getHeaderField("Location");
+            conn.disconnect();
+            if (location == null) {
+                throw new IOException("Redirect (" + code + ") with no Location header");
+            }
+            // Resolve relative redirects against the current URL, then re-validate the target.
+            current = new URL(current, location);
         }
-        return new BufferedInputStream(url.openStream());
+        throw new IOException("Too many redirects (>" + MAX_REDIRECTS + ") for URL: " + url);
+    }
+
+    /**
+     * Returns whether insecure (non-public) URL access is explicitly allowed.
+     *
+     * @return true if {@code DJL_ALLOW_INSECURE_URL} / {@code ai.djl.allow_insecure_url} is set
+     *     true
+     */
+    public static boolean isInsecureUrlAllowed() {
+        String mode =
+                getenv("DJL_ALLOW_INSECURE_URL", System.getProperty("ai.djl.allow_insecure_url"));
+        return Boolean.parseBoolean(mode);
+    }
+
+    /**
+     * Returns whether a host resolves exclusively to public (non-internal) IP addresses.
+     *
+     * <p>A host is rejected if it is empty or if any resolved address is loopback, link-local,
+     * site-local (RFC 1918 private), wildcard, or multicast.
+     *
+     * @param host the host name to validate
+     * @return true if every resolved address is a public address
+     */
+    public static boolean isPublicHost(String host) {
+        if (host == null || host.isEmpty()) {
+            return false;
+        }
+        try {
+            InetAddress[] addresses = InetAddress.getAllByName(host);
+            if (addresses.length == 0) {
+                return false;
+            }
+            for (InetAddress addr : addresses) {
+                if (addr.isLoopbackAddress()
+                        || addr.isLinkLocalAddress()
+                        || addr.isSiteLocalAddress()
+                        || addr.isAnyLocalAddress()
+                        || addr.isMulticastAddress()) {
+                    return false;
+                }
+            }
+        } catch (UnknownHostException e) {
+            return false;
+        }
+        return true;
     }
 
     /**

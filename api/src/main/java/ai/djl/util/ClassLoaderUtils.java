@@ -242,9 +242,22 @@ public final class ClassLoaderUtils {
     /**
      * Tries to compile java classes in the directory.
      *
+     * <p>Compiling bundled {@code .java} sources at model-load time is disabled by default. Enable
+     * it with {@code DJL_COMPILE_JAVA=true} or {@code -Dai.djl.compile_java=true} when loading
+     * models from a trusted source. Models that ship precompiled {@code .class} or {@code .jar}
+     * files, or that supply a translator programmatically, are unaffected.
+     *
      * @param dir the directory to scan java file.
      */
     public static void compileJavaClass(Path dir) {
+        if (!isDynamicCompilationEnabled()) {
+            logger.warn(
+                    "Skipping bundled Java compilation in {}: dynamic compilation is disabled by"
+                            + " default. Set DJL_COMPILE_JAVA=true or"
+                            + " -Dai.djl.compile_java=true to enable it for trusted models.",
+                    dir);
+            return;
+        }
         try {
             if (!Files.isDirectory(dir)) {
                 logger.debug("Directory not exists: {}", dir);
@@ -264,5 +277,15 @@ public final class ClassLoaderUtils {
         } catch (Throwable e) {
             logger.warn("Failed to compile bundled java file", e);
         }
+    }
+
+    /**
+     * Returns whether dynamic compilation of bundled java sources is explicitly enabled.
+     *
+     * @return true if {@code DJL_COMPILE_JAVA} / {@code ai.djl.compile_java} is set true
+     */
+    public static boolean isDynamicCompilationEnabled() {
+        String mode = Utils.getenv("DJL_COMPILE_JAVA", System.getProperty("ai.djl.compile_java"));
+        return Boolean.parseBoolean(mode);
     }
 }

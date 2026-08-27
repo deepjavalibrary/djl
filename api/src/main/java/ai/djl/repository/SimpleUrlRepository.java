@@ -20,7 +20,6 @@ import ai.djl.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -102,7 +101,10 @@ public class SimpleUrlRepository extends AbstractRepository {
     protected void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
             throws IOException {
         logger.debug("Downloading artifact: {} ...", uri);
-        try (InputStream is = new BufferedInputStream(uri.toURL().openStream())) {
+        // Route through Utils.openUrl so the download is subject to the same URL handling
+        // (scheme restriction, non-public address blocking, redirect re-validation) instead of
+        // calling openStream() directly, which would bypass them.
+        try (InputStream is = Utils.openUrl(uri.toURL())) {
             save(is, tmp, item, progress);
         }
     }
@@ -137,10 +139,19 @@ public class SimpleUrlRepository extends AbstractRepository {
     private long getContentLength() throws IOException {
         String scheme = uri.getScheme();
         if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
+            // Apply the same rule as Utils.openUrl to the HEAD probe: reject non-public
+            // destinations and do not auto-follow redirects (a 302 could otherwise reach an
+            // internal target such as the instance metadata endpoint).
+            if (!Utils.isInsecureUrlAllowed() && !Utils.isPublicHost(uri.getHost())) {
+                throw new IOException("Blocked request to non-public address: " + uri.getHost());
+            }
             HttpURLConnection conn = null;
             try {
                 resolved = true;
                 conn = (HttpURLConnection) uri.toURL().openConnection();
+                if (!Utils.isInsecureUrlAllowed()) {
+                    conn.setInstanceFollowRedirects(false);
+                }
                 conn.setRequestMethod("HEAD");
                 int code = conn.getResponseCode();
                 if (code != 200) {
