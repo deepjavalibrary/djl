@@ -199,7 +199,7 @@ In this section we will take you through the creation and training of our time s
 
 In timeseries package, we do not just predict the target value, but the target probability distribution. The parameter of the probablity distribution will be contained in the loss function. So this can be seen as [parametric statistics](https://en.wikipedia.org/wiki/Parametric_statistics).
 
-The benifit of using probability distribution is that it can reflect the possibility of the target value in different intervals, which is of greater significance for real production scenarios. Therefore, before you train any of your timing models, you need to define a probability `DistributionOutput` for it as the predicted output.
+The benefit of using probability distribution is that it can reflect the possibility of the target value in different intervals, which is of greater significance for real production scenarios. Therefore, before you train any of your timing models, you need to define a probability `DistributionOutput` for it as the predicted output.
 
 ```java
 DistributionOutput distributionOutput = new NegativeBinomialOutput();
