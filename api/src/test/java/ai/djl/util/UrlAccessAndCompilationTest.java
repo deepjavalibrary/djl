@@ -69,7 +69,15 @@ public class UrlAccessAndCompilationTest {
                         "jarok");
             }
         } finally {
-            Files.deleteIfExists(jar);
+            // The JVM caches open jar files, so a handle can remain on the temp jar after the
+            // stream is closed. On Windows that makes an immediate delete fail, so fall back to
+            // deleting on JVM exit.
+            jar.toFile().deleteOnExit();
+            try {
+                Files.deleteIfExists(jar);
+            } catch (IOException ignore) {
+                // cleaned up by deleteOnExit
+            }
         }
     }
 
