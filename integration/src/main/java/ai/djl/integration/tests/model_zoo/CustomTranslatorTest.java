@@ -146,15 +146,22 @@ public class CustomTranslatorTest {
         Path destFile = classesDir.resolve("MyTranslator.java");
         Files.copy(srcFile, destFile, StandardCopyOption.REPLACE_EXISTING);
 
-        // load translator from classes folder
-        runImageClassification(Application.UNDEFINED, null, "MyTranslator");
+        // Compiling a bundled .java translator is opt-in; enable it for the cases below, which
+        // exercise that path (the jar case is built from the compiled output).
+        System.setProperty("ai.djl.compile_java", "true");
+        try {
+            // load translator from classes folder
+            runImageClassification(Application.UNDEFINED, null, "MyTranslator");
 
-        Path jarFile = libsDir.resolve("example.jar");
-        ZipUtils.zip(classesDir, jarFile, false);
-        Utils.deleteQuietly(classesDir);
+            Path jarFile = libsDir.resolve("example.jar");
+            ZipUtils.zip(classesDir, jarFile, false);
+            Utils.deleteQuietly(classesDir);
 
-        // load translator from jar file
-        runImageClassification(Application.UNDEFINED, null, "MyTranslator");
+            // load translator from jar file
+            runImageClassification(Application.UNDEFINED, null, "MyTranslator");
+        } finally {
+            System.clearProperty("ai.djl.compile_java");
+        }
     }
 
     @Test
