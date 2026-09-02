@@ -476,6 +476,7 @@ public class UrlAccessAndCompilationTest {
                     } else {
                         // Record what the final hop actually received.
                         record(seen, exchange, "auth", "Authorization");
+                        record(seen, exchange, "cookie", "Cookie");
                         record(seen, exchange, "keep", "X-Keep");
                         byte[] out = "arrived".getBytes(StandardCharsets.UTF_8);
                         exchange.sendResponseHeaders(200, out.length);
@@ -487,6 +488,7 @@ public class UrlAccessAndCompilationTest {
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("Authorization", "Bearer secret");
+            headers.put("Cookie", "session=abc");
             headers.put("X-Keep", "kept");
             headers.put("X-Optional", null);
             URL url = new URL("http://127.0.0.1:" + port + "/start");
@@ -495,9 +497,16 @@ public class UrlAccessAndCompilationTest {
                 Assert.assertEquals(
                         new String(is.readAllBytes(), StandardCharsets.UTF_8), "arrived");
             }
-            Assert.assertFalse(
-                    seen.containsKey("auth"), "credentials must not be sent across origins");
+            // "keep" arriving proves the final hop was reached, so the absence checks below are
+            // not passing merely because the redirect never completed.
             Assert.assertEquals(seen.get("keep"), "kept", "other headers must still be sent");
+            Assert.assertFalse(
+                    seen.containsKey("auth"), "Authorization must not be sent across origins");
+            Assert.assertFalse(
+                    seen.containsKey("cookie"), "Cookie must not be sent across origins");
+            // Proxy-Authorization is deliberately not asserted here: HttpURLConnection treats it as
+            // a restricted header and never transmits it, so an absence check would pass whether or
+            // not the strip works. It is covered by testCredentialHeadersAreRecognized instead.
         } finally {
             server.stop(0);
         }
@@ -519,6 +528,7 @@ public class UrlAccessAndCompilationTest {
                         exchange.sendResponseHeaders(302, -1);
                     } else {
                         record(seen, exchange, "auth", "Authorization");
+                        record(seen, exchange, "cookie", "Cookie");
                         exchange.sendResponseHeaders(200, -1);
                     }
                     exchange.close();
@@ -527,6 +537,7 @@ public class UrlAccessAndCompilationTest {
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("Authorization", "Bearer secret");
+            headers.put("Cookie", "session=abc");
             URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
             HttpURLConnection conn = Utils.openHttpConnection(url, "GET", headers, h -> true);
             try {
@@ -534,10 +545,31 @@ public class UrlAccessAndCompilationTest {
             } finally {
                 conn.disconnect();
             }
+            // All three must survive a same-origin hop. This is also the control that keeps the
+            // cross-origin test honest: it proves the connection can send these headers at all, so
+            // their absence there is the strip working rather than the header never being set.
             Assert.assertEquals(seen.get("auth"), "Bearer secret");
+            Assert.assertEquals(seen.get("cookie"), "session=abc");
         } finally {
             server.stop(0);
         }
+    }
+
+    @Test
+    public void testCredentialHeadersAreRecognized() {
+        // All three names must be recognized, case-insensitively. Proxy-Authorization cannot be
+        // asserted over a real connection because HttpURLConnection refuses to transmit it, so this
+        // is where that branch is covered.
+        Assert.assertTrue(Utils.isCredentialHeader("Authorization"));
+        Assert.assertTrue(Utils.isCredentialHeader("authorization"));
+        Assert.assertTrue(Utils.isCredentialHeader("Cookie"));
+        Assert.assertTrue(Utils.isCredentialHeader("COOKIE"));
+        Assert.assertTrue(Utils.isCredentialHeader("Proxy-Authorization"));
+        Assert.assertTrue(Utils.isCredentialHeader("proxy-authorization"));
+        // Headers that must keep following redirects.
+        Assert.assertFalse(Utils.isCredentialHeader("Accept"));
+        Assert.assertFalse(Utils.isCredentialHeader("User-Agent"));
+        Assert.assertFalse(Utils.isCredentialHeader("X-Authorization"));
     }
 
     @Test

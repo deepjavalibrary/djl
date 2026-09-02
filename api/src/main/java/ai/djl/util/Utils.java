@@ -741,7 +741,14 @@ public final class Utils {
         return port == -1 ? url.getDefaultPort() : port;
     }
 
-    private static boolean isCredentialHeader(String name) {
+    /**
+     * Returns whether a header name carries credentials that must not follow a cross-origin
+     * redirect.
+     *
+     * @param name the header name
+     * @return true if the header carries credentials
+     */
+    static boolean isCredentialHeader(String name) {
         return "Authorization".equalsIgnoreCase(name)
                 || "Cookie".equalsIgnoreCase(name)
                 || "Proxy-Authorization".equalsIgnoreCase(name);
