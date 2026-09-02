@@ -294,7 +294,18 @@ public final class ClassLoaderUtils {
             return;
         }
         try {
-            compiler.run(null, null, null, files);
+            int rc = compiler.run(null, null, null, files);
+            if (rc != 0) {
+                // Report the failure: the caller resolves a translator from the compiled output, so
+                // a failed compile otherwise surfaces later as a missing class or as a silent
+                // fallback to a default implementation. Compiler diagnostics go to stderr.
+                logger.error(
+                        "Failed to compile {} bundled java file(s) in {}, compiler exit code {}."
+                                + " See the compiler output for details.",
+                        files.length,
+                        dir,
+                        rc);
+            }
         } catch (Throwable e) {
             logger.warn("Failed to compile bundled java file", e);
         }

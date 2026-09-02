@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -419,6 +420,122 @@ public class UrlAccessAndCompilationTest {
             } finally {
                 conn.disconnect();
             }
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testSameOriginTreatsImplicitAndExplicitDefaultPortAsEqual()
+            throws MalformedURLException {
+        // URL#getPort returns -1 for an implicit port, so comparing raw ports would classify a
+        // redirect that only makes the default port explicit as cross-origin and drop credentials.
+        Assert.assertTrue(
+                Utils.sameOrigin(
+                        new URL("https://example.com/a"), new URL("https://example.com:443/b")));
+        Assert.assertTrue(
+                Utils.sameOrigin(
+                        new URL("http://example.com/a"), new URL("http://example.com:80/b")));
+        // A genuinely different port, scheme or host is still cross-origin.
+        Assert.assertFalse(
+                Utils.sameOrigin(
+                        new URL("https://example.com/a"), new URL("https://example.com:8443/b")));
+        Assert.assertFalse(
+                Utils.sameOrigin(
+                        new URL("https://example.com/a"), new URL("http://example.com/b")));
+        Assert.assertFalse(
+                Utils.sameOrigin(
+                        new URL("https://example.com/a"), new URL("https://other.example/b")));
+    }
+
+    @Test
+    public void testCrossOriginRedirectDropsCredentialsAndAllowsNullHeaderValue()
+            throws IOException {
+        // Two things at once, because they exercise the same hop: the credential header must not
+        // reach the redirect target, and a caller's header map may legally hold a null value.
+        Map<String, String> r = new HashMap<>();
+        Map<String, String> seen = new HashMap<>();
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        int port = server.getAddress().getPort();
+        // 127.0.0.1 -> localhost is a different host string, so the hop is cross-origin.
+        r.put("/start", "http://localhost:" + port + "/final");
+        server.createContext(
+                "/",
+                exchange -> {
+                    String path = exchange.getRequestURI().getPath();
+                    String target = r.get(path);
+                    if (target != null) {
+                        exchange.getResponseHeaders().add("Location", target);
+                        exchange.sendResponseHeaders(302, -1);
+                    } else {
+                        // Record what the final hop actually received.
+                        seen.put(
+                                "auth",
+                                String.valueOf(
+                                        exchange.getRequestHeaders().getFirst("Authorization")));
+                        seen.put(
+                                "keep",
+                                String.valueOf(exchange.getRequestHeaders().getFirst("X-Keep")));
+                        byte[] out = "arrived".getBytes(StandardCharsets.UTF_8);
+                        exchange.sendResponseHeaders(200, out.length);
+                        exchange.getResponseBody().write(out);
+                    }
+                    exchange.close();
+                });
+        server.start();
+        try {
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Authorization", "Bearer secret");
+            headers.put("X-Keep", "kept");
+            headers.put("X-Optional", null);
+            URL url = new URL("http://127.0.0.1:" + port + "/start");
+            try (InputStream is =
+                    Utils.openHttpConnection(url, "GET", headers, h -> true).getInputStream()) {
+                Assert.assertEquals(
+                        new String(is.readAllBytes(), StandardCharsets.UTF_8), "arrived");
+            }
+            Assert.assertEquals(seen.get("auth"), "null", "credentials must not cross origins");
+            Assert.assertEquals(seen.get("keep"), "kept", "other headers must still be sent");
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testSameOriginRedirectKeepsCredentials() throws IOException {
+        // The counterpart to the test above: a same-origin hop must not lose the header.
+        Map<String, String> r = new HashMap<>();
+        Map<String, String> seen = new HashMap<>();
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        r.put("/start", "/final");
+        server.createContext(
+                "/",
+                exchange -> {
+                    String target = r.get(exchange.getRequestURI().getPath());
+                    if (target != null) {
+                        exchange.getResponseHeaders().add("Location", target);
+                        exchange.sendResponseHeaders(302, -1);
+                    } else {
+                        seen.put(
+                                "auth",
+                                String.valueOf(
+                                        exchange.getRequestHeaders().getFirst("Authorization")));
+                        exchange.sendResponseHeaders(200, -1);
+                    }
+                    exchange.close();
+                });
+        server.start();
+        try {
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Authorization", "Bearer secret");
+            URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
+            HttpURLConnection conn = Utils.openHttpConnection(url, "GET", headers, h -> true);
+            try {
+                Assert.assertEquals(conn.getResponseCode(), 200);
+            } finally {
+                conn.disconnect();
+            }
+            Assert.assertEquals(seen.get("auth"), "Bearer secret");
         } finally {
             server.stop(0);
         }

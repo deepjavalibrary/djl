@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -606,6 +605,8 @@ public final class Utils {
             URL url, String method, Map<String, String> headers, Predicate<String> hostAllowed)
             throws IOException {
         URL current = url;
+        // Set once a redirect leaves the original origin, so credentials are not carried to it.
+        boolean stripCredentials = false;
         // One initial request plus at most MAX_REDIRECTS redirect hops.
         for (int i = 0; i <= MAX_REDIRECTS; ++i) {
             String protocol = current.getProtocol();
@@ -620,6 +621,9 @@ public final class Utils {
             conn.setInstanceFollowRedirects(false);
             conn.setRequestMethod(method);
             for (Map.Entry<String, String> entry : headers.entrySet()) {
+                if (stripCredentials && isCredentialHeader(entry.getKey())) {
+                    continue;
+                }
                 conn.addRequestProperty(entry.getKey(), entry.getValue());
             }
             int code;
@@ -644,8 +648,9 @@ public final class Utils {
             // Resolve relative redirects against the current URL, then re-validate the target.
             URL next = new URL(current, location);
             if (!sameOrigin(current, next)) {
-                // Following a redirect to another origin must not carry credentials with it.
-                headers = withoutCredentials(headers);
+                // Following a redirect to another origin must not carry credentials with it. Once
+                // dropped they stay dropped, even if a later hop returns to the original origin.
+                stripCredentials = true;
             }
             current = next;
         }
@@ -701,32 +706,45 @@ public final class Utils {
                 }
             }
         } catch (UnknownHostException e) {
-            logger.warn("Cannot resolve host, treating as not public: {}", host, e);
+            // The host name is the actionable part; the stack trace adds nothing and would be
+            // emitted once per unresolvable host.
+            logger.warn("Cannot resolve host, treating as not public: {}", host);
             return false;
         }
         return true;
     }
 
-    private static boolean sameOrigin(URL a, URL b) {
+    /**
+     * Returns whether two URLs share a scheme, host and effective port.
+     *
+     * @param a the first URL
+     * @param b the second URL
+     * @return true if both URLs have the same origin
+     */
+    static boolean sameOrigin(URL a, URL b) {
         return a.getProtocol().equalsIgnoreCase(b.getProtocol())
                 && a.getHost().equalsIgnoreCase(b.getHost())
-                && a.getPort() == b.getPort();
+                && effectivePort(a) == effectivePort(b);
     }
 
-    private static Map<String, String> withoutCredentials(Map<String, String> headers) {
-        if (headers.isEmpty()) {
-            return headers;
-        }
-        Map<String, String> copy = new ConcurrentHashMap<>();
-        for (Map.Entry<String, String> entry : headers.entrySet()) {
-            String name = entry.getKey();
-            if (!"Authorization".equalsIgnoreCase(name)
-                    && !"Cookie".equalsIgnoreCase(name)
-                    && !"Proxy-Authorization".equalsIgnoreCase(name)) {
-                copy.put(name, entry.getValue());
-            }
-        }
-        return copy;
+    /**
+     * Returns the port of a URL, substituting the protocol default when the port is implicit.
+     *
+     * <p>{@link URL#getPort()} returns -1 for an implicit port, so comparing it directly would
+     * treat {@code https://host/a} and {@code https://host:443/b} as different origins.
+     *
+     * @param url the URL to read the port from
+     * @return the explicit port, or the protocol default when the port is implicit
+     */
+    private static int effectivePort(URL url) {
+        int port = url.getPort();
+        return port == -1 ? url.getDefaultPort() : port;
+    }
+
+    private static boolean isCredentialHeader(String name) {
+        return "Authorization".equalsIgnoreCase(name)
+                || "Cookie".equalsIgnoreCase(name)
+                || "Proxy-Authorization".equalsIgnoreCase(name);
     }
 
     private static boolean isRedirect(int code) {
