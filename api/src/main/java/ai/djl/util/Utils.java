@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -562,13 +563,32 @@ public final class Utils {
 
     private static InputStream openHttpUrlSecurely(URL url, Map<String, String> headers)
             throws IOException {
+        return openHttpUrlSecurely(url, headers, Utils::isPublicHost);
+    }
+
+    /**
+     * Opens an http(s) URL, resolving redirects explicitly so that every hop is checked against
+     * {@code hostAllowed} rather than being followed by the connection itself.
+     *
+     * <p>The host check is a parameter so the redirect handling can be exercised against a local
+     * test server.
+     *
+     * @param url the URL to open
+     * @param headers HTTP headers
+     * @param hostAllowed the check applied to the host of every hop
+     * @return an input stream for reading from the URL connection
+     * @throws IOException if an I/O exception occurs or a hop is not allowed
+     */
+    static InputStream openHttpUrlSecurely(
+            URL url, Map<String, String> headers, Predicate<String> hostAllowed)
+            throws IOException {
         URL current = url;
         for (int i = 0; i <= MAX_REDIRECTS; ++i) {
             String protocol = current.getProtocol();
             if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
-                throw new IOException("Blocked redirect to non-public URL protocol: " + protocol);
+                throw new IOException("Blocked redirect to unsupported URL protocol: " + protocol);
             }
-            if (!isPublicHost(current.getHost())) {
+            if (!hostAllowed.test(current.getHost())) {
                 throw new IOException(
                         "Blocked request to non-public address: " + current.getHost());
             }

@@ -93,13 +93,9 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testRedirectToNonPublicBlockedByDefault() throws IOException {
-        // A public host that 302-redirects to a non-public destination must not be followed.
-        // Stand up a real local HTTP server that returns 302 -> http://169.254.169.254/... and
-        // confirm openUrl refuses it. The first hop (127.0.0.1) is itself non-public so it is
-        // blocked immediately; more importantly, even if the first hop were public, the loop
-        // re-validates the Location target and blocks 169.254.169.254 on the next iteration
-        // (setInstanceFollowRedirects(false) means the JVM never silently follows it). Either way
-        // the redirect target must be re-checked and refused.
+        // End-to-end through openUrl: a server that 302-redirects to a non-public destination is
+        // refused. Note the first hop here is itself non-public, so this asserts the entry check;
+        // the redirect re-validation itself is covered by testRedirectToDisallowedHostIsRejected.
         com.sun.net.httpserver.HttpServer server =
                 com.sun.net.httpserver.HttpServer.create(
                         new java.net.InetSocketAddress("127.0.0.1", 0), 0);
@@ -126,16 +122,6 @@ public class UrlAccessAndCompilationTest {
         } finally {
             server.stop(0);
         }
-    }
-
-    @Test
-    public void testPublicHostRedirectRevalidated() throws IOException {
-        // Stronger variant: make the FIRST hop pass the host check (use a hostname that resolves to
-        // a public address, 8.8.8.8, but point it at our local listener via a custom
-        // URLStreamHandler
-        // is overkill) — instead assert the predicate directly for the redirect target so the
-        // re-validation contract is explicit: the Location host (169.254.169.254) is non-public.
-        Assert.assertFalse(Utils.isPublicHost("169.254.169.254"));
     }
 
     @Test
@@ -248,5 +234,160 @@ public class UrlAccessAndCompilationTest {
                                 }
                             });
         }
+    }
+
+    // ----- Redirect handling (exercised against a local server via the host-check seam) -----
+
+    /** Serves a redirect chain / final body on loopback for redirect tests. */
+    private static com.sun.net.httpserver.HttpServer startServer(
+            java.util.Map<String, String> redirects, String body) throws IOException {
+        com.sun.net.httpserver.HttpServer server =
+                com.sun.net.httpserver.HttpServer.create(
+                        new java.net.InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext(
+                "/",
+                exchange -> {
+                    String path = exchange.getRequestURI().getPath();
+                    String target = redirects.get(path);
+                    if (target != null) {
+                        if (!target.isEmpty()) {
+                            exchange.getResponseHeaders().add("Location", target);
+                        }
+                        exchange.sendResponseHeaders(302, -1);
+                    } else {
+                        byte[] out = body.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                        exchange.sendResponseHeaders(200, out.length);
+                        exchange.getResponseBody().write(out);
+                    }
+                    exchange.close();
+                });
+        server.start();
+        return server;
+    }
+
+    @Test
+    public void testRedirectIsFollowedAndRevalidated() throws IOException {
+        java.util.Map<String, String> r = new java.util.HashMap<>();
+        r.put("/start", "/final");
+        com.sun.net.httpserver.HttpServer server = startServer(r, "arrived");
+        try {
+            URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
+            // allow loopback so the redirect loop itself runs
+            try (java.io.InputStream is =
+                    Utils.openHttpUrlSecurely(url, java.util.Collections.emptyMap(), h -> true)) {
+                Assert.assertEquals(
+                        new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8),
+                        "arrived");
+            }
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testRedirectToDisallowedHostIsRejected() throws IOException {
+        java.util.Map<String, String> r = new java.util.HashMap<>();
+        r.put("/start", "http://169.254.169.254/latest/meta-data/x.tar.gz");
+        com.sun.net.httpserver.HttpServer server = startServer(r, "unused");
+        try {
+            URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
+            // first hop allowed, redirect target must still be re-checked and refused
+            IOException e =
+                    Assert.expectThrows(
+                            IOException.class,
+                            () ->
+                                    Utils.openHttpUrlSecurely(
+                                            url,
+                                            java.util.Collections.emptyMap(),
+                                            h -> !"169.254.169.254".equals(h)));
+            Assert.assertTrue(
+                    e.getMessage().contains("non-public"), "unexpected: " + e.getMessage());
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testRedirectToUnsupportedSchemeIsRejected() throws IOException {
+        java.util.Map<String, String> r = new java.util.HashMap<>();
+        r.put("/start", "ftp://ftp.example.com/model.tar.gz");
+        com.sun.net.httpserver.HttpServer server = startServer(r, "unused");
+        try {
+            URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
+            IOException e =
+                    Assert.expectThrows(
+                            IOException.class,
+                            () ->
+                                    Utils.openHttpUrlSecurely(
+                                            url, java.util.Collections.emptyMap(), h -> true));
+            Assert.assertTrue(
+                    e.getMessage().contains("URL protocol"), "unexpected: " + e.getMessage());
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testRedirectWithoutLocationIsRejected() throws IOException {
+        java.util.Map<String, String> r = new java.util.HashMap<>();
+        r.put("/start", "");
+        com.sun.net.httpserver.HttpServer server = startServer(r, "unused");
+        try {
+            URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
+            IOException e =
+                    Assert.expectThrows(
+                            IOException.class,
+                            () ->
+                                    Utils.openHttpUrlSecurely(
+                                            url, java.util.Collections.emptyMap(), h -> true));
+            Assert.assertTrue(
+                    e.getMessage().contains("no Location"), "unexpected: " + e.getMessage());
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testTooManyRedirectsIsRejected() throws IOException {
+        java.util.Map<String, String> r = new java.util.HashMap<>();
+        for (int i = 0; i < 10; ++i) {
+            r.put("/hop" + i, "/hop" + (i + 1));
+        }
+        com.sun.net.httpserver.HttpServer server = startServer(r, "unused");
+        try {
+            URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/hop0");
+            IOException e =
+                    Assert.expectThrows(
+                            IOException.class,
+                            () ->
+                                    Utils.openHttpUrlSecurely(
+                                            url, java.util.Collections.emptyMap(), h -> true));
+            Assert.assertTrue(
+                    e.getMessage().contains("Too many redirects"), "unexpected: " + e.getMessage());
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testInsecureOptOutAllowsNonPublicHttpHost() throws IOException {
+        com.sun.net.httpserver.HttpServer server =
+                startServer(new java.util.HashMap<>(), "opted-out");
+        try {
+            System.setProperty("ai.djl.allow_insecure_url", "true");
+            URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/data");
+            try (java.io.InputStream is = Utils.openUrl(url)) {
+                Assert.assertEquals(
+                        new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8),
+                        "opted-out");
+            }
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testUnknownHostIsNotPublic() {
+        Assert.assertFalse(Utils.isPublicHost("no-such-host.invalid"));
     }
 }

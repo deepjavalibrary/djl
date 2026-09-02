@@ -77,4 +77,38 @@ public class RepositoryDownloadTest {
             Files.deleteIfExists(tmp);
         }
     }
+
+    @Test
+    public void testSimpleUrlRepositoryRejectsNonPublicHost() {
+        // The content-length HEAD probe is a second entry point into the same download flow, so it
+        // applies the same destination rule.
+        SimpleUrlRepository repository =
+                new SimpleUrlRepository(
+                        "test",
+                        URI.create("http://169.254.169.254/latest/meta-data/x.tar.gz"),
+                        "x.tar.gz");
+        // getResources() resolves metadata, which performs the HEAD probe.
+        Assert.assertTrue(repository.getResources().isEmpty());
+    }
+
+    @Test
+    public void testSimpleUrlRepositoryDownloadRejectsNonPublicHost() throws IOException {
+        SimpleUrlRepository repository =
+                new SimpleUrlRepository(
+                        "test", URI.create("http://10.0.0.5/model.tar.gz"), "model.tar.gz");
+        Path tmp = Files.createTempDirectory("djl-simpleurl-probe");
+        try {
+            Artifact.Item item = new Artifact.Item();
+            item.setName("data");
+            item.setUri("http://10.0.0.5/model.tar.gz");
+            IOException e =
+                    Assert.expectThrows(
+                            IOException.class,
+                            () -> repository.download(tmp, URI.create(""), item, null));
+            Assert.assertTrue(
+                    e.getMessage().contains("non-public"), "unexpected: " + e.getMessage());
+        } finally {
+            Files.deleteIfExists(tmp);
+        }
+    }
 }
