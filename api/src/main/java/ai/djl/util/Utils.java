@@ -537,8 +537,14 @@ public final class Utils {
         // to restore the previous unrestricted behavior.
         String protocol = url.getProtocol();
         if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
-            return new BufferedInputStream(
-                    openHttpConnection(url, "GET", headers).getInputStream());
+            HttpURLConnection conn = openHttpConnection(url, "GET", headers);
+            try {
+                return new BufferedInputStream(conn.getInputStream());
+            } catch (IOException e) {
+                // An error response leaves the connection open, so release it before propagating.
+                conn.disconnect();
+                throw e;
+            }
         }
         // Local-resource schemes and full-opt-out use the legacy direct stream.
         if (isInsecureUrlAllowed()
@@ -624,10 +630,8 @@ public final class Utils {
                 throw e;
             }
             if (!isRedirect(code)) {
-                if (code >= 400) {
-                    conn.disconnect();
-                    throw new IOException("Failed to open " + current + ", status code: " + code);
-                }
+                // A non-redirect status is the caller's to interpret: openUrl surfaces it when the
+                // stream is opened, and the content-length probe treats non-200 as unknown size.
                 return conn;
             }
             // Redirect: re-validate the target on the next loop iteration instead of letting
