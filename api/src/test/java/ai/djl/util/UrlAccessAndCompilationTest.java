@@ -402,4 +402,43 @@ public class UrlAccessAndCompilationTest {
         Assert.assertFalse(Utils.isPublicHost("::1"));
         Assert.assertTrue(Utils.isPublicHost("2001:4860:4860::8888"));
     }
+
+    @Test
+    public void testOptOutAppliesToHeadConnection() throws IOException {
+        // The shared connection helper must honor the opt-out too, otherwise callers that only need
+        // response metadata (the content-length probe) stay blocked when the flag is set.
+        com.sun.net.httpserver.HttpServer server =
+                startServer(new java.util.HashMap<>(), "head-ok");
+        try {
+            URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/data");
+            // blocked by default: loopback is not public
+            Assert.assertThrows(
+                    IOException.class,
+                    () -> Utils.openHttpConnection(url, "HEAD", java.util.Collections.emptyMap()));
+            System.setProperty("ai.djl.allow_insecure_url", "true");
+            java.net.HttpURLConnection conn =
+                    Utils.openHttpConnection(url, "HEAD", java.util.Collections.emptyMap());
+            try {
+                Assert.assertEquals(conn.getResponseCode(), 200);
+            } finally {
+                conn.disconnect();
+            }
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testCompilationSkippedQuietlyWithoutBundledSources() throws IOException {
+        // No bundled sources is the common case and must be a silent no-op.
+        Path dir = Files.createTempDirectory("djl-nosrc");
+        Path classes = Files.createDirectories(dir.resolve("classes"));
+        try {
+            ClassLoaderUtils.compileJavaClass(classes);
+            Assert.assertEquals(classes.toFile().list().length, 0);
+        } finally {
+            Files.deleteIfExists(classes);
+            Files.deleteIfExists(dir);
+        }
+    }
 }

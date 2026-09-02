@@ -250,14 +250,6 @@ public final class ClassLoaderUtils {
      * @param dir the directory to scan java file.
      */
     public static void compileJavaClass(Path dir) {
-        if (!isDynamicCompilationEnabled()) {
-            logger.warn(
-                    "Skipping bundled Java compilation in {}: dynamic compilation is disabled by"
-                            + " default. Set DJL_COMPILE_JAVA=true or"
-                            + " -Dai.djl.compile_java=true to enable it for trusted models.",
-                    dir);
-            return;
-        }
         try {
             if (!Files.isDirectory(dir)) {
                 logger.debug("Directory not exists: {}", dir);
@@ -270,10 +262,22 @@ public final class ClassLoaderUtils {
                                 .map(p -> p.toAbsolutePath().toString())
                                 .toArray(String[]::new);
             }
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            if (files.length > 0) {
-                compiler.run(null, null, null, files);
+            if (files.length == 0) {
+                return;
             }
+            // Only report the skip when there is actually something that would have been
+            // compiled, so the common case of a model without bundled sources stays quiet.
+            if (!isDynamicCompilationEnabled()) {
+                logger.warn(
+                        "Skipping compilation of {} bundled java file(s) in {}: compiling bundled"
+                                + " sources is disabled by default. Set DJL_COMPILE_JAVA=true or"
+                                + " -Dai.djl.compile_java=true to enable it for trusted models.",
+                        files.length,
+                        dir);
+                return;
+            }
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            compiler.run(null, null, null, files);
         } catch (Throwable e) {
             logger.warn("Failed to compile bundled java file", e);
         }

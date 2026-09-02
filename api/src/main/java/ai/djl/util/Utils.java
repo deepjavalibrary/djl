@@ -537,16 +537,6 @@ public final class Utils {
         boolean insecureAllowed = isInsecureUrlAllowed();
         String protocol = url.getProtocol();
         if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
-            if (isOfflineMode()) {
-                throw new IOException("Offline mode is enabled.");
-            }
-            if (insecureAllowed) {
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                for (Map.Entry<String, String> entry : headers.entrySet()) {
-                    conn.addRequestProperty(entry.getKey(), entry.getValue());
-                }
-                return conn.getInputStream();
-            }
             return openHttpConnection(url, "GET", headers).getInputStream();
         }
         // Local-resource schemes and full-opt-out use the legacy direct stream.
@@ -577,6 +567,17 @@ public final class Utils {
      */
     public static HttpURLConnection openHttpConnection(
             URL url, String method, Map<String, String> headers) throws IOException {
+        if (isOfflineMode()) {
+            throw new IOException("Offline mode is enabled.");
+        }
+        if (isInsecureUrlAllowed()) {
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod(method);
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                conn.addRequestProperty(entry.getKey(), entry.getValue());
+            }
+            return conn;
+        }
         return openHttpConnection(url, method, headers, Utils::isPublicHost);
     }
 
