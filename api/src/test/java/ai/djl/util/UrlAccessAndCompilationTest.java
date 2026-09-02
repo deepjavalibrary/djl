@@ -12,6 +12,7 @@
  */
 package ai.djl.util;
 
+import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 import org.testng.Assert;
@@ -30,8 +31,10 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarOutputStream;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 /**
@@ -454,7 +457,10 @@ public class UrlAccessAndCompilationTest {
         // Two things at once, because they exercise the same hop: the credential header must not
         // reach the redirect target, and a caller's header map may legally hold a null value.
         Map<String, String> r = new HashMap<>();
-        Map<String, String> seen = new HashMap<>();
+        // Written by the server's handler thread and read by this thread, so it must be safe for
+        // concurrent access. Absent headers are left out rather than stored as a "null" string, so
+        // the assertions below test presence directly.
+        Map<String, String> seen = new ConcurrentHashMap<>();
         HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         int port = server.getAddress().getPort();
         // 127.0.0.1 -> localhost is a different host string, so the hop is cross-origin.
@@ -469,13 +475,8 @@ public class UrlAccessAndCompilationTest {
                         exchange.sendResponseHeaders(302, -1);
                     } else {
                         // Record what the final hop actually received.
-                        seen.put(
-                                "auth",
-                                String.valueOf(
-                                        exchange.getRequestHeaders().getFirst("Authorization")));
-                        seen.put(
-                                "keep",
-                                String.valueOf(exchange.getRequestHeaders().getFirst("X-Keep")));
+                        record(seen, exchange, "auth", "Authorization");
+                        record(seen, exchange, "keep", "X-Keep");
                         byte[] out = "arrived".getBytes(StandardCharsets.UTF_8);
                         exchange.sendResponseHeaders(200, out.length);
                         exchange.getResponseBody().write(out);
@@ -494,7 +495,8 @@ public class UrlAccessAndCompilationTest {
                 Assert.assertEquals(
                         new String(is.readAllBytes(), StandardCharsets.UTF_8), "arrived");
             }
-            Assert.assertEquals(seen.get("auth"), "null", "credentials must not cross origins");
+            Assert.assertFalse(
+                    seen.containsKey("auth"), "credentials must not be sent across origins");
             Assert.assertEquals(seen.get("keep"), "kept", "other headers must still be sent");
         } finally {
             server.stop(0);
@@ -505,7 +507,7 @@ public class UrlAccessAndCompilationTest {
     public void testSameOriginRedirectKeepsCredentials() throws IOException {
         // The counterpart to the test above: a same-origin hop must not lose the header.
         Map<String, String> r = new HashMap<>();
-        Map<String, String> seen = new HashMap<>();
+        Map<String, String> seen = new ConcurrentHashMap<>();
         HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         r.put("/start", "/final");
         server.createContext(
@@ -516,10 +518,7 @@ public class UrlAccessAndCompilationTest {
                         exchange.getResponseHeaders().add("Location", target);
                         exchange.sendResponseHeaders(302, -1);
                     } else {
-                        seen.put(
-                                "auth",
-                                String.valueOf(
-                                        exchange.getRequestHeaders().getFirst("Authorization")));
+                        record(seen, exchange, "auth", "Authorization");
                         exchange.sendResponseHeaders(200, -1);
                     }
                     exchange.close();
@@ -548,10 +547,25 @@ public class UrlAccessAndCompilationTest {
         Path classes = Files.createDirectories(dir.resolve("classes"));
         try {
             ClassLoaderUtils.compileJavaClass(classes);
-            Assert.assertEquals(classes.toFile().list().length, 0);
+            // Files.list rather than File.list, which returns null instead of throwing.
+            try (Stream<Path> entries = Files.list(classes)) {
+                Assert.assertEquals(entries.count(), 0L);
+            }
         } finally {
             Files.deleteIfExists(classes);
             Files.deleteIfExists(dir);
+        }
+    }
+
+    /**
+     * Records a request header under {@code key} only when it was actually sent, so a caller can
+     * distinguish absent from present-but-empty.
+     */
+    private static void record(
+            Map<String, String> seen, HttpExchange exchange, String key, String header) {
+        String value = exchange.getRequestHeaders().getFirst(header);
+        if (value != null) {
+            seen.put(key, value);
         }
     }
 }
