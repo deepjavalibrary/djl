@@ -168,6 +168,11 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testCompilationDisabledByDefault() throws IOException {
+        // The environment variable takes precedence over the system property, matching
+        // DJL_OFFLINE, so skip rather than fail if a build host has it set.
+        if (Utils.getenv("DJL_COMPILE_JAVA") != null) {
+            throw new org.testng.SkipException("DJL_COMPILE_JAVA is set in the environment");
+        }
         Path dir = Files.createTempDirectory("djl-compile");
         Path classes = Files.createDirectories(dir.resolve("classes"));
         Files.write(
@@ -177,9 +182,13 @@ public class UrlAccessAndCompilationTest {
                         .getBytes(StandardCharsets.UTF_8));
         System.clearProperty("djl.test.canary");
         try {
-            ClassLoaderUtils.compileJavaClass(classes);
-            // Default (disabled): no .class produced and the static initializer never ran.
+            Assert.assertThrows(
+                    IllegalStateException.class, () -> ClassLoaderUtils.compileJavaClass(classes));
+            // Default (disabled): nothing compiled and the static initializer never ran.
             Assert.assertFalse(Files.exists(classes.resolve("Bundled.class")));
+            Assert.assertNull(
+                    System.getProperty("djl.test.canary"),
+                    "the bundled static initializer must not have run");
             Assert.assertFalse(ClassLoaderUtils.isDynamicCompilationEnabled());
         } finally {
             deleteTree(dir);
@@ -188,6 +197,9 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testCompilationEnabledWithOptIn() throws IOException {
+        if (Utils.getenv("DJL_COMPILE_JAVA") != null) {
+            throw new org.testng.SkipException("DJL_COMPILE_JAVA is set in the environment");
+        }
         System.setProperty("ai.djl.compile_java", "true");
         Assert.assertTrue(ClassLoaderUtils.isDynamicCompilationEnabled());
         Path dir = Files.createTempDirectory("djl-compile-optin");

@@ -133,6 +133,7 @@ public class SimpleUrlRepository extends AbstractRepository {
         String hash = Utils.hash(uri.toString());
         MRL mrl = model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
         metadata.setRepositoryUri(mrl.toURI());
+        resolved = true;
         return metadata;
     }
 
@@ -141,7 +142,6 @@ public class SimpleUrlRepository extends AbstractRepository {
         if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
             HttpURLConnection conn = null;
             try {
-                resolved = true;
                 // Route the HEAD probe through the same handling as the download path, so
                 // redirects are resolved explicitly and every hop is checked.
                 conn = Utils.openHttpConnection(uri.toURL(), "HEAD", Collections.emptyMap());

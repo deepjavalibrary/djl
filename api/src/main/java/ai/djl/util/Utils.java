@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -622,7 +623,11 @@ public final class Utils {
                 conn.disconnect();
                 throw e;
             }
-            if (code < 300 || code >= 400) {
+            if (!isRedirect(code)) {
+                if (code >= 400) {
+                    conn.disconnect();
+                    throw new IOException("Failed to open " + current + ", status code: " + code);
+                }
                 return conn;
             }
             // Redirect: re-validate the target on the next loop iteration instead of letting
@@ -633,7 +638,12 @@ public final class Utils {
                 throw new IOException("Redirect (" + code + ") with no Location header");
             }
             // Resolve relative redirects against the current URL, then re-validate the target.
-            current = new URL(current, location);
+            URL next = new URL(current, location);
+            if (!sameOrigin(current, next)) {
+                // Following a redirect to another origin must not carry credentials with it.
+                headers = withoutCredentials(headers);
+            }
+            current = next;
         }
         throw new IOException("Too many redirects (>" + MAX_REDIRECTS + ") for URL: " + url);
     }
@@ -687,9 +697,37 @@ public final class Utils {
                 }
             }
         } catch (UnknownHostException e) {
+            logger.warn("Cannot resolve host, treating as not public: {}", host, e);
             return false;
         }
         return true;
+    }
+
+    private static boolean sameOrigin(URL a, URL b) {
+        return a.getProtocol().equalsIgnoreCase(b.getProtocol())
+                && a.getHost().equalsIgnoreCase(b.getHost())
+                && a.getPort() == b.getPort();
+    }
+
+    private static Map<String, String> withoutCredentials(Map<String, String> headers) {
+        if (headers.isEmpty()) {
+            return headers;
+        }
+        Map<String, String> copy = new ConcurrentHashMap<>();
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            String name = entry.getKey();
+            if (!"Authorization".equalsIgnoreCase(name)
+                    && !"Cookie".equalsIgnoreCase(name)
+                    && !"Proxy-Authorization".equalsIgnoreCase(name)) {
+                copy.put(name, entry.getValue());
+            }
+        }
+        return copy;
+    }
+
+    private static boolean isRedirect(int code) {
+        // 300, 304 and 305 are 3xx but are not redirects to follow.
+        return code == 301 || code == 302 || code == 303 || code == 307 || code == 308;
     }
 
     private static boolean isIpv6UniqueLocal(InetAddress addr) {

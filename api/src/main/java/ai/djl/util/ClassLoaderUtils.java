@@ -250,41 +250,50 @@ public final class ClassLoaderUtils {
      * @param dir the directory to scan java file.
      */
     public static void compileJavaClass(Path dir) {
+        String[] files;
         try {
             if (!Files.isDirectory(dir)) {
                 logger.debug("Directory not exists: {}", dir);
                 return;
             }
-            String[] files;
             try (Stream<Path> stream = Files.walk(dir)) {
                 files =
                         stream.filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
                                 .map(p -> p.toAbsolutePath().toString())
                                 .toArray(String[]::new);
             }
-            if (files.length == 0) {
-                return;
-            }
-            // Only report the skip when there is actually something that would have been
-            // compiled, so the common case of a model without bundled sources stays quiet.
-            if (!isDynamicCompilationEnabled()) {
-                logger.warn(
-                        "Skipping compilation of {} bundled java file(s) in {}: compiling bundled"
-                                + " sources is disabled by default. Set DJL_COMPILE_JAVA=true or"
-                                + " -Dai.djl.compile_java=true to enable it for trusted models.",
-                        files.length,
-                        dir);
-                return;
-            }
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            if (compiler == null) {
-                logger.warn(
-                        "Cannot compile {} bundled java file(s) in {}: no system java compiler is"
-                                + " available, a JDK is required.",
-                        files.length,
-                        dir);
-                return;
-            }
+        } catch (IOException e) {
+            logger.warn("Failed to scan for bundled java files in {}", dir, e);
+            return;
+        }
+        if (files.length == 0) {
+            // Nothing to compile: the common case of a model without bundled sources stays quiet.
+            return;
+        }
+        if (!isDynamicCompilationEnabled()) {
+            // Report rather than return quietly: callers resolve a translator from the compiled
+            // output and would otherwise fall back to a default implementation, producing
+            // different results with only a log line to explain it.
+            throw new IllegalStateException(
+                    "Found "
+                            + files.length
+                            + " bundled java file(s) in "
+                            + dir
+                            + " but compiling bundled sources is disabled by default. Set"
+                            + " DJL_COMPILE_JAVA=true or -Dai.djl.compile_java=true to enable it"
+                            + " for models from a trusted source, or ship precompiled .class/.jar"
+                            + " files instead.");
+        }
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            logger.warn(
+                    "Cannot compile {} bundled java file(s) in {}: no system java compiler is"
+                            + " available, a JDK is required.",
+                    files.length,
+                    dir);
+            return;
+        }
+        try {
             compiler.run(null, null, null, files);
         } catch (Throwable e) {
             logger.warn("Failed to compile bundled java file", e);

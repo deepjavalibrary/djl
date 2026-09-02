@@ -78,14 +78,15 @@ public class RepositoryDownloadTest {
     @Test
     public void testSimpleUrlRepositoryRejectsNonPublicHost() {
         // The content-length HEAD probe is a second entry point into the same download flow, so it
-        // applies the same destination rule.
+        // applies the same destination rule. Assert on the thrown cause rather than on
+        // getResources(), which swallows every IOException and would pass either way.
         SimpleUrlRepository repository =
                 new SimpleUrlRepository(
                         "test",
                         URI.create("http://169.254.169.254/latest/meta-data/x.tar.gz"),
                         "x.tar.gz");
-        // getResources() resolves metadata, which performs the HEAD probe.
-        Assert.assertTrue(repository.getResources().isEmpty());
+        IOException e = Assert.expectThrows(IOException.class, () -> repository.locate(null));
+        Assert.assertTrue(e.getMessage().contains("non-public"), "unexpected: " + e.getMessage());
     }
 
     @Test
