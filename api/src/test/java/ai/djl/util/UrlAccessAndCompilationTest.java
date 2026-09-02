@@ -12,14 +12,26 @@
  */
 package ai.djl.util;
 
+import com.sun.net.httpserver.HttpServer;
+
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
 
 /**
  * Tests for the configurable URL-access and bundled-source-compilation defaults in {@link
@@ -39,11 +51,9 @@ public class UrlAccessAndCompilationTest {
     public void testFileProtocolAllowedByDefault() throws IOException {
         // file:// performs no network fetch, so it is allowed by default.
         Path tmp = Files.createTempFile("djl-local", ".txt");
-        Files.write(tmp, "secret".getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        try (java.io.InputStream is = Utils.openUrl(tmp.toUri().toURL())) {
-            Assert.assertEquals(
-                    new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8),
-                    "secret");
+        Files.write(tmp, "secret".getBytes(StandardCharsets.UTF_8));
+        try (InputStream is = Utils.openUrl(tmp.toUri().toURL())) {
+            Assert.assertEquals(new String(is.readAllBytes(), StandardCharsets.UTF_8), "secret");
         } finally {
             Files.deleteIfExists(tmp);
         }
@@ -55,18 +65,15 @@ public class UrlAccessAndCompilationTest {
         // performs no network fetch, so it is allowed by default. Build a real one-entry
         // jar and read it back through a jar: URL.
         Path jar = Files.createTempFile("djl-jar", ".jar");
-        try (java.util.jar.JarOutputStream jos =
-                new java.util.jar.JarOutputStream(Files.newOutputStream(jar))) {
-            jos.putNextEntry(new java.util.zip.ZipEntry("META-INF/probe.txt"));
-            jos.write("jarok".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(jar))) {
+            jos.putNextEntry(new ZipEntry("META-INF/probe.txt"));
+            jos.write("jarok".getBytes(StandardCharsets.UTF_8));
             jos.closeEntry();
         }
         try {
             URL jarUrl = new URL("jar:" + jar.toUri() + "!/META-INF/probe.txt");
-            try (java.io.InputStream is = Utils.openUrl(jarUrl)) {
-                Assert.assertEquals(
-                        new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8),
-                        "jarok");
+            try (InputStream is = Utils.openUrl(jarUrl)) {
+                Assert.assertEquals(new String(is.readAllBytes(), StandardCharsets.UTF_8), "jarok");
             }
         } finally {
             // The JVM caches open jar files, so a handle can remain on the temp jar after the
@@ -92,33 +99,27 @@ public class UrlAccessAndCompilationTest {
     }
 
     @Test
-    public void testRedirectToNonPublicBlockedByDefault() throws IOException {
-        // End-to-end through openUrl: a server that 302-redirects to a non-public destination is
-        // refused. Note the first hop here is itself non-public, so this asserts the entry check;
-        // the redirect re-validation itself is covered by testRedirectToDisallowedHostIsRejected.
-        com.sun.net.httpserver.HttpServer server =
-                com.sun.net.httpserver.HttpServer.create(
-                        new java.net.InetSocketAddress("127.0.0.1", 0), 0);
+    public void testNonPublicHostBlockedBeforeConnecting() throws IOException {
+        // The destination check runs before any request, so the listener must never be contacted.
+        // Redirect re-validation is covered by testRedirectToDisallowedHostIsRejected.
+        AtomicInteger hits = new AtomicInteger();
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         server.createContext(
                 "/",
                 exchange -> {
-                    exchange.getResponseHeaders()
-                            .add(
-                                    "Location",
-                                    "http://169.254.169.254/latest/meta-data/iam/"
-                                            + "meta-data/artifact.tar.gz");
-                    exchange.sendResponseHeaders(302, -1);
+                    hits.incrementAndGet();
+                    exchange.sendResponseHeaders(200, -1);
                     exchange.close();
                 });
         server.start();
         try {
-            int port = server.getAddress().getPort();
-            URL redirecting = new URL("http://127.0.0.1:" + port + "/model.tar.gz");
-            IOException ex =
-                    Assert.expectThrows(IOException.class, () -> Utils.openUrl(redirecting));
+            URL url =
+                    new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/model.tar.gz");
+            IOException ex = Assert.expectThrows(IOException.class, () -> Utils.openUrl(url));
             Assert.assertTrue(
                     ex.getMessage().contains("Blocked request to non-public address"),
                     "expected non-public-address block, got: " + ex.getMessage());
+            Assert.assertEquals(hits.get(), 0, "the destination must not be contacted");
         } finally {
             server.stop(0);
         }
@@ -173,7 +174,7 @@ public class UrlAccessAndCompilationTest {
                 classes.resolve("Bundled.java"),
                 ("public class Bundled { static { System.setProperty(\"djl.test.canary\", \"ran\");"
                                 + " } }")
-                        .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        .getBytes(StandardCharsets.UTF_8));
         System.clearProperty("djl.test.canary");
         try {
             ClassLoaderUtils.compileJavaClass(classes);
@@ -194,7 +195,7 @@ public class UrlAccessAndCompilationTest {
         Files.write(
                 classes.resolve("Hello.java"),
                 "public class Hello { public int v() { return 1; } }"
-                        .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        .getBytes(StandardCharsets.UTF_8));
         try {
             ClassLoaderUtils.compileJavaClass(classes);
             // Opt-in: compilation runs (a system compiler must be present in the test JDK).
@@ -226,11 +227,9 @@ public class UrlAccessAndCompilationTest {
     // ----- Redirect handling (exercised against a local server via the host-check seam) -----
 
     /** Serves a redirect chain / final body on loopback for redirect tests. */
-    private static com.sun.net.httpserver.HttpServer startServer(
-            java.util.Map<String, String> redirects, String body) throws IOException {
-        com.sun.net.httpserver.HttpServer server =
-                com.sun.net.httpserver.HttpServer.create(
-                        new java.net.InetSocketAddress("127.0.0.1", 0), 0);
+    private static HttpServer startServer(Map<String, String> redirects, String body)
+            throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         server.createContext(
                 "/",
                 exchange -> {
@@ -242,7 +241,7 @@ public class UrlAccessAndCompilationTest {
                         }
                         exchange.sendResponseHeaders(302, -1);
                     } else {
-                        byte[] out = body.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                        byte[] out = body.getBytes(StandardCharsets.UTF_8);
                         exchange.sendResponseHeaders(200, out.length);
                         exchange.getResponseBody().write(out);
                     }
@@ -254,19 +253,17 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testRedirectIsFollowedAndRevalidated() throws IOException {
-        java.util.Map<String, String> r = new java.util.HashMap<>();
+        Map<String, String> r = new HashMap<>();
         r.put("/start", "/final");
-        com.sun.net.httpserver.HttpServer server = startServer(r, "arrived");
+        HttpServer server = startServer(r, "arrived");
         try {
             URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
             // allow loopback so the redirect loop itself runs
-            try (java.io.InputStream is =
-                    Utils.openHttpConnection(
-                                    url, "GET", java.util.Collections.emptyMap(), h -> true)
+            try (InputStream is =
+                    Utils.openHttpConnection(url, "GET", Collections.emptyMap(), h -> true)
                             .getInputStream()) {
                 Assert.assertEquals(
-                        new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8),
-                        "arrived");
+                        new String(is.readAllBytes(), StandardCharsets.UTF_8), "arrived");
             }
         } finally {
             server.stop(0);
@@ -275,9 +272,9 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testRedirectToDisallowedHostIsRejected() throws IOException {
-        java.util.Map<String, String> r = new java.util.HashMap<>();
+        Map<String, String> r = new HashMap<>();
         r.put("/start", "http://169.254.169.254/latest/meta-data/x.tar.gz");
-        com.sun.net.httpserver.HttpServer server = startServer(r, "unused");
+        HttpServer server = startServer(r, "unused");
         try {
             URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
             // first hop allowed, redirect target must still be re-checked and refused
@@ -288,7 +285,7 @@ public class UrlAccessAndCompilationTest {
                                     Utils.openHttpConnection(
                                             url,
                                             "GET",
-                                            java.util.Collections.emptyMap(),
+                                            Collections.emptyMap(),
                                             h -> !"169.254.169.254".equals(h)));
             Assert.assertTrue(
                     e.getMessage().contains("non-public"), "unexpected: " + e.getMessage());
@@ -299,9 +296,9 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testRedirectToUnsupportedSchemeIsRejected() throws IOException {
-        java.util.Map<String, String> r = new java.util.HashMap<>();
+        Map<String, String> r = new HashMap<>();
         r.put("/start", "ftp://ftp.example.com/model.tar.gz");
-        com.sun.net.httpserver.HttpServer server = startServer(r, "unused");
+        HttpServer server = startServer(r, "unused");
         try {
             URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
             IOException e =
@@ -309,10 +306,7 @@ public class UrlAccessAndCompilationTest {
                             IOException.class,
                             () ->
                                     Utils.openHttpConnection(
-                                            url,
-                                            "GET",
-                                            java.util.Collections.emptyMap(),
-                                            h -> true));
+                                            url, "GET", Collections.emptyMap(), h -> true));
             Assert.assertTrue(
                     e.getMessage().contains("URL protocol"), "unexpected: " + e.getMessage());
         } finally {
@@ -322,9 +316,9 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testRedirectWithoutLocationIsRejected() throws IOException {
-        java.util.Map<String, String> r = new java.util.HashMap<>();
+        Map<String, String> r = new HashMap<>();
         r.put("/start", "");
-        com.sun.net.httpserver.HttpServer server = startServer(r, "unused");
+        HttpServer server = startServer(r, "unused");
         try {
             URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
             IOException e =
@@ -332,10 +326,7 @@ public class UrlAccessAndCompilationTest {
                             IOException.class,
                             () ->
                                     Utils.openHttpConnection(
-                                            url,
-                                            "GET",
-                                            java.util.Collections.emptyMap(),
-                                            h -> true));
+                                            url, "GET", Collections.emptyMap(), h -> true));
             Assert.assertTrue(
                     e.getMessage().contains("no Location"), "unexpected: " + e.getMessage());
         } finally {
@@ -345,11 +336,11 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testTooManyRedirectsIsRejected() throws IOException {
-        java.util.Map<String, String> r = new java.util.HashMap<>();
+        Map<String, String> r = new HashMap<>();
         for (int i = 0; i < 10; ++i) {
             r.put("/hop" + i, "/hop" + (i + 1));
         }
-        com.sun.net.httpserver.HttpServer server = startServer(r, "unused");
+        HttpServer server = startServer(r, "unused");
         try {
             URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/hop0");
             IOException e =
@@ -357,10 +348,7 @@ public class UrlAccessAndCompilationTest {
                             IOException.class,
                             () ->
                                     Utils.openHttpConnection(
-                                            url,
-                                            "GET",
-                                            java.util.Collections.emptyMap(),
-                                            h -> true));
+                                            url, "GET", Collections.emptyMap(), h -> true));
             Assert.assertTrue(
                     e.getMessage().contains("Too many redirects"), "unexpected: " + e.getMessage());
         } finally {
@@ -370,15 +358,13 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testInsecureOptOutAllowsNonPublicHttpHost() throws IOException {
-        com.sun.net.httpserver.HttpServer server =
-                startServer(new java.util.HashMap<>(), "opted-out");
+        HttpServer server = startServer(new HashMap<>(), "opted-out");
         try {
             System.setProperty("ai.djl.allow_insecure_url", "true");
             URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/data");
-            try (java.io.InputStream is = Utils.openUrl(url)) {
+            try (InputStream is = Utils.openUrl(url)) {
                 Assert.assertEquals(
-                        new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8),
-                        "opted-out");
+                        new String(is.readAllBytes(), StandardCharsets.UTF_8), "opted-out");
             }
         } finally {
             server.stop(0);
@@ -407,17 +393,15 @@ public class UrlAccessAndCompilationTest {
     public void testOptOutAppliesToHeadConnection() throws IOException {
         // The shared connection helper must honor the opt-out too, otherwise callers that only need
         // response metadata (the content-length probe) stay blocked when the flag is set.
-        com.sun.net.httpserver.HttpServer server =
-                startServer(new java.util.HashMap<>(), "head-ok");
+        HttpServer server = startServer(new HashMap<>(), "head-ok");
         try {
             URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/data");
             // blocked by default: loopback is not public
             Assert.assertThrows(
                     IOException.class,
-                    () -> Utils.openHttpConnection(url, "HEAD", java.util.Collections.emptyMap()));
+                    () -> Utils.openHttpConnection(url, "HEAD", Collections.emptyMap()));
             System.setProperty("ai.djl.allow_insecure_url", "true");
-            java.net.HttpURLConnection conn =
-                    Utils.openHttpConnection(url, "HEAD", java.util.Collections.emptyMap());
+            HttpURLConnection conn = Utils.openHttpConnection(url, "HEAD", Collections.emptyMap());
             try {
                 Assert.assertEquals(conn.getResponseCode(), 200);
             } finally {

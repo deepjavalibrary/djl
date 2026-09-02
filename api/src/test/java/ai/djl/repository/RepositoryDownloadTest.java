@@ -61,7 +61,7 @@ public class RepositoryDownloadTest {
     private IOException downloadItemUri(String itemUri) throws IOException {
         Path tmp = Files.createTempDirectory("djl-download-probe");
         try {
-            Repository repository =
+            AbstractRepository repository =
                     new RemoteRepository(
                             "test", URI.create("https://resources.djl.ai/test-models/"));
             Artifact.Item item = new Artifact.Item();
@@ -69,10 +69,7 @@ public class RepositoryDownloadTest {
             item.setUri(itemUri);
 
             return Assert.expectThrows(
-                    IOException.class,
-                    () ->
-                            ((AbstractRepository) repository)
-                                    .download(tmp, URI.create(""), item, null));
+                    IOException.class, () -> repository.download(tmp, URI.create(""), item, null));
         } finally {
             Files.deleteIfExists(tmp);
         }

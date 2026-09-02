@@ -277,6 +277,14 @@ public final class ClassLoaderUtils {
                 return;
             }
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            if (compiler == null) {
+                logger.warn(
+                        "Cannot compile {} bundled java file(s) in {}: no system java compiler is"
+                                + " available, a JDK is required.",
+                        files.length,
+                        dir);
+                return;
+            }
             compiler.run(null, null, null, files);
         } catch (Throwable e) {
             logger.warn("Failed to compile bundled java file", e);
@@ -288,7 +296,7 @@ public final class ClassLoaderUtils {
      *
      * @return true if {@code DJL_COMPILE_JAVA} / {@code ai.djl.compile_java} is set true
      */
-    public static boolean isDynamicCompilationEnabled() {
+    static boolean isDynamicCompilationEnabled() {
         String mode = Utils.getenv("DJL_COMPILE_JAVA", System.getProperty("ai.djl.compile_java"));
         return Boolean.parseBoolean(mode);
     }

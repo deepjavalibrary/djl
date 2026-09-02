@@ -150,7 +150,7 @@ public class SimpleUrlRepository extends AbstractRepository {
                     logger.debug("Failed detect content length, error code: {}", code);
                     return -1;
                 }
-                return conn.getContentLength();
+                return conn.getContentLengthLong();
             } finally {
                 if (conn != null) {
                     conn.disconnect();

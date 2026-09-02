@@ -526,7 +526,7 @@ public final class Utils {
      * @param url the URL to open
      * @param headers HTTP headers
      * @return an input stream for reading from the URL connection.
-     * @throws IOException if an I/O exception occurs
+     * @throws IOException if an I/O exception occurs, or the destination or scheme is not allowed
      */
     public static InputStream openUrl(URL url, Map<String, String> headers) throws IOException {
         // Remote fetches are limited to public http(s) destinations by default, and redirects are
@@ -534,13 +534,13 @@ public final class Utils {
         // (file:, jar:) are unrestricted, since they do not perform a network fetch. Other schemes
         // are not supported. Set DJL_ALLOW_INSECURE_URL=true (or -Dai.djl.allow_insecure_url=true)
         // to restore the previous unrestricted behavior.
-        boolean insecureAllowed = isInsecureUrlAllowed();
         String protocol = url.getProtocol();
         if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
-            return openHttpConnection(url, "GET", headers).getInputStream();
+            return new BufferedInputStream(
+                    openHttpConnection(url, "GET", headers).getInputStream());
         }
         // Local-resource schemes and full-opt-out use the legacy direct stream.
-        if (insecureAllowed
+        if (isInsecureUrlAllowed()
                 || "file".equalsIgnoreCase(protocol)
                 || "jar".equalsIgnoreCase(protocol)) {
             return new BufferedInputStream(url.openStream());
@@ -615,7 +615,13 @@ public final class Utils {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
                 conn.addRequestProperty(entry.getKey(), entry.getValue());
             }
-            int code = conn.getResponseCode();
+            int code;
+            try {
+                code = conn.getResponseCode();
+            } catch (IOException e) {
+                conn.disconnect();
+                throw e;
+            }
             if (code < 300 || code >= 400) {
                 return conn;
             }
@@ -638,7 +644,7 @@ public final class Utils {
      * @return true if {@code DJL_ALLOW_INSECURE_URL} / {@code ai.djl.allow_insecure_url} is set
      *     true
      */
-    public static boolean isInsecureUrlAllowed() {
+    static boolean isInsecureUrlAllowed() {
         String mode =
                 getenv("DJL_ALLOW_INSECURE_URL", System.getProperty("ai.djl.allow_insecure_url"));
         return Boolean.parseBoolean(mode);
@@ -650,12 +656,18 @@ public final class Utils {
      * <p>A host is rejected if it is empty or if any resolved address is loopback, link-local,
      * site-local (RFC 1918 private), wildcard, multicast, or an IPv6 unique local address
      * (fc00::/7). The latter is checked explicitly because {@link InetAddress#isSiteLocalAddress()}
-     * only covers the deprecated fec0::/10 range.
+     * only covers the deprecated fec0::/10 range. IPv4-mapped IPv6 literals resolve to an {@code
+     * Inet4Address} and are covered by the IPv4 checks.
+     *
+     * <p>Note that this resolves the host name and the subsequent connection resolves it again, so
+     * a name that resolves to an allowed address here could resolve to a different address when the
+     * connection is made. Pinning the connection to a validated address would be needed to close
+     * that gap; environments that require it should restrict egress at the network layer.
      *
      * @param host the host name to validate
      * @return true if every resolved address is a public address
      */
-    public static boolean isPublicHost(String host) {
+    static boolean isPublicHost(String host) {
         if (host == null || host.isEmpty()) {
             return false;
         }
