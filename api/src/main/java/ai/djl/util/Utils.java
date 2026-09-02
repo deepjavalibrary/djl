@@ -547,7 +547,7 @@ public final class Utils {
                 }
                 return conn.getInputStream();
             }
-            return openHttpUrlSecurely(url, headers);
+            return openHttpConnection(url, "GET", headers).getInputStream();
         }
         // Local-resource schemes and full-opt-out use the legacy direct stream.
         if (insecureAllowed
@@ -561,28 +561,44 @@ public final class Utils {
                         + ". Set DJL_ALLOW_INSECURE_URL=true to override.");
     }
 
-    private static InputStream openHttpUrlSecurely(URL url, Map<String, String> headers)
-            throws IOException {
-        return openHttpUrlSecurely(url, headers, Utils::isPublicHost);
+    /**
+     * Opens an http(s) connection using the specified request method, resolving redirects
+     * explicitly so that every hop is checked against the same destination rule.
+     *
+     * <p>This is the shared entry point for remote reads: {@link #openUrl(URL, Map)} uses it for
+     * {@code GET}, and callers that only need response metadata can use it for {@code HEAD}. The
+     * caller owns the returned connection and should disconnect it when finished.
+     *
+     * @param url the URL to open
+     * @param method the HTTP request method, for example {@code GET} or {@code HEAD}
+     * @param headers HTTP headers
+     * @return the connection for the final, validated hop
+     * @throws IOException if an I/O exception occurs or a hop is not allowed
+     */
+    public static HttpURLConnection openHttpConnection(
+            URL url, String method, Map<String, String> headers) throws IOException {
+        return openHttpConnection(url, method, headers, Utils::isPublicHost);
     }
 
     /**
-     * Opens an http(s) URL, resolving redirects explicitly so that every hop is checked against
-     * {@code hostAllowed} rather than being followed by the connection itself.
+     * Opens an http(s) connection, resolving redirects explicitly so that every hop is checked
+     * against {@code hostAllowed} rather than being followed by the connection itself.
      *
      * <p>The host check is a parameter so the redirect handling can be exercised against a local
      * test server.
      *
      * @param url the URL to open
+     * @param method the HTTP request method
      * @param headers HTTP headers
      * @param hostAllowed the check applied to the host of every hop
-     * @return an input stream for reading from the URL connection
+     * @return the connection for the final, validated hop
      * @throws IOException if an I/O exception occurs or a hop is not allowed
      */
-    static InputStream openHttpUrlSecurely(
-            URL url, Map<String, String> headers, Predicate<String> hostAllowed)
+    static HttpURLConnection openHttpConnection(
+            URL url, String method, Map<String, String> headers, Predicate<String> hostAllowed)
             throws IOException {
         URL current = url;
+        // One initial request plus at most MAX_REDIRECTS redirect hops.
         for (int i = 0; i <= MAX_REDIRECTS; ++i) {
             String protocol = current.getProtocol();
             if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
@@ -594,12 +610,13 @@ public final class Utils {
             }
             HttpURLConnection conn = (HttpURLConnection) current.openConnection();
             conn.setInstanceFollowRedirects(false);
+            conn.setRequestMethod(method);
             for (Map.Entry<String, String> entry : headers.entrySet()) {
                 conn.addRequestProperty(entry.getKey(), entry.getValue());
             }
             int code = conn.getResponseCode();
             if (code < 300 || code >= 400) {
-                return conn.getInputStream();
+                return conn;
             }
             // Redirect: re-validate the target on the next loop iteration instead of letting
             // HttpURLConnection follow it blindly (which would defeat the host check above).
@@ -630,7 +647,9 @@ public final class Utils {
      * Returns whether a host resolves exclusively to public (non-internal) IP addresses.
      *
      * <p>A host is rejected if it is empty or if any resolved address is loopback, link-local,
-     * site-local (RFC 1918 private), wildcard, or multicast.
+     * site-local (RFC 1918 private), wildcard, multicast, or an IPv6 unique local address
+     * (fc00::/7). The latter is checked explicitly because {@link InetAddress#isSiteLocalAddress()}
+     * only covers the deprecated fec0::/10 range.
      *
      * @param host the host name to validate
      * @return true if every resolved address is a public address
@@ -649,7 +668,8 @@ public final class Utils {
                         || addr.isLinkLocalAddress()
                         || addr.isSiteLocalAddress()
                         || addr.isAnyLocalAddress()
-                        || addr.isMulticastAddress()) {
+                        || addr.isMulticastAddress()
+                        || isIpv6UniqueLocal(addr)) {
                     return false;
                 }
             }
@@ -657,6 +677,12 @@ public final class Utils {
             return false;
         }
         return true;
+    }
+
+    private static boolean isIpv6UniqueLocal(InetAddress addr) {
+        byte[] bytes = addr.getAddress();
+        // fc00::/7 - the first seven bits are 1111110
+        return bytes.length == 16 && (bytes[0] & 0xFE) == 0xFC;
     }
 
     /**

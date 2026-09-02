@@ -139,20 +139,12 @@ public class SimpleUrlRepository extends AbstractRepository {
     private long getContentLength() throws IOException {
         String scheme = uri.getScheme();
         if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
-            // Apply the same rule as Utils.openUrl to the HEAD probe: reject non-public
-            // destinations and do not auto-follow redirects (a 302 could otherwise reach an
-            // internal target such as the instance metadata endpoint).
-            if (!Utils.isInsecureUrlAllowed() && !Utils.isPublicHost(uri.getHost())) {
-                throw new IOException("Blocked request to non-public address: " + uri.getHost());
-            }
             HttpURLConnection conn = null;
             try {
                 resolved = true;
-                conn = (HttpURLConnection) uri.toURL().openConnection();
-                if (!Utils.isInsecureUrlAllowed()) {
-                    conn.setInstanceFollowRedirects(false);
-                }
-                conn.setRequestMethod("HEAD");
+                // Route the HEAD probe through the same handling as the download path, so
+                // redirects are resolved explicitly and every hop is checked.
+                conn = Utils.openHttpConnection(uri.toURL(), "HEAD", Collections.emptyMap());
                 int code = conn.getResponseCode();
                 if (code != 200) {
                     logger.debug("Failed detect content length, error code: {}", code);

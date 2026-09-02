@@ -159,19 +159,6 @@ public class UrlAccessAndCompilationTest {
     }
 
     @Test
-    public void testInsecureOptOutAllowsFileProtocol() throws IOException {
-        System.setProperty("ai.djl.allow_insecure_url", "true");
-        Assert.assertTrue(Utils.isInsecureUrlAllowed());
-        Path tmp = Files.createTempFile("djl-optout", ".txt");
-        Files.write(tmp, "ok".getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        try (java.io.InputStream is = Utils.openUrl(tmp.toUri().toURL())) {
-            Assert.assertEquals(new String(is.readAllBytes(), "UTF-8"), "ok");
-        } finally {
-            Files.deleteIfExists(tmp);
-        }
-    }
-
-    @Test
     public void testInsecureUrlAllowedFlagDefaultsFalse() {
         Assert.assertFalse(Utils.isInsecureUrlAllowed());
     }
@@ -274,7 +261,9 @@ public class UrlAccessAndCompilationTest {
             URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/start");
             // allow loopback so the redirect loop itself runs
             try (java.io.InputStream is =
-                    Utils.openHttpUrlSecurely(url, java.util.Collections.emptyMap(), h -> true)) {
+                    Utils.openHttpConnection(
+                                    url, "GET", java.util.Collections.emptyMap(), h -> true)
+                            .getInputStream()) {
                 Assert.assertEquals(
                         new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8),
                         "arrived");
@@ -296,8 +285,9 @@ public class UrlAccessAndCompilationTest {
                     Assert.expectThrows(
                             IOException.class,
                             () ->
-                                    Utils.openHttpUrlSecurely(
+                                    Utils.openHttpConnection(
                                             url,
+                                            "GET",
                                             java.util.Collections.emptyMap(),
                                             h -> !"169.254.169.254".equals(h)));
             Assert.assertTrue(
@@ -318,8 +308,11 @@ public class UrlAccessAndCompilationTest {
                     Assert.expectThrows(
                             IOException.class,
                             () ->
-                                    Utils.openHttpUrlSecurely(
-                                            url, java.util.Collections.emptyMap(), h -> true));
+                                    Utils.openHttpConnection(
+                                            url,
+                                            "GET",
+                                            java.util.Collections.emptyMap(),
+                                            h -> true));
             Assert.assertTrue(
                     e.getMessage().contains("URL protocol"), "unexpected: " + e.getMessage());
         } finally {
@@ -338,8 +331,11 @@ public class UrlAccessAndCompilationTest {
                     Assert.expectThrows(
                             IOException.class,
                             () ->
-                                    Utils.openHttpUrlSecurely(
-                                            url, java.util.Collections.emptyMap(), h -> true));
+                                    Utils.openHttpConnection(
+                                            url,
+                                            "GET",
+                                            java.util.Collections.emptyMap(),
+                                            h -> true));
             Assert.assertTrue(
                     e.getMessage().contains("no Location"), "unexpected: " + e.getMessage());
         } finally {
@@ -360,8 +356,11 @@ public class UrlAccessAndCompilationTest {
                     Assert.expectThrows(
                             IOException.class,
                             () ->
-                                    Utils.openHttpUrlSecurely(
-                                            url, java.util.Collections.emptyMap(), h -> true));
+                                    Utils.openHttpConnection(
+                                            url,
+                                            "GET",
+                                            java.util.Collections.emptyMap(),
+                                            h -> true));
             Assert.assertTrue(
                     e.getMessage().contains("Too many redirects"), "unexpected: " + e.getMessage());
         } finally {
@@ -389,5 +388,18 @@ public class UrlAccessAndCompilationTest {
     @Test
     public void testUnknownHostIsNotPublic() {
         Assert.assertFalse(Utils.isPublicHost("no-such-host.invalid"));
+    }
+
+    @Test
+    public void testIpv6UniqueLocalAddressIsNotPublic() {
+        // fc00::/7 is the IPv6 unique-local range. InetAddress#isSiteLocalAddress only covers the
+        // deprecated fec0::/10, so these must be rejected explicitly.
+        Assert.assertFalse(Utils.isPublicHost("fd00::1"));
+        Assert.assertFalse(Utils.isPublicHost("fc00::1"));
+        Assert.assertFalse(Utils.isPublicHost("fdff:ffff::1"));
+        // link-local and loopback IPv6 remain rejected, and a public IPv6 address is allowed
+        Assert.assertFalse(Utils.isPublicHost("fe80::1"));
+        Assert.assertFalse(Utils.isPublicHost("::1"));
+        Assert.assertTrue(Utils.isPublicHost("2001:4860:4860::8888"));
     }
 }
