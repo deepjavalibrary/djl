@@ -177,7 +177,8 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray truncatedNormal(float loc, float scale, Shape shape, DataType dataType) {
-        int sampleSize = (int) shape.size();
+        // Fail closed rather than silently truncating an element count beyond int range.
+        int sampleSize = Math.toIntExact(shape.size());
         double[] dist = new double[sampleSize];
 
         for (int i = 0; i < sampleSize; i++) {
@@ -461,7 +462,10 @@ public abstract class BaseNDManager implements NDManager {
         }
 
         int remaining = buffer.remaining();
-        int expectedSize = isByteBuffer ? dataType.getNumOfBytes() * expected : expected;
+        // Compute the expected byte count in 64-bit arithmetic. getNumOfBytes() * expected is
+        // int*int, which overflows for large element counts and wraps to a small or negative
+        // value, causing the check below to compare against the wrong size.
+        long expectedSize = isByteBuffer ? (long) dataType.getNumOfBytes() * expected : expected;
         if (remaining < expectedSize) {
             throw new IllegalArgumentException(
                     "The NDArray size is: " + expected + ", but buffer size is: " + remaining);
@@ -470,7 +474,8 @@ public abstract class BaseNDManager implements NDManager {
             logger.warn(
                     "Input buffer size is greater than the NDArray size, please set limit"
                             + " explicitly.");
-            buffer.limit(expectedSize);
+            // Safe narrowing: in this branch expectedSize < remaining <= Integer.MAX_VALUE.
+            buffer.limit((int) expectedSize);
         }
     }
 

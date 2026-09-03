@@ -313,7 +313,7 @@ public class MxNDArray extends NativeResource<Pointer> implements LazyNDArray {
             return;
         }
 
-        ByteBuffer bb = manager.allocateDirect(size * type.getNumOfBytes());
+        ByteBuffer bb = manager.allocateDirect(Math.toIntExact((long) size * type.getNumOfBytes()));
         BaseNDManager.copyBuffer(buffer, bb);
         JnaUtils.syncCopyFromCPU(getHandle(), bb, size);
     }
