@@ -72,7 +72,7 @@ public class PtNDManager extends BaseNDManager {
             return JniUtils.createNdFromByteBuffer(
                     this, (ByteBuffer) data, shape, dataType, SparseFormat.DENSE, device);
         }
-        ByteBuffer buf = allocateDirect(size * dataType.getNumOfBytes());
+        ByteBuffer buf = allocateDirect(Math.toIntExact((long) size * dataType.getNumOfBytes()));
         copyBuffer(data, buf);
         return JniUtils.createNdFromByteBuffer(
                 this, buf, shape, dataType, SparseFormat.DENSE, device);

@@ -257,7 +257,7 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
             return;
         }
         // int8, uint8, boolean use ByteBuffer, so need to explicitly input DataType
-        ByteBuffer buf = manager.allocateDirect(size * type.getNumOfBytes());
+        ByteBuffer buf = manager.allocateDirect(Math.toIntExact((long) size * type.getNumOfBytes()));
         BaseNDManager.copyBuffer(buffer, buf);
 
         // If NDArray is on the GPU, it is native code responsibility to control the data life cycle

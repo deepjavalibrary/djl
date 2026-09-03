@@ -169,7 +169,9 @@ public abstract class NDArrayAdapter implements NDArray {
     }
 
     private ByteBuffer toTypeInternal(Number[] numbers, DataType dataType) {
-        int size = dataType.getNumOfBytes() * numbers.length;
+        // 64-bit arithmetic with a fail-closed narrowing: getNumOfBytes() * length can overflow
+        // int for large arrays, silently allocating an undersized direct buffer.
+        int size = Math.toIntExact((long) dataType.getNumOfBytes() * numbers.length);
         ByteBuffer bb = manager.allocateDirect(size);
         for (Number number : numbers) {
             switch (dataType) {
