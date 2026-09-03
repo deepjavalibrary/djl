@@ -33,7 +33,11 @@ DJL can load Translator from the following source:
 
 - from jar files directly locate in `libs` folder
 - from compiled java .class file in `libs/classes` folder
-- DJL can compile .java files in `libs/classes` folder at runtime and load compiled class
+- DJL can compile .java files in `libs/classes` folder at runtime and load compiled class.
+  Compiling sources at model-load time is **opt-in**: set `DJL_COMPILE_JAVA=true` or
+  `-Dai.djl.compile_java=true` when loading models from a trusted source. Without it, a model that
+  bundles `.java` sources fails to load with a message naming the flag. Shipping a precompiled
+  `.class` or `.jar` instead needs no flag and is the recommended option.
 
 ## Configure data processing based on standard Translator
 DJL provides several built-in Translator for well-know ML applications, such as `Image Classification`

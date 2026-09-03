@@ -187,7 +187,9 @@ public abstract class AbstractRepository implements Repository {
         }
 
         logger.debug("Downloading artifact: {} ...", fileUri);
-        try (InputStream is = new BufferedInputStream(fileUri.toURL().openStream())) {
+        // The artifact URI comes from the repository metadata and may be absolute, so route it
+        // through Utils.openUrl to apply the same URL handling as the rest of the download paths.
+        try (InputStream is = Utils.openUrl(fileUri.toURL())) {
             save(is, tmp, item, progress);
         }
     }

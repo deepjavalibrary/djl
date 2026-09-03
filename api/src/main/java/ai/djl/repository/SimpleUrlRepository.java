@@ -20,7 +20,6 @@ import ai.djl.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -102,7 +101,10 @@ public class SimpleUrlRepository extends AbstractRepository {
     protected void download(Path tmp, URI baseUri, Artifact.Item item, Progress progress)
             throws IOException {
         logger.debug("Downloading artifact: {} ...", uri);
-        try (InputStream is = new BufferedInputStream(uri.toURL().openStream())) {
+        // Route through Utils.openUrl so the download is subject to the same URL handling
+        // (scheme restriction, non-public address blocking, redirect re-validation) instead of
+        // calling openStream() directly, which would bypass them.
+        try (InputStream is = Utils.openUrl(uri.toURL())) {
             save(is, tmp, item, progress);
         }
     }
@@ -131,23 +133,31 @@ public class SimpleUrlRepository extends AbstractRepository {
         String hash = Utils.hash(uri.toString());
         MRL mrl = model(Application.UNDEFINED, DefaultModelZoo.GROUP_ID, hash);
         metadata.setRepositoryUri(mrl.toURI());
+        resolved = true;
         return metadata;
     }
 
     private long getContentLength() throws IOException {
         String scheme = uri.getScheme();
         if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
+            if (Utils.isOfflineMode()) {
+                // An unknown size is represented as -1, and the artifact may already be cached, so
+                // reporting the size as unknown keeps a cached model loadable offline. Probing here
+                // would fail the load before prepare() can find the cached resource directory.
+                logger.debug("Offline mode is enabled, skipping content length probe: {}", uri);
+                return -1;
+            }
             HttpURLConnection conn = null;
             try {
-                resolved = true;
-                conn = (HttpURLConnection) uri.toURL().openConnection();
-                conn.setRequestMethod("HEAD");
+                // Route the HEAD probe through the same handling as the download path, so
+                // redirects are resolved explicitly and every hop is checked.
+                conn = Utils.openHttpConnection(uri.toURL(), "HEAD", Collections.emptyMap());
                 int code = conn.getResponseCode();
                 if (code != 200) {
                     logger.debug("Failed detect content length, error code: {}", code);
                     return -1;
                 }
-                return conn.getContentLength();
+                return conn.getContentLengthLong();
             } finally {
                 if (conn != null) {
                     conn.disconnect();

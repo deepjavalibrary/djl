@@ -40,6 +40,7 @@ import ai.djl.util.ZipUtils;
 import com.google.gson.reflect.TypeToken;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -146,15 +147,29 @@ public class CustomTranslatorTest {
         Path destFile = classesDir.resolve("MyTranslator.java");
         Files.copy(srcFile, destFile, StandardCopyOption.REPLACE_EXISTING);
 
-        // load translator from classes folder
-        runImageClassification(Application.UNDEFINED, null, "MyTranslator");
+        // Compiling a bundled .java translator is opt-in; enable it for the cases below, which
+        // exercise that path (the jar case is built from the compiled output). The environment
+        // variable takes precedence over the system property, so an environment that pins it off
+        // would make the property below a no-op and the assertions fail for an unrelated reason.
+        String envOptIn = Utils.getenv("DJL_COMPILE_JAVA");
+        if (envOptIn != null && !Boolean.parseBoolean(envOptIn)) {
+            throw new SkipException(
+                    "DJL_COMPILE_JAVA is set to " + envOptIn + " in the environment");
+        }
+        System.setProperty("ai.djl.compile_java", "true");
+        try {
+            // load translator from classes folder
+            runImageClassification(Application.UNDEFINED, null, "MyTranslator");
 
-        Path jarFile = libsDir.resolve("example.jar");
-        ZipUtils.zip(classesDir, jarFile, false);
-        Utils.deleteQuietly(classesDir);
+            Path jarFile = libsDir.resolve("example.jar");
+            ZipUtils.zip(classesDir, jarFile, false);
+            Utils.deleteQuietly(classesDir);
 
-        // load translator from jar file
-        runImageClassification(Application.UNDEFINED, null, "MyTranslator");
+            // load translator from jar file
+            runImageClassification(Application.UNDEFINED, null, "MyTranslator");
+        } finally {
+            System.clearProperty("ai.djl.compile_java");
+        }
     }
 
     @Test
