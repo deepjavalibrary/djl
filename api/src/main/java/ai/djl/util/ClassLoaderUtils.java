@@ -256,11 +256,11 @@ public final class ClassLoaderUtils {
             return;
         }
         if (!isDynamicCompilationEnabled()) {
-            // Skipped rather than failed here: whether this matters depends on the caller, since a
-            // model may also ship a precompiled .class or .jar that satisfies the lookup. Callers
-            // that resolve an implementation from the output report it via hasSkippedJavaSources
-            // when the lookup finds nothing, so a load cannot silently change behavior.
-            logger.warn(
+            // Logged at error and not thrown: a model may also ship a precompiled .class or .jar
+            // that satisfies the lookup, or the sources may be incidental to it, so failing here
+            // would break loads that do not depend on compiling them. The message names the flag so
+            // a model that did depend on it is diagnosable.
+            logger.error(
                     "Skipping {} bundled java file(s) in {}: compiling bundled sources is disabled"
                             + " by default. Set DJL_COMPILE_JAVA=true or"
                             + " -Dai.djl.compile_java=true to enable it for models from a trusted"
@@ -294,21 +294,6 @@ public final class ClassLoaderUtils {
         } catch (Throwable e) {
             logger.warn("Failed to compile bundled java file", e);
         }
-    }
-
-    /**
-     * Returns whether {@code dir} holds bundled {@code .java} sources that were not compiled
-     * because compilation is disabled.
-     *
-     * <p>Callers that resolve an implementation from the compiled output use this to report a
-     * missing implementation as a configuration problem rather than falling back silently. It is
-     * false once the opt-in is set, and false when the directory holds no sources.
-     *
-     * @param dir the directory that was scanned for java sources
-     * @return true if sources are present and compilation is disabled
-     */
-    public static boolean hasSkippedJavaSources(Path dir) {
-        return !isDynamicCompilationEnabled() && findJavaSources(dir).length > 0;
     }
 
     private static String[] findJavaSources(Path dir) {

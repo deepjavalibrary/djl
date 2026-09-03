@@ -59,6 +59,12 @@ public class UrlAccessAndCompilationTest {
         if (Utils.getenv("DJL_OFFLINE") != null) {
             throw new org.testng.SkipException("DJL_OFFLINE is set in the environment");
         }
+        if (Utils.getenv("DJL_ALLOW_INSECURE_URL") != null) {
+            throw new org.testng.SkipException("DJL_ALLOW_INSECURE_URL is set in the environment");
+        }
+        // The opt-out disables everything these tests assert, and the build forwards ai.djl.*
+        // properties into the test JVM, so clear it here and restore it in cleanup().
+        System.clearProperty("ai.djl.allow_insecure_url");
         // Offline mode is refused before the destination is examined, which is correct but would
         // make every assertion below read "Offline mode is enabled" instead. `gradlew --offline`
         // sets this property, so clear it for these tests and restore it in cleanup().
@@ -174,7 +180,9 @@ public class UrlAccessAndCompilationTest {
             try (InputStream is = Utils.openUrl(tmp.toUri().toURL())) {
                 Assert.assertEquals(new String(is.readAllBytes(), StandardCharsets.UTF_8), "local");
             }
-            URL viaLocalhost = new URL("file://localhost" + tmp.toAbsolutePath());
+            // Build the authority form from the URI path, not from the filesystem path: on Windows
+            // an absolute path is "D:\..." and concatenating it produces a malformed URL.
+            URL viaLocalhost = new URL("file://localhost" + tmp.toUri().getPath());
             try (InputStream is = Utils.openUrl(viaLocalhost)) {
                 Assert.assertEquals(new String(is.readAllBytes(), StandardCharsets.UTF_8), "local");
             }
@@ -312,8 +320,8 @@ public class UrlAccessAndCompilationTest {
                         .getBytes(StandardCharsets.UTF_8));
         System.clearProperty("djl.test.canary");
         try {
-            // Scanning must not throw: a model may still ship a usable .class or .jar, so whether a
-            // skipped source matters is the caller's decision, reported via hasSkippedJavaSources.
+            // Scanning must not throw: a model may still ship a usable .class or .jar, or the
+            // sources may be incidental, so failing here would break loads that never needed them.
             ClassLoaderUtils.compileJavaClass(classes);
             // Default (disabled): nothing compiled and the static initializer never ran.
             Assert.assertFalse(Files.exists(classes.resolve("Bundled.class")));
@@ -321,21 +329,6 @@ public class UrlAccessAndCompilationTest {
                     System.getProperty("djl.test.canary"),
                     "the bundled static initializer must not have run");
             Assert.assertFalse(ClassLoaderUtils.isDynamicCompilationEnabled());
-            Assert.assertTrue(ClassLoaderUtils.hasSkippedJavaSources(classes));
-        } finally {
-            deleteTree(dir);
-        }
-    }
-
-    @Test
-    public void testSkippedSourcesNotReportedWhenNoneBundled() throws IOException {
-        // The flag being off must not make an ordinary model look misconfigured.
-        Path dir = Files.createTempDirectory("djl-nosources");
-        Path classes = Files.createDirectories(dir.resolve("classes"));
-        try {
-            Files.write(classes.resolve("Ready.class"), new byte[] {1, 2, 3});
-            Assert.assertFalse(ClassLoaderUtils.hasSkippedJavaSources(classes));
-            Assert.assertFalse(ClassLoaderUtils.hasSkippedJavaSources(dir.resolve("absent")));
         } finally {
             deleteTree(dir);
         }
@@ -349,12 +342,16 @@ public class UrlAccessAndCompilationTest {
         Path classes = Files.createDirectories(dir.resolve("classes"));
         Path sub = Files.createDirectories(classes.resolve("sub"));
         try {
-            if (!sub.toFile().setReadable(false)) {
+            Files.write(
+                    sub.resolve("Hidden.java"), "class Hidden {}".getBytes(StandardCharsets.UTF_8));
+            if (!sub.toFile().setReadable(false) || sub.toFile().canRead()) {
+                // Running as root bypasses the permission, so the walk would succeed and the
+                // assertion below would hold for the wrong reason.
+                sub.toFile().setReadable(true);
                 throw new org.testng.SkipException("cannot make a directory unreadable here");
             }
-            // Must return normally rather than propagating.
+            // Must return normally rather than propagating the UncheckedIOException.
             ClassLoaderUtils.compileJavaClass(classes);
-            Assert.assertFalse(ClassLoaderUtils.hasSkippedJavaSources(classes));
         } finally {
             sub.toFile().setReadable(true);
             deleteTree(dir);
@@ -745,6 +742,65 @@ public class UrlAccessAndCompilationTest {
         } finally {
             server.stop(0);
         }
+    }
+
+    @Test
+    public void testSchemeDowngradeIsRecognized() throws MalformedURLException {
+        // Checked directly rather than over a socket: pointing an https URL at a plaintext listener
+        // blocks in the TLS handshake, since only the connect phase is bounded by a timeout.
+        Assert.assertTrue(
+                Utils.isSchemeDowngrade(new URL("https://host/a"), new URL("http://host/b")));
+        Assert.assertTrue(
+                Utils.isSchemeDowngrade(new URL("https://host/a"), new URL("http://other.host/b")));
+        // Same scheme, and the http -> https upgrade, must both be allowed.
+        Assert.assertFalse(
+                Utils.isSchemeDowngrade(
+                        new URL("https://host/a"), new URL("https://other.host/b")));
+        Assert.assertFalse(
+                Utils.isSchemeDowngrade(new URL("http://host/a"), new URL("https://host/b")));
+        Assert.assertFalse(
+                Utils.isSchemeDowngrade(new URL("http://host/a"), new URL("http://host/b")));
+    }
+
+    @Test
+    public void testUnfollowedRedirectStatusIsRejected() throws IOException {
+        // 300/304/305 are 3xx but are not followed. getInputStream() succeeds for any code below
+        // 400, so handing the connection back would let the negotiation page be written out as the
+        // artifact.
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext(
+                "/",
+                exchange -> {
+                    byte[] out = "CHOICES-PAGE".getBytes(StandardCharsets.UTF_8);
+                    exchange.getResponseHeaders().add("Location", "/other");
+                    exchange.sendResponseHeaders(300, out.length);
+                    exchange.getResponseBody().write(out);
+                    exchange.close();
+                });
+        server.start();
+        try {
+            URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/x.tar.gz");
+            IOException e =
+                    Assert.expectThrows(
+                            IOException.class,
+                            () -> Utils.openHttpConnection(url, "GET", null, h -> true));
+            Assert.assertTrue(
+                    e.getMessage().contains("Unexpected redirect status 300"),
+                    "unexpected: " + e.getMessage());
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testCarrierGradeNatIsNotPublic() {
+        // 100.64.0.0/10 is standard Kubernetes secondary pod CIDR space, so an internal service can
+        // be addressed there, and InetAddress has no predicate for it.
+        Assert.assertFalse(Utils.isPublicHost("100.64.0.1"));
+        Assert.assertFalse(Utils.isPublicHost("100.127.255.254"));
+        // Addresses either side of the range must not be caught by the arithmetic.
+        Assert.assertTrue(Utils.isPublicHost("100.63.255.255"));
+        Assert.assertTrue(Utils.isPublicHost("100.128.0.1"));
     }
 
     @Test

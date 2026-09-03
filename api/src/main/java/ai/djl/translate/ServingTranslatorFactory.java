@@ -84,26 +84,10 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         return (Translator<I, O>) loadDefaultTranslator(model, arguments);
     }
 
-    private ServingTranslator findTranslator(Path path, String className)
-            throws TranslateException {
+    private ServingTranslator findTranslator(Path path, String className) {
         Path classesDir = path.resolve("classes");
         ClassLoaderUtils.compileJavaClass(classesDir);
-        ServingTranslator translator =
-                ClassLoaderUtils.findImplementation(path, ServingTranslator.class, className);
-        if (translator == null && ClassLoaderUtils.hasSkippedJavaSources(classesDir)) {
-            // No implementation was found and the only candidates were sources left uncompiled.
-            // Report it instead of falling back to a default translator, which would load the model
-            // and serve different results with nothing but a log line to explain it. A model that
-            // also ships a precompiled .class or .jar resolves above and is unaffected.
-            throw new TranslateException(
-                    "No translator found in "
-                            + path
-                            + ". It bundles java sources, but compiling bundled sources is disabled"
-                            + " by default. Set DJL_COMPILE_JAVA=true or"
-                            + " -Dai.djl.compile_java=true to enable it for models from a trusted"
-                            + " source, or ship precompiled .class/.jar files instead.");
-        }
-        return translator;
+        return ClassLoaderUtils.findImplementation(path, ServingTranslator.class, className);
     }
 
     private TranslatorFactory loadTranslatorFactory(String className) {

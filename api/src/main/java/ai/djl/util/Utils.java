@@ -741,7 +741,15 @@ public final class Utils {
                 throw e;
             }
             if (!isRedirect(code)) {
-                // A non-redirect status is the caller's to interpret: openUrl surfaces it when the
+                if (code / 100 == 3) {
+                    // A 3xx that is not followed (300, 304, 305, ...) still carries a body, and
+                    // getInputStream() succeeds for any code below 400, so returning it would let
+                    // a negotiation page be written out as the model or the native library.
+                    conn.disconnect();
+                    throw new IOException(
+                            "Unexpected redirect status " + code + " for URL: " + url);
+                }
+                // Other statuses are the caller's to interpret: openUrl surfaces an error when the
                 // stream is opened, and the content-length probe treats non-200 as unknown size.
                 return conn;
             }
@@ -754,6 +762,10 @@ public final class Utils {
             }
             // Resolve relative redirects against the current URL, then re-validate the target.
             URL next = new URL(current, location);
+            if (isSchemeDowngrade(current, next)) {
+                throw new IOException(
+                        "Blocked redirect downgrading https to " + next.getProtocol());
+            }
             if (!sameOrigin(current, next)) {
                 // Following a redirect to another origin must not carry credentials with it. Once
                 // dropped they stay dropped, even if a later hop returns to the original origin.
@@ -808,7 +820,8 @@ public final class Utils {
                         || addr.isSiteLocalAddress()
                         || addr.isAnyLocalAddress()
                         || addr.isMulticastAddress()
-                        || isIpv6UniqueLocal(addr)) {
+                        || isIpv6UniqueLocal(addr)
+                        || isCarrierGradeNat(addr)) {
                     return false;
                 }
             }
@@ -819,6 +832,24 @@ public final class Utils {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns whether following {@code to} from {@code from} would drop TLS.
+     *
+     * <p>{@link HttpURLConnection} refuses to follow a redirect that changes scheme, so resolving
+     * hops explicitly has to refuse the downgrade too. Otherwise an {@code https} fetch answered
+     * with a plaintext {@code Location} would be retrieved in the clear, and nothing downstream
+     * would notice: {@code SimpleUrlRepository} never records a checksum, so checksum validation is
+     * a no-op for these artifacts.
+     *
+     * @param from the current hop
+     * @param to the redirect target
+     * @return true if the hop drops https
+     */
+    static boolean isSchemeDowngrade(URL from, URL to) {
+        return "https".equalsIgnoreCase(from.getProtocol())
+                && !"https".equalsIgnoreCase(to.getProtocol());
     }
 
     /**
@@ -864,6 +895,27 @@ public final class Utils {
     private static boolean isRedirect(int code) {
         // 300, 304 and 305 are 3xx but are not redirects to follow.
         return code == 301 || code == 302 || code == 303 || code == 307 || code == 308;
+    }
+
+    /**
+     * Returns whether an IPv4 address is in the RFC 6598 carrier-grade NAT range (100.64.0.0/10).
+     *
+     * <p>Checked explicitly because {@link InetAddress} has no predicate for it and because it is
+     * routinely used for Kubernetes secondary pod CIDRs, so an internal service can be addressed
+     * there. Other reserved ranges are deliberately not included: no deployment serves an internal
+     * endpoint from IETF protocol assignments or unallocated space, so blocking them would add
+     * surface without removing risk.
+     *
+     * @param addr the address to classify
+     * @return true if the address is in 100.64.0.0/10
+     */
+    private static boolean isCarrierGradeNat(InetAddress addr) {
+        byte[] b = addr.getAddress();
+        if (b.length != 4 || (b[0] & 0xFF) != 100) {
+            return false;
+        }
+        int second = b[1] & 0xFF;
+        return second >= 64 && second <= 127;
     }
 
     private static boolean isIpv6UniqueLocal(InetAddress addr) {
