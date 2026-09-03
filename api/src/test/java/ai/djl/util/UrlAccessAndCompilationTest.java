@@ -96,10 +96,11 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testJarProtocolAllowedByDefault() throws IOException {
-        // jar:file: reads a resource bundled inside a local jar (e.g. djl-serving's
-        // plugin.definition). Only a nested file: URL is a purely local read; the nested-http case
-        // is covered by testJarUrlNestingRemoteProtocolIsBlocked. Build a real one-entry jar and
-        // read it back through a jar: URL.
+        // jar:file: with no authority reads a resource bundled inside a local jar (e.g.
+        // djl-serving's plugin.definition). The nested URL is what decides: a remote nested scheme
+        // is covered by testJarUrlNestingRemoteProtocolIsBlocked and a nested file: carrying an
+        // authority by testJarUrlNestingRemoteFileAuthorityIsBlocked. Build a real one-entry jar
+        // and read it back through a jar: URL.
         Path jar = Files.createTempFile("djl-jar", ".jar");
         try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(jar))) {
             jos.putNextEntry(new ZipEntry("META-INF/probe.txt"));
@@ -127,9 +128,8 @@ public class UrlAccessAndCompilationTest {
     @Test
     public void testJarUrlNestingRemoteProtocolIsBlocked() throws IOException {
         // A jar: URL nests another URL and the connection fetches it, but reports protocol "jar"
-        // with an empty host -- so without an explicit check on the nested URL,
-        // jar:http://host/x.jar
-        // would reach the network without ever being seen by the destination rule.
+        // with an empty host, so nothing about the outer URL reveals the destination. Without a
+        // check on the nested URL, jar:http://host/x.jar reaches the network unseen.
         AtomicInteger hits = new AtomicInteger();
         HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         server.createContext(
@@ -145,12 +145,58 @@ public class UrlAccessAndCompilationTest {
             URL nested = new URL("jar:http://127.0.0.1:" + port + "/x.jar!/entry.txt");
             IOException e = Assert.expectThrows(IOException.class, () -> Utils.openUrl(nested));
             Assert.assertTrue(
-                    e.getMessage().contains("nesting a non-local protocol"),
+                    e.getMessage().contains("nesting a remote protocol"),
                     "unexpected: " + e.getMessage());
             Assert.assertEquals(hits.get(), 0, "the nested destination must not be contacted");
         } finally {
             server.stop(0);
         }
+    }
+
+    @Test
+    public void testFileUrlWithRemoteAuthorityIsBlocked() throws IOException {
+        // file: is only a local read when it has no authority. The JDK's file handler falls back to
+        // FTP for any other authority, so file://host/path performs an outbound fetch to host --
+        // which the scheme name alone does not reveal. Verified: openConnection() on these returns
+        // sun.net.www.protocol.ftp.FtpURLConnection.
+        for (String u :
+                new String[] {
+                    "file://10.0.0.5/pub/model.tar.gz", "file://169.254.169.254/latest/meta-data/x"
+                }) {
+            IOException e = Assert.expectThrows(IOException.class, () -> Utils.openUrl(new URL(u)));
+            Assert.assertTrue(
+                    e.getMessage().contains("remote authority"), u + " -> " + e.getMessage());
+        }
+        // A genuinely local file: URL still works, with and without an explicit localhost.
+        Path tmp = Files.createTempFile("djl-localauth", ".txt");
+        Files.write(tmp, "local".getBytes(StandardCharsets.UTF_8));
+        try {
+            try (InputStream is = Utils.openUrl(tmp.toUri().toURL())) {
+                Assert.assertEquals(new String(is.readAllBytes(), StandardCharsets.UTF_8), "local");
+            }
+            URL viaLocalhost = new URL("file://localhost" + tmp.toAbsolutePath());
+            try (InputStream is = Utils.openUrl(viaLocalhost)) {
+                Assert.assertEquals(new String(is.readAllBytes(), StandardCharsets.UTF_8), "local");
+            }
+        } finally {
+            Files.deleteIfExists(tmp);
+        }
+    }
+
+    @Test
+    public void testJarUrlNestingRemoteFileAuthorityIsBlocked() {
+        // The nested protocol being "file" is not sufficient: jar:file://host/x.jar!/e is fetched
+        // over FTP exactly like the bare file: form, so the nested URL's authority has to be
+        // checked
+        // too. This is the shape a nested-protocol-name check alone lets through.
+        IOException e =
+                Assert.expectThrows(
+                        IOException.class,
+                        () ->
+                                Utils.openUrl(
+                                        new URL("jar:file://10.0.0.5/pub/evil.jar!/entry.txt")));
+        Assert.assertTrue(
+                e.getMessage().contains("remote authority"), "unexpected: " + e.getMessage());
     }
 
     @Test

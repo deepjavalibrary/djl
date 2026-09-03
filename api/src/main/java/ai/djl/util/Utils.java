@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
@@ -548,27 +549,94 @@ public final class Utils {
             return openHttpStream(url, headers);
         }
         if ("file".equalsIgnoreCase(protocol)) {
+            requireLocalFileUrl(url);
             return new BufferedInputStream(url.openStream());
         }
         if ("jar".equalsIgnoreCase(protocol)) {
             // A jar: URL nests another URL, as jar:<nested>!/<entry>, and the connection fetches
-            // that nested URL. Only a nested file: URL is a purely local read; jar:http://... would
-            // perform a network fetch that neither the destination rule nor the redirect handling
-            // above can see, because a jar: URL reports protocol "jar" and an empty host.
-            URL nested = ((JarURLConnection) url.openConnection()).getJarFileURL();
-            String nestedProtocol = nested.getProtocol();
-            if (!"file".equalsIgnoreCase(nestedProtocol)) {
-                throw new IOException(
-                        "Blocked jar URL nesting a non-local protocol: "
-                                + nestedProtocol
-                                + ". Set DJL_ALLOW_INSECURE_URL=true to override.");
-            }
+            // that nested URL, so the nested URL is what has to be judged: the outer URL reports
+            // protocol "jar" and an empty host, which no destination rule can act on.
+            requireLocalRead(nestedUrlOf(url));
             return new BufferedInputStream(url.openStream());
         }
         throw new IOException(
                 "Blocked request using unsupported URL protocol: "
                         + protocol
                         + ". Set DJL_ALLOW_INSECURE_URL=true to override.");
+    }
+
+    /**
+     * Returns the URL nested inside a {@code jar:} URL, or the URL itself if it cannot be read.
+     *
+     * @param url the jar URL
+     * @return the nested URL
+     * @throws IOException if the nested URL cannot be determined
+     */
+    private static URL nestedUrlOf(URL url) throws IOException {
+        URLConnection conn = url.openConnection();
+        if (!(conn instanceof JarURLConnection)) {
+            // A container may register its own handler for jar:. Without access to the nested URL
+            // there is nothing to judge, so refuse rather than guess.
+            throw new IOException(
+                    "Blocked jar URL with an unrecognized connection type: "
+                            + conn.getClass().getName()
+                            + ". Set DJL_ALLOW_INSECURE_URL=true to override.");
+        }
+        return ((JarURLConnection) conn).getJarFileURL();
+    }
+
+    /**
+     * Verifies that a URL denotes a local read rather than a network fetch.
+     *
+     * <p>Judged on the destination rather than on the scheme name, because several schemes read
+     * locally in one form and over the network in another. {@code file:} with an authority is
+     * fetched over FTP by the JDK, and {@code jar:} nests whatever it is given. Container schemes
+     * that address a resource inside the running application ({@code nested:} for a Spring Boot
+     * executable jar, {@code vfs:}, {@code wsjar:}, {@code bundleresource:}) are local reads and
+     * are allowed, so packaging an application as an executable jar keeps working.
+     *
+     * @param url the URL to check
+     * @throws IOException if the URL would perform a network fetch
+     */
+    private static void requireLocalRead(URL url) throws IOException {
+        String protocol = url.getProtocol();
+        if ("http".equalsIgnoreCase(protocol)
+                || "https".equalsIgnoreCase(protocol)
+                || "ftp".equalsIgnoreCase(protocol)
+                || "ftps".equalsIgnoreCase(protocol)) {
+            throw new IOException(
+                    "Blocked jar URL nesting a remote protocol: "
+                            + protocol
+                            + ". Set DJL_ALLOW_INSECURE_URL=true to override.");
+        }
+        if ("file".equalsIgnoreCase(protocol)) {
+            requireLocalFileUrl(url);
+        } else if ("jar".equalsIgnoreCase(protocol)) {
+            requireLocalRead(nestedUrlOf(url));
+        }
+    }
+
+    /**
+     * Verifies that a {@code file:} URL has no remote authority.
+     *
+     * <p>{@code file://host/path} is not a local read: the JDK's file handler falls back to FTP for
+     * any authority that is not empty, {@code localhost} or a {@code ~} user reference, so such a
+     * URL performs an outbound fetch to {@code host}.
+     *
+     * @param url the file URL to check
+     * @throws IOException if the URL carries a remote authority
+     */
+    private static void requireLocalFileUrl(URL url) throws IOException {
+        String host = url.getHost();
+        if (host != null
+                && !host.isEmpty()
+                && !"localhost".equalsIgnoreCase(host)
+                && !host.startsWith("~")) {
+            throw new IOException(
+                    "Blocked file URL with a remote authority: "
+                            + host
+                            + ". Set DJL_ALLOW_INSECURE_URL=true to override.");
+        }
     }
 
     private static InputStream openHttpStream(URL url, Map<String, String> headers)
