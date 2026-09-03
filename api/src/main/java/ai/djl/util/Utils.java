@@ -635,6 +635,9 @@ public final class Utils {
     static HttpURLConnection openHttpConnection(
             URL url, String method, Map<String, String> headers, Predicate<String> hostAllowed)
             throws IOException {
+        // Also normalised here rather than relying on the public overload: this one is called
+        // directly, so it should not depend on a caller having done it.
+        Map<String, String> requestHeaders = headers == null ? Collections.emptyMap() : headers;
         URL current = url;
         // Set once a redirect leaves the original origin, so credentials are not carried to it.
         boolean stripCredentials = false;
@@ -656,7 +659,7 @@ public final class Utils {
             // artifact downloads are large and legitimately slow.
             conn.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
             conn.setRequestMethod(method);
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
+            for (Map.Entry<String, String> entry : requestHeaders.entrySet()) {
                 if (stripCredentials && isCredentialHeader(entry.getKey())) {
                     continue;
                 }

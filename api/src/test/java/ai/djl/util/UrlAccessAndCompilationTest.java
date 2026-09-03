@@ -673,19 +673,22 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testNullHeadersAreTreatedAsEmpty() throws IOException {
-        // openHttpConnection is new public API; null headers must not surface as an NPE from inside
-        // the redirect loop. Exercised with the opt-out set and without, since the two take
-        // different paths through the method.
+        // openHttpConnection is new public API; null headers must not surface as an NPE. There are
+        // two independent places the header map is read -- the validated redirect loop and the
+        // opt-out branch -- and both must tolerate it. A default-path call to a non-public host is
+        // NOT one of them: it is rejected before any header is read, so it would pass either way.
         HttpServer server = startServer(new HashMap<>(), "no-headers");
         try {
             URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/data");
-            // Default path: rejected on the destination, but by an IOException rather than an NPE.
-            IOException e =
-                    Assert.expectThrows(
-                            IOException.class, () -> Utils.openHttpConnection(url, "HEAD", null));
-            Assert.assertTrue(
-                    e.getMessage().contains("non-public"), "unexpected: " + e.getMessage());
-            // Opt-out path: the request is actually issued, so a null map must be usable.
+            // Validated path, reached with a permissive host check so the loop body actually runs.
+            // This is the branch production traffic takes.
+            HttpURLConnection validated = Utils.openHttpConnection(url, "HEAD", null, h -> true);
+            try {
+                Assert.assertEquals(validated.getResponseCode(), 200);
+            } finally {
+                validated.disconnect();
+            }
+            // Opt-out branch: a separate header loop, so cover it separately.
             System.setProperty("ai.djl.allow_insecure_url", "true");
             HttpURLConnection conn = Utils.openHttpConnection(url, "HEAD", null);
             try {
