@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -53,6 +54,8 @@ public final class Utils {
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
     private static final int MAX_REDIRECTS = 5;
+
+    private static final int CONNECT_TIMEOUT_MILLIS = 10_000;
 
     public static final String[] EMPTY_ARRAY = new String[0];
 
@@ -530,31 +533,54 @@ public final class Utils {
      */
     public static InputStream openUrl(URL url, Map<String, String> headers) throws IOException {
         // Remote fetches are limited to public http(s) destinations by default, and redirects are
-        // resolved explicitly so each hop is checked against the same rule. Local-resource schemes
-        // (file:, jar:) are unrestricted, since they do not perform a network fetch. Other schemes
-        // are not supported. Set DJL_ALLOW_INSECURE_URL=true (or -Dai.djl.allow_insecure_url=true)
-        // to restore the previous unrestricted behavior.
+        // resolved explicitly so each hop is checked against the same rule. file: is a local read.
+        // jar: is allowed only when the URL it nests is itself local (see below). Other schemes are
+        // not supported. Set DJL_ALLOW_INSECURE_URL=true (or -Dai.djl.allow_insecure_url=true) to
+        // restore the previous unrestricted behavior.
         String protocol = url.getProtocol();
-        if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
-            HttpURLConnection conn = openHttpConnection(url, "GET", headers);
-            try {
-                return new BufferedInputStream(conn.getInputStream());
-            } catch (IOException e) {
-                // An error response leaves the connection open, so release it before propagating.
-                conn.disconnect();
-                throw e;
+        if (isInsecureUrlAllowed()) {
+            if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
+                return openHttpStream(url, headers);
             }
+            return new BufferedInputStream(url.openStream());
         }
-        // Local-resource schemes and full-opt-out use the legacy direct stream.
-        if (isInsecureUrlAllowed()
-                || "file".equalsIgnoreCase(protocol)
-                || "jar".equalsIgnoreCase(protocol)) {
+        if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
+            return openHttpStream(url, headers);
+        }
+        if ("file".equalsIgnoreCase(protocol)) {
+            return new BufferedInputStream(url.openStream());
+        }
+        if ("jar".equalsIgnoreCase(protocol)) {
+            // A jar: URL nests another URL, as jar:<nested>!/<entry>, and the connection fetches
+            // that nested URL. Only a nested file: URL is a purely local read; jar:http://... would
+            // perform a network fetch that neither the destination rule nor the redirect handling
+            // above can see, because a jar: URL reports protocol "jar" and an empty host.
+            URL nested = ((JarURLConnection) url.openConnection()).getJarFileURL();
+            String nestedProtocol = nested.getProtocol();
+            if (!"file".equalsIgnoreCase(nestedProtocol)) {
+                throw new IOException(
+                        "Blocked jar URL nesting a non-local protocol: "
+                                + nestedProtocol
+                                + ". Set DJL_ALLOW_INSECURE_URL=true to override.");
+            }
             return new BufferedInputStream(url.openStream());
         }
         throw new IOException(
                 "Blocked request using unsupported URL protocol: "
                         + protocol
                         + ". Set DJL_ALLOW_INSECURE_URL=true to override.");
+    }
+
+    private static InputStream openHttpStream(URL url, Map<String, String> headers)
+            throws IOException {
+        HttpURLConnection conn = openHttpConnection(url, "GET", headers);
+        try {
+            return new BufferedInputStream(conn.getInputStream());
+        } catch (IOException e) {
+            // An error response leaves the connection open, so release it before propagating.
+            conn.disconnect();
+            throw e;
+        }
     }
 
     /**
@@ -619,6 +645,11 @@ public final class Utils {
             }
             HttpURLConnection conn = (HttpURLConnection) current.openConnection();
             conn.setInstanceFollowRedirects(false);
+            // Bound the connect phase. This loop can open up to MAX_REDIRECTS + 1 connections, so
+            // without it a black-holed destination multiplies the OS SYN timeout by the hop count.
+            // Only the connect phase is bounded: a read timeout would also apply to the body, and
+            // artifact downloads are large and legitimately slow.
+            conn.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
             conn.setRequestMethod(method);
             for (Map.Entry<String, String> entry : headers.entrySet()) {
                 if (stripCredentials && isCredentialHeader(entry.getKey())) {

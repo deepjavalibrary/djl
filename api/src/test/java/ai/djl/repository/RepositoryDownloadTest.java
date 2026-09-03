@@ -12,7 +12,12 @@
  */
 package ai.djl.repository;
 
+import ai.djl.util.Utils;
+
 import org.testng.Assert;
+import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -22,6 +27,28 @@ import java.nio.file.Path;
 
 /** Tests the URL handling applied when downloading artifacts declared by repository metadata. */
 public class RepositoryDownloadTest {
+
+    private String savedOffline;
+
+    @BeforeMethod
+    public void clearOfflineMode() {
+        savedOffline = System.getProperty("ai.djl.offline");
+        if (Utils.getenv("DJL_OFFLINE") != null) {
+            throw new SkipException("DJL_OFFLINE is set in the environment");
+        }
+        // Offline mode is refused before the destination is examined, so these tests would assert
+        // on the wrong message under `gradlew --offline`, which sets this property.
+        System.clearProperty("ai.djl.offline");
+    }
+
+    @AfterMethod
+    public void restoreOfflineMode() {
+        if (savedOffline == null) {
+            System.clearProperty("ai.djl.offline");
+        } else {
+            System.setProperty("ai.djl.offline", savedOffline);
+        }
+    }
 
     @Test
     public void testNonPublicArtifactUriIsRejected() throws IOException {

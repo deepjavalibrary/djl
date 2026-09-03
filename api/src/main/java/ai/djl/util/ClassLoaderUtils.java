@@ -250,39 +250,24 @@ public final class ClassLoaderUtils {
      * @param dir the directory to scan java file.
      */
     public static void compileJavaClass(Path dir) {
-        String[] files;
-        try {
-            if (!Files.isDirectory(dir)) {
-                logger.debug("Directory not exists: {}", dir);
-                return;
-            }
-            try (Stream<Path> stream = Files.walk(dir)) {
-                files =
-                        stream.filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
-                                .map(p -> p.toAbsolutePath().toString())
-                                .toArray(String[]::new);
-            }
-        } catch (IOException e) {
-            logger.warn("Failed to scan for bundled java files in {}", dir, e);
-            return;
-        }
+        String[] files = findJavaSources(dir);
         if (files.length == 0) {
             // Nothing to compile: the common case of a model without bundled sources stays quiet.
             return;
         }
         if (!isDynamicCompilationEnabled()) {
-            // Report rather than return quietly: callers resolve a translator from the compiled
-            // output and would otherwise fall back to a default implementation, producing
-            // different results with only a log line to explain it.
-            throw new IllegalStateException(
-                    "Found "
-                            + files.length
-                            + " bundled java file(s) in "
-                            + dir
-                            + " but compiling bundled sources is disabled by default. Set"
-                            + " DJL_COMPILE_JAVA=true or -Dai.djl.compile_java=true to enable it"
-                            + " for models from a trusted source, or ship precompiled .class/.jar"
-                            + " files instead.");
+            // Skipped rather than failed here: whether this matters depends on the caller, since a
+            // model may also ship a precompiled .class or .jar that satisfies the lookup. Callers
+            // that resolve an implementation from the output report it via hasSkippedJavaSources
+            // when the lookup finds nothing, so a load cannot silently change behavior.
+            logger.warn(
+                    "Skipping {} bundled java file(s) in {}: compiling bundled sources is disabled"
+                            + " by default. Set DJL_COMPILE_JAVA=true or"
+                            + " -Dai.djl.compile_java=true to enable it for models from a trusted"
+                            + " source, or ship precompiled .class/.jar files instead.",
+                    files.length,
+                    dir);
+            return;
         }
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if (compiler == null) {
@@ -308,6 +293,42 @@ public final class ClassLoaderUtils {
             }
         } catch (Throwable e) {
             logger.warn("Failed to compile bundled java file", e);
+        }
+    }
+
+    /**
+     * Returns whether {@code dir} holds bundled {@code .java} sources that were not compiled
+     * because compilation is disabled.
+     *
+     * <p>Callers that resolve an implementation from the compiled output use this to report a
+     * missing implementation as a configuration problem rather than falling back silently. It is
+     * false once the opt-in is set, and false when the directory holds no sources.
+     *
+     * @param dir the directory that was scanned for java sources
+     * @return true if sources are present and compilation is disabled
+     */
+    public static boolean hasSkippedJavaSources(Path dir) {
+        return !isDynamicCompilationEnabled() && findJavaSources(dir).length > 0;
+    }
+
+    private static String[] findJavaSources(Path dir) {
+        try {
+            if (!Files.isDirectory(dir)) {
+                logger.debug("Directory not exists: {}", dir);
+                return Utils.EMPTY_ARRAY;
+            }
+            try (Stream<Path> stream = Files.walk(dir)) {
+                return stream.filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
+                        .map(p -> p.toAbsolutePath().toString())
+                        .toArray(String[]::new);
+            }
+        } catch (IOException | RuntimeException e) {
+            // Files.walk reports traversal errors from the terminal operation as an unchecked
+            // UncheckedIOException (an unreadable subdirectory, a symlink loop, a directory removed
+            // concurrently), so catching IOException alone would turn a scan problem into a failed
+            // model load.
+            logger.warn("Failed to scan for bundled java files in {}", dir, e);
+            return Utils.EMPTY_ARRAY;
         }
     }
 

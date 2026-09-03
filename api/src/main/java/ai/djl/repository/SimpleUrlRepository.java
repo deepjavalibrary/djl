@@ -140,6 +140,13 @@ public class SimpleUrlRepository extends AbstractRepository {
     private long getContentLength() throws IOException {
         String scheme = uri.getScheme();
         if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
+            if (Utils.isOfflineMode()) {
+                // An unknown size is represented as -1, and the artifact may already be cached, so
+                // reporting the size as unknown keeps a cached model loadable offline. Probing here
+                // would fail the load before prepare() can find the cached resource directory.
+                logger.debug("Offline mode is enabled, skipping content length probe: {}", uri);
+                return -1;
+            }
             HttpURLConnection conn = null;
             try {
                 // Route the HEAD probe through the same handling as the download path, so

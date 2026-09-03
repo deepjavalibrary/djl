@@ -17,6 +17,7 @@ import com.sun.net.httpserver.HttpServer;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -43,10 +44,40 @@ import java.util.zip.ZipEntry;
  */
 public class UrlAccessAndCompilationTest {
 
+    private String savedInsecureUrl;
+    private String savedCompileJava;
+    private String savedOffline;
+
+    @BeforeMethod
+    public void saveProperties() {
+        // The build forwards every ai.djl.* system property into the test JVM, so these may already
+        // be set by the developer running the suite. Record them and put them back afterwards
+        // instead of clearing them, which would change behavior for every later test in the module.
+        savedInsecureUrl = System.getProperty("ai.djl.allow_insecure_url");
+        savedCompileJava = System.getProperty("ai.djl.compile_java");
+        savedOffline = System.getProperty("ai.djl.offline");
+        if (Utils.getenv("DJL_OFFLINE") != null) {
+            throw new org.testng.SkipException("DJL_OFFLINE is set in the environment");
+        }
+        // Offline mode is refused before the destination is examined, which is correct but would
+        // make every assertion below read "Offline mode is enabled" instead. `gradlew --offline`
+        // sets this property, so clear it for these tests and restore it in cleanup().
+        System.clearProperty("ai.djl.offline");
+    }
+
     @AfterMethod
     public void cleanup() {
-        System.clearProperty("ai.djl.allow_insecure_url");
-        System.clearProperty("ai.djl.compile_java");
+        restore("ai.djl.allow_insecure_url", savedInsecureUrl);
+        restore("ai.djl.compile_java", savedCompileJava);
+        restore("ai.djl.offline", savedOffline);
+    }
+
+    private static void restore(String key, String value) {
+        if (value == null) {
+            System.clearProperty(key);
+        } else {
+            System.setProperty(key, value);
+        }
     }
 
     // ----- URL access: Utils.openUrl -----
@@ -65,9 +96,10 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testJarProtocolAllowedByDefault() throws IOException {
-        // jar:// reads a resource bundled inside a jar (e.g. djl-serving's plugin.definition). This
-        // performs no network fetch, so it is allowed by default. Build a real one-entry
-        // jar and read it back through a jar: URL.
+        // jar:file: reads a resource bundled inside a local jar (e.g. djl-serving's
+        // plugin.definition). Only a nested file: URL is a purely local read; the nested-http case
+        // is covered by testJarUrlNestingRemoteProtocolIsBlocked. Build a real one-entry jar and
+        // read it back through a jar: URL.
         Path jar = Files.createTempFile("djl-jar", ".jar");
         try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(jar))) {
             jos.putNextEntry(new ZipEntry("META-INF/probe.txt"));
@@ -93,13 +125,48 @@ public class UrlAccessAndCompilationTest {
     }
 
     @Test
+    public void testJarUrlNestingRemoteProtocolIsBlocked() throws IOException {
+        // A jar: URL nests another URL and the connection fetches it, but reports protocol "jar"
+        // with an empty host -- so without an explicit check on the nested URL,
+        // jar:http://host/x.jar
+        // would reach the network without ever being seen by the destination rule.
+        AtomicInteger hits = new AtomicInteger();
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext(
+                "/",
+                exchange -> {
+                    hits.incrementAndGet();
+                    exchange.sendResponseHeaders(200, -1);
+                    exchange.close();
+                });
+        server.start();
+        try {
+            int port = server.getAddress().getPort();
+            URL nested = new URL("jar:http://127.0.0.1:" + port + "/x.jar!/entry.txt");
+            IOException e = Assert.expectThrows(IOException.class, () -> Utils.openUrl(nested));
+            Assert.assertTrue(
+                    e.getMessage().contains("nesting a non-local protocol"),
+                    "unexpected: " + e.getMessage());
+            Assert.assertEquals(hits.get(), 0, "the nested destination must not be contacted");
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
     public void testFtpProtocolBlockedByDefault() {
         // Non-http(s), non-local schemes (ftp, gopher, ...) remain blocked by default: they are
         // neither trusted local reads nor host-validated http(s), so loosening jar/file must not
         // reopen them.
-        Assert.assertThrows(
-                IOException.class,
-                () -> Utils.openUrl(new URL("ftp://ftp.example.com/pub/model.tar.gz")));
+        // Assert on the message: unpatched, an ftp: URL to a non-existent host also throws an
+        // IOException (UnknownHostException), so a bare assertThrows would pass either way.
+        IOException e =
+                Assert.expectThrows(
+                        IOException.class,
+                        () -> Utils.openUrl(new URL("ftp://ftp.example.com/pub/model.tar.gz")));
+        Assert.assertTrue(
+                e.getMessage().contains("unsupported URL protocol"),
+                "unexpected: " + e.getMessage());
     }
 
     @Test
@@ -131,21 +198,31 @@ public class UrlAccessAndCompilationTest {
 
     @Test
     public void testLinkLocalAddressBlockedByDefault() {
-        Assert.assertThrows(
-                IOException.class,
-                () -> Utils.openUrl(new URL("http://169.254.169.254/latest/meta-data/")));
+        IOException e =
+                Assert.expectThrows(
+                        IOException.class,
+                        () -> Utils.openUrl(new URL("http://169.254.169.254/latest/meta-data/")));
+        Assert.assertTrue(e.getMessage().contains("non-public"), "unexpected: " + e.getMessage());
     }
 
     @Test
     public void testLoopbackBlockedByDefault() {
-        Assert.assertThrows(IOException.class, () -> Utils.openUrl(new URL("http://127.0.0.1:1/")));
-        Assert.assertThrows(IOException.class, () -> Utils.openUrl(new URL("http://localhost:1/")));
+        // Unpatched, both of these throw ConnectException (connection refused), which is also an
+        // IOException, so the message is what distinguishes the fix from the pre-existing failure.
+        for (String u : new String[] {"http://127.0.0.1:1/", "http://localhost:1/"}) {
+            IOException e = Assert.expectThrows(IOException.class, () -> Utils.openUrl(new URL(u)));
+            Assert.assertTrue(e.getMessage().contains("non-public"), u + " -> " + e.getMessage());
+        }
     }
 
     @Test
     public void testPrivateAddressBlockedByDefault() {
-        Assert.assertThrows(IOException.class, () -> Utils.openUrl(new URL("http://10.0.0.5/")));
-        Assert.assertThrows(IOException.class, () -> Utils.openUrl(new URL("http://192.168.1.1/")));
+        // Without the message assertion these would eventually pass on unpatched code too, after
+        // the OS SYN timeout rather than immediately.
+        for (String u : new String[] {"http://10.0.0.5/", "http://192.168.1.1/"}) {
+            IOException e = Assert.expectThrows(IOException.class, () -> Utils.openUrl(new URL(u)));
+            Assert.assertTrue(e.getMessage().contains("non-public"), u + " -> " + e.getMessage());
+        }
     }
 
     @Test
@@ -177,6 +254,9 @@ public class UrlAccessAndCompilationTest {
         if (Utils.getenv("DJL_COMPILE_JAVA") != null) {
             throw new org.testng.SkipException("DJL_COMPILE_JAVA is set in the environment");
         }
+        // The build forwards ai.djl.* properties into the test JVM, so clear it for this test; the
+        // original value is restored by cleanup().
+        System.clearProperty("ai.djl.compile_java");
         Path dir = Files.createTempDirectory("djl-compile");
         Path classes = Files.createDirectories(dir.resolve("classes"));
         Files.write(
@@ -186,15 +266,51 @@ public class UrlAccessAndCompilationTest {
                         .getBytes(StandardCharsets.UTF_8));
         System.clearProperty("djl.test.canary");
         try {
-            Assert.assertThrows(
-                    IllegalStateException.class, () -> ClassLoaderUtils.compileJavaClass(classes));
+            // Scanning must not throw: a model may still ship a usable .class or .jar, so whether a
+            // skipped source matters is the caller's decision, reported via hasSkippedJavaSources.
+            ClassLoaderUtils.compileJavaClass(classes);
             // Default (disabled): nothing compiled and the static initializer never ran.
             Assert.assertFalse(Files.exists(classes.resolve("Bundled.class")));
             Assert.assertNull(
                     System.getProperty("djl.test.canary"),
                     "the bundled static initializer must not have run");
             Assert.assertFalse(ClassLoaderUtils.isDynamicCompilationEnabled());
+            Assert.assertTrue(ClassLoaderUtils.hasSkippedJavaSources(classes));
         } finally {
+            deleteTree(dir);
+        }
+    }
+
+    @Test
+    public void testSkippedSourcesNotReportedWhenNoneBundled() throws IOException {
+        // The flag being off must not make an ordinary model look misconfigured.
+        Path dir = Files.createTempDirectory("djl-nosources");
+        Path classes = Files.createDirectories(dir.resolve("classes"));
+        try {
+            Files.write(classes.resolve("Ready.class"), new byte[] {1, 2, 3});
+            Assert.assertFalse(ClassLoaderUtils.hasSkippedJavaSources(classes));
+            Assert.assertFalse(ClassLoaderUtils.hasSkippedJavaSources(dir.resolve("absent")));
+        } finally {
+            deleteTree(dir);
+        }
+    }
+
+    @Test
+    public void testScanSurvivesUnreadableSubdirectory() throws IOException {
+        // Files.walk surfaces traversal errors from the terminal operation as an unchecked
+        // UncheckedIOException, which must not escape as a failed model load.
+        Path dir = Files.createTempDirectory("djl-walkfail");
+        Path classes = Files.createDirectories(dir.resolve("classes"));
+        Path sub = Files.createDirectories(classes.resolve("sub"));
+        try {
+            if (!sub.toFile().setReadable(false)) {
+                throw new org.testng.SkipException("cannot make a directory unreadable here");
+            }
+            // Must return normally rather than propagating.
+            ClassLoaderUtils.compileJavaClass(classes);
+            Assert.assertFalse(ClassLoaderUtils.hasSkippedJavaSources(classes));
+        } finally {
+            sub.toFile().setReadable(true);
             deleteTree(dir);
         }
     }
