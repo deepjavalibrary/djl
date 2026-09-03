@@ -314,7 +314,7 @@ public final class ClassLoaderUtils {
     private static String[] findJavaSources(Path dir) {
         try {
             if (!Files.isDirectory(dir)) {
-                logger.debug("Directory not exists: {}", dir);
+                logger.debug("Directory does not exist: {}", dir);
                 return Utils.EMPTY_ARRAY;
             }
             try (Stream<Path> stream = Files.walk(dir)) {

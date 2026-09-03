@@ -672,6 +672,33 @@ public class UrlAccessAndCompilationTest {
     }
 
     @Test
+    public void testNullHeadersAreTreatedAsEmpty() throws IOException {
+        // openHttpConnection is new public API; null headers must not surface as an NPE from inside
+        // the redirect loop. Exercised with the opt-out set and without, since the two take
+        // different paths through the method.
+        HttpServer server = startServer(new HashMap<>(), "no-headers");
+        try {
+            URL url = new URL("http://127.0.0.1:" + server.getAddress().getPort() + "/data");
+            // Default path: rejected on the destination, but by an IOException rather than an NPE.
+            IOException e =
+                    Assert.expectThrows(
+                            IOException.class, () -> Utils.openHttpConnection(url, "HEAD", null));
+            Assert.assertTrue(
+                    e.getMessage().contains("non-public"), "unexpected: " + e.getMessage());
+            // Opt-out path: the request is actually issued, so a null map must be usable.
+            System.setProperty("ai.djl.allow_insecure_url", "true");
+            HttpURLConnection conn = Utils.openHttpConnection(url, "HEAD", null);
+            try {
+                Assert.assertEquals(conn.getResponseCode(), 200);
+            } finally {
+                conn.disconnect();
+            }
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
     public void testCredentialHeadersAreRecognized() {
         // All three names must be recognized, case-insensitively. Proxy-Authorization cannot be
         // asserted over a real connection because HttpURLConnection refuses to transmit it, so this

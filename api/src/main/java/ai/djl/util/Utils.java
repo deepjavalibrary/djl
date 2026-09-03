@@ -602,6 +602,11 @@ public final class Utils {
         if (isOfflineMode()) {
             throw new IOException("Offline mode is enabled.");
         }
+        if (headers == null) {
+            // No headers is a reasonable thing for a caller to mean, and an NPE from inside the
+            // redirect loop would be hard to trace back to the argument.
+            headers = Collections.emptyMap();
+        }
         if (isInsecureUrlAllowed()) {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
