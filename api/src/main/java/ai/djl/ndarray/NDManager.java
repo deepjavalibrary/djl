@@ -792,7 +792,7 @@ public interface NDManager extends AutoCloseable {
         // 64-bit, so an element count or buffer size beyond int range throws instead of silently
         // truncating or wrapping to an undersized allocation.
         int size = Math.toIntExact(shape.size());
-        ByteBuffer bb = allocateDirect(Math.toIntExact((long) size * dataType.getNumOfBytes()));
+        ByteBuffer bb = allocateDirect(Math.multiplyExact(size, dataType.getNumOfBytes()));
         return create(bb, shape, dataType);
     }
 
@@ -824,7 +824,7 @@ public interface NDManager extends AutoCloseable {
         // 64-bit, so an element count or buffer size beyond int range throws instead of silently
         // truncating or wrapping to an undersized allocation.
         int size = Math.toIntExact(shape.size());
-        ByteBuffer bb = allocateDirect(Math.toIntExact((long) size * dataType.getNumOfBytes()));
+        ByteBuffer bb = allocateDirect(Math.multiplyExact(size, dataType.getNumOfBytes()));
         for (int i = 0; i < size; ++i) {
             switch (dataType) {
                 case FLOAT16:

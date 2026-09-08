@@ -462,10 +462,8 @@ public abstract class BaseNDManager implements NDManager {
         }
 
         int remaining = buffer.remaining();
-        // Compute the expected byte count in 64-bit arithmetic. getNumOfBytes() * expected is
-        // int*int, which overflows for large element counts and wraps to a small or negative
-        // value, causing the check below to compare against the wrong size.
-        long expectedSize = isByteBuffer ? (long) dataType.getNumOfBytes() * expected : expected;
+        int expectedSize =
+                isByteBuffer ? Math.multiplyExact(dataType.getNumOfBytes(), expected) : expected;
         if (remaining < expectedSize) {
             throw new IllegalArgumentException(
                     "The NDArray size is: " + expected + ", but buffer size is: " + remaining);
@@ -474,8 +472,7 @@ public abstract class BaseNDManager implements NDManager {
             logger.warn(
                     "Input buffer size is greater than the NDArray size, please set limit"
                             + " explicitly.");
-            // Safe narrowing: in this branch expectedSize < remaining <= Integer.MAX_VALUE.
-            buffer.limit((int) expectedSize);
+            buffer.limit(expectedSize);
         }
     }
 

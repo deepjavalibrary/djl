@@ -51,12 +51,10 @@ final class NDSerializer {
      * @return byte array
      */
     static byte[] encode(NDArray array) {
-        // 64-bit arithmetic with a fail-closed narrowing: size() * getNumOfBytes() can overflow
-        // int for large arrays, sizing the output stream too small or negatively.
         int total =
-                Math.toIntExact(
-                        (long) Math.toIntExact(array.size()) * array.getDataType().getNumOfBytes()
-                                + 100);
+                Math.multiplyExact(
+                                Math.toIntExact(array.size()), array.getDataType().getNumOfBytes())
+                        + 100;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream(total)) {
             encode(array, baos);
             return baos.toByteArray();
