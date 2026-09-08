@@ -52,9 +52,10 @@ final class NDSerializer {
      */
     static byte[] encode(NDArray array) {
         int total =
-                Math.multiplyExact(
-                                Math.toIntExact(array.size()), array.getDataType().getNumOfBytes())
-                        + 100;
+                Math.addExact(
+                        Math.multiplyExact(
+                                Math.toIntExact(array.size()), array.getDataType().getNumOfBytes()),
+                        100);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream(total)) {
             encode(array, baos);
             return baos.toByteArray();

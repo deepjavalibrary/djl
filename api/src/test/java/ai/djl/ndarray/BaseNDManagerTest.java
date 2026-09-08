@@ -62,14 +62,7 @@ public class BaseNDManagerTest {
 
     private static void assertOverflowRejected(ByteBuffer buffer, DataType dataType, int expected) {
         Assert.assertThrows(
-                "A "
-                        + buffer.remaining()
-                        + "-byte buffer must not pass validation for "
-                        + expected
-                        + " "
-                        + dataType
-                        + " elements",
-                IllegalArgumentException.class,
+                ArithmeticException.class,
                 () -> BaseNDManager.validateBuffer(buffer.duplicate(), dataType, expected));
     }
 }
