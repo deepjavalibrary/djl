@@ -15,7 +15,7 @@ md build\classes
 cd build
 
 javac -sourcepath ../src/main/java/ ../src/main/java/ai/djl/sentencepiece/jni/SentencePieceLibrary.java -h include -d classes
-cmake ..
+cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
 cmake --build . --config Release
 
 :: for nightly ci
