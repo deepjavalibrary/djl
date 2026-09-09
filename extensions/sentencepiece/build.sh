@@ -28,7 +28,7 @@ cd build
 rm -rf classes
 mkdir classes
 javac -sourcepath ../src/main/java/ ../src/main/java/ai/djl/sentencepiece/jni/SentencePieceLibrary.java -h include -d classes
-cmake ..
+cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
 cmake --build . --config Release -- -j "${NUM_PROC}"
 
 popd
