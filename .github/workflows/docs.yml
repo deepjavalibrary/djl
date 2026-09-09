@@ -20,13 +20,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
           java-version: 17
 
       - name: Set up Python3
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -38,7 +38,7 @@ jobs:
 
       - name: Cache IJava Kernel
         id: ijava-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.local/share/jupyter/kernels/java
           key: ${{ runner.os }}-ijava-kernel
@@ -51,19 +51,19 @@ jobs:
           ./gradlew installKernel
 
       - name: Checkout DJL Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.version-number }}
 
       - name: Checkout DJL-Serving
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: 'deepjavalibrary/djl-serving'
           ref: ${{ github.event.inputs.version-number }}
           path: docs/serving
 
       - name: Checkout DJL-Demo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: 'deepjavalibrary/djl-demo'
           ref: ${{ github.event.inputs.version-number }}
@@ -71,7 +71,7 @@ jobs:
 
       - name: Cache Jupyter Notebooks
         id: jupyter-notebooks-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: docs/demos/jupyter
           key: ${{ runner.os }}-jupyter-${{ hashFiles('docs/demos/jupyter/*') }}
@@ -89,7 +89,7 @@ jobs:
         run: tools/scripts/build-website.sh "$VERSION_INPUT"
 
       - name: Configure Deployment AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
