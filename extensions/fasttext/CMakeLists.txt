@@ -8,6 +8,7 @@ set(JAVA_AWT_LIBRARY NotNeeded)
 set(JAVA_AWT_INCLUDE_PATH NotNeeded)
 find_package(JNI REQUIRED)
 find_path(UTILS_INCLUDE_DIR NAMES djl/utils.h PATHS ${PROJECT_SOURCE_DIR}/../../api/src/main/native REQUIRED)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 add_subdirectory(fastText)
 
 add_library(jni_fasttext SHARED src/main/native/ai_djl_fasttext_jni_FastTextLibrary.cc)
