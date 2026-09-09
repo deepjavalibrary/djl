@@ -30,25 +30,25 @@ if [[ ! -d "libtorch" ]]; then
 
     if [[ $ARCH == 'aarch64' ]]; then
       if [[ "$VERSION" =~ ^(2.[7-9].*)$ ]]; then
-        curl -s "https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-linux-aarch64-${VERSION}.zip" | jar xv >/dev/null
+        curl -sL "https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-linux-aarch64-${VERSION}.zip" | jar xv >/dev/null
       else
-        curl -s "https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch${AARCH64_CXX11ABI}-shared-with-deps-${VERSION}-aarch64.zip" | jar xv >/dev/null
+        curl -sL "https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch${AARCH64_CXX11ABI}-shared-with-deps-${VERSION}-aarch64.zip" | jar xv >/dev/null
       fi
     else
-      curl -s "https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip" | jar xv >/dev/null
+      curl -sL "https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip" | jar xv >/dev/null
     fi
   elif [[ $PLATFORM == 'darwin' ]]; then
     if [[ "$VERSION" =~ ^(2.[2-9].*)$ ]]; then
       if [[ $ARCH == 'aarch64' ]]; then
-        curl -s "https://download.pytorch.org/libtorch/cpu/libtorch-macos-arm64-${VERSION}.zip" | jar xv >/dev/null
+        curl -sL "https://download.pytorch.org/libtorch/cpu/libtorch-macos-arm64-${VERSION}.zip" | jar xv >/dev/null
       else
-        curl -s "https://download.pytorch.org/libtorch/cpu/libtorch-macos-x86_64-${VERSION}.zip" | jar xv >/dev/null
+        curl -sL "https://download.pytorch.org/libtorch/cpu/libtorch-macos-x86_64-${VERSION}.zip" | jar xv >/dev/null
       fi
     else
       if [[ $ARCH == 'aarch64' ]]; then
-        curl -s "https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-macos-${VERSION}-aarch64.zip" | jar xv >/dev/null
+        curl -sL "https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-macos-${VERSION}-aarch64.zip" | jar xv >/dev/null
       else
-        curl -s "https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip" | jar xv >/dev/null
+        curl -sL "https://download.pytorch.org/libtorch/cpu/libtorch-macos-${VERSION}.zip" | jar xv >/dev/null
       fi
     fi
   else
