@@ -88,6 +88,6 @@ You can pull the module from the central Maven repository by including the follo
 <dependency>
     <groupId>ai.djl.google</groupId>
     <artifactId>google-ai</artifactId>
-    <version>0.37.0</version>
+    <version>0.38.0</version>
 </dependency>
 ```
