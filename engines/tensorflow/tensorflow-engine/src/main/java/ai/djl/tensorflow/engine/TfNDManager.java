@@ -93,7 +93,7 @@ public class TfNDManager extends BaseNDManager {
                             (ByteBuffer) data, shape, dataType, getEagerSession(), device);
             return new TfNDArray(this, handle);
         }
-        ByteBuffer buf = allocateDirect(size * dataType.getNumOfBytes());
+        ByteBuffer buf = allocateDirect(Math.multiplyExact(size, dataType.getNumOfBytes()));
         copyBuffer(data, buf);
         TFE_TensorHandle handle =
                 JavacppUtils.createTFETensorFromByteBuffer(

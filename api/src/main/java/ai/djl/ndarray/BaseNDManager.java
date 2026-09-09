@@ -177,7 +177,8 @@ public abstract class BaseNDManager implements NDManager {
     /** {@inheritDoc} */
     @Override
     public NDArray truncatedNormal(float loc, float scale, Shape shape, DataType dataType) {
-        int sampleSize = (int) shape.size();
+        // Fail closed rather than silently truncating an element count beyond int range.
+        int sampleSize = Math.toIntExact(shape.size());
         double[] dist = new double[sampleSize];
 
         for (int i = 0; i < sampleSize; i++) {
@@ -461,7 +462,8 @@ public abstract class BaseNDManager implements NDManager {
         }
 
         int remaining = buffer.remaining();
-        int expectedSize = isByteBuffer ? dataType.getNumOfBytes() * expected : expected;
+        int expectedSize =
+                isByteBuffer ? Math.multiplyExact(dataType.getNumOfBytes(), expected) : expected;
         if (remaining < expectedSize) {
             throw new IllegalArgumentException(
                     "The NDArray size is: " + expected + ", but buffer size is: " + remaining);

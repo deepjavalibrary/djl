@@ -169,7 +169,7 @@ public abstract class NDArrayAdapter implements NDArray {
     }
 
     private ByteBuffer toTypeInternal(Number[] numbers, DataType dataType) {
-        int size = dataType.getNumOfBytes() * numbers.length;
+        int size = Math.multiplyExact(dataType.getNumOfBytes(), numbers.length);
         ByteBuffer bb = manager.allocateDirect(size);
         for (Number number : numbers) {
             switch (dataType) {

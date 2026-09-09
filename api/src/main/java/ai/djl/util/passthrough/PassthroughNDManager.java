@@ -97,7 +97,7 @@ public final class PassthroughNDManager implements NDManager {
         if (data instanceof ByteBuffer) {
             return new PassthroughNDArray(this, data, shape, dataType);
         }
-        ByteBuffer bb = ByteBuffer.allocate(size * dataType.getNumOfBytes());
+        ByteBuffer bb = ByteBuffer.allocate(Math.multiplyExact(size, dataType.getNumOfBytes()));
         bb.order(ByteOrder.nativeOrder());
         BaseNDManager.copyBuffer(data, bb);
         return new PassthroughNDArray(this, bb, shape, dataType);
