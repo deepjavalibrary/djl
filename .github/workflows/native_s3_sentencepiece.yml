@@ -21,7 +21,7 @@ jobs:
           dnf -y group install "Development Tools"
           dnf -y install patch git cmake3 python3-devel python3-pip java-17-amazon-corretto-devel jq
           pip3 install awscli --upgrade
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Release JNI prep
         run: |
           export CMAKE_POLICY_VERSION_MINIMUM=3.5
@@ -58,13 +58,13 @@ jobs:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
           java-version: 17
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
@@ -75,7 +75,7 @@ jobs:
           ./gradlew :extensions:sentencepiece:compileJNI
           ./gradlew -Pjni :extensions:sentencepiece:test
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
@@ -90,9 +90,9 @@ jobs:
     if: ${{ github.repository == 'deepjavalibrary/djl' && always() }}
     runs-on: macos-latest-xlarge
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 17
           distribution: corretto
@@ -100,7 +100,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('*/build.gradle.kts', 'engines/**/build.gradle.kts', 'extensions/**/build.gradle.kts') }}
@@ -111,7 +111,7 @@ jobs:
           ./gradlew :extensions:sentencepiece:compileJNI
           ./gradlew -Pjni :extensions:sentencepiece:test
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::425969335547:role/djl-ci-publish-role
           aws-region: us-east-2
@@ -136,7 +136,7 @@ jobs:
           dnf -y group install "Development Tools"
           dnf -y install patch git cmake3 python3-devel python3-pip java-17-amazon-corretto-devel jq
           pip3 install awscli --upgrade
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Release JNI prep
         run: |
           ./gradlew :extensions:sentencepiece:compileJNI

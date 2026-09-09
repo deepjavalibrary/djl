@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Checkout Apache MXNet repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: apache/incubator-mxnet
           ref: 1.9.1
@@ -23,7 +23,7 @@ jobs:
           clang --version
           CMAKE_STATICBUILD=1 ./tools/staticbuild/build.sh cpu
       - name: Upload libmxnet.dylib
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: libmxnet.dylib
           path: build/libmxnet.dylib
