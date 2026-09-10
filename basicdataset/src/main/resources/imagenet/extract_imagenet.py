@@ -139,7 +139,7 @@ def check_file(filename, checksum, sha1):
 
 def build_rec_process(img_dir, train=False, num_thread=1):
     rec_dir = os.path.abspath(os.path.join(img_dir, '../rec'))
-    makedirs(rec_dir)
+    os.makedirs(rec_dir, exist_ok=True)
     prefix = 'train' if train else 'val'
     print('Building ImageRecord file for ' + prefix + ' ...')
     to_path = rec_dir
