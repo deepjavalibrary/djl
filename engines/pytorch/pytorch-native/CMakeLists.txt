@@ -93,7 +93,7 @@ else()
             PROPERTY IMPORTED_LOCATION
             ${CMAKE_CURRENT_SOURCE_DIR}/libtorch_android/${ANDROID_ABI}/lib/${name}.a)
     endfunction(import_static_lib)
-    list(APPEND LIBS libtorch libtorch_cpu libc10 libnnpack libXNNPACK libpytorch_qnnpack libpthreadpool libeigen_blas libcpuinfo libclog libVulkanWrapper)
+    list(APPEND LIBS libtorch libtorch_cpu libc10 libnnpack libXNNPACK libmicrokernels-prod libpytorch_qnnpack libpthreadpool libeigen_blas libcpuinfo libclog libVulkanWrapper)
     foreach(lib IN LISTS LIBS)
         import_static_lib(${lib})
     endforeach()
@@ -105,15 +105,18 @@ else()
         libtorch
         libtorch_cpu
         -Wl,--no-whole-archive
+        -Wl,--start-group
         libc10
         libnnpack
         libXNNPACK
+        libmicrokernels-prod
         libpytorch_qnnpack
         libpthreadpool
         libeigen_blas
         libcpuinfo
         libclog
         libVulkanWrapper
+        -Wl,--end-group
         ${log-lib}
     )
 endif()
