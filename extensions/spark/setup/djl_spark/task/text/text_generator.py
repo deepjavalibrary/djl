@@ -41,7 +41,6 @@ class TextGenerator:
         """
         self.input_col = input_col
         self.output_col = output_col
-        self.model_url = model_url
         self.hf_model_id = hf_model_id
         self.engine = engine
         self.batch_size = batch_size
