@@ -707,4 +707,6 @@ final class PyTorchLibrary {
     native void torchIndexAppendArray(long torchIndexHandle, long arrayHandle);
 
     native long torchDiff(long self, int n, int dim);
+
+    native long torchRoll(long self, long[] shifts, long[] dims);
 }

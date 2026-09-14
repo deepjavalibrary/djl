@@ -788,4 +788,24 @@ public class NDArrayNumericOpTest {
             Assert.assertEquals(expected, diff);
         }
     }
+
+    @Test
+    public void testRoll() {
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray array = manager.arange(8f);
+
+            // No axis: this NDArray is flattened before rolling, then reshaped back
+            NDArray expected = manager.create(new float[] {6f, 7f, 0f, 1f, 2f, 3f, 4f, 5f});
+            Assert.assertEquals(expected, array.roll(2));
+
+            // Negative shift rolls in the opposite direction
+            expected = manager.create(new float[] {2f, 3f, 4f, 5f, 6f, 7f, 0f, 1f});
+            Assert.assertEquals(expected, array.roll(-2));
+
+            // Along a given axis
+            NDArray array2d = array.reshape(2, 4);
+            expected = manager.create(new float[][] {{4f, 5f, 6f, 7f}, {0f, 1f, 2f, 3f}});
+            Assert.assertEquals(expected, array2d.roll(1, 0));
+        }
+    }
 }

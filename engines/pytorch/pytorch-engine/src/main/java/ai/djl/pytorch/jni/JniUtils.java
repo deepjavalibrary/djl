@@ -1945,4 +1945,11 @@ public final class JniUtils {
         return new PtNDArray(
                 ndArray.getManager(), PyTorchLibrary.LIB.torchDiff(ndArray.getHandle(), n, dim));
     }
+
+    public static PtNDArray roll(PtNDArray ndArray, long[] shifts, int[] axes) {
+        long[] dims = Arrays.stream(axes).mapToLong(i -> i).toArray();
+        return new PtNDArray(
+                ndArray.getManager(),
+                PyTorchLibrary.LIB.torchRoll(ndArray.getHandle(), shifts, dims));
+    }
 }

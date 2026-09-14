@@ -1790,6 +1790,12 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
 
     /** {@inheritDoc} */
     @Override
+    public NDArray roll(long[] shifts, int[] axes) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof TfNDArray) {
             return contentEquals((TfNDArray) obj);

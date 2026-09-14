@@ -1688,6 +1688,12 @@ public class PtNDArray extends NativeResource<Long> implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray roll(long[] shifts, int[] axes) {
+        return JniUtils.roll(this, shifts, axes);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public PtNDArrayEx getNDArrayInternal() {
         if (ptNDArrayEx == null) {
             throw new UnsupportedOperationException(

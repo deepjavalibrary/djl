@@ -1310,6 +1310,12 @@ public abstract class NDArrayAdapter implements NDArray {
 
     /** {@inheritDoc} */
     @Override
+    public NDArray roll(long[] shifts, int[] axes) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public NDArrayEx getNDArrayInternal() {
         NDArray array = getAlternativeArray();
         if (array instanceof NDArrayAdapter) {
