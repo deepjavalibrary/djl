@@ -160,6 +160,34 @@ if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
     esac
 fi
 
+##########################################################################################
+# Extension to allow automatically downloading the gradle-wrapper.jar
+# This allows using the maven wrapper in projects that prohibit checking in binary data.
+##########################################################################################
+WRAPPER_JAR_PATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+if [ ! -r "${WRAPPER_JAR_PATH}" ]; then
+    jarUrl="https://raw.githubusercontent.com/gradle/gradle/master/gradle/wrapper/gradle-wrapper.jar"
+    if command -v wget > /dev/null; then
+        wget -q "${jarUrl}" -O "${WRAPPER_JAR_PATH}"
+    elif command -v curl > /dev/null; then
+        curl -s -o "${WRAPPER_JAR_PATH}" "$jarUrl"
+    else
+        javaClass="$APP_HOME/gradle/wrapper/GradleWrapperDownloader.java"
+        if [ -e "$javaClass" ]; then
+            if [ ! -e "$APP_HOME/gradle/wrapper/GradleWrapperDownloader.class" ]; then
+                # Compiling the Java class
+                ("${JAVACMD}c" "$javaClass")
+            fi
+            if [ -e "$APP_HOME/gradle/wrapper/GradleWrapperDownloader.class" ]; then
+                ("$JAVACMD" -cp gradle/wrapper GradleWrapperDownloader "$APP_HOME")
+            fi
+        fi
+    fi
+fi
+##########################################################################################
+# End of extension
+##########################################################################################
+
 # Collect all arguments for the java command, stacking in reverse order:
 #   * args from the command line
 #   * the main class name

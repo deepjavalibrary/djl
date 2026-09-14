@@ -70,10 +70,24 @@ goto fail
 :execute
 @rem Setup the command line
 
+set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar
+set DOWNLOAD_URL="https://raw.githubusercontent.com/gradle/gradle/master/gradle/wrapper/gradle-wrapper.jar"
 
+@rem Extension to allow automatically downloading the gradle-wrapper.jar
+@rem This allows using the gradle wrapper in projects that prohibit checking in binary data.
+if exist %CLASSPATH% (
+    echo Found %CLASSPATH%
+) else (
+    echo Couldn't find %CLASSPATH%, downloading it ...
+	echo Downloading from: %DOWNLOAD_URL%
+    powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object Net.WebClient).DownloadFile('%DOWNLOAD_URL%', '%CLASSPATH%')"
+
+    echo Finished downloading %CLASSPATH%
+)
+@rem End of extension
 
 @rem Execute Gradle
-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -jar "%APP_HOME%\gradle\wrapper\gradle-wrapper.jar" %*
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -jar "%CLASSPATH%" %*
 
 :end
 @rem End local scope for the variables with windows NT shell
