@@ -33,6 +33,7 @@ tasks {
 }
 
 pmd {
+    toolVersion = "7.13.0"
     isIgnoreFailures = false
     tasks["pmdTest"].enabled = false
     ruleSets = emptyList() // workaround pmd gradle plugin bug
