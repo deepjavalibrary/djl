@@ -5562,8 +5562,8 @@ public interface NDArray extends NDResource, BytesSupplier {
     NDArray diff(int n, int dim);
 
     /**
-     * Rolls this {@code NDArray} by shifting elements, with the last shifted elements
-     * reintroduced at the start.
+     * Rolls this {@code NDArray} by shifting elements, with the last shifted elements reintroduced
+     * at the start.
      *
      * <p>If no axis is given (see {@link NDArray#roll(long[], int[])}), this {@code NDArray} is
      * flattened before rolling, then reshaped back to its original {@link Shape}.
@@ -5577,8 +5577,8 @@ public interface NDArray extends NDResource, BytesSupplier {
      * [6., 7., 0., 1., 2., 3., 4., 5.]
      * </pre>
      *
-     * @param shift the number of places by which elements are shifted. Negative shifts roll in
-     *     the opposite direction
+     * @param shift the number of places by which elements are shifted. Negative shifts roll in the
+     *     opposite direction
      * @return the result {@code NDArray} with the same {@link Shape} as this {@code NDArray}
      * @see NDArray#roll(long[], int[])
      */
@@ -5606,8 +5606,8 @@ public interface NDArray extends NDResource, BytesSupplier {
      * ]
      * </pre>
      *
-     * @param shift the number of places by which elements are shifted. Negative shifts roll in
-     *     the opposite direction
+     * @param shift the number of places by which elements are shifted. Negative shifts roll in the
+     *     opposite direction
      * @param axis the axis along which elements are shifted
      * @return the result {@code NDArray} with the same {@link Shape} as this {@code NDArray}
      * @see NDArray#roll(long[], int[])
