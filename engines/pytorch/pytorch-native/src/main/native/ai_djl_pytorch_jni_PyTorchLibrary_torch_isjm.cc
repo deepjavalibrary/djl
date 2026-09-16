@@ -193,3 +193,14 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchUnique(
   return jarray;
   API_END_RETURN()
 }
+
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchRoll(
+    JNIEnv* env, jobject jthis, jlong jhandle, jlongArray jshifts, jlongArray jdims) {
+  API_BEGIN()
+  const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
+  const std::vector<int64_t> shifts = djl::utils::jni::GetVecFromJLongArray(env, jshifts);
+  const std::vector<int64_t> dims = djl::utils::jni::GetVecFromJLongArray(env, jdims);
+  const torch::Tensor* result_ptr = new torch::Tensor(tensor_ptr->roll(shifts, dims));
+  return reinterpret_cast<uintptr_t>(result_ptr);
+  API_END_RETURN()
+}

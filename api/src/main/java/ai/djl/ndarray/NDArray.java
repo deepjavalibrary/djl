@@ -5560,4 +5560,74 @@ public interface NDArray extends NDResource, BytesSupplier {
      * @return a new {@link NDArray} containing the differenced values
      */
     NDArray diff(int n, int dim);
+
+    /**
+     * Rolls this {@code NDArray} by shifting elements, with the last shifted elements reintroduced
+     * at the start.
+     *
+     * <p>If no axis is given (see {@link NDArray#roll(long[], int[])}), this {@code NDArray} is
+     * flattened before rolling, then reshaped back to its original {@link Shape}.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(8f);
+     * jshell&gt; array.roll(2);
+     * ND: (8) cpu() float32
+     * [6., 7., 0., 1., 2., 3., 4., 5.]
+     * </pre>
+     *
+     * @param shift the number of places by which elements are shifted. Negative shifts roll in the
+     *     opposite direction
+     * @return the result {@code NDArray} with the same {@link Shape} as this {@code NDArray}
+     * @see NDArray#roll(long[], int[])
+     */
+    default NDArray roll(long shift) {
+        return roll(new long[] {shift}, new int[0]);
+    }
+
+    /**
+     * Rolls this {@code NDArray} by shifting elements along a given axis, with the last shifted
+     * elements reintroduced at the start of that axis.
+     *
+     * <p>Examples
+     *
+     * <pre>
+     * jshell&gt; NDArray array = manager.arange(8f).reshape(2, 4);
+     * jshell&gt; array;
+     * ND: (2, 4) cpu() float32
+     * [[0., 1., 2., 3.],
+     *  [4., 5., 6., 7.],
+     * ]
+     * jshell&gt; array.roll(1, 0);
+     * ND: (2, 4) cpu() float32
+     * [[4., 5., 6., 7.],
+     *  [0., 1., 2., 3.],
+     * ]
+     * </pre>
+     *
+     * @param shift the number of places by which elements are shifted. Negative shifts roll in the
+     *     opposite direction
+     * @param axis the axis along which elements are shifted
+     * @return the result {@code NDArray} with the same {@link Shape} as this {@code NDArray}
+     * @see NDArray#roll(long[], int[])
+     */
+    default NDArray roll(long shift, int axis) {
+        return roll(new long[] {shift}, new int[] {axis});
+    }
+
+    /**
+     * Rolls this {@code NDArray} by shifting elements along given axes, with the last shifted
+     * elements reintroduced at the start of each axis.
+     *
+     * <p>{@code shifts} and {@code axes} are matched pairwise by position; if {@code axes} is
+     * empty, this {@code NDArray} is flattened before rolling, then reshaped back to its original
+     * {@link Shape}.
+     *
+     * @param shifts the number of places by which elements are shifted along each corresponding
+     *     axis. Negative shifts roll in the opposite direction
+     * @param axes the axes along which elements are shifted, matched pairwise with {@code shifts}
+     * @return the result {@code NDArray} with the same {@link Shape} as this {@code NDArray}
+     */
+    NDArray roll(long[] shifts, int[] axes);
 }
