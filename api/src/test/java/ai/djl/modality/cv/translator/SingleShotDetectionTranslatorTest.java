@@ -63,8 +63,8 @@ public class SingleShotDetectionTranslatorTest {
     @Test
     public void testWithoutRescaleOrApplyRatioKeepsRawValues()
             throws ModelException, IOException, TranslateException {
-        // Baseline: a model that already emits ratios (no rescale, no applyRatio) must be passed
-        // through unchanged -- this is the behavior #3841 fixed and must not regress.
+        // Baseline: with neither flag set, the raw pixel-space output must be passed through
+        // unchanged -- this is the behavior #3841 fixed and must not regress.
         DetectedObjects.DetectedObject detection =
                 predictWithArguments(false, false).best();
 
