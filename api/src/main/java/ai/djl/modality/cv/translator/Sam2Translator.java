@@ -60,6 +60,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
     private Predictor<NDList, NDList> predictor;
     private String encoderPath;
     private String encodeMethod;
+    private boolean multimaskOutput;
 
     /** Constructs a {@code Sam2Translator} instance. */
     public Sam2Translator(Builder builder) {
@@ -69,6 +70,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         pipeline.add(new Normalize(MEAN, STD));
         this.encoderPath = builder.encoderPath;
         this.encodeMethod = builder.encodeMethod;
+        this.multimaskOutput = builder.multimaskOutput;
     }
 
     /** {@inheritDoc} */
@@ -149,7 +151,6 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
     public DetectedObjects processOutput(TranslatorContext ctx, NDList list) {
         NDArray logits = list.get(0);
         NDArray scores = list.get(1).squeeze(0);
-        long best = scores.argMax().getLong();
 
         int width = (Integer) ctx.getAttachment("width");
         int height = (Integer) ctx.getAttachment("height");
@@ -159,13 +160,29 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
         logits = logits.getNDArrayInternal().interpolation(size, mode, false);
         NDArray masks = logits.gt(0f).squeeze(0);
 
-        float[][] dist = Mask.toMask(masks.get(best).toType(DataType.FLOAT32, true));
-        Mask mask = new Mask(0, 0, width, height, dist, true);
-        double probability = scores.getFloat(best);
+        if (!multimaskOutput) {
+            long best = scores.argMax().getLong();
+            float[][] dist = Mask.toMask(masks.get(best).toType(DataType.FLOAT32, true));
+            Mask mask = new Mask(0, 0, width, height, dist, true);
+            double probability = scores.getFloat(best);
 
-        List<String> classes = Collections.singletonList("");
-        List<Double> probabilities = Collections.singletonList(probability);
-        List<BoundingBox> boxes = Collections.singletonList(mask);
+            List<String> classes = Collections.singletonList("");
+            List<Double> probabilities = Collections.singletonList(probability);
+            List<BoundingBox> boxes = Collections.singletonList(mask);
+
+            return new DetectedObjects(classes, probabilities, boxes);
+        }
+
+        long numMasks = scores.getShape().get(0);
+        List<String> classes = new ArrayList<>();
+        List<Double> probabilities = new ArrayList<>();
+        List<BoundingBox> boxes = new ArrayList<>();
+        for (long i = 0; i < numMasks; ++i) {
+            float[][] dist = Mask.toMask(masks.get(i).toType(DataType.FLOAT32, true));
+            classes.add("");
+            probabilities.add((double) scores.getFloat(i));
+            boxes.add(new Mask(0, 0, width, height, dist, true));
+        }
 
         return new DetectedObjects(classes, probabilities, boxes);
     }
@@ -194,10 +211,12 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
 
         String encoderPath;
         String encodeMethod;
+        boolean multimaskOutput;
 
         Builder(Map<String, ?> arguments) {
             encoderPath = ArgumentsUtil.stringValue(arguments, "encoder");
             encodeMethod = ArgumentsUtil.stringValue(arguments, "encode_method");
+            multimaskOutput = ArgumentsUtil.booleanValue(arguments, "multimask_output");
         }
 
         /**
@@ -219,6 +238,18 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
          */
         public Builder optEncodeMethod(String encodeMethod) {
             this.encodeMethod = encodeMethod;
+            return this;
+        }
+
+        /**
+         * Sets whether to return all candidate masks instead of only the highest-scoring one.
+         * Default is {@code false}.
+         *
+         * @param multimaskOutput true to return all candidate masks
+         * @return the builder
+         */
+        public Builder optMultimaskOutput(boolean multimaskOutput) {
+            this.multimaskOutput = multimaskOutput;
             return this;
         }
 
