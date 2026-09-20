@@ -71,11 +71,10 @@ public class Sam2TranslatorTest {
                             NDArray logits =
                                     manager.create(
                                             new float[] {
-                                                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                                                -1, -1, -1, -1,
-                                                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                                                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                                                -1, -1, -1, -1
+                                                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                                                -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                                                1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                                                -1, -1, -1, -1, -1
                                             },
                                             new Shape(1, 3, 4, 4));
                             NDArray scores =
@@ -87,7 +86,8 @@ public class Sam2TranslatorTest {
         BufferedImage buf = new BufferedImage(4, 4, BufferedImage.TYPE_INT_RGB);
         Image img = ImageFactory.getInstance().fromImage(buf);
 
-        Sam2Translator translator = Sam2Translator.builder().optMultimaskOutput(multimaskOutput).build();
+        Sam2Translator translator =
+                Sam2Translator.builder().optMultimaskOutput(multimaskOutput).build();
 
         Criteria<Sam2Input, DetectedObjects> criteria =
                 Criteria.builder()
@@ -100,8 +100,7 @@ public class Sam2TranslatorTest {
 
         try (ZooModel<Sam2Input, DetectedObjects> model = criteria.loadModel();
                 Predictor<Sam2Input, DetectedObjects> predictor = model.newPredictor()) {
-            Sam2Input input =
-                    Sam2Input.builder(img).addPoint(1, 1).build();
+            Sam2Input input = Sam2Input.builder(img).addPoint(1, 1).build();
             return predictor.predict(input);
         }
     }
