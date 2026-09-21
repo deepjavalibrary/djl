@@ -46,8 +46,7 @@ public class SingleShotDetectionTranslatorTest {
     @Test
     public void testRescaleArgumentNormalizesPixelBoxes()
             throws ModelException, IOException, TranslateException {
-        DetectedObjects.DetectedObject detection =
-                predictWithArguments(true, false).best();
+        DetectedObjects.DetectedObject detection = predictWithArguments(true, false).best();
 
         BoundingBox box = detection.getBoundingBox();
         // The fake model below emits a pixel-space box of (100, 100, 200, 200) out of a
@@ -65,8 +64,7 @@ public class SingleShotDetectionTranslatorTest {
             throws ModelException, IOException, TranslateException {
         // Baseline: with neither flag set, the raw pixel-space output must be passed through
         // unchanged -- this is the behavior #3841 fixed and must not regress.
-        DetectedObjects.DetectedObject detection =
-                predictWithArguments(false, false).best();
+        DetectedObjects.DetectedObject detection = predictWithArguments(false, false).best();
 
         BoundingBox box = detection.getBoundingBox();
         Assert.assertEquals(box.getBounds().getX(), 100.0, 1e-6);
@@ -76,8 +74,7 @@ public class SingleShotDetectionTranslatorTest {
     @Test
     public void testApplyRatioArgumentStillWorks()
             throws ModelException, IOException, TranslateException {
-        DetectedObjects.DetectedObject detection =
-                predictWithArguments(false, true).best();
+        DetectedObjects.DetectedObject detection = predictWithArguments(false, true).best();
 
         BoundingBox box = detection.getBoundingBox();
         Assert.assertEquals(box.getBounds().getX(), 100.0 / IMAGE_SIZE, 1e-6);
