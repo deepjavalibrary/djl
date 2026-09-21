@@ -17,6 +17,7 @@ import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.modality.cv.output.Mask;
 import ai.djl.modality.cv.translator.Sam2Translator.Sam2Input;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
@@ -58,6 +59,16 @@ public class Sam2TranslatorTest {
         Assert.assertEquals(result.item(0).getProbability(), 0.2, 1e-6);
         Assert.assertEquals(result.item(1).getProbability(), 0.9, 1e-6);
         Assert.assertEquals(result.item(2).getProbability(), 0.1, 1e-6);
+
+        // Each candidate's logits fixture is uniformly -1, 1, or -1 respectively, so a pixel's
+        // probability distinguishes which raw mask actually made it into each returned object -
+        // this fails if every entry carries the same (e.g. best-scoring) mask.
+        DetectedObjects.DetectedObject item0 = result.item(0);
+        DetectedObjects.DetectedObject item1 = result.item(1);
+        DetectedObjects.DetectedObject item2 = result.item(2);
+        Assert.assertEquals(((Mask) item0.getBoundingBox()).getProbDist()[0][0], 0f, 1e-6);
+        Assert.assertEquals(((Mask) item1.getBoundingBox()).getProbDist()[0][0], 1f, 1e-6);
+        Assert.assertEquals(((Mask) item2.getBoundingBox()).getProbDist()[0][0], 0f, 1e-6);
     }
 
     private DetectedObjects predict(boolean multimaskOutput)
