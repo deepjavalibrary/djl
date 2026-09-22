@@ -34,10 +34,26 @@ DJL can load Translator from the following source:
 - from jar files directly locate in `libs` folder
 - from compiled java .class file in `libs/classes` folder
 - DJL can compile .java files in `libs/classes` folder at runtime and load compiled class.
-  Compiling sources at model-load time is **opt-in**: set `DJL_COMPILE_JAVA=true` or
-  `-Dai.djl.compile_java=true` when loading models from a trusted source. Without it, a model that
-  bundles `.java` sources fails to load with a message naming the flag. Shipping a precompiled
-  `.class` or `.jar` instead needs no flag and is the recommended option.
+
+Loading a Translator that is bundled with the model is **opt-in**, whether it ships as a `.jar`, as a
+`.class`, or as `.java` sources compiled at load time. Set `DJL_LOAD_BUNDLED_CLASSES=true` or
+`-Dai.djl.load_bundled_classes=true` when loading models from a trusted source. Without it, DJL
+ignores the bundled content and logs a message naming the flag.
+
+Compiling bundled `.java` sources is a **separate** opt-in: set `DJL_COMPILE_JAVA=true` or
+`-Dai.djl.compile_java=true`. Compiled output is still bundled content, so a model that ships
+sources needs **both** flags; a model that ships a precompiled `.class` or `.jar` needs only
+`DJL_LOAD_BUNDLED_CLASSES`.
+
+The alternative that needs no flag is to install the Translator on the application classpath and
+name it explicitly with the `translator` property in `serving.properties`. This is the recommended
+option, because a `className` is still resolved against the application classpath while bundled
+loading is disabled.
+
+Note that when no `translator` property is set, DJL has to read the bundled content to discover the
+class name. With bundled loading disabled there is nothing to discover, so DJL falls back to a
+default Translator for the model's `application` rather than failing. Set the `translator` property
+if you want an explicit failure instead of a fallback.
 
 ## Configure data processing based on standard Translator
 DJL provides several built-in Translator for well-know ML applications, such as `Image Classification`
