@@ -38,6 +38,7 @@ import ai.djl.util.Utils;
 import ai.djl.util.ZipUtils;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -68,11 +69,24 @@ public class BlockFactoryTest {
                         .optModelName("exported")
                         .optEngine(TestUtils.getEngine())
                         .build();
+        // The BlockFactory ships as a precompiled .class inside the model and no blockFactory
+        // argument names it, so DJL discovers it by scanning the model's classes directory. Loading
+        // classes bundled with a model is opt-in, so enable it for this load. The environment
+        // variable takes precedence over the system property, so an environment that pins it off
+        // would make the property a no-op and the assertion below fail for an unrelated reason.
+        String envOptIn = Utils.getenv("DJL_LOAD_BUNDLED_CLASSES");
+        if (envOptIn != null && !Boolean.parseBoolean(envOptIn)) {
+            throw new SkipException(
+                    "DJL_LOAD_BUNDLED_CLASSES is set to " + envOptIn + " in the environment");
+        }
+        System.setProperty("ai.djl.load_bundled_classes", "true");
         try (ZooModel<NDList, NDList> model = criteria.loadModel();
                 Predictor<NDList, NDList> pred = model.newPredictor()) {
             NDManager manager = model.getNDManager();
             NDList destOut = pred.predict(new NDList(manager.ones(new Shape(1, 3, 32, 32))));
             Assert.assertEquals(destOut.singletonOrThrow().getShape(), new Shape(1, 10));
+        } finally {
+            System.clearProperty("ai.djl.load_bundled_classes");
         }
     }
 

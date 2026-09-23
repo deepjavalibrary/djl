@@ -147,16 +147,16 @@ public class CustomTranslatorTest {
         Path destFile = classesDir.resolve("MyTranslator.java");
         Files.copy(srcFile, destFile, StandardCopyOption.REPLACE_EXISTING);
 
-        // Compiling a bundled .java translator is opt-in; enable it for the cases below, which
-        // exercise that path (the jar case is built from the compiled output). The environment
-        // variable takes precedence over the system property, so an environment that pins it off
-        // would make the property below a no-op and the assertions fail for an unrelated reason.
-        String envOptIn = Utils.getenv("DJL_COMPILE_JAVA");
-        if (envOptIn != null && !Boolean.parseBoolean(envOptIn)) {
-            throw new SkipException(
-                    "DJL_COMPILE_JAVA is set to " + envOptIn + " in the environment");
-        }
+        // Two separate opt-ins are needed for the cases below: one to compile the bundled .java
+        // translator, and one to load bundled class content at all. Compiled output is still
+        // bundled content, so the compile flag alone would produce a .class that is then ignored.
+        // The environment variables take precedence over the system properties, so an environment
+        // that pins either off would make the property a no-op and the assertions fail for an
+        // unrelated reason.
+        requireNotPinnedOff("DJL_COMPILE_JAVA");
+        requireNotPinnedOff("DJL_LOAD_BUNDLED_CLASSES");
         System.setProperty("ai.djl.compile_java", "true");
+        System.setProperty("ai.djl.load_bundled_classes", "true");
         try {
             // load translator from classes folder
             runImageClassification(Application.UNDEFINED, null, "MyTranslator");
@@ -169,6 +169,7 @@ public class CustomTranslatorTest {
             runImageClassification(Application.UNDEFINED, null, "MyTranslator");
         } finally {
             System.clearProperty("ai.djl.compile_java");
+            System.clearProperty("ai.djl.load_bundled_classes");
         }
     }
 
@@ -219,6 +220,19 @@ public class CustomTranslatorTest {
             Type type = new TypeToken<List<Classification>>() {}.getType();
             List<Classification> result = JsonUtils.GSON.fromJson(content, type);
             Assert.assertEquals(result.get(0).getClassName(), "car");
+        }
+    }
+
+    /**
+     * Skips when the environment explicitly disables an opt-in this test needs, since the
+     * environment variable wins over the system property set below it.
+     *
+     * @param name the environment variable to check
+     */
+    private static void requireNotPinnedOff(String name) {
+        String value = Utils.getenv(name);
+        if (value != null && !Boolean.parseBoolean(value)) {
+            throw new SkipException(name + " is set to " + value + " in the environment");
         }
     }
 

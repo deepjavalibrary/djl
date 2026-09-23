@@ -12,6 +12,9 @@
  */
 package ai.djl.util;
 
+import ai.djl.translate.Batchifier;
+import ai.djl.translate.StackBatchifier;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
@@ -39,13 +42,18 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 /**
- * Tests for the configurable URL-access and bundled-source-compilation defaults in {@link
- * Utils#openUrl} and {@link ClassLoaderUtils#compileJavaClass}.
+ * Tests for the configurable URL-access, bundled-source-compilation and bundled-class-loading
+ * defaults in {@link Utils#openUrl}, {@link ClassLoaderUtils#compileJavaClass} and {@link
+ * ClassLoaderUtils#findImplementation}.
  */
 public class UrlAccessAndCompilationTest {
 
+    /** Set by the static initializer of the class compiled into a test model's {@code classes}. */
+    private static final String BUNDLED_CANARY = "djl.test.bundled_canary";
+
     private String savedInsecureUrl;
     private String savedCompileJava;
+    private String savedLoadBundledClasses;
     private String savedOffline;
 
     @BeforeMethod
@@ -55,6 +63,7 @@ public class UrlAccessAndCompilationTest {
         // instead of clearing them, which would change behavior for every later test in the module.
         savedInsecureUrl = System.getProperty("ai.djl.allow_insecure_url");
         savedCompileJava = System.getProperty("ai.djl.compile_java");
+        savedLoadBundledClasses = System.getProperty("ai.djl.load_bundled_classes");
         savedOffline = System.getProperty("ai.djl.offline");
         if (Utils.getenv("DJL_OFFLINE") != null) {
             throw new org.testng.SkipException("DJL_OFFLINE is set in the environment");
@@ -75,7 +84,9 @@ public class UrlAccessAndCompilationTest {
     public void cleanup() {
         restore("ai.djl.allow_insecure_url", savedInsecureUrl);
         restore("ai.djl.compile_java", savedCompileJava);
+        restore("ai.djl.load_bundled_classes", savedLoadBundledClasses);
         restore("ai.djl.offline", savedOffline);
+        System.clearProperty(BUNDLED_CANARY);
     }
 
     private static void restore(String key, String value) {
@@ -835,6 +846,192 @@ public class UrlAccessAndCompilationTest {
             Files.deleteIfExists(classes);
             Files.deleteIfExists(dir);
         }
+    }
+
+    // ----- Bundled class loading: ClassLoaderUtils.findImplementation -----
+
+    @Test
+    public void testBundledClassLoadingFlagDefaultsFalse() {
+        requireUnsetBundledEnv();
+        System.clearProperty("ai.djl.load_bundled_classes");
+        Assert.assertFalse(ClassLoaderUtils.isBundledClassLoadingEnabled());
+    }
+
+    @Test
+    public void testBundledClassIgnoredByDefaultWhenNamed() throws IOException {
+        requireUnsetBundledEnv();
+        System.clearProperty("ai.djl.load_bundled_classes");
+        Path dir = createModelWithBundledClass(false);
+        try {
+            // Named lookup: the class exists only under classes/, so with bundled loading off it
+            // must not resolve and its static initializer must not run.
+            Assert.assertNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, "Canary"));
+            Assert.assertNull(System.getProperty(BUNDLED_CANARY));
+        } finally {
+            deleteTree(dir);
+        }
+    }
+
+    @Test
+    public void testBundledClassIgnoredByDefaultWhenScanned() throws IOException {
+        requireUnsetBundledEnv();
+        System.clearProperty("ai.djl.load_bundled_classes");
+        Path dir = createModelWithBundledClass(false);
+        try {
+            // Unnamed lookup walks classes/ and would instantiate whatever it finds there.
+            Assert.assertNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, null));
+            Assert.assertNull(System.getProperty(BUNDLED_CANARY));
+        } finally {
+            deleteTree(dir);
+        }
+    }
+
+    @Test
+    public void testBundledJarIgnoredByDefault() throws IOException {
+        requireUnsetBundledEnv();
+        System.clearProperty("ai.djl.load_bundled_classes");
+        Path dir = createModelWithBundledClass(true);
+        try {
+            // A jar beside the model is the second place bundled classes can live, so the default
+            // has to cover it as well as classes/.
+            Assert.assertNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, null));
+            Assert.assertNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, "Canary"));
+            Assert.assertNull(System.getProperty(BUNDLED_CANARY));
+        } finally {
+            deleteTree(dir);
+        }
+    }
+
+    @Test
+    public void testBundledClassLoadedWithOptIn() throws IOException {
+        requireUnsetBundledEnv();
+        Path dir = createModelWithBundledClass(false);
+        try {
+            System.setProperty("ai.djl.load_bundled_classes", "true");
+            Assert.assertTrue(ClassLoaderUtils.isBundledClassLoadingEnabled());
+            Assert.assertNotNull(
+                    ClassLoaderUtils.findImplementation(dir, Runnable.class, "Canary"));
+            // Negative control for the guard: with the opt-in set the bundled class does load, so
+            // the assertions above fail for the right reason rather than because the fixture is
+            // broken.
+            Assert.assertEquals(System.getProperty(BUNDLED_CANARY), "ran");
+        } finally {
+            deleteTree(dir);
+        }
+    }
+
+    @Test
+    public void testBundledJarLoadedWithOptIn() throws IOException {
+        requireUnsetBundledEnv();
+        Path dir = createModelWithBundledClass(true);
+        try {
+            System.setProperty("ai.djl.load_bundled_classes", "true");
+            // Control for testBundledJarIgnoredByDefault: proves the jar fixture is genuinely
+            // loadable, so that test's assertions fail on the guard rather than on packaging drift.
+            Assert.assertNotNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, null));
+            Assert.assertEquals(System.getProperty(BUNDLED_CANARY), "ran");
+        } finally {
+            deleteTree(dir);
+        }
+    }
+
+    @Test
+    public void testNoErrorReportedWithoutBundledClasses() throws IOException {
+        requireUnsetBundledEnv();
+        System.clearProperty("ai.djl.load_bundled_classes");
+        Path dir = Files.createTempDirectory("djl-bundled-empty");
+        try {
+            // A model that bundles nothing, and one whose classes/ directory holds only sources,
+            // have nothing to skip. Neither may be reported, otherwise every ordinary model load
+            // emits an error. hasBundledClasses is what distinguishes them.
+            Files.createDirectories(dir.resolve("classes"));
+            Assert.assertNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, null));
+            Files.write(
+                    dir.resolve("classes").resolve("Source.java"),
+                    "class Source {}".getBytes(StandardCharsets.UTF_8));
+            Assert.assertNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, null));
+        } finally {
+            deleteTree(dir);
+        }
+    }
+
+    @Test
+    public void testClasspathImplementationStillResolvesWhenBundledDisabled() throws IOException {
+        requireUnsetBundledEnv();
+        System.clearProperty("ai.djl.load_bundled_classes");
+        // Bundled content is present and is deliberately not what satisfies the lookup: this is the
+        // case where the guard must stay out of the way, because the named class comes from the
+        // application classpath and the bundled copy was never needed.
+        Path dir = createModelWithBundledClass(false);
+        try {
+            // A named implementation already on the application classpath is not model content, so
+            // turning bundled loading off must not stop it from resolving.
+            Object impl =
+                    ClassLoaderUtils.findImplementation(
+                            dir, Batchifier.class, "ai.djl.translate.StackBatchifier");
+            Assert.assertNotNull(impl, "a classpath implementation must still resolve");
+            Assert.assertTrue(impl instanceof StackBatchifier);
+            // The bundled class sitting alongside it must not have been touched.
+            Assert.assertNull(System.getProperty(BUNDLED_CANARY));
+        } finally {
+            deleteTree(dir);
+        }
+    }
+
+    /** Skips when the environment variable is set, which takes precedence over the property. */
+    private static void requireUnsetBundledEnv() {
+        if (Utils.getenv("DJL_LOAD_BUNDLED_CLASSES") != null) {
+            throw new org.testng.SkipException(
+                    "DJL_LOAD_BUNDLED_CLASSES is set in the environment");
+        }
+    }
+
+    /**
+     * Builds a model directory holding a precompiled class whose static initializer sets {@link
+     * #BUNDLED_CANARY}, so a test can observe whether it was initialized.
+     *
+     * @param asJar package the compiled class into a jar beside the model instead of leaving it
+     *     under {@code classes}
+     * @return the model directory
+     */
+    private static Path createModelWithBundledClass(boolean asJar) throws IOException {
+        javax.tools.JavaCompiler compiler = javax.tools.ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            throw new org.testng.SkipException("no system java compiler available");
+        }
+        Path dir = Files.createTempDirectory("djl-bundled");
+        Path classes = Files.createDirectories(dir.resolve("classes"));
+        Path source = classes.resolve("Canary.java");
+        Files.write(
+                source,
+                ("public class Canary implements Runnable {\n"
+                                + "    static { System.setProperty(\""
+                                + BUNDLED_CANARY
+                                + "\", \"ran\"); }\n"
+                                + "    public void run() {}\n"
+                                + "}\n")
+                        .getBytes(StandardCharsets.UTF_8));
+        int rc = compiler.run(null, null, null, source.toAbsolutePath().toString());
+        if (rc != 0) {
+            deleteTree(dir);
+            throw new IOException("failed to compile the test fixture, compiler exit code " + rc);
+        }
+        // Leave only the compiled output, so these tests cover the class-loading flag rather than
+        // the separate compilation flag.
+        Files.delete(source);
+        Path compiled = classes.resolve("Canary.class");
+        Assert.assertTrue(Files.exists(compiled), "fixture was not compiled");
+        if (asJar) {
+            try (JarOutputStream jos =
+                    new JarOutputStream(Files.newOutputStream(dir.resolve("canary.jar")))) {
+                jos.putNextEntry(new ZipEntry("Canary.class"));
+                jos.write(Files.readAllBytes(compiled));
+                jos.closeEntry();
+            }
+            Files.delete(compiled);
+        }
+        System.clearProperty(BUNDLED_CANARY);
+        return dir;
     }
 
     /**
