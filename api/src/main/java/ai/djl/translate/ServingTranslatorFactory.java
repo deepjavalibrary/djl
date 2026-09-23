@@ -79,6 +79,19 @@ public class ServingTranslatorFactory implements TranslatorFactory {
             return (Translator<I, O>) servingTranslator;
         } else if (className != null) {
             throw new TranslateException("Failed to load translator: " + className);
+        } else if (ClassLoaderUtils.hasSkippedBundledClasses(libPath)) {
+            // The model bundles class content and does not name a translator, so the name could
+            // only have come from that content. Falling through to a default translator would load
+            // the model and serve it with different pre- and post-processing, which is not
+            // distinguishable from a correct load, so report it instead.
+            throw new TranslateException(
+                    "Failed to load the translator bundled in "
+                            + libPath
+                            + ": loading classes shipped with a model is disabled by default. Set"
+                            + " DJL_LOAD_BUNDLED_CLASSES=true or"
+                            + " -Dai.djl.load_bundled_classes=true to load it for models from a"
+                            + " trusted source, or install the translator on the application"
+                            + " classpath and name it with the translator property.");
         }
 
         return (Translator<I, O>) loadDefaultTranslator(model, arguments);

@@ -50,10 +50,12 @@ name it explicitly with the `translator` property in `serving.properties`. This 
 option, because a `className` is still resolved against the application classpath while bundled
 loading is disabled.
 
-Note that when no `translator` property is set, DJL has to read the bundled content to discover the
-class name. With bundled loading disabled there is nothing to discover, so DJL falls back to a
-default Translator for the model's `application` rather than failing. Set the `translator` property
-if you want an explicit failure instead of a fallback.
+When no `translator` property is set, DJL has to read the bundled content to discover the class name.
+With bundled loading disabled there is nothing to discover, so loading a model that bundles a
+Translator fails with a message naming the flag. DJL does not fall back to a default Translator in
+that case, because a model served with a substituted Translator applies different pre- and
+post-processing while otherwise looking like a correct load. A model that bundles nothing is
+unaffected and still falls back to the default Translator for its `application`.
 
 ## Configure data processing based on standard Translator
 DJL provides several built-in Translator for well-know ML applications, such as `Image Classification`

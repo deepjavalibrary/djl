@@ -68,16 +68,7 @@ public final class ClassLoaderUtils {
         try {
             Path classesDir = path.resolve("classes");
             // we only consider .class files and skip .java files
-            List<Path> jarFiles;
-            if (Files.isDirectory(path)) {
-                try (Stream<Path> stream = Files.list(path)) {
-                    jarFiles =
-                            stream.filter(p -> p.toString().endsWith(".jar"))
-                                    .collect(Collectors.toList());
-                }
-            } else {
-                jarFiles = Collections.emptyList();
-            }
+            List<Path> jarFiles = listJarFiles(path);
             boolean bundledEnabled = isBundledClassLoadingEnabled();
             final ClassLoader contextCl = getContextClassLoader();
             ClassLoader cl = contextCl;
@@ -128,6 +119,40 @@ public final class ClassLoaderUtils {
             logger.debug("Failed to find Translator", e);
         }
         return null;
+    }
+
+    /**
+     * Returns whether the path holds bundled class content that {@link #findImplementation(Path,
+     * Class, String)} will not consult, because loading classes bundled with a model is not
+     * enabled.
+     *
+     * <p>A caller that must resolve an implementation can use this to tell "the model bundles no
+     * implementation" apart from "the model bundles one that was not loaded", which otherwise look
+     * the same: both return null.
+     *
+     * @param path the path that would be searched
+     * @return true if bundled {@code .class} or {@code .jar} content is present and will not be
+     *     loaded
+     */
+    public static boolean hasSkippedBundledClasses(Path path) {
+        if (isBundledClassLoadingEnabled()) {
+            return false;
+        }
+        try {
+            return hasBundledClasses(path.resolve("classes"), listJarFiles(path));
+        } catch (IOException e) {
+            logger.debug("Failed to list bundled jar files in {}", path, e);
+            return false;
+        }
+    }
+
+    private static List<Path> listJarFiles(Path path) throws IOException {
+        if (!Files.isDirectory(path)) {
+            return Collections.emptyList();
+        }
+        try (Stream<Path> stream = Files.list(path)) {
+            return stream.filter(p -> p.toString().endsWith(".jar")).collect(Collectors.toList());
+        }
     }
 
     /**
