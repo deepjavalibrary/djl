@@ -200,8 +200,7 @@ public class TfNDArray extends NativeResource<TFE_TensorHandle> implements NDArr
             JavacppUtils.setByteBuffer(getHandle(), (ByteBuffer) buffer);
             return;
         }
-        ByteBuffer bb =
-                getManager().allocateDirect(Math.multiplyExact(size, type.getNumOfBytes()));
+        ByteBuffer bb = getManager().allocateDirect(Math.multiplyExact(size, type.getNumOfBytes()));
         BaseNDManager.copyBuffer(buffer, bb);
         JavacppUtils.setByteBuffer(getHandle(), bb);
     }
