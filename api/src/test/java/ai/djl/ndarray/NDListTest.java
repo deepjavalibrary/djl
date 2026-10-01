@@ -19,6 +19,9 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 public class NDListTest {
 
@@ -49,5 +52,43 @@ public class NDListTest {
             Assert.assertEquals(list.get(0).getName(), "attention");
             Assert.assertEquals(list.get(0).toByteArray(), new byte[] {0, 1, 2, 3, 4, 5});
         }
+    }
+
+    /** Safetensors entries whose data offsets do not match their shape and dtype are rejected. */
+    @Test
+    public void testSafetensorsMalformedMetadata() {
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
+            // 8 FLOAT32 elements need 32 bytes, but the offsets only cover 16.
+            byte[] undersized = safetensors("F32", 8, 0, 16);
+            Assert.assertThrows(
+                    IllegalArgumentException.class, () -> NDList.decode(manager, undersized));
+
+            byte[] negative = safetensors("F32", 4, -4, 12);
+            Assert.assertThrows(
+                    IllegalArgumentException.class, () -> NDList.decode(manager, negative));
+
+            // FLOAT64 (8 bytes) * 2^29 == 2^32, which does not fit in an int.
+            byte[] overflow = safetensors("F64", 1 << 29, 0, 16);
+            Assert.assertThrows(ArithmeticException.class, () -> NDList.decode(manager, overflow));
+        }
+    }
+
+    private static byte[] safetensors(String dtype, int size, int begin, int end) {
+        String header =
+                "{\"a\":{\"dtype\":\""
+                        + dtype
+                        + "\",\"shape\":["
+                        + size
+                        + "],\"data_offsets\":["
+                        + begin
+                        + ','
+                        + end
+                        + "]}}";
+        byte[] json = header.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer bb = ByteBuffer.allocate(8 + json.length + end);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.putLong(json.length);
+        bb.put(json);
+        return bb.array();
     }
 }

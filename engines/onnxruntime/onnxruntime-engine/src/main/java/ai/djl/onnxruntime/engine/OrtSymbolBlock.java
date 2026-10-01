@@ -175,7 +175,8 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
                 finalData.addAll(((Map<Object, Object>) map.getValue()).values());
             }
             Shape shape = new Shape(values.size(), finalData.size() / values.size());
-            ByteBuffer buffer = ByteBuffer.allocate(finalData.size() * type.size);
+            ByteBuffer buffer =
+                    ByteBuffer.allocate(Math.multiplyExact(finalData.size(), type.size));
             switch (type) {
                 case FLOAT:
                     finalData.forEach(ele -> buffer.putFloat((Float) ele));

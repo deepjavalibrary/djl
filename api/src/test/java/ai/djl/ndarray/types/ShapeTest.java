@@ -33,6 +33,24 @@ public class ShapeTest {
         Assert.assertEquals(shape.getLeadingOnes(), 1);
     }
 
+    /**
+     * {@link Shape#size()} previously multiplied the dimensions without an overflow check, so a
+     * product beyond long range wrapped to a small value. It now throws instead.
+     */
+    @Test
+    public void testSizeOverflow() {
+        // 16 * (2^60 + 1) == 2^64 + 16, which wraps int64 to 16.
+        Shape shape = new Shape(16, (1L << 60) + 1);
+        Assert.assertThrows(ArithmeticException.class, shape::size);
+        Assert.assertThrows(ArithmeticException.class, () -> shape.size(0, 1));
+
+        // 2^32 * 2^32 == 2^64, which wraps int64 to exactly 0.
+        Shape square = new Shape(1L << 32, 1L << 32);
+        Assert.assertThrows(ArithmeticException.class, square::size);
+
+        Assert.assertEquals(new Shape(2, -1).size(), -1);
+    }
+
     @Test
     public void testHasLayout() {
         Shape withLayout =

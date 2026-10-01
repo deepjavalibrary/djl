@@ -12,6 +12,7 @@
  */
 package ai.djl.ml.xgboost;
 
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
@@ -67,7 +68,8 @@ public class XgbSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             XgbNDArray xgbNDArray = sub.from(array);
             // TODO: return DirectBuffer from JNI to avoid copy
             float[] result = JniUtils.inference(this, xgbNDArray, treeLimit, mode);
-            ByteBuffer buf = manager.allocateDirect(result.length * 4);
+            int size = BaseNDManager.toBufferSize(result.length, DataType.FLOAT32);
+            ByteBuffer buf = manager.allocateDirect(size);
             buf.asFloatBuffer().put(result);
             buf.rewind();
 
