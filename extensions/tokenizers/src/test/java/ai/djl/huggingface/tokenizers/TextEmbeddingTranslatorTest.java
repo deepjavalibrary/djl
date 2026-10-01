@@ -36,6 +36,7 @@ import ai.djl.util.PairList;
 import ai.djl.util.Utils;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -335,6 +336,84 @@ public class TextEmbeddingTranslatorTest {
             float[][] res = (float[][]) batchOutput.get(0).getData().getAsObject();
             Assert.assertEquals(res[0].length, 384);
             Assertions.assertAlmostEquals(res[0][0], 0.05103);
+        }
+    }
+
+    @Test
+    public void testFilesOutsideModelDir() throws ModelException, IOException {
+        if (Utils.isFileOutsideModelDirAllowed()) {
+            throw new SkipException("Files outside the model directory are allowed");
+        }
+        // The dense and layerNorm weights next to the model directory, rather than in it.
+        Path root = Files.createTempDirectory("djl-embedding");
+        try {
+            Path modelDir = Files.createDirectories(root.resolve("model"));
+            Path linear = root.resolve("linear.safetensors");
+            Path norm = root.resolve("norm.safetensors");
+            try (NDManager manager = NDManager.newBaseManager("Rust")) {
+                NDArray weight = manager.ones(new Shape(256, 384));
+                weight.setName("linear.weight");
+                try (OutputStream os = Files.newOutputStream(linear)) {
+                    new NDList(weight).encode(os, NDList.Encoding.SAFETENSORS);
+                }
+                NDArray normWeight = manager.ones(new Shape(384));
+                normWeight.setName("norm.weight");
+                NDArray bias = manager.ones(new Shape(384));
+                bias.setName("norm.bias");
+                try (OutputStream os = Files.newOutputStream(norm)) {
+                    new NDList(normWeight, bias).encode(os, NDList.Encoding.SAFETENSORS);
+                }
+            }
+
+            String[][] cases = {
+                {"dense", "../linear.safetensors"},
+                {"dense", linear.toAbsolutePath().toString()},
+                {"layerNorm", "../norm.safetensors"},
+                {"layerNorm", norm.toAbsolutePath().toString()}
+            };
+            for (String[] c : cases) {
+                Criteria<String, float[]> criteria =
+                        Criteria.builder()
+                                .setTypes(String.class, float[].class)
+                                .optModelPath(modelDir)
+                                .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                                .optArgument("block_shapes", "(1,7,384)")
+                                .optArgument("block_names", "last_hidden_state")
+                                .optEngine("PyTorch")
+                                .optArgument("tokenizer", "google-bert/bert-base-uncased")
+                                .optArgument(c[0], c[1])
+                                .optOption("hasParameter", "false")
+                                .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                                .build();
+                try (ZooModel<String, float[]> model = criteria.loadModel();
+                        Predictor<String, float[]> predictor = model.newPredictor()) {
+                    TranslateException e =
+                            Assert.expectThrows(
+                                    TranslateException.class,
+                                    () -> predictor.predict("This is an example sentence"));
+                    Assert.assertTrue(
+                            e.getCause() instanceof IllegalArgumentException,
+                            c[0] + "=" + c[1] + " -> " + e.getCause());
+                }
+            }
+
+            // The tokenizer is resolved the same way when it is not a hub name.
+            Path tokenizer = Paths.get("src/test/resources/fake-tokenizer-with-padding");
+            Criteria<String, float[]> criteria =
+                    Criteria.builder()
+                            .setTypes(String.class, float[].class)
+                            .optModelPath(modelDir)
+                            .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                            .optArgument("block_shapes", "(1,7,384)")
+                            .optArgument("block_names", "last_hidden_state")
+                            .optEngine("PyTorch")
+                            .optArgument("tokenizerPath", tokenizer.toAbsolutePath().toString())
+                            .optOption("hasParameter", "false")
+                            .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                            .build();
+            Assert.assertThrows(IllegalArgumentException.class, criteria::loadModel);
+        } finally {
+            Utils.deleteQuietly(root);
         }
     }
 }

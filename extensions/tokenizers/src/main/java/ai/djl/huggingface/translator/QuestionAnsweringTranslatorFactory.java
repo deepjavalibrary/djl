@@ -58,8 +58,7 @@ public class QuestionAnsweringTranslatorFactory implements TranslatorFactory, Se
         Path modelPath = model.getModelPath();
         try {
             HuggingFaceTokenizer tokenizer =
-                    HuggingFaceTokenizer.builder(arguments)
-                            .optTokenizerPath(modelPath)
+                    HuggingFaceTokenizer.builder(arguments, modelPath)
                             .optManager(model.getNDManager())
                             .build();
             QuestionAnsweringTranslator translator =

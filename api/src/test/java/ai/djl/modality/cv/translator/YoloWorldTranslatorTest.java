@@ -33,11 +33,14 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.Utils;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -123,6 +126,55 @@ public class YoloWorldTranslatorTest {
             Input input1 = new Input();
             input1.add(JsonUtils.toJson(map));
             Assert.assertThrows(TranslateException.class, () -> predictor.predict(input1));
+        }
+    }
+
+    @Test
+    public void testClipModelOutsideModelDir()
+            throws ModelException, IOException, TranslateException {
+        if (Utils.isFileOutsideModelDirAllowed()) {
+            throw new SkipException("Files outside the model directory are allowed");
+        }
+        Path file = Paths.get("../examples/src/test/resources/kitten.jpg");
+        Image img = ImageFactory.getInstance().fromFile(file);
+        VisionLanguageInput input = new VisionLanguageInput(img, new String[] {"cat"});
+        Block block =
+                new LambdaBlock(
+                        a -> new NDList(a.getManager().ones(new Shape(1, 6, 6300))), "model");
+
+        // A copy of the clip model next to the model directory, rather than in it.
+        Path source = Paths.get("src/test/resources/yolo_world");
+        Path root = Files.createTempDirectory("djl-yolo-world");
+        try {
+            Path modelDir = Files.createDirectories(root.resolve("model"));
+            Files.copy(source.resolve("vocab.json"), modelDir.resolve("vocab.json"));
+            Files.copy(source.resolve("merges.txt"), modelDir.resolve("merges.txt"));
+            Path clip = Files.copy(source.resolve("identity.pt"), root.resolve("identity.pt"));
+            for (String name : new String[] {"../identity.pt", clip.toAbsolutePath().toString()}) {
+                Criteria<VisionLanguageInput, DetectedObjects> criteria =
+                        Criteria.builder()
+                                .setTypes(VisionLanguageInput.class, DetectedObjects.class)
+                                .optModelPath(modelDir)
+                                .optBlock(block)
+                                .optEngine("PyTorch")
+                                .optArgument("clipModelPath", name)
+                                .optArgument("toTensor", true)
+                                .optOption("hasParameter", "false")
+                                .optTranslatorFactory(new YoloWorldTranslatorFactory())
+                                .build();
+                try (ZooModel<VisionLanguageInput, DetectedObjects> model = criteria.loadModel();
+                        Predictor<VisionLanguageInput, DetectedObjects> predictor =
+                                model.newPredictor()) {
+                    TranslateException e =
+                            Assert.expectThrows(
+                                    TranslateException.class, () -> predictor.predict(input));
+                    Assert.assertTrue(
+                            e.getCause() instanceof IllegalArgumentException,
+                            name + " -> " + e.getCause());
+                }
+            }
+        } finally {
+            Utils.deleteQuietly(root);
         }
     }
 

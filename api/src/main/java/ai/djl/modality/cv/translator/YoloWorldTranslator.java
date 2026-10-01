@@ -44,7 +44,6 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -80,10 +79,7 @@ public class YoloWorldTranslator
     public void prepare(TranslatorContext ctx) throws Exception {
         Model model = ctx.getModel();
         Path modelPath = model.getModelPath();
-        Path path = Paths.get(clipModelPath);
-        if (!path.isAbsolute() && Files.notExists(path)) {
-            path = modelPath.resolve(clipModelPath);
-        }
+        Path path = Utils.resolveModelFile(modelPath, clipModelPath);
         if (!Files.exists(path)) {
             throw new IOException("clip model not found: " + clipModelPath);
         }

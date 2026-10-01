@@ -107,3 +107,15 @@ Criteria<Image, Classifications> criteria = Criteria.builder()
         .optArgument("softmax", true)
         .build();
 ```
+
+Arguments that name a file, such as `synsetFileName`, `tokenizerPath` or `dense`, are resolved in the
+model directory. Naming a file outside the model directory is **opt-in**: set
+`DJL_ALLOW_FILES_OUTSIDE_MODEL_DIR=true` or `-Dai.djl.allow_files_outside_model_dir=true`.
+`synsetUrl` accepts `http` and `https` URLs and is fetched like other remote resources: hosts that
+resolve to private, loopback or link-local addresses are refused, and nothing is fetched in offline
+mode. For a synset file stored with the model, use `synsetFileName` instead. To restore the previous
+behavior (other schemes and private hosts), set `DJL_ALLOW_INSECURE_URL=true` or
+`-Dai.djl.allow_insecure_url=true`; this does not apply in offline mode.
+
+`encoder` (SAM2) and `clipModelPath` (YOLO-World) are no longer looked up in the current working
+directory first.

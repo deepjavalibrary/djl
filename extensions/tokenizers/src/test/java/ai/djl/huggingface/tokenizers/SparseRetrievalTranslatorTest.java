@@ -27,10 +27,12 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.Assertions;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.Utils;
 
 import com.google.gson.JsonArray;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -140,6 +142,61 @@ public class SparseRetrievalTranslatorTest {
             Assert.assertNull(res.getDenseEmbedding());
             Assert.assertEquals(tokenWeights.size(), 5);
             Assertions.assertAlmostEquals(tokenWeights.get("2023"), 1025.0);
+        }
+    }
+
+    @Test
+    public void testSparseLinearOutsideModelDir() throws ModelException, IOException {
+        if (Utils.isFileOutsideModelDirAllowed()) {
+            throw new SkipException("Files outside the model directory are allowed");
+        }
+        // The sparse linear weights next to the model directory, rather than in it.
+        Path root = Files.createTempDirectory("djl-sparse");
+        try {
+            Path modelDir = Files.createDirectories(root.resolve("model"));
+            Path sparseLinear = root.resolve("sparse_linear.safetensors");
+            try (NDManager manager = NDManager.newBaseManager("PyTorch")) {
+                NDArray weight = manager.ones(new Shape(1, 1024));
+                weight.setName("weight");
+                NDArray bias = manager.ones(new Shape(1));
+                bias.setName("bias");
+                NDList linear = new NDList(weight, bias);
+                try (OutputStream os = Files.newOutputStream(sparseLinear)) {
+                    linear.encode(os, NDList.Encoding.SAFETENSORS);
+                }
+            }
+
+            String[] names = {
+                "../sparse_linear.safetensors", sparseLinear.toAbsolutePath().toString()
+            };
+            for (String name : names) {
+                Criteria<String, EmbeddingOutput> criteria =
+                        Criteria.builder()
+                                .setTypes(String.class, EmbeddingOutput.class)
+                                .optModelPath(modelDir)
+                                .optEngine("PyTorch")
+                                .optArgument("blockFactory", "ai.djl.nn.OnesBlockFactory")
+                                .optArgument("block_shapes", "(2,9,1024)")
+                                .optArgument("block_names", "last_hidden_state")
+                                .optArgument("tokenizer", "bert-base-uncased")
+                                .optArgument("sparse", true)
+                                .optArgument("sparseLinear", name)
+                                .optOption("hasParameter", "false")
+                                .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
+                                .build();
+                try (ZooModel<String, EmbeddingOutput> model = criteria.loadModel();
+                        Predictor<String, EmbeddingOutput> predictor = model.newPredictor()) {
+                    TranslateException e =
+                            Assert.expectThrows(
+                                    TranslateException.class,
+                                    () -> predictor.predict("This is an example sentence"));
+                    Assert.assertTrue(
+                            e.getCause() instanceof IllegalArgumentException,
+                            name + " -> " + e.getCause());
+                }
+            }
+        } finally {
+            Utils.deleteQuietly(root);
         }
     }
 }

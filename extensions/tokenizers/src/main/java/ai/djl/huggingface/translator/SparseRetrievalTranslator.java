@@ -23,13 +23,13 @@ import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,10 +74,7 @@ public class SparseRetrievalTranslator implements Translator<String, EmbeddingOu
             translator.prepare(ctx);
         }
         if (sparseLinear != null) {
-            Path file = Paths.get(sparseLinear);
-            if (!file.isAbsolute()) {
-                file = ctx.getModel().getModelPath().resolve(file);
-            }
+            Path file = Utils.resolveModelFile(ctx.getModel().getModelPath(), sparseLinear);
             if (Files.notExists(file)) {
                 throw new TranslateException("sparseLinear file does not exist: " + sparseLinear);
             }
