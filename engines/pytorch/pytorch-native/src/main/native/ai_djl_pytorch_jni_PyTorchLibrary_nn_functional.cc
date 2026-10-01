@@ -229,7 +229,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNRnn(J
   // process output
   jlongArray jarray = env->NewLongArray(2);
   std::vector<jlong> jptrs;
-  jptrs.reserve(2);
+  jptrs.resize(2);
   jptrs[0] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<0>(outputs)));
   jptrs[1] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<1>(outputs)));
   env->SetLongArrayRegion(jarray, 0, 2, jptrs.data());
@@ -251,7 +251,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNGru(J
   // process output
   jlongArray jarray = env->NewLongArray(2);
   std::vector<jlong> jptrs;
-  jptrs.reserve(2);
+  jptrs.resize(2);
   jptrs[0] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<0>(outputs)));
   jptrs[1] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<1>(outputs)));
   env->SetLongArrayRegion(jarray, 0, 2, jptrs.data());
@@ -273,7 +273,7 @@ JNIEXPORT jlongArray JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchNNLstm(
   // process output
   jlongArray jarray = env->NewLongArray(3);
   std::vector<jlong> jptrs;
-  jptrs.reserve(3);
+  jptrs.resize(3);
   jptrs[0] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<0>(outputs)));
   jptrs[1] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<1>(outputs)));
   jptrs[2] = reinterpret_cast<uintptr_t>(new torch::Tensor(std::get<2>(outputs)));
