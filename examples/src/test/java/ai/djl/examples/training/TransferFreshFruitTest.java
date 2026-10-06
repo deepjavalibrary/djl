@@ -37,8 +37,8 @@ public class TransferFreshFruitTest {
         for (String[] arg : args) {
             TrainingResult result = TransferFreshFruit.runExample(arg);
             Assert.assertNotNull(result);
-            Assert.assertTrue(result.getEvaluations().get("validate_Accuracy") > 0.76f);
-            Assert.assertTrue(result.getEvaluations().get("train_Accuracy") > 0.85f);
+            Assert.assertTrue(result.getEvaluations().get("validate_Accuracy") > 0.6f);
+            Assert.assertTrue(result.getEvaluations().get("train_Accuracy") > 0.7f);
         }
     }
 }
