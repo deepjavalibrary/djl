@@ -406,6 +406,37 @@ public final class Utils {
     }
 
     /**
+     * Resolves a file name against the model directory.
+     *
+     * <p>Model arguments can come from the model's own {@code serving.properties} or {@code
+     * metadata.json}, so a file they name is only resolved inside the model directory. Set {@code
+     * DJL_ALLOW_FILES_OUTSIDE_MODEL_DIR=true} (or {@code
+     * -Dai.djl.allow_files_outside_model_dir=true}) to allow files outside it.
+     *
+     * @param modelDir the model directory
+     * @param name the file name, relative to the model directory or absolute
+     * @return the resolved path
+     * @throws IllegalArgumentException if the file is outside the model directory
+     */
+    public static Path resolveModelFile(Path modelDir, String name) {
+        Path file = modelDir.resolve(name);
+        if (isFileOutsideModelDirAllowed()) {
+            return file;
+        }
+        // Checked on the normalized path rather than the real path: a Hugging Face hub cache links
+        // each file in a snapshot to a shared blob directory, so following links would reject a
+        // correctly downloaded model.
+        Path dir = modelDir.toAbsolutePath().normalize();
+        if (!file.toAbsolutePath().normalize().startsWith(dir)) {
+            throw new IllegalArgumentException(
+                    "File is outside the model directory: "
+                            + name
+                            + ". Set DJL_ALLOW_FILES_OUTSIDE_MODEL_DIR=true to override.");
+        }
+        return file;
+    }
+
+    /**
      * Gets the value of the specified environment variable or system property.
      *
      * @param name the name of the environment variable
@@ -782,9 +813,23 @@ public final class Utils {
      * @return true if {@code DJL_ALLOW_INSECURE_URL} / {@code ai.djl.allow_insecure_url} is set
      *     true
      */
-    static boolean isInsecureUrlAllowed() {
+    public static boolean isInsecureUrlAllowed() {
         String mode =
                 getenv("DJL_ALLOW_INSECURE_URL", System.getProperty("ai.djl.allow_insecure_url"));
+        return Boolean.parseBoolean(mode);
+    }
+
+    /**
+     * Returns whether model arguments may name files outside the model directory.
+     *
+     * @return true if {@code DJL_ALLOW_FILES_OUTSIDE_MODEL_DIR} / {@code
+     *     ai.djl.allow_files_outside_model_dir} is set true
+     */
+    public static boolean isFileOutsideModelDirAllowed() {
+        String mode =
+                getenv(
+                        "DJL_ALLOW_FILES_OUTSIDE_MODEL_DIR",
+                        System.getProperty("ai.djl.allow_files_outside_model_dir"));
         return Boolean.parseBoolean(mode);
     }
 

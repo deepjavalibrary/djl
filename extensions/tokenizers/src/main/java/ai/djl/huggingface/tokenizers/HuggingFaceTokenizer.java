@@ -646,6 +646,33 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
         return builder;
     }
 
+    /**
+     * Creates a builder to build a {@code HuggingFaceTokenizer} for a model.
+     *
+     * <p>The tokenizer path defaults to the model directory. A {@code tokenizerPath} or {@code
+     * tokenizerConfigPath} argument is resolved in the model directory with {@link
+     * Utils#resolveModelFile(Path, String)}.
+     *
+     * @param arguments the models' arguments
+     * @param modelPath the model directory
+     * @return a new builder
+     */
+    public static Builder builder(Map<String, ?> arguments, Path modelPath) {
+        Builder builder = builder(arguments);
+        String tokenizerPath = builder.options.get("tokenizerPath");
+        Path path =
+                tokenizerPath == null
+                        ? modelPath
+                        : Utils.resolveModelFile(modelPath, tokenizerPath);
+        builder.options.put("tokenizerPath", path.toString());
+        String configPath = builder.options.get("tokenizerConfigPath");
+        if (configPath != null) {
+            Path file = Utils.resolveModelFile(modelPath, configPath);
+            builder.options.put("tokenizerConfigPath", file.toString());
+        }
+        return builder;
+    }
+
     private String prepareForTokenization(String text) {
         if (addPrefixSpace && !text.startsWith(" ")) {
             text = " " + text;

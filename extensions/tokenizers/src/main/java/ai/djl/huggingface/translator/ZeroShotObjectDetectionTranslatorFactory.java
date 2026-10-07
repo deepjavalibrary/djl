@@ -62,8 +62,7 @@ public class ZeroShotObjectDetectionTranslatorFactory implements TranslatorFacto
         Path modelPath = model.getModelPath();
         try {
             HuggingFaceTokenizer tokenizer =
-                    HuggingFaceTokenizer.builder(arguments)
-                            .optTokenizerPath(modelPath)
+                    HuggingFaceTokenizer.builder(arguments, modelPath)
                             .optManager(model.getNDManager())
                             .build();
             ZeroShotObjectDetectionTranslator translator =

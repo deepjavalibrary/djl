@@ -23,11 +23,11 @@ import ai.djl.translate.ArgumentsUtil;
 import ai.djl.translate.Batchifier;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
+import ai.djl.util.Utils;
 
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -73,10 +73,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
     public void prepare(TranslatorContext ctx) throws Exception {
         NDManager manager = ctx.getPredictorManager().newSubManager();
         if (dense != null) {
-            Path file = Paths.get(dense);
-            if (!file.isAbsolute()) {
-                file = ctx.getModel().getModelPath().resolve(file);
-            }
+            Path file = Utils.resolveModelFile(ctx.getModel().getModelPath(), dense);
             if (Files.exists(file)) {
                 try (InputStream is = Files.newInputStream(file)) {
                     denseModel = NDList.decode(manager, is);
@@ -84,10 +81,7 @@ public class TextEmbeddingTranslator implements Translator<String, float[]> {
             }
         }
         if (layerNorm != null) {
-            Path file = Paths.get(layerNorm);
-            if (!file.isAbsolute()) {
-                file = ctx.getModel().getModelPath().resolve(file);
-            }
+            Path file = Utils.resolveModelFile(ctx.getModel().getModelPath(), layerNorm);
             if (Files.exists(file)) {
                 try (InputStream is = Files.newInputStream(file)) {
                     layerNormModel = NDList.decode(manager, is);

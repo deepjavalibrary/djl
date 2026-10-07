@@ -305,6 +305,9 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
         /**
          * Sets the URL of the synset file.
          *
+         * <p>Only {@code http} and {@code https} URLs are supported. Use {@link
+         * #optSynsetArtifactName(String)} for a synset file stored with the model.
+         *
          * @param synsetUrl the URL of the synset file
          * @return the builder
          */
@@ -381,6 +384,20 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
         }
 
         public SynsetLoader(URL synsetUrl) {
+            // synsetUrl can come from the model's own arguments, so it is limited to a remote
+            // fetch, which Utils.openUrl checks. A local synset is named with synsetFileName and
+            // resolved in the model directory.
+            String protocol = synsetUrl.getProtocol();
+            if (!Utils.isInsecureUrlAllowed()
+                    && !"http".equalsIgnoreCase(protocol)
+                    && !"https".equalsIgnoreCase(protocol)) {
+                throw new IllegalArgumentException(
+                        "Unsupported synsetUrl protocol: "
+                                + protocol
+                                + ". Use synsetFileName (optSynsetArtifactName) for a file in the"
+                                + " model directory, or set DJL_ALLOW_INSECURE_URL=true to"
+                                + " override.");
+            }
             this.synsetUrl = synsetUrl;
         }
 
@@ -392,7 +409,7 @@ public abstract class BaseImageTranslator<T> implements Translator<Image, T> {
             if (synset != null) {
                 return synset;
             } else if (synsetUrl != null) {
-                try (InputStream is = synsetUrl.openStream()) {
+                try (InputStream is = Utils.openUrl(synsetUrl)) {
                     return Utils.readLines(is);
                 }
             }

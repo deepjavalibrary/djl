@@ -62,8 +62,7 @@ public class TextClassificationTranslatorFactory implements TranslatorFactory, S
         Path modelPath = model.getModelPath();
         try {
             HuggingFaceTokenizer tokenizer =
-                    HuggingFaceTokenizer.builder(arguments)
-                            .optTokenizerPath(modelPath)
+                    HuggingFaceTokenizer.builder(arguments, modelPath)
                             .optManager(model.getNDManager())
                             .build();
             if (ArgumentsUtil.booleanValue(arguments, "reranking")) {

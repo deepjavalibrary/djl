@@ -38,13 +38,13 @@ import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
+import ai.djl.util.Utils;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -84,10 +84,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
             return;
         }
         Model model = ctx.getModel();
-        Path path = Paths.get(encoderPath);
-        if (!path.isAbsolute() && Files.notExists(path)) {
-            path = model.getModelPath().resolve(encoderPath);
-        }
+        Path path = Utils.resolveModelFile(model.getModelPath(), encoderPath);
         if (!Files.exists(path)) {
             throw new IOException("encoder model not found: " + encoderPath);
         }

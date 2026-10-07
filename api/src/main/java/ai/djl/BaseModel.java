@@ -198,7 +198,7 @@ public abstract class BaseModel implements Model {
         if (artifactName == null) {
             throw new IllegalArgumentException("artifactName cannot be null");
         }
-        Path file = modelDir.resolve(artifactName);
+        Path file = Utils.resolveModelFile(modelDir, artifactName);
         if (Files.exists(file) && Files.isReadable(file)) {
             return file.toUri().toURL();
         }

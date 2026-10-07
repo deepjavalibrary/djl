@@ -21,6 +21,7 @@ import ai.djl.util.PairList;
 import ai.djl.util.Utils;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -688,6 +689,51 @@ public class HuggingFaceTokenizerTest {
                 Assert.assertTrue(
                         encoding.getIds().length <= 48, "Encoding length should not exceed 48");
             }
+        }
+    }
+
+    @Test
+    public void testBuilderWithModelPath() throws IOException {
+        if (Utils.isFileOutsideModelDirAllowed()) {
+            throw new SkipException("Files outside the model directory are allowed");
+        }
+        Path modelDir = Paths.get("src/test/resources/fake-tokenizer-with-null-padding");
+        // The tokenizer defaults to the model directory, and relative paths are resolved in it
+        // rather than in the working directory.
+        Map<String, String> arguments = new ConcurrentHashMap<>();
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.builder(arguments, modelDir).build()) {
+            Assert.assertTrue(tokenizer.encode("Hello World").getTokens().length > 0);
+        }
+        arguments.put("tokenizerPath", "tokenizer.json");
+        arguments.put("tokenizerConfigPath", "tokenizer_config.json");
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.builder(arguments, modelDir).build()) {
+            Assert.assertTrue(tokenizer.encode("Hello World").getTokens().length > 0);
+        }
+
+        // A tokenizer or config next to the model directory is rejected.
+        Path other = Paths.get("src/test/resources/fake-tokenizer-with-padding");
+        String[] names = {"../fake-tokenizer-with-padding", other.toAbsolutePath().toString()};
+        for (String key : new String[] {"tokenizerPath", "tokenizerConfigPath"}) {
+            for (String name : names) {
+                Map<String, String> outside = Collections.singletonMap(key, name);
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () -> HuggingFaceTokenizer.builder(outside, modelDir));
+            }
+        }
+
+        System.setProperty("ai.djl.allow_files_outside_model_dir", "true");
+        try {
+            Map<String, String> outside =
+                    Collections.singletonMap("tokenizerPath", "../fake-tokenizer-with-padding");
+            try (HuggingFaceTokenizer tokenizer =
+                    HuggingFaceTokenizer.builder(outside, modelDir).build()) {
+                Assert.assertTrue(tokenizer.encode("test sentence").getTokens().length > 0);
+            }
+        } finally {
+            System.clearProperty("ai.djl.allow_files_outside_model_dir");
         }
     }
 }
