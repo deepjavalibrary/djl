@@ -66,7 +66,7 @@ inline jlongArray GetPtrArrayFromContainer(JNIEnv* env, T1 list) {
   size_t len = list.size();
   jlongArray jarray = env->NewLongArray(len);
   std::vector<jlong> jptrs;
-  jptrs.reserve(len);
+  jptrs.resize(len);
   for (size_t i = 0; i < len; ++i) {
     const auto* element_ptr = new T2(list[i]);
     jptrs[i] = reinterpret_cast<uintptr_t>(element_ptr);
