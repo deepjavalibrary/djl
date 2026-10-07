@@ -107,7 +107,7 @@ public class ImageServingTranslator implements Translator<Input, Output> {
                         throw new TranslateException("Missing \"image_url\" in json.");
                     }
 
-                    image = factory.fromUrl(url.getAsString());
+                    image = factory.fromRequestUrl(url.getAsString());
                 } catch (JsonParseException e) {
                     throw new TranslateException("Input is not a valid json.", e);
                 }

@@ -91,7 +91,7 @@ public class VisionLanguageInput {
             if (url == null) {
                 throw new TranslateException("Missing \"image\" parameter in input.");
             }
-            Image img = ImageFactory.getInstance().fromUrl(url.getAsString());
+            Image img = ImageFactory.getInstance().fromRequestUrl(url.getAsString());
             String text = JsonUtils.GSON.fromJson(obj.get("text"), String.class);
             String[] candidates =
                     JsonUtils.GSON.fromJson(obj.get("candidate_labels"), String[].class);
