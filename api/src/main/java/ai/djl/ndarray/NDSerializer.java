@@ -52,10 +52,7 @@ final class NDSerializer {
      */
     static byte[] encode(NDArray array) {
         int total =
-                Math.addExact(
-                        Math.multiplyExact(
-                                Math.toIntExact(array.size()), array.getDataType().getNumOfBytes()),
-                        100);
+                Math.addExact(BaseNDManager.toBufferSize(array.size(), array.getDataType()), 100);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream(total)) {
             encode(array, baos);
             return baos.toByteArray();
@@ -314,7 +311,7 @@ final class NDSerializer {
             longs = Arrays.stream(tokens).mapToLong(Long::parseLong).toArray();
         }
         Shape shape = new Shape(longs);
-        len = Math.toIntExact(shape.size() * dataType.getNumOfBytes());
+        len = BaseNDManager.toBufferSize(shape.size(), dataType);
         ByteBuffer data = manager.allocateDirect(len);
         char order = typeStr.charAt(0);
         if (order == '>') {

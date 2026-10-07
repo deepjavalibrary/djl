@@ -74,7 +74,7 @@ public class RsNDManager extends BaseNDManager {
         if (data.isDirect() && data instanceof ByteBuffer) {
             buf = (ByteBuffer) data;
         } else {
-            buf = allocateDirect(Math.multiplyExact(size, dataType.getNumOfBytes()));
+            buf = allocateDirect(BaseNDManager.toBufferSize(size, dataType));
             copyBuffer(data, buf);
         }
         String deviceType = device.getDeviceType();

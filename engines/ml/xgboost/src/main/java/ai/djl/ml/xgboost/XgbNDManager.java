@@ -146,6 +146,7 @@ public class XgbNDManager extends BaseNDManager {
             throw new UnsupportedOperationException("XgbNDArray only supports float32.");
         }
 
+        BaseNDManager.validateBuffer(data, dataType, Math.toIntExact(shape.size()));
         if (data instanceof ByteBuffer) {
             if (data.isDirect()) {
                 // TODO: allow user to set missing value
@@ -161,7 +162,7 @@ public class XgbNDManager extends BaseNDManager {
                     "Only Float32 data type supported, actual " + inputType);
         }
 
-        int size = Math.toIntExact(shape.size() * DataType.FLOAT32.getNumOfBytes());
+        int size = BaseNDManager.toBufferSize(shape.size(), DataType.FLOAT32);
         ByteBuffer buf = allocateDirect(size);
         buf.asFloatBuffer().put((FloatBuffer) data);
         buf.rewind();
