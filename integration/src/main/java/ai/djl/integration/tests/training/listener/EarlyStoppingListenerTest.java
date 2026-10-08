@@ -78,7 +78,7 @@ public class EarlyStoppingListenerTest {
 
     @Test
     public void testEarlyStoppingStopsOnEpoch2() throws Exception {
-        Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
+        Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation.reluBlock());
 
         try (Model model = Model.newInstance("lin-reg", TestUtils.getEngine())) {
             model.setBlock(mlpModel);
@@ -117,7 +117,7 @@ public class EarlyStoppingListenerTest {
 
     @Test
     public void testEarlyStoppingStopsOnEpoch3AsMinEpochsIs3() throws Exception {
-        Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
+        Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation.reluBlock());
 
         try (Model model = Model.newInstance("lin-reg", TestUtils.getEngine())) {
             model.setBlock(mlpModel);
@@ -156,7 +156,7 @@ public class EarlyStoppingListenerTest {
 
     @Test
     public void testEarlyStoppingStopsOnEpoch1AsMaxDurationIs1ms() throws Exception {
-        Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
+        Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation.reluBlock());
 
         try (Model model = Model.newInstance("lin-reg", TestUtils.getEngine())) {
             model.setBlock(mlpModel);
