@@ -18,13 +18,17 @@ import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.NDUtils;
 import ai.djl.ndarray.index.NDArrayIndexer;
+import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.internal.NDArrayEx;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 import ai.djl.nn.recurrent.RNN;
 import ai.djl.pytorch.jni.JniUtils;
+import ai.djl.util.Pair;
+import ai.djl.util.PairList;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -620,6 +624,7 @@ public class PtNDArrayEx implements NDArrayEx {
         return JniUtils.cat(srcArray, axis);
     }
 
+
     /** {@inheritDoc} */
     @Override
     public NDList multiBoxTarget(
@@ -629,8 +634,236 @@ public class PtNDArrayEx implements NDArrayEx {
             float negativeMiningRatio,
             float negativeMiningThreshold,
             int minNegativeSamples) {
-        throw new UnsupportedOperationException("Not implemented");
+
+        float[] variances = {0.1f, 0.1f, 0.2f, 0.2f}; // from mxnet default
+
+        NDArray anchors = inputs.get(0);
+        NDArray labels = inputs.get(1);
+        NDArray preds = inputs.get(2);
+
+        long numBatches = labels.size(0);
+        long numLabels = labels.size(1);
+        long numAnchors = anchors.size(1);
+
+        NDArray locTarget = inputs.getManager().create(new Shape(numBatches, numAnchors * 4));
+        NDArray classTarget = inputs.getManager().create(new Shape(numBatches, numAnchors));
+        NDArray locMask = inputs.getManager().create(new Shape(numBatches, numAnchors * 4));
+
+        for (int batchInd = 0; batchInd < numBatches; batchInd++) {
+
+            int numValidGT = 0;
+            for (int labelInd = 0; labelInd < numLabels; labelInd++) {
+                if (labels.getFloat(batchInd, labelInd, 0) == -1 &&
+                        labels.getFloat(batchInd, labelInd, 1) == -1 &&
+                        labels.getFloat(batchInd, labelInd, 2) == -1 &&
+                        labels.getFloat(batchInd, labelInd, 3) == -1 &&
+                        labels.getFloat(batchInd, labelInd, 4) == -1) {
+                    break;
+                }
+                numValidGT++;
+            }
+            if (numValidGT > 0) {
+                Boolean[] gtFlags = new Boolean[numValidGT];
+                Arrays.fill(gtFlags, false);
+                PairList<Float, Integer> maxMatches = new PairList<>();
+                for (int i = 0; i < numAnchors; i++) {
+                    maxMatches.add(new Pair<>(-1f, -1));
+                }
+                int[] anchorFlags = new int[Math.toIntExact(numAnchors)];
+                Arrays.fill(anchorFlags, -1);
+                int numPositive = 0;
+
+                // while (std::find(gt_flags.begin(), gt_flags.end(), false) != gt_flags.end()) {
+                while (Arrays.stream(gtFlags).anyMatch(b -> !b)) {
+                    int bestAnchor = -1;
+                    int bestGT = -1;
+                    float maxOverlap = 1e-6f;
+                    for (int j = 0; j < numAnchors; j++) {
+                        if (anchorFlags[j] == 1) {
+                            continue; // already matched
+                        }
+                        for (int k = 0; k < numValidGT; k++) {
+                            if (gtFlags[k]) {
+                                continue; // already matched
+                            }
+                            // anchor index is j, label index is k
+                            float[] outputsKRow4 = anchors.get(new NDIndex(String.format("%d,%d,0:4", 0, j))).toFloatArray();
+                            float[] outputsJRow4 = labels.get(new NDIndex(String.format("%d,%d,1:5", batchInd, k))).toFloatArray();
+                            float iou = calculateOverlap(outputsKRow4, outputsJRow4);
+
+                            if (iou > maxOverlap) {
+                                bestAnchor = j;
+                                bestGT     = k;
+                                maxOverlap = iou;
+                            }
+                        }
+                    }
+                    if (bestAnchor == -1) {
+                        assert bestGT == -1;
+                        break;
+                    } else {
+                        assert maxMatches.get(bestAnchor).getKey() == -1f;
+                        assert maxMatches.get(bestAnchor).getValue() == -1;
+                        maxMatches.keys().set(bestAnchor, maxOverlap);
+                        maxMatches.values().set(bestAnchor, bestGT);
+                        numPositive++;
+                        gtFlags[bestGT] = true;
+                        anchorFlags[bestAnchor] = 1;
+                    }
+                }
+                if (iouThreshold > 0) {
+                    for (int j = 0; j < numAnchors; j++) {
+                        if (anchorFlags[j] == 1) {
+                            continue; // already matched
+                        }
+                        int bestGT = -1;
+                        float maxIou = -1f;
+                        for (int k = 0; k < numValidGT; k++) {
+                            // anchor index is j, label index is k
+                            float[] outputsKRow4 = anchors.get(new NDIndex(String.format("%d,%d,0:4", 0, j))).toFloatArray();
+                            float[] outputsJRow4 = labels.get(new NDIndex(String.format("%d,%d,1:5", batchInd, k))).toFloatArray();
+                            float iou = calculateOverlap(outputsKRow4, outputsJRow4);
+
+                            if (iou > maxIou) {
+                                bestGT = k;
+                                maxIou = iou;
+                            }
+                        }
+                        if (bestGT != -1) {
+                            assert maxMatches.get(j).getKey() == -1f;
+                            assert maxMatches.get(j).getValue() == -1;
+                            maxMatches.keys().set(j, maxIou);
+                            maxMatches.values().set(j, bestGT);
+                            if (maxIou > iouThreshold) {
+                                numPositive++;
+                                gtFlags[bestGT] = true;
+                                anchorFlags[j] = 1;
+                            }
+                        }
+                    }
+                }
+
+                if (negativeMiningRatio > 0) {
+                    long numClasses = preds.size(1);
+                    assert negativeMiningThreshold > 0;
+                    int numNegative = (int) (numPositive * negativeMiningRatio);
+                    if (numNegative > (numAnchors - numPositive)) {
+                        numNegative = (int) (numAnchors - numPositive);
+                    }
+                    if (numNegative > 0) {
+                        // use negative mining, pick up "best" negative samples
+                        List<Pair<Double, Integer>> pairs = new ArrayList<>(); // value, index
+                        for (int j = 0; j < numAnchors; j++) {
+                            if (anchorFlags[j] == 1) {
+                                continue; // already matched
+                            }
+                            if (maxMatches.get(j).getKey() == -1) { // not calculated yet
+                                int bestGT = -1;
+                                float maxIou = -1f;
+                                for (int k = 0; k < numValidGT; k++) {
+                                    float[] outputsKRow4 = anchors.get(new NDIndex(String.format("%d,%d,0:4", 0, j))).toFloatArray();
+                                    float[] outputsJRow4 = labels.get(new NDIndex(String.format("%d,%d,1:5", batchInd, k))).toFloatArray();
+                                    float iou = calculateOverlap(outputsKRow4, outputsJRow4);
+
+                                    if (iou > maxIou) {
+                                        bestGT = k;
+                                        maxIou = iou;
+                                    }
+                                }
+                                if (bestGT != -1) {
+                                    assert maxMatches.get(j).getKey() == -1f;
+                                    assert maxMatches.get(j).getValue() == -1;
+                                    maxMatches.keys().set(j, maxIou);
+                                    maxMatches.values().set(j, bestGT);
+                                }
+                            }
+                            if (maxMatches.get(j).getKey() < negativeMiningThreshold && anchorFlags[j] == -1) {
+                                float maxVal = preds.getFloat(batchInd, j, 0);
+                                for (int k = 1; k < numClasses; k++) {
+                                    float tmp = preds.getFloat(batchInd, j, k);
+                                    if (tmp > maxVal)
+                                        maxVal = tmp;
+                                }
+                                double sum = 0;
+                                for (int k = 0; k < numClasses; k++) {
+                                    float tmp = preds.getFloat(batchInd, j, k);
+                                    sum += Math.exp(tmp - maxVal);
+                                }
+                                double prob = Math.exp(preds.getFloat(batchInd, j, 0) - maxVal) / sum;
+                                // loss should be -log(x), but value does not matter, skip log
+                                pairs.add(new Pair<>(-prob, j));
+                            }
+                        }
+                        assert pairs.size() >= numNegative;
+                        pairs.sort(Comparator.comparingDouble(Pair::getKey));
+                        for (int i = 0; i < numNegative; i++) {
+                            anchorFlags[pairs.get(i).getValue()] = 0;
+                        }
+                    }
+                } else {
+                    // use all negative samples
+                    for (int i = 0; i < numAnchors; ++i) {
+                        if (anchorFlags[i] != 1) {
+                            anchorFlags[i] = 0;
+                        }
+                    }
+                }
+
+                // assign training targets
+                for (int i = 0; i < numAnchors; i++) {
+                    if (anchorFlags[i] == 1) {
+                        // positive sample
+                        assert maxMatches.get(i).getValue() >= 0;
+                        // 0 reserved for background
+                        classTarget.set(
+                                new NDIndex(batchInd, i),
+                                labels.getFloat(batchInd, maxMatches.get(i).getValue(), 0) + 1
+                        );
+                        locMask.set(new NDIndex(batchInd + "," + (i*4) + ":" + ((i*4)+4)), 1);
+                        // todo anchor zero index...?
+                        AssignLocTargets(
+                                anchors.get(new NDIndex(0 + "," + i + ",:")),
+                                labels.get(new NDIndex(batchInd + "," + maxMatches.get(i).getValue() + ",1:")),
+                                locTarget.get(new NDIndex(String.format("%d,%d:%d", batchInd, i * 4, (i * 4) + 4))),
+                                variances
+                        );
+                    } else if (anchorFlags[i] == 0) {
+                        // negative sample
+                        classTarget.set(new NDIndex(batchInd, i), 0);
+                        locMask.set(new NDIndex(batchInd + "," + (i*4) + ":" + ((i*4)+4)), 0);
+                    }
+                }
+            }
+        }
+        return new NDList(locTarget, locMask, classTarget);
     }
+
+    void AssignLocTargets(NDArray anchor,
+                          NDArray label,
+                          NDArray locTarget,
+                          float[] variances) {
+        float al   = anchor.getFloat(0);
+        float at   = anchor.getFloat(1);
+        float ar   = anchor.getFloat(2);
+        float ab   = anchor.getFloat(3);
+        float aw   = ar - al;
+        float ah   = ab - at;
+        float ax   = (float) ((al + ar) * 0.5);
+        float ay   = (float) ((at + ab) * 0.5);
+        float gl   = label.getFloat(0);
+        float gt   = label.getFloat(1);
+        float gr   = label.getFloat(2);
+        float gb   = label.getFloat(3);
+        float gw   = gr - gl;
+        float gh   = gb - gt;
+        float gx   = (float) ((gl + gr) * 0.5);
+        float gy   = (float) ((gt + gb) * 0.5);
+        locTarget.set(new NDIndex(0), (gx - ax) / aw / variances[0]);
+        locTarget.set(new NDIndex(1), (gy - ay) / ah / variances[1]);
+        locTarget.set(new NDIndex(2), Math.log(gw / aw) / variances[2]);
+        locTarget.set(new NDIndex(3), Math.log(gh / ah) / variances[3]);
+    }
+
 
     /** {@inheritDoc} */
     @Override
