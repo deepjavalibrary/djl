@@ -346,7 +346,7 @@ public class Sam2Translator implements NoBatchifyTranslator<Sam2Input, DetectedO
             if (prompt.prompt == null || prompt.prompt.length == 0) {
                 throw new IllegalArgumentException("Missing prompt value");
             }
-            Image image = ImageFactory.getInstance().fromUrl(prompt.image);
+            Image image = ImageFactory.getInstance().fromRequestUrl(prompt.image);
             Builder builder = builder(image);
             if (prompt.visualize) {
                 builder.visualize();

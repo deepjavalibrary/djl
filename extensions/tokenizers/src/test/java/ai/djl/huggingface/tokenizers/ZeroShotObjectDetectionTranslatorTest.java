@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -115,7 +116,10 @@ public class ZeroShotObjectDetectionTranslatorTest {
                 Predictor<Input, Output> predictor = model.newPredictor()) {
             Input input = new Input();
             Map<String, Object> map = new ConcurrentHashMap<>();
-            map.put("image_url", file.toUri());
+            String url =
+                    "data:image/jpeg;base64,"
+                            + Base64.getEncoder().encodeToString(Files.readAllBytes(file));
+            map.put("image_url", url);
             map.put("candidate_labels", textInput.getCandidates());
             input.add(JsonUtils.toJson(map));
             Output out = predictor.predict(input);

@@ -34,9 +34,13 @@ public class BufferedImageFactoryTest {
     public void testLoadImage() throws IOException {
         try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
             ImageFactory factory = ImageFactory.getInstance();
-            Image img = factory.fromUrl("https://resources.djl.ai/images/dog_bike_car.jpg");
+            String url = "https://resources.djl.ai/images/dog_bike_car.jpg";
+            Image img = factory.fromUrl(url);
             NDArray array = img.toNDArray(manager);
             Assert.assertEquals(new Shape(img.getHeight(), img.getWidth(), 3), array.getShape());
+
+            // The same URL is accepted when it arrives with a request.
+            Assert.assertEquals(factory.fromRequestUrl(url).getWidth(), img.getWidth());
 
             try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
                 img.save(bos, "png");
