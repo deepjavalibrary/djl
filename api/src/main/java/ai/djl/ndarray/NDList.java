@@ -206,9 +206,13 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
             }
             SafeTensor st = pair.getValue();
             Shape shape = new Shape(st.shape);
+            DataType dataType = DataType.fromSafetensors(st.dtype);
+            if (st.offsets[0] < 0
+                    || st.size() != BaseNDManager.toBufferSize(shape.size(), dataType)) {
+                throw new IOException("Malformed safetensors metadata: " + json);
+            }
             ByteBuffer bb = ByteBuffer.wrap(buf, st.offsets[0], st.size());
             bb.order(ByteOrder.LITTLE_ENDIAN);
-            DataType dataType = DataType.fromSafetensors(st.dtype);
             NDArray array = manager.create(bb, shape, dataType);
             array.setName(pair.getKey());
             ret.add(array);
@@ -467,8 +471,8 @@ public class NDList extends ArrayList<NDArray> implements NDResource, BytesSuppl
                 SafeTensor st = new SafeTensor();
                 st.dtype = nd.getDataType().asSafetensors();
                 st.shape = nd.getShape().getShape();
-                long size = nd.getDataType().getNumOfBytes() * nd.size();
-                int limit = offset + Math.toIntExact(size);
+                int size = BaseNDManager.toBufferSize(nd.size(), nd.getDataType());
+                int limit = Math.addExact(offset, size);
                 st.offsets = new int[] {offset, limit};
                 map.put(name, st);
                 offset = limit;

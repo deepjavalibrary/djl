@@ -17,6 +17,7 @@ import ai.djl.ml.lightgbm.LgbmDataset;
 import ai.djl.ml.lightgbm.LgbmNDArray;
 import ai.djl.ml.lightgbm.LgbmNDManager;
 import ai.djl.ml.lightgbm.LgbmSymbolBlock;
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.util.Pair;
@@ -52,6 +53,12 @@ public final class JniUtils {
         checkCall(result);
         int iterations = lightgbmlib.intp_value(outIterations);
         lightgbmlib.delete_intp(outIterations);
+        try {
+            checkTreesPerIteration(handle);
+        } catch (EngineException e) {
+            freeModel(handle);
+            throw e;
+        }
         return new LgbmSymbolBlock(manager, iterations, handle);
     }
 
@@ -104,9 +111,16 @@ public final class JniUtils {
                             outBuffer);
             checkCall(result);
             int length = Math.toIntExact(lightgbmlib.int64_tp_value(outLength));
+            if (length > bufferLength) {
+                throw new EngineException(
+                        "LightGBM output length "
+                                + length
+                                + " exceeds buffer length "
+                                + bufferLength);
+            }
             if (a.getDataType() == DataType.FLOAT32) {
-                ByteBuffer bb =
-                        ByteBuffer.allocateDirect(length * 4).order(ByteOrder.nativeOrder());
+                int size = BaseNDManager.toBufferSize(length, DataType.FLOAT32);
+                ByteBuffer bb = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
                 FloatBuffer wrapped = bb.asFloatBuffer();
                 for (int i = 0; i < length; i++) {
                     wrapped.put((float) lightgbmlib.doubleArray_getitem(outBuffer, i));
@@ -114,8 +128,8 @@ public final class JniUtils {
                 bb.rewind();
                 return new Pair<>(length, bb);
             } else if (a.getDataType() == DataType.FLOAT64) {
-                ByteBuffer bb =
-                        ByteBuffer.allocateDirect(length * 8).order(ByteOrder.nativeOrder());
+                int size = BaseNDManager.toBufferSize(length, DataType.FLOAT64);
+                ByteBuffer bb = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
                 DoubleBuffer wrapped = bb.asDoubleBuffer();
                 for (int i = 0; i < length; i++) {
                     wrapped.put(lightgbmlib.doubleArray_getitem(outBuffer, i));
@@ -147,20 +161,22 @@ public final class JniUtils {
                     lightgbmlib.LGBM_BoosterGetNumClasses(
                             lightgbmlib.voidpp_value(model), numClasses);
             checkCall(outFlag);
+            // loadModel has checked that this is also the number of trees per iteration, which
+            // the lengths below rely on.
             int classes = lightgbmlib.intp_value(numClasses);
 
             if (inferenceType == lightgbmlibConstants.C_API_PREDICT_NORMAL
                     || inferenceType == lightgbmlibConstants.C_API_PREDICT_RAW_SCORE) {
-                return classes * rows;
+                return toBufferLength(classes, rows);
             } else if (inferenceType == lightgbmlibConstants.C_API_PREDICT_LEAF_INDEX) {
-                return classes * rows * iterations;
+                return toBufferLength(classes, rows, iterations);
             } else if (inferenceType == lightgbmlibConstants.C_API_PREDICT_CONTRIB) {
                 int outFlag2 =
                         lightgbmlib.LGBM_BoosterGetNumFeature(
                                 lightgbmlib.voidpp_value(model), numFeatures);
                 checkCall(outFlag2);
                 int features = lightgbmlib.intp_value(numFeatures);
-                return classes * rows * (features + 1);
+                return toBufferLength(classes, rows, features + 1L);
             } else {
                 throw new IllegalArgumentException("Unsupported inference type: " + inferenceType);
             }
@@ -168,6 +184,51 @@ public final class JniUtils {
             lightgbmlib.delete_intp(numClasses);
             lightgbmlib.delete_intp(numFeatures);
         }
+    }
+
+    private static void checkTreesPerIteration(SWIGTYPE_p_p_void model) {
+        SWIGTYPE_p_int numClasses = lightgbmlib.new_intp();
+        SWIGTYPE_p_int numModels = lightgbmlib.new_intp();
+        try {
+            int outFlag =
+                    lightgbmlib.LGBM_BoosterGetNumClasses(
+                            lightgbmlib.voidpp_value(model), numClasses);
+            checkCall(outFlag);
+            outFlag =
+                    lightgbmlib.LGBM_BoosterNumModelPerIteration(
+                            lightgbmlib.voidpp_value(model), numModels);
+            checkCall(outFlag);
+            checkTreesPerIteration(
+                    lightgbmlib.intp_value(numClasses), lightgbmlib.intp_value(numModels));
+        } finally {
+            lightgbmlib.delete_intp(numClasses);
+            lightgbmlib.delete_intp(numModels);
+        }
+    }
+
+    static void checkTreesPerIteration(int classes, int models) {
+        // LightGBM lays out each row of the output by the number of classes, but writes one value
+        // per tree in an iteration. Models trained by LightGBM always have the two equal, and the
+        // prediction buffer lengths rely on it.
+        if (models != classes) {
+            throw new EngineException(
+                    "Invalid LightGBM model: "
+                            + classes
+                            + " classes but "
+                            + models
+                            + " trees per iteration");
+        }
+    }
+
+    static int toBufferLength(long... factors) {
+        long length = 1;
+        for (long factor : factors) {
+            if (factor < 0) {
+                throw new IllegalArgumentException("Invalid LightGBM buffer dimension: " + factor);
+            }
+            length = Math.multiplyExact(length, factor);
+        }
+        return Math.toIntExact(length);
     }
 
     public static SWIGTYPE_p_p_void datasetFromFile(String fileName) {

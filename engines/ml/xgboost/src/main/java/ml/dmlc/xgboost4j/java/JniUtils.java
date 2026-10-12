@@ -47,10 +47,10 @@ public final class JniUtils {
 
     public static long createDMatrix(Buffer buf, Shape shape, float missing) {
         long[] handles = new long[1];
-        int rol = (int) shape.get(0);
-        int col = (int) shape.get(1);
+        int row = Math.toIntExact(shape.get(0));
+        int col = Math.toIntExact(shape.get(1));
         long handle = new PointerProxy(Native.getDirectBufferPointer(buf)).getPeer();
-        checkCall(XGBoostJNI.XGDMatrixCreateFromMatRef(handle, rol, col, missing, handles));
+        checkCall(XGBoostJNI.XGDMatrixCreateFromMatRef(handle, row, col, missing, handles));
         return handles[0];
     }
 

@@ -205,7 +205,8 @@ public class BitmapImageFactory extends ImageFactory {
             } else {
                 channel = 3;
             }
-            ByteBuffer bb = manager.allocateDirect(channel * getWidth() * getHeight());
+            int size = Math.toIntExact((long) channel * getWidth() * getHeight());
+            ByteBuffer bb = manager.allocateDirect(size);
             bitmap.getPixels(pixels, 0, getWidth(), 0, 0, getWidth(), getHeight());
             for (int rgb : pixels) {
                 int red = (rgb >> 16) & 0xFF;

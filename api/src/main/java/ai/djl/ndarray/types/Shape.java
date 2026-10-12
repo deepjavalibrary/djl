@@ -165,6 +165,7 @@ public class Shape {
      * @param dimensions the dimension or dimensions to find the size of
      * @return the size of specific dimension(s) or -1 for indeterminate size
      * @throws IllegalArgumentException thrown if passed an invalid dimension
+     * @throws ArithmeticException thrown if the size overflows a long
      */
     public long size(int... dimensions) {
         long total = 1;
@@ -175,7 +176,7 @@ public class Shape {
             if (shape[Math.toIntExact(d)] == -1) {
                 return -1;
             }
-            total *= shape[Math.toIntExact(d)];
+            total = Math.multiplyExact(total, shape[Math.toIntExact(d)]);
         }
         return total;
     }
@@ -184,6 +185,7 @@ public class Shape {
      * Returns the total size.
      *
      * @return the total size or -1 for indeterminate size
+     * @throws ArithmeticException thrown if the total size overflows a long
      */
     public long size() {
         long total = 1;
@@ -191,7 +193,7 @@ public class Shape {
             if (v == -1) {
                 return -1;
             }
-            total *= v;
+            total = Math.multiplyExact(total, v);
         }
         return total;
     }

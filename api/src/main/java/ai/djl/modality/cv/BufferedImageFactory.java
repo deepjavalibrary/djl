@@ -20,6 +20,7 @@ import ai.djl.modality.cv.output.Mask;
 import ai.djl.modality.cv.output.Point;
 import ai.djl.modality.cv.output.Rectangle;
 import ai.djl.modality.cv.util.NDImageUtils;
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -246,7 +247,8 @@ public class BufferedImageFactory extends ImageFactory {
                 channel = 3;
             }
 
-            ByteBuffer bb = manager.allocateDirect(channel * height * width);
+            int size = BaseNDManager.toBufferSize((long) channel * height * width, DataType.UINT8);
+            ByteBuffer bb = manager.allocateDirect(size);
             if (image.getType() == BufferedImage.TYPE_BYTE_GRAY) {
                 int[] data = new int[width * height];
                 image.getData().getPixels(0, 0, width, height, data);

@@ -12,7 +12,9 @@
  */
 package ai.djl.util;
 
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
@@ -59,7 +61,8 @@ public final class Float16Utils {
      * @return a byte buffer with float16 values represented as shorts (2 bytes each).
      */
     public static ByteBuffer toByteBuffer(NDManager manager, float[] floats) {
-        ByteBuffer buffer = manager.allocateDirect(floats.length * 2);
+        ByteBuffer buffer =
+                manager.allocateDirect(BaseNDManager.toBufferSize(floats.length, DataType.FLOAT16));
         for (float f : floats) {
             short value = floatToHalf(f);
             buffer.putShort(value);

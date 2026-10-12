@@ -462,8 +462,7 @@ public abstract class BaseNDManager implements NDManager {
         }
 
         int remaining = buffer.remaining();
-        int expectedSize =
-                isByteBuffer ? Math.multiplyExact(dataType.getNumOfBytes(), expected) : expected;
+        int expectedSize = isByteBuffer ? toBufferSize(expected, dataType) : expected;
         if (remaining < expectedSize) {
             throw new IllegalArgumentException(
                     "The NDArray size is: " + expected + ", but buffer size is: " + remaining);
@@ -476,8 +475,24 @@ public abstract class BaseNDManager implements NDManager {
         }
     }
 
+    /**
+     * Returns the number of bytes required to store the given number of elements.
+     *
+     * @param elements the number of elements
+     * @param dataType the {@code DataType} of the elements
+     * @return the number of bytes
+     * @throws IllegalArgumentException if the number of elements is negative
+     * @throws ArithmeticException if the number of bytes does not fit in an int
+     */
+    public static int toBufferSize(long elements, DataType dataType) {
+        if (elements < 0) {
+            throw new IllegalArgumentException("Invalid number of elements: " + elements);
+        }
+        return Math.toIntExact(Math.multiplyExact(elements, dataType.getNumOfBytes()));
+    }
+
     private static boolean isCompatible(DataType type1, DataType type2) {
-        if (type1.getNumOfBytes() != type1.getNumOfBytes()) {
+        if (type1.getNumOfBytes() != type2.getNumOfBytes()) {
             return false;
         }
         if (type1.getNumOfBytes() == 2) {

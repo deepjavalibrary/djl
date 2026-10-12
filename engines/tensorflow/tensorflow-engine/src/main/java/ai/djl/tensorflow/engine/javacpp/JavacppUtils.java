@@ -252,7 +252,7 @@ public final class JavacppUtils {
     private static TF_Tensor createEmptyTFTensor(Shape shape, DataType dataType) {
         int dType = TfDataType.toTf(dataType);
         long[] dims = shape.getShape();
-        long numBytes = dataType.getNumOfBytes() * shape.size();
+        long numBytes = Math.multiplyExact(shape.size(), dataType.getNumOfBytes());
         TF_Tensor tensor = AbstractTF_Tensor.allocateTensor(dType, dims, numBytes);
         if (tensor == null || tensor.isNull()) {
             throw new IllegalStateException("unable to allocate memory for the Tensor");
@@ -319,7 +319,7 @@ public final class JavacppUtils {
         if (dataType == DataType.STRING) {
             numBytes = buf.remaining() + 1;
         } else {
-            numBytes = shape.size() * dataType.getNumOfBytes();
+            numBytes = Math.multiplyExact(shape.size(), dataType.getNumOfBytes());
         }
         try (PointerScope ignored = new PointerScope()) {
             TF_Tensor tensor = AbstractTF_Tensor.allocateTensor(dType, dims, numBytes);

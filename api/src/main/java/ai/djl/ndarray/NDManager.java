@@ -412,12 +412,14 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(float[][] data) {
-        FloatBuffer buffer = allocateDirect(data.length * data[0].length * 4).asFloatBuffer();
+        Shape shape = new Shape(data.length, data[0].length);
+        int size = BaseNDManager.toBufferSize(shape.size(), DataType.FLOAT32);
+        FloatBuffer buffer = allocateDirect(size).asFloatBuffer();
         for (float[] d : data) {
             buffer.put(d);
         }
         buffer.rewind();
-        return create(buffer, new Shape(data.length, data[0].length));
+        return create(buffer, shape);
     }
 
     /**
@@ -427,12 +429,14 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(int[][] data) {
-        IntBuffer buffer = allocateDirect(data.length * data[0].length * 4).asIntBuffer();
+        Shape shape = new Shape(data.length, data[0].length);
+        int size = BaseNDManager.toBufferSize(shape.size(), DataType.INT32);
+        IntBuffer buffer = allocateDirect(size).asIntBuffer();
         for (int[] d : data) {
             buffer.put(d);
         }
         buffer.rewind();
-        return create(buffer, new Shape(data.length, data[0].length));
+        return create(buffer, shape);
     }
 
     /**
@@ -442,12 +446,14 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(double[][] data) {
-        DoubleBuffer buffer = allocateDirect(data.length * data[0].length * 8).asDoubleBuffer();
+        Shape shape = new Shape(data.length, data[0].length);
+        int size = BaseNDManager.toBufferSize(shape.size(), DataType.FLOAT64);
+        DoubleBuffer buffer = allocateDirect(size).asDoubleBuffer();
         for (double[] d : data) {
             buffer.put(d);
         }
         buffer.rewind();
-        return create(buffer, new Shape(data.length, data[0].length));
+        return create(buffer, shape);
     }
 
     /**
@@ -457,12 +463,14 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(long[][] data) {
-        LongBuffer buffer = allocateDirect(data.length * data[0].length * 8).asLongBuffer();
+        Shape shape = new Shape(data.length, data[0].length);
+        int size = BaseNDManager.toBufferSize(shape.size(), DataType.INT64);
+        LongBuffer buffer = allocateDirect(size).asLongBuffer();
         for (long[] d : data) {
             buffer.put(d);
         }
         buffer.rewind();
-        return create(buffer, new Shape(data.length, data[0].length));
+        return create(buffer, shape);
     }
 
     /**
@@ -472,12 +480,14 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(byte[][] data) {
-        ByteBuffer buffer = allocateDirect(data.length * data[0].length);
+        Shape shape = new Shape(data.length, data[0].length);
+        int size = BaseNDManager.toBufferSize(shape.size(), DataType.INT8);
+        ByteBuffer buffer = allocateDirect(size);
         for (byte[] d : data) {
             buffer.put(d);
         }
         buffer.rewind();
-        return create(buffer, new Shape(data.length, data[0].length));
+        return create(buffer, shape);
     }
 
     /**
@@ -487,14 +497,16 @@ public interface NDManager extends AutoCloseable {
      * @return a new instance of {@link NDArray}
      */
     default NDArray create(boolean[][] data) {
-        ByteBuffer buffer = allocateDirect(data.length * data[0].length);
+        Shape shape = new Shape(data.length, data[0].length);
+        int size = BaseNDManager.toBufferSize(shape.size(), DataType.BOOLEAN);
+        ByteBuffer buffer = allocateDirect(size);
         for (boolean[] d : data) {
             for (boolean b : d) {
                 buffer.put((byte) (b ? 1 : 0));
             }
         }
         buffer.rewind();
-        return create(buffer, new Shape(data.length, data[0].length), DataType.BOOLEAN);
+        return create(buffer, shape, DataType.BOOLEAN);
     }
 
     /**
@@ -792,7 +804,7 @@ public interface NDManager extends AutoCloseable {
         // 64-bit, so an element count or buffer size beyond int range throws instead of silently
         // truncating or wrapping to an undersized allocation.
         int size = Math.toIntExact(shape.size());
-        ByteBuffer bb = allocateDirect(Math.multiplyExact(size, dataType.getNumOfBytes()));
+        ByteBuffer bb = allocateDirect(BaseNDManager.toBufferSize(size, dataType));
         return create(bb, shape, dataType);
     }
 
@@ -824,7 +836,7 @@ public interface NDManager extends AutoCloseable {
         // 64-bit, so an element count or buffer size beyond int range throws instead of silently
         // truncating or wrapping to an undersized allocation.
         int size = Math.toIntExact(shape.size());
-        ByteBuffer bb = allocateDirect(Math.multiplyExact(size, dataType.getNumOfBytes()));
+        ByteBuffer bb = allocateDirect(BaseNDManager.toBufferSize(size, dataType));
         for (int i = 0; i < size; ++i) {
             switch (dataType) {
                 case FLOAT16:

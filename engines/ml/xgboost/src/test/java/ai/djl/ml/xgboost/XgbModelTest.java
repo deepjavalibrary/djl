@@ -33,6 +33,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
@@ -130,6 +131,23 @@ public class XgbModelTest {
             FloatBuffer fb = FloatBuffer.wrap(new float[] {7, 8, 9});
             array = manager.createCSR(fb, indptr, indices, new Shape(3, 4));
             Assert.assertEquals(array.getSparseFormat(), SparseFormat.CSR);
+        }
+    }
+
+    /** A direct buffer smaller than the requested matrix shape must be rejected. */
+    @Test
+    public void testCreateRejectsUndersizedBuffer() {
+        try (XgbNDManager manager =
+                (XgbNDManager) XgbNDManager.getSystemManager().newSubManager()) {
+            // 4 FLOAT32 elements, but a 4x4 matrix needs 16.
+            Buffer[] buffers = {
+                ByteBuffer.allocateDirect(16), ByteBuffer.allocate(16), FloatBuffer.allocate(4)
+            };
+            for (Buffer buffer : buffers) {
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () -> manager.create(buffer, new Shape(4, 4), DataType.FLOAT32));
+            }
         }
     }
 }

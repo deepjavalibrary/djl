@@ -60,16 +60,24 @@ public class LgbmModelTest {
                 NDList output = predictor.predict(new NDList(array));
                 Assert.assertEquals(output.singletonOrThrow().getDataType(), DataType.FLOAT32);
                 Assert.assertEquals(output.singletonOrThrow().getShape().size(), 10);
+
+                // The model has one class, 4 features and 100 trees.
+                lgbm.setInferenceType("RAW_SCORE");
+                Assert.assertEquals(lgbm.getInferenceType(), "RAW_SCORE");
+                output = predictor.predict(new NDList(array));
+                Assert.assertEquals(output.singletonOrThrow().getShape().size(), 10);
+
+                lgbm.setInferenceType("LEAF_INDEX");
+                Assert.assertEquals(lgbm.getInferenceType(), "LEAF_INDEX");
+                output = predictor.predict(new NDList(array));
+                Assert.assertEquals(output.singletonOrThrow().getShape().size(), 10 * 100);
+
+                lgbm.setInferenceType("CONTRIB");
+                Assert.assertEquals(lgbm.getInferenceType(), "CONTRIB");
+                output = predictor.predict(new NDList(array));
+                // One value per feature, plus the expected value.
+                Assert.assertEquals(output.singletonOrThrow().getShape().size(), 10 * (4 + 1));
             }
-
-            lgbm.setInferenceType("RAW_SCORE");
-            Assert.assertEquals(lgbm.getInferenceType(), "RAW_SCORE");
-
-            lgbm.setInferenceType("LEAF_INDEX");
-            Assert.assertEquals(lgbm.getInferenceType(), "LEAF_INDEX");
-
-            lgbm.setInferenceType("CONTRIB");
-            Assert.assertEquals(lgbm.getInferenceType(), "CONTRIB");
 
             Assert.assertThrows(() -> lgbm.setInferenceType("invalid"));
         }
