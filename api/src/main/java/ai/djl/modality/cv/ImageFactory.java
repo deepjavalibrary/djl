@@ -13,6 +13,7 @@
 package ai.djl.modality.cv;
 
 import ai.djl.ndarray.NDArray;
+import ai.djl.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +107,9 @@ public abstract class ImageFactory {
     /**
      * Gets {@link Image} from string representation.
      *
+     * <p>A string that is not an absolute URL is loaded as a local file. Use {@link
+     * #fromRequestUrl(String)} for a URL that arrived with a request.
+     *
      * @param url the String represent URL or base64 encoded image to load from
      * @return {@link Image}
      * @throws IOException URL is not valid.
@@ -125,6 +129,45 @@ public abstract class ImageFactory {
             return fromUrl(uri.toURL());
         }
         return fromFile(Paths.get(url));
+    }
+
+    /**
+     * Gets {@link Image} from a URL that arrived with a request, such as the {@code image_url} of a
+     * JSON input.
+     *
+     * <p>Unlike {@link #fromUrl(String)}, this only accepts a base64 {@code data:} URI or an {@code
+     * http} or {@code https} URL, and the URL is fetched with {@link Utils#openUrl(URL)}, so it
+     * gets the same checks as other remote resources. Set {@code DJL_ALLOW_INSECURE_URL=true} (or
+     * {@code -Dai.djl.allow_insecure_url=true}) to accept any URL or file path, as {@link
+     * #fromUrl(String)} does; as for other remote resources, nothing is fetched in offline mode.
+     *
+     * @param url the {@code data:} URI, or the {@code http} or {@code https} URL
+     * @return {@link Image}
+     * @throws IOException if the URL is not supported, or the image cannot be read
+     */
+    public Image fromRequestUrl(String url) throws IOException {
+        if (URL_PATTERN.matcher(url).matches()) {
+            return fromUrl(url);
+        }
+        URI uri = URI.create(url);
+        if (Utils.isInsecureUrlAllowed()) {
+            if (!uri.isAbsolute()) {
+                return fromFile(Paths.get(url));
+            }
+        } else {
+            // The URL comes from whoever sent the request, so it is limited to a remote fetch,
+            // which Utils.openUrl checks. A local file path or a file: URL is not accepted here.
+            String scheme = uri.getScheme();
+            if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+                throw new IOException(
+                        "Unsupported image URL: only data:, http and https URLs are accepted. Set"
+                                + " DJL_ALLOW_INSECURE_URL=true to override.");
+            }
+        }
+        // Utils.openUrl applies offline mode even when DJL_ALLOW_INSECURE_URL is set.
+        try (InputStream is = Utils.openUrl(uri.toURL())) {
+            return fromInputStream(is);
+        }
     }
 
     /**

@@ -20,8 +20,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 
 public class Sam2InputTest {
 
@@ -29,9 +31,12 @@ public class Sam2InputTest {
     public void test() throws IOException {
         Path file = Paths.get("../examples/src/test/resources/kitten.jpg");
         Image img = ImageFactory.getInstance().fromFile(file);
+        String url =
+                "data:image/jpeg;base64,"
+                        + Base64.getEncoder().encodeToString(Files.readAllBytes(file));
         String json =
                 "{\"image_url\": \""
-                        + file.toUri().toURL()
+                        + url
                         + "\",\n"
                         + "\"visualize\": true,\n"
                         + "\"prompt\": [\n"
