@@ -210,12 +210,14 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSet(
   torch::AutoNonVariableTypeMode guard;
   const auto* tensor_ptr = reinterpret_cast<torch::Tensor*>(jhandle);
   torch::ArrayRef<int64_t> sizes = tensor_ptr->sizes();
+  // from_blob() and DataPtr() below take the buffer address without validating its extent
+  void* address = utils::GetValidatedDirectBufferAddress(env, jbuffer, sizes, tensor_ptr->dtype().itemsize());
   // the jbuffer is on the CPU. Although storage can specify GPU device,
   // it still doesn't move the data to GPU for us. So we
   // handle the gpu case explicitly here
   if (tensor_ptr->device().is_cuda()) {
     auto options = torch::TensorOptions().dtype(tensor_ptr->dtype()).requires_grad(false);
-    torch::Tensor temp = torch::from_blob(env->GetDirectBufferAddress(jbuffer), sizes, options);
+    torch::Tensor temp = torch::from_blob(address, sizes, options);
     temp = temp.to(tensor_ptr->device());
     tensor_ptr->set_(temp);
     return;
@@ -223,7 +225,7 @@ JNIEXPORT void JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchSet(
   std::vector<int64_t> strides = at::detail::defaultStrides(sizes);
   torch::Storage storage(torch::Storage::use_byte_size_t(),
       at::detail::computeStorageNbytes(sizes, strides, tensor_ptr->dtype().itemsize()),
-      torch::DataPtr(env->GetDirectBufferAddress(jbuffer), tensor_ptr->device()),
+      torch::DataPtr(address, tensor_ptr->device()),
       /*allocator=*/nullptr,
       /*resizable=*/false);
   tensor_ptr->set_(storage, 0, sizes, strides);

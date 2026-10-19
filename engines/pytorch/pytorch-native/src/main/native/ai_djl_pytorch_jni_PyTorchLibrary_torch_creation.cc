@@ -29,7 +29,8 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(JNI
     options = options.dtype(utils::GetScalarTypeFromDType(jdtype));
   }
   // the java side hold the reference for the directByteBuffer
-  torch::Tensor result = torch::from_blob(env->GetDirectBufferAddress(jbuffer), shape_vec, options);
+  void* address = utils::GetValidatedDirectBufferAddress(env, jbuffer, shape_vec, options.dtype().itemsize());
+  torch::Tensor result = torch::from_blob(address, shape_vec, options);
   // from_blob doesn't support torch::kSparse and torch::kMkldnn, so explicit cast the type here
   if (jlayout == 1) {
     result = result.to_sparse();
