@@ -20,6 +20,7 @@
 #include <torch/script.h>
 
 #include <iostream>
+#include <limits>
 #ifdef V1_13_X
 #include <c10/util/variant.h>
 #else
@@ -158,6 +159,30 @@ inline torch::TensorOptions CreateTensorOptions(
     options = options.dtype(GetScalarTypeFromDType(jdtype));
   }
   return options;
+}
+
+inline int64_t GetTensorByteSize(torch::IntArrayRef shape, int64_t element_size) {
+  TORCH_CHECK(element_size > 0, "Invalid element size: ", element_size);
+  constexpr int64_t limit = std::numeric_limits<int64_t>::max();
+  int64_t numel = 1;
+  for (const int64_t dim : shape) {
+    TORCH_CHECK(dim >= 0, "Invalid shape dimension: ", dim);
+    TORCH_CHECK(dim == 0 || numel <= limit / dim, "Tensor element count overflows int64");
+    numel *= dim;
+  }
+  TORCH_CHECK(numel <= limit / element_size, "Tensor size in bytes overflows int64");
+  return numel * element_size;
+}
+
+inline void* GetValidatedDirectBufferAddress(
+    JNIEnv* env, jobject jbuffer, torch::IntArrayRef shape, int64_t element_size) {
+  void* address = env->GetDirectBufferAddress(jbuffer);
+  const int64_t capacity = env->GetDirectBufferCapacity(jbuffer);
+  TORCH_CHECK(address != nullptr && capacity >= 0, "Expected a direct ByteBuffer");
+  const int64_t required = GetTensorByteSize(shape, element_size);
+  TORCH_CHECK(capacity >= required, "Buffer is too small for the requested shape: ", capacity,
+      " bytes available, ", required, " bytes required");
+  return address;
 }
 
 }  // namespace utils
