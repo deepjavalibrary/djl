@@ -170,7 +170,16 @@ public final class LibUtils {
                     .map(Path::toString)
                     .forEach(LibUtils::loadNativeLibrary);
 
-            if (Files.exists((libDir.resolve("cudnn64_8.dll")))) {
+            if (Files.exists((libDir.resolve("cudnn64_9.dll")))) {
+                loadNativeLibrary(libDir.resolve("cudnn_graph64_9.dll").toString());
+                loadNativeLibrary(libDir.resolve("cudnn_engines_precompiled64_9.dll").toString());
+                loadNativeLibrary(libDir.resolve("cudnn_engines_runtime_compiled64_9.dll").toString());
+                loadNativeLibrary(libDir.resolve("cudnn_heuristic64_9.dll").toString());
+                loadNativeLibrary(libDir.resolve("cudnn_ops64_9.dll").toString());
+                loadNativeLibrary(libDir.resolve("cudnn_cnn64_9.dll").toString());
+                loadNativeLibrary(libDir.resolve("cudnn_adv64_9.dll").toString());
+                loadNativeLibrary(libDir.resolve("cudnn64_9.dll").toString());
+            } else if (Files.exists((libDir.resolve("cudnn64_8.dll")))) {
                 loadNativeLibrary(libDir.resolve("cudnn64_8.dll").toString());
                 loadNativeLibrary(libDir.resolve("cudnn_ops_infer64_8.dll").toString());
                 loadNativeLibrary(libDir.resolve("cudnn_ops_train64_8.dll").toString());
@@ -181,7 +190,7 @@ public final class LibUtils {
             } else if (Files.exists((libDir.resolve("cudnn64_7.dll")))) {
                 loadNativeLibrary(libDir.resolve("cudnn64_7.dll").toString());
             }
-
+            
             if (!isCuda) {
                 deferred =
                         Arrays.asList(
