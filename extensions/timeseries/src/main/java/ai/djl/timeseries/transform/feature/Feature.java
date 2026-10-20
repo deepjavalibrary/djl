@@ -122,6 +122,11 @@ public final class Feature {
 
         TemporalAmount timeFreq;
         if (freq.endsWith("H") || freq.endsWith("T") || freq.endsWith("S")) {
+            if (freq.endsWith("T")) {
+                // ISO-8601 duration format has no "T" (minute) designator -- it uses "M", which
+                // TimeFeature/TimeOffset can't use since "M" already means month there.
+                sb.setCharAt(sb.length() - 1, 'M');
+            }
             sb.insert(0, "PT");
             timeFreq = Duration.parse(sb.toString());
         } else {
