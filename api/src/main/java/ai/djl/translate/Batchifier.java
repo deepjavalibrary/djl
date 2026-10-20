@@ -48,8 +48,10 @@ public interface Batchifier extends Serializable {
             case "none":
                 return null;
             default:
+                // The name reaches here from a model's batchifier argument, so it is allowlisted
+                // like any other class a model selects.
                 ClassLoader cl = ClassLoaderUtils.getContextClassLoader();
-                Batchifier b = ClassLoaderUtils.initClass(cl, Batchifier.class, name);
+                Batchifier b = ClassLoaderUtils.initModelClass(cl, Batchifier.class, name);
                 if (b == null) {
                     throw new IllegalArgumentException("Invalid batchifier name: " + name);
                 }

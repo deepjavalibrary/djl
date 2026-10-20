@@ -274,7 +274,12 @@ public interface Repository {
      * @throws IOException if it failed to ensure the creation of the cache directory
      */
     default Path getResourceDirectory(Artifact artifact) throws IOException {
-        return getCacheDirectory().resolve(artifact.getResourceUri().getPath());
+        // The artifact's own name and version are resolved into this URI, so an absolute or
+        // scheme-carrying name would otherwise place the model directory outside the cache. Checked
+        // on the path rather than the URI, because the escape only appears once getPath() has
+        // decoded it.
+        return AbstractRepository.resolveInside(
+                getCacheDirectory(), artifact.getResourceUri().getPath());
     }
 
     /**

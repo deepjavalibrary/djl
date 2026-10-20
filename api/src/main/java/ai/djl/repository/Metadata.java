@@ -324,6 +324,9 @@ public class Metadata {
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
                 artifact.setMetadata(this);
+                // Before the repository's own arguments are merged in, so this sees only what the
+                // metadata itself carried.
+                artifact.removeUntrustedEntries();
                 artifact.getArguments().putAll(arguments);
             }
         }

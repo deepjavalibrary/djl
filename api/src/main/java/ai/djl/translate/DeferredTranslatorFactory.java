@@ -14,12 +14,12 @@ package ai.djl.translate;
 
 import ai.djl.Model;
 import ai.djl.repository.zoo.Criteria;
+import ai.djl.util.ClassLoaderUtils;
 import ai.djl.util.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
@@ -70,14 +70,10 @@ public class DeferredTranslatorFactory implements TranslatorFactory {
     }
 
     private TranslatorFactory loadTranslatorFactory(String className) {
-        try {
-            Class<?> clazz = Class.forName(className);
-            Class<? extends TranslatorFactory> subclass = clazz.asSubclass(TranslatorFactory.class);
-            Constructor<? extends TranslatorFactory> constructor = subclass.getConstructor();
-            return constructor.newInstance();
-        } catch (Throwable e) {
-            logger.trace("Not able to load TranslatorFactory: {}", className, e);
-        }
-        return null;
+        // This class's own loader is what Class.forName(className) resolved against, so which
+        // classes resolve is unchanged; going through initClass is what puts the type check
+        // before the named class is initialized.
+        ClassLoader cl = DeferredTranslatorFactory.class.getClassLoader(); // NOPMD
+        return ClassLoaderUtils.initModelClass(cl, TranslatorFactory.class, className);
     }
 }
