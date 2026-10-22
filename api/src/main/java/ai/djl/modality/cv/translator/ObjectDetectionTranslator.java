@@ -84,6 +84,10 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
          * function is aimed to cover those who produce the pixel value. Make this to true to divide
          * the width/height in postprocessing in order to get ratio in detectedObjects.
          *
+         * <p>{@link #configPostProcess(Map)} also enables this when the model arguments carry a
+         * {@code rescale} flag, since that is the key some model zoo artifacts (e.g. the MXNet SSD
+         * zoo models) use to request the same pixel-to-ratio conversion.
+         *
          * @param value whether to apply ratio
          * @return this builder
          */
@@ -97,7 +101,8 @@ public abstract class ObjectDetectionTranslator extends BaseImageTranslator<Dete
         protected void configPostProcess(Map<String, ?> arguments) {
             super.configPostProcess(arguments);
             if (ArgumentsUtil.booleanValue(arguments, "optApplyRatio")
-                    || ArgumentsUtil.booleanValue(arguments, "applyRatio")) {
+                    || ArgumentsUtil.booleanValue(arguments, "applyRatio")
+                    || ArgumentsUtil.booleanValue(arguments, "rescale")) {
                 optApplyRatio(true);
             }
             threshold = ArgumentsUtil.floatValue(arguments, "threshold", 0.2f);
