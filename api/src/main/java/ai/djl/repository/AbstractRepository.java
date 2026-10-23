@@ -89,6 +89,34 @@ public abstract class AbstractRepository implements Repository {
         return Paths.get(resolvePath(item, path)).toAbsolutePath();
     }
 
+    /**
+     * Resolves a name that came from artifact metadata against a directory DJL chose, and refuses
+     * one that escapes it.
+     *
+     * <p>Names in a {@code metadata.json} are data: an absolute name, or one carrying {@code ..}
+     * segments, otherwise places the read or the write outside the cache. This is the containment
+     * {@link ZipUtils} already applies to the entries inside an archive, applied to the name that
+     * decides where the archive lands.
+     *
+     * @param dir the directory the name must resolve inside
+     * @param name the name from the artifact metadata
+     * @return the resolved path
+     * @throws IOException if the name resolves outside {@code dir}
+     */
+    static Path resolveInside(Path dir, String name) throws IOException {
+        if (name == null) {
+            throw new IOException("Artifact item has no name, cannot resolve it in: " + dir);
+        }
+        Path resolved = dir.resolve(name);
+        // The rule is Utils.isInsideDirectory. The override Utils.resolveModelFile honours is
+        // deliberately not reused: this contains the cache and the download directory, not a file
+        // that a model argument named.
+        if (!Utils.isInsideDirectory(dir, resolved)) {
+            throw new IOException("Invalid artifact name, resolves outside " + dir + ": " + name);
+        }
+        return resolved.toAbsolutePath().normalize();
+    }
+
     protected URI resolvePath(Artifact.Item item, String path) throws IOException {
         Artifact artifact = item.getArtifact();
         URI artifactUri = artifact.getResourceUri();
@@ -97,19 +125,24 @@ public abstract class AbstractRepository implements Repository {
         // Resolve cached item
         if (itemUri != null && URI.create(itemUri).isAbsolute() || isRemote()) {
             Path cacheDir = getCacheDirectory();
-            Path resourceDir = cacheDir.resolve(artifactUri.getPath());
+            // Contained like the leaf below: the artifact's own name and version are resolved into
+            // artifactUri, so checking only the item name would check it against a parent that is
+            // already outside the cache.
+            Path resourceDir = resolveInside(cacheDir, artifactUri.getPath());
             String type = item.getType();
             String fileName = item.getName();
             Path cachedFile;
             if ("dir".equals(type)) {
                 if (!fileName.isEmpty()) {
-                    cachedFile = resourceDir.resolve(fileName);
+                    cachedFile = resolveInside(resourceDir, fileName);
                 } else {
                     cachedFile = resourceDir;
                 }
-                return cachedFile.resolve(path).toUri();
+                // Contained like the leaf: path is documented as being within the cached
+                // directory.
+                return resolveInside(cachedFile, path).toUri();
             } else {
-                return resourceDir.resolve(fileName).toUri();
+                return resolveInside(resourceDir, fileName).toUri();
             }
         }
 
@@ -203,7 +236,7 @@ public abstract class AbstractRepository implements Repository {
             Path dir;
             if (!fileName.isEmpty()) {
                 // honer the name set in metadata.json
-                dir = tmp.resolve(fileName);
+                dir = resolveInside(tmp, fileName);
                 Files.createDirectories(dir);
             } else {
                 dir = tmp;
@@ -218,7 +251,7 @@ public abstract class AbstractRepository implements Repository {
                 throw new IOException("File type is not supported: " + extension);
             }
         } else {
-            Path file = tmp.resolve(fileName);
+            Path file = resolveInside(tmp, fileName);
             if ("zip".equals(extension)) {
                 ZipInputStream zis = new ZipInputStream(pis);
                 zis.getNextEntry();

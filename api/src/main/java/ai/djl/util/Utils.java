@@ -423,17 +423,29 @@ public final class Utils {
         if (isFileOutsideModelDirAllowed()) {
             return file;
         }
-        // Checked on the normalized path rather than the real path: a Hugging Face hub cache links
-        // each file in a snapshot to a shared blob directory, so following links would reject a
-        // correctly downloaded model.
-        Path dir = modelDir.toAbsolutePath().normalize();
-        if (!file.toAbsolutePath().normalize().startsWith(dir)) {
+        if (!isInsideDirectory(modelDir, file)) {
             throw new IllegalArgumentException(
                     "File is outside the model directory: "
                             + name
                             + ". Set DJL_ALLOW_FILES_OUTSIDE_MODEL_DIR=true to override.");
         }
         return file;
+    }
+
+    /**
+     * Returns whether a path stays inside a directory.
+     *
+     * <p>Judged on the normalized path rather than the real path: a Hugging Face hub cache links
+     * each file in a snapshot to a shared blob directory, so following links would reject a
+     * correctly downloaded model. Comparison is by path element, so a sibling directory whose name
+     * merely starts with {@code dir}'s name is outside.
+     *
+     * @param dir the directory the path must stay inside
+     * @param file the path to check, usually resolved from an untrusted name
+     * @return true if {@code file} is {@code dir} or sits under it
+     */
+    public static boolean isInsideDirectory(Path dir, Path file) {
+        return file.toAbsolutePath().normalize().startsWith(dir.toAbsolutePath().normalize());
     }
 
     /**

@@ -258,7 +258,7 @@ public class BaseModelLoader implements ModelLoader {
     }
 
     protected TranslatorFactory getTranslatorFactory(
-            Criteria<?, ?> criteria, Map<String, Object> arguments) {
+            Criteria<?, ?> criteria, Map<String, Object> arguments) throws ModelNotFoundException {
         TranslatorFactory factory = criteria.getTranslatorFactory();
         if (factory != null) {
             return factory;
@@ -269,7 +269,12 @@ public class BaseModelLoader implements ModelLoader {
             ClassLoader cl = ClassLoaderUtils.getContextClassLoader();
             factory = ClassLoaderUtils.initClass(cl, TranslatorFactory.class, factoryClass);
             if (factory == null) {
-                logger.warn("Failed to load translatorFactory: {}", factoryClass);
+                // Not a fall-through to the default factory: a model that names a factory and is
+                // then served with different pre- and post-processing is not distinguishable from
+                // a correct load. ModelNotFoundException rather than IllegalArgumentException so
+                // Criteria.loadModel keeps trying the remaining candidate loaders.
+                throw new ModelNotFoundException(
+                        "Failed to load translatorFactory: " + factoryClass);
             }
         }
         return factory;
@@ -299,8 +304,17 @@ public class BaseModelLoader implements ModelLoader {
                 prop.load(reader);
             }
             for (String key : prop.stringPropertyNames()) {
+                // This file ships inside the model, so every key in it is model-supplied, on both
+                // branches: djl_rpc_uri arrives as a plain argument, not as an option.
+                String name = key.startsWith("option.") ? key.substring(7) : key;
+                if (Artifact.isUntrustedKey(name)) {
+                    logger.error(
+                            "Ignoring {} in serving.properties: only the application may set it.",
+                            key);
+                    continue;
+                }
                 if (key.startsWith("option.")) {
-                    options.putIfAbsent(key.substring(7), prop.getProperty(key));
+                    options.putIfAbsent(name, prop.getProperty(key));
                 } else {
                     arguments.putIfAbsent(key, prop.getProperty(key));
                 }

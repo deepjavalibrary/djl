@@ -23,7 +23,6 @@ import ai.djl.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,7 +56,7 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         String factoryClass = ArgumentsUtil.stringValue(arguments, "translatorFactory");
         if (factoryClass != null) {
             Translator<Input, Output> translator =
-                    getServingTranslator(factoryClass, model, arguments);
+                    getServingTranslator(factoryClass, model, arguments, true);
             if (translator != null) {
                 return (Translator<I, O>) translator;
             }
@@ -103,22 +102,23 @@ public class ServingTranslatorFactory implements TranslatorFactory {
         return ClassLoaderUtils.findImplementation(path, ServingTranslator.class, className);
     }
 
-    private TranslatorFactory loadTranslatorFactory(String className) {
-        try {
-            Class<?> clazz = Class.forName(className);
-            Class<? extends TranslatorFactory> subclass = clazz.asSubclass(TranslatorFactory.class);
-            Constructor<? extends TranslatorFactory> constructor = subclass.getConstructor();
-            return constructor.newInstance();
-        } catch (Throwable e) {
-            logger.trace("Not able to load TranslatorFactory: {}", className, e);
+    private TranslatorFactory loadTranslatorFactory(String className, boolean fromModel) {
+        // This class's own loader is what Class.forName(className) resolved against, so which
+        // classes resolve is unchanged; going through ClassLoaderUtils is what puts the type check
+        // before the named class is initialized. Only a name the model chose is allowlisted —
+        // detectTranslatorFactory's names are DJL's own.
+        ClassLoader cl = ServingTranslatorFactory.class.getClassLoader(); // NOPMD
+        if (fromModel) {
+            return ClassLoaderUtils.initClass(cl, TranslatorFactory.class, className);
         }
-        return null;
+        return ClassLoaderUtils.initClass(cl, TranslatorFactory.class, className);
     }
 
     private Translator<Input, Output> loadDefaultTranslator(Model model, Map<String, ?> arguments)
             throws TranslateException {
         String factoryClass = detectTranslatorFactory(arguments);
-        Translator<Input, Output> translator = getServingTranslator(factoryClass, model, arguments);
+        Translator<Input, Output> translator =
+                getServingTranslator(factoryClass, model, arguments, false);
         if (translator != null) {
             return translator;
         }
@@ -159,8 +159,9 @@ public class ServingTranslatorFactory implements TranslatorFactory {
     }
 
     private Translator<Input, Output> getServingTranslator(
-            String factoryClass, Model model, Map<String, ?> arguments) throws TranslateException {
-        TranslatorFactory factory = loadTranslatorFactory(factoryClass);
+            String factoryClass, Model model, Map<String, ?> arguments, boolean fromModel)
+            throws TranslateException {
+        TranslatorFactory factory = loadTranslatorFactory(factoryClass, fromModel);
         if (factory != null && factory.isSupported(Input.class, Output.class)) {
             logger.info("Using TranslatorFactory: {}", factoryClass);
             return factory.newInstance(Input.class, Output.class, model, arguments);

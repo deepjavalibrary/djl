@@ -73,7 +73,10 @@ When loading a model, the profiler can be enabled by specifying the desired file
             .build()
 ```
 
-Following this, the file will appear at "build/tesetOrtProfiling_YYYY-MM-DD.json".
+Following this, the file will appear at "build/testOrtProfiling_YYYY-MM-DD.json" **inside the model
+directory**: the path is resolved there because a model's own options can set it. To write to a path
+outside the model directory, set `DJL_ALLOW_FILES_OUTSIDE_MODEL_DIR=true` (or
+`-Dai.djl.allow_files_outside_model_dir=true`), and only for models from a trusted source.
 
 You can view it in a browser using a trace consumer like `chrome://tracing `.
 For more details, see the [OnnxRuntime Profiler Docs](https://onnxruntime.ai/docs/performance/tune-performance/profiling-tools.html).
