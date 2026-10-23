@@ -109,6 +109,18 @@ public class OrtOptionGateTest {
     }
 
     @Test
+    public void testProfilerPrefixThroughLinkIsRefused() throws IOException {
+        // Lexically inside the model directory, but the link sends the write elsewhere.
+        Path modelDir = Files.createTempDirectory("ort-profiler");
+        Path outside = Files.createTempDirectory("ort-outside");
+        Files.createSymbolicLink(modelDir.resolve("logs"), outside);
+        Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> OrtModel.resolveProfilerPrefix(modelDir, "logs/sub/profile"));
+        Assert.assertFalse(Files.exists(outside.resolve("sub")));
+    }
+
+    @Test
     public void testCustomOpLibraryIsOptIn() {
         Assert.assertNull(OrtModel.allowedCustomOpLibrary("/tmp/custom.so"));
         // Null stays null, so the caller falls back to the classpath library either way.

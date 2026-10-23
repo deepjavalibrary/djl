@@ -105,7 +105,9 @@ public final class RpcClient {
         httpHeaders.put(new CaseInsensitiveKey("Content-Type"), contentType);
         // A header name assigned below belongs in Artifact.UNTRUSTED_KEYS too.
         String authHeader = "Authorization";
-        if (url.startsWith("https://generativelanguage.googleapis.com/")) {
+        // Matched lower-cased, since requireHttpUrl accepts the scheme and host in any case.
+        String endpoint = url.toLowerCase(Locale.ROOT);
+        if (endpoint.startsWith("https://generativelanguage.googleapis.com/")) {
             if (apiKey == null) {
                 apiKey = Utils.getenv("GEMINI_API_KEY");
                 if (apiKey == null) {
@@ -115,10 +117,10 @@ public final class RpcClient {
                     apiKey = Utils.getEnvOrSystemProperty("GENAI_API_KEY");
                 }
             }
-            if (!url.endsWith("/openai/chat/completions")) {
+            if (!endpoint.endsWith("/openai/chat/completions")) {
                 authHeader = "x-goog-api-key";
             }
-        } else if (url.startsWith("https://api.anthropic.com/")) {
+        } else if (endpoint.startsWith("https://api.anthropic.com/")) {
             if (apiKey == null) {
                 apiKey = Utils.getEnvOrSystemProperty("ANTHROPIC_API_KEY");
                 if (apiKey == null) {
@@ -126,7 +128,7 @@ public final class RpcClient {
                 }
             }
             authHeader = "x-api-key";
-        } else if (url.startsWith("https://api.openai.com/")) {
+        } else if (endpoint.startsWith("https://api.openai.com/")) {
             if (apiKey == null) {
                 apiKey = Utils.getEnvOrSystemProperty("OPENAI_API_KEY");
                 if (apiKey == null) {

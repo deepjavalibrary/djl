@@ -12,10 +12,13 @@
  */
 package ai.djl.repository;
 
+import ai.djl.Application;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -54,5 +57,13 @@ public class ArtifactNameContainmentTest {
                 IOException.class, () -> AbstractRepository.resolveInside(DIR, "/etc/passwd"));
         // A missing name is refused rather than resolving to the directory.
         Assert.assertThrows(IOException.class, () -> AbstractRepository.resolveInside(DIR, null));
+    }
+
+    @Test
+    public void testMrlEscapingCacheIsRefused() {
+        // locate creates the metadata cache directory from the MRL path before downloading.
+        Repository repo = new RemoteRepository("test", URI.create("https://localhost/"));
+        MRL mrl = repo.model(Application.UNDEFINED, "ai.djl", "../../../../../escaped");
+        Assert.assertThrows(IOException.class, () -> repo.locate(mrl));
     }
 }

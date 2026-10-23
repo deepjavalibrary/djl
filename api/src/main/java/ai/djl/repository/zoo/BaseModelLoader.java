@@ -97,7 +97,14 @@ public class BaseModelLoader implements ModelLoader {
         Map<String, String> options = artifact.getOptions(criteria.getOptions());
 
         try {
-            TranslatorFactory factory = getTranslatorFactory(criteria, arguments);
+            TranslatorFactory factory;
+            try {
+                factory = getTranslatorFactory(criteria, arguments);
+            } catch (FactoryLoadException e) {
+                // ModelNotFoundException rather than IllegalArgumentException so Criteria.loadModel
+                // keeps trying the remaining candidate loaders.
+                throw new ModelNotFoundException(e.getMessage(), e);
+            }
             Class<I> input = criteria.getInputClass();
             Class<O> output = criteria.getOutputClass();
             if (factory == null || !factory.isSupported(input, output)) {
@@ -258,7 +265,7 @@ public class BaseModelLoader implements ModelLoader {
     }
 
     protected TranslatorFactory getTranslatorFactory(
-            Criteria<?, ?> criteria, Map<String, Object> arguments) throws ModelNotFoundException {
+            Criteria<?, ?> criteria, Map<String, Object> arguments) {
         TranslatorFactory factory = criteria.getTranslatorFactory();
         if (factory != null) {
             return factory;
@@ -271,10 +278,9 @@ public class BaseModelLoader implements ModelLoader {
             if (factory == null) {
                 // Not a fall-through to the default factory: a model that names a factory and is
                 // then served with different pre- and post-processing is not distinguishable from
-                // a correct load. ModelNotFoundException rather than IllegalArgumentException so
-                // Criteria.loadModel keeps trying the remaining candidate loaders.
-                throw new ModelNotFoundException(
-                        "Failed to load translatorFactory: " + factoryClass);
+                // a correct load. Unchecked, so this protected signature is unchanged; loadModel
+                // converts it.
+                throw new FactoryLoadException("Failed to load translatorFactory: " + factoryClass);
             }
         }
         return factory;
@@ -319,6 +325,16 @@ public class BaseModelLoader implements ModelLoader {
                     arguments.putIfAbsent(key, prop.getProperty(key));
                 }
             }
+        }
+    }
+
+    /** Thrown when a model names a translator factory that cannot be loaded. */
+    private static final class FactoryLoadException extends IllegalArgumentException {
+
+        private static final long serialVersionUID = 1L;
+
+        FactoryLoadException(String message) {
+            super(message);
         }
     }
 }

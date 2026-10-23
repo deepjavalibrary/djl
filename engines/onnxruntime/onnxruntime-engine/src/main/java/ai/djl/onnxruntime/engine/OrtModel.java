@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -277,7 +278,8 @@ public class OrtModel extends BaseModel {
             // Normalized: a prefix containing .. would otherwise leave a stray directory behind.
             Path created = parent.normalize();
             if (!Utils.isFileOutsideModelDirAllowed()
-                    && !Utils.isInsideDirectory(modelDir, created)) {
+                    && (!Utils.isInsideDirectory(modelDir, created)
+                            || !isRealPathInside(modelDir, created))) {
                 // Checked before anything is created.
                 throw new IllegalArgumentException(
                         "Invalid profilerOutput, resolves outside the model directory: "
@@ -286,6 +288,30 @@ public class OrtModel extends BaseModel {
             Files.createDirectories(created);
         }
         return prefix.toString();
+    }
+
+    /**
+     * Returns whether the deepest existing ancestor of a path really lies inside a directory.
+     *
+     * <p>The lexical check does not follow links: with {@code modelDir/logs} linking elsewhere,
+     * {@code logs/profile} passes it, and both {@code createDirectories} and the engine would then
+     * write through the link.
+     *
+     * @param dir the directory
+     * @param path the path, which need not exist yet
+     * @return true if the existing part of the path resolves inside the directory
+     */
+    private static boolean isRealPathInside(Path dir, Path path) {
+        Path existing = path.toAbsolutePath();
+        while (existing != null && !Files.exists(existing, LinkOption.NOFOLLOW_LINKS)) {
+            existing = existing.getParent();
+        }
+        try {
+            // A dangling link fails toRealPath and is refused with the rest.
+            return existing != null && existing.toRealPath().startsWith(dir.toRealPath());
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     /**
