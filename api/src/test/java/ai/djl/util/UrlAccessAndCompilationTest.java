@@ -55,6 +55,7 @@ public class UrlAccessAndCompilationTest {
     private String savedCompileJava;
     private String savedLoadBundledClasses;
     private String savedOffline;
+    private String savedAllowedModelClasses;
 
     @BeforeMethod
     public void saveProperties() {
@@ -65,6 +66,10 @@ public class UrlAccessAndCompilationTest {
         savedCompileJava = System.getProperty("ai.djl.compile_java");
         savedLoadBundledClasses = System.getProperty("ai.djl.load_bundled_classes");
         savedOffline = System.getProperty("ai.djl.offline");
+        savedAllowedModelClasses = System.getProperty("ai.djl.allowed_model_classes");
+        // The discovery tests below set this, and a value already set would restrict the classes
+        // every other test here loads.
+        System.clearProperty("ai.djl.allowed_model_classes");
         if (Utils.getenv("DJL_OFFLINE") != null) {
             throw new org.testng.SkipException("DJL_OFFLINE is set in the environment");
         }
@@ -86,6 +91,7 @@ public class UrlAccessAndCompilationTest {
         restore("ai.djl.compile_java", savedCompileJava);
         restore("ai.djl.load_bundled_classes", savedLoadBundledClasses);
         restore("ai.djl.offline", savedOffline);
+        restore("ai.djl.allowed_model_classes", savedAllowedModelClasses);
         System.clearProperty(BUNDLED_CANARY);
     }
 
@@ -936,6 +942,50 @@ public class UrlAccessAndCompilationTest {
     }
 
     @Test
+    public void testDiscoveredBundledClassIsAllowlisted() throws IOException {
+        requireUnsetBundledEnv();
+        requireUnsetAllowlistEnv();
+        Path dir = createModelWithBundledClass(false);
+        try {
+            System.setProperty("ai.djl.load_bundled_classes", "true");
+            // Discovery is the other way a model selects a class: it bundles one and names
+            // nothing, so the scan picks the name out of its own content.
+            System.setProperty("ai.djl.allowed_model_classes", "com.example.allowed.*");
+            Assert.assertNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, null));
+            Assert.assertNull(System.getProperty(BUNDLED_CANARY));
+
+            // Control: the same discovery succeeds once the allowlist admits the class, so the
+            // assertion above is the allowlist and not a fixture that cannot load.
+            System.setProperty("ai.djl.allowed_model_classes", "Canary");
+            Assert.assertNotNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, null));
+            Assert.assertEquals(System.getProperty(BUNDLED_CANARY), "ran");
+        } finally {
+            deleteTree(dir);
+        }
+    }
+
+    @Test
+    public void testDiscoveredBundledJarClassIsAllowlisted() throws IOException {
+        requireUnsetBundledEnv();
+        requireUnsetAllowlistEnv();
+        Path dir = createModelWithBundledClass(true);
+        try {
+            System.setProperty("ai.djl.load_bundled_classes", "true");
+            // A jar is the second place a discovered name can come from, and it is scanned by a
+            // different helper.
+            System.setProperty("ai.djl.allowed_model_classes", "com.example.allowed.*");
+            Assert.assertNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, null));
+            Assert.assertNull(System.getProperty(BUNDLED_CANARY));
+
+            System.setProperty("ai.djl.allowed_model_classes", "Canary");
+            Assert.assertNotNull(ClassLoaderUtils.findImplementation(dir, Runnable.class, null));
+            Assert.assertEquals(System.getProperty(BUNDLED_CANARY), "ran");
+        } finally {
+            deleteTree(dir);
+        }
+    }
+
+    @Test
     public void testNoErrorReportedWithoutBundledClasses() throws IOException {
         requireUnsetBundledEnv();
         System.clearProperty("ai.djl.load_bundled_classes");
@@ -983,6 +1033,13 @@ public class UrlAccessAndCompilationTest {
         if (Utils.getenv("DJL_LOAD_BUNDLED_CLASSES") != null) {
             throw new org.testng.SkipException(
                     "DJL_LOAD_BUNDLED_CLASSES is set in the environment");
+        }
+    }
+
+    private static void requireUnsetAllowlistEnv() {
+        if (Utils.getenv("DJL_ALLOWED_MODEL_CLASSES") != null) {
+            throw new org.testng.SkipException(
+                    "DJL_ALLOWED_MODEL_CLASSES is set in the environment");
         }
     }
 

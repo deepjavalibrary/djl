@@ -58,6 +58,10 @@ public final class ClassLoaderUtils {
      * to precompiled content regardless of {@link #compileJavaClass(Path)}, so a model that bundles
      * {@code .java} sources needs both flags.
      *
+     * <p>Every name here comes from the model, whether it supplied it as {@code className} or the
+     * scans below derived it from its bundled content, so all of them are subject to {@code
+     * DJL_ALLOWED_MODEL_CLASSES} / {@code -Dai.djl.allowed_model_classes}.
+     *
      * @param path the path to scan from
      * @param type the type of the class
      * @param className the name of the classes, pass null if name is unknown
@@ -65,6 +69,12 @@ public final class ClassLoaderUtils {
      * @return the Class implementation
      */
     public static <T> T findImplementation(Path path, Class<T> type, String className) {
+        // Every caller takes className from the model (the translator and blockFactory arguments,
+        // and djl-serving's workflow functions), so the allowlist applies here as it does in
+        // initModelClass.
+        if (className != null && !className.isEmpty() && !allowModelClass(className)) {
+            return null;
+        }
         try {
             Path classesDir = path.resolve("classes");
             // we only consider .class files and skip .java files
@@ -213,6 +223,12 @@ public final class ClassLoaderUtils {
                 String className = p.toString();
                 className = className.substring(0, className.lastIndexOf('.'));
                 className = className.replace(File.separatorChar, '.');
+                if (!isClassAllowed(className)) {
+                    // The name comes from the model's own bundled content, so the allowlist
+                    // applies to a discovered class as it does to a named one. Skipped quietly:
+                    // this is a scan, and a model's jar can hold any number of other classes.
+                    continue;
+                }
                 T implemented = initClass(cl, type, className);
                 if (implemented != null) {
                     return implemented;
@@ -231,6 +247,9 @@ public final class ClassLoaderUtils {
                 if (fileName.endsWith(".class")) {
                     fileName = fileName.substring(0, fileName.lastIndexOf('.'));
                     fileName = fileName.replace('/', '.');
+                    if (!isClassAllowed(fileName)) {
+                        continue;
+                    }
                     T implemented = initClass(cl, type, fileName);
                     if (implemented != null) {
                         return implemented;
@@ -244,6 +263,10 @@ public final class ClassLoaderUtils {
     /**
      * Loads the specified class and constructs an instance.
      *
+     * <p>The class is resolved without being initialized and is type-checked against {@code type}
+     * before it is instantiated, so a class that does not implement {@code type} never runs its
+     * static initializer.
+     *
      * @param cl the {@code ClassLoader} to use
      * @param type the type of the class
      * @param className the class to be loaded
@@ -252,7 +275,9 @@ public final class ClassLoaderUtils {
      */
     public static <T> T initClass(ClassLoader cl, Class<T> type, String className) {
         try {
-            Class<?> clazz = Class.forName(className, true, cl);
+            // initialize = false: the asSubclass check below then runs before any code in the
+            // class does, so naming a class is not enough to execute it.
+            Class<?> clazz = Class.forName(className, false, cl);
             Class<? extends T> sub = clazz.asSubclass(type);
             Constructor<? extends T> constructor = sub.getConstructor();
             return constructor.newInstance();
@@ -260,6 +285,88 @@ public final class ClassLoaderUtils {
             logger.trace("Not able to load Object", e);
         }
         return null;
+    }
+
+    /**
+     * Loads a class whose name came from a model and constructs an instance.
+     *
+     * <p>Behaves as {@link #initClass(ClassLoader, Class, String)}, except that the name is first
+     * checked against {@code DJL_ALLOWED_MODEL_CLASSES} / {@code -Dai.djl.allowed_model_classes},
+     * so a deployment can bound which implementations a model is allowed to select. Use this
+     * wherever the name is read from model metadata or {@code serving.properties}; names DJL
+     * supplies itself go through {@code initClass}.
+     *
+     * @param cl the {@code ClassLoader} to use
+     * @param type the type of the class
+     * @param className the class to be loaded, as named by the model
+     * @param <T> the type of the class
+     * @return an instance of the class, null if the class not found or not allowed
+     */
+    public static <T> T initModelClass(ClassLoader cl, Class<T> type, String className) {
+        if (!allowModelClass(className)) {
+            return null;
+        }
+        return initClass(cl, type, className);
+    }
+
+    /**
+     * Reports whether a model-supplied class name is allowed, logging it when it is not.
+     *
+     * @param className the class name a model named
+     * @return true if the class may be loaded
+     */
+    private static boolean allowModelClass(String className) {
+        if (className == null) {
+            // Nothing was named, so there is nothing to allow; naming the flag here would report a
+            // refusal to an operator who never set one.
+            return false;
+        }
+        if (isClassAllowed(className)) {
+            return true;
+        }
+        // Logged at error: the load that needed the class fails after this, and the flag is the
+        // only way to tell this refusal apart from a missing dependency.
+        logger.error(
+                "Refusing to load {}: it is not allowed by DJL_ALLOWED_MODEL_CLASSES /"
+                        + " -Dai.djl.allowed_model_classes.",
+                className);
+        return false;
+    }
+
+    /**
+     * Returns whether a class named by a model may be loaded.
+     *
+     * <p>Unset, which is the default, allows any class: the type check in {@link #initClass} is
+     * then the only restriction. When set, the value is a comma-separated list of class names, each
+     * of which may end in {@code .*} to allow a package and its subpackages.
+     *
+     * @param className the class name to check
+     * @return true if the class may be loaded
+     */
+    static boolean isClassAllowed(String className) {
+        if (className == null) {
+            // Keeps the predicate total: initModelClass checks it outside any try, and its callers
+            // are documented to get null back rather than an exception.
+            return false;
+        }
+        String allowed =
+                Utils.getenv(
+                        "DJL_ALLOWED_MODEL_CLASSES",
+                        System.getProperty("ai.djl.allowed_model_classes"));
+        if (allowed == null || allowed.isEmpty()) {
+            return true;
+        }
+        for (String entry : allowed.split(",")) {
+            String name = entry.trim();
+            if (name.endsWith(".*")) {
+                if (className.startsWith(name.substring(0, name.length() - 1))) {
+                    return true;
+                }
+            } else if (name.equals(className)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
