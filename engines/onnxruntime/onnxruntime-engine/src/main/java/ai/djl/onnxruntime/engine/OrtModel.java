@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -90,7 +91,7 @@ public class OrtModel extends BaseModel {
         }
 
         try {
-            SessionOptions ortOptions = getSessionOptions(options);
+            SessionOptions ortOptions = getSessionOptions(options, true);
             OrtSession session = env.createSession(modelFile.toString(), ortOptions);
             block = new OrtSymbolBlock(session, (OrtNDManager) manager);
         } catch (OrtException e) {
@@ -109,7 +110,8 @@ public class OrtModel extends BaseModel {
         modelDir.toFile().deleteOnExit();
         try {
             byte[] buf = Utils.toByteArray(is);
-            SessionOptions ortOptions = getSessionOptions(options);
+            // The model directory is a temp dir here, so a path option is not contained against it.
+            SessionOptions ortOptions = getSessionOptions(options, false);
             OrtSession session = env.createSession(buf, ortOptions);
             block = new OrtSymbolBlock(session, (OrtNDManager) manager);
         } catch (OrtException e) {
@@ -155,7 +157,18 @@ public class OrtModel extends BaseModel {
         }
     }
 
-    private SessionOptions getSessionOptions(Map<String, ?> options) throws OrtException {
+    /**
+     * Builds the session options.
+     *
+     * @param options the model options
+     * @param containPaths whether a path in the options must resolve inside the model directory;
+     *     false for a model loaded from a stream, whose directory is a temporary one
+     * @return the session options
+     * @throws OrtException if the options are not valid
+     * @throws IOException if the profiler output directory cannot be created
+     */
+    private SessionOptions getSessionOptions(Map<String, ?> options, boolean containPaths)
+            throws OrtException, IOException {
         if (options == null) {
             return sessionOptions;
         }
@@ -196,7 +209,7 @@ public class OrtModel extends BaseModel {
             ortSession.disablePerSessionThreads();
         }
 
-        String customOpLibrary = (String) options.get("customOpLibrary");
+        String customOpLibrary = allowedCustomOpLibrary((String) options.get("customOpLibrary"));
         if (customOpLibrary == null) {
             customOpLibrary = getOrtxLibraryPath();
         }
@@ -206,6 +219,9 @@ public class OrtModel extends BaseModel {
 
         String profilerOutput = (String) options.get("profilerOutput");
         if (profilerOutput != null) {
+            if (containPaths) {
+                profilerOutput = resolveProfilerPrefix(modelDir, profilerOutput);
+            }
             ortSession.enableProfiling(profilerOutput);
         }
 
@@ -232,6 +248,109 @@ public class OrtModel extends BaseModel {
             ortSession.addCUDA(device.getDeviceId());
         }
         return ortSession;
+    }
+
+    /**
+     * Resolves the profiler output prefix inside the model directory.
+     *
+     * <p>ONNX Runtime creates {@code <prefix>_<timestamp>.json} from it, so the prefix is resolved
+     * inside the model directory and the timestamped file lands beside it. A nested prefix keeps
+     * working: the directory it names is created here.
+     *
+     * @param modelDir the model directory
+     * @param profilerOutput the configured prefix
+     * @return the resolved prefix
+     * @throws IOException if the directory the prefix names cannot be created
+     */
+    static String resolveProfilerPrefix(Path modelDir, String profilerOutput) throws IOException {
+        Path prefix = Utils.resolveModelFile(modelDir, profilerOutput);
+        if (!Utils.isFileOutsideModelDirAllowed()
+                && prefix.toAbsolutePath()
+                        .normalize()
+                        .equals(modelDir.toAbsolutePath().normalize())) {
+            // The engine appends a timestamp, so a prefix that is the model directory itself puts
+            // the file on a sibling of it, which the containment above does not catch.
+            throw new IllegalArgumentException(
+                    "Invalid profilerOutput, names the model directory: " + profilerOutput);
+        }
+        Path parent = prefix.getParent();
+        if (parent != null) {
+            // Normalized: a prefix containing .. would otherwise leave a stray directory behind.
+            Path created = parent.normalize();
+            if (!Utils.isFileOutsideModelDirAllowed()
+                    && (!Utils.isInsideDirectory(modelDir, created)
+                            || !isRealPathInside(modelDir, created))) {
+                // Checked before anything is created.
+                throw new IllegalArgumentException(
+                        "Invalid profilerOutput, resolves outside the model directory: "
+                                + profilerOutput);
+            }
+            Files.createDirectories(created);
+        }
+        return prefix.toString();
+    }
+
+    /**
+     * Returns whether the deepest existing ancestor of a path really lies inside a directory.
+     *
+     * <p>The lexical check does not follow links: with {@code modelDir/logs} linking elsewhere,
+     * {@code logs/profile} passes it, and both {@code createDirectories} and the engine would then
+     * write through the link.
+     *
+     * @param dir the directory
+     * @param path the path, which need not exist yet
+     * @return true if the existing part of the path resolves inside the directory
+     */
+    private static boolean isRealPathInside(Path dir, Path path) {
+        Path existing = path.toAbsolutePath();
+        while (existing != null && !Files.exists(existing, LinkOption.NOFOLLOW_LINKS)) {
+            existing = existing.getParent();
+        }
+        try {
+            // A dangling link fails toRealPath and is refused with the rest.
+            return existing != null && existing.toRealPath().startsWith(dir.toRealPath());
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Returns the custom op library to register, or null if the configured one is refused.
+     *
+     * <p>A model's options can set this, and {@code registerCustomOpLibrary} dlopens the path,
+     * which runs the library's constructors before ONNX Runtime validates it. Containment is not
+     * enough, since a model may ship the library itself, so loading one named by a model is opt-in.
+     * The classpath-provided library is unaffected: the caller falls back to it when this returns
+     * null.
+     *
+     * @param customOpLibrary the configured library, or null
+     * @return the library to register, or null
+     */
+    static String allowedCustomOpLibrary(String customOpLibrary) {
+        if (customOpLibrary == null || isCustomOpLibraryAllowed()) {
+            return customOpLibrary;
+        }
+        logger.error(
+                "Ignoring customOpLibrary {}: loading a custom op library named by a model is"
+                        + " disabled by default. Set DJL_ALLOW_CUSTOM_OP_LIBRARY=true or"
+                        + " -Dai.djl.allow_custom_op_library=true for models from a trusted"
+                        + " source.",
+                customOpLibrary);
+        return null;
+    }
+
+    /**
+     * Returns whether loading a custom op library named by a model is explicitly enabled.
+     *
+     * @return true if {@code DJL_ALLOW_CUSTOM_OP_LIBRARY} / {@code ai.djl.allow_custom_op_library}
+     *     is set true
+     */
+    private static boolean isCustomOpLibraryAllowed() {
+        String mode =
+                Utils.getenv(
+                        "DJL_ALLOW_CUSTOM_OP_LIBRARY",
+                        System.getProperty("ai.djl.allow_custom_op_library"));
+        return Boolean.parseBoolean(mode);
     }
 
     private String getOrtxLibraryPath() {
