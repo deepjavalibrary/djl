@@ -244,6 +244,10 @@ public final class ClassLoaderUtils {
     /**
      * Loads the specified class and constructs an instance.
      *
+     * <p>The class is resolved without being initialized and is type-checked against {@code type}
+     * before it is instantiated, so a class that does not implement {@code type} never runs its
+     * static initializer.
+     *
      * @param cl the {@code ClassLoader} to use
      * @param type the type of the class
      * @param className the class to be loaded
@@ -252,7 +256,9 @@ public final class ClassLoaderUtils {
      */
     public static <T> T initClass(ClassLoader cl, Class<T> type, String className) {
         try {
-            Class<?> clazz = Class.forName(className, true, cl);
+            // initialize = false: the asSubclass check below then runs before any code in the
+            // class does, so naming a class is not enough to execute it.
+            Class<?> clazz = Class.forName(className, false, cl);
             Class<? extends T> sub = clazz.asSubclass(type);
             Constructor<? extends T> constructor = sub.getConstructor();
             return constructor.newInstance();

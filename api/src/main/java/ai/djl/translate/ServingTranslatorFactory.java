@@ -23,7 +23,6 @@ import ai.djl.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -104,15 +103,11 @@ public class ServingTranslatorFactory implements TranslatorFactory {
     }
 
     private TranslatorFactory loadTranslatorFactory(String className) {
-        try {
-            Class<?> clazz = Class.forName(className);
-            Class<? extends TranslatorFactory> subclass = clazz.asSubclass(TranslatorFactory.class);
-            Constructor<? extends TranslatorFactory> constructor = subclass.getConstructor();
-            return constructor.newInstance();
-        } catch (Throwable e) {
-            logger.trace("Not able to load TranslatorFactory: {}", className, e);
-        }
-        return null;
+        // Going through ClassLoaderUtils puts the type check before the named class is
+        // initialized; this class's own loader is what Class.forName resolved against, so which
+        // classes resolve is unchanged.
+        ClassLoader cl = ServingTranslatorFactory.class.getClassLoader(); // NOPMD
+        return ClassLoaderUtils.initClass(cl, TranslatorFactory.class, className);
     }
 
     private Translator<Input, Output> loadDefaultTranslator(Model model, Map<String, ?> arguments)

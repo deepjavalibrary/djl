@@ -64,7 +64,8 @@ public class LocalRepository extends AbstractRepository {
     @Override
     public Metadata locate(MRL mrl) throws IOException {
         URI uri = mrl.toURI();
-        Path base = path.resolve(uri.getPath());
+        // The MRL path carries caller-supplied group and artifact ids, as in RemoteRepository.
+        Path base = resolveInside(path, uri.getPath());
         Path file = base.resolve("metadata.json");
         if (!Files.isRegularFile(file)) {
             return null;

@@ -78,7 +78,17 @@ public final class RpcClient {
      * @throws MalformedURLException if url is invalid
      */
     public static RpcClient getClient(Map<String, ?> arguments) throws MalformedURLException {
-        String url = arguments.get("djl_rpc_uri").toString();
+        Object uri = arguments.get("djl_rpc_uri");
+        if (uri == null) {
+            // Absent when a model named this factory and set the destination itself: both
+            // Metadata.init and BaseModelLoader's serving.properties filter drop that key, leaving
+            // the factory without one.
+            throw new MalformedURLException("djl_rpc_uri is required.");
+        }
+        String url = uri.toString();
+        // send() casts the connection to HttpURLConnection, so a non-http endpoint already failed
+        // with a ClassCastException at the first predict; this refuses it where it is configured.
+        requireHttpUrl(url);
         String method = getOrDefault(arguments, "method", "POST");
         String apiKey = getOrDefault(arguments, "api_key", null);
         String contentType = getOrDefault(arguments, "content-type", "application/json");
@@ -92,8 +102,18 @@ public final class RpcClient {
             httpHeaders.put(new CaseInsensitiveKey(key), value);
         }
         httpHeaders.put(new CaseInsensitiveKey("Content-Type"), contentType);
+        // A header name assigned below belongs in Artifact.UNTRUSTED_KEYS too.
         String authHeader = "Authorization";
-        if (url.startsWith("https://generativelanguage.googleapis.com/")) {
+        // Scheme and host only: those are case-insensitive, a path is not.
+        URL parsed = new URL(url);
+        StringBuilder sb = new StringBuilder(parsed.getProtocol()).append("://");
+        sb.append(parsed.getHost());
+        if (parsed.getPort() != -1 && parsed.getPort() != parsed.getDefaultPort()) {
+            // A port written out as the scheme's default names the same endpoint.
+            sb.append(':').append(parsed.getPort());
+        }
+        String endpoint = sb.append('/').toString().toLowerCase(Locale.ROOT);
+        if (endpoint.startsWith("https://generativelanguage.googleapis.com/")) {
             if (apiKey == null) {
                 apiKey = Utils.getenv("GEMINI_API_KEY");
                 if (apiKey == null) {
@@ -106,7 +126,7 @@ public final class RpcClient {
             if (!url.endsWith("/openai/chat/completions")) {
                 authHeader = "x-goog-api-key";
             }
-        } else if (url.startsWith("https://api.anthropic.com/")) {
+        } else if (endpoint.startsWith("https://api.anthropic.com/")) {
             if (apiKey == null) {
                 apiKey = Utils.getEnvOrSystemProperty("ANTHROPIC_API_KEY");
                 if (apiKey == null) {
@@ -114,7 +134,7 @@ public final class RpcClient {
                 }
             }
             authHeader = "x-api-key";
-        } else if (url.startsWith("https://api.openai.com/")) {
+        } else if (endpoint.startsWith("https://api.openai.com/")) {
             if (apiKey == null) {
                 apiKey = Utils.getEnvOrSystemProperty("OPENAI_API_KEY");
                 if (apiKey == null) {
@@ -217,9 +237,25 @@ public final class RpcClient {
         }
     }
 
+    /**
+     * Verifies that the remote endpoint is an http(s) URL.
+     *
+     * @param url the configured endpoint
+     * @throws MalformedURLException if the URL is not http or https
+     */
+    private static void requireHttpUrl(String url) throws MalformedURLException {
+        String protocol = new URL(url).getProtocol();
+        if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
+            throw new MalformedURLException("Unsupported djl_rpc_uri protocol: " + protocol);
+        }
+    }
+
     private static String getOrDefault(Map<String, ?> arguments, String key, String def) {
+        // Folded the way RESERVED_KEYS is: equalsIgnoreCase treats the dotless "ı" as "i", so a
+        // key this read as api_key could pass a ROOT-lowercased filter.
+        String wanted = key.toLowerCase(Locale.ROOT);
         for (Map.Entry<String, ?> entry : arguments.entrySet()) {
-            if (entry.getKey().equalsIgnoreCase(key)) {
+            if (entry.getKey().toLowerCase(Locale.ROOT).equals(wanted)) {
                 return entry.getValue().toString();
             }
         }

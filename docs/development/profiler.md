@@ -73,7 +73,9 @@ When loading a model, the profiler can be enabled by specifying the desired file
             .build()
 ```
 
-Following this, the file will appear at "build/tesetOrtProfiling_YYYY-MM-DD.json".
+Following this, the file will appear at "build/testOrtProfiling_YYYY-MM-DD.json", relative to the
+working directory. A model's own `metadata.json` or `serving.properties` cannot set this option;
+only the application can, through `Criteria`.
 
 You can view it in a browser using a trace consumer like `chrome://tracing `.
 For more details, see the [OnnxRuntime Profiler Docs](https://onnxruntime.ai/docs/performance/tune-performance/profiling-tools.html).

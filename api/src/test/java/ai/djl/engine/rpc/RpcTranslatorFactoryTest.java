@@ -27,6 +27,7 @@ import ai.djl.util.Pair;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 
 import org.testng.Assert;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
@@ -193,6 +195,49 @@ public class RpcTranslatorFactoryTest {
         }
     }
 
+    @Test
+    public void testRpcUriMustBeHttp() throws MalformedURLException {
+        // A model's arguments can set djl_rpc_uri, and send() only speaks http.
+        Assert.assertThrows(
+                MalformedURLException.class,
+                () -> RpcClient.getClient(Map.of("djl_rpc_uri", "file:///etc/passwd")));
+        Assert.assertThrows(
+                MalformedURLException.class,
+                () -> RpcClient.getClient(Map.of("djl_rpc_uri", "jar:file:/tmp/a.jar!/b")));
+        // Absent once Metadata.init and the serving.properties filter have dropped a model's copy
+        // of the key, which used to be a NullPointerException.
+        Assert.assertThrows(MalformedURLException.class, () -> RpcClient.getClient(Map.of()));
+
+        Assert.assertNotNull(RpcClient.getClient(Map.of("djl_rpc_uri", "http://localhost/x")));
+        Assert.assertNotNull(RpcClient.getClient(Map.of("djl_rpc_uri", "HTTPS://localhost/x")));
+    }
+
+    @Test
+    public void testApplicationCredentialHeadersAreSent() throws IOException {
+        try (HeaderServer server = new HeaderServer()) {
+            // A model's copy is already dropped at the metadata boundary, so these are the
+            // application's. api_key only produces Bearer, so Basic auth needs this path.
+            RpcClient client =
+                    RpcClient.getClient(
+                            Map.of(
+                                    "djl_rpc_uri",
+                                    server.getUrl(),
+                                    "Authorization",
+                                    "Basic application-secret",
+                                    "Cookie",
+                                    "session=application",
+                                    "x-api-key",
+                                    "application-key",
+                                    "Accept",
+                                    "*/*"));
+            client.send(new Input());
+            Assert.assertEquals(server.getHeader("Authorization"), "Basic application-secret");
+            Assert.assertEquals(server.getHeader("Cookie"), "session=application");
+            Assert.assertEquals(server.getHeader("x-api-key"), "application-key");
+            Assert.assertEquals(server.getHeader("Accept"), "*/*");
+        }
+    }
+
     private static final class TestData implements JsonSerializable {
 
         private static final long serialVersionUID = 1L;
@@ -229,14 +274,16 @@ public class RpcTranslatorFactoryTest {
     private static final class HeaderServer implements AutoCloseable {
 
         private final HttpServer server;
-        private final AtomicReference<String> authorization = new AtomicReference<>();
+        private final AtomicReference<Headers> requestHeaders = new AtomicReference<>();
 
         HeaderServer() throws IOException {
             server = HttpServer.create(new InetSocketAddress(0), 0);
             server.createContext(
                     "/invocations",
                     exchange -> {
-                        authorization.set(exchange.getRequestHeaders().getFirst("Authorization"));
+                        Headers received = new Headers();
+                        received.putAll(exchange.getRequestHeaders());
+                        requestHeaders.set(received);
                         byte[] body = "{}".getBytes(StandardCharsets.UTF_8);
                         exchange.sendResponseHeaders(200, body.length);
                         try (OutputStream os = exchange.getResponseBody()) {
@@ -250,8 +297,13 @@ public class RpcTranslatorFactoryTest {
             return "http://localhost:" + server.getAddress().getPort() + "/invocations";
         }
 
+        String getHeader(String name) {
+            Headers received = requestHeaders.get();
+            return received == null ? null : received.getFirst(name);
+        }
+
         String getAuthorization() {
-            return authorization.get();
+            return getHeader("Authorization");
         }
 
         /** {@inheritDoc} */
