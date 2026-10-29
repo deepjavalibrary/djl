@@ -33,7 +33,7 @@ You can pull the model zoo from the central Maven repository by including the fo
 <dependency>
     <groupId>ai.djl</groupId>
     <artifactId>model-zoo</artifactId>
-    <version>0.39.0</version>
+    <version>0.40.0</version>
 </dependency>
 ```
 
