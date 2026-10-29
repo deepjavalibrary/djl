@@ -15,11 +15,18 @@ package ai.djl.repository;
 import ai.djl.Application;
 import ai.djl.util.JsonUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,6 +36,26 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @SuppressWarnings("PMD.LooseCoupling")
 public class Artifact {
+
+    private static final Logger logger = LoggerFactory.getLogger(Artifact.class);
+
+    // Lower case: RpcClient matches these case-insensitively.
+    private static final Set<String> UNTRUSTED_KEYS =
+            Collections.unmodifiableSet(
+                    new HashSet<>(
+                            Arrays.asList(
+                                    "djl_rpc_uri",
+                                    "api_key",
+                                    "api-key",
+                                    "authorization",
+                                    "x-api-key",
+                                    "x-goog-api-key",
+                                    "cookie",
+                                    "proxy-authorization",
+                                    "openai-organization",
+                                    "openai-project",
+                                    "customoplibrary",
+                                    "profileroutput")));
 
     private transient String metadataVersion;
     private String version;
@@ -185,6 +212,65 @@ public class Artifact {
      */
     public void setArguments(Map<String, Object> arguments) {
         this.arguments = arguments;
+    }
+
+    /**
+     * Returns whether a key may not be set by a model.
+     *
+     * <p>Each names native code to load, a file to write, a destination to connect to or the
+     * credentials to send there: {@code djl_rpc_uri}, {@code customOpLibrary}, {@code
+     * profilerOutput}, {@code api_key} and every header {@link ai.djl.engine.rpc.RpcClient}
+     * authenticates with. This is the single check on the option names, and no engine gates them
+     * again. It applies to metadata only: {@link ai.djl.repository.zoo.Criteria}, a repository
+     * URL's query arguments and a repository's own arguments are all merged afterwards.
+     *
+     * @param key an argument or option name
+     * @return true if a model may not set the key
+     */
+    public static boolean isUntrustedKey(String key) {
+        if (key == null) {
+            return false;
+        }
+        for (String untrusted : UNTRUSTED_KEYS) {
+            // equalsIgnoreCase, matching how RpcClient looks a key up: under
+            // toLowerCase(Locale.ROOT) a dotless "apı_key" is not api_key here, while that
+            // lookup still reads it as one.
+            if (untrusted.equalsIgnoreCase(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Drops the keys a model may not set from this artifact's own arguments and options.
+     *
+     * <p>Called from {@link Metadata#init(Map)}, which runs once per artifact straight after JSON
+     * deserialization and before a repository merges its URL arguments in. So this sees exactly the
+     * metadata's own values, and anything merged afterwards — URL arguments, and later the caller's
+     * {@code Criteria} values — is unaffected.
+     */
+    void removeUntrustedEntries() {
+        // Both maps are swept: a metadata.json may set the same key in arguments and in options.
+        removeUntrustedEntries(arguments);
+        removeUntrustedEntries(options);
+    }
+
+    private static void removeUntrustedEntries(Map<String, ?> map) {
+        if (map == null) {
+            return;
+        }
+        // Iterated rather than looked up by name, so a key that differs only in case is dropped
+        // too.
+        Iterator<String> it = map.keySet().iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            if (isUntrustedKey(key)) {
+                it.remove();
+                logger.debug(
+                        "Ignoring {} from model metadata: only the application may set it.", key);
+            }
+        }
     }
 
     /**

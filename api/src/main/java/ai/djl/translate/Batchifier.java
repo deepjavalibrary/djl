@@ -48,6 +48,8 @@ public interface Batchifier extends Serializable {
             case "none":
                 return null;
             default:
+                // The name reaches here from a model's batchifier argument, so it is resolved
+                // without initializing and type-checked before construction.
                 ClassLoader cl = ClassLoaderUtils.getContextClassLoader();
                 Batchifier b = ClassLoaderUtils.initClass(cl, Batchifier.class, name);
                 if (b == null) {

@@ -274,7 +274,7 @@ public interface Repository {
      * @throws IOException if it failed to ensure the creation of the cache directory
      */
     default Path getResourceDirectory(Artifact artifact) throws IOException {
-        return getCacheDirectory().resolve(artifact.getResourceUri().getPath());
+        return AbstractRepository.resolveArtifactDir(getCacheDirectory(), artifact);
     }
 
     /**

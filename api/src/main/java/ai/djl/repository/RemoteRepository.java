@@ -63,7 +63,8 @@ public class RemoteRepository extends AbstractRepository {
     public Metadata locate(MRL mrl) throws IOException {
         URI mrlUri = mrl.toURI();
         URI file = uri.resolve(mrlUri.getPath() + "/metadata.json");
-        Path cacheDir = getCacheDirectory().resolve(mrlUri.getPath());
+        // The MRL path carries caller-supplied group and artifact ids, and is created below.
+        Path cacheDir = resolveInside(getCacheDirectory(), mrlUri.getPath());
         if (!Files.exists(cacheDir)) {
             Files.createDirectories(cacheDir);
         }

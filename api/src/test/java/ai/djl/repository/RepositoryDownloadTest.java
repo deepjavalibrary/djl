@@ -77,8 +77,12 @@ public class RepositoryDownloadTest {
     @Test
     public void testUnsupportedSchemeArtifactUriIsRejected() throws IOException {
         IOException e = downloadItemUri("ftp://ftp.example.com/model.tar.gz");
+        // Refused by the artifact-item scheme allowlist, which runs before Utils.openUrl would
+        // refuse the protocol itself. The message names the item as the source, which separates a
+        // crafted metadata.json from a misconfigured repository.
         Assert.assertTrue(
-                e.getMessage().contains("URL protocol"), "unexpected message: " + e.getMessage());
+                e.getMessage().contains("unsupported scheme"),
+                "unexpected message: " + e.getMessage());
     }
 
     /**

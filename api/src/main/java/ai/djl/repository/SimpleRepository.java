@@ -150,7 +150,8 @@ public class SimpleRepository extends AbstractRepository {
         if (isRemote) {
             return super.resolvePath(item, path);
         }
-        return this.path.resolve(item.getName()).toUri();
+        // Contained like AbstractRepository's: the item name comes from the artifact's metadata.
+        return resolveInside(this.path, item.getName()).toUri();
     }
 
     /** {@inheritDoc} */
