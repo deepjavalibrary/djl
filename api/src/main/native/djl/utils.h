@@ -26,26 +26,63 @@ namespace jni {
 static constexpr const jint RELEASE_MODE = JNI_ABORT;
 static constexpr const jlong NULL_PTR = 0;
 
+// JNI's own string functions (NewStringUTF, GetStringUTFChars) use modified UTF-8, which encodes NUL and
+// characters outside the BMP differently from standard UTF-8. Strings are converted with java.lang.String
+// and StandardCharsets.UTF_8 instead. The classes, methods and charset are looked up once per native library.
+struct StringReflection {
+  jclass string_class;
+  jmethodID getbytes_method;
+  jmethodID ctor;
+  jobject utf8_charset;
+};
+
+inline const StringReflection& GetStringReflection(JNIEnv* env) {
+  // function-local static: initialized once, thread safe since C++11
+  static const StringReflection reflection = [env]() {
+    StringReflection r{};
+    jclass string_class = env->FindClass("java/lang/String");
+    r.string_class = (jclass) env->NewGlobalRef(string_class);
+    env->DeleteLocalRef(string_class);
+    r.getbytes_method = env->GetMethodID(r.string_class, "getBytes", "(Ljava/nio/charset/Charset;)[B");
+    r.ctor = env->GetMethodID(r.string_class, "<init>", "([BLjava/nio/charset/Charset;)V");
+
+    jclass charsets_class = env->FindClass("java/nio/charset/StandardCharsets");
+    jfieldID utf8_field = env->GetStaticFieldID(charsets_class, "UTF_8", "Ljava/nio/charset/Charset;");
+    jobject utf8_charset = env->GetStaticObjectField(charsets_class, utf8_field);
+    r.utf8_charset = env->NewGlobalRef(utf8_charset);
+    env->DeleteLocalRef(utf8_charset);
+    env->DeleteLocalRef(charsets_class);
+    return r;
+  }();
+  return reflection;
+}
+
 inline std::string GetStringFromJString(JNIEnv* env, jstring jstr) {
   if (jstr == nullptr) {
     return std::string();
   }
 
-  // TODO: cache reflection to improve performance
-  const jclass string_class = env->GetObjectClass(jstr);
-  const jmethodID getbytes_method = env->GetMethodID(string_class, "getBytes", "(Ljava/lang/String;)[B");
-
-  const jstring charset = env->NewStringUTF("UTF-8");
-  const jbyteArray jbytes = (jbyteArray) env->CallObjectMethod(jstr, getbytes_method, charset);
-  env->DeleteLocalRef(charset);
+  const StringReflection& reflection = GetStringReflection(env);
+  const jbyteArray jbytes =
+      (jbyteArray) env->CallObjectMethod(jstr, reflection.getbytes_method, reflection.utf8_charset);
 
   const jsize length = env->GetArrayLength(jbytes);
-  jbyte* c_str = env->GetByteArrayElements(jbytes, NULL);
-  std::string str = std::string(reinterpret_cast<const char *>(c_str), length);
-
-  env->ReleaseByteArrayElements(jbytes, c_str, RELEASE_MODE);
+  std::string str(length, '\0');
+  env->GetByteArrayRegion(jbytes, 0, length, reinterpret_cast<jbyte*>(&str[0]));
   env->DeleteLocalRef(jbytes);
   return str;
+}
+
+// Creates a java.lang.String from standard UTF-8, including NUL and characters outside the BMP.
+// Use this instead of NewStringUTF for any text that is not known to be ASCII.
+inline jstring GetJStringFromString(JNIEnv* env, const std::string& str) {
+  const StringReflection& reflection = GetStringReflection(env);
+  const auto len = static_cast<jsize>(str.length());
+  jbyteArray jbytes = env->NewByteArray(len);
+  env->SetByteArrayRegion(jbytes, 0, len, reinterpret_cast<const jbyte*>(str.data()));
+  auto jstr = (jstring) env->NewObject(reflection.string_class, reflection.ctor, jbytes, reflection.utf8_charset);
+  env->DeleteLocalRef(jbytes);
+  return jstr;
 }
 
 template<typename T>
@@ -112,24 +149,14 @@ inline std::vector<std::string> GetVecFromJStringArray(JNIEnv* env, jobjectArray
 
 // String[]
 inline jobjectArray GetStringArrayFromVec(JNIEnv* env, const std::vector <std::string> &vec) {
-  jobjectArray array = env->NewObjectArray(vec.size(), env->FindClass("java/lang/String"), nullptr);
-
-  // TODO: cache reflection to improve performance
-  const jclass string_class = env->FindClass("java/lang/String");
-  const jmethodID ctor = env->GetMethodID(string_class, "<init>", "([BLjava/lang/String;)V");
-  const jstring charset = env->NewStringUTF("UTF-8");
+  const StringReflection& reflection = GetStringReflection(env);
+  jobjectArray array = env->NewObjectArray(vec.size(), reflection.string_class, nullptr);
 
   for (int i = 0; i < vec.size(); ++i) {
-    const char* c_str = vec[i].c_str();
-    int len = vec[i].length();
-    auto jbytes = env->NewByteArray(len);
-    env->SetByteArrayRegion(jbytes, 0, len, reinterpret_cast<const jbyte*>(c_str));
-    jobject jstr = env->NewObject(string_class, ctor, jbytes, charset);
-    env->DeleteLocalRef(jbytes);
+    jstring jstr = GetJStringFromString(env, vec[i]);
     env->SetObjectArrayElement(array, i, jstr);
+    env->DeleteLocalRef(jstr);
   }
-
-  env->DeleteLocalRef(charset);
   return array;
 }
 

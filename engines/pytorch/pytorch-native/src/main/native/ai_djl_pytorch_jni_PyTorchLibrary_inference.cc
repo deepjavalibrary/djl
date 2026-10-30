@@ -64,7 +64,7 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljav
     for (size_t i = 0; i < len; ++i) {
       auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
       auto name = djl::utils::jni::GetStringFromJString(env, jname);
-      env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
+      env->SetObjectArrayElement(jefvalues, i, djl::utils::jni::GetJStringFromString(env, map[name]));
     }
     return reinterpret_cast<uintptr_t>(module_ptr);
   }
@@ -81,7 +81,7 @@ Java_ai_djl_pytorch_jni_PyTorchLibrary_moduleLoad__Ljava_lang_String_2_3IZ_3Ljav
   for (size_t i = 0; i < len; ++i) {
     auto jname = (jstring) env->GetObjectArrayElement(jefnames, i);
     auto name = djl::utils::jni::GetStringFromJString(env, jname);
-    env->SetObjectArrayElement(jefvalues, i, env->NewStringUTF(map[name].c_str()));
+    env->SetObjectArrayElement(jefvalues, i, djl::utils::jni::GetJStringFromString(env, map[name]));
   }
   return reinterpret_cast<uintptr_t>(module_ptr);
   API_END_RETURN()
