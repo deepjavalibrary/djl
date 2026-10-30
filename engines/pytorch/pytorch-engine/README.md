@@ -51,7 +51,7 @@ The following table illustrates which pytorch version that DJL supports:
 
 | PyTorch engine version | PyTorch native library version            |
 |------------------------|-------------------------------------------|
-| pytorch-engine:0.40.0  | 1.13.1, 2.5.1, **2.7.1**                  |
+| pytorch-engine:0.40.0  | 1.13.1, 2.5.1, 2.7.1, **2.11.0**          |
 | pytorch-engine:0.39.0  | 1.13.1, 2.5.1, **2.7.1**                  |
 | pytorch-engine:0.38.0  | 1.13.1, 2.5.1, **2.7.1**                  |
 | pytorch-engine:0.37.0  | 1.13.1, 2.5.1, **2.7.1**                  |
@@ -180,7 +180,7 @@ installed on your GPU machine, you can use one of the following library:
 #### Linux GPU
 
 - ai.djl.pytorch:pytorch-jni:2.7.1-0.39.0
-- ai.djl.pytorch:pytorch-native-cu124:2.7.1:linux-x86_64 - CUDA 12.8
+- ai.djl.pytorch:pytorch-native-cu128:2.7.1:linux-x86_64 - CUDA 12.8
 
 ```xml
 
@@ -293,7 +293,7 @@ For the Windows platform, you can choose between CPU and GPU.
 #### Windows GPU
 
 - ai.djl.pytorch:pytorch-jni:2.7.1-0.39.0
-- ai.djl.pytorch:pytorch-native-cu128:2.7.1:win-x86_64 - CUDA 12.4
+- ai.djl.pytorch:pytorch-native-cu128:2.7.1:win-x86_64 - CUDA 12.8
 
 ```xml
 

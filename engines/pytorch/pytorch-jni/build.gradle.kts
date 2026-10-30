@@ -39,7 +39,7 @@ tasks {
                 "osx-aarch64/cpu/libdjl_torch.dylib",
                 "win-x86_64/cpu/djl_torch.dll"
             ) + when {
-                ptVer.matches(Regex("2.7.\\d")) -> listOf(
+                ptVer.matches(Regex("2\\.(7|11)\\.\\d+")) -> listOf(
                     "linux-aarch64/cpu/libdjl_torch.so",
                     "linux-x86_64/cu128/libdjl_torch.so",
                     "win-x86_64/cu128/djl_torch.dll"
