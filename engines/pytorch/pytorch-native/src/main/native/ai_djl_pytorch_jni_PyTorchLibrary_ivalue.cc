@@ -235,7 +235,7 @@ JNIEXPORT jstring JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueToString(
     JNIEnv* env, jobject jthis, jlong jhandle) {
   API_BEGIN()
   auto* ivalue_ptr = reinterpret_cast<torch::IValue*>(jhandle);
-  return env->NewStringUTF(ivalue_ptr->toString()->string().c_str());
+  return djl::utils::jni::GetJStringFromString(env, ivalue_ptr->toString()->string());
   API_END_RETURN()
 }
 
