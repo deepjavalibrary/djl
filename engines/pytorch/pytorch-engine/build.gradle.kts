@@ -28,7 +28,7 @@ tasks {
     }
 
     test {
-        environment("PATH" to "src/test/bin:${environment["PATH"]}")
+        environment("PATH", "src/test/bin;${System.getenv("PATH")}")
     }
 
     clean { dependsOn(":engines:pytorch:pytorch-jni:clean") }
