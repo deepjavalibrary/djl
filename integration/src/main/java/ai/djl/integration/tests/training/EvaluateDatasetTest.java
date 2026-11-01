@@ -50,7 +50,7 @@ public class EvaluateDatasetTest {
 
             testMnistDataset.prepare();
 
-            Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation::relu);
+            Mlp mlpModel = new Mlp(784, 1, new int[] {256}, Activation.reluBlock());
 
             try (Model model = Model.newInstance("lin-reg", TestUtils.getEngine())) {
                 model.setBlock(mlpModel);
