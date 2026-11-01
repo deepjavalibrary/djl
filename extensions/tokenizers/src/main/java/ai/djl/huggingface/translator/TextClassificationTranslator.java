@@ -29,8 +29,11 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 /** The translator for Huggingface text classification model. */
 public class TextClassificationTranslator implements Translator<String, Classifications> {
@@ -112,12 +115,12 @@ public class TextClassificationTranslator implements Translator<String, Classifi
         } else if ("single_label_classification".equals(config.problemType) || size > 1) {
             logits = logits.softmax(0);
         }
-        long[] indices = logits.argSort(-1, false).toLongArray();
         float[] buf = logits.toFloatArray();
+        Integer[] indices = IntStream.range(0, buf.length).boxed().toArray(Integer[]::new);
+        Arrays.sort(indices, Comparator.comparingDouble((Integer i) -> buf[i]).reversed());
         List<String> classes = new ArrayList<>(size);
         List<Double> probabilities = new ArrayList<>(size);
-        for (long l : indices) {
-            int index = Math.toIntExact(l);
+        for (int index : indices) {
             classes.add(config.id2label.get(String.valueOf(index)));
             probabilities.add((double) buf[index]);
         }
