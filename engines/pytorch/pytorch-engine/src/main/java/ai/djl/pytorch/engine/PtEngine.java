@@ -123,6 +123,20 @@ public final class PtEngine extends Engine {
 
     /** {@inheritDoc} */
     @Override
+    public Device defaultDevice() {
+        if (defaultDevice != null) {
+            return defaultDevice;
+        }
+        if ("aarch64".equals(System.getProperty("os.arch"))
+                && System.getProperty("os.name").startsWith("Mac")) {
+            defaultDevice = Device.of("mps", -1);
+            return defaultDevice;
+        }
+        return super.defaultDevice();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public SymbolBlock newSymbolBlock(NDManager manager) {
         return new PtSymbolBlock((PtNDManager) manager);
     }

@@ -13,6 +13,7 @@
 
 package ai.djl.pytorch.integration;
 
+import ai.djl.Device;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDList;
@@ -93,9 +94,10 @@ public class TorchScriptTest {
             try (InputStream is = Files.newInputStream(modelFile)) {
                 PtSymbolBlock block = JniUtils.loadModule(manager, is, true, false);
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
+                // writeModule with MPS cannot be loaded back on MPS
                 JniUtils.writeModule(block, os, true);
                 ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray());
-                JniUtils.loadModule(manager, bis, true, true);
+                JniUtils.loadModuleHandle(bis, Device.cpu(), true, true);
                 bis.close();
                 os.close();
             }
