@@ -89,23 +89,35 @@ public class PtIValueNDArrayTest {
         }
     }
 
-    @Test(expectedExceptions = IllegalStateException.class)
+    @Test
     public void testClosedWithManager() {
         TestRequirements.notMacX86();
         PtNDManager manager = (PtNDManager) NDManager.newBaseManager("PyTorch");
         PtIValueNDArray c = carrier(manager);
         manager.close();
-        c.getIValue();
+        Assert.expectThrows(IllegalStateException.class, c::getIValue);
     }
 
-    @Test(expectedExceptions = IllegalStateException.class)
+    @Test
     public void testExplicitCloseIsIdempotent() {
         TestRequirements.notMacX86();
         try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager("PyTorch")) {
             PtIValueNDArray c = carrier(manager);
             c.close();
             c.close();
-            c.getIValue();
+            Assert.expectThrows(IllegalStateException.class, c::getIValue);
+        }
+    }
+
+    @Test
+    public void testToStringDoesNotThrow() {
+        TestRequirements.notMacX86();
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager("PyTorch")) {
+            String str = carrier(manager).toString();
+            Assert.assertTrue(str.contains("input"), str);
+            for (String key : KEYS) {
+                Assert.assertTrue(str.contains(key), str);
+            }
         }
     }
 }

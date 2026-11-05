@@ -20,6 +20,7 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.jni.IValue;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * A special {@link NDArray} that carries a prebuilt {@code Dict[str, Tensor]} {@link IValue}.
@@ -133,5 +134,11 @@ public final class PtIValueNDArray extends NDArrayAdapter {
     public void close() {
         super.close();
         ivalue.close();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "PtIValueNDArray{name=" + getName() + ", keys=" + Arrays.toString(keys) + "}";
     }
 }
