@@ -43,14 +43,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 /** The file is for integration test for special TorchScript input. */
 public class TorchScriptTest {
@@ -107,13 +101,10 @@ public class TorchScriptTest {
                         return input;
                     }
                 };
-        // The published dict_input model unpacks exactly one dict value, so it rejects extra keys.
-        // Patch its forward to look up "input" instead, so that multi-key dicts are accepted.
-        Path patched = patchedDictModel();
         Criteria<NDList, NDList> criteria =
                 Criteria.builder()
                         .setTypes(NDList.class, NDList.class)
-                        .optModelPath(patched)
+                        .optModelUrls("https://resources.djl.ai/test-models/dict_input.zip")
                         .optTranslator(translator)
                         .optProgress(new ProgressBar())
                         .build();
@@ -121,23 +112,21 @@ public class TorchScriptTest {
         try (NDManager manager = NDManager.newBaseManager();
                 ZooModel<NDList, NDList> model = criteria.loadModel();
                 Predictor<NDList, NDList> predictor = model.newPredictor()) {
-            ByteBuffer parent = ByteBuffer.allocateDirect(40).order(ByteOrder.nativeOrder());
+            // The published model unpacks exactly one dict value, so multi-key/multi-dtype
+            // coverage lives in IValueStringMapBlobsTest/IValueUtilsTest.
+            ByteBuffer parent = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
             ByteBuffer floats = slice(parent, 0, 16);
-            ByteBuffer longs = slice(parent, 16, 24);
             for (int i = 0; i < 4; ++i) {
                 floats.putFloat(i * 4, 1f);
-            }
-            for (int i = 0; i < 3; ++i) {
-                longs.putLong(i * 8, i + 1);
             }
             PtIValueNDArray carrier =
                     ((PtNDManager) manager)
                             .createStringMap(
                                     "input1",
-                                    new String[] {"input", "extra"},
-                                    new ByteBuffer[] {floats, longs},
-                                    new long[][] {{2, 2}, {3}},
-                                    new DataType[] {DataType.FLOAT32, DataType.INT64});
+                                    new String[] {"input"},
+                                    new ByteBuffer[] {floats},
+                                    new long[][] {{2, 2}},
+                                    new DataType[] {DataType.FLOAT32});
             NDArray expected = manager.ones(new Shape(2, 2));
             for (int i = 0; i < 2; ++i) {
                 NDList output = predictor.predict(new NDList(carrier));
@@ -145,52 +134,9 @@ public class TorchScriptTest {
             }
 
             PairList<String, Shape> desc = ((PtSymbolBlock) model.getBlock()).describeInput();
-            Assert.assertEquals(desc.size(), 2);
+            Assert.assertEquals(desc.size(), 1);
             Assert.assertEquals(desc.get("input1.input"), new Shape(2, 2));
-            Assert.assertEquals(desc.get("input1.extra"), new Shape(3));
         }
-    }
-
-    private static Path patchedDictModel() throws ModelException, IOException {
-        Criteria<NDList, NDList> original =
-                Criteria.builder()
-                        .setTypes(NDList.class, NDList.class)
-                        .optModelUrls("https://resources.djl.ai/test-models/dict_input.zip")
-                        .optProgress(new ProgressBar())
-                        .build();
-        Path source;
-        try (ZooModel<NDList, NDList> model = original.loadModel()) {
-            source = model.getModelPath().resolve(model.getName() + ".pt");
-        }
-        Path dir = Files.createTempDirectory("dict_input_multi");
-        Path target = dir.resolve("dict_input_multi.pt");
-        String from = "_0, = torch.values(argument_1)";
-        String to = "_0 = torch.__getitem__(argument_1, \"input\")";
-        try (ZipFile zip = new ZipFile(source.toFile());
-                ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(target))) {
-            for (ZipEntry entry : Collections.list(zip.entries())) {
-                byte[] data;
-                try (InputStream is = zip.getInputStream(entry)) {
-                    data = is.readAllBytes();
-                }
-                if (entry.getName().endsWith("code/__torch__.py")) {
-                    String code = new String(data, StandardCharsets.UTF_8);
-                    Assert.assertTrue(code.contains(from));
-                    data = code.replace(from, to).getBytes(StandardCharsets.UTF_8);
-                }
-                ZipEntry out = new ZipEntry(entry.getName());
-                out.setMethod(ZipEntry.STORED);
-                out.setSize(data.length);
-                out.setCompressedSize(data.length);
-                CRC32 crc = new CRC32();
-                crc.update(data);
-                out.setCrc(crc.getValue());
-                zos.putNextEntry(out);
-                zos.write(data);
-                zos.closeEntry();
-            }
-        }
-        return target;
     }
 
     private static ByteBuffer slice(ByteBuffer parent, int offset, int length) {
