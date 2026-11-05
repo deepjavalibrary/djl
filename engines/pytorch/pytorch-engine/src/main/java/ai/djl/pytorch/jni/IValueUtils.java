@@ -15,6 +15,7 @@ package ai.djl.pytorch.jni;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
+import ai.djl.pytorch.engine.PtIValueNDArray;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
@@ -23,8 +24,12 @@ import ai.djl.util.PairList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,7 +63,14 @@ public final class IValueUtils {
                 PyTorchLibrary.LIB.moduleRunMethod(
                         block.getHandle(), method, iValueHandles, isTrain, CUDA_STREAM);
         PtNDManager manager = (PtNDManager) inputs.get(0).getManager();
-        Arrays.stream(ivalues).forEach(IValue::close);
+        // carrier IValues are owned by their PtIValueNDArray and must stay open
+        Set<IValue> carriers = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (NDArray array : inputs) {
+            if (array instanceof PtIValueNDArray) {
+                carriers.add(((PtIValueNDArray) array).getIValue());
+            }
+        }
+        Arrays.stream(ivalues).filter(v -> !carriers.contains(v)).forEach(IValue::close);
         try (IValue iValue = new IValue(result)) {
             return iValue.toNDList(manager);
         }
@@ -103,8 +115,15 @@ public final class IValueUtils {
     static Pair<IValue[], String> getInputs(NDList ndList) {
         List<PairList<String, PtNDArray>> outputs = new ArrayList<>();
         Map<String, Integer> indexMap = new ConcurrentHashMap<>();
+        Map<Integer, IValue> carriers = new HashMap<>();
         String methodName = "forward";
         for (NDArray array : ndList) {
+            if (array instanceof PtIValueNDArray) {
+                // prebuilt IValue carrier: passed through as-is, name is not parsed
+                carriers.put(outputs.size(), ((PtIValueNDArray) array).getIValue());
+                outputs.add(new PairList<>());
+                continue;
+            }
             String name = array.getName();
             Matcher m;
             if (name != null && name.contains(".")) {
@@ -141,6 +160,11 @@ public final class IValueUtils {
         }
         IValue[] ret = new IValue[outputs.size()];
         for (int i = 0; i < outputs.size(); ++i) {
+            IValue carrier = carriers.get(i);
+            if (carrier != null) {
+                ret[i] = carrier;
+                continue;
+            }
             PairList<String, PtNDArray> pl = outputs.get(i);
             String key = pl.get(0).getKey();
             if (key == null) {

@@ -15,7 +15,9 @@ package ai.djl.pytorch.jni;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.pytorch.engine.PtIValueNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.testing.TestRequirements;
 import ai.djl.util.Pair;
@@ -23,6 +25,8 @@ import ai.djl.util.Pair;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -191,6 +195,71 @@ public class IValueUtilsTest {
             Assert.assertEquals(result.getValue(), "get_text_feature");
 
             Arrays.stream(iValues).forEach(IValue::close);
+        }
+    }
+
+    private static PtIValueNDArray carrier(PtNDManager manager, String name) {
+        ByteBuffer buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
+        PtIValueNDArray c =
+                manager.createStringMap(
+                        name,
+                        new String[] {"a"},
+                        new ByteBuffer[] {buf},
+                        new long[][] {{2}},
+                        new DataType[] {DataType.FLOAT32});
+        return c;
+    }
+
+    @Test
+    public void testCarrierPassthrough() {
+        TestRequirements.notMacX86();
+
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
+            NDArray x = manager.zeros(new Shape(1));
+            x.setName("x");
+            PtIValueNDArray carrier = carrier(manager, "d");
+            NDArray y = manager.ones(new Shape(1));
+            y.setName("y");
+            NDList input = new NDList(x, carrier, y);
+
+            IValue[] ret = IValueUtils.getInputs(input).getKey();
+            Assert.assertEquals(ret.length, 3);
+            Assert.assertSame(ret[1], carrier.getIValue());
+            Assert.assertTrue(ret[0].isTensor());
+            Assert.assertTrue(ret[2].isTensor());
+            ret[0].close();
+            ret[2].close();
+            Assert.assertTrue(carrier.getIValue().isMap());
+        }
+    }
+
+    @Test
+    public void testCarrierNameNotParsed() {
+        TestRequirements.notMacX86();
+
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
+            NDArray x = manager.zeros(new Shape(1));
+            x.setName("a.k");
+            PtIValueNDArray carrier = carrier(manager, "a.b");
+            NDList input = new NDList(carrier, x);
+
+            IValue[] ret = IValueUtils.getInputs(input).getKey();
+            Assert.assertEquals(ret.length, 2);
+            Assert.assertSame(ret[0], carrier.getIValue());
+            Assert.assertTrue(ret[1].isMap());
+            ret[1].close();
+        }
+    }
+
+    @Test
+    public void testClosedCarrierRejected() {
+        TestRequirements.notMacX86();
+
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager()) {
+            PtIValueNDArray carrier = carrier(manager, "d");
+            carrier.close();
+            NDList input = new NDList(carrier);
+            Assert.assertThrows(IllegalStateException.class, () -> IValueUtils.getInputs(input));
         }
     }
 }
