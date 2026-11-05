@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.pytorch.jni.IValue;
 import ai.djl.pytorch.jni.JniUtils;
 
 import java.nio.Buffer;
@@ -82,6 +83,35 @@ public class PtNDManager extends BaseNDManager {
     @Override
     public NDArray create(String[] data, Charset charset, Shape shape) {
         return new PtNDArray(this, data, shape);
+    }
+
+    /**
+     * Creates a carrier holding a {@code Dict[str, Tensor]} built from direct buffers in one JNI
+     * call.
+     *
+     * @param name the name of the carrier
+     * @param keys the dictionary keys
+     * @param buffers the direct buffers, one per key
+     * @param shapes the tensor shapes, one per key
+     * @param dtypes the tensor data types, one per key
+     * @return the carrier array
+     * @throws IllegalArgumentException if the arguments are invalid or the name is null or empty
+     * @throws ai.djl.engine.EngineException if the native check fails, e.g. a buffer is too small
+     * @see IValue#stringMapFrom(String[], ByteBuffer[], long[][], DataType[]) for the buffer
+     *     lifetime, byte order, and position/limit rules
+     */
+    public PtIValueNDArray createStringMap(
+            String name, String[] keys, ByteBuffer[] buffers, long[][] shapes, DataType[] dtypes) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("name must be non-null and non-empty");
+        }
+        IValue ivalue = IValue.stringMapFrom(keys, buffers, shapes, dtypes);
+        try {
+            return new PtIValueNDArray(this, name, ivalue, keys, shapes);
+        } catch (RuntimeException | Error e) {
+            ivalue.close();
+            throw e;
+        }
     }
 
     /** {@inheritDoc} */

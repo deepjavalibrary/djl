@@ -12,15 +12,20 @@
  */
 package ai.djl.pytorch.jni;
 
+import ai.djl.Device;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.pytorch.engine.PtDeviceType;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.util.NativeResource;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,6 +34,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>DJL doesn't support creating nested IValue.
  */
 public class IValue extends NativeResource<Long> {
+
+    // keeps the source buffers reachable while native tensors point into them
+    private Object bufferRef;
 
     IValue(long handle) {
         super(handle);
@@ -305,6 +313,80 @@ public class IValue extends NativeResource<Long> {
     }
 
     /**
+     * Creates a new {@code IValue} of type {@code Dict[str, Tensor]} directly from direct buffers
+     * in a single JNI call. On CPU nothing is copied: the tensors point into the caller's buffers.
+     * The buffers are kept reachable until this {@code IValue} is closed.
+     *
+     * <p>Values derived from the dictionary ({@link #toIValueMap()}, {@link
+     * #toTensor(PtNDManager)}, model outputs that alias an input, results of {@code
+     * PtSymbolBlock.forward(IValue...)}) share that memory and do NOT keep it alive. They must not
+     * be used after this {@code IValue} (or the carrier owning it) is closed, unless the caller
+     * keeps the buffers reachable.
+     *
+     * <p>{@link ByteBuffer#slice()} returns a BIG_ENDIAN view regardless of its parent, so callers
+     * must call {@code .order(ByteOrder.nativeOrder())} on each slice before writing, otherwise the
+     * values are silently wrong.
+     *
+     * <p>The {@code position} and {@code limit} of the buffers are ignored: data is read from the
+     * buffer's start address (the slice start for slices), and the capacity must cover the shape.
+     *
+     * @param keys the dictionary keys, must be non-null and unique
+     * @param buffers the direct buffers holding the tensor data
+     * @param shapes the shape of each tensor
+     * @param dtypes the data type of each tensor
+     * @return a new {@code IValue} of type {@code Dict[str, Tensor]}
+     * @throws IllegalArgumentException if the arguments are invalid
+     * @throws ai.djl.engine.EngineException if the native check fails, e.g. a buffer is too small
+     */
+    public static IValue stringMapFrom(
+            String[] keys, ByteBuffer[] buffers, long[][] shapes, DataType[] dtypes) {
+        int n = keys.length;
+        if (n == 0) {
+            throw new IllegalArgumentException("At least one entry is required");
+        }
+        if (buffers.length != n || shapes.length != n || dtypes.length != n) {
+            throw new IllegalArgumentException("keys, buffers, shapes and dtypes must match");
+        }
+        Set<String> seen = new HashSet<>();
+        int[] dtypeOrdinals = new int[n];
+        for (int i = 0; i < n; ++i) {
+            if (keys[i] == null) {
+                throw new IllegalArgumentException("Null key at index " + i);
+            }
+            if (!seen.add(keys[i])) {
+                throw new IllegalArgumentException("Duplicate key: " + keys[i]);
+            }
+            if (buffers[i] == null || !buffers[i].isDirect()) {
+                throw new IllegalArgumentException("A direct ByteBuffer is required: " + keys[i]);
+            }
+            if (shapes[i] == null) {
+                throw new IllegalArgumentException("Null shape for key: " + keys[i]);
+            }
+            for (long dim : shapes[i]) {
+                if (dim < 0) {
+                    throw new IllegalArgumentException("Invalid shape for key: " + keys[i]);
+                }
+            }
+            if (dtypes[i] == DataType.COMPLEX64) {
+                throw new IllegalArgumentException(
+                        "COMPLEX64 is not supported yet (see #3927) for key: " + keys[i]);
+            }
+            if (dtypes[i] == null || dtypes[i].ordinal() > DataType.BOOLEAN.ordinal()) {
+                throw new IllegalArgumentException(
+                        "Unsupported data type " + dtypes[i] + " for key: " + keys[i]);
+            }
+            dtypeOrdinals[i] = dtypes[i].ordinal();
+        }
+        int[] device = {PtDeviceType.toDeviceType(Device.cpu()), -1};
+        long handle =
+                PyTorchLibrary.LIB.iValueFromStringMapBlobs(
+                        keys, buffers, shapes, dtypeOrdinals, device);
+        IValue ret = new IValue(handle);
+        ret.bufferRef = buffers.clone();
+        return ret;
+    }
+
+    /**
      * Creates a new {@code IValue} of type {@code Map[String, IValue]}.
      *
      * @param map the Map[String, IValue] value
@@ -507,5 +589,6 @@ public class IValue extends NativeResource<Long> {
         if (pointer != null) {
             PyTorchLibrary.LIB.torchDeleteIValue(pointer);
         }
+        bufferRef = null;
     }
 }
