@@ -176,6 +176,45 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromStringM
   API_END_RETURN()
 }
 
+JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromStringMapBlobs(JNIEnv* env, jobject jthis,
+    jobjectArray jkeys, jobjectArray jbuffers, jobjectArray jshapes, jintArray jdtypes, jintArray jdevice) {
+  API_BEGIN()
+  const auto len = static_cast<size_t>(env->GetArrayLength(jkeys));
+  const auto device = utils::GetDeviceFromJDevice(env, jdevice);
+  jint* jdtype_ptr = env->GetIntArrayElements(jdtypes, JNI_FALSE);
+  const std::vector<jint> dtypes(jdtype_ptr, jdtype_ptr + len);
+  env->ReleaseIntArrayElements(jdtypes, jdtype_ptr, JNI_ABORT);
+  torch::Dict<std::string, torch::Tensor> dict;
+  dict.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    auto jkey = (jstring) env->GetObjectArrayElement(jkeys, i);
+    auto jbuffer = env->GetObjectArrayElement(jbuffers, i);
+    auto jshape = (jlongArray) env->GetObjectArrayElement(jshapes, i);
+    std::string key = djl::utils::jni::GetStringFromJString(env, jkey);
+    const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
+    TORCH_CHECK(dtypes[i] >= 0 && dtypes[i] <= 8, "Unsupported data type: ", dtypes[i]);
+    const auto options = torch::TensorOptions().dtype(utils::GetScalarTypeFromDType(dtypes[i]));
+    void* address = nullptr;
+    if (utils::GetTensorByteSize(shape_vec, options.dtype().itemsize()) == 0) {
+      // empty tensors don't need backing memory
+      TORCH_CHECK(jbuffer != nullptr, "Expected a direct ByteBuffer");
+    } else {
+      address = utils::GetValidatedDirectBufferAddress(env, jbuffer, shape_vec, options.dtype().itemsize());
+    }
+    torch::Tensor tensor = torch::from_blob(address, shape_vec, options);
+    if (!device.is_cpu()) {
+      tensor = tensor.to(device);
+    }
+    dict.insert(key, tensor);
+    env->DeleteLocalRef(jkey);
+    env->DeleteLocalRef(jbuffer);
+    env->DeleteLocalRef(jshape);
+  }
+  const auto* ivalue_ptr = new torch::IValue(dict);
+  return reinterpret_cast<uintptr_t>(ivalue_ptr);
+  API_END_RETURN()
+}
+
 JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromStringIValueMap(
     JNIEnv* env, jobject jthis, jobjectArray jkeys, jlongArray jvalues) {
   API_BEGIN()
