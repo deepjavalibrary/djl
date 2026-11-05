@@ -25,7 +25,6 @@ import ai.djl.util.PairList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +114,7 @@ public final class IValueUtils {
     static Pair<IValue[], String> getInputs(NDList ndList) {
         List<PairList<String, PtNDArray>> outputs = new ArrayList<>();
         Map<String, Integer> indexMap = new ConcurrentHashMap<>();
-        Map<Integer, IValue> carriers = new HashMap<>();
+        Map<Integer, IValue> carriers = new ConcurrentHashMap<>();
         String methodName = "forward";
         for (NDArray array : ndList) {
             if (array instanceof PtIValueNDArray) {

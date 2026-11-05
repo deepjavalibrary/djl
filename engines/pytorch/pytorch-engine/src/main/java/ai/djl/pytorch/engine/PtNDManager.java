@@ -79,6 +79,12 @@ public class PtNDManager extends BaseNDManager {
                 this, buf, shape, dataType, SparseFormat.DENSE, device);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public NDArray create(String[] data, Charset charset, Shape shape) {
+        return new PtNDArray(this, data, shape);
+    }
+
     /**
      * Creates a carrier holding a {@code Dict[str, Tensor]} built from direct buffers in one JNI
      * call.
@@ -94,12 +100,6 @@ public class PtNDManager extends BaseNDManager {
             String name, String[] keys, ByteBuffer[] buffers, long[][] shapes, DataType[] dtypes) {
         IValue ivalue = IValue.stringMapFrom(keys, buffers, shapes, dtypes);
         return new PtIValueNDArray(this, name, ivalue, keys, shapes);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NDArray create(String[] data, Charset charset, Shape shape) {
-        return new PtNDArray(this, data, shape);
     }
 
     /** {@inheritDoc} */
