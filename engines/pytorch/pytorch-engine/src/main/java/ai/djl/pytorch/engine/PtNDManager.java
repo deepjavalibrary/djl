@@ -20,6 +20,7 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
+import ai.djl.pytorch.jni.IValue;
 import ai.djl.pytorch.jni.JniUtils;
 
 import java.nio.Buffer;
@@ -76,6 +77,23 @@ public class PtNDManager extends BaseNDManager {
         copyBuffer(data, buf);
         return JniUtils.createNdFromByteBuffer(
                 this, buf, shape, dataType, SparseFormat.DENSE, device);
+    }
+
+    /**
+     * Creates a carrier holding a {@code Dict[str, Tensor]} built from direct buffers in one JNI
+     * call.
+     *
+     * @param name the name of the carrier
+     * @param keys the dictionary keys
+     * @param buffers the direct buffers, one per key
+     * @param shapes the tensor shapes, one per key
+     * @param dtypes the tensor data types, one per key
+     * @return the carrier array
+     */
+    public PtIValueNDArray createStringMap(
+            String name, String[] keys, ByteBuffer[] buffers, long[][] shapes, DataType[] dtypes) {
+        IValue ivalue = IValue.stringMapFrom(keys, buffers, shapes, dtypes);
+        return new PtIValueNDArray(this, name, ivalue, keys, shapes);
     }
 
     /** {@inheritDoc} */
