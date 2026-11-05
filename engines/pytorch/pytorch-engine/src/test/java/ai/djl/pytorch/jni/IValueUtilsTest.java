@@ -200,14 +200,12 @@ public class IValueUtilsTest {
 
     private static PtIValueNDArray carrier(PtNDManager manager, String name) {
         ByteBuffer buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
-        PtIValueNDArray c =
-                manager.createStringMap(
-                        name,
-                        new String[] {"a"},
-                        new ByteBuffer[] {buf},
-                        new long[][] {{2}},
-                        new DataType[] {DataType.FLOAT32});
-        return c;
+        return manager.createStringMap(
+                name,
+                new String[] {"a"},
+                new ByteBuffer[] {buf},
+                new long[][] {{2}},
+                new DataType[] {DataType.FLOAT32});
     }
 
     @Test

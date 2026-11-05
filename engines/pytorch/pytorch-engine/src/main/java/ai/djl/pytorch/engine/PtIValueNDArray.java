@@ -15,6 +15,7 @@ package ai.djl.pytorch.engine;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrayAdapter;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.NDScope;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.pytorch.jni.IValue;
@@ -25,7 +26,17 @@ import java.util.Arrays;
 /**
  * A special {@link NDArray} that carries a prebuilt {@code Dict[str, Tensor]} {@link IValue}.
  *
- * <p>It is only a transport for model inputs. It does not support any tensor operation.
+ * <p>It is only a transport for model inputs. It does not support any tensor operation. Use it with
+ * a {@code NoBatchifyTranslator}: there is no {@code Batchifier} support.
+ *
+ * <p>{@code NDList.toString()} and {@code NDList.getShapes()} throw on a list containing a carrier,
+ * because the api module calls {@code getShape} and {@code getDataType}. Reusing a carrier across
+ * predicts reuses the same TorchScript dict, so a model that mutates its input dict affects later
+ * calls.
+ *
+ * <p>On CPU the tensors point into the caller's buffers; see {@link IValue#stringMapFrom(String[],
+ * ByteBuffer[], long[][], DataType[])} for lifetime, byte order, and position/limit rules. Values
+ * derived from the dict must not be used after the carrier is closed.
  */
 public final class PtIValueNDArray extends NDArrayAdapter {
 
@@ -41,15 +52,28 @@ public final class PtIValueNDArray extends NDArrayAdapter {
      * @param ivalue the dictionary {@link IValue}
      * @param keys the dictionary keys
      * @param shapes the tensor shape for each key
+     * @throws IllegalArgumentException if the name is null or empty, or shapes and keys differ in
+     *     length
      */
+    @SuppressWarnings("this-escape")
     public PtIValueNDArray(
             PtNDManager manager, String name, IValue ivalue, String[] keys, long[][] shapes) {
         super(manager, null, null, DataType.UNKNOWN, NDManager.nextUid());
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("name must be non-null and non-empty");
+        }
+        if (shapes.length != keys.length) {
+            throw new IllegalArgumentException("shapes and keys must have the same length");
+        }
         setName(name);
         this.ivalue = ivalue;
         this.keys = keys.clone();
-        this.shapes = shapes.clone();
+        this.shapes = new long[shapes.length][];
+        for (int i = 0; i < shapes.length; ++i) {
+            this.shapes[i] = shapes[i].clone();
+        }
         manager.attachInternal(getUid(), this);
+        NDScope.register(this);
     }
 
     /**
@@ -134,6 +158,18 @@ public final class PtIValueNDArray extends NDArrayAdapter {
     public void close() {
         super.close();
         ivalue.close();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object o) {
+        return this == o;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return System.identityHashCode(this);
     }
 
     /** {@inheritDoc} */

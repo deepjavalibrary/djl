@@ -16,6 +16,7 @@ import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.pytorch.jni.IValue;
 import ai.djl.testing.TestRequirements;
 
 import org.testng.Assert;
@@ -114,10 +115,70 @@ public class PtIValueNDArrayTest {
         TestRequirements.notMacX86();
         try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager("PyTorch")) {
             String str = carrier(manager).toString();
-            Assert.assertTrue(str.contains("input"), str);
+            Assert.assertTrue(str.contains("name=input"), str);
             for (String key : KEYS) {
                 Assert.assertTrue(str.contains(key), str);
             }
         }
+    }
+
+    @Test
+    public void testIdentityEqualsAndHashCode() {
+        TestRequirements.notMacX86();
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager("PyTorch")) {
+            PtIValueNDArray c1 = carrier(manager);
+            PtIValueNDArray c2 = carrier(manager);
+            Assert.assertTrue(c1.equals(c1));
+            Assert.assertFalse(c1.equals(c2));
+            Assert.assertFalse(c1.equals(null));
+            Assert.assertEquals(c1.hashCode(), c1.hashCode());
+            Assert.assertEquals(c1.hashCode(), System.identityHashCode(c1));
+        }
+    }
+
+    @Test
+    public void testShapesKeysLengthMismatch() {
+        TestRequirements.notMacX86();
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager("PyTorch");
+                IValue iv =
+                        IValue.stringMapFrom(
+                                new String[] {"a"},
+                                new ByteBuffer[] {ByteBuffer.allocateDirect(8)},
+                                new long[][] {{2}},
+                                new DataType[] {DataType.FLOAT32})) {
+            Assert.assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            new PtIValueNDArray(
+                                    manager, "input", iv, new String[] {"a"}, new long[][] {}));
+        }
+    }
+
+    @Test
+    public void testNullOrEmptyName() {
+        TestRequirements.notMacX86();
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager("PyTorch")) {
+            ByteBuffer buf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
+            for (String name : new String[] {null, ""}) {
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () ->
+                                manager.createStringMap(
+                                        name,
+                                        new String[] {"a"},
+                                        new ByteBuffer[] {buf},
+                                        new long[][] {{2}},
+                                        new DataType[] {DataType.FLOAT32}));
+            }
+        }
+    }
+
+    @Test
+    public void testCreateOnClosedManagerThrows() {
+        TestRequirements.notMacX86();
+        PtNDManager manager = (PtNDManager) NDManager.newBaseManager("PyTorch");
+        manager.close();
+        // best effort: the IValue built before the failure must be closed, not leaked
+        Assert.assertThrows(IllegalStateException.class, () -> carrier(manager));
     }
 }

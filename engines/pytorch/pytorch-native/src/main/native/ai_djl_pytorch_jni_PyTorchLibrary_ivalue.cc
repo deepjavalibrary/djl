@@ -180,6 +180,9 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromStringM
     jobjectArray jkeys, jobjectArray jbuffers, jobjectArray jshapes, jintArray jdtypes, jintArray jdevice) {
   API_BEGIN()
   const auto len = static_cast<size_t>(env->GetArrayLength(jkeys));
+  TORCH_CHECK(static_cast<size_t>(env->GetArrayLength(jbuffers)) == len, "buffers length must equal keys length");
+  TORCH_CHECK(static_cast<size_t>(env->GetArrayLength(jshapes)) == len, "shapes length must equal keys length");
+  TORCH_CHECK(static_cast<size_t>(env->GetArrayLength(jdtypes)) == len, "dtypes length must equal keys length");
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
   jint* jdtype_ptr = env->GetIntArrayElements(jdtypes, JNI_FALSE);
   const std::vector<jint> dtypes(jdtype_ptr, jdtype_ptr + len);

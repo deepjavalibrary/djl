@@ -95,11 +95,23 @@ public class PtNDManager extends BaseNDManager {
      * @param shapes the tensor shapes, one per key
      * @param dtypes the tensor data types, one per key
      * @return the carrier array
+     * @throws IllegalArgumentException if the arguments are invalid or the name is null or empty
+     * @throws ai.djl.engine.EngineException if the native check fails, e.g. a buffer is too small
+     * @see IValue#stringMapFrom(String[], ByteBuffer[], long[][], DataType[]) for the buffer
+     *     lifetime, byte order, and position/limit rules
      */
     public PtIValueNDArray createStringMap(
             String name, String[] keys, ByteBuffer[] buffers, long[][] shapes, DataType[] dtypes) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("name must be non-null and non-empty");
+        }
         IValue ivalue = IValue.stringMapFrom(keys, buffers, shapes, dtypes);
-        return new PtIValueNDArray(this, name, ivalue, keys, shapes);
+        try {
+            return new PtIValueNDArray(this, name, ivalue, keys, shapes);
+        } catch (RuntimeException | Error e) {
+            ivalue.close();
+            throw e;
+        }
     }
 
     /** {@inheritDoc} */

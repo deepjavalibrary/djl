@@ -132,6 +132,12 @@ public class TorchScriptTest {
                 NDList output = predictor.predict(new NDList(carrier));
                 Assert.assertEquals(output.singletonOrThrow(), expected);
             }
+            NDArray plain = manager.ones(new Shape(2, 2));
+            plain.setName("input1.input");
+            NDList plainOutput = predictor.predict(new NDList(plain));
+            Assert.assertEquals(plainOutput.singletonOrThrow(), expected);
+            NDList carrierOutput = predictor.predict(new NDList(carrier));
+            Assert.assertEquals(carrierOutput.singletonOrThrow(), plainOutput.singletonOrThrow());
 
             PairList<String, Shape> desc = ((PtSymbolBlock) model.getBlock()).describeInput();
             Assert.assertEquals(desc.size(), 1);

@@ -118,6 +118,7 @@ public class IValueStringMapBlobsTest {
     private static WeakReference<ByteBuffer> createMap(IValue[] out) {
         ByteBuffer parent = direct(16);
         ByteBuffer s = slice(parent, 0, 16);
+        s.asFloatBuffer().put(new float[] {1f, 2f, 3f, 4f});
         out[0] =
                 IValue.stringMapFrom(
                         new String[] {"a"},
@@ -136,6 +137,17 @@ public class IValueStringMapBlobsTest {
             System.gc();
         }
         Assert.assertNotNull(ref.get());
+        try (NDManager manager = NDManager.newBaseManager()) {
+            Map<String, IValue> values = holder[0].toIValueMap();
+            try {
+                PtNDArray a = values.get("a").toTensor((PtNDManager) manager);
+                Assert.assertEquals(a.toFloatArray(), new float[] {1f, 2f, 3f, 4f});
+            } finally {
+                for (IValue v : values.values()) {
+                    v.close();
+                }
+            }
+        }
         holder[0].close();
         Assert.assertThrows(IllegalStateException.class, () -> holder[0].getHandle());
     }
@@ -182,7 +194,10 @@ public class IValueStringMapBlobsTest {
                 IllegalArgumentException.class,
                 () -> IValue.stringMapFrom(k1, new ByteBuffer[] {ByteBuffer.allocate(16)}, s1, d1));
         // unsupported dtypes
-        for (DataType dt : new DataType[] {DataType.UNKNOWN, DataType.STRING, DataType.BFLOAT16}) {
+        for (DataType dt :
+                new DataType[] {
+                    DataType.UNKNOWN, DataType.STRING, DataType.BFLOAT16, DataType.COMPLEX64
+                }) {
             Assert.assertThrows(
                     IllegalArgumentException.class,
                     () -> IValue.stringMapFrom(k1, b1, s1, new DataType[] {dt}));
@@ -208,5 +223,40 @@ public class IValueStringMapBlobsTest {
                                         new long[][] {{4}},
                                         new DataType[] {DataType.FLOAT32}));
         Assert.assertTrue(e.getMessage().contains("Buffer is too small"), e.getMessage());
+    }
+
+    @Test
+    public void testNativeArrayLengthMismatch() {
+        TestRequirements.notMacX86();
+        ByteBuffer buf = direct(16);
+        int[] device = {0, -1};
+        // bypasses the Java validation: native must reject arrays shorter than keys
+        Assert.assertThrows(
+                EngineException.class,
+                () ->
+                        PyTorchLibrary.LIB.iValueFromStringMapBlobs(
+                                new String[] {"a", "b"},
+                                new ByteBuffer[] {buf},
+                                new long[][] {{2}, {2}},
+                                new int[] {0, 0},
+                                device));
+        Assert.assertThrows(
+                EngineException.class,
+                () ->
+                        PyTorchLibrary.LIB.iValueFromStringMapBlobs(
+                                new String[] {"a", "b"},
+                                new ByteBuffer[] {buf, buf},
+                                new long[][] {{2}},
+                                new int[] {0, 0},
+                                device));
+        Assert.assertThrows(
+                EngineException.class,
+                () ->
+                        PyTorchLibrary.LIB.iValueFromStringMapBlobs(
+                                new String[] {"a", "b"},
+                                new ByteBuffer[] {buf, buf},
+                                new long[][] {{2}, {2}},
+                                new int[] {0},
+                                device));
     }
 }
