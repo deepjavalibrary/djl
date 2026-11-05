@@ -58,6 +58,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     private int stride;
     private int padToMultipleOf;
     private int modelMaxLength;
+    private boolean modelMaxLengthUnknown;
     private boolean cleanupTokenizationSpaces;
     private boolean stripAccents;
     private boolean addPrefixSpace;
@@ -108,6 +109,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     private void applyConfig(TokenizerConfig config, Map<String, String> options) {
         if (options != null && !options.containsKey("modelMaxLength")) {
             this.modelMaxLength = config.getModelMaxLength();
+            this.modelMaxLengthUnknown = config.isModelMaxLengthUnknown();
         }
         this.cleanupTokenizationSpaces = config.isCleanUpTokenizationSpaces();
         if (options != null && !options.containsKey("addSpecialTokens")) {
@@ -691,6 +693,16 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
      * See: https://huggingface.co/docs/transformers/pad_truncation
      */
     private void updateTruncationAndPadding(PadTokenResolver.PadInfo padInfo) {
+        if (modelMaxLengthUnknown && maxLength == -1) {
+            if (truncation != TruncationStrategy.DO_NOT_TRUNCATE) {
+                logger.warn("No maxLength is specified for this tokenizer, disabling truncation");
+                truncation = TruncationStrategy.DO_NOT_TRUNCATE;
+            }
+            if (padding == PaddingStrategy.MAX_LENGTH) {
+                logger.warn("No maxLength is specified for this tokenizer, disabling padding");
+                padding = PaddingStrategy.DO_NOT_PAD;
+            }
+        }
         boolean isTruncate = truncation != TruncationStrategy.DO_NOT_TRUNCATE;
         if (padding == PaddingStrategy.MAX_LENGTH || isTruncate) {
             if (maxLength == -1) {
@@ -698,7 +710,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
                         "maxLength is not explicitly specified, use modelMaxLength: {}",
                         modelMaxLength);
                 maxLength = modelMaxLength;
-            } else if (maxLength > modelMaxLength) {
+            } else if (!modelMaxLengthUnknown && maxLength > modelMaxLength) {
                 logger.warn(
                         "maxLength is greater then modelMaxLength, change to: {}", modelMaxLength);
                 maxLength = modelMaxLength;
@@ -708,7 +720,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
                 int remainder = maxLength % padToMultipleOf;
                 if (remainder != 0) {
                     int newMaxLength = maxLength + padToMultipleOf - maxLength % padToMultipleOf;
-                    if (newMaxLength > modelMaxLength) {
+                    if (!modelMaxLengthUnknown && newMaxLength > modelMaxLength) {
                         newMaxLength -= padToMultipleOf;
                     }
                     logger.warn(
