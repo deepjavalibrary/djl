@@ -36,6 +36,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class HuggingFaceTokenizerTest {
 
+    private static final Path TOKENIZER_WITH_NULL_PADDING_PATH =
+            Paths.get("src/test/resources/fake-tokenizer-with-null-padding");
+
+    private static final String UNKNOWN_MODEL_MAX_LENGTH_CONFIG =
+            "src/test/resources/unknown-model-max-length/tokenizer_config.json";
+
     @Test
     public void testVersion() {
         try (HuggingFaceTokenizer tokenizer = HuggingFaceTokenizer.newInstance("bert-base-cased")) {
@@ -593,10 +599,11 @@ public class HuggingFaceTokenizerTest {
     public void testConfigParameters() throws IOException {
         try (HuggingFaceTokenizer tokenizer =
                 HuggingFaceTokenizer.builder()
-                        .optTokenizerPath(
-                                Paths.get("src/test/resources/fake-tokenizer-with-null-padding/"))
+                        .optTokenizerPath(TOKENIZER_WITH_NULL_PADDING_PATH)
                         .optTokenizerConfigPath(
-                                "src/test/resources/fake-tokenizer-with-null-padding/tokenizer_config.json")
+                                TOKENIZER_WITH_NULL_PADDING_PATH
+                                        .resolve("tokenizer_config.json")
+                                        .toString())
                         .build()) {
             String input = "Hello World";
             Encoding encoding = tokenizer.encode(input); // with special tokens
@@ -653,10 +660,11 @@ public class HuggingFaceTokenizerTest {
                 HuggingFaceTokenizer.builder()
                         .optMaxLength(48)
                         .optAddSpecialTokens(false)
-                        .optTokenizerPath(
-                                Paths.get("src/test/resources/fake-tokenizer-with-null-padding/"))
+                        .optTokenizerPath(TOKENIZER_WITH_NULL_PADDING_PATH)
                         .optTokenizerConfigPath(
-                                "src/test/resources/fake-tokenizer-with-null-padding/tokenizer_config.json")
+                                TOKENIZER_WITH_NULL_PADDING_PATH
+                                        .resolve("tokenizer_config.json")
+                                        .toString())
                         .build()) {
             String input = "Hello World";
             Encoding encoding = tokenizer.encode(input); // with special tokens
@@ -693,11 +701,83 @@ public class HuggingFaceTokenizerTest {
     }
 
     @Test
+    public void testUnknownModelMaxLengthOptions() throws IOException {
+        List<Map<String, String>> options =
+                Arrays.asList(
+                        Map.of("maxLength", "600", "padding", "max_length"),
+                        Map.of("modelMaxLength", "16", "padding", "max_length"),
+                        Map.of("maxLength", "32", "modelMaxLength", "16", "padding", "max_length"),
+                        Map.of("maxLength", "6", "padToMultipleOf", "4", "padding", "max_length"));
+        int[] expectedMaxLengths = {600, 16, 16, 8};
+        String longInput = String.join(" ", Collections.nCopies(640, "test"));
+        for (int i = 0; i < options.size(); ++i) {
+            int expectedMaxLength = expectedMaxLengths[i];
+            try (HuggingFaceTokenizer tokenizer =
+                    HuggingFaceTokenizer.newInstance(
+                            TOKENIZER_WITH_NULL_PADDING_PATH,
+                            UNKNOWN_MODEL_MAX_LENGTH_CONFIG,
+                            options.get(i))) {
+                Assert.assertEquals(tokenizer.getMaxLength(), expectedMaxLength);
+                Assert.assertEquals(
+                        tokenizer.encode("test sentence").getIds().length, expectedMaxLength);
+                Assert.assertEquals(tokenizer.encode(longInput).getIds().length, expectedMaxLength);
+            }
+        }
+    }
+
+    @Test
+    public void testUnknownModelMaxLengthWithoutMaxLength() throws IOException {
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.newInstance(
+                        TOKENIZER_WITH_NULL_PADDING_PATH,
+                        UNKNOWN_MODEL_MAX_LENGTH_CONFIG,
+                        Map.of())) {
+            Assert.assertEquals(tokenizer.getTruncation(), "DO_NOT_TRUNCATE");
+            Assert.assertEquals(tokenizer.getPadding(), "LONGEST");
+            String longInput = String.join(" ", Collections.nCopies(640, "test"));
+            Assert.assertTrue(
+                    tokenizer.encode(longInput).getIds().length
+                            > TokenizerConfig.DEFAULT_MAX_LENGTH);
+            Encoding[] encodings = tokenizer.batchEncode(new String[] {"test", "test sentence"});
+            Assert.assertEquals(encodings[0].getIds(), new long[] {0, 3, 6, 2, 1});
+            Assert.assertEquals(encodings[1].getIds(), new long[] {0, 3, 6, 7, 2});
+        }
+    }
+
+    @Test
+    public void testUnknownModelMaxLengthPaddingWithoutMaxLength() throws IOException {
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.newInstance(
+                        TOKENIZER_WITH_NULL_PADDING_PATH,
+                        UNKNOWN_MODEL_MAX_LENGTH_CONFIG,
+                        Map.of("padding", "max_length"))) {
+            Assert.assertEquals(tokenizer.getTruncation(), "DO_NOT_TRUNCATE");
+            Assert.assertEquals(tokenizer.getPadding(), "DO_NOT_PAD");
+            Assert.assertEquals(
+                    tokenizer.encode("test sentence").getIds(), new long[] {0, 3, 6, 7, 2});
+        }
+    }
+
+    @Test
+    public void testUnknownModelMaxLengthWithPresetLength() throws IOException {
+        Path presetLengthTokenizerPath =
+                Paths.get("src/test/resources/fake-tokenizer-with-padding");
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.newInstance(
+                        presetLengthTokenizerPath,
+                        UNKNOWN_MODEL_MAX_LENGTH_CONFIG,
+                        Map.of("padding", "max_length"))) {
+            Assert.assertEquals(tokenizer.getMaxLength(), 64);
+            Assert.assertEquals(tokenizer.encode("Hello World").getIds().length, 64);
+        }
+    }
+
+    @Test
     public void testBuilderWithModelPath() throws IOException {
         if (Utils.isFileOutsideModelDirAllowed()) {
             throw new SkipException("Files outside the model directory are allowed");
         }
-        Path modelDir = Paths.get("src/test/resources/fake-tokenizer-with-null-padding");
+        Path modelDir = TOKENIZER_WITH_NULL_PADDING_PATH;
         // The tokenizer defaults to the model directory, and relative paths are resolved in it
         // rather than in the working directory.
         Map<String, String> arguments = new ConcurrentHashMap<>();
