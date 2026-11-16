@@ -12,6 +12,8 @@
  */
 #include "djl_pytorch_jni_log.h"
 
+#include <djl/utils.h>
+
 #include "ai_djl_pytorch_jni_cache.h"
 
 static inline jobject get_log_object(JNIEnv* env) { return env->GetStaticObjectField(JNI_UTILS_CLASS, LOGGER_FIELD); }
@@ -19,13 +21,19 @@ static inline jobject get_log_object(JNIEnv* env) { return env->GetStaticObjectF
 Log::Log(JNIEnv* env) : env(env), logger(get_log_object(env)) {}
 
 void Log::info(const std::string& message) {
-  env->CallVoidMethod(logger, INFO_METHOD, env->NewStringUTF(message.c_str()));
+  jstring jmessage = djl::utils::jni::GetJStringFromString(env, message);
+  env->CallVoidMethod(logger, INFO_METHOD, jmessage);
+  env->DeleteLocalRef(jmessage);
 }
 
 void Log::debug(const std::string& message) {
-  env->CallVoidMethod(logger, DEBUG_METHOD, env->NewStringUTF(message.c_str()));
+  jstring jmessage = djl::utils::jni::GetJStringFromString(env, message);
+  env->CallVoidMethod(logger, DEBUG_METHOD, jmessage);
+  env->DeleteLocalRef(jmessage);
 }
 
 void Log::error(const std::string& message) {
-  env->CallVoidMethod(logger, ERROR_METHOD, env->NewStringUTF(message.c_str()));
+  jstring jmessage = djl::utils::jni::GetJStringFromString(env, message);
+  env->CallVoidMethod(logger, ERROR_METHOD, jmessage);
+  env->DeleteLocalRef(jmessage);
 }
