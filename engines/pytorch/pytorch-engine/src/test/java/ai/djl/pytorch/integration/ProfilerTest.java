@@ -14,6 +14,7 @@
 package ai.djl.pytorch.integration;
 
 import ai.djl.Application;
+import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -58,6 +59,7 @@ public class ProfilerTest {
                     Criteria.builder()
                             .setTypes(Image.class, Classifications.class)
                             .optApplication(Application.CV.IMAGE_CLASSIFICATION)
+                            .optDevice(Device.cpu()) // MPS doesn't support float64 (by profiler)
                             .optFilter("layers", "18")
                             .optTranslator(translator)
                             .optProgress(new ProgressBar())
