@@ -50,7 +50,7 @@ public class RandomSampler implements Sampler.SubSampler {
             // java array didn't support index greater than max integer
             // so cast to int for now
             for (int i = Math.toIntExact(size) - 1; i > 0; --i) {
-                swap(indices, i, RandomUtils.nextInt(i));
+                swap(indices, i, RandomUtils.nextInt(i + 1));
             }
         }
 
