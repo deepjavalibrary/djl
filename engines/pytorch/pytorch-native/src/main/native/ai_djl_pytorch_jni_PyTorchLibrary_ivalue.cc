@@ -167,6 +167,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromStringM
   for (size_t i = 0; i < len; ++i) {
     auto jname = (jstring) env->GetObjectArrayElement(jkeys, i);
     std::string name = djl::utils::jni::GetStringFromJString(env, jname);
+    env->DeleteLocalRef(jname);
     dict.insert(name, *reinterpret_cast<torch::Tensor*>(jptrs[i]));
   }
   env->ReleaseLongArrayElements(jvalues, jptrs, JNI_ABORT);
@@ -182,6 +183,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromStringI
   auto len = static_cast<size_t>(env->GetArrayLength(jvalues));
   jlong* jptrs = env->GetLongArrayElements(jvalues, JNI_FALSE);
   if (len == 0) {
+    env->ReleaseLongArrayElements(jvalues, jptrs, JNI_ABORT);
     const auto* ivalue_ptr = new torch::IValue{c10::impl::GenericDict(c10::StringType::get(), c10::TensorType::get())};
     return reinterpret_cast<uintptr_t>(ivalue_ptr);
   }
@@ -191,6 +193,7 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_iValueFromStringI
   for (size_t i = 0; i < len; ++i) {
     auto jname = (jstring) env->GetObjectArrayElement(jkeys, i);
     std::string name = djl::utils::jni::GetStringFromJString(env, jname);
+    env->DeleteLocalRef(jname);
     dict.insert(name, *reinterpret_cast<torch::IValue*>(jptrs[i]));
   }
   env->ReleaseLongArrayElements(jvalues, jptrs, JNI_ABORT);

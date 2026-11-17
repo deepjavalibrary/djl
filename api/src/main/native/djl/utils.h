@@ -34,10 +34,15 @@ inline std::string GetStringFromJString(JNIEnv* env, jstring jstr) {
   // TODO: cache reflection to improve performance
   const jclass string_class = env->GetObjectClass(jstr);
   const jmethodID getbytes_method = env->GetMethodID(string_class, "getBytes", "(Ljava/lang/String;)[B");
+  env->DeleteLocalRef(string_class);
 
   const jstring charset = env->NewStringUTF("UTF-8");
   const jbyteArray jbytes = (jbyteArray) env->CallObjectMethod(jstr, getbytes_method, charset);
   env->DeleteLocalRef(charset);
+  if (env->ExceptionCheck()) {
+    // leave the exception pending, it is thrown when the native method returns
+    return std::string();
+  }
 
   const jsize length = env->GetArrayLength(jbytes);
   jbyte* c_str = env->GetByteArrayElements(jbytes, NULL);
@@ -104,8 +109,9 @@ inline std::vector<std::string> GetVecFromJStringArray(JNIEnv* env, jobjectArray
   jsize len = env->GetArrayLength(array);
   vec.reserve(len);
   for (int i = 0; i < len; ++i) {
-    vec.emplace_back(djl::utils::jni::GetStringFromJString(
-            env, (jstring) env->GetObjectArrayElement(array, i)));
+    auto jstr = (jstring) env->GetObjectArrayElement(array, i);
+    vec.emplace_back(djl::utils::jni::GetStringFromJString(env, jstr));
+    env->DeleteLocalRef(jstr);
   }
   return std::move(vec);
 }
