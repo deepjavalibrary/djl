@@ -107,7 +107,7 @@ public final class HuggingFaceTokenizer extends NativeResource<Long> implements 
     }
 
     private void applyConfig(TokenizerConfig config, Map<String, String> options) {
-        if (options != null && !options.containsKey("modelMaxLength")) {
+        if (options == null || !options.containsKey("modelMaxLength")) {
             this.modelMaxLength = config.getModelMaxLength();
             this.modelMaxLengthUnknown = config.isModelMaxLengthUnknown();
         }

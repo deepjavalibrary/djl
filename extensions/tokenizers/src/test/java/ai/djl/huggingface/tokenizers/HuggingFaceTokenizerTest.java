@@ -773,6 +773,27 @@ public class HuggingFaceTokenizerTest {
     }
 
     @Test
+    public void testModelMaxLengthFromConfigWithNullOptions() throws IOException {
+        String configPath =
+                TOKENIZER_WITH_NULL_PADDING_PATH.resolve("tokenizer_config.json").toString();
+        String longInput = String.join(" ", Collections.nCopies(640, "test"));
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.newInstance(
+                        TOKENIZER_WITH_NULL_PADDING_PATH, configPath, null)) {
+            Assert.assertEquals(tokenizer.getMaxLength(), 256);
+            Assert.assertEquals(tokenizer.encode(longInput).getIds().length, 256);
+        }
+        try (HuggingFaceTokenizer tokenizer =
+                HuggingFaceTokenizer.newInstance(
+                        TOKENIZER_WITH_NULL_PADDING_PATH, UNKNOWN_MODEL_MAX_LENGTH_CONFIG, null)) {
+            Assert.assertEquals(tokenizer.getTruncation(), "DO_NOT_TRUNCATE");
+            Assert.assertTrue(
+                    tokenizer.encode(longInput).getIds().length
+                            > TokenizerConfig.DEFAULT_MAX_LENGTH);
+        }
+    }
+
+    @Test
     public void testBuilderWithModelPath() throws IOException {
         if (Utils.isFileOutsideModelDirAllowed()) {
             throw new SkipException("Files outside the model directory are allowed");
