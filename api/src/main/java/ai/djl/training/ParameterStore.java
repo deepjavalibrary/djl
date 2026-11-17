@@ -19,9 +19,6 @@ import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.nn.Parameter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -81,7 +78,7 @@ public class ParameterStore {
             String parameterId = entry.getKey();
             ParameterData data = entry.getValue();
             if (data.requireGradient()) {
-                NDArray[] params = data.toArray();
+                NDArray[] params = data.mirrors.clone();
                 parameterServer.update(parameterId, params);
             }
         }
@@ -100,49 +97,11 @@ public class ParameterStore {
         if (parameter == null) {
             return null;
         }
-        String parameterId = parameter.getId();
         int index = deviceMap.get(device);
         ParameterData data =
-                parameterMap.computeIfAbsent(parameterId, k -> new ParameterData(parameter));
-
-        if (data.isEmpty()) {
-            NDArray array = parameter.getArray();
-
-            if (parameterServer != null) {
-                // initialize on parameter store for first time
-                parameterServer.init(parameterId, new NDArray[] {array});
-                NDArray[] arrays = new NDArray[deviceMap.size()];
-                for (Map.Entry<Device, Integer> entry : deviceMap.entrySet()) {
-                    Device dev = entry.getKey();
-                    int i = entry.getValue();
-                    if (i == index && array.getDevice().equals(dev)) {
-                        arrays[i] = array;
-                    } else {
-                        arrays[i] = array.toDevice(dev, true);
-                        arrays[i].attach(manager);
-                        // some parameter doesn't require grad
-                        // for example running_mean in BatchNorm
-                        if (parameter.requiresGradient()) {
-                            arrays[i].setRequiresGradient(true);
-                        }
-                    }
-                    data.add(arrays[i]);
-                }
-            } else {
-                if (copy || !array.getDevice().equals(device)) {
-                    array = array.toDevice(device, true);
-                    array.attach(manager);
-                    // some parameter doesn't require grad
-                    // for example running_mean in BatchNorm
-                    if (parameter.requiresGradient() && training) {
-                        array.setRequiresGradient(true);
-                    }
-                }
-                data.add(array);
-            }
-        }
-
-        return data.get(index);
+                parameterMap.computeIfAbsent(
+                        parameter.getId(), id -> new ParameterData(parameter, device, training));
+        return data.mirrors[index];
     }
 
     /**
@@ -164,28 +123,38 @@ public class ParameterStore {
     /** A helper for {@link ParameterStore} that stores data for a single parameter. */
     private final class ParameterData {
 
-        private Parameter parameter;
-        private List<NDArray> list;
+        private final Parameter parameter;
+        private final NDArray[] mirrors;
 
-        private ParameterData(Parameter parameter) {
+        private ParameterData(Parameter parameter, Device device, boolean training) {
             this.parameter = parameter;
-            list = Collections.synchronizedList(new ArrayList<>());
-        }
+            NDArray array = parameter.getArray();
+            if (parameterServer == null) {
+                if (copy || !array.getDevice().equals(device)) {
+                    array = array.toDevice(device, true);
+                    array.attach(manager);
+                    if (parameter.requiresGradient() && training) {
+                        array.setRequiresGradient(true);
+                    }
+                }
+                mirrors = new NDArray[] {array};
+                return;
+            }
 
-        private boolean isEmpty() {
-            return list.isEmpty();
-        }
-
-        private void add(NDArray array) {
-            list.add(array);
-        }
-
-        private NDArray get(int index) {
-            return list.get(index);
-        }
-
-        private NDArray[] toArray() {
-            return list.toArray(new NDArray[0]);
+            parameterServer.init(parameter.getId(), new NDArray[] {array});
+            mirrors = new NDArray[deviceMap.size()];
+            for (Map.Entry<Device, Integer> entry : deviceMap.entrySet()) {
+                Device target = entry.getKey();
+                NDArray mirror = array;
+                if (!array.getDevice().equals(target)) {
+                    mirror = array.toDevice(target, true);
+                    mirror.attach(manager);
+                    if (parameter.requiresGradient()) {
+                        mirror.setRequiresGradient(true);
+                    }
+                }
+                mirrors[entry.getValue()] = mirror;
+            }
         }
 
         private boolean requireGradient() {
@@ -197,7 +166,7 @@ public class ParameterStore {
             Device device = array.getDevice();
             if (!deviceMap.containsKey(device)) {
                 // model's parameters maybe loaded on different device than any of training devices.
-                list.get(0).copyTo(array);
+                mirrors[0].copyTo(array);
             }
         }
     }

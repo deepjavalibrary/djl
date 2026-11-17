@@ -48,6 +48,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class GradientCollectorIntegrationTest {
 
@@ -146,10 +149,7 @@ public class GradientCollectorIntegrationTest {
         }
     }
 
-    /**
-     * Ensures that a gradient collector does not start when one is already created because they are
-     * global.
-     */
+    /** A thread can only have one active collector for the engine. */
     @Test
     @SuppressWarnings({"try", "PMD.UseTryWithResources"})
     public void testMultipleGradientCollectors() {
@@ -166,6 +166,36 @@ public class GradientCollectorIntegrationTest {
                         }
                     }
                 });
+    }
+
+    @Test
+    public void testCollectorsOnDifferentThreads() throws Exception {
+        Engine engine = Engine.getEngine(TestUtils.getEngine());
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try (NDManager manager = engine.newBaseManager();
+                GradientCollector caller = engine.newGradientCollector()) {
+            NDArray weight = manager.create(3f);
+            weight.setRequiresGradient(true);
+            NDArray loss = weight.square();
+            float workerGradient =
+                    executor.submit(
+                                    () -> {
+                                        try (NDManager workerManager = engine.newBaseManager();
+                                                GradientCollector worker =
+                                                        engine.newGradientCollector()) {
+                                            NDArray otherWeight = workerManager.create(2f);
+                                            otherWeight.setRequiresGradient(true);
+                                            worker.backward(otherWeight.square());
+                                            return otherWeight.getGradient().getFloat();
+                                        }
+                                    })
+                            .get(30, TimeUnit.SECONDS);
+            Assert.assertEquals(workerGradient, 4f);
+            caller.backward(loss);
+            Assert.assertEquals(weight.getGradient().getFloat(), 6f);
+        } finally {
+            executor.shutdownNow();
+        }
     }
 
     @Test

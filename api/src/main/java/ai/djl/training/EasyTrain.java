@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 
 /** Helper for easy training of a whole model, a trainining batch, or a validation batch. */
 public final class EasyTrain {
@@ -53,18 +54,12 @@ public final class EasyTrain {
             // We iterate through the dataset once during each epoch
             for (Batch batch : trainer.iterateDataset(trainingDataset)) {
 
-                // During trainBatch, we update the loss and evaluators with the results for the
-                // training batch
-                trainBatch(trainer, batch);
-
-                // Now, we update the model parameters based on the results of the latest trainBatch
-                trainer.step();
-
-                // We must make sure to close the batch to ensure all the memory associated with the
-                // batch is cleared.
-                // If the memory isn't closed after each batch, you will very quickly run out of
-                // memory on your GPU
-                batch.close();
+                try {
+                    trainBatch(trainer, batch);
+                    trainer.step();
+                } finally {
+                    batch.close();
+                }
             }
 
             // After each epoch, test against the validation dataset if we have one
@@ -91,21 +86,18 @@ public final class EasyTrain {
         Batch[] splits = batch.split(trainer.getDevices(), false);
         BatchData batchData =
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
-        try (GradientCollector collector = trainer.newGradientCollector()) {
-
-            if (splits.length > 1 && trainer.getExecutorService().isPresent()) {
-                // multi-threaded
-                ExecutorService executor = trainer.getExecutorService().get();
-                List<CompletableFuture<Boolean>> futures = new ArrayList<>(splits.length);
-                for (Batch split : splits) {
-                    futures.add(
-                            CompletableFuture.supplyAsync(
-                                    () -> trainSplit(trainer, collector, batchData, split),
-                                    executor));
-                }
-                CompletableFuture.allOf(futures.stream().toArray(CompletableFuture[]::new));
-            } else {
-                // sequence
+        if (splits.length > 1 && trainer.getExecutorService().isPresent()) {
+            runParallel(
+                    splits,
+                    trainer.getExecutorService().get(),
+                    split -> {
+                        // Gradient recording belongs to the thread running the forward pass.
+                        try (GradientCollector collector = trainer.newGradientCollector()) {
+                            trainSplit(trainer, collector, batchData, split);
+                        }
+                    });
+        } else {
+            try (GradientCollector collector = trainer.newGradientCollector()) {
                 for (Batch split : splits) {
                     trainSplit(trainer, collector, batchData, split);
                 }
@@ -115,7 +107,7 @@ public final class EasyTrain {
         trainer.notifyListeners(listener -> listener.onTrainingBatch(trainer, batchData));
     }
 
-    private static boolean trainSplit(
+    private static void trainSplit(
             Trainer trainer, GradientCollector collector, BatchData batchData, Batch split) {
         NDList data = split.getData();
         NDList labels = split.getLabels();
@@ -128,7 +120,6 @@ public final class EasyTrain {
         batchData.getLabels().put(labels.get(0).getDevice(), labels);
         batchData.getPredictions().put(preds.get(0).getDevice(), preds);
         trainer.addMetric("training-metrics", time);
-        return true;
     }
 
     /**
@@ -151,15 +142,10 @@ public final class EasyTrain {
                 new BatchData(batch, new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
 
         if (splits.length > 1 && trainer.getExecutorService().isPresent()) {
-            // multi-threaded
-            ExecutorService executor = trainer.getExecutorService().get();
-            List<CompletableFuture<Boolean>> futures = new ArrayList<>(splits.length);
-            for (Batch split : splits) {
-                futures.add(
-                        CompletableFuture.supplyAsync(
-                                () -> validateSplit(trainer, batchData, split), executor));
-            }
-            CompletableFuture.allOf(futures.stream().toArray(CompletableFuture[]::new));
+            runParallel(
+                    splits,
+                    trainer.getExecutorService().get(),
+                    split -> validateSplit(trainer, batchData, split));
         } else {
             // sequence
             for (Batch split : splits) {
@@ -170,13 +156,25 @@ public final class EasyTrain {
         trainer.notifyListeners(listener -> listener.onValidationBatch(trainer, batchData));
     }
 
-    private static boolean validateSplit(Trainer trainer, BatchData batchData, Batch split) {
+    private static void validateSplit(Trainer trainer, BatchData batchData, Batch split) {
         NDList data = split.getData();
         NDList labels = split.getLabels();
         NDList preds = trainer.evaluate(data);
         batchData.getLabels().put(labels.get(0).getDevice(), labels);
         batchData.getPredictions().put(preds.get(0).getDevice(), preds);
-        return true;
+    }
+
+    private static void runParallel(
+            Batch[] splits, ExecutorService executor, Consumer<Batch> action) {
+        List<CompletableFuture<Void>> futures = new ArrayList<>(splits.length);
+        try {
+            for (Batch split : splits) {
+                futures.add(CompletableFuture.runAsync(() -> action.accept(split), executor));
+            }
+        } finally {
+            // Even if submission fails, let accepted tasks finish using the batch before returning.
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[0])).join();
+        }
     }
 
     /**
@@ -192,8 +190,11 @@ public final class EasyTrain {
 
         if (testDataset != null) {
             for (Batch batch : trainer.iterateDataset(testDataset)) {
-                validateBatch(trainer, batch);
-                batch.close();
+                try {
+                    validateBatch(trainer, batch);
+                } finally {
+                    batch.close();
+                }
             }
         }
     }
