@@ -34,7 +34,7 @@ public enum DataType {
     INT8(Format.INT, 1),
     INT64(Format.INT, 8),
     BOOLEAN(Format.BOOLEAN, 1),
-    COMPLEX64(Format.FLOATING, 4),
+    COMPLEX64(Format.FLOATING, 8),
     UNKNOWN(Format.UNKNOWN, 0),
     STRING(Format.STRING, -1),
     BFLOAT16(Format.FLOATING, 2),

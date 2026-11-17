@@ -20,6 +20,11 @@ import java.nio.ByteOrder;
 public class DataTypeTest {
 
     @Test
+    public void complex64SizeTest() {
+        Assert.assertEquals(DataType.COMPLEX64.getNumOfBytes(), 2 * Float.BYTES);
+    }
+
+    @Test
     public void numpyTest() {
         char order = ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN ? '>' : '<';
 
