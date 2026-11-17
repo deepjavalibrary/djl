@@ -149,13 +149,14 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
                 output.add(array);
             } else if (value instanceof OnnxSequence) {
                 // TODO: avoid memory copying to heap
-                OnnxSequence seq = (OnnxSequence) value;
-                if (seq.getInfo().isSequenceOfMaps()) {
-                    NDArray array = seq2Nd(seq);
-                    array.setName(r.getKey());
-                    output.add(array);
-                } else {
-                    output.addAll(seq2NdList(seq));
+                try (OnnxSequence seq = (OnnxSequence) value) {
+                    if (seq.getInfo().isSequenceOfMaps()) {
+                        NDArray array = seq2Nd(seq);
+                        array.setName(r.getKey());
+                        output.add(array);
+                    } else {
+                        output.addAll(seq2NdList(seq));
+                    }
                 }
             } else {
                 throw new UnsupportedOperationException("Unsupported output type! " + r.getKey());
@@ -171,8 +172,12 @@ public class OrtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable
             DataType dp;
             List<Object> finalData = new ArrayList<>();
             OnnxJavaType type = seq.getInfo().mapInfo.valueType;
-            for (OnnxMap map : values) {
-                finalData.addAll(((Map<Object, Object>) map.getValue()).values());
+            try {
+                for (OnnxMap map : values) {
+                    finalData.addAll(((Map<Object, Object>) map.getValue()).values());
+                }
+            } finally {
+                OnnxValue.close(values);
             }
             Shape shape = new Shape(values.size(), finalData.size() / values.size());
             ByteBuffer buffer =
