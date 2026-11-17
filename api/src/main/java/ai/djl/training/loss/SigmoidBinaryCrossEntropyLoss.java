@@ -72,7 +72,8 @@ public class SigmoidBinaryCrossEntropyLoss extends Loss {
             loss =
                     epsLog(pred)
                             .mul(lab)
-                            .add(epsLog(NDArrays.sub(1., pred)).mul(NDArrays.sub(1., lab)));
+                            .add(epsLog(NDArrays.sub(1., pred)).mul(NDArrays.sub(1., lab)))
+                            .neg();
         }
         if (weight != 1f) {
             loss = loss.mul(weight);
