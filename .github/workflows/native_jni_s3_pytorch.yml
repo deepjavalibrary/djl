@@ -54,8 +54,8 @@ jobs:
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION
           ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:test "-Dai.djl.default_engine=PyTorch"
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
-          # precxx11 is not supported since PyTorch 2.7.1
-          if [[ $PYTORCH_VERSION != "2.7.1" ]]; then \
+          # precxx11 is not supported since PyTorch 2.7
+          if [[ $PYTORCH_VERSION =~ ^(1\.|2\.[0-6]\.) ]]; then \
             ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION
             ./gradlew :engines:pytorch:pytorch-jni:clean
             PYTORCH_PRECXX11=true ./gradlew -Pjni -Ppt_version=$PYTORCH_VERSION :integration:clean :integration:test "-Dai.djl.default_engine=PyTorch"
@@ -66,8 +66,8 @@ jobs:
           export CUDA_VERSION=${CUDA_VERSION:-cu128}
           ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pcuda=$CUDA_VERSION -Ppt_version=$PYTORCH_VERSION
           ./gradlew :engines:pytorch:pytorch-native:cleanJNI
-          # precxx11 is not supported since PyTorch 2.7.1
-          if [[ $PYTORCH_VERSION != "2.7.1" ]]; then \
+          # precxx11 is not supported since PyTorch 2.7
+          if [[ $PYTORCH_VERSION =~ ^(1\.|2\.[0-6]\.) ]]; then \
             ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Pcuda=$CUDA_VERSION -Ppt_version=$PYTORCH_VERSION; \
           fi
       - name: Configure AWS Credentials
@@ -210,7 +210,7 @@ jobs:
           PYTORCH_VERSION=$PT_VERSION_INPUT
           export PYTORCH_VERSION=${PYTORCH_VERSION:-$(awk -F '=' '/pytorch/ {gsub(/ ?"/, "", $2); print $2}' gradle/libs.versions.toml)}
           echo $PYTORCH_VERSION
-          if [[ $PYTORCH_VERSION == "2.7.1" ]]; then \
+          if [[ ! $PYTORCH_VERSION =~ ^(1\.|2\.[0-6]\.) ]]; then \
             ./gradlew :engines:pytorch:pytorch-native:compileJNI -Ppt_version=$PYTORCH_VERSION; \
           else \
             ./gradlew :engines:pytorch:pytorch-native:compileJNI -Pprecxx11 -Ppt_version=$PYTORCH_VERSION; \
