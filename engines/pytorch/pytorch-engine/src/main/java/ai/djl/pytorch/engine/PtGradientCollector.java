@@ -18,25 +18,22 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.pytorch.jni.JniUtils;
 import ai.djl.training.GradientCollector;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /** {@code PtGradientCollector} is the PyTorch implementation of {@link GradientCollector}. */
 public final class PtGradientCollector implements GradientCollector {
 
-    private boolean gradModel;
-    private static AtomicBoolean isCollecting = new AtomicBoolean();
+    private static final ThreadLocal<Boolean> COLLECTING = new ThreadLocal<>();
+
+    private final boolean previousGradMode;
 
     /** Constructs a new {@code PtGradientCollector} instance. */
     public PtGradientCollector() {
-        gradModel = JniUtils.isGradMode();
-        JniUtils.setGradMode(true);
-
-        boolean wasCollecting = isCollecting.getAndSet(true);
-        if (wasCollecting) {
+        if (Boolean.TRUE.equals(COLLECTING.get())) {
             throw new IllegalStateException(
-                    "A PtGradientCollector is already collecting. Only one can be collecting at a"
-                            + " time");
+                    "A PtGradientCollector is already collecting on this thread");
         }
+        previousGradMode = JniUtils.isGradMode();
+        JniUtils.setGradMode(true);
+        COLLECTING.set(true);
 
         // TODO Currently has performance implications and so has been disabled
         // Should fix and re-enable support for PyTorch gradient accumulation
@@ -84,10 +81,7 @@ public final class PtGradientCollector implements GradientCollector {
     /** {@inheritDoc} */
     @Override
     public void close() {
-        if (!gradModel) {
-            JniUtils.setGradMode(false);
-        }
-        isCollecting.set(false);
-        // TODO: do some clean up if necessary
+        JniUtils.setGradMode(previousGradMode);
+        COLLECTING.remove();
     }
 }

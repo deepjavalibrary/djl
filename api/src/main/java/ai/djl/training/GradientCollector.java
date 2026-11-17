@@ -27,8 +27,9 @@ import ai.djl.ndarray.NDArray;
  * collector is left open for multiple calls to backwards, the gradients collected are accumulated
  * and added together.
  *
- * <p>Due to limitations in most engines, the gradient collectors are global. This means that only
- * one can be used at a time. If multiple are opened, an error will be thrown.
+ * <p>Gradient recording is scoped to the current thread. Open and close the collector on the thread
+ * that runs the forward and backward passes. Only one collector per engine can be active on a
+ * thread at a time.
  */
 public interface GradientCollector extends AutoCloseable {
 
