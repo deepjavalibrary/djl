@@ -14,6 +14,10 @@ package ai.djl.huggingface.tokenizers;
 
 import ai.djl.util.JsonUtils;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 import org.slf4j.Logger;
@@ -21,6 +25,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -32,14 +38,19 @@ import java.util.Objects;
 public class TokenizerConfig {
     private static final Logger logger = LoggerFactory.getLogger(TokenizerConfig.class);
 
+    // Transformers uses model_max_length > int(1e20) to indicate an unknown model limit.
+    private static final BigDecimal UNKNOWN_LENGTH_THRESHOLD = new BigDecimal("1e20");
+
     /** The constant DEFAULT_MAX_LENGTH. */
     public static final int DEFAULT_MAX_LENGTH = 512;
 
     @SerializedName("tokenizer_class")
     private String tokenizerClass;
 
+    // Retain the sentinel value to distinguish it from a literal -1.
     @SerializedName("model_max_length")
-    private Integer modelMaxLength;
+    @JsonAdapter(ModelMaxLengthDeserializer.class)
+    private BigDecimal modelMaxLength;
 
     @SerializedName("strip_accents")
     private Boolean stripAccents;
@@ -91,13 +102,28 @@ public class TokenizerConfig {
     /**
      * Gets model max length.
      *
-     * @return the model max length
+     * <p>Hugging Face uses integer values greater than {@code 1e20} when no model limit is known.
+     * These values are returned as {@code -1}.
+     *
+     * @return the model max length, or -1 when the configuration marks it as unknown
      */
     public int getModelMaxLength() {
         if (Objects.isNull(modelMaxLength)) {
             return DEFAULT_MAX_LENGTH;
         }
-        return modelMaxLength;
+        if (isModelMaxLengthUnknown()) {
+            return -1;
+        }
+        return modelMaxLength.intValue();
+    }
+
+    /**
+     * Returns whether the configuration marks the model max length as unknown.
+     *
+     * @return true if the configured length is a Hugging Face unknown-length sentinel
+     */
+    boolean isModelMaxLengthUnknown() {
+        return modelMaxLength != null && modelMaxLength.compareTo(UNKNOWN_LENGTH_THRESHOLD) > 0;
     }
 
     /**
@@ -206,5 +232,40 @@ public class TokenizerConfig {
      */
     public boolean hasExplicitAddPrefixSpace() {
         return addPrefixSpace != null;
+    }
+
+    private static final class ModelMaxLengthDeserializer implements JsonDeserializer<BigDecimal> {
+
+        /** {@inheritDoc} */
+        @Override
+        public BigDecimal deserialize(
+                JsonElement json, Type type, JsonDeserializationContext context) {
+            if (json.isJsonPrimitive()) {
+                BigDecimal configuredModelMaxLength;
+                try {
+                    configuredModelMaxLength = json.getAsBigDecimal();
+                } catch (NumberFormatException e) {
+                    // Gson's Integer adapter accepts numeric formats that BigDecimal does not.
+                    return parseIntegerModelMaxLength(json);
+                }
+                if (configuredModelMaxLength.compareTo(UNKNOWN_LENGTH_THRESHOLD) > 0) {
+                    // Integer values have zero or negative scale after removing trailing zeros.
+                    boolean isIntegerValue =
+                            configuredModelMaxLength.stripTrailingZeros().scale() <= 0;
+                    if (isIntegerValue) {
+                        return configuredModelMaxLength;
+                    }
+                }
+            }
+            return parseIntegerModelMaxLength(json);
+        }
+
+        private static BigDecimal parseIntegerModelMaxLength(JsonElement json) {
+            // Parse JSON text to preserve the existing Integer validation.
+            // Reading JsonElement directly can silently truncate fractions or overflow.
+            Integer validatedModelMaxLength =
+                    JsonUtils.GSON.fromJson(json.toString(), Integer.class);
+            return BigDecimal.valueOf(validatedModelMaxLength);
+        }
     }
 }
