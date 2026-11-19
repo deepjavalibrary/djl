@@ -337,9 +337,41 @@ public class IValue extends NativeResource<Long> {
      * @return a new {@code IValue} of type {@code Dict[str, Tensor]}
      * @throws IllegalArgumentException if the arguments are invalid
      * @throws ai.djl.engine.EngineException if the native check fails, e.g. a buffer is too small
+     * @see #stringMapFrom(String[], ByteBuffer[], long[][], DataType[], Device) to place the
+     *     tensors on another device
      */
     public static IValue stringMapFrom(
             String[] keys, ByteBuffer[] buffers, long[][] shapes, DataType[] dtypes) {
+        return stringMapFrom(keys, buffers, shapes, dtypes, Device.cpu());
+    }
+
+    /**
+     * Creates a new {@code IValue} of type {@code Dict[str, Tensor]} from direct buffers in a
+     * single JNI call, with every tensor placed on the given device.
+     *
+     * <p>On CPU this behaves exactly like {@link #stringMapFrom(String[], ByteBuffer[], long[][],
+     * DataType[])}: nothing is copied and the buffers are kept reachable until this {@code IValue}
+     * is closed. On any other device each tensor is copied to that device during the call, so the
+     * buffers can be reused or released as soon as this method returns.
+     *
+     * @param keys the dictionary keys, must be non-null and unique
+     * @param buffers the direct buffers holding the tensor data
+     * @param shapes the shape of each tensor
+     * @param dtypes the data type of each tensor
+     * @param device the device to place the tensors on
+     * @return a new {@code IValue} of type {@code Dict[str, Tensor]}
+     * @throws IllegalArgumentException if the arguments are invalid
+     * @throws ai.djl.engine.EngineException if the native check fails, e.g. a buffer is too small
+     */
+    public static IValue stringMapFrom(
+            String[] keys,
+            ByteBuffer[] buffers,
+            long[][] shapes,
+            DataType[] dtypes,
+            Device device) {
+        if (device == null) {
+            throw new IllegalArgumentException("device must not be null");
+        }
         int n = keys.length;
         if (n == 0) {
             throw new IllegalArgumentException("At least one entry is required");
@@ -377,12 +409,15 @@ public class IValue extends NativeResource<Long> {
             }
             dtypeOrdinals[i] = dtypes[i].ordinal();
         }
-        int[] device = {PtDeviceType.toDeviceType(Device.cpu()), -1};
+        int[] jdevice = {PtDeviceType.toDeviceType(device), device.getDeviceId()};
         long handle =
                 PyTorchLibrary.LIB.iValueFromStringMapBlobs(
-                        keys, buffers, shapes, dtypeOrdinals, device);
+                        keys, buffers, shapes, dtypeOrdinals, jdevice);
         IValue ret = new IValue(handle);
-        ret.bufferRef = buffers.clone();
+        if (Device.Type.CPU.equals(device.getDeviceType())) {
+            // Only CPU tensors alias the buffers; other devices get a copy in native code
+            ret.bufferRef = buffers.clone();
+        }
         return ret;
     }
 

@@ -166,6 +166,9 @@ public class IValueStringMapBlobsTest {
         Assert.assertThrows(
                 IllegalArgumentException.class,
                 () -> IValue.stringMapFrom(new String[] {"a", "b"}, b1, s1, d1));
+        // null device
+        Assert.assertThrows(
+                IllegalArgumentException.class, () -> IValue.stringMapFrom(k1, b1, s1, d1, null));
         // all empty
         Assert.assertThrows(
                 IllegalArgumentException.class,

@@ -12,6 +12,7 @@
  */
 package ai.djl.pytorch.engine;
 
+import ai.djl.Device;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
@@ -25,6 +26,7 @@ import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Map;
 
 public class PtIValueNDArrayTest {
 
@@ -169,6 +171,37 @@ public class PtIValueNDArrayTest {
                                         new ByteBuffer[] {buf},
                                         new long[][] {{2}},
                                         new DataType[] {DataType.FLOAT32}));
+            }
+        }
+    }
+
+    @Test
+    public void testTensorsOnManagerDevice() {
+        TestRequirements.notMacX86();
+        try (PtNDManager manager = (PtNDManager) NDManager.newBaseManager("PyTorch")) {
+            assertTensorsOn(carrier(manager), manager);
+        }
+    }
+
+    @Test
+    public void testTensorsOnGpuManager() {
+        TestRequirements.notMacX86();
+        TestRequirements.gpu("PyTorch");
+        try (PtNDManager manager =
+                (PtNDManager) NDManager.newBaseManager(Device.gpu(), "PyTorch")) {
+            assertTensorsOn(carrier(manager), manager);
+        }
+    }
+
+    private static void assertTensorsOn(PtIValueNDArray c, PtNDManager manager) {
+        Map<String, IValue> values = c.getIValue().toIValueMap();
+        try {
+            for (IValue v : values.values()) {
+                Assert.assertEquals(v.toTensor(manager).getDevice(), manager.getDevice());
+            }
+        } finally {
+            for (IValue v : values.values()) {
+                v.close();
             }
         }
     }

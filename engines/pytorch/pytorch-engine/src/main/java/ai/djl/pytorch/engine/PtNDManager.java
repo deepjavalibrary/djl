@@ -87,7 +87,7 @@ public class PtNDManager extends BaseNDManager {
 
     /**
      * Creates a carrier holding a {@code Dict[str, Tensor]} built from direct buffers in one JNI
-     * call.
+     * call. The tensors are placed on this manager's device.
      *
      * @param name the name of the carrier
      * @param keys the dictionary keys
@@ -97,15 +97,15 @@ public class PtNDManager extends BaseNDManager {
      * @return the carrier array
      * @throws IllegalArgumentException if the arguments are invalid or the name is null or empty
      * @throws ai.djl.engine.EngineException if the native check fails, e.g. a buffer is too small
-     * @see IValue#stringMapFrom(String[], ByteBuffer[], long[][], DataType[]) for the buffer
-     *     lifetime, byte order, and position/limit rules
+     * @see IValue#stringMapFrom(String[], ByteBuffer[], long[][], DataType[], Device) for the
+     *     buffer lifetime, byte order, and position/limit rules
      */
     public PtIValueNDArray createStringMap(
             String name, String[] keys, ByteBuffer[] buffers, long[][] shapes, DataType[] dtypes) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name must be non-null and non-empty");
         }
-        IValue ivalue = IValue.stringMapFrom(keys, buffers, shapes, dtypes);
+        IValue ivalue = IValue.stringMapFrom(keys, buffers, shapes, dtypes, device);
         try {
             return new PtIValueNDArray(this, name, ivalue, keys, shapes);
         } catch (RuntimeException | Error e) {
