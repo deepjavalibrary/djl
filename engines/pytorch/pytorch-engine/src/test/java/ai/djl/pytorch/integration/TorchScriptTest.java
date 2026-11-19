@@ -15,9 +15,12 @@ package ai.djl.pytorch.integration;
 
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
+import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.pytorch.engine.PtIValueNDArray;
 import ai.djl.pytorch.engine.PtNDArray;
 import ai.djl.pytorch.engine.PtNDManager;
 import ai.djl.pytorch.engine.PtSymbolBlock;
@@ -26,7 +29,10 @@ import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.ProgressBar;
+import ai.djl.translate.NoBatchifyTranslator;
 import ai.djl.translate.TranslateException;
+import ai.djl.translate.TranslatorContext;
+import ai.djl.util.PairList;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -35,6 +41,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -75,6 +83,73 @@ public class TorchScriptTest {
                 Assert.assertEquals(model.getName(), "dict_input");
             }
         }
+    }
+
+    @Test
+    public void testDictInputCarrier() throws ModelException, IOException, TranslateException {
+        TestRequirements.notMacX86();
+
+        NoBatchifyTranslator<NDList, NDList> translator =
+                new NoBatchifyTranslator<NDList, NDList>() {
+                    @Override
+                    public NDList processOutput(TranslatorContext ctx, NDList list) {
+                        return list;
+                    }
+
+                    @Override
+                    public NDList processInput(TranslatorContext ctx, NDList input) {
+                        return input;
+                    }
+                };
+        Criteria<NDList, NDList> criteria =
+                Criteria.builder()
+                        .setTypes(NDList.class, NDList.class)
+                        .optModelUrls("https://resources.djl.ai/test-models/dict_input.zip")
+                        .optTranslator(translator)
+                        .optProgress(new ProgressBar())
+                        .build();
+
+        try (NDManager manager = NDManager.newBaseManager();
+                ZooModel<NDList, NDList> model = criteria.loadModel();
+                Predictor<NDList, NDList> predictor = model.newPredictor()) {
+            // The published model unpacks exactly one dict value, so multi-key/multi-dtype
+            // coverage lives in IValueStringMapBlobsTest/IValueUtilsTest.
+            ByteBuffer parent = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
+            ByteBuffer floats = slice(parent, 0, 16);
+            for (int i = 0; i < 4; ++i) {
+                floats.putFloat(i * 4, 1f);
+            }
+            PtIValueNDArray carrier =
+                    ((PtNDManager) manager)
+                            .createStringMap(
+                                    "input1",
+                                    new String[] {"input"},
+                                    new ByteBuffer[] {floats},
+                                    new long[][] {{2, 2}},
+                                    new DataType[] {DataType.FLOAT32});
+            NDArray expected = manager.ones(new Shape(2, 2));
+            for (int i = 0; i < 2; ++i) {
+                NDList output = predictor.predict(new NDList(carrier));
+                Assert.assertEquals(output.singletonOrThrow(), expected);
+            }
+            NDArray plain = manager.ones(new Shape(2, 2));
+            plain.setName("input1.input");
+            NDList plainOutput = predictor.predict(new NDList(plain));
+            Assert.assertEquals(plainOutput.singletonOrThrow(), expected);
+            NDList carrierOutput = predictor.predict(new NDList(carrier));
+            Assert.assertEquals(carrierOutput.singletonOrThrow(), plainOutput.singletonOrThrow());
+
+            PairList<String, Shape> desc = ((PtSymbolBlock) model.getBlock()).describeInput();
+            Assert.assertEquals(desc.size(), 1);
+            Assert.assertEquals(desc.get("input1.input"), new Shape(2, 2));
+        }
+    }
+
+    private static ByteBuffer slice(ByteBuffer parent, int offset, int length) {
+        ByteBuffer dup = parent.duplicate();
+        dup.position(offset);
+        dup.limit(offset + length);
+        return dup.slice().order(ByteOrder.nativeOrder());
     }
 
     @Test
