@@ -104,6 +104,33 @@ public class TransformTest {
     }
 
     @Test
+    public void testAddTimeFeatureWithMinuteFrequency() {
+        // Regression test for GitHub issue #3625: "T" (minute) frequency strings such as "2T"
+        // failed java.time.Duration.parse because ISO-8601 durations use "M" for minutes, not
+        // "T", and Feature.addTimeFeature inserted the raw granularity char unchanged.
+        try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
+            TimeSeriesData input = new TimeSeriesData(10);
+            List<BiFunction<NDManager, List<LocalDateTime>, NDArray>> timeFeatures =
+                    TimeFeature.timeFeaturesFromFreqStr("T");
+
+            input.setStartTime(LocalDateTime.parse("2011-01-29T00:00"));
+            input.setField(FieldName.TARGET, manager.ones(new Shape(32, 48)));
+            Feature.addTimeFeature(
+                    manager,
+                    FieldName.START,
+                    FieldName.TARGET,
+                    FieldName.FEAT_AGE,
+                    timeFeatures,
+                    28,
+                    "2T",
+                    input);
+
+            NDArray array = input.get(FieldName.FEAT_AGE);
+            Assert.assertEquals(array.getShape(), new Shape(5, 76));
+        }
+    }
+
+    @Test
     public void testAddAgeFeature() {
         try (NDManager manager = NDManager.newBaseManager(Device.cpu())) {
             TimeSeriesData input = new TimeSeriesData(10);
