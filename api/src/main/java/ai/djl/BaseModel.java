@@ -355,7 +355,8 @@ public abstract class BaseModel implements Model {
             epoch = Integer.parseInt(epochOption.toString());
         }
 
-        return modelDir.resolve(String.format(Locale.ROOT, "%s-%04d.params", prefix, epoch));
+        return Utils.resolveModelFile(
+                modelDir, String.format(Locale.ROOT, "%s-%04d.params", prefix, epoch));
     }
 
     protected boolean readParameters(Path paramFile, Map<String, ?> options)

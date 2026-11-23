@@ -127,7 +127,7 @@ public class TfModel extends BaseModel {
     }
 
     private Path findModelDir(String prefix) {
-        Path path = modelDir.resolve(prefix);
+        Path path = Utils.resolveModelFile(modelDir, prefix);
         if (!Files.exists(path)) {
             return null;
         }
