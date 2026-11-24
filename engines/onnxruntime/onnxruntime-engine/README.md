@@ -122,3 +122,13 @@ try (ZooModel<String, float[]> model = criteria.loadModel();
     Assert.assertEquals(res.length, 384);
 }
 ```
+
+#### Load a custom operator library
+
+ONNX Runtime can load operators from a shared library you build. Name it with the `customOpLibrary` option in the Criteria:
+
+```
+optOption("customOpLibrary", "/path/to/libcustom_ops.so")
+```
+
+The library is loaded into the Java process, so only set this option from configuration you trust. A model's own `metadata.json` or `serving.properties` cannot set it; only the application can, through `Criteria`. When the option is not set and the ONNX Runtime extensions package is on the classpath, DJL loads the extensions library instead.
