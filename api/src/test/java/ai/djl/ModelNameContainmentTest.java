@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
@@ -100,17 +101,22 @@ public class ModelNameContainmentTest {
             BaseModel base = (BaseModel) model;
             base.setModelDir(modelDir);
             Map<String, String> epoch = Collections.singletonMap("epoch", "0");
+            Map<String, String> noEpoch = Collections.emptyMap();
             Assert.assertEquals(
                     base.paramPathResolver("model", epoch),
                     modelDir.toAbsolutePath().resolve("model-0000.params"));
+            // With no epoch and no parameter file there is nothing to load, which is not an error.
+            Assert.assertNull(base.paramPathResolver("model", noEpoch));
             for (String name : outsideNames) {
-                IllegalArgumentException e =
-                        Assert.expectThrows(
-                                IllegalArgumentException.class,
-                                () -> base.paramPathResolver(name, epoch));
-                Assert.assertTrue(
-                        e.getMessage().contains("outside the model directory"),
-                        name + " -> " + e.getMessage());
+                for (Map<String, String> options : Arrays.asList(epoch, noEpoch)) {
+                    IllegalArgumentException e =
+                            Assert.expectThrows(
+                                    IllegalArgumentException.class,
+                                    () -> base.paramPathResolver(name, options));
+                    Assert.assertTrue(
+                            e.getMessage().contains("outside the model directory"),
+                            name + " " + options + " -> " + e.getMessage());
+                }
             }
         }
     }

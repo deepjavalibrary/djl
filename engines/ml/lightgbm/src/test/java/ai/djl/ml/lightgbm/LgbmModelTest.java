@@ -89,6 +89,7 @@ public class LgbmModelTest {
 
     @Test
     public void testModelNameOutsideModelDir() throws IOException {
+        TestRequirements.notArm();
         if (Utils.isFileOutsideModelDirAllowed()) {
             throw new SkipException("Files outside the model directory are allowed");
         }

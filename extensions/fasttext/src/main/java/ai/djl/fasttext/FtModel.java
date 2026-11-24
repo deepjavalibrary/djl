@@ -131,14 +131,14 @@ public class FtModel implements Model {
         if (prefix == null) {
             prefix = modelName;
         }
-        Path modelFile = Utils.resolveModelFile(modelDir, prefix);
+        Path modelFile = modelDir.resolve(prefix);
         if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
             if (prefix.endsWith(".ftz") || prefix.endsWith(".bin")) {
                 return null;
             }
-            modelFile = Utils.resolveModelFile(modelDir, prefix + ".ftz");
+            modelFile = modelDir.resolve(prefix + ".ftz");
             if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
-                modelFile = Utils.resolveModelFile(modelDir, prefix + ".bin");
+                modelFile = modelDir.resolve(prefix + ".bin");
                 if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
                     return null;
                 }
