@@ -27,8 +27,10 @@ import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import ai.djl.translate.NoopTranslator;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.Utils;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -148,6 +151,27 @@ public class XgbModelTest {
                         IllegalArgumentException.class,
                         () -> manager.create(buffer, new Shape(4, 4), DataType.FLOAT32));
             }
+        }
+    }
+
+    @Test
+    public void testModelNameOutsideModelDir() throws IOException {
+        if (Utils.isFileOutsideModelDirAllowed()) {
+            throw new SkipException("Files outside the model directory are allowed");
+        }
+        Path root = Files.createTempDirectory("djl-xgb-model-name");
+        try (Model model = Model.newInstance("model", "XGBoost")) {
+            Path modelDir = Files.createDirectories(root.resolve("model"));
+            // The file "../outside" would select if the name were not contained.
+            Files.write(root.resolve("outside.json"), new byte[] {0});
+            IllegalArgumentException e =
+                    Assert.expectThrows(
+                            IllegalArgumentException.class,
+                            () -> model.load(modelDir, "../outside"));
+            Assert.assertTrue(
+                    e.getMessage().contains("outside the model directory"), e.getMessage());
+        } finally {
+            Utils.deleteQuietly(root);
         }
     }
 }

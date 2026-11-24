@@ -13,6 +13,7 @@
 
 package ai.djl.ml.lightgbm;
 
+import ai.djl.Model;
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.NDArray;
@@ -25,11 +26,14 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.testing.TestRequirements;
 import ai.djl.training.util.DownloadUtils;
 import ai.djl.translate.TranslateException;
+import ai.djl.util.Utils;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -80,6 +84,28 @@ public class LgbmModelTest {
             }
 
             Assert.assertThrows(() -> lgbm.setInferenceType("invalid"));
+        }
+    }
+
+    @Test
+    public void testModelNameOutsideModelDir() throws IOException {
+        TestRequirements.notArm();
+        if (Utils.isFileOutsideModelDirAllowed()) {
+            throw new SkipException("Files outside the model directory are allowed");
+        }
+        Path root = Files.createTempDirectory("djl-lgbm-model-name");
+        try (Model model = Model.newInstance("model", "LightGBM")) {
+            Path modelDir = Files.createDirectories(root.resolve("model"));
+            // The file "../outside" would select if the name were not contained.
+            Files.write(root.resolve("outside.txt"), new byte[] {0});
+            IllegalArgumentException e =
+                    Assert.expectThrows(
+                            IllegalArgumentException.class,
+                            () -> model.load(modelDir, "../outside"));
+            Assert.assertTrue(
+                    e.getMessage().contains("outside the model directory"), e.getMessage());
+        } finally {
+            Utils.deleteQuietly(root);
         }
     }
 }
