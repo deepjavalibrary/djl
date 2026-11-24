@@ -18,6 +18,7 @@ import ai.djl.ml.lightgbm.jni.JniUtils;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.translate.ArgumentsUtil;
+import ai.djl.util.Utils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -80,12 +81,12 @@ public class LgbmModel extends BaseModel {
         if (prefix == null) {
             prefix = modelName;
         }
-        Path modelFile = modelDir.resolve(prefix);
+        Path modelFile = Utils.resolveModelFile(modelDir, prefix);
         if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
             if (prefix.endsWith(".txt")) {
                 return null;
             }
-            modelFile = modelDir.resolve(prefix + ".txt");
+            modelFile = Utils.resolveModelFile(modelDir, prefix + ".txt");
             if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
                 return null;
             }

@@ -130,12 +130,12 @@ public class OrtModel extends BaseModel {
             return file;
         }
         for (String prefix : prefixes) {
-            Path modelFile = modelDir.resolve(prefix);
+            Path modelFile = Utils.resolveModelFile(modelDir, prefix);
             if (Files.isRegularFile(modelFile)) {
                 return modelFile;
             }
             if (!prefix.endsWith(".onnx")) {
-                modelFile = modelDir.resolve(prefix + ".onnx");
+                modelFile = Utils.resolveModelFile(modelDir, prefix + ".onnx");
                 if (Files.isRegularFile(modelFile)) {
                     return modelFile;
                 }

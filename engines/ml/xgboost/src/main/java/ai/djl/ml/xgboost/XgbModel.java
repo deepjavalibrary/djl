@@ -16,6 +16,7 @@ import ai.djl.BaseModel;
 import ai.djl.Model;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.util.Utils;
 
 import ml.dmlc.xgboost4j.java.JniUtils;
 
@@ -90,20 +91,20 @@ public class XgbModel extends BaseModel {
         if (prefix == null) {
             prefix = modelName;
         }
-        Path modelFile = modelDir.resolve(prefix);
+        Path modelFile = Utils.resolveModelFile(modelDir, prefix);
         if (Files.notExists(modelFile) || !Files.isRegularFile(modelFile)) {
             if (prefix.endsWith(".json") || prefix.endsWith(".xgb") || prefix.endsWith(".bst")) {
                 return null;
             }
-            modelFile = modelDir.resolve(prefix + ".json");
+            modelFile = Utils.resolveModelFile(modelDir, prefix + ".json");
             if (Files.isRegularFile(modelFile)) {
                 return modelFile;
             }
-            modelFile = modelDir.resolve(prefix + ".xgb");
+            modelFile = Utils.resolveModelFile(modelDir, prefix + ".xgb");
             if (Files.isRegularFile(modelFile)) {
                 return modelFile;
             }
-            modelFile = modelDir.resolve(prefix + ".bst");
+            modelFile = Utils.resolveModelFile(modelDir, prefix + ".bst");
             if (Files.isRegularFile(modelFile)) {
                 return modelFile;
             }

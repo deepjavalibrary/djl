@@ -341,6 +341,8 @@ public abstract class BaseModel implements Model {
     }
 
     protected Path paramPathResolver(String prefix, Map<String, ?> options) throws IOException {
+        // Epoch discovery only matches names inside modelDir, so check the prefix before it.
+        Utils.resolveModelFile(modelDir, paramFileName(prefix, 0));
         Object epochOption = null;
         if (options != null) {
             epochOption = options.get("epoch");
@@ -355,7 +357,11 @@ public abstract class BaseModel implements Model {
             epoch = Integer.parseInt(epochOption.toString());
         }
 
-        return modelDir.resolve(String.format(Locale.ROOT, "%s-%04d.params", prefix, epoch));
+        return Utils.resolveModelFile(modelDir, paramFileName(prefix, epoch));
+    }
+
+    private static String paramFileName(String prefix, int epoch) {
+        return String.format(Locale.ROOT, "%s-%04d.params", prefix, epoch);
     }
 
     protected boolean readParameters(Path paramFile, Map<String, ?> options)

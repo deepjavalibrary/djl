@@ -171,12 +171,12 @@ public class PtModel extends BaseModel {
             return file;
         }
         for (String prefix : prefixes) {
-            Path modelFile = modelDir.resolve(prefix);
+            Path modelFile = Utils.resolveModelFile(modelDir, prefix);
             if (Files.isRegularFile(modelFile)) {
                 return modelFile;
             }
             if (!prefix.endsWith(".pt")) {
-                modelFile = modelDir.resolve(prefix + ".pt");
+                modelFile = Utils.resolveModelFile(modelDir, prefix + ".pt");
                 if (Files.isRegularFile(modelFile)) {
                     return modelFile;
                 }
