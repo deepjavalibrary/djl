@@ -610,6 +610,9 @@ final class PyTorchLibrary {
 
     native long iValueFromStringMap(String[] keys, long[] tensorHandles);
 
+    native long iValueFromStringMapBlobs(
+            String[] keys, ByteBuffer[] buffers, long[][] shapes, int[] dtypes, int[] device);
+
     native long iValueFromStringIValueMap(String[] keys, long[] tensorHandles);
 
     native long iValueToTensor(long iValueHandle);

@@ -141,7 +141,16 @@ public class PtSymbolBlock extends AbstractSymbolBlock implements AutoCloseable 
                     inputDescriptions = new PairList<>();
                     outputDescriptions = new PairList<>();
                     for (NDArray array : inputs) {
-                        inputDescriptions.add(array.getName(), array.getShape());
+                        if (array instanceof PtIValueNDArray) {
+                            PtIValueNDArray carrier = (PtIValueNDArray) array;
+                            String[] keys = carrier.getKeys();
+                            Shape[] shapes = carrier.getShapes();
+                            for (int i = 0; i < keys.length; ++i) {
+                                inputDescriptions.add(carrier.getName() + '.' + keys[i], shapes[i]);
+                            }
+                        } else {
+                            inputDescriptions.add(array.getName(), array.getShape());
+                        }
                     }
                     NDList outputs = IValueUtils.forward(this, inputs, training);
                     for (NDArray array : outputs) {
