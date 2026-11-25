@@ -160,7 +160,7 @@ tasks {
         if (packageType == "gpu") {
             // @formatter:off
             val files = mapOf(
-                "$cuda/libtorch-cxx11-abi-shared-with-deps-$ptVersion%2B$cuda.zip" to "$cuda/linux-x86_64",
+                "$cuda/libtorch-shared-with-deps-$ptVersion%2B$cuda.zip"           to "$cuda/linux-x86_64",
                 "$cuda/libtorch-win-shared-with-deps-$ptVersion%2B$cuda.zip"       to "$cuda/win-x86_64",
             )
             // @formatter:on
@@ -169,7 +169,7 @@ tasks {
         } else {
             // @formatter:off
             val files = mapOf(
-                "cpu/libtorch-cxx11-abi-shared-with-deps-$ptVersion%2Bcpu.zip"     to "cpu/linux-x86_64",
+                "cpu/libtorch-shared-with-deps-$ptVersion%2Bcpu.zip"               to "cpu/linux-x86_64",
                 "cpu/libtorch-macos-arm64-$ptVersion.zip"                          to "cpu/osx-aarch64",
                 "cpu/libtorch-win-shared-with-deps-$ptVersion%2Bcpu.zip"           to "cpu/win-x86_64",
             )

@@ -19,17 +19,21 @@ if [[ $3 == "precxx11" ]]; then
   CXX11ABI=""
   AARCH64_CXX11ABI=""
 fi
+# libtorch is cxx11 abi only since 2.8, and the "-cxx11-abi" infix is dropped from the file name
+if [[ "$VERSION" =~ ^2\.([89]|[1-9][0-9])\. ]]; then
+  CXX11ABI=""
+fi
 ARCH=$4
 
 if [[ ! -d "libtorch" ]]; then
   if [[ $PLATFORM == 'linux' ]]; then
-    if [[ ! "$FLAVOR" =~ ^(cpu|cu117|cu121|cu124|cu128)$ ]]; then
+    if [[ ! "$FLAVOR" =~ ^(cpu|cu117|cu121|cu124|cu126|cu128|cu130)$ ]]; then
       echo "$FLAVOR is not supported."
       exit 1
     fi
 
     if [[ $ARCH == 'aarch64' ]]; then
-      if [[ "$VERSION" =~ ^(2.[7-9].*)$ ]]; then
+      if [[ "$VERSION" =~ ^2\.([7-9]|[1-9][0-9])\. ]]; then
         curl -sL "https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch-linux-aarch64-${VERSION}.zip" | jar xv >/dev/null
       else
         curl -sL "https://djl-ai.s3.amazonaws.com/publish/pytorch/${VERSION}/libtorch${AARCH64_CXX11ABI}-shared-with-deps-${VERSION}-aarch64.zip" | jar xv >/dev/null
@@ -38,7 +42,7 @@ if [[ ! -d "libtorch" ]]; then
       curl -sL "https://download.pytorch.org/libtorch/${FLAVOR}/libtorch${CXX11ABI}-shared-with-deps-${VERSION}%2B${FLAVOR}.zip" | jar xv >/dev/null
     fi
   elif [[ $PLATFORM == 'darwin' ]]; then
-    if [[ "$VERSION" =~ ^(2.[2-9].*)$ ]]; then
+    if [[ "$VERSION" =~ ^2\.([2-9]|[1-9][0-9])\. ]]; then
       if [[ $ARCH == 'aarch64' ]]; then
         curl -sL "https://download.pytorch.org/libtorch/cpu/libtorch-macos-arm64-${VERSION}.zip" | jar xv >/dev/null
       else
@@ -57,7 +61,7 @@ if [[ ! -d "libtorch" ]]; then
   fi
 fi
 
-if [[ "$VERSION" == "1.13.1" || "$VERSION" == "2.0.1" || "$VERSION" =~ ^(2.1.*)$ ]]; then
+if [[ "$VERSION" == "1.13.1" || "$VERSION" == "2.0.1" || "$VERSION" =~ ^2\.1\. ]]; then
   PT_VERSION=V1_13_X
 fi
 
