@@ -12,12 +12,15 @@
  */
 package ai.djl.integration.tests.training;
 
+import ai.djl.engine.Engine;
 import ai.djl.integration.util.TestUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Activation;
 import ai.djl.testing.Assertions;
+import ai.djl.training.GradientCollector;
 import ai.djl.training.loss.Loss;
 
 import org.testng.Assert;
@@ -116,6 +119,59 @@ public class LossTest {
                             .evaluate(new NDList(label), new NDList(pred))
                             .getFloat(),
                     0.10272846f);
+        }
+    }
+
+    @Test
+    public void sigmoidBinaryCrossEntropyFromProbabilitiesTest() {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray prediction = manager.create(new float[] {0.8f, 0.2f});
+            NDArray label = manager.create(new float[] {1f, 0f});
+            NDArray loss =
+                    Loss.sigmoidBinaryCrossEntropyLoss("loss", 1, true)
+                            .evaluate(new NDList(label), new NDList(prediction));
+            Assertions.assertAlmostEquals(loss.getFloat(), (float) -Math.log(0.8));
+
+            NDArray weightedLoss =
+                    Loss.sigmoidBinaryCrossEntropyLoss("loss", 2, true)
+                            .evaluate(new NDList(label), new NDList(prediction));
+            Assertions.assertAlmostEquals(weightedLoss.getFloat(), (float) (-2 * Math.log(0.8)));
+        }
+    }
+
+    @Test
+    public void sigmoidBinaryCrossEntropyInputModesTest() {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray logits = manager.create(new float[] {-2f, -1f, 0.5f, 2f}, new Shape(2, 2));
+            NDArray label = manager.create(new float[] {0f, 1f, 0.25f, 1f}, new Shape(2, 2));
+            NDArray logitsLoss =
+                    Loss.sigmoidBinaryCrossEntropyLoss()
+                            .evaluate(new NDList(label), new NDList(logits));
+            NDArray probabilitiesLoss =
+                    Loss.sigmoidBinaryCrossEntropyLoss("loss", 1, true)
+                            .evaluate(new NDList(label), new NDList(Activation.sigmoid(logits)));
+            Assertions.assertAlmostEquals(probabilitiesLoss, logitsLoss);
+        }
+    }
+
+    @Test
+    public void sigmoidBinaryCrossEntropyFromProbabilitiesGradientTest() {
+        TestUtils.requiresEngine("MXNet", "PyTorch", "TensorFlow");
+        try (NDManager manager = NDManager.newBaseManager(TestUtils.getEngine())) {
+            NDArray prediction = manager.create(new float[] {0.8f, 0.2f});
+            NDArray label = manager.create(new float[] {1f, 0f});
+            prediction.setRequiresGradient(true);
+            Engine engine = Engine.getEngine(TestUtils.getEngine());
+            try (GradientCollector collector = engine.newGradientCollector()) {
+                NDArray loss =
+                        Loss.sigmoidBinaryCrossEntropyLoss("loss", 1, true)
+                                .evaluate(new NDList(label), new NDList(prediction));
+                collector.backward(loss);
+            }
+            Assertions.assertAlmostEquals(
+                    prediction.getGradient(), manager.create(new float[] {-0.625f, 0.625f}));
         }
     }
 
