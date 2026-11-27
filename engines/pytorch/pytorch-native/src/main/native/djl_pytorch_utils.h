@@ -91,8 +91,7 @@ inline torch::ScalarType GetScalarTypeFromDType(jint dtype) {
     case 8:
       return torch::kComplexFloat;
     default:
-      // TODO improve the error handling
-      throw;
+      TORCH_CHECK(false, "Unsupported DJL dtype ordinal: ", dtype);
   }
 }
 
@@ -147,18 +146,14 @@ inline torch::TensorOptions CreateTensorOptions(
     JNIEnv* env, jint jdtype, jint jlayout, jintArray jdevice, jboolean jrequired_grad) {
   // it gets the device and collect jdevice memory
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
-  auto options = torch::TensorOptions()
-                     // for tensor creation API, MKLDNN layout is not supported
-                     // the workaround is to create with Strided then call to_mkldnn()
-                     .layout((jlayout != 1) ? torch::kStrided : torch::kSparse)
-                     .memory_format(torch::MemoryFormat::Contiguous)
-                     .device(device)
-                     .requires_grad(JNI_TRUE == jrequired_grad);
-  // DJL's UNKNOWN type
-  if (jdtype != 8) {
-    options = options.dtype(GetScalarTypeFromDType(jdtype));
-  }
-  return options;
+  return torch::TensorOptions()
+      .dtype(GetScalarTypeFromDType(jdtype))
+      // for tensor creation API, MKLDNN layout is not supported
+      // the workaround is to create with Strided then call to_mkldnn()
+      .layout((jlayout != 1) ? torch::kStrided : torch::kSparse)
+      .memory_format(torch::MemoryFormat::Contiguous)
+      .device(device)
+      .requires_grad(JNI_TRUE == jrequired_grad);
 }
 
 inline int64_t GetTensorByteSize(torch::IntArrayRef shape, int64_t element_size) {

@@ -499,10 +499,7 @@ public abstract class BaseNDManager implements NDManager {
             // fp16, bf16, int16, uint16 all uses ShortBuffer
             return true;
         }
-        if (type1.getFormat() == type2.getFormat()) {
-            return true;
-        }
-        return type1.isInteger() && type2.isInteger();
+        return type1 == type2 || (type1.isInteger() && type2.isInteger());
     }
 
     /**

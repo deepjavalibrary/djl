@@ -92,6 +92,15 @@ public class BaseNDManagerTest {
         BaseNDManager.validateBuffer(DoubleBuffer.allocate(4), DataType.FLOAT64, 4);
     }
 
+    @Test
+    public void testValidateBufferRejectsDoubleForComplex64() {
+        Assert.assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        BaseNDManager.validateBuffer(
+                                DoubleBuffer.allocate(1), DataType.COMPLEX64, 1));
+    }
+
     /** {@link BaseNDManager#toBufferSize} rejects negative counts and byte counts beyond int. */
     @Test
     public void testToBufferSize() {

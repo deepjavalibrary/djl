@@ -23,11 +23,8 @@ JNIEXPORT jlong JNICALL Java_ai_djl_pytorch_jni_PyTorchLibrary_torchFromBlob(JNI
   API_BEGIN()
   const auto shape_vec = djl::utils::jni::GetVecFromJLongArray(env, jshape);
   const auto device = utils::GetDeviceFromJDevice(env, jdevice);
-  auto options = torch::TensorOptions().requires_grad(JNI_TRUE == jrequired_grad);
-  // DJL's UNKNOWN type
-  if (jdtype != 8) {
-    options = options.dtype(utils::GetScalarTypeFromDType(jdtype));
-  }
+  const auto options =
+      torch::TensorOptions().dtype(utils::GetScalarTypeFromDType(jdtype)).requires_grad(JNI_TRUE == jrequired_grad);
   // the java side hold the reference for the directByteBuffer
   void* address = utils::GetValidatedDirectBufferAddress(env, jbuffer, shape_vec, options.dtype().itemsize());
   torch::Tensor result = torch::from_blob(address, shape_vec, options);

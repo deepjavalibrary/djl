@@ -14,6 +14,7 @@ package ai.djl.pytorch.engine;
 
 import ai.djl.Device;
 import ai.djl.engine.Engine;
+import ai.djl.engine.EngineException;
 import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
@@ -66,6 +67,9 @@ public class PtNDManager extends BaseNDManager {
     /** {@inheritDoc} */
     @Override
     public PtNDArray create(Buffer data, Shape shape, DataType dataType) {
+        if (dataType.getNumOfBytes() <= 0) {
+            throw new EngineException("Unsupported PyTorch buffer data type: " + dataType);
+        }
         int size = Math.toIntExact(shape.size());
         BaseNDManager.validateBuffer(data, dataType, size);
         if (data.isDirect() && data instanceof ByteBuffer) {
